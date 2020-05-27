@@ -51,7 +51,7 @@
                           {url: document.URL.split('/apidoc')[0] + "/apidoc/openapi3/apis/single", name: "Controller resources - RestConf draft02"}];
       var devices = JSON.parse(xmlHttp.responseText);
       for (var i =0; i < devices.length; i++) {
-        var device_name = devices[i]['instance'].split('node=')[1].replace('/', '');
+        var device_name = devices[i]['instance'].split('=')[1].replace('/', '');
         var dveice_id = devices[i]['id'];
         var dict = {
           url: base_url_rfc + dveice_id,
