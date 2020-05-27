@@ -83,8 +83,8 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     public void setUp() throws Exception {
         schemaContext = BASE_SCHEMAS.getBaseSchemaWithNotifications().getEffectiveModelContext();
         final DataSchemaNode schemasNode =
-                ((ContainerSchemaNode) schemaContext
-                        .getDataChildByName(NetconfState.QNAME)).getDataChildByName(Schemas.QNAME);
+                ((ContainerSchemaNode) schemaContext.findDataChildByName(NetconfState.QNAME).orElseThrow())
+                .findDataChildByName(Schemas.QNAME).orElseThrow();
 
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);

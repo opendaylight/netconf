@@ -317,7 +317,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, LIBRARY_CONTEXT,
-                    LIBRARY_CONTEXT.getDataChildByName(ModulesState.QNAME));
+                    LIBRARY_CONTEXT.findDataChildByName(ModulesState.QNAME).orElseThrow());
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             final NormalizedNode<?, ?> parsed = resultHolder.getResult();
             return Optional.of(parsed);

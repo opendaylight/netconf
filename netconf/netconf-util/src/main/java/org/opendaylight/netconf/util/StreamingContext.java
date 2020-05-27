@@ -59,8 +59,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         // We try to look up if this node was added by augmentation
         if (schema instanceof DataSchemaNode && result.isAugmenting()) {
             for (final AugmentationSchemaNode aug : ((AugmentationTarget)schema).getAvailableAugmentations()) {
-                final DataSchemaNode found = aug.getDataChildByName(result.getQName());
-                if (found != null) {
+                if (aug.findDataChildByName(result.getQName()).isPresent()) {
                     return new Augmentation(aug, schema);
                 }
             }
@@ -98,22 +97,20 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
     abstract boolean isMixin();
 
     private static Optional<DataSchemaNode> findChildSchemaNode(final DataNodeContainer parent, final QName child) {
-        DataSchemaNode potential = parent.getDataChildByName(child);
-        if (potential == null) {
-            potential = findChoice(Iterables.filter(parent.getChildNodes(), ChoiceSchemaNode.class), child);
-        }
-        return Optional.ofNullable(potential);
+        final Optional<DataSchemaNode> potential = parent.findDataChildByName(child);
+        return potential.isPresent() ? potential
+                : findChoice(Iterables.filter(parent.getChildNodes(), ChoiceSchemaNode.class), child);
     }
 
-    private static ChoiceSchemaNode findChoice(final Iterable<ChoiceSchemaNode> choices, final QName child) {
+    private static Optional<DataSchemaNode> findChoice(final Iterable<ChoiceSchemaNode> choices, final QName child) {
         for (final ChoiceSchemaNode choice : choices) {
             for (final CaseSchemaNode caze : choice.getCases()) {
                 if (findChildSchemaNode(caze, child).isPresent()) {
-                    return choice;
+                    return Optional.of(choice);
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private static StreamingContext<?> fromListSchemaNode(final ListSchemaNode potential) {
