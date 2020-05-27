@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,9 +71,8 @@ public class NodeContainerProxyTest {
     }
 
     @Test
-    public void testGetDataChildByName() throws Exception {
-        final DataSchemaNode schemaNode = proxy.getDataChildByName(NODE_1_QNAME);
-        assertEquals(schemaNode1, schemaNode);
+    public void testFindDataChildByName() {
+        assertEquals(Optional.of(schemaNode1), proxy.findDataChildByName(NODE_1_QNAME));
     }
 
     @Test
