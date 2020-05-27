@@ -68,12 +68,6 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
         this.domSchemaService = domSchemaService;
     }
 
-    @Deprecated
-    public static SchemaContextHandler newInstance(final TransactionChainHandler transactionChainHandler,
-            final DOMSchemaService domSchemaService) {
-        return new SchemaContextHandler(transactionChainHandler, domSchemaService);
-    }
-
     @PostConstruct
     public void init() {
         listenerRegistration = domSchemaService.registerSchemaContextListener(this);

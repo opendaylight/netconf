@@ -50,7 +50,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.Keepa
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.input.source.ConfigSource;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -63,7 +62,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Provides base operations for netconf e.g. get, get-config, edit-config, (un)lock, commit etc.
@@ -76,11 +74,6 @@ public final class NetconfBaseOps {
     private final DOMRpcService rpc;
     private final MountPointContext mountContext;
     private final RpcStructureTransformer transformer;
-
-    @Deprecated
-    public NetconfBaseOps(final DOMRpcService rpc, final EffectiveModelContext schemaContext) {
-        this(rpc, new EmptyMountPointContext(schemaContext));
-    }
 
     public NetconfBaseOps(final DOMRpcService rpc, final MountPointContext mountContext) {
         this.rpc = rpc;

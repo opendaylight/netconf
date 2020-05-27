@@ -282,7 +282,7 @@ public final class TestUtils {
         doReturn(mockTx).when(mockChain).newWriteOnlyTransaction();
 
         doReturn(mockChain).when(mockDataBroker).createTransactionChain(any());
-        SchemaContextHandler schemaContextHandler = SchemaContextHandler.newInstance(
+        SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
                 new TransactionChainHandler(mockDataBroker), Mockito.mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(schemaContext);
         return schemaContextHandler;

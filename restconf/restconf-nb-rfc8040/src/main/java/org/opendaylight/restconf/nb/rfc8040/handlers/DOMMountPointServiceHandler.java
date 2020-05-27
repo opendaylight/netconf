@@ -16,7 +16,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 
 /**
  * Implementation of {@link DOMMountPointServiceHandler}.
- *
  */
 @Singleton
 public final class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
@@ -31,11 +30,6 @@ public final class DOMMountPointServiceHandler implements Handler<DOMMountPointS
     @Inject
     public DOMMountPointServiceHandler(final @Reference DOMMountPointService domMountPointService) {
         this.domMountPointService = requireNonNull(domMountPointService);
-    }
-
-    @Deprecated
-    public static DOMMountPointServiceHandler newInstance(final DOMMountPointService domMountPointService) {
-        return new DOMMountPointServiceHandler(domMountPointService);
     }
 
     @Override

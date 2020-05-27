@@ -671,7 +671,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void toActionRequestConflictingInListTest() {
         QName barInputQname = QName.create(BAR_QNAME, "bar");
         QName barIdQname = QName.create(BAR_QNAME, "bar-id");
-        Byte barInput = new Byte("1");
+        Byte barInput = 1;
 
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(BAR_QNAME));

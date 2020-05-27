@@ -7,20 +7,20 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 
-import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -30,7 +30,6 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 
 public class YangLibrarySchemaYangSourceProviderTest {
-
     private SourceIdentifier workingSid;
     private YangLibrarySchemaYangSourceProvider yangLibrarySchemaYangSourceProvider;
 
@@ -47,8 +46,9 @@ public class YangLibrarySchemaYangSourceProviderTest {
     public void testGetSource() throws Exception {
         ListenableFuture<? extends YangTextSchemaSource> source = yangLibrarySchemaYangSourceProvider
                 .getSource(workingSid);
-        final String x = new String(ByteStreams.toByteArray(source.get().openStream()));
-        Assert.assertThat(x, CoreMatchers.containsString("module config-test-rpc"));
+
+        final String x = source.get().asCharSource(StandardCharsets.UTF_8).read();
+        assertThat(x, containsString("module config-test-rpc"));
     }
 
     @Test
@@ -59,17 +59,14 @@ public class YangLibrarySchemaYangSourceProviderTest {
         final YangLibrarySchemaYangSourceProvider failingYangLibrarySchemaYangSourceProvider =
                 new YangLibrarySchemaYangSourceProvider(id, sourceIdentifierURLMap);
 
-        try {
-            failingYangLibrarySchemaYangSourceProvider.getSource(workingSid).get();
-            fail();
-        } catch (ExecutionException e) {
-            final Throwable cause = e.getCause();
-            assertTrue(cause instanceof SchemaSourceException);
-        }
+        final ListenableFuture<?> future = failingYangLibrarySchemaYangSourceProvider.getSource(workingSid);
+        final ExecutionException ex = assertThrows(ExecutionException.class, () -> future.get());
+        assertThat(ex.getCause(), instanceOf(SchemaSourceException.class));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGetSourceNotAvailable() throws Exception {
-        yangLibrarySchemaYangSourceProvider.getSource(RevisionSourceIdentifier.create("aaaaa"));
+        assertThrows(IllegalArgumentException.class,
+            () -> yangLibrarySchemaYangSourceProvider.getSource(RevisionSourceIdentifier.create("aaaaa")));
     }
 }

@@ -36,7 +36,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
@@ -156,7 +155,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
         final Node node = new NodeBuilder()
                 .withKey(new NodeKey(nodeId))
                 .setNodeId(nodeId)
-                .addAugmentation(NetconfNode.class, netconfNode)
+                .addAugmentation(netconfNode)
                 .build();
 
         final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
@@ -221,20 +220,19 @@ public class NetconfCommandsImpl implements NetconfCommands {
             final String newPassword = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.PASSWORD))
                     ? updated.get(NetconfConsoleConstants.PASSWORD) : password;
 
-            final Credentials credentials =
-                    new LoginPasswordBuilder().setPassword(newPassword).setUsername(newUsername).build();
-            final NetconfNode updatedNetconfNode = new NetconfNodeBuilder()
-                    .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
-                    .setPort(new PortNumber(Uint16.valueOf(Integer.decode(devicePort))))
-                    .setTcpOnly(tcpOnly)
-                    .setSchemaless(isSchemaless)
-                    .setCredentials(credentials)
-                    .build();
-
             final Node updatedNode = new NodeBuilder()
                     .withKey(node.key())
                     .setNodeId(node.getNodeId())
-                    .addAugmentation(NetconfNode.class, updatedNetconfNode)
+                    .addAugmentation(new NetconfNodeBuilder()
+                        .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
+                        .setPort(new PortNumber(Uint16.valueOf(Integer.decode(devicePort))))
+                        .setTcpOnly(tcpOnly)
+                        .setSchemaless(isSchemaless)
+                        .setCredentials(new LoginPasswordBuilder()
+                            .setPassword(newPassword)
+                            .setUsername(newUsername)
+                            .build())
+                        .build())
                     .build();
 
             final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();

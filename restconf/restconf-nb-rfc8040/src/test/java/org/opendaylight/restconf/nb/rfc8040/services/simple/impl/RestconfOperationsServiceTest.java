@@ -16,8 +16,9 @@ import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -33,6 +34,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfOperationsServiceTest {
 
     @Mock
@@ -49,11 +51,10 @@ public class RestconfOperationsServiceTest {
 
     @Before
     public void init() throws Exception {
-        MockitoAnnotations.initMocks(this);
         this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
         this.schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
 
-        this.domMountPointServiceHandler = DOMMountPointServiceHandler.newInstance(this.domMountPointService);
+        this.domMountPointServiceHandler = new DOMMountPointServiceHandler(this.domMountPointService);
 
         final QNameModule module1 = QNameModule.create(URI.create("module:1"));
         final QNameModule module2 = QNameModule.create(URI.create("module:2"));

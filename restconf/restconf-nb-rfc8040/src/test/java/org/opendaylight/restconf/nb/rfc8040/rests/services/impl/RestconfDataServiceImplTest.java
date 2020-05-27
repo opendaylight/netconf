@@ -197,12 +197,12 @@ public class RestconfDataServiceImplTest {
 
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
-        final SchemaContextHandler schemaContextHandler = SchemaContextHandler.newInstance(transactionChainHandler,
+        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(transactionChainHandler,
                 Mockito.mock(DOMSchemaService.class));
 
         schemaContextHandler.onModelContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
-                DOMMountPointServiceHandler.newInstance(mountPointService), this.delegRestconfSubscrService,
+                new DOMMountPointServiceHandler(mountPointService), this.delegRestconfSubscrService,
                 this.actionServiceHandler);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));

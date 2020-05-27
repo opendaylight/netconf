@@ -192,7 +192,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockDOMDataBroker);
 
         final DOMMountPointServiceHandler mountPointServiceHandler =
-                DOMMountPointServiceHandler.newInstance(mockMountPointService);
+                new DOMMountPointServiceHandler(mockMountPointService);
 
         final DOMNotificationService mockNotificationService = mock(DOMNotificationService.class);
         final ServicesWrapper servicesWrapper = ServicesWrapper.newInstance(schemaContextHandler,
