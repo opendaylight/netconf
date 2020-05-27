@@ -14,7 +14,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
@@ -30,9 +30,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -57,6 +58,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class YangLibProviderTest {
     private static final File CACHE_DIR = new File("target/yanglib");
 
@@ -82,8 +84,6 @@ public class YangLibProviderTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         try {
             if (CACHE_DIR.exists()) {
                 FileUtils.cleanDirectory(CACHE_DIR);
@@ -152,7 +152,7 @@ public class YangLibProviderTest {
         List<PotentialSchemaSource<?>> potentialSources = Collections.emptyList();
         yangLibProvider.schemaSourceRegistered(potentialSources);
 
-        verifyZeroInteractions(dataBroker, writeTransaction);
+        verifyNoMoreInteractions(dataBroker, writeTransaction);
 
         // test list of non yang schema sources registered
         // expected behavior is to do nothing
@@ -168,7 +168,7 @@ public class YangLibProviderTest {
                         ASTSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         yangLibProvider.schemaSourceRegistered(potentialSources);
-        verifyZeroInteractions(dataBroker, writeTransaction);
+        verifyNoMoreInteractions(dataBroker, writeTransaction);
 
         // add yang schema source to list
         potentialSources.add(
@@ -200,7 +200,7 @@ public class YangLibProviderTest {
         yangLibProvider.schemaSourceUnregistered(nonYangSource);
 
         // expected behaviour is to do nothing if non yang based source is unregistered
-        verifyZeroInteractions(dataBroker, writeTransaction);
+        verifyNoMoreInteractions(dataBroker, writeTransaction);
     }
 
     @Test

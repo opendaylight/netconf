@@ -93,7 +93,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(domTx).when(dataBroker).createTransactionChain(any());
 
         transactionHandler = new TransactionChainHandler(dataBroker);
-        schemaHandler = SchemaContextHandler.newInstance(transactionHandler, mock(DOMSchemaService.class));
+        schemaHandler = new SchemaContextHandler(transactionHandler, mock(DOMSchemaService.class));
 
         DOMDataTreeChangeService dataTreeChangeService = mock(DOMDataTreeChangeService.class);
         doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)

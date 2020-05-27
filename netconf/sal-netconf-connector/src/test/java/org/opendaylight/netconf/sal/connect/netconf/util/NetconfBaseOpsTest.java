@@ -24,9 +24,10 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -51,6 +52,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfBaseOpsTest extends AbstractTestModelTest {
     private static final QName CONTAINER_Q_NAME = QName.create("test:namespace", "2013-07-22", "c");
 
@@ -66,7 +68,6 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         final InputStream okStream = getClass().getResourceAsStream("/netconfMessages/rpc-reply_ok.xml");
         final InputStream dataStream = getClass().getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
         final NetconfMessage ok = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
@@ -95,7 +96,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         callback = new NetconfRpcFutureCallback("prefix", id);
-        baseOps = new NetconfBaseOps(rpc, SCHEMA_CONTEXT);
+        baseOps = new NetconfBaseOps(rpc, new EmptyMountPointContext(SCHEMA_CONTEXT));
     }
 
     @Test

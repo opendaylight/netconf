@@ -85,8 +85,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         domDataBroker = getDomBroker();
 
         transactionChainHandler = new TransactionChainHandler(domDataBroker);
-        schemaContextHandler = SchemaContextHandler.newInstance(transactionChainHandler,
-                Mockito.mock(DOMSchemaService.class));
+        schemaContextHandler = new SchemaContextHandler(transactionChainHandler, Mockito.mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(SCHEMA_CONTEXT);
     }
 
