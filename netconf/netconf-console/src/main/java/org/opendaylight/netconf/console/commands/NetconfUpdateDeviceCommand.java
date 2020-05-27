@@ -47,6 +47,7 @@ public class NetconfUpdateDeviceCommand implements Action {
             aliases = { "--username" },
             description = "Username for NETCONF connection",
             required = true,
+            censor = true,
             multiValued = false)
     private String username;
 
@@ -54,6 +55,7 @@ public class NetconfUpdateDeviceCommand implements Action {
             aliases = { "--password" },
             description = "Password for NETCONF connection",
             required = true,
+            censor = true,
             multiValued = false)
     private String password;
 
