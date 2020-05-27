@@ -76,6 +76,7 @@ public class NetconfConnectDeviceCommand implements Action {
             aliases = { "--username" },
             description = "Username for netconf connection",
             required = false,
+            censor = true,
             multiValued = false)
     private String username;
 
@@ -83,6 +84,7 @@ public class NetconfConnectDeviceCommand implements Action {
             aliases = { "--password" },
             description = "Password for netconf connection",
             required = false,
+            censor = true,
             multiValued = false)
     private String password;
 
