@@ -1,4 +1,22 @@
 {
   "pushCert": "certificate version 0.1\npusher 67A363D10814EEE4 1590402331 +0530\npushee ssh://git.opendaylight.org:29418/netconf.git\nnonce 1590402331-5D101C52CCD881481DAA9764AEE0153F412ACA10\n\n0000000000000000000000000000000000000000 2ea44a768491daf3d5ed93f48844bd65a1891e5b refs/for/master\n-----BEGIN PGP SIGNATURE-----\n\niQGzBAABCgAdFiEEsMMTALql+Uq3GCZGZ6Nj0QgU7uQFAl7LnRsACgkQZ6Nj0QgU\n7uTEKwv/RvrFC+fz9i2Njwi81JuxfvTdZ+CdMnTXYz9xs8CNbiNwIspa/pUFckiQ\nsM5e9p40AUhne6dtWy9FqkD3U8hVbBsbbEaHjf7XaGAn2kFtlhzpREWF5o3LmqII\nPZjRKqlvvZeBUtR6BaAJ11k1ZplwySBVJwTz6mA74T33Jl1gejvLp3kN4hyjrg1V\nWFuGa1nT4YqoHl5xFH3dgDLaFL25zZVY1a/klhtywMhmZqmv0hsZI2Eh7vkg3Anb\nvJcWKCJT563/Kx8pSWw/9tgS84CH6u6EvVhua3ZK0zoLNzpowdIs/rLHsg+9qiFE\n7TsCfUApUAXzibMu0rYUhzeDXpB7KB9mN3Wwmw30LrM5OOZu7zfpOakhoOY674sB\nzKFu/kGt9hujg9MRLZ84C119917wyqQHqoHwZE11/T7p3LXZ9vSlwAs/4b1UC+o5\nL5XWqEQoG0DPEMv9eLhdqcS1abdePCwbTyO9QkAW5IhnC+BvP6PepW+foqGEF6Tx\nkpczbC2g\n\u003dAf7B\n-----END PGP SIGNATURE-----\n",
-  "comments": []
+  "comments": [
+    {
+      "key": {
+        "uuid": "f51327c2_fb9f345b",
+        "filename": "restconf/restconf-nb-bierman02/src/test/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapterTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 8351
+      },
+      "writtenOn": "2020-05-29T12:36:49Z",
+      "side": 1,
+      "message": "Please also add a JUnit test for the new flag",
+      "revId": "2ea44a768491daf3d5ed93f48844bd65a1891e5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
 }
