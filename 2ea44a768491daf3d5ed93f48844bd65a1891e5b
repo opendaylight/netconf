@@ -17,6 +17,24 @@
       "revId": "2ea44a768491daf3d5ed93f48844bd65a1891e5b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8f132846_1beb7140",
+        "filename": "restconf/restconf-nb-bierman02/src/test/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapterTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-05-31T16:20:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f51327c2_fb9f345b",
+      "revId": "2ea44a768491daf3d5ed93f48844bd65a1891e5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
