@@ -28,12 +28,11 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
           <artifactId>org.apache.karaf.shell.console</artifactId>
           <scope>provided</scope>
       </dependency>
-
-      <!-- Project Dependencies -->
       <dependency>
           <groupId>org.opendaylight.netconf</groupId>
           <artifactId>sal-netconf-connector</artifactId>
       </dependency>
+
       <dependency>
           <groupId>org.opendaylight.yangtools</groupId>
           <artifactId>yang-test-util</artifactId>
@@ -45,7 +44,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
       <dependency>
           <groupId>org.awaitility</groupId>
           <artifactId>awaitility</artifactId>
-          <scope>test</scope>
       </dependency>
   </dependencies>
 
