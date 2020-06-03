@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import java.util.Set;
-import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketSessionHandler;
+import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSESessionHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 /**
@@ -21,12 +21,12 @@ public interface BaseListenerInterface extends AutoCloseable {
      *
      * @return Set of all subscribers.
      */
-    Set<WebSocketSessionHandler> getSubscribers();
+    Set<SSESessionHandler> getSubscribers();
 
     /**
-     * Checks if exists at least one {@link WebSocketSessionHandler} subscriber.
+     * Checks if exists at least one {@link SSESessionHandler} subscriber.
      *
-     * @return {@code true} if exist at least one {@link WebSocketSessionHandler} subscriber, {@code false} otherwise.
+     * @return {@code true} if exist at least one {@link SSESessionHandler} subscriber, {@code false} otherwise.
      */
     boolean hasSubscribers();
 
@@ -45,18 +45,18 @@ public interface BaseListenerInterface extends AutoCloseable {
     String getOutputType();
 
     /**
-     * Registers {@link WebSocketSessionHandler} subscriber.
+     * Registers {@link SSESessionHandler} subscriber.
      *
-     * @param subscriber Web-socket session handler.
+     * @param subscriber SSE session handler.
      */
-    void addSubscriber(WebSocketSessionHandler subscriber);
+    void addSubscriber(SSESessionHandler subscriber);
 
     /**
-     * Removes {@link WebSocketSessionHandler} subscriber.
+     * Removes {@link SSESessionHandler} subscriber.
      *
-     * @param subscriber Web-socket session handler.
+     * @param subscriber SSE session handler.
      */
-    void removeSubscriber(WebSocketSessionHandler subscriber);
+    void removeSubscriber(SSESessionHandler subscriber);
 
     /**
      * Sets {@link ListenerRegistration} registration.
