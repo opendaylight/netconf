@@ -19,7 +19,10 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSEInitializer;
 import org.opendaylight.restconf.nb.rfc8040.web.WebInitializer;
 
 /**
@@ -36,6 +39,7 @@ import org.opendaylight.restconf.nb.rfc8040.web.WebInitializer;
 @Singleton
 public class Rfc8040RestConfWiring {
     private final ServicesWrapper servicesWrapper;
+    private final ServicesNotifWrapper servicesNotifWrapper;
 
     @Inject
     public Rfc8040RestConfWiring(final SchemaContextHandler schemaCtxHandler,
@@ -44,13 +48,21 @@ public class Rfc8040RestConfWiring {
             final DOMDataBrokerHandler domDataBrokerHandler, final RpcServiceHandler rpcServiceHandler,
             final ActionServiceHandler actionServiceHandler,
             final NotificationServiceHandler notificationServiceHandler,
+            final SSEInitializer sseInit,
+            final Configuration configuration,
             @Reference final DOMSchemaService domSchemaService) {
         servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, domMountPointServiceHandler,
             transactionChainHandler, domDataBrokerHandler, rpcServiceHandler, actionServiceHandler,
-            notificationServiceHandler, domSchemaService);
+            notificationServiceHandler, domSchemaService, configuration);
+        servicesNotifWrapper = ServicesNotifWrapper.newInstance(sseInit);
     }
 
     public ServicesWrapper getServicesWrapper() {
         return servicesWrapper;
     }
+
+    public ServicesNotifWrapper getServicesNotifWrapper() {
+        return servicesNotifWrapper;
+    }
+
 }

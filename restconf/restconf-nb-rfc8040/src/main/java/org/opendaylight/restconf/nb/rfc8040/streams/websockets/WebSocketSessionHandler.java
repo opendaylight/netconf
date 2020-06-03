@@ -26,6 +26,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.opendaylight.restconf.nb.rfc8040.streams.SessionHandlerInterface;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * to data-change-event or notification listener, and sending of data over established web-socket session.
  */
 @WebSocket
-public class WebSocketSessionHandler {
+public class WebSocketSessionHandler implements SessionHandlerInterface {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketSessionHandler.class);
     private static final byte[] PING_PAYLOAD = "ping".getBytes(Charset.defaultCharset());
@@ -225,6 +226,15 @@ public class WebSocketSessionHandler {
             return Optional.of(session.getRemote().getInetSocketAddress());
         } else {
             return Optional.empty();
+        }
+    }
+
+    @Override
+    public synchronized boolean isConnected() {
+        if (session != null && session.isOpen()) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
