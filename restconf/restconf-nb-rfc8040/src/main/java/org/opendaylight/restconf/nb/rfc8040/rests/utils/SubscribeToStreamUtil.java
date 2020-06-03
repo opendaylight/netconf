@@ -288,18 +288,9 @@ public final class SubscribeToStreamUtil {
     }
 
     static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
-        final String scheme = uriInfo.getAbsolutePath().getScheme();
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-        switch (scheme) {
-            case RestconfStreamsConstants.SCHEMA_UPGRADE_SECURED_URI:
-                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_SECURED_URI);
-                break;
-            case RestconfStreamsConstants.SCHEMA_UPGRADE_URI:
-            default:
-                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI);
-        }
-        return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + RestconfConstants.SLASH + streamName)
-                .build();
+        return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + RestconfConstants.SLASH
+                + RestconfConstants.NOTIF + RestconfConstants.SLASH + streamName).build();
     }
 
     /**
