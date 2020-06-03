@@ -24,6 +24,7 @@ import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
+import org.opendaylight.restconf.nb.rfc8040.RestconfNotifApplication;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -40,27 +41,27 @@ public class WebInitializer {
 
     @Inject
     public WebInitializer(@Reference WebServer webServer, @Reference WebContextSecurer webContextSecurer,
-            @Reference ServletSupport servletSupport, RestconfApplication webApp,
+            @Reference ServletSupport servletSupport, RestconfApplication webApp,RestconfNotifApplication webAppNotif,
             @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig,
             WebSocketInitializer webSocketServlet) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath(RestconfConstants.BASE_URI_PATTERN)
                 .supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                         .addUrlPattern("/*").build())
+                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webAppNotif)
+                        .build()).asyncSupported(true).addUrlPattern("/notif/*").name("notificationServlet").build())
                 .addServlet(ServletDetails.builder().servlet(webSocketServlet).addAllUrlPatterns(Lists.newArrayList(
                         RestconfStreamsConstants.DATA_CHANGE_EVENT_STREAM_PATTERN,
                         RestconfStreamsConstants.YANG_NOTIFICATION_STREAM_PATTERN)).build())
-
                 // Allows user to add javax.servlet.Filter(s) in front of REST services
                 .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
-                    .addUrlPattern("/*").build())
-
+                    .addUrlPattern("/*").asyncSupported(true).build())
                 .addFilter(FilterDetails.builder().filter(new org.eclipse.jetty.servlets.GzipFilter())
                     .putInitParam("mimeTypes",
                         "application/xml,application/yang.data+xml,xml,application/json,application/yang.data+json")
-                    .addUrlPattern("/*").build());
+                    .addUrlPattern("/*").asyncSupported(true).build());
 
-        webContextSecurer.requireAuthentication(webContextBuilder, "/*");
+        webContextSecurer.requireAuthentication(webContextBuilder, true , "/*");
 
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
