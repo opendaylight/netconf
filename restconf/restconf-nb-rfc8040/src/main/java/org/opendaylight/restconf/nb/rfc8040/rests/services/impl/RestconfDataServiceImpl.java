@@ -55,7 +55,14 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
+<<<<<<< HEAD   (3101cd Return Location in resp header for notif subscrip)
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+=======
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
+import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+>>>>>>> CHANGE (407283 RESTCONF RFC8040 compliance: SSE support)
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -88,6 +95,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
+    private final SubscribeToStreamUtil streamUtils;
 
     // FIXME: evaluate thread-safety of updates (synchronized) vs. access (mostly unsynchronized) here
     private SchemaContextHandler schemaContextHandler;
@@ -99,12 +107,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final TransactionChainHandler transactionChainHandler,
             final DOMMountPointServiceHandler mountPointServiceHandler,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final ActionServiceHandler actionServiceHandler) {
+            final ActionServiceHandler actionServiceHandler,
+            final Configuration configuration) {
         this.actionServiceHandler = requireNonNull(actionServiceHandler);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.mountPointServiceHandler = requireNonNull(mountPointServiceHandler);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
+        streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
+                : SubscribeToStreamUtil.webSockets();
     }
 
     @Override
@@ -167,14 +178,93 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node, parameters)).build();
     }
 
+<<<<<<< HEAD   (3101cd Return Location in resp header for notif subscrip)
+=======
+    /**
+     * Read specific type of data from data store via transaction and if identifier read data from
+     * streams then put streams from actual schema context to datastore.
+     *
+     * @param identifier    identifier of data to read
+     * @param content       type of data to read (config, state, all)
+     * @param strategy      {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa      value of with-defaults parameter
+     * @param schemaContext schema context
+     * @param uriInfo       uri info
+     * @return {@link NormalizedNode}
+     */
+    private NormalizedNode<?, ?> readData(final String identifier, final String content,
+            final RestconfStrategy strategy, final String withDefa, final EffectiveModelContext schemaContext,
+            final UriInfo uriInfo) {
+        if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
+            createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
+        }
+        return ReadDataTransactionUtil.readData(content, strategy, withDefa, schemaContext);
+    }
+
+    private void createAllYangNotificationStreams(final RestconfStrategy strategy,
+            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
+        strategy.prepareReadWriteExecution();
+        final boolean exist = checkExist(schemaContext, strategy);
+
+        for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
+            final NotificationListenerAdapter notifiStreamXML =
+                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
+                    NotificationOutputType.XML);
+            final NotificationListenerAdapter notifiStreamJSON =
+                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
+                    NotificationOutputType.JSON);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamXML);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamJSON);
+        }
+        try {
+            strategy.commit().get();
+        } catch (final InterruptedException | ExecutionException e) {
+            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
+        }
+    }
+
+    private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
+            final UriInfo uriInfo, final RestconfStrategy strategy, final boolean exist,
+            final NotificationListenerAdapter listener) {
+        final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
+        final NormalizedNode<?, ?> mapToStreams =
+            RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+                listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
+                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
+        writeDataToDS(schemaContext,
+            listener.getSchemaPath().getLastComponent().getLocalName(), strategy, exist, mapToStreams);
+    }
+
+    private static boolean checkExist(final EffectiveModelContext schemaContext, final RestconfStrategy strategy) {
+        try {
+            return strategy.exists(LogicalDatastoreType.OPERATIONAL,
+                IdentifierCodec.deserialize(Rfc8040.MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
+        } catch (final InterruptedException | ExecutionException exception) {
+            throw new RestconfDocumentedException("Problem while checking data if exists", exception);
+        }
+    }
+
+    private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
+                                      final RestconfStrategy strategy, final boolean exist,
+                                      final NormalizedNode<?, ?> mapToStreams) {
+        final String pathId;
+        if (exist) {
+            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
+        } else {
+            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
+        }
+        strategy.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
+            mapToStreams);
+    }
+
+>>>>>>> CHANGE (407283 RESTCONF RFC8040 compliance: SSE support)
     @Override
     public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
-                .getInstanceIdentifierContext();
+        final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
 
         PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
         PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);

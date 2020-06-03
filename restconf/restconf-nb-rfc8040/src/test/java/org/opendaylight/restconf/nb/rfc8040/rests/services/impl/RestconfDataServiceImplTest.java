@@ -63,6 +63,13 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+<<<<<<< HEAD   (3101cd Return Location in resp header for notif subscrip)
+=======
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+>>>>>>> CHANGE (407283 RESTCONF RFC8040 compliance: SSE support)
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -123,6 +130,8 @@ public class RestconfDataServiceImplTest {
     private DOMTransactionChain mountTransactionChain;
     @Mock
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
+    @Mock
+    private Configuration configuration;
 
     @Before
     public void setUp() throws Exception {
@@ -201,8 +210,13 @@ public class RestconfDataServiceImplTest {
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
+<<<<<<< HEAD   (3101cd Return Location in resp header for notif subscrip)
                 DOMMountPointServiceHandler.newInstance(mountPointService), this.delegRestconfSubscrService,
                 this.actionServiceHandler);
+=======
+                new DOMMountPointServiceHandler(mountPointService), this.delegRestconfSubscrService,
+                this.actionServiceHandler, configuration);
+>>>>>>> CHANGE (407283 RESTCONF RFC8040 compliance: SSE support)
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(this.contextRef.get()).when(this.mountPoint).getSchemaContext();

@@ -22,6 +22,7 @@ public final class RestconfConstants {
     public static final char SLASH = '/';
     public static final Splitter SLASH_SPLITTER = Splitter.on(SLASH);
     public static final String BASE_URI_PATTERN = "rests";
+    public static final String NOTIF = "notif";
 
     private RestconfConstants() {
         throw new UnsupportedOperationException("Util class");

@@ -1,0 +1,19 @@
+<<<<<<< HEAD   (3101cd Return Location in resp header for notif subscrip)
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2020 PANTHEON.tech, s.r.o. and others.
+  ~
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  ~ and is available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-restconf-nb-rfc8040-${project.version}">
+    <feature name="odl-restconf-nb-rfc8040" version="${project.version}">
+        <feature version="[2,3)">odl-controller-exp-netty-config</feature>
+        <configfile finalname="etc/org.opendaylight.restconf.nb.rfc8040.cfg">
+            mvn:org.opendaylight.netconf/restconf-nb-rfc8040/${project.version}/cfg/config
+        </configfile>
+    </feature>
+</features>
+>>>>>>> CHANGE (407283 RESTCONF RFC8040 compliance: SSE support)

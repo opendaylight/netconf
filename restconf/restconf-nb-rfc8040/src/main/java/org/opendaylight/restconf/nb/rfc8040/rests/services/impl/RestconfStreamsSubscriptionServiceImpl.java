@@ -7,8 +7,15 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +36,23 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+<<<<<<< HEAD   (3101cd Return Location in resp header for notif subscrip)
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.SubscribeToStreamUtil;
+=======
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+>>>>>>> CHANGE (407283 RESTCONF RFC8040 compliance: SSE support)
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +61,9 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSubscriptionService {
-
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
+
+    private final SubscribeToStreamUtil streamUtils;
 
     private HandlersHolder handlersHolder;
 
@@ -59,12 +78,16 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      *             handler of {@link SchemaContext}
      * @param transactionChainHandler
      *             handler of {@link DOMTransactionChain}
+     * @param configuration
+     *             configuration for restconf {@link Configuration}}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
             final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler,
-            final TransactionChainHandler transactionChainHandler) {
+            final TransactionChainHandler transactionChainHandler, final Configuration configuration) {
         this.handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationServiceHandler,
                 transactionChainHandler, schemaHandler);
+        streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
+                : SubscribeToStreamUtil.webSockets();
     }
 
     @Override
@@ -80,33 +103,54 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
         final NotificationQueryParams notificationQueryParams = NotificationQueryParams.fromUriInfo(uriInfo);
 
-        URI response = null;
+        final URI response;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = SubscribeToStreamUtil.subscribeToDataStream(identifier, uriInfo, notificationQueryParams,
+            response = streamUtils.subscribeToDataStream(identifier, uriInfo, notificationQueryParams,
                     this.handlersHolder);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            response = SubscribeToStreamUtil.subscribeToYangStream(identifier, uriInfo, notificationQueryParams,
+            response = streamUtils.subscribeToYangStream(identifier, uriInfo, notificationQueryParams,
                     this.handlersHolder);
+        } else {
+            final String msg = "Bad type of notification of sal-remote";
+            LOG.warn(msg);
+            throw new RestconfDocumentedException(msg);
         }
 
-        if (response != null) {
-            // prepare node with value of location
-            final InstanceIdentifierContext<?> iid =
-                    SubscribeToStreamUtil.prepareIIDSubsStreamOutput(this.handlersHolder.getSchemaHandler());
-            final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
-                    ImmutableLeafNodeBuilder.create().withValue(response.toString());
-            builder.withNodeIdentifier(NodeIdentifier.create(RestconfStreamsConstants.LOCATION_QNAME));
+        // prepare node with value of location
+        final InstanceIdentifierContext<?> iid = prepareIIDSubsStreamOutput(this.handlersHolder.getSchemaHandler());
+        final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
+                ImmutableLeafNodeBuilder.create().withValue(response.toString());
+        builder.withNodeIdentifier(NodeIdentifier.create(RestconfStreamsConstants.LOCATION_QNAME));
 
-            // prepare new header with location
-            final Map<String, Object> headers = new HashMap<>();
-            headers.put("Location", response);
+        // prepare new header with location
+        final Map<String, Object> headers = new HashMap<>();
+        headers.put("Location", response);
 
-            return new NormalizedNodeContext(iid, builder.build(), headers);
-        }
+        return new NormalizedNodeContext(iid, builder.build(), headers);
+    }
 
-        final String msg = "Bad type of notification of sal-remote";
-        LOG.warn(msg);
-        throw new RestconfDocumentedException(msg);
+    /**
+     * Prepare InstanceIdentifierContext for Location leaf.
+     *
+     * @param schemaHandler Schema context handler.
+     * @return InstanceIdentifier of Location leaf.
+     */
+    private static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
+        final Optional<Module> module = schemaHandler.get()
+                .findModule(RestconfStreamsConstants.NOTIFI_QNAME.getModule());
+        Preconditions.checkState(module.isPresent());
+        final Optional<DataSchemaNode> notify = module.get()
+                .findDataChildByName(RestconfStreamsConstants.NOTIFI_QNAME);
+        Preconditions.checkState(notify.isPresent());
+        final Optional<DataSchemaNode> location = ((ContainerSchemaNode) notify.get())
+                .findDataChildByName(RestconfStreamsConstants.LOCATION_QNAME);
+        Preconditions.checkState(location.isPresent());
+
+        final List<PathArgument> path = new ArrayList<>();
+        path.add(NodeIdentifier.create(RestconfStreamsConstants.NOTIFI_QNAME));
+        path.add(NodeIdentifier.create(RestconfStreamsConstants.LOCATION_QNAME));
+        return new InstanceIdentifierContext<SchemaNode>(YangInstanceIdentifier.create(path), location.get(),
+                null, schemaHandler.get());
     }
 
     /**
@@ -169,6 +213,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * Parser and holder of query paramteres from uriInfo for notifications.
      */
     public static final class NotificationQueryParams {
+        private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+                .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
+                .appendValue(ChronoField.MONTH_OF_YEAR, 2).appendLiteral('-')
+                .appendValue(ChronoField.DAY_OF_MONTH, 2).appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':')
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2).appendLiteral(':')
+                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+                .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
+                .appendOffset("+HH:MM", "Z").toFormatter();
 
         private final Instant start;
         private final Instant stop;
@@ -193,7 +246,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                     case "start-time":
                         if (!startTimeUsed) {
                             startTimeUsed = true;
-                            start = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
+                            start = parseDateFromQueryParam(entry);
                         } else {
                             throw new RestconfDocumentedException("Start-time parameter can be used only once.");
                         }
@@ -201,7 +254,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                     case "stop-time":
                         if (!stopTimeUsed) {
                             stopTimeUsed = true;
-                            stop = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
+                            stop = parseDateFromQueryParam(entry);
                         } else {
                             throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
                         }
@@ -222,6 +275,26 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
             }
 
             return new NotificationQueryParams(start, stop, filter);
+        }
+
+
+        /**
+         * Parse input of query parameters - start-time or stop-time - from {@link DateAndTime} format
+         * to {@link Instant} format.
+         *
+         * @param entry Start-time or stop-time as string in {@link DateAndTime} format.
+         * @return Parsed {@link Instant} by entry.
+         */
+        private static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
+            final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
+            final String value = event.getValue();
+            final TemporalAccessor accessor;
+            try {
+                accessor = FORMATTER.parse(value);
+            } catch (final DateTimeParseException e) {
+                throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
+            }
+            return Instant.from(accessor);
         }
 
         /**
