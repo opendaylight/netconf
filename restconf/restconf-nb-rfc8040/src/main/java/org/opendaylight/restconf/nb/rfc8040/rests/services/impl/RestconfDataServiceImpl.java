@@ -253,7 +253,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
         requireNonNull(payload);
         if (payload.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition) {
-            return invokeAction(payload, uriInfo);
+            return invokeAction(payload);
         }
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
@@ -356,11 +356,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      *
      * @param payload
      *             {@link NormalizedNodeContext} - the body of the operation
-     * @param uriInfo
-     *             URI info
      * @return {@link NormalizedNodeContext} wrapped in {@link Response}
      */
-    public Response invokeAction(final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response invokeAction(final NormalizedNodeContext payload) {
         final InstanceIdentifierContext<?> context = payload.getInstanceIdentifierContext();
         final DOMMountPoint mountPoint = context.getMountPoint();
         final SchemaPath schemaPath = context.getSchemaNode().getPath();
