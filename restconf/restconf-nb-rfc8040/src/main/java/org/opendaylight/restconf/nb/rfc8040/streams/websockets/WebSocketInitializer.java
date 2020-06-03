@@ -15,6 +15,7 @@ import javax.inject.Singleton;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 
 /**
  * Web-socket servlet listening on ws or wss schemas for created data-change-event or notification streams.
@@ -24,7 +25,7 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 public class WebSocketInitializer extends WebSocketServlet {
 
     private final ScheduledExecutorService executorService;
-    private final WebSocketConfiguration webSocketConfiguration;
+    private final Configuration configuration;
 
     /**
      * Creation of the web-socket initializer.
@@ -34,9 +35,9 @@ public class WebSocketInitializer extends WebSocketServlet {
      */
     @Inject
     public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool,
-            final WebSocketConfiguration webSocketConfiguration) {
+            final Configuration configuration) {
         this.executorService = scheduledThreadPool.getExecutor();
-        this.webSocketConfiguration = webSocketConfiguration;
+        this.configuration = configuration;
     }
 
     /**
@@ -46,8 +47,8 @@ public class WebSocketInitializer extends WebSocketServlet {
      */
     @Override
     public void configure(final WebSocketServletFactory factory) {
-        factory.getPolicy().setIdleTimeout(webSocketConfiguration.getIdleTimeout());
-        factory.setCreator(new WebSocketFactory(executorService, webSocketConfiguration.getMaximumFragmentLength(),
-                webSocketConfiguration.getHeartbeatInterval()));
+        factory.getPolicy().setIdleTimeout(configuration.getIdleTimeout());
+        factory.setCreator(new WebSocketFactory(executorService, configuration.getMaximumFragmentLength(),
+                configuration.getHeartbeatInterval()));
     }
 }
