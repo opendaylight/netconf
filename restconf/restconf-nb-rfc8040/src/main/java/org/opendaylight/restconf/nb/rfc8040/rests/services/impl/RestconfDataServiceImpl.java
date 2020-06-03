@@ -63,6 +63,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
@@ -107,17 +108,20 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private TransactionChainHandler transactionChainHandler;
     private DOMMountPointServiceHandler mountPointServiceHandler;
     private volatile ActionServiceHandler actionServiceHandler;
+    private final Configuration configuration;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
             final TransactionChainHandler transactionChainHandler,
             final DOMMountPointServiceHandler mountPointServiceHandler,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final ActionServiceHandler actionServiceHandler) {
+            final ActionServiceHandler actionServiceHandler,
+            final Configuration configuration) {
         this.actionServiceHandler = requireNonNull(actionServiceHandler);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.mountPointServiceHandler = requireNonNull(mountPointServiceHandler);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
+        this.configuration = requireNonNull(configuration);
     }
 
     @Override
@@ -185,23 +189,22 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param identifier    identifier of data to read
      * @param content       type of data to read (config, state, all)
      * @param strategy      {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa      vaule of with-defaults parameter
+     * @param withDefa      value of with-defaults parameter
      * @param schemaContext schema context
      * @param uriInfo       uri info
      * @return {@link NormalizedNode}
      */
-    public static NormalizedNode<?, ?> readData(final String identifier, final String content,
-                                                final RestconfStrategy strategy, final String withDefa,
-                                                final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
+    private NormalizedNode<?, ?> readData(final String identifier, final String content,
+            final RestconfStrategy strategy, final String withDefa, final EffectiveModelContext schemaContext,
+            final UriInfo uriInfo) {
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
             createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
         }
         return ReadDataTransactionUtil.readData(content, strategy, withDefa, schemaContext);
     }
 
-    private static void createAllYangNotificationStreams(final RestconfStrategy strategy,
-                                                         final EffectiveModelContext schemaContext,
-                                                         final UriInfo uriInfo) {
+    private void createAllYangNotificationStreams(final RestconfStrategy strategy,
+            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
         strategy.prepareReadWriteExecution();
         final boolean exist = checkExist(schemaContext, strategy);
 
@@ -222,11 +225,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
     }
 
-    private static void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-                                                           final UriInfo uriInfo, final RestconfStrategy strategy,
-                                                           final boolean exist,
-                                                           final NotificationListenerAdapter listener) {
-        final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+    private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
+            final UriInfo uriInfo, final RestconfStrategy strategy, final boolean exist,
+            final NotificationListenerAdapter listener) {
+        final URI uri = configuration.getUrlResolver().prepareUriByStreamName(uriInfo, listener.getStreamName());
         final NormalizedNode<?, ?> mapToStreams =
             RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
@@ -246,15 +248,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
                                       final RestconfStrategy strategy, final boolean exist,
-                                      final NormalizedNode mapToStreams) {
-        String pathId;
+                                      final NormalizedNode<?, ?> mapToStreams) {
+        final String pathId;
         if (exist) {
             pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
         } else {
             pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
         }
-        strategy.merge(LogicalDatastoreType.OPERATIONAL,
-            IdentifierCodec.deserialize(pathId, schemaContext), mapToStreams);
+        strategy.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
+            mapToStreams);
     }
 
     @Override
@@ -263,8 +265,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
-                .getInstanceIdentifierContext();
+        final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
 
         PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
         PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
