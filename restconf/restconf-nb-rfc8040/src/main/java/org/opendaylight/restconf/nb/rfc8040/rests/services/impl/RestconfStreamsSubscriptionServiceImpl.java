@@ -29,6 +29,8 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.UrlResolver;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
@@ -46,6 +48,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
 
     private HandlersHolder handlersHolder;
+    private Configuration configuration;
 
     /**
      * Initialize holder of handlers with holders as parameters.
@@ -58,12 +61,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      *             handler of {@link SchemaContext}
      * @param transactionChainHandler
      *             handler of {@link DOMTransactionChain}
+     * @param configuration
+     *             configuration for restconf {@link Configuration}}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
             final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler,
-            final TransactionChainHandler transactionChainHandler) {
+            final TransactionChainHandler transactionChainHandler, Configuration configuration) {
         this.handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationServiceHandler,
                 transactionChainHandler, schemaHandler);
+        this.configuration = configuration;
     }
 
     @Override
@@ -79,13 +85,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
         final NotificationQueryParams notificationQueryParams = NotificationQueryParams.fromUriInfo(uriInfo);
 
+        UrlResolver urlResolver = configuration.getUrlResolver();
         URI response = null;
+
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
             response = SubscribeToStreamUtil.subscribeToDataStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+                    this.handlersHolder, urlResolver);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             response = SubscribeToStreamUtil.subscribeToYangStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+                    this.handlersHolder, urlResolver);
         }
 
         if (response != null) {
