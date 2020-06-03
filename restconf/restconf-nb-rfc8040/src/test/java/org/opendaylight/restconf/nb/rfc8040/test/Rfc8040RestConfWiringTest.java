@@ -32,7 +32,7 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040RestConfWiring;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
-import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSEConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.test.incubate.InMemoryMdsalModule;
 import org.opendaylight.restconf.nb.rfc8040.web.WebInitializer;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
@@ -47,8 +47,8 @@ public class Rfc8040RestConfWiringTest {
 
     public static class TestModule extends AbstractModule {
 
-        private static final WebSocketConfiguration SAMPLE_WEB_SOCKET_CONFIGURATION
-                = new WebSocketConfiguration(8192, 30000, 5000);
+        private static final SSEConfiguration SAMPLE_SSE_CONFIGURATION
+                = new SSEConfiguration(8192, 5000);
 
         @Override
         protected void configure() {
@@ -57,7 +57,7 @@ public class Rfc8040RestConfWiringTest {
             bind(JSONRestconfServiceRfc8040Impl.class).asEagerSingleton();
             bind(WebInitializer.class).asEagerSingleton();
             bind(CustomFilterAdapterConfiguration.class).toInstance(listener -> { });
-            bind(WebSocketConfiguration.class).toInstance(SAMPLE_WEB_SOCKET_CONFIGURATION);
+            bind(SSEConfiguration.class).toInstance(SAMPLE_SSE_CONFIGURATION);
         }
 
         @Provides

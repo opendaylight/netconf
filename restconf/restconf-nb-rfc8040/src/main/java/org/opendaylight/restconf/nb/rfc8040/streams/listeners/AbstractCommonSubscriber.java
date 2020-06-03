@@ -8,12 +8,10 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import com.google.common.base.Preconditions;
-import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.Set;
-import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketSessionHandler;
+import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSESessionHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +23,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
-    private final Set<WebSocketSessionHandler> subscribers = new HashSet<>();
+    private final Set<SSESessionHandler> subscribers = new HashSet<>();
     private volatile ListenerRegistration<?> registration;
 
     @Override
@@ -34,7 +32,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public final synchronized Set<WebSocketSessionHandler> getSubscribers() {
+    public final synchronized Set<SSESessionHandler> getSubscribers() {
         return new HashSet<>(this.subscribers);
     }
 
@@ -49,18 +47,18 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public synchronized void addSubscriber(final WebSocketSessionHandler subscriber) {
-        final Optional<InetSocketAddress> remoteEndpointAddress = subscriber.getRemoteEndpointAddress();
-        Preconditions.checkState(remoteEndpointAddress.isPresent());
-        LOG.debug("Subscriber {} is added.", remoteEndpointAddress.get());
+    public synchronized void addSubscriber(final SSESessionHandler subscriber) {
+        final boolean isConnected = subscriber.isConnected();
+        Preconditions.checkState(isConnected);
+        LOG.debug("Subscriber {} is added.", subscriber);
         subscribers.add(subscriber);
     }
 
     @Override
-    public synchronized void removeSubscriber(final WebSocketSessionHandler subscriber) {
-        final Optional<InetSocketAddress> remoteEndpointAddress = subscriber.getRemoteEndpointAddress();
-        Preconditions.checkState(remoteEndpointAddress.isPresent());
-        LOG.debug("Subscriber {} is removed.", remoteEndpointAddress.get());
+    public synchronized void removeSubscriber(final SSESessionHandler subscriber) {
+        final boolean isConnected = subscriber.isConnected();
+        Preconditions.checkState(isConnected);
+        LOG.debug("Subscriber {} is removed", subscriber);
         subscribers.remove(subscriber);
         if (!hasSubscribers()) {
             ListenersBroker.getInstance().removeAndCloseListener(this);
@@ -78,18 +76,18 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     /**
-     * Post data to subscribed web-socket session handlers.
+     * Post data to subscribed SSE session handlers.
      *
      * @param data Data of incoming notifications.
      */
     synchronized void post(final String data) {
-        final Iterator<WebSocketSessionHandler> iterator = subscribers.iterator();
+        final Iterator<SSESessionHandler> iterator = subscribers.iterator();
         while (iterator.hasNext()) {
-            final WebSocketSessionHandler subscriber = iterator.next();
-            final Optional<InetSocketAddress> remoteEndpointAddress = subscriber.getRemoteEndpointAddress();
-            if (remoteEndpointAddress.isPresent()) {
+            final SSESessionHandler subscriber = iterator.next();
+            final boolean isConnected = subscriber.isConnected();
+            if (isConnected) {
                 subscriber.sendDataMessage(data);
-                LOG.debug("Data was sent to subscriber {} on address {}:", this, remoteEndpointAddress.get());
+                LOG.debug("Data was sent to subscriber {} on connection {}:", this, subscriber);
             } else {
                 // removal is probably not necessary, because it will be removed explicitly soon after invocation of
                 // onWebSocketClosed(..) in handler; but just to be sure ...
