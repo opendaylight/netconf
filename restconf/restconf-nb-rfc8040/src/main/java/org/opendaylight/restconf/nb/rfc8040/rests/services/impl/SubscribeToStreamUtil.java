@@ -10,21 +10,13 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import java.net.URI;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
@@ -33,14 +25,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ResolveEnumUtil;
@@ -51,18 +41,11 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,21 +53,68 @@ import org.slf4j.LoggerFactory;
 /**
  * Subscribe to stream util class.
  */
-final class SubscribeToStreamUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(SubscribeToStreamUtil.class);
-    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-            .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
-            .appendValue(ChronoField.MONTH_OF_YEAR, 2).appendLiteral('-')
-            .appendValue(ChronoField.DAY_OF_MONTH, 2).appendLiteral('T')
-            .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':')
-            .appendValue(ChronoField.MINUTE_OF_HOUR, 2).appendLiteral(':')
-            .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-            .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
-            .appendOffset("+HH:MM", "Z").toFormatter();
+abstract class SubscribeToStreamUtil {
+    /**
+     * Implementation of {@link UrlResolver} for Server-sent events.
+     */
+    private static final class ServerSentEvents extends SubscribeToStreamUtil {
+        static final ServerSentEvents INSTANCE = new ServerSentEvents();
 
-    private SubscribeToStreamUtil() {
-        throw new UnsupportedOperationException("Utility class");
+        @Override
+        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+            final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+            return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/'
+                    + RestconfConstants.NOTIF + '/' + streamName).build();
+        }
     }
+
+    /**
+     * Implementation of {@link UrlResolver} for Web sockets.
+     */
+    private static final class WebSockets extends SubscribeToStreamUtil {
+        static final WebSockets INSTANCE = new WebSockets();
+
+        @Override
+        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+            final String scheme = uriInfo.getAbsolutePath().getScheme();
+            final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+            switch (scheme) {
+                case "https":
+                    // Secured HTTP goes to Secured WebSockets
+                    uriBuilder.scheme("wss");
+                    break;
+                case "http":
+                default:
+                    // Unsecured HTTP and others go to unsecured WebSockets
+                    uriBuilder.scheme("ws");
+            }
+            return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/' + streamName).build();
+        }
+    }
+
+
+    private static final Logger LOG = LoggerFactory.getLogger(SubscribeToStreamUtil.class);
+
+    SubscribeToStreamUtil() {
+        // Hidden on purpose
+    }
+
+    static SubscribeToStreamUtil serverSentEvents() {
+        return ServerSentEvents.INSTANCE;
+    }
+
+    static SubscribeToStreamUtil webSockets() {
+        return WebSockets.INSTANCE;
+    }
+
+    /**
+     * Prepare URL from base name and stream name.
+     *
+     * @param uriInfo base URL information
+     * @param streamName name of stream for create
+     * @return final URL
+     */
+    abstract @NonNull URI prepareUriByStreamName(UriInfo uriInfo, String streamName);
 
     /**
      * Register listener by streamName in identifier to listen to yang notifications, and put or delete information
@@ -94,9 +124,10 @@ final class SubscribeToStreamUtil {
      * @param uriInfo                 URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
+     * @param urlResolver             Resolver for proper implementation. Possibilities is WS or SSE.
      * @return Stream location for listening.
      */
-    static URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
+    final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
@@ -116,8 +147,8 @@ final class SubscribeToStreamUtil {
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
 
+        final URI uri = prepareUriByStreamName(uriInfo, streamName);
         registerToListenNotification(
                 notificationListenerAdapter.get(), handlersHolder.getNotificationServiceHandler());
         notificationListenerAdapter.get().setQueryParams(
@@ -141,30 +172,6 @@ final class SubscribeToStreamUtil {
     }
 
     /**
-     * Prepare InstanceIdentifierContext for Location leaf.
-     *
-     * @param schemaHandler Schema context handler.
-     * @return InstanceIdentifier of Location leaf.
-     */
-    static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
-        final Optional<Module> module = schemaHandler.get()
-                .findModule(RestconfStreamsConstants.NOTIFI_QNAME.getModule());
-        Preconditions.checkState(module.isPresent());
-        final Optional<DataSchemaNode> notify = module.get()
-                .findDataChildByName(RestconfStreamsConstants.NOTIFI_QNAME);
-        Preconditions.checkState(notify.isPresent());
-        final Optional<DataSchemaNode> location = ((ContainerSchemaNode) notify.get())
-                .findDataChildByName(RestconfStreamsConstants.LOCATION_QNAME);
-        Preconditions.checkState(location.isPresent());
-
-        final List<PathArgument> path = new ArrayList<>();
-        path.add(NodeIdentifier.create(RestconfStreamsConstants.NOTIFI_QNAME));
-        path.add(NodeIdentifier.create(RestconfStreamsConstants.LOCATION_QNAME));
-        return new InstanceIdentifierContext<SchemaNode>(YangInstanceIdentifier.create(path), location.get(),
-                null, schemaHandler.get());
-    }
-
-    /**
      * Register listener by streamName in identifier to listen to data change notifications, and put or delete
      * information about listener to DS according to ietf-restconf-monitoring.
      *
@@ -174,7 +181,7 @@ final class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Location for listening.
      */
-    static URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
+    final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
         final LogicalDatastoreType datastoreType = parseURIEnum(
@@ -228,26 +235,7 @@ final class SubscribeToStreamUtil {
         return schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
     }
 
-    /**
-     * Parse input of query parameters - start-time or stop-time - from {@link DateAndTime} format
-     * to {@link Instant} format.
-     *
-     * @param entry Start-time or stop-time as string in {@link DateAndTime} format.
-     * @return Parsed {@link Instant} by entry.
-     */
-    static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
-        final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
-        final String value = event.getValue();
-        final TemporalAccessor accessor;
-        try {
-            accessor = FORMATTER.parse(value);
-        } catch (final DateTimeParseException e) {
-            throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
-        }
-        return Instant.from(accessor);
-    }
-
-    static void writeDataToDS(final SchemaContext schemaContext, final String name,
+    private static void writeDataToDS(final SchemaContext schemaContext, final String name,
             final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
             final NormalizedNode<?, ?> mapToStreams) {
         String pathId;
@@ -260,7 +248,7 @@ final class SubscribeToStreamUtil {
                 IdentifierCodec.deserialize(pathId, schemaContext), mapToStreams);
     }
 
-    static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
+    private static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
         try {
             readWriteTransaction.commit().get();
         } catch (final InterruptedException | ExecutionException e) {
@@ -283,22 +271,6 @@ final class SubscribeToStreamUtil {
             }
         }
         return result;
-    }
-
-    static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
-        final String scheme = uriInfo.getAbsolutePath().getScheme();
-        final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-        switch (scheme) {
-            case "https":
-                // Secured HTTP goes to Secured WebSockets
-                uriBuilder.scheme("wss");
-                break;
-            case "http":
-            default:
-                // Unsecured HTTP and others go to unsecured WebSockets
-                uriBuilder.scheme("ws");
-        }
-        return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/' + streamName).build();
     }
 
     /**
@@ -326,7 +298,7 @@ final class SubscribeToStreamUtil {
         listener.setRegistration(registration);
     }
 
-    static boolean checkExist(final SchemaContext schemaContext,
+    private static boolean checkExist(final SchemaContext schemaContext,
                               final DOMDataTreeReadOperations readWriteTransaction) {
         try {
             return readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,

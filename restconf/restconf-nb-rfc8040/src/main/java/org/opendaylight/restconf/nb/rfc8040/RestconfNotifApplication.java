@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2020 Lumina Networks, Inc. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -11,13 +11,17 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
 
+/**
+ * Restconf Application extends {@link AbstractRestconfApplication}. Is used for sending SSE.
+ */
 @Singleton
-public class RestconfApplication extends AbstractRestconfApplication<ServicesWrapper> {
+public class RestconfNotifApplication extends AbstractRestconfApplication<ServicesNotifWrapper> {
     @Inject
-    public RestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler mountPointServiceHandler, final ServicesWrapper servicesNotifWrapper) {
+    public RestconfNotifApplication(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointServiceHandler mountPointServiceHandler,
+            final ServicesNotifWrapper servicesNotifWrapper) {
         super(schemaContextHandler, mountPointServiceHandler, servicesNotifWrapper);
     }
 }
