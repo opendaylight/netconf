@@ -260,20 +260,23 @@ public final class ReadDataTransactionUtil {
      *             schema context
      * @param uriInfo
      *             uri info
+     * @param useSSE
+     *             when is true use SSE else use WS
      * @return {@link NormalizedNode}
      */
     public static NormalizedNode<?, ?> readData(final String identifier, final String content,
                                                 final TransactionVarsWrapper transactionNode, final String withDefa,
-                                                final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
+                                                final SchemaContextRef schemaContextRef, final UriInfo uriInfo,
+                                                final boolean useSSE) {
         final SchemaContext schemaContext = schemaContextRef.get();
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(transactionNode, schemaContextRef, uriInfo);
+            createAllYangNotificationStreams(transactionNode, schemaContextRef, uriInfo, useSSE);
         }
         return readData(content, transactionNode, withDefa, schemaContext);
     }
 
     private static void createAllYangNotificationStreams(final TransactionVarsWrapper transactionNode,
-            final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
+            final SchemaContextRef schemaContextRef, final UriInfo uriInfo, final boolean useSSE) {
         final DOMDataTreeReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
         final boolean exist = SubscribeToStreamUtil.checkExist(schemaContextRef.get(), wTx);
 
@@ -284,16 +287,22 @@ public final class ReadDataTransactionUtil {
             final NotificationListenerAdapter notifiStreamJSON =
                     CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
                             NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContextRef, uriInfo, wTx, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContextRef, uriInfo, wTx, exist, notifiStreamJSON);
+            writeNotificationStreamToDatastore(schemaContextRef, uriInfo, wTx, exist, notifiStreamXML, useSSE);
+            writeNotificationStreamToDatastore(schemaContextRef, uriInfo, wTx, exist, notifiStreamJSON, useSSE);
+
         }
         SubscribeToStreamUtil.submitData(wTx);
     }
 
     private static void writeNotificationStreamToDatastore(final SchemaContextRef schemaContextRef,
             final UriInfo uriInfo, final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
-            final NotificationListenerAdapter listener) {
-        final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+            final NotificationListenerAdapter listener, final boolean useSSE) {
+        final URI uri;
+        if (useSSE) {
+            uri = SubscribeToStreamUtil.prepareUriByStreamNameSSE(uriInfo, listener.getStreamName());
+        } else {
+            uri = SubscribeToStreamUtil.prepareUriByStreamNameWS(uriInfo, listener.getStreamName());
+        }
         final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().getLastComponent(), schemaContextRef.get().getNotifications(), null,
                 listener.getOutputType(), uri,
