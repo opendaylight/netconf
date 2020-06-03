@@ -94,10 +94,13 @@ final class SubscribeToStreamUtil {
      * @param uriInfo                 URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
+     * @param useSSE                  when is true use SSE else use WS
      * @return Stream location for listening.
      */
+
     static URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final boolean useSSE) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -116,8 +119,13 @@ final class SubscribeToStreamUtil {
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
 
+        final URI uri;
+        if (useSSE) {
+            uri = SubscribeToStreamUtil.prepareUriByStreamNameSSE(uriInfo, streamName);
+        } else {
+            uri = SubscribeToStreamUtil.prepareUriByStreamNameWS(uriInfo, streamName);
+        }
         registerToListenNotification(
                 notificationListenerAdapter.get(), handlersHolder.getNotificationServiceHandler());
         notificationListenerAdapter.get().setQueryParams(
@@ -172,10 +180,12 @@ final class SubscribeToStreamUtil {
      * @param uriInfo                 Base URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
+     * @param useSSE                  when is true use SSE else use WS
      * @return Location for listening.
      */
     static URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final boolean useSSE) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
         final LogicalDatastoreType datastoreType = parseURIEnum(
                 LogicalDatastoreType.class,
@@ -207,7 +217,12 @@ final class SubscribeToStreamUtil {
         listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
         registration(datastoreType, listener.get(), handlersHolder.getDomDataBrokerHandler().get());
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri;
+        if (useSSE) {
+            uri = SubscribeToStreamUtil.prepareUriByStreamNameSSE(uriInfo, streamName);
+        } else {
+            uri = SubscribeToStreamUtil.prepareUriByStreamNameWS(uriInfo, streamName);
+        }
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
@@ -285,7 +300,13 @@ final class SubscribeToStreamUtil {
         return result;
     }
 
-    static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+    static URI prepareUriByStreamNameSSE(final UriInfo uriInfo, final String streamName) {
+        final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+        return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/'
+                + RestconfConstants.NOTIF + '/' + streamName).build();
+    }
+
+    static URI prepareUriByStreamNameWS(final UriInfo uriInfo, final String streamName) {
         final String scheme = uriInfo.getAbsolutePath().getScheme();
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
         switch (scheme) {
