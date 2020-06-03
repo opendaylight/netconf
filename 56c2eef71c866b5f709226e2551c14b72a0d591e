@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a0ff1d94_b076059e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-06-03T20:57:26Z",
+      "side": 1,
+      "message": "Please rework this commit message in the format with brief summary of change\nin first line, followed by blank line, then longer explanation of the change\nas needed. Next is another blank line, then on the line above the Signed-off-by\nline put: JIRA: NETCONF-696",
+      "revId": "56c2eef71c866b5f709226e2551c14b72a0d591e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
