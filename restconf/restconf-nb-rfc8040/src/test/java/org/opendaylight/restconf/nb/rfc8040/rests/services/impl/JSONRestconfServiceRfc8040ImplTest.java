@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
@@ -503,7 +502,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), isNull());
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), any());
 
         final String uriPath = "toaster:cancel-toast";
 
@@ -511,7 +510,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         assertEquals("Output present", false, output.isPresent());
 
-        verify(mockRpcService).invokeRpc(eq(path), isNull());
+        verify(mockRpcService).invokeRpc(eq(path), any());
     }
 
     @Test
@@ -522,7 +521,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_OUTPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
-        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), isNull());
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), any());
 
         final String uriPath = "toaster:testOutput";
 
@@ -533,7 +532,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         assertThat("Output element is missing namespace", output.get(), containsString("\"toaster:output\""));
         assertThat("Missing \"textOut\"", output.get(), containsString("\"textOut\":\"foo\""));
 
-        verify(mockRpcService).invokeRpc(eq(path), isNull());
+        verify(mockRpcService).invokeRpc(eq(path), any());
     }
 
     @Test(expected = OperationFailedException.class)

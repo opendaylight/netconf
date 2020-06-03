@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -166,7 +165,7 @@ public class InvokeRpcMethodTest {
         final SchemaPath type = SchemaPath.create(true, qname);
 
         doReturn(immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("testExeption")))
-        .when(brokerFacade).invokeRpc(eq(type), isNull());
+        .when(brokerFacade).invokeRpc(eq(type), any());
 
         try {
             this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
@@ -210,7 +209,7 @@ public class InvokeRpcMethodTest {
         final DOMRpcResult result = new DefaultDOMRpcResult(rpcErrors);
         final SchemaPath path = SchemaPath.create(true,
                 QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast"));
-        doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(path), isNull());
+        doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(path), any());
 
         try {
             this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
@@ -231,7 +230,7 @@ public class InvokeRpcMethodTest {
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         final SchemaPath path = SchemaPath.create(true, qname);
 
-        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), isNull());
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), any());
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
         assertNotNull(output);
@@ -248,7 +247,7 @@ public class InvokeRpcMethodTest {
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         final SchemaPath path = SchemaPath.create(true, qname);
-        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), isNull());
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), any());
 
         WebApplicationException exceptionToBeThrown = null;
         try {
@@ -355,7 +354,7 @@ public class InvokeRpcMethodTest {
 
         final DOMRpcResult result = new DefaultDOMRpcResult(container);
 
-        doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(rpcDef.getPath()), isNull());
+        doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(rpcDef.getPath()), any());
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:testOutput", null, uriInfo);
         assertNotNull(output);

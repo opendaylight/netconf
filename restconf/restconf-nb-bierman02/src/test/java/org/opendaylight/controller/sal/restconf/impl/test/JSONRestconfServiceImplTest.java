@@ -8,9 +8,9 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -445,7 +445,7 @@ public class JSONRestconfServiceImplTest {
         final SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class), isNull());
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class), any());
 
         final String uriPath = "toaster:cancel-toast";
 
@@ -453,7 +453,7 @@ public class JSONRestconfServiceImplTest {
 
         assertEquals("Output present", false, output.isPresent());
 
-        verify(brokerFacade).invokeRpc(eq(path), isNull());
+        verify(brokerFacade).invokeRpc(eq(path), any());
     }
 
     @Test
@@ -464,7 +464,7 @@ public class JSONRestconfServiceImplTest {
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_OUTPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
-        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class), isNull());
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class), any());
 
         final String uriPath = "toaster:testOutput";
 
@@ -474,7 +474,7 @@ public class JSONRestconfServiceImplTest {
         assertNotNull("Returned null response", output.get());
         assertThat("Missing \"textOut\"", output.get(), containsString("\"textOut\":\"foo\""));
 
-        verify(brokerFacade).invokeRpc(eq(path), isNull());
+        verify(brokerFacade).invokeRpc(eq(path), any());
     }
 
     @Test(expected = OperationFailedException.class)

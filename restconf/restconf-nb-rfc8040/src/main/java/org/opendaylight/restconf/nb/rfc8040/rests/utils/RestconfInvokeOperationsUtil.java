@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import javax.ws.rs.core.Response.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
@@ -25,10 +26,12 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +61,7 @@ public final class RestconfInvokeOperationsUtil {
             final SchemaPath schemaPath) {
         final Optional<DOMRpcService> mountPointService = mountPoint.getService(DOMRpcService.class);
         if (mountPointService.isPresent()) {
-            return prepareResult(mountPointService.get().invokeRpc(schemaPath, data));
+            return prepareResult(mountPointService.get().invokeRpc(schemaPath, nonnullInput(schemaPath, data)));
         }
         final String errmsg = "RPC service is missing.";
         LOG.debug(errmsg);
@@ -83,7 +86,12 @@ public final class RestconfInvokeOperationsUtil {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
 
-        return prepareResult(rpcService.invokeRpc(schemaPath, data));
+        return prepareResult(rpcService.invokeRpc(schemaPath, nonnullInput(schemaPath, data)));
+    }
+
+    private static @NonNull NormalizedNode<?, ?> nonnullInput(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        return input != null ? input
+                : ImmutableNodes.containerNode(YangConstants.operationInputQName(type.getLastComponent().getModule()));
     }
 
     /**

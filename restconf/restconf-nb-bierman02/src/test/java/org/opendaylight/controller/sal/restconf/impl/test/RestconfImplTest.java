@@ -159,7 +159,7 @@ public class RestconfImplTest {
                 .invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
         this.restconfImpl.invokeRpc("randomId", ctx, uriInfo);
         this.restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
-        verify(rpcService, times(2)).invokeRpc(any(SchemaPath.class), isNull());
+        verify(rpcService, times(2)).invokeRpc(any(SchemaPath.class), any());
     }
 
     /**
