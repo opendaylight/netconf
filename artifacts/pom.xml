@@ -490,6 +490,13 @@
                 <version>1.12.0-SNAPSHOT</version>
             </dependency>
             <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-nb-rfc8040</artifactId>
+                <type>cfg</type>
+                <classifier>config</classifier>
+                <version>1.12.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-rest-connector-config</artifactId>
                 <version>1.12.0-SNAPSHOT</version>
