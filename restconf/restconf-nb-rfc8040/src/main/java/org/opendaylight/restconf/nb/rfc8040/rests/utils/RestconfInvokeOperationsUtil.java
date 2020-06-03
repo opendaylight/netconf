@@ -133,9 +133,7 @@ public final class RestconfInvokeOperationsUtil {
         if (!mountPointService.isPresent()) {
             throw new RestconfDocumentedException("DomAction service is missing.");
         }
-
-        return prepareActionResult(mountPointService.get().invokeAction(schemaPath,
-            prepareDataTreeId(yangIId, schemaPath), data));
+        return prepareActionResult(mountPointService.get().invokeAction(schemaPath, prepareDataTreeId(yangIId), data));
     }
 
     /**
@@ -150,9 +148,9 @@ public final class RestconfInvokeOperationsUtil {
      * @return {@link DOMActionResult}
      */
     public static DOMActionResult invokeAction(final ContainerNode data, final SchemaPath schemaPath,
-            final ActionServiceHandler actionServiceHandler, final YangInstanceIdentifier yangIId) {
-        return prepareActionResult(actionServiceHandler.get().invokeAction(schemaPath,
-            prepareDataTreeId(yangIId, schemaPath), data));
+        final ActionServiceHandler actionServiceHandler, final YangInstanceIdentifier yangIId) {
+        return prepareActionResult(actionServiceHandler.get().invokeAction(schemaPath, prepareDataTreeId(yangIId),
+            data));
     }
 
     /**
@@ -197,19 +195,11 @@ public final class RestconfInvokeOperationsUtil {
      *
      * @param yangIId
      *             {@link YangInstanceIdentifier}
-     * @param schemaPath
-     *              {@link SchemaPath}
      * @return {@link DOMDataTreeIdentifier} domDataTreeIdentifier
      */
-    private static DOMDataTreeIdentifier prepareDataTreeId(final YangInstanceIdentifier yangIId,
-            final SchemaPath schemaPath) {
-        final List<PathArgument> pathArg = new ArrayList<>();
-        for (PathArgument path : yangIId.getPathArguments()) {
-            if (path.getNodeType().getLocalName().equals(schemaPath.getLastComponent().getLocalName())) {
-                break;
-            }
-            pathArg.add(path);
-        }
+    private static DOMDataTreeIdentifier prepareDataTreeId(final YangInstanceIdentifier yangIId) {
+        final List<PathArgument> pathArg = new ArrayList<>(yangIId.getPathArguments());
+        pathArg.remove(pathArg.size() - 1);
         YangInstanceIdentifier yangInstanceIdentifier = YangInstanceIdentifier.builder().append(pathArg).build();
         DOMDataTreeIdentifier domDataTreeIdentifier = new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL,
             yangInstanceIdentifier);
