@@ -51,6 +51,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.OptimisticLockFailedException;
@@ -80,6 +81,7 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -389,6 +391,7 @@ public final class RestconfImpl implements RestconfService {
         final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
         final ListenableFuture<? extends DOMRpcResult> response;
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
+        final NormalizedNode<?, ?> input =  nonnullInput(type, payload.getData());
         final EffectiveModelContext schemaContext;
 
         if (mountPoint != null) {
@@ -398,7 +401,7 @@ public final class RestconfImpl implements RestconfService {
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
             schemaContext = mountPoint.getEffectiveModelContext();
-            response = mountRpcServices.get().invokeRpc(type, payload.getData());
+            response = mountRpcServices.get().invokeRpc(type, input);
         } else {
             if (namespace.toString().equals(SAL_REMOTE_NAMESPACE)) {
                 if (identifier.contains(CREATE_DATA_SUBSCR)) {
@@ -411,7 +414,7 @@ public final class RestconfImpl implements RestconfService {
                     throw new RestconfDocumentedException(msg, ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
             } else {
-                response = this.broker.invokeRpc(type, payload.getData());
+                response = this.broker.invokeRpc(type, input);
             }
             schemaContext = this.controllerContext.getGlobalSchema();
         }
@@ -434,6 +437,14 @@ public final class RestconfImpl implements RestconfService {
                     new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint, schemaContext),
                     resultData, QueryParametersParser.parseWriterParameters(uriInfo));
         }
+    }
+
+    private static @NonNull NormalizedNode<?, ?> nonnullInput(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        return input != null ? input : defaultInput(type.getLastComponent());
+    }
+
+    private static @NonNull ContainerNode defaultInput(final QName rpcName) {
+        return ImmutableNodes.containerNode(YangConstants.operationInputQName(rpcName.getModule()));
     }
 
     @SuppressFBWarnings(value = "NP_LOAD_OF_KNOWN_NULL_VALUE",
@@ -482,15 +493,16 @@ public final class RestconfImpl implements RestconfService {
                     + " with an input section defined", ErrorType.RPC, ErrorTag.MISSING_ELEMENT);
         }
 
+        final ContainerNode input = defaultInput(rpc.getQName());
         final ListenableFuture<? extends DOMRpcResult> response;
         if (mountPoint != null) {
             final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
             if (!mountRpcServices.isPresent()) {
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
-            response = mountRpcServices.get().invokeRpc(rpc.getPath(), null);
+            response = mountRpcServices.get().invokeRpc(rpc.getPath(), input);
         } else {
-            response = this.broker.invokeRpc(rpc.getPath(), null);
+            response = this.broker.invokeRpc(rpc.getPath(), input);
         }
 
         final NormalizedNode<?, ?> result = checkRpcResponse(response).getResult();
