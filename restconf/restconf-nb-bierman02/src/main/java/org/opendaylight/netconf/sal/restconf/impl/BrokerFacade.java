@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response.Status;
 import org.apache.aries.blueprint.annotation.service.Reference;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
@@ -490,7 +491,8 @@ public class BrokerFacade implements Closeable {
     }
 
     // RPC
-    public ListenableFuture<? extends DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    public ListenableFuture<? extends DOMRpcResult> invokeRpc(final @NonNull SchemaPath type,
+            final @NonNull NormalizedNode<?, ?> input) {
         if (this.rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
