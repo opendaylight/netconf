@@ -55,6 +55,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -94,17 +95,20 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private TransactionChainHandler transactionChainHandler;
     private DOMMountPointServiceHandler mountPointServiceHandler;
     private volatile ActionServiceHandler actionServiceHandler;
+    private Configuration configuration;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
             final TransactionChainHandler transactionChainHandler,
             final DOMMountPointServiceHandler mountPointServiceHandler,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final ActionServiceHandler actionServiceHandler) {
+            final ActionServiceHandler actionServiceHandler,
+            final Configuration configuration) {
         this.actionServiceHandler = requireNonNull(actionServiceHandler);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.mountPointServiceHandler = requireNonNull(mountPointServiceHandler);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
+        this.configuration = requireNonNull(configuration);
     }
 
     @Override
@@ -138,7 +142,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 instanceIdentifier, mountPoint, getTransactionChainHandler(mountPoint));
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(identifier, parameters.getContent(),
-                transactionNode, parameters.getWithDefault(), schemaContextRef, uriInfo);
+                transactionNode, parameters.getWithDefault(), schemaContextRef, uriInfo, configuration.isUseSSE());
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
