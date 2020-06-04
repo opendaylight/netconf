@@ -196,6 +196,10 @@
       <artifactId>threadpool-config-impl</artifactId>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.opendaylight.netconf</groupId>
+          <artifactId>sal-netconf-connector</artifactId>
+      </dependency>
   </dependencies>
 
   <build>

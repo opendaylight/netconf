@@ -10,24 +10,25 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.Map;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.netconf.sal.connect.netconf.sal.netconf.CreateOperationDOMTransactionChain;
+import org.opendaylight.netconf.sal.connect.netconf.sal.netconf.NetconfDOMDataBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * {@link DOMTransactionChain} implementation for Netconf connector.
  */
-public class TxChain implements DOMTransactionChain, TxListener {
+public class TxChain implements CreateOperationDOMTransactionChain, TxListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(TxChain.class);
 
-    private final DOMDataBroker dataBroker;
+    private final NetconfDOMDataBroker dataBroker;
     private final DOMTransactionChainListener listener;
     /**
      * Submitted transactions that haven't completed yet.
@@ -41,7 +42,7 @@ public class TxChain implements DOMTransactionChain, TxListener {
     private boolean closed = false;
     private boolean successful = true;
 
-    public TxChain(final DOMDataBroker dataBroker, final DOMTransactionChainListener listener) {
+    public TxChain(final NetconfDOMDataBroker dataBroker, final DOMTransactionChainListener listener) {
         this.dataBroker = dataBroker;
         this.listener = listener;
     }
@@ -64,8 +65,24 @@ public class TxChain implements DOMTransactionChain, TxListener {
     }
 
     @Override
+    public synchronized DOMDataTreeWriteTransaction newCreateOperationWriteTransaction() {
+        checkOperationPermitted();
+        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newCreateOperationWriteTransaction();
+        Preconditions.checkState(writeTransaction instanceof AbstractWriteTx);
+        final AbstractWriteTx pendingWriteTx = (AbstractWriteTx) writeTransaction;
+        pendingTransactions.put(pendingWriteTx, pendingWriteTx.addListener(this));
+        currentTransaction = pendingWriteTx;
+        return pendingWriteTx;
+    }
+
+    @Override
     public synchronized DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
         return new ReadWriteTx(dataBroker.newReadOnlyTransaction(), newWriteOnlyTransaction());
+    }
+
+    @Override
+    public synchronized DOMDataTreeReadWriteTransaction newCreateOperationReadWriteTransaction() {
+        return new ReadWriteTx(dataBroker.newReadOnlyTransaction(), newCreateOperationWriteTransaction());
     }
 
     @Override

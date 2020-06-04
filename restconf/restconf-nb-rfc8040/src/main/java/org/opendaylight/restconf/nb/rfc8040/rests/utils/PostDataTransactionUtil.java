@@ -18,6 +18,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.sal.connect.netconf.sal.netconf.CreateOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -100,7 +101,13 @@ public final class PostDataTransactionUtil {
             final NormalizedNode<?, ?> data, final TransactionVarsWrapper transactionNode,
             final EffectiveModelContext schemaContext, final String insert, final String point) {
         final DOMTransactionChain transactionChain = transactionNode.getTransactionChain();
-        final DOMDataTreeReadWriteTransaction newReadWriteTransaction = transactionChain.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction newReadWriteTransaction;
+        if(transactionChain instanceof CreateOperationDOMTransactionChain) {
+            newReadWriteTransaction = ((CreateOperationDOMTransactionChain) transactionChain)
+                    .newCreateOperationReadWriteTransaction();
+        } else {
+            newReadWriteTransaction = transactionChain.newReadWriteTransaction();
+        }
         if (insert == null) {
             makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
             return newReadWriteTransaction.commit();

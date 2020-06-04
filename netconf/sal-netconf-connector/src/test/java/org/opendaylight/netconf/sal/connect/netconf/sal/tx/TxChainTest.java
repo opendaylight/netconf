@@ -19,15 +19,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.netconf.sal.connect.netconf.sal.netconf.NetconfDOMDataBroker;
 
 public class TxChainTest {
 
     @Mock
-    private DOMDataBroker broker;
+    private NetconfDOMDataBroker broker;
     @Mock
     private DOMTransactionChainListener listener;
     @Mock
