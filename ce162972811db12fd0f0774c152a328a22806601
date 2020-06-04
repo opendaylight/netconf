@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e5f109b_8febfbff",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/netconf/RFC6241DataTreeService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-04T14:53:43Z",
+      "side": 1,
+      "message": "How about instead of extending DOMDataBroker, we create f.ex a CreateOperationExtension which would have a new method newCreateOperationWriteTransaction(). NetconfDeviceDataBroker could implement it and you would avoid having 2 instances of almost the same class. You would then register the only NetconfDataBroker instance into the MountInstance as both DOMDataBroker and CreateOperationExtension.\n\nOn Restconf side you would retrieve both of these services and use the method from the extension for new transaction when handling post requests.",
+      "range": {
+        "startLine": 12,
+        "startChar": 17,
+        "endLine": 12,
+        "endChar": 39
+      },
+      "revId": "ce162972811db12fd0f0774c152a328a22806601",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
