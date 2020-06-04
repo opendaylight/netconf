@@ -58,6 +58,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
@@ -585,6 +586,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         doCallRealMethod().when(mockMountPoint).getSchemaContext();
 
         doReturn(Optional.of(mockDOMDataBroker)).when(mockMountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.of(mockDOMDataBroker)).when(mockMountPoint).getService(NetconfDOMDataBrokerOperations.class);
 
         doReturn(Optional.of(mockMountPoint)).when(mockMountPointService).getMountPoint(notNull());
 

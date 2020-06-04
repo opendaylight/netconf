@@ -100,7 +100,7 @@ public class NetconfDeviceSalFacadeTest {
             null);
 
         verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext),
-                any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class),
+                any(DOMDataBroker.class), null, eq(deviceRpc), any(NetconfDeviceNotificationService.class),
                 isNull());
         verify(netconfDeviceTopologyAdapter,
                 times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());

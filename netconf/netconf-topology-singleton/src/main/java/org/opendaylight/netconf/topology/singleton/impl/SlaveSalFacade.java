@@ -51,7 +51,7 @@ public class SlaveSalFacade {
         final ProxyDOMDataBroker netconfDeviceDataBroker = new ProxyDOMDataBroker(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
 
-        salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
+        salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker, null,
             deviceRpc, notificationService, deviceAction);
 
         LOG.info("{}: Slave mount point registered.", id);
