@@ -48,6 +48,7 @@ public final class NetconfDeviceRpc implements DOMRpcService {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
         final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
             transformer.toRpcRequest(type, input), type.getLastComponent());
@@ -56,8 +57,13 @@ public final class NetconfDeviceRpc implements DOMRpcService {
         Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
             @Override
             public void onSuccess(final RpcResult<NetconfMessage> result) {
-                ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
-                        : new DefaultDOMRpcResult(result.getErrors()));
+                try {
+                    ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
+                            : new DefaultDOMRpcResult(result.getErrors()));
+                } catch (Exception cause) {
+                    ret.setException(new DOMRpcImplementationNotAvailableException(cause,
+                            "Unable to parse rpc reply. type: %s input: %s", type, input));
+                }
             }
 
             @Override
