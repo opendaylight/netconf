@@ -29,15 +29,15 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
-public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
+public class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
 
-    private final RemoteDeviceId id;
-    private final NetconfBaseOps netconfOps;
-    private final boolean rollbackSupport;
-    private final boolean candidateSupported;
-    private final boolean runningWritable;
+    protected final RemoteDeviceId id;
+    protected final NetconfBaseOps netconfOps;
+    protected final boolean rollbackSupport;
+    protected final boolean candidateSupported;
+    protected final boolean runningWritable;
 
-    private boolean isLockAllowed = true;
+    protected boolean isLockAllowed = true;
 
     public NetconfDeviceDataBroker(final RemoteDeviceId id, final MountPointContext mountContext,
                                    final DOMRpcService rpc, final NetconfSessionPreferences netconfSessionPreferences) {
@@ -89,5 +89,4 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     void setLockAllowed(final boolean isLockAllowedOrig) {
         this.isLockAllowed = isLockAllowedOrig;
     }
-
 }

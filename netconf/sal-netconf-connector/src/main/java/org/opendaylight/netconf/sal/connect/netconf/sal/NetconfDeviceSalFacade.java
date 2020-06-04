@@ -75,8 +75,8 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
                                                final NetconfSessionPreferences netconfSessionPreferences,
                                                final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
         final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
-        final NetconfDeviceDataBroker netconfDeviceDataBroker =
-                new NetconfDeviceDataBroker(id, mountContext, deviceRpc, netconfSessionPreferences);
+        final OperationNetconfDeviceDataBroker netconfDeviceDataBroker =
+                new OperationNetconfDeviceDataBroker(id, mountContext, deviceRpc, netconfSessionPreferences);
         registerLockListener(netconfDeviceDataBroker);
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
