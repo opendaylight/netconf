@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "01605681_fc3b75e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2020-06-04T15:24:49Z",
+      "side": 1,
+      "message": "which version ?",
+      "range": {
+        "startLine": 7,
+        "startChar": 47,
+        "endLine": 7,
+        "endChar": 52
+      },
+      "revId": "0ac67ebdb45ffeb757ff3fc46d570780d634eca9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "07592544_29542e8d",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2020-06-04T15:24:49Z",
+      "side": 1,
+      "message": "tab and trailing blanks to remove here\nNormally this is handled by recent pyang versions.\nThere are subsequent improvement after pyang 2 but also subsequent bugs!\nPlease precise the payng version you used",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 17
+      },
+      "revId": "0ac67ebdb45ffeb757ff3fc46d570780d634eca9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f39aedcd_c7fb3235",
         "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-optional.yang",
         "patchSetId": 2
