@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f33ff61_d07260df",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-04T11:12:52Z",
+      "side": 1,
+      "message": "This doesn\u0027t look right to me. I think basing the logic here on whether the input request produces null is wrong. You should be able to break this again just by changing the last line of the included UT to not have null input in the invokeRpc. ie:         assertThrows(ExecutionException.class, () -\u003e failingRpc.invokeRpc(path, mock(ContainerNode.class)).get());",
+      "range": {
+        "startLine": 57,
+        "startChar": 12,
+        "endLine": 57,
+        "endChar": 57
+      },
+      "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "48b6600e_2b07591a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-04T11:12:52Z",
+      "side": 1,
+      "message": "I think the proper way to fix this would be to wrap this callback in try/catch block for RuntimeException and fail the returned future in case there is any exception thrown.",
+      "range": {
+        "startLine": 64,
+        "startChar": 16,
+        "endLine": 67,
+        "endChar": 17
+      },
+      "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
