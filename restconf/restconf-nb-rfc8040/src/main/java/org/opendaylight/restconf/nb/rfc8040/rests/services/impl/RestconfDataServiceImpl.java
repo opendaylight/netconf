@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -260,7 +261,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
+                payload.getInstanceIdentifierContext(), mountPoint, getCreateTransactionChainHandler(mountPoint));
         return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode,
                 getSchemaContext(mountPoint), checkedParms.insert, checkedParms.point);
     }
@@ -329,6 +330,23 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return mountPoint == null ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
     }
 
+    private TransactionChainHandler getCreateTransactionChainHandler(final DOMMountPoint mountPoint) {
+        if (mountPoint == null) {
+            return transactionChainHandler;
+        } else {
+            final Optional<NetconfDOMDataBrokerOperations> domDataBrokerService =
+                    mountPoint.getService(NetconfDOMDataBrokerOperations.class);
+            if (domDataBrokerService.isPresent()) {
+                return new TransactionChainHandler(domDataBrokerService.get());
+            }
+
+            final String errMsg = "DOM data broker service isn't available for mount point "
+                    + mountPoint.getIdentifier();
+            LOG.warn(errMsg);
+            throw new RestconfDocumentedException(errMsg);
+        }
+    }
+
     private SchemaContextRef getSchemaContext(final DOMMountPoint mountPoint) {
         return mountPoint == null ? new SchemaContextRef(schemaContextHandler.get())
                 : new SchemaContextRef(mountPoint.getEffectiveModelContext());
@@ -341,7 +359,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @return {@link TransactionChainHandler}
      */
     private static TransactionChainHandler transactionChainOfMountPoint(final @NonNull DOMMountPoint mountPoint) {
-        final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
+        final Optional<DOMDataBroker> domDataBrokerService =
+                mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             return new TransactionChainHandler(domDataBrokerService.get());
         }

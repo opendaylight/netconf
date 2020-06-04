@@ -99,41 +99,43 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     @Override
     public synchronized void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
                                  final NormalizedNode<?, ?> data) {
-        checkEditable(store);
-
-        // Trying to write only mixin nodes (not visible when serialized).
-        // Ignoring. Some devices cannot handle empty edit-config rpc
-        if (containsOnlyNonVisibleData(path, data)) {
-            LOG.debug("Ignoring put for {} and data {}. Resulting data structure is empty.", path, data);
-            return;
+        final String operation = "put";
+        if (canPerformOperation(store, path, data, operation)) {
+            final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.ofNullable(data),
+                    Optional.of(ModifyAction.REPLACE), path);
+            editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), operation);
         }
-
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.ofNullable(data),
-                        Optional.of(ModifyAction.REPLACE), path);
-        editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "put");
     }
 
     @Override
     public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
                                    final NormalizedNode<?, ?> data) {
+        final String operation = "merge";
+        if (canPerformOperation(store, path, data, operation)) {
+            final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.ofNullable(data),
+                    Optional.empty(), path);
+            editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), operation);
+        }
+
+    }
+
+    protected boolean canPerformOperation(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                                          final NormalizedNode<?, ?> data, String operation) {
         checkEditable(store);
 
         // Trying to write only mixin nodes (not visible when serialized).
         // Ignoring. Some devices cannot handle empty edit-config rpc
         if (containsOnlyNonVisibleData(path, data)) {
-            LOG.debug("Ignoring merge for {} and data {}. Resulting data structure is empty.", path, data);
-            return;
+            LOG.debug("Ignoring {} for {} and data {}. Resulting data structure is empty.", operation, path, data);
+            return false;
         }
-
-        final DataContainerChild<?, ?> editStructure =  netOps.createEditConfigStrcture(Optional.ofNullable(data),
-            Optional.empty(), path);
-        editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "merge");
+        return true;
     }
 
     /**
      * Check whether the data to be written consists only from mixins.
      */
-    private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path,
+    protected static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path,
                                                       final NormalizedNode<?, ?> data) {
         // There's only one such case:top level list (pathArguments == 1 && data is Mixin)
         // any other mixin nodes are contained by a "regular" node thus visible when serialized
@@ -203,7 +205,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
     protected abstract ListenableFuture<RpcResult<Void>> performCommit();
 
-    private void checkEditable(final LogicalDatastoreType store) {
+    protected void checkEditable(final LogicalDatastoreType store) {
         checkNotFinished();
         checkArgument(store == LogicalDatastoreType.CONFIGURATION,
                 "Can edit only configuration data, not %s", store);
