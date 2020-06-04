@@ -8,14 +8,18 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,6 +34,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -92,6 +97,20 @@ public class NetconfDeviceRpcTest {
         path = SchemaPath
                 .create(true, QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config"));
         expectedReply = transformer.toRpcResult(reply, path);
+    }
+
+    @Test
+    public void testDeadlock() throws Exception {
+        // when rpc is successful, but transformer fails for some reason
+        final MessageTransformer<NetconfMessage> failingTransformer = mock(MessageTransformer.class);
+        final RemoteDeviceCommunicator<NetconfMessage> communicatorMock = mock(RemoteDeviceCommunicator.class);
+        final NetconfMessage msg = null;
+        final RpcResult<NetconfMessage> result = RpcResultBuilder.success(msg).build();
+        when(communicatorMock.sendRequest(any(), any())).thenReturn(Futures.immediateFuture(result));
+        when(failingTransformer.toRpcResult(any(), any())).thenThrow(new RuntimeException("FAIL"));
+        final NetconfDeviceRpc failingRpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicatorMock, failingTransformer);
+        assertThrows(ExecutionException.class, () -> failingRpc.invokeRpc(path, mock(ContainerNode.class)).get());
+        assertThrows(ExecutionException.class, () -> failingRpc.invokeRpc(path, null).get());
     }
 
     @Test
