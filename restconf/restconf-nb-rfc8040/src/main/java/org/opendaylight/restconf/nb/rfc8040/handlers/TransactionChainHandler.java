@@ -13,10 +13,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of {@link TransactionChainHandler}.
  */
 @Singleton
-public class TransactionChainHandler implements Handler<DOMTransactionChain>, AutoCloseable {
+public class TransactionChainHandler implements Handler<NetconfOperationDOMTransactionChain>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(TransactionChainHandler.class);
 
     private final DOMTransactionChainListener transactionChainListener = new DOMTransactionChainListener() {
@@ -44,14 +45,14 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
         }
     };
 
-    private final DOMDataBroker dataBroker;
+    private final NetconfDOMDataBrokerOperations dataBroker;
     private final Queue<DOMTransactionChain> transactionChainList;
 
     /**
      * Prepare transaction chain service for Restconf services.
      */
     @Inject
-    public TransactionChainHandler(final DOMDataBroker dataBroker) {
+    public TransactionChainHandler(final NetconfDOMDataBrokerOperations dataBroker) {
         this.dataBroker = Objects.requireNonNull(dataBroker);
         this.transactionChainList = new ConcurrentLinkedQueue<>();
     }
@@ -62,8 +63,9 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
      * @return new instance of object {@link DOMTransactionChain}
      */
     @Override
-    public DOMTransactionChain get() {
-        final DOMTransactionChain transactionChain = dataBroker.createTransactionChain(transactionChainListener);
+    public NetconfOperationDOMTransactionChain get() {
+        final NetconfOperationDOMTransactionChain transactionChain = dataBroker
+                .createNetconfTransactionChain(transactionChainListener);
         this.transactionChainList.add(transactionChain);
         LOG.trace("Started TransactionChain({})", transactionChain);
         return transactionChain;

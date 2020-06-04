@@ -28,9 +28,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -60,7 +60,7 @@ public class ReadDataTransactionUtilTest {
 
     private TransactionVarsWrapper wrapper;
     @Mock
-    private DOMTransactionChain transactionChain;
+    private NetconfOperationDOMTransactionChain transactionChain;
     @Mock
     private InstanceIdentifierContext<ContainerSchemaNode> context;
     @Mock
@@ -86,8 +86,8 @@ public class ReadDataTransactionUtilTest {
         when(containerChildNode.getQName()).thenReturn(containerChildQName);
         when(containerSchemaNode.getDataChildByName(containerChildQName)).thenReturn(containerChildNode);
 
-        DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        NetconfDOMDataBrokerOperations mockDataBroker = Mockito.mock(NetconfDOMDataBrokerOperations.class);
+        Mockito.doReturn(transactionChain).when(mockDataBroker).createNetconfTransactionChain(Mockito.any());
         wrapper = new TransactionVarsWrapper(this.context, null, new TransactionChainHandler(mockDataBroker));
     }
 

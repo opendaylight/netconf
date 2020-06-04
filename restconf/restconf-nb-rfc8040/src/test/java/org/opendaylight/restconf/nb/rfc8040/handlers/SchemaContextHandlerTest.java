@@ -25,7 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -62,7 +62,7 @@ public class SchemaContextHandlerTest {
     @Before
     public void setup() throws Exception {
         final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
+        final NetconfOperationDOMTransactionChain domTx = mock(NetconfOperationDOMTransactionChain.class);
         when(txHandler.get()).thenReturn(domTx);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
         when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);

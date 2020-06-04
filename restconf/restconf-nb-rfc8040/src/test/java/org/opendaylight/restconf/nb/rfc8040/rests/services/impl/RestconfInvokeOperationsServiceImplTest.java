@@ -27,7 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -61,7 +61,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         final SchemaContextRef contextRef = new SchemaContextRef(
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
+        final NetconfOperationDOMTransactionChain domTx = mock(NetconfOperationDOMTransactionChain.class);
         when(txHandler.get()).thenReturn(domTx);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
         when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);

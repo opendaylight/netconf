@@ -9,7 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 
@@ -22,7 +22,7 @@ public final class TransactionVarsWrapper {
     private final InstanceIdentifierContext<?> instanceIdentifier;
     private final DOMMountPoint mountPoint;
     private LogicalDatastoreType configuration = null;
-    private final DOMTransactionChain transactionChain;
+    private final NetconfOperationDOMTransactionChain transactionChain;
     private final TransactionChainHandler transactionChainHandler;
 
     /**
@@ -89,7 +89,7 @@ public final class TransactionVarsWrapper {
      *
      * @return transaction chain
      */
-    public DOMTransactionChain getTransactionChain() {
+    public NetconfOperationDOMTransactionChain getTransactionChain() {
         return this.transactionChain;
     }
 

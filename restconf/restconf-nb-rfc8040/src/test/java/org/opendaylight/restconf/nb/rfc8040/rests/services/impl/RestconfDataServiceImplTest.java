@@ -42,15 +42,15 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -103,7 +103,7 @@ public class RestconfDataServiceImplTest {
     private TransactionChainHandler transactionChainHandler;
 
     @Mock
-    private DOMTransactionChain domTransactionChain;
+    private NetconfOperationDOMTransactionChain domTransactionChain;
     @Mock
     private UriInfo uriInfo;
     @Mock
@@ -117,11 +117,11 @@ public class RestconfDataServiceImplTest {
     @Mock
     private DOMMountPoint mountPoint;
     @Mock
-    private DOMDataBroker mountDataBroker;
+    private NetconfDOMDataBrokerOperations mountDataBroker;
     @Mock
     private ActionServiceHandler actionServiceHandler;
     @Mock
-    private DOMTransactionChain mountTransactionChain;
+    private NetconfOperationDOMTransactionChain mountTransactionChain;
     @Mock
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
 
@@ -190,10 +190,11 @@ public class RestconfDataServiceImplTest {
 
         doReturn(this.read).when(domTransactionChain).newReadOnlyTransaction();
         doReturn(this.readWrite).when(domTransactionChain).newReadWriteTransaction();
+        doReturn(this.readWrite).when(domTransactionChain).newCreateOperationReadWriteTransaction();
         doReturn(this.write).when(domTransactionChain).newWriteOnlyTransaction();
 
-        DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
-        Mockito.doReturn(domTransactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        NetconfDOMDataBrokerOperations mockDataBroker = Mockito.mock(NetconfDOMDataBrokerOperations.class);
+        Mockito.doReturn(domTransactionChain).when(mockDataBroker).createNetconfTransactionChain(Mockito.any());
 
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
@@ -208,9 +209,10 @@ public class RestconfDataServiceImplTest {
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doCallRealMethod().when(this.mountPoint).getSchemaContext();
         doReturn(this.contextRef.get()).when(this.mountPoint).getEffectiveModelContext();
-        doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint)
+                .getService(NetconfDOMDataBrokerOperations.class);
         doReturn(this.mountTransactionChain).when(this.mountDataBroker)
-                .createTransactionChain(any(DOMTransactionChainListener.class));
+                .createNetconfTransactionChain(any(DOMTransactionChainListener.class));
         doReturn(this.read).when(this.mountTransactionChain).newReadOnlyTransaction();
         doReturn(this.readWrite).when(this.mountTransactionChain).newReadWriteTransaction();
     }

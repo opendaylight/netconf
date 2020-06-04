@@ -21,9 +21,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -34,13 +34,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class DeleteDataTransactionUtilTest {
     @Mock
-    private DOMTransactionChain transactionChain;
+    private NetconfOperationDOMTransactionChain transactionChain;
     @Mock
     private InstanceIdentifierContext<?> context;
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
-    private DOMDataBroker mockDataBroker;
+    private NetconfDOMDataBrokerOperations mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
 
@@ -51,7 +51,7 @@ public class DeleteDataTransactionUtilTest {
         Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         Mockito.when(this.context.getInstanceIdentifier()).thenReturn(YangInstanceIdentifier.empty());
 
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        Mockito.doReturn(transactionChain).when(mockDataBroker).createNetconfTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
     }
 

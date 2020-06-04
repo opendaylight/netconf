@@ -36,12 +36,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
@@ -80,7 +80,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     public void setUp() throws FileNotFoundException, URISyntaxException {
         MockitoAnnotations.initMocks(this);
 
-        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
+        final NetconfOperationDOMTransactionChain domTx = mock(NetconfOperationDOMTransactionChain.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
         when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
         final DOMDataTreeReadWriteTransaction rwTx = mock(DOMDataTreeReadWriteTransaction.class);
@@ -89,8 +89,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
-        final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
-        doReturn(domTx).when(dataBroker).createTransactionChain(any());
+        final NetconfDOMDataBrokerOperations dataBroker = mock(NetconfDOMDataBrokerOperations.class);
+        doReturn(domTx).when(dataBroker).createNetconfTransactionChain(any());
 
         transactionHandler = new TransactionChainHandler(dataBroker);
         schemaHandler = new SchemaContextHandler(transactionHandler, mock(DOMSchemaService.class));

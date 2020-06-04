@@ -28,9 +28,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
@@ -58,13 +58,13 @@ public class PatchDataTransactionUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
 
     @Mock
-    private DOMTransactionChain transactionChain;
+    private NetconfOperationDOMTransactionChain transactionChain;
 
     @Mock
     private DOMDataTreeReadWriteTransaction rwTransaction;
 
     @Mock
-    private DOMDataBroker mockDataBroker;
+    private NetconfDOMDataBrokerOperations mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
     private SchemaContextRef refSchemaCtx;
@@ -80,7 +80,7 @@ public class PatchDataTransactionUtilTest {
     public void setUp() throws Exception {
         initMocks(this);
 
-        doReturn(transactionChain).when(mockDataBroker).createTransactionChain(any());
+        doReturn(transactionChain).when(mockDataBroker).createNetconfTransactionChain(any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
         this.refSchemaCtx = new SchemaContextRef(

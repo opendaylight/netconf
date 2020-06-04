@@ -13,7 +13,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -21,6 +20,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 public class TransactionChainHandlerTest {
@@ -52,7 +53,7 @@ public class TransactionChainHandlerTest {
         Assert.assertFalse(this.transactionChainHandler.verifyIfExistTransactionChain(chain2));
     }
 
-    private final class TxChainLocal implements DOMTransactionChain {
+    private final class TxChainLocal implements NetconfOperationDOMTransactionChain {
         DOMTransactionChainListener listener;
 
         TxChainLocal(DOMTransactionChainListener listener) {
@@ -81,9 +82,19 @@ public class TransactionChainHandlerTest {
         public void close() {
             listener.onTransactionChainSuccessful(this);
         }
+
+        @Override
+        public DOMDataTreeWriteTransaction newCreateOperationWriteTransaction() {
+            return null;
+        }
+
+        @Override
+        public DOMDataTreeReadWriteTransaction newCreateOperationReadWriteTransaction() {
+            return null;
+        }
     }
 
-    private final class DataBrokerLocal implements DOMDataBroker {
+    private final class DataBrokerLocal implements NetconfDOMDataBrokerOperations {
 
         @Override
         public @NonNull DOMTransactionChain createTransactionChain(DOMTransactionChainListener listener) {
@@ -112,6 +123,21 @@ public class TransactionChainHandlerTest {
 
         @Override
         public DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
+            return null;
+        }
+
+        @Override
+        public NetconfOperationDOMTransactionChain createNetconfTransactionChain(DOMTransactionChainListener listener) {
+            return new TxChainLocal(listener);
+        }
+
+        @Override
+        public DOMDataTreeWriteTransaction newCreateOperationWriteTransaction() {
+            return null;
+        }
+
+        @Override
+        public DOMDataTreeReadWriteTransaction newCreateOperationReadWriteTransaction() {
             return null;
         }
     }

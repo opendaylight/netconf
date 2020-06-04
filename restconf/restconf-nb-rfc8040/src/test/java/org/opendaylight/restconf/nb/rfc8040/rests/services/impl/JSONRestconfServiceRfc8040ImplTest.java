@@ -44,7 +44,6 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -56,8 +55,9 @@ import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
@@ -122,7 +122,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private static EffectiveModelContext schemaContext;
 
     @Mock
-    private DOMTransactionChain mockTxChain;
+    private NetconfOperationDOMTransactionChain mockTxChain;
 
     @Mock
     private DOMDataTreeReadWriteTransaction mockReadWriteTx;
@@ -137,7 +137,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private DOMMountPointService mockMountPointService;
 
     @Mock
-    private DOMDataBroker mockDOMDataBroker;
+    private NetconfDOMDataBrokerOperations mockDOMDataBroker;
 
     @Mock
     private DOMRpcService mockRpcService;
@@ -184,9 +184,10 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         doReturn(mockReadOnlyTx).when(mockTxChain).newReadOnlyTransaction();
         doReturn(mockReadWriteTx).when(mockTxChain).newReadWriteTransaction();
+        doReturn(mockReadWriteTx).when(mockTxChain).newCreateOperationReadWriteTransaction();
         doReturn(mockWriteTx).when(mockTxChain).newWriteOnlyTransaction();
 
-        doReturn(mockTxChain).when(mockDOMDataBroker).createTransactionChain(any());
+        doReturn(mockTxChain).when(mockDOMDataBroker).createNetconfTransactionChain(any());
 
         final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockDOMDataBroker);
 
@@ -584,7 +585,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         doReturn(schemaContextTestModule).when(mockMountPoint).getEffectiveModelContext();
         doCallRealMethod().when(mockMountPoint).getSchemaContext();
 
-        doReturn(Optional.of(mockDOMDataBroker)).when(mockMountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.of(mockDOMDataBroker)).when(mockMountPoint).getService(NetconfDOMDataBrokerOperations.class);
 
         doReturn(Optional.of(mockMountPoint)).when(mockMountPointService).getMountPoint(notNull());
 

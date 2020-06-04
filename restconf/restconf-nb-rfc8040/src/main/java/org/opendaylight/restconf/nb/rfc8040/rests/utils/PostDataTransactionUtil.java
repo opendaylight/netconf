@@ -18,6 +18,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -99,8 +100,9 @@ public final class PostDataTransactionUtil {
     private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data, final TransactionVarsWrapper transactionNode,
             final EffectiveModelContext schemaContext, final String insert, final String point) {
-        final DOMTransactionChain transactionChain = transactionNode.getTransactionChain();
-        final DOMDataTreeReadWriteTransaction newReadWriteTransaction = transactionChain.newReadWriteTransaction();
+        final NetconfOperationDOMTransactionChain transactionChain = transactionNode.getTransactionChain();
+        final DOMDataTreeReadWriteTransaction newReadWriteTransaction =
+                transactionChain.newCreateOperationReadWriteTransaction();
         if (insert == null) {
             makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
             return newReadWriteTransaction.commit();

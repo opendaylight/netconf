@@ -31,11 +31,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -62,7 +62,7 @@ public class PostDataTransactionUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
 
     @Mock
-    private DOMTransactionChain transactionChain;
+    private NetconfOperationDOMTransactionChain transactionChain;
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -74,7 +74,7 @@ public class PostDataTransactionUtilTest {
     @Mock
     private UriBuilder uriBuilder;
     @Mock
-    private DOMDataBroker mockDataBroker;
+    private NetconfDOMDataBrokerOperations mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
     private SchemaContextRef refSchemaCtx;
@@ -138,10 +138,10 @@ public class PostDataTransactionUtilTest {
                 .build();
 
         doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/16/")).when(this.uriInfo).getBaseUriBuilder();
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.readWrite).when(this.transactionChain).newCreateOperationReadWriteTransaction();
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
 
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        Mockito.doReturn(transactionChain).when(mockDataBroker).createNetconfTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
     }
 

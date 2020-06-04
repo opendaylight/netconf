@@ -18,7 +18,13 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
+import org.opendaylight.netconf.api.tx.NetconfOperationDOMTransactionChain;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.CreateOperationWriteCandidateRunningTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.CreateOperationWriteCandidateTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.CreateOperationWriteRunningTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.NetconfTxChain;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.TxChain;
@@ -29,7 +35,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
-public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
+public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker, NetconfDOMDataBrokerOperations {
 
     private final RemoteDeviceId id;
     private final NetconfBaseOps netconfOps;
@@ -88,6 +94,29 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     void setLockAllowed(final boolean isLockAllowedOrig) {
         this.isLockAllowed = isLockAllowedOrig;
+    }
+
+    @Override
+    public NetconfOperationDOMTransactionChain createNetconfTransactionChain(DOMTransactionChainListener listener) {
+        return new NetconfTxChain(this, this, listener);
+    }
+
+    @Override
+    public DOMDataTreeWriteTransaction newCreateOperationWriteTransaction() {
+        if (candidateSupported) {
+            if (runningWritable) {
+                return new CreateOperationWriteCandidateRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
+            } else {
+                return new CreateOperationWriteCandidateTx(id, netconfOps, rollbackSupport, isLockAllowed);
+            }
+        } else {
+            return new CreateOperationWriteRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
+        }
+    }
+
+    @Override
+    public DOMDataTreeReadWriteTransaction newCreateOperationReadWriteTransaction() {
+        return new ReadWriteTx(newReadOnlyTransaction(), newCreateOperationWriteTransaction());
     }
 
 }
