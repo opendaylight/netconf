@@ -49,24 +49,31 @@ public final class NetconfDeviceRpc implements DOMRpcService {
 
     @Override
     public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+
         final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
             transformer.toRpcRequest(type, input), type.getLastComponent());
 
         final SettableFuture<DOMRpcResult> ret = SettableFuture.create();
-        Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
-            @Override
-            public void onSuccess(final RpcResult<NetconfMessage> result) {
-                ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
-                        : new DefaultDOMRpcResult(result.getErrors()));
-            }
+        if (transformer.toRpcRequest(type, input) == null) {
+            ret.setException(new DOMRpcImplementationNotAvailableException(
+                    "Transformer produces null request and is invalid"));
+            return ret;
+        } else {
+            Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
+                @Override
+                public void onSuccess(final RpcResult<NetconfMessage> result) {
+                    ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
+                            : new DefaultDOMRpcResult(result.getErrors()));
+                }
 
-            @Override
-            public void onFailure(final Throwable cause) {
-                ret.setException(new DOMRpcImplementationNotAvailableException(cause, "Unable to invoke rpc %s", type));
-            }
+                @Override
+                public void onFailure(final Throwable cause) {
+                    ret.setException(new DOMRpcImplementationNotAvailableException(cause, "Unable to invoke rpc %s", type));
+                }
 
-        }, MoreExecutors.directExecutor());
-        return ret;
+            }, MoreExecutors.directExecutor());
+            return ret;
+        }
     }
 
     @Override
