@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.netconf.sal.connect.netconf.sal.netconf.RFC6241DataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -260,7 +261,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
+                payload.getInstanceIdentifierContext(), mountPoint, getPostTransactionChainHandler(mountPoint));
         return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode,
                 getSchemaContext(mountPoint), checkedParms.insert, checkedParms.point);
     }
@@ -323,6 +324,17 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
 
         return PlainPatchDataTransactionUtil.patchData(payload, transactionNode, ref);
+    }
+
+    private TransactionChainHandler getPostTransactionChainHandler(final DOMMountPoint mountPoint) {
+        if(mountPoint == null) {
+            return transactionChainHandler;
+        } else {
+            final Optional<RFC6241DataTreeService> domDataBrokerService = mountPoint
+                    .getService(RFC6241DataTreeService.class);
+            return domDataBrokerService.map(TransactionChainHandler::new)
+                    .orElseGet(() -> transactionChainOfMountPoint(mountPoint));
+        }
     }
 
     private TransactionChainHandler getTransactionChainHandler(final DOMMountPoint mountPoint) {

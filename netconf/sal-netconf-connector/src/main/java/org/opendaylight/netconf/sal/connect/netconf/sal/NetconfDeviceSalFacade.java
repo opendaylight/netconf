@@ -77,12 +77,15 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
         final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
         final NetconfDeviceDataBroker netconfDeviceDataBroker =
                 new NetconfDeviceDataBroker(id, mountContext, deviceRpc, netconfSessionPreferences);
+        final RFC6241NetconfDeviceDataBroker rfc6241NetconfDeviceDataBroker =
+                new RFC6241NetconfDeviceDataBroker(id, mountContext, deviceRpc, netconfSessionPreferences);
         registerLockListener(netconfDeviceDataBroker);
+        registerLockListener(rfc6241NetconfDeviceDataBroker);
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
         salProvider.getMountInstance()
-                .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, deviceRpc, notificationService,
-                        deviceAction);
+                .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, rfc6241NetconfDeviceDataBroker,
+                        deviceRpc, notificationService, deviceAction);
         salProvider.getTopologyDatastoreAdapter()
                 .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
