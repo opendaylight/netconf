@@ -133,7 +133,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     /**
      * Check whether the data to be written consists only from mixins.
      */
-    private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path,
+    protected static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path,
                                                       final NormalizedNode<?, ?> data) {
         // There's only one such case:top level list (pathArguments == 1 && data is Mixin)
         // any other mixin nodes are contained by a "regular" node thus visible when serialized
@@ -203,7 +203,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
     protected abstract ListenableFuture<RpcResult<Void>> performCommit();
 
-    private void checkEditable(final LogicalDatastoreType store) {
+    protected void checkEditable(final LogicalDatastoreType store) {
         checkNotFinished();
         checkArgument(store == LogicalDatastoreType.CONFIGURATION,
                 "Can edit only configuration data, not %s", store);

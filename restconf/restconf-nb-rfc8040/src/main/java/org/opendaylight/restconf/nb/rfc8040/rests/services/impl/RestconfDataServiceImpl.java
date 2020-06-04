@@ -28,8 +28,8 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -341,7 +341,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @return {@link TransactionChainHandler}
      */
     private static TransactionChainHandler transactionChainOfMountPoint(final @NonNull DOMMountPoint mountPoint) {
-        final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
+        final Optional<NetconfDOMDataBrokerOperations> domDataBrokerService =
+                mountPoint.getService(NetconfDOMDataBrokerOperations.class);
         if (domDataBrokerService.isPresent()) {
             return new TransactionChainHandler(domDataBrokerService.get());
         }

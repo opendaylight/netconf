@@ -51,6 +51,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -208,7 +209,8 @@ public class RestconfDataServiceImplTest {
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doCallRealMethod().when(this.mountPoint).getSchemaContext();
         doReturn(this.contextRef.get()).when(this.mountPoint).getEffectiveModelContext();
-        doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint)
+                .getService(NetconfDOMDataBrokerOperations.class);
         doReturn(this.mountTransactionChain).when(this.mountDataBroker)
                 .createTransactionChain(any(DOMTransactionChainListener.class));
         doReturn(this.read).when(this.mountTransactionChain).newReadOnlyTransaction();

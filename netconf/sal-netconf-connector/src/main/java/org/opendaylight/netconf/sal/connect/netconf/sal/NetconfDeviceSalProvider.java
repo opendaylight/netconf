@@ -134,6 +134,10 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             mountBuilder.addInitialSchemaContext(initialCtx);
 
             mountBuilder.addService(DOMDataBroker.class, broker);
+            if (broker instanceof OperationNetconfDeviceDataBroker) {
+                mountBuilder.addService(OperationNetconfDeviceDataBroker.class,
+                        (OperationNetconfDeviceDataBroker) broker);
+            }
             mountBuilder.addService(DOMRpcService.class, rpc);
             mountBuilder.addService(DOMNotificationService.class, newNotificationService);
             if (deviceAction != null) {
