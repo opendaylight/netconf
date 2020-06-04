@@ -56,8 +56,13 @@ public final class NetconfDeviceRpc implements DOMRpcService {
         Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
             @Override
             public void onSuccess(final RpcResult<NetconfMessage> result) {
-                ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
-                        : new DefaultDOMRpcResult(result.getErrors()));
+                try {
+                    ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
+                            : new DefaultDOMRpcResult(result.getErrors()));
+                } catch (Exception cause) {
+                    ret.setException(new DOMRpcImplementationNotAvailableException(cause,
+                            "Unable to invoke rpc %s", type));
+                }
             }
 
             @Override
