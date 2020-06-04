@@ -23,6 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.tx.NetconfDOMDataBrokerOperations;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -120,11 +121,11 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         public void onTopologyDeviceConnected(final EffectiveModelContext initialCtx,
                 final DOMDataBroker broker, final DOMRpcService rpc,
                 final NetconfDeviceNotificationService newNotificationService) {
-            onTopologyDeviceConnected(initialCtx, broker, rpc, newNotificationService, null);
+            onTopologyDeviceConnected(initialCtx, broker, null, rpc, newNotificationService, null);
         }
 
         public synchronized void onTopologyDeviceConnected(final EffectiveModelContext initialCtx,
-                final DOMDataBroker broker, final DOMRpcService rpc,
+                final DOMDataBroker broker, NetconfDOMDataBrokerOperations operationBroker, final DOMRpcService rpc,
                 final NetconfDeviceNotificationService newNotificationService, final DOMActionService deviceAction) {
             requireNonNull(mountService, "Closed");
             checkState(topologyRegistration == null, "Already initialized");
@@ -134,6 +135,9 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             mountBuilder.addInitialSchemaContext(initialCtx);
 
             mountBuilder.addService(DOMDataBroker.class, broker);
+            if (operationBroker != null) {
+                mountBuilder.addService(NetconfDOMDataBrokerOperations.class, operationBroker);
+            }
             mountBuilder.addService(DOMRpcService.class, rpc);
             mountBuilder.addService(DOMNotificationService.class, newNotificationService);
             if (deviceAction != null) {
