@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a63f410e_87ba808d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-06-05T04:58:50Z",
+      "side": 1,
+      "message": "Please put the summary of the change on the first line, then a blank line\nfollowing by any extra explanation of the changes. finally on the\nline above the Signed-off-by with JIRA: NETCONF-689",
+      "revId": "75a2d681d48d1a3af15b68dbf807ca4a99dbf5a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
