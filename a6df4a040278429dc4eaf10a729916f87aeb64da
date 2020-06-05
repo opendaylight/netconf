@@ -117,6 +117,30 @@
       "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dc874dd2_0710ac4a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-05T08:30:10Z",
+      "side": 1,
+      "message": "We can use Exception here aswell. I just tend to use runtime when there are no throws in any of the calls in the try/catch block, not sure whether that is better or worse :)\n\nIn this case we really want to avoid this deadlock, so using     @SuppressWarnings(\"checkstyle:IllegalCatch\") is warranted imo.",
+      "parentUuid": "2137e75a_72058676",
+      "range": {
+        "startLine": 64,
+        "startChar": 16,
+        "endLine": 67,
+        "endChar": 17
+      },
+      "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
