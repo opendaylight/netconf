@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "28a47854_b22e2e86",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomePwEncryption.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8637
+      },
+      "writtenOn": "2020-06-05T09:14:11Z",
+      "side": 1,
+      "message": "Yes, that\u0027s right. The patch-1 has to be merged with original commit. Could you please let me know how to do that.",
+      "parentUuid": "ae38d272_a3ebf0d4",
+      "revId": "6c197bd5ccf8128ecebca32653c5f5fd6370dba4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "35d28ff6_ea545d22",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomePwEncryption.java",
         "patchSetId": 1

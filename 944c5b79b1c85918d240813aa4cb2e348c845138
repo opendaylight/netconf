@@ -94,6 +94,30 @@
       "revId": "944c5b79b1c85918d240813aa4cb2e348c845138",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "46781e81_a2359f34",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8637
+      },
+      "writtenOn": "2020-06-05T09:14:11Z",
+      "side": 1,
+      "message": "Thanks for your comment. I have aligned the commit message body.",
+      "parentUuid": "5cf6b614_b92ddf65",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 26
+      },
+      "revId": "944c5b79b1c85918d240813aa4cb2e348c845138",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
