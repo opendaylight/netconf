@@ -141,6 +141,30 @@
       "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d43658d_60d7f354",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-06-05T15:57:36Z",
+      "side": 1,
+      "message": "Ok, makes sense to me.",
+      "parentUuid": "dc874dd2_0710ac4a",
+      "range": {
+        "startLine": 64,
+        "startChar": 16,
+        "endLine": 67,
+        "endChar": 17
+      },
+      "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
