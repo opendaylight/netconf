@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "a546a288_84f54c6a",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomePwEncryption.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2020-06-05T09:23:04Z",
+      "side": 1,
+      "message": "Assuming the relation chain is correct, here is one way to do it.\nSince it was the case on my local copy, I\u0027ve taken care of that\n\n$ git reset --soft HEAD~1\n$ git commit --amend",
+      "parentUuid": "28a47854_b22e2e86",
+      "revId": "6c197bd5ccf8128ecebca32653c5f5fd6370dba4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "35d28ff6_ea545d22",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomePwEncryption.java",
         "patchSetId": 1
