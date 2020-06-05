@@ -110,6 +110,24 @@
       "revId": "92942648c244ad2d173199b98da2d1f980a2e4f4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dba635dd_72d88cb4",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/websockets/WebSocketConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2020-06-05T14:26:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "92149672_6f2c2a29",
+      "revId": "92942648c244ad2d173199b98da2d1f980a2e4f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
