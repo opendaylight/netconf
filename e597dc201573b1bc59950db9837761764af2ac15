@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "175798ec_15c3521a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-05T09:03:31Z",
+      "side": 1,
+      "message": "Also if an exception is thrown here, it means that the rpc was invoked successfully, but we failed to parse the reply.",
+      "range": {
+        "startLine": 64,
+        "startChar": 28,
+        "endLine": 64,
+        "endChar": 54
+      },
+      "revId": "e597dc201573b1bc59950db9837761764af2ac15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
