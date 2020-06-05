@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "43e2380b_c4631a15",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/RestconfInvokeOperationsUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-06-05T14:26:18Z",
+      "side": 1,
+      "message": "I think this is a complicated way of saying yangIId.getParent().",
+      "range": {
+        "startLine": 209,
+        "startChar": 0,
+        "endLine": 211,
+        "endChar": 113
+      },
+      "revId": "10cfe1d749e38ab58ca0b0faeafd18dfe92a5dbc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
