@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "e1b3f45b_a3234414",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-06-05T04:28:36Z",
+      "side": 1,
+      "message": "thanks for the help.\n\nnew ps adds this extra condition to the UT as well.",
+      "parentUuid": "3f33ff61_d07260df",
+      "range": {
+        "startLine": 57,
+        "startChar": 12,
+        "endLine": 57,
+        "endChar": 57
+      },
+      "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "48b6600e_2b07591a",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2020-06-04T11:12:52Z",
       "side": 1,
       "message": "I think the proper way to fix this would be to wrap this callback in try/catch block for RuntimeException and fail the returned future in case there is any exception thrown.",
+      "range": {
+        "startLine": 64,
+        "startChar": 16,
+        "endLine": 67,
+        "endChar": 17
+      },
+      "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "20dc7ef8_e2696d32",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-06-05T04:28:36Z",
+      "side": 1,
+      "message": "new ps does this, but I am catching Exception more generally instead of RuntimeException. Is that better\nor worse for some reason. Appreciate the help.",
+      "parentUuid": "48b6600e_2b07591a",
       "range": {
         "startLine": 64,
         "startChar": 16,
