@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d7f6771_ca515ec7",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomePwEncryption.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-05T11:46:31Z",
+      "side": 1,
+      "message": "If I\u0027m not mistaken with this approach you let the credentials get into the datastore unencrypted and then pick them up via DTCL, encrypt them and rewrite them to the datastore right? In that case you still have a period during which you have unencrypted credentials, which are going to be picked up by the listener thats starting the connection, which will be retriggered after you write in the encrypted passwords.\n\nBetter approach would be to go away from direct datastore writes, add in an rpc for configuring devices and encrypt the passwords right when the rpc is being handled. That way the connector is only started once and the unencrypted passwords never even hit the datastore.",
+      "range": {
+        "startLine": 189,
+        "startChar": 24,
+        "endLine": 193,
+        "endChar": 25
+      },
+      "revId": "d4ce436eddcdd1574441e89a1c38b91cddde9e99",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
