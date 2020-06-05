@@ -22,6 +22,30 @@
       "revId": "ce162972811db12fd0f0774c152a328a22806601",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3c2248a7_35cb7292",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/netconf/RFC6241DataTreeService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-06-05T14:03:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e5f109b_8febfbff",
+      "range": {
+        "startLine": 12,
+        "startChar": 17,
+        "endLine": 12,
+        "endChar": 39
+      },
+      "revId": "ce162972811db12fd0f0774c152a328a22806601",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
