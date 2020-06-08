@@ -189,6 +189,30 @@
       "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "469111a3_31044eb0",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-08T08:57:18Z",
+      "side": 1,
+      "message": "This is not really a case of defining a checked exception and catching that for better flow. Any unchecked exception thrown here is going to cause this deadlock. Since we have no idea what might get through the cracks(since the call inside transformer is leaving netconf), we should catch anything thats missed by the transformer(it already catches checked exceptions related to parsing).",
+      "parentUuid": "6b4f065a_165d34b4",
+      "range": {
+        "startLine": 64,
+        "startChar": 16,
+        "endLine": 67,
+        "endChar": 17
+      },
+      "revId": "a6df4a040278429dc4eaf10a729916f87aeb64da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
