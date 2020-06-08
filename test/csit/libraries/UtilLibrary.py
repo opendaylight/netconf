@@ -207,7 +207,7 @@ def wait_for_controller_stopped(ip, username, password, karafHome):
 
 
 def clean_journal(ip, username, password, karafHome):
-    execute_ssh_command(ip, username, password, "rm -rf " + karafHome + "/journal")
+    execute_ssh_command(ip, username, password, "rm -rf " + karafHome + "/*journal")
 
 
 def kill_controller(ip, username, password, karafHome):
