@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -94,6 +95,12 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                     context.getWriterParameters().getDepth(), context.getWriterParameters().getFields());
             jsonWriter.endObject();
             jsonWriter.flush();
+        }
+
+        if (httpHeaders != null) {
+            for (final Map.Entry<String, Object> entry : context.getNewHeaders().entrySet()) {
+                httpHeaders.add(entry.getKey(), entry.getValue());
+            }
         }
     }
 
