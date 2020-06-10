@@ -328,7 +328,6 @@ final class SubscribeToStreamUtil {
 
     static boolean checkExist(final SchemaContext schemaContext,
                               final DOMDataTreeReadOperations readWriteTransaction) {
-        boolean exist;
         try {
             return readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
                     IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();

@@ -28,6 +28,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -100,8 +101,8 @@ public class NetconfDeviceSalFacadeTest {
             null);
 
         verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext),
-                any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class),
-                isNull());
+                any(DOMDataBroker.class), any(NetconfDataTreeService.class), eq(deviceRpc),
+                any(NetconfDeviceNotificationService.class), isNull());
         verify(netconfDeviceTopologyAdapter,
                 times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }

@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.primitives.Ints;
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,14 +20,13 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -83,10 +82,8 @@ public final class ReadDataTransactionUtil {
     /**
      * Parse parameters from URI request and check their types and values.
      *
-     * @param identifier
-     *             {@link InstanceIdentifierContext}
-     * @param uriInfo
-     *             URI info
+     * @param identifier {@link InstanceIdentifierContext}
+     * @param uriInfo    URI info
      * @return {@link WriterParameters}
      */
     public static WriterParameters parseUriParameters(final InstanceIdentifierContext<?> identifier,
@@ -173,60 +170,50 @@ public final class ReadDataTransactionUtil {
                     builder.setWithDefault(withDefaults.get(0));
             }
         }
-
         return builder.build();
     }
 
     /**
      * Read specific type of data from data store via transaction.
      *
-     * @param valueOfContent
-     *            type of data to read (config, state, all)
-     * @param transactionNode
-     *            {@link TransactionVarsWrapper} - wrapper for variables
-     * @param schemaContext
-     *            schema context
+     * @param valueOfContent type of data to read (config, state, all)
+     * @param strategy       {@link RestconfStrategy} - wrapper for variables
+     * @param schemaContext  schema context
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
-            final @NonNull TransactionVarsWrapper transactionNode, final SchemaContext schemaContext) {
-        return readData(valueOfContent, transactionNode, null, schemaContext);
+            final @NonNull RestconfStrategy strategy, final SchemaContext schemaContext) {
+        return readData(valueOfContent, strategy, null, schemaContext);
     }
 
     /**
-     * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} inside of object
-     * {@link TransactionVarsWrapper} provided as a parameter.
+     * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} if any
+     * inside of object {@link RestconfStrategy} provided as a parameter.
      *
-     * @param valueOfContent
-     *            type of data to read (config, state, all)
-     * @param transactionNode
-     *            {@link TransactionVarsWrapper} - wrapper for variables
-     * @param withDefa
-     *            value of with-defaults parameter
-     * @param ctx
-     *            schema context
+     * @param valueOfContent type of data to read (config, state, all)
+     * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa       vaule of with-defaults parameter
+     * @param ctx            schema context
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
-            final @NonNull TransactionVarsWrapper transactionNode, final String withDefa, final SchemaContext ctx) {
+                                                          final @NonNull RestconfStrategy strategy,
+                                                          final String withDefa, final SchemaContext ctx) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
-                transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
                 if (withDefa == null) {
-                    return readDataViaTransaction(transactionNode);
+                    return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true);
                 } else {
-                    return prepareDataByParamWithDef(readDataViaTransaction(transactionNode),
-                            transactionNode.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
+                    return prepareDataByParamWithDef(
+                            readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true),
+                            strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
                 }
             case RestconfDataServiceConstant.ReadData.NONCONFIG:
-                transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
-                return readDataViaTransaction(transactionNode);
-
+                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, true);
             case RestconfDataServiceConstant.ReadData.ALL:
-                return readAllData(transactionNode, withDefa, ctx);
-
+                return readAllData(strategy, withDefa, ctx);
             default:
-                transactionNode.getTransactionChain().close();
+                strategy.cancel();
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
@@ -358,79 +345,57 @@ public final class ReadDataTransactionUtil {
     }
 
     /**
-     * If is set specific {@link LogicalDatastoreType} in
-     * {@link TransactionVarsWrapper}, then read this type of data from DS. If
-     * don't, we have to read all data from DS (state + config).
-     * This method will close {@link org.opendaylight.mdsal.dom.api.DOMTransactionChain} inside of
-     * {@link TransactionVarsWrapper}.
+     * If is set specific {@link LogicalDatastoreType} in {@link RestconfStrategy}, then read this type of data from DS.
+     * If don't, we have to read all data from DS (state + config)
      *
-     * @param transactionNode
-     *             {@link TransactionVarsWrapper} - wrapper for variables
+     * @param strategy              {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param closeTransactionChain If is set to true, after transaction it will close transactionChain
+     *                              in {@link RestconfStrategy} if any
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
-            final @NonNull TransactionVarsWrapper transactionNode) {
-        return readDataViaTransaction(transactionNode, true);
-    }
-
-
-    /**
-     * If is set specific {@link LogicalDatastoreType} in
-     * {@link TransactionVarsWrapper}, then read this type of data from DS. If
-     * don't, we have to read all data from DS (state + config)
-     *
-     * @param transactionNode
-     *             {@link TransactionVarsWrapper} - wrapper for variables
-     * @param closeTransactionChain
-     *             If is set to true, after transaction it will close transactionChain in {@link TransactionVarsWrapper}
-     * @return {@link NormalizedNode}
-     */
-    private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
-            final @NonNull TransactionVarsWrapper transactionNode, final boolean closeTransactionChain) {
+            final @NonNull RestconfStrategy strategy,
+            final LogicalDatastoreType store,
+            final boolean closeTransactionChain) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        try (DOMDataTreeReadTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
-            final FluentFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = tx.read(
-                transactionNode.getLogicalDatastoreType(),
-                transactionNode.getInstanceIdentifier().getInstanceIdentifier());
-            if (closeTransactionChain) {
-                //Method close transactionChain inside of TransactionVarsWrapper, if is provide as a parameter.
-                FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                        dataFactory, transactionNode.getTransactionChain());
-            } else {
-                FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                        dataFactory);
-            }
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(
+                store, strategy.getInstanceIdentifier().getInstanceIdentifier());
+        if (closeTransactionChain) {
+            //Method close transactionChain if any
+            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                    dataFactory, strategy.getTransactionChain());
+        } else {
+            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                    dataFactory);
         }
         return dataFactory.build();
     }
 
     /**
      * Read config and state data, then map them. Close {@link DOMTransactionChain} inside of object
-     * {@link TransactionVarsWrapper} provided as a parameter.
+     * {@link RestconfStrategy} provided as a parameter if any.
      *
-     * @param transactionNode
-     *            {@link TransactionVarsWrapper} - wrapper for variables
-     * @param withDefa
-     *            with-defaults parameter
-     * @param ctx
-     *            schema context
+     * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa with-defaults parameter
+     * @param ctx      schema context
      * @return {@link NormalizedNode}
      */
-    private static @Nullable NormalizedNode<?, ?> readAllData(final @NonNull TransactionVarsWrapper transactionNode,
+    private static @Nullable NormalizedNode<?, ?> readAllData(final @NonNull RestconfStrategy strategy,
             final String withDefa, final SchemaContext ctx) {
         // PREPARE STATE DATA NODE
-        transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
-        final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(transactionNode, false);
+        final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(
+                strategy, LogicalDatastoreType.OPERATIONAL, false);
 
         // PREPARE CONFIG DATA NODE
-        transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
         final NormalizedNode<?, ?> configDataNode;
-        //Here will be closed transactionChain
+        //Here will be closed transactionChain if any
         if (withDefa == null) {
-            configDataNode = readDataViaTransaction(transactionNode);
+            configDataNode = readDataViaTransaction(
+                    strategy, LogicalDatastoreType.CONFIGURATION, true);
         } else {
-            configDataNode = prepareDataByParamWithDef(readDataViaTransaction(transactionNode),
-                    transactionNode.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
+            configDataNode = prepareDataByParamWithDef(
+                    readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true),
+                    strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
         }
 
         // if no data exists
@@ -455,10 +420,8 @@ public final class ReadDataTransactionUtil {
     /**
      * Merge state and config data into a single NormalizedNode.
      *
-     * @param stateDataNode
-     *             data node of state data
-     * @param configDataNode
-     *             data node of config data
+     * @param stateDataNode  data node of state data
+     * @param configDataNode data node of config data
      * @return {@link NormalizedNode}
      */
     private static @NonNull NormalizedNode<?, ?> mergeStateAndConfigData(
@@ -474,10 +437,8 @@ public final class ReadDataTransactionUtil {
     /**
      * Validates whether the two NormalizedNodes can be merged.
      *
-     * @param stateDataNode
-     *             data node of state data
-     * @param configDataNode
-     *             data node of config data
+     * @param stateDataNode  data node of state data
+     * @param configDataNode data node of config data
      */
     private static void validateNodeMerge(final @NonNull NormalizedNode<?, ?> stateDataNode,
                                           final @NonNull NormalizedNode<?, ?> configDataNode) {
@@ -491,10 +452,8 @@ public final class ReadDataTransactionUtil {
     /**
      * Prepare and map data for rpc.
      *
-     * @param configDataNode
-     *             data node of config data
-     * @param stateDataNode
-     *             data node of state data
+     * @param configDataNode data node of config data
+     * @param stateDataNode  data node of state data
      * @return {@link NormalizedNode}
      */
     private static @NonNull NormalizedNode<?, ?> prepareRpcData(final @NonNull NormalizedNode<?, ?> configDataNode,
@@ -514,10 +473,8 @@ public final class ReadDataTransactionUtil {
     /**
      * Map node to map entry builder.
      *
-     * @param dataNode
-     *             data node
-     * @param mapEntryBuilder
-     *             builder for mapping data
+     * @param dataNode        data node
+     * @param mapEntryBuilder builder for mapping data
      */
     private static void mapRpcDataNode(final @NonNull NormalizedNode<?, ?> dataNode,
             final @NonNull DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder) {
@@ -527,10 +484,8 @@ public final class ReadDataTransactionUtil {
     /**
      * Prepare and map all data from DS.
      *
-     * @param configDataNode
-     *             data node of config data
-     * @param stateDataNode
-     *             data node of state data
+     * @param configDataNode data node of config data
+     * @param stateDataNode  data node of state data
      * @return {@link NormalizedNode}
      */
     @SuppressWarnings("unchecked")
@@ -627,12 +582,9 @@ public final class ReadDataTransactionUtil {
     /**
      * Map value from container node to builder.
      *
-     * @param configData
-     *             collection of config data nodes
-     * @param stateData
-     *             collection of state data nodes
-     * @param builder
-     *             builder
+     * @param configData collection of config data nodes
+     * @param stateData  collection of state data nodes
+     * @param builder    builder
      */
     private static <T extends NormalizedNode<? extends PathArgument, ?>> void mapValueToBuilder(
             final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
@@ -653,12 +605,9 @@ public final class ReadDataTransactionUtil {
      * Map data with different identifiers to builder. Data with different identifiers can be just added
      * as childs to parent node.
      *
-     * @param configMap
-     *             map of config data nodes
-     * @param stateMap
-     *             map of state data nodes
-     * @param builder
-     *           - builder
+     * @param configMap map of config data nodes
+     * @param stateMap  map of state data nodes
+     * @param builder   - builder
      */
     private static <T extends NormalizedNode<? extends PathArgument, ?>> void mapDataToBuilder(
             final @NonNull Map<PathArgument, T> configMap, final @NonNull Map<PathArgument, T> stateMap,
@@ -673,12 +622,9 @@ public final class ReadDataTransactionUtil {
      * Map data with the same identifiers to builder. Data with the same identifiers cannot be just added but we need to
      * go one level down with {@code prepareData} method.
      *
-     * @param configMap
-     *             immutable config data
-     * @param stateMap
-     *             immutable state data
-     * @param builder
-     *           - builder
+     * @param configMap immutable config data
+     * @param stateMap  immutable state data
+     * @param builder   - builder
      */
     @SuppressWarnings("unchecked")
     private static <T extends NormalizedNode<? extends PathArgument, ?>> void mergeDataToBuilder(

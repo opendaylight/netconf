@@ -52,7 +52,7 @@ public class SlaveSalFacade {
             actorSystem.dispatcher(), actorResponseWaitTime);
 
         salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
-            deviceRpc, notificationService, deviceAction);
+            null, deviceRpc, notificationService, deviceAction);
 
         LOG.info("{}: Slave mount point registered.", id);
     }
