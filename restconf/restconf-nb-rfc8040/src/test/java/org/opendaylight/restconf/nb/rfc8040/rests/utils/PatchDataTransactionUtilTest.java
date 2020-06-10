@@ -40,7 +40,8 @@ import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -185,9 +186,9 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdMerge, null, null, this.refSchemaCtx.get());
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
+        final RestconfStrategy strategy = new MdsalRestconfStrategy(iidContext, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
 
         for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue(entity.isOk());
@@ -214,9 +215,9 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
+        final RestconfStrategy strategy = new MdsalRestconfStrategy(iidContext, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
 
         for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
@@ -237,9 +238,9 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
+        final RestconfStrategy strategy = new MdsalRestconfStrategy(iidContext, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(RestconfError.ErrorType.PROTOCOL,
@@ -262,9 +263,9 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
+        final RestconfStrategy strategy = new MdsalRestconfStrategy(iidContext, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
 
         for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue(entity.isOk());
