@@ -12,14 +12,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
  * Util class for delete specific data in config DS.
- *
  */
 public final class DeleteDataTransactionUtil {
 
@@ -30,36 +27,20 @@ public final class DeleteDataTransactionUtil {
     /**
      * Delete data from DS via transaction.
      *
-     * @param transactionNode
-     *             Wrapper for data of transaction
+     * @param strategy object that perform the actual DS operations
      * @return {@link Response}
      */
-    public static Response deleteData(final TransactionVarsWrapper transactionNode) {
-        final DOMTransactionChain transactionChain = transactionNode.getTransactionChainHandler().get();
-        final FluentFuture<? extends CommitInfo> future = submitData(transactionChain,
-                transactionNode.getInstanceIdentifier().getInstanceIdentifier());
-        final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
-        //This method will close transactionChain
-        FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response,
-                transactionChain);
-        return response.build();
-    }
-
-    /**
-     * Delete data via transaction. Return error if data to delete does not exist.
-     *
-     * @param transactionChain
-     *             transaction chain
-     * @param path
-     *             path of data to delete
-     * @return {@link FluentFuture}
-     */
-    private static FluentFuture<? extends CommitInfo> submitData(
-            final DOMTransactionChain transactionChain, final YangInstanceIdentifier path) {
-        final DOMDataTreeReadWriteTransaction readWriteTx = transactionChain.newReadWriteTransaction();
-        TransactionUtil.checkItemExists(transactionChain, readWriteTx, LogicalDatastoreType.CONFIGURATION, path,
+    public static Response deleteData(final RestconfStrategy strategy) {
+        strategy.prepareExecution();
+        final YangInstanceIdentifier path = strategy.getInstanceIdentifier().getInstanceIdentifier();
+        TransactionUtil.checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
                 RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
-        readWriteTx.delete(LogicalDatastoreType.CONFIGURATION, path);
-        return readWriteTx.commit();
+        strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
+        final FluentFuture<? extends CommitInfo> future = strategy.commit();
+        final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
+        //This method will close transactionChain if any
+        FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response,
+                strategy.getTransactionChain());
+        return response.build();
     }
 }
