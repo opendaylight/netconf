@@ -30,6 +30,7 @@
 
   <modules>
     <module>netconf-api</module>
+    <module>netconf-dom-api</module>
     <module>netconf-config</module>
     <module>netconf-impl</module>
     <module>mdsal-netconf-ssh</module>
