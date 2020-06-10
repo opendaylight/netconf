@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "199a1efa_6e930c0a",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/AbstractQueryParams.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-06-10T11:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49012ae2_1d22d2f4",
+      "range": {
+        "startLine": 102,
+        "startChar": 19,
+        "endLine": 102,
+        "endChar": 25
+      },
+      "revId": "d6876378242825277627bf965e64bab83469f79c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4d91ba30_3397ea02",
         "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
         "patchSetId": 6
@@ -45,6 +69,30 @@
       "revId": "d6876378242825277627bf965e64bab83469f79c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9edf4e22_f183d06c",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-06-10T11:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d91ba30_3397ea02",
+      "range": {
+        "startLine": 289,
+        "startChar": 8,
+        "endLine": 289,
+        "endChar": 28
+      },
+      "revId": "d6876378242825277627bf965e64bab83469f79c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "ba7cea89_d6437f89",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-06-10T11:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f1d2819_1cf8800c",
+      "range": {
+        "startLine": 300,
+        "startChar": 12,
+        "endLine": 300,
+        "endChar": 28
+      },
+      "revId": "d6876378242825277627bf965e64bab83469f79c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c232121_b6a76208",
         "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
         "patchSetId": 6
@@ -91,6 +163,30 @@
       "revId": "d6876378242825277627bf965e64bab83469f79c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "52a71922_a243e3df",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-06-10T11:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c232121_b6a76208",
+      "range": {
+        "startLine": 302,
+        "startChar": 16,
+        "endLine": 302,
+        "endChar": 22
+      },
+      "revId": "d6876378242825277627bf965e64bab83469f79c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "7e38ea61_8f80f347",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-06-10T11:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "728211c6_ab7dfbdd",
+      "range": {
+        "startLine": 304,
+        "startChar": 8,
+        "endLine": 304,
+        "endChar": 32
+      },
+      "revId": "d6876378242825277627bf965e64bab83469f79c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "528aa2c7_27458624",
         "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
         "patchSetId": 6
@@ -137,6 +257,30 @@
       "revId": "d6876378242825277627bf965e64bab83469f79c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0cbecc53_963af69c",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-06-10T11:11:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "528aa2c7_27458624",
+      "range": {
+        "startLine": 305,
+        "startChar": 12,
+        "endLine": 305,
+        "endChar": 88
+      },
+      "revId": "d6876378242825277627bf965e64bab83469f79c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
