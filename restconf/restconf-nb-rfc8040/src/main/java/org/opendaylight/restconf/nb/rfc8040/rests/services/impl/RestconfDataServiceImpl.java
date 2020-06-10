@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -45,7 +46,9 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
@@ -135,10 +138,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                instanceIdentifier, mountPoint, getTransactionChainHandler(mountPoint));
+        final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, mountPoint);
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(identifier, parameters.getContent(),
-                transactionNode, parameters.getWithDefault(), schemaContextRef, uriInfo);
+                strategy, parameters.getWithDefault(), schemaContextRef, uriInfo);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
@@ -181,19 +183,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        final EffectiveModelContext ref;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-            ref = this.schemaContextHandler.get();
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = mountPoint.getEffectiveModelContext();
-        }
+        final EffectiveModelContext ref = mountPoint == null
+                ? this.schemaContextHandler.get()
+                : mountPoint.getEffectiveModelContext();
 
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
-        return PutDataTransactionUtil.putData(payload, ref, transactionNode, checkedParms.insert, checkedParms.point);
+        final RestconfStrategy strategy = getRestconfStrategy(payload.getInstanceIdentifierContext(), mountPoint);
+        return PutDataTransactionUtil.putData(payload, ref, strategy, checkedParms.insert, checkedParms.point);
     }
 
     private static QueryParams checkQueryParameters(final UriInfo uriInfo) {
@@ -257,11 +252,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
-
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
-        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode,
+        final RestconfStrategy strategy = getRestconfStrategy(payload.getInstanceIdentifierContext(),
+                payload.getInstanceIdentifierContext().getMountPoint());
+        return PostDataTransactionUtil.postData(uriInfo, payload, strategy,
                 getSchemaContext(mountPoint), checkedParms.insert, checkedParms.point);
     }
 
@@ -271,16 +265,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 identifier, this.schemaContextHandler.get(), Optional.of(this.mountPointServiceHandler.get()));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-        }
-
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
-                localTransactionChainHandler);
-        return DeleteDataTransactionUtil.deleteData(transactionNode);
+        final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, mountPoint);
+        return DeleteDataTransactionUtil.deleteData(strategy);
     }
 
     @Override
@@ -291,9 +277,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
         final DOMMountPoint mountPoint = requireNonNull(context).getInstanceIdentifierContext().getMountPoint();
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                context.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
-        return PatchDataTransactionUtil.patchData(context, transactionNode, getSchemaContext(mountPoint));
+        final RestconfStrategy strategy = getRestconfStrategy(context.getInstanceIdentifierContext(), mountPoint);
+        return PatchDataTransactionUtil.patchData(context, strategy, getSchemaContext(mountPoint));
     }
 
     @Override
@@ -308,34 +293,35 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        final EffectiveModelContext ref;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-            ref = this.schemaContextHandler.get();
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = mountPoint.getEffectiveModelContext();
-        }
+        final EffectiveModelContext ref = mountPoint == null
+                ? this.schemaContextHandler.get()
+                : mountPoint.getEffectiveModelContext();
+        final RestconfStrategy strategy = getRestconfStrategy(payload.getInstanceIdentifierContext(), mountPoint);
 
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
-
-        return PlainPatchDataTransactionUtil.patchData(payload, transactionNode, ref);
-    }
-
-    private TransactionChainHandler getTransactionChainHandler(final DOMMountPoint mountPoint) {
-        return mountPoint == null ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
+        return PlainPatchDataTransactionUtil.patchData(payload, strategy, ref);
     }
 
     private EffectiveModelContext getSchemaContext(final DOMMountPoint mountPoint) {
         return mountPoint == null ? schemaContextHandler.get() : mountPoint.getEffectiveModelContext();
     }
 
+    public synchronized RestconfStrategy getRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
+                                                final DOMMountPoint mountPoint) {
+        if (mountPoint != null) {
+            final Optional<NetconfDataTreeService> service = mountPoint.getService(NetconfDataTreeService.class);
+            if (service.isPresent()) {
+                return new NetconfRestconfStrategy(service.get(), instanceIdentifier);
+            }
+        }
+        final TransactionChainHandler transactionChain = mountPoint == null
+                ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
+        return new MdsalRestconfStrategy(instanceIdentifier, transactionChain);
+    }
+
     /**
      * Prepare transaction chain to access data of mount point.
-     * @param mountPoint
-     *            mount point reference
+     *
+     * @param mountPoint mount point reference
      * @return {@link TransactionChainHandler}
      */
     private static TransactionChainHandler transactionChainOfMountPoint(final @NonNull DOMMountPoint mountPoint) {
@@ -352,10 +338,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     /**
      * Invoke Action operation.
      *
-     * @param payload
-     *             {@link NormalizedNodeContext} - the body of the operation
-     * @param uriInfo
-     *             URI info
+     * @param payload {@link NormalizedNodeContext} - the body of the operation
+     * @param uriInfo URI info
      * @return {@link NormalizedNodeContext} wrapped in {@link Response}
      */
     public Response invokeAction(final NormalizedNodeContext payload, final UriInfo uriInfo) {
