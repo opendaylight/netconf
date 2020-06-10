@@ -9,13 +9,22 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -78,6 +87,36 @@ public final class TransactionUtil {
         writeTx.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
     }
 
+    public static void ensureParentsByMerge(final YangInstanceIdentifier path, final SchemaContext schemaContext,
+                                            final NetconfDataTreeService netconfService,
+                                            List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+        final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
+        YangInstanceIdentifier rootNormalizedPath = null;
+
+        final Iterator<PathArgument> it = path.getPathArguments().iterator();
+
+        while (it.hasNext()) {
+            final PathArgument pathArgument = it.next();
+            if (rootNormalizedPath == null) {
+                rootNormalizedPath = YangInstanceIdentifier.create(pathArgument);
+            }
+
+            if (it.hasNext()) {
+                normalizedPathWithoutChildArgs.add(pathArgument);
+            }
+        }
+
+        if (normalizedPathWithoutChildArgs.isEmpty()) {
+            return;
+        }
+
+        final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
+                YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
+        resultsFutures.add(
+                netconfService.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath,
+                        parentStructure, Optional.empty()));
+    }
+
     /**
      * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
      * data does NOT already exists.
@@ -100,6 +139,25 @@ public final class TransactionUtil {
             // close transaction
             rwTransaction.cancel();
             transactionChain.close();
+            // throw error
+            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
+            throw new RestconfDocumentedException(
+                    "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
+        }
+    }
+
+    public static void checkItemExists(final NetconfDataTreeService netconfService,
+                                       final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                                       final String operationType) {
+        final FluentFuture<Boolean> future = isDataExists(netconfService, store, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, operationType, response);
+
+        if (!response.result) {
+            // close transaction
+            netconfService.discardChanges();
+            netconfService.unlock();
             // throw error
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             throw new RestconfDocumentedException(
@@ -134,5 +192,48 @@ public final class TransactionUtil {
             throw new RestconfDocumentedException(
                     "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
         }
+    }
+
+    public static void checkItemDoesNotExists(final NetconfDataTreeService netconfService,
+                                              final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                                              final String operationType) {
+        final FluentFuture<Boolean> future = isDataExists(netconfService, store, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, operationType, response);
+
+        if (response.result) {
+            netconfService.discardChanges();
+            netconfService.unlock();
+            // throw error
+            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
+            throw new RestconfDocumentedException(
+                    "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
+        }
+    }
+
+    public static FluentFuture<Boolean> isDataExists(final NetconfDataTreeService netconfDataTreeService,
+                                        final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        return remapException(netconfDataTreeService.readData(store, path))
+                .transform(optionalNode -> optionalNode != null && optionalNode.isPresent(),
+                MoreExecutors.directExecutor());
+    }
+
+    private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
+        final SettableFuture<T> ret = SettableFuture.create();
+        Futures.addCallback(input, new FutureCallback<T>() {
+
+            @Override
+            public void onSuccess(final T result) {
+                ret.set(result);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                ret.setException(cause instanceof ReadFailedException ? cause
+                        : new ReadFailedException("NETCONF operation failed", cause));
+            }
+        }, MoreExecutors.directExecutor());
+        return FluentFuture.from(ret);
     }
 }

@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.netconf.node.fields.optional.topology.node.DatastoreLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +20,10 @@ final class LockChangeListener implements DataTreeChangeListener<DatastoreLock> 
 
     private static final Logger LOG = LoggerFactory.getLogger(LockChangeListener.class);
 
-    private final NetconfDeviceDataBroker netconfDeviceDataBroker;
+    private final NetconfDataTreeServiceImpl netconfDataTreeService;
 
-    LockChangeListener(final DOMDataBroker netconfDeviceDataBrokder) {
-        this.netconfDeviceDataBroker = (NetconfDeviceDataBroker)netconfDeviceDataBrokder;
+    LockChangeListener(final NetconfDataTreeService netconfDataTreeService) {
+        this.netconfDataTreeService = (NetconfDataTreeServiceImpl) netconfDataTreeService;
     }
 
     @Override
@@ -38,10 +38,10 @@ final class LockChangeListener implements DataTreeChangeListener<DatastoreLock> 
                                  + "operate in a manner which is not supported. Concurrent access to "
                                  + "the data store may interfere with data consistency.");
                     }
-                    netconfDeviceDataBroker.setLockAllowed(rootNode.getDataAfter().isDatastoreLockAllowed());
+                    netconfDataTreeService.setLockAllowed(rootNode.getDataAfter().isDatastoreLockAllowed());
                     break;
                 case DELETE:
-                    netconfDeviceDataBroker.setLockAllowed(true);
+                    netconfDataTreeService.setLockAllowed(true);
                     break;
                 default:
                     LOG.debug("Unsupported modification type: {}.", rootNode.getModificationType());
