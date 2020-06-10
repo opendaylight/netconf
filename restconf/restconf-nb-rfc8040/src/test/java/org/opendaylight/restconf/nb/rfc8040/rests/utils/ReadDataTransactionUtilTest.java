@@ -37,7 +37,8 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -58,7 +59,7 @@ public class ReadDataTransactionUtilTest {
     private static final YangInstanceIdentifier.NodeIdentifier NODE_IDENTIFIER = new YangInstanceIdentifier
             .NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
 
-    private TransactionVarsWrapper wrapper;
+    private RestconfStrategy strategy;
     @Mock
     private DOMTransactionChain transactionChain;
     @Mock
@@ -88,7 +89,8 @@ public class ReadDataTransactionUtilTest {
 
         DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
-        wrapper = new TransactionVarsWrapper(this.context, null, new TransactionChainHandler(mockDataBroker));
+        strategy = RestconfDataServiceImpl.getRestconfStrategy(this.context, null,
+                new TransactionChainHandler(mockDataBroker).get());
     }
 
     @Test
@@ -98,7 +100,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(valueOfContent, strategy, schemaContext);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -111,7 +113,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(valueOfContent, strategy, schemaContext);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -124,7 +126,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(valueOfContent, strategy, schemaContext);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -135,7 +137,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.NONCONFIG;
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(valueOfContent, strategy, schemaContext);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -148,7 +150,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(valueOfContent, strategy, schemaContext);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
@@ -166,7 +168,7 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
-                RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+                RestconfDataServiceConstant.ReadData.ALL, strategy, schemaContext);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
@@ -185,7 +187,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(valueOfContent, strategy, schemaContext);
         final MapNode checkingData = Builders
                 .mapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
@@ -203,7 +205,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
 
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, strategy, schemaContext);
 
         final MapNode expectedData = Builders.orderedMapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(DATA.listQname)).withChild(DATA.checkData)
@@ -220,7 +222,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
 
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, strategy, schemaContext);
 
         final UnkeyedListNode expectedData = Builders.unkeyedListBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(DATA.listQname))
@@ -240,7 +242,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.leafSetNodePath).when(context).getInstanceIdentifier();
 
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, strategy, schemaContext);
 
         final LeafSetNode<String> expectedData = Builders.<String>leafSetBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(DATA.leafListQname)).withValue(
@@ -258,7 +260,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.leafSetNodePath).when(context).getInstanceIdentifier();
 
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, strategy, schemaContext);
 
         final LeafSetNode<String> expectedData = Builders.<String>orderedLeafSetBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(DATA.leafListQname)).withValue(
@@ -274,7 +276,7 @@ public class ReadDataTransactionUtilTest {
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
         final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+                ReadDataTransactionUtil.readData(valueOfContent, strategy, schemaContext);
         assertNull(normalizedNode);
     }
 
@@ -282,7 +284,7 @@ public class ReadDataTransactionUtilTest {
     public void readDataFailTest() {
         final String valueOfContent = RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
-                valueOfContent, wrapper, schemaContext);
+                valueOfContent, strategy, schemaContext);
         assertNull(normalizedNode);
     }
 

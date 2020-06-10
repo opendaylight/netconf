@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2020 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.api;
+
+import com.google.common.util.concurrent.ListenableFuture;
+import java.util.List;
+import java.util.Optional;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMService;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+
+public interface NetconfDataTreeService extends DOMService {
+
+    List<ListenableFuture<? extends DOMRpcResult>> lock();
+
+    void unlock();
+
+    void discardChanges();
+
+    ListenableFuture<Optional<NormalizedNode<?,?>>> get(YangInstanceIdentifier path);
+
+    ListenableFuture<Optional<NormalizedNode<?,?>>> getConfig(YangInstanceIdentifier path);
+
+    ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
+                                                   NormalizedNode<?, ?> data,
+                                                   Optional<ModifyAction> defaultOperation);
+
+    ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
+                                                     NormalizedNode<?, ?> data,
+                                                     Optional<ModifyAction> defaultOperation);
+
+    ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
+                                                    NormalizedNode<?, ?> data,
+                                                    Optional<ModifyAction> defaultOperation);
+
+    ListenableFuture<? extends DOMRpcResult> delete(LogicalDatastoreType store, YangInstanceIdentifier path);
+
+    ListenableFuture<? extends DOMRpcResult> remove(LogicalDatastoreType store, YangInstanceIdentifier path);
+
+    ListenableFuture<? extends CommitInfo> commit(List<ListenableFuture<? extends DOMRpcResult>> resultsFutures);
+}
