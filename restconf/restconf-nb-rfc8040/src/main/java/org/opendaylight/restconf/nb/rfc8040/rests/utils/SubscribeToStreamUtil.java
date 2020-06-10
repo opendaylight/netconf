@@ -69,7 +69,6 @@ import org.slf4j.LoggerFactory;
  * Subscribe to stream util class.
  */
 public final class SubscribeToStreamUtil {
-
     private static final Logger LOG = LoggerFactory.getLogger(SubscribeToStreamUtil.class);
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
@@ -329,7 +328,6 @@ public final class SubscribeToStreamUtil {
 
     static boolean checkExist(final SchemaContext schemaContext,
                               final DOMDataTreeReadOperations readWriteTransaction) {
-        boolean exist;
         try {
             return readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
                     IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
@@ -363,5 +361,4 @@ public final class SubscribeToStreamUtil {
         }
         return ResolveEnumUtil.resolveEnum(clazz, value);
     }
-
 }

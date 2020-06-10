@@ -51,6 +51,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -64,6 +65,9 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -118,6 +122,8 @@ public class RestconfDataServiceImplTest {
     private DOMMountPoint mountPoint;
     @Mock
     private DOMDataBroker mountDataBroker;
+    @Mock
+    private NetconfDataTreeService netconfService;
     @Mock
     private ActionServiceHandler actionServiceHandler;
     @Mock
@@ -543,5 +549,18 @@ public class RestconfDataServiceImplTest {
         assertFalse(status.getEditCollection().get(2).getEditErrors().isEmpty());
         final String errorMessage = status.getEditCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
+    }
+
+    @Test
+    public void testGetRestconfStrategy() {
+        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(
+                this.iidBase, this.schemaNode, this.mountPoint, this.contextRef.get());
+
+        RestconfStrategy restconfStrategy = this.dataService.getRestconfStrategy(iidContext, this.mountPoint);
+        assertTrue(restconfStrategy instanceof MdsalRestconfStrategy);
+
+        doReturn(Optional.of(this.netconfService)).when(this.mountPoint).getService(NetconfDataTreeService.class);
+        restconfStrategy = this.dataService.getRestconfStrategy(iidContext, this.mountPoint);
+        assertTrue(restconfStrategy instanceof NetconfRestconfStrategy);
     }
 }
