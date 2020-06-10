@@ -18,6 +18,7 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -75,14 +76,14 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
                                                final NetconfSessionPreferences netconfSessionPreferences,
                                                final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
         final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
-        final NetconfDeviceDataBroker netconfDeviceDataBroker =
-                new NetconfDeviceDataBroker(id, mountContext, deviceRpc, netconfSessionPreferences);
-        registerLockListener(netconfDeviceDataBroker);
+        final NetconfDataTreeService netconfService =
+                new NetconfDataTreeServiceImpl(id, mountContext, deviceRpc, netconfSessionPreferences);
+        registerLockListener(netconfService);
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
         salProvider.getMountInstance()
-                .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, deviceRpc, notificationService,
-                        deviceAction);
+                .onTopologyDeviceConnected(schemaContext, null, netconfService,
+                        deviceRpc, notificationService, deviceAction);
         salProvider.getTopologyDatastoreAdapter()
                 .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
@@ -134,10 +135,10 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
         }
     }
 
-    private void registerLockListener(final NetconfDeviceDataBroker netconfDeviceDataBroker) {
+    private void registerLockListener(final NetconfDataTreeService netconfDataTreeService) {
         listenerRegistration = dataBroker.registerDataTreeChangeListener(
                 DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, createTopologyListPath()),
-                new LockChangeListener(netconfDeviceDataBroker));
+                new LockChangeListener(netconfDataTreeService));
     }
 
     private InstanceIdentifier<DatastoreLock> createTopologyListPath() {
