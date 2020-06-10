@@ -42,7 +42,8 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -160,10 +161,9 @@ public class PostDataTransactionUtilTest {
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        final TransactionVarsWrapper wrapper =
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
+        final RestconfStrategy strategy = new MdsalRestconfStrategy(iidContext, transactionChainHandler);
         final Response response =
-                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
+                PostDataTransactionUtil.postData(this.uriInfo, payload, strategy, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -183,10 +183,9 @@ public class PostDataTransactionUtilTest {
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        final TransactionVarsWrapper wrapper =
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
+        final RestconfStrategy strategy = new MdsalRestconfStrategy(iidContext, transactionChainHandler);
         final Response response =
-                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
+                PostDataTransactionUtil.postData(this.uriInfo, payload, strategy, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), "UTF-8"),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
@@ -210,11 +209,10 @@ public class PostDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         final DOMException domException = new DOMException((short) 414, "Post request failed");
         doReturn(immediateFailedFluentFuture(domException)).when(this.readWrite).commit();
-        final TransactionVarsWrapper wrapper =
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
+        final RestconfStrategy strategy = new MdsalRestconfStrategy(iidContext, transactionChainHandler);
 
         try {
-            PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
+            PostDataTransactionUtil.postData(this.uriInfo, payload, strategy, this.refSchemaCtx, null, null);
             fail("Expected RestconfDocumentedException");
         } catch (final RestconfDocumentedException e) {
             assertEquals(1, e.getErrors().size());

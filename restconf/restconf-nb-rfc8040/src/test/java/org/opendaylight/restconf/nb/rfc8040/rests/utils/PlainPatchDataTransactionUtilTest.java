@@ -30,7 +30,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -175,7 +175,7 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+                new MdsalRestconfStrategy(iidContext, transactionChainHandler),
                 this.refSchemaCtx);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
@@ -197,8 +197,7 @@ public class PlainPatchDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
-        PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(iidContext, transactionChainHandler),
                 this.refSchemaCtx);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
@@ -221,7 +220,7 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+                new MdsalRestconfStrategy(iidContext, transactionChainHandler),
                 this.refSchemaCtx);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData());
