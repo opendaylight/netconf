@@ -30,7 +30,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -223,7 +223,8 @@ public class PutDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
+                RestconfDataServiceImpl.getRestconfStrategy(payload.getInstanceIdentifierContext(), null,
+                        transactionChainHandler.get()), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
@@ -247,7 +248,8 @@ public class PutDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
+                RestconfDataServiceImpl.getRestconfStrategy(payload.getInstanceIdentifierContext(), null,
+                        transactionChainHandler.get()), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
@@ -270,7 +272,8 @@ public class PutDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
+                RestconfDataServiceImpl.getRestconfStrategy(payload.getInstanceIdentifierContext(), null,
+                        transactionChainHandler.get()), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());
