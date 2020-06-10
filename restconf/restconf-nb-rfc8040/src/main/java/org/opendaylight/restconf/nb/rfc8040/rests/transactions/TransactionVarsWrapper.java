@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 
@@ -24,6 +25,7 @@ public final class TransactionVarsWrapper {
     private LogicalDatastoreType configuration = null;
     private final DOMTransactionChain transactionChain;
     private final TransactionChainHandler transactionChainHandler;
+    private NetconfDataTreeService  netconfDataTreeService;
 
     /**
      * Set base type of variables, which ones we need for transaction.
@@ -43,7 +45,16 @@ public final class TransactionVarsWrapper {
         this.instanceIdentifier = instanceIdentifier;
         this.mountPoint = mountPoint;
         this.transactionChainHandler = transactionChainHandler;
-        transactionChain = transactionChainHandler.get();
+        if (transactionChainHandler != null) {
+            transactionChain = transactionChainHandler.get();
+        } else {
+            transactionChain = null;
+        }
+        if (mountPoint != null) {
+            netconfDataTreeService = mountPoint.getService(NetconfDataTreeService.class).orElse(null);
+        } else {
+            netconfDataTreeService = null;
+        }
     }
 
     /**
@@ -95,5 +106,13 @@ public final class TransactionVarsWrapper {
 
     public TransactionChainHandler getTransactionChainHandler() {
         return transactionChainHandler;
+    }
+
+    public NetconfDataTreeService getNetconfDataTreeService() {
+        return netconfDataTreeService;
+    }
+
+    public void setNetconfDataTreeService(NetconfDataTreeService netconfDataTreeService) {
+        this.netconfDataTreeService = netconfDataTreeService;
     }
 }

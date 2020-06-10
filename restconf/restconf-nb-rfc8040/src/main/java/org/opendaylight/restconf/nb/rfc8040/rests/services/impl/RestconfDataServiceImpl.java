@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -341,6 +342,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @return {@link TransactionChainHandler}
      */
     private static TransactionChainHandler transactionChainOfMountPoint(final @NonNull DOMMountPoint mountPoint) {
+        if (mountPoint.getService(NetconfDataTreeService.class).isPresent()) {
+            return null;
+        }
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             return new TransactionChainHandler(domDataBrokerService.get());
