@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -25,11 +26,13 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -45,9 +48,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class PlainPatchDataTransactionUtilTest {
-
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
-
     @Mock
     private DOMTransactionChain transactionChain;
     @Mock
@@ -58,6 +59,8 @@ public class PlainPatchDataTransactionUtilTest {
     private DOMDataTreeWriteTransaction write;
     @Mock
     private DOMDataBroker mockDataBroker;
+    @Mock
+    private NetconfDataTreeService netconfService;
 
     private TransactionChainHandler transactionChainHandler;
     private LeafNode<?> leafGap;
@@ -169,13 +172,19 @@ public class PlainPatchDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
         PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+                new MdsalRestconfStrategy(iidContext, transactionChainHandler),
                 this.schema);
-
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
+
+        PlainPatchDataTransactionUtil.patchData(payload,
+                new NetconfRestconfStrategy(netconfService, iidContext),
+                this.schema);
+        verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
@@ -192,13 +201,17 @@ public class PlainPatchDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
-        PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(iidContext, transactionChainHandler),
                 this.schema);
-
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
+
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService, iidContext),
+                this.schema);
+        verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
@@ -215,11 +228,16 @@ public class PlainPatchDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
         PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+                new MdsalRestconfStrategy(iidContext, transactionChainHandler),
                 this.schema);
-
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData());
+
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService, iidContext),
+                this.schema);
+        verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData(),
+                Optional.empty());
     }
 }
