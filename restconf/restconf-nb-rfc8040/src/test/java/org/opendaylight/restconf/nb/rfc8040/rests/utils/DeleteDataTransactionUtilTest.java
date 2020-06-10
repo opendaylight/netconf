@@ -29,7 +29,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class DeleteDataTransactionUtilTest {
@@ -66,7 +66,8 @@ public class DeleteDataTransactionUtilTest {
 
         // test
         final Response response = DeleteDataTransactionUtil.deleteData(
-                new TransactionVarsWrapper(this.context, null, transactionChainHandler));
+                RestconfDataServiceImpl.getRestconfStrategy(this.context, null,
+                        transactionChainHandler.get()));
 
         // assert success
         assertEquals("Not expected response received", Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -83,8 +84,8 @@ public class DeleteDataTransactionUtilTest {
 
         // test and assert error
         try {
-            DeleteDataTransactionUtil.deleteData(new TransactionVarsWrapper(this.context, null,
-                    transactionChainHandler));
+            DeleteDataTransactionUtil.deleteData(RestconfDataServiceImpl.getRestconfStrategy(this.context, null,
+                    transactionChainHandler.get()));
             fail("Delete operation should fail due to missing data");
         } catch (final RestconfDocumentedException e) {
             assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());

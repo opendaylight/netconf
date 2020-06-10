@@ -30,7 +30,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -175,7 +175,8 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+                RestconfDataServiceImpl.getRestconfStrategy(payload.getInstanceIdentifierContext(), null,
+                        transactionChainHandler.get()),
                 this.refSchemaCtx);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
@@ -198,7 +199,8 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+                RestconfDataServiceImpl.getRestconfStrategy(payload.getInstanceIdentifierContext(), null,
+                        transactionChainHandler.get()),
                 this.refSchemaCtx);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
@@ -221,7 +223,8 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PlainPatchDataTransactionUtil.patchData(payload,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
+                RestconfDataServiceImpl.getRestconfStrategy(payload.getInstanceIdentifierContext(), null,
+                        transactionChainHandler.get()),
                 this.refSchemaCtx);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData());
