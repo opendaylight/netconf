@@ -25,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
@@ -42,6 +43,8 @@ public class MountInstanceTest {
     private DOMMountPointService service;
     @Mock
     private DOMDataBroker broker;
+    @Mock
+    private NetconfDataTreeService netconfService;
     @Mock
     private DOMRpcService rpcService;
     @Mock
@@ -72,10 +75,20 @@ public class MountInstanceTest {
 
 
     @Test
-    public void testOnTopologyDeviceConnected() throws Exception {
+    public void testOnTopologyDeviceConnected() {
         mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
         verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
+        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
+        verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
+    }
+
+    @Test
+    public void testOnTopologyDeviceConnectedWithNetconfService() {
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, null, netconfService, rpcService,
+                notificationService, null);
+        verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
+        verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
         verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
     }

@@ -24,16 +24,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -43,13 +45,16 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
@@ -60,6 +65,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConst
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -142,10 +148,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                instanceIdentifier, mountPoint, getTransactionChainHandler(mountPoint));
+        final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, mountPoint);
         final NormalizedNode<?, ?> node = readData(identifier, parameters.getContent(),
-                transactionNode, parameters.getWithDefault(), schemaContextRef, uriInfo);
+                strategy, parameters.getWithDefault(), schemaContextRef, uriInfo);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
@@ -173,62 +178,83 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node, parameters)).build();
     }
 
-
     /**
      * Read specific type of data from data store via transaction and if identifier read data from
      * streams then put streams from actual schema context to datastore.
      *
-     * @param identifier
-     *             identifier of data to read
-     * @param content
-     *             type of data to read (config, state, all)
-     * @param transactionNode
-     *             {@link TransactionVarsWrapper} - wrapper for variables
-     * @param withDefa
-     *             vaule of with-defaults parameter
-     * @param schemaContext
-     *             schema context
-     * @param uriInfo
-     *             uri info
+     * @param identifier    identifier of data to read
+     * @param content       type of data to read (config, state, all)
+     * @param strategy      {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa      vaule of with-defaults parameter
+     * @param schemaContext schema context
+     * @param uriInfo       uri info
      * @return {@link NormalizedNode}
      */
-    private static NormalizedNode<?, ?> readData(final String identifier, final String content,
-                                                final TransactionVarsWrapper transactionNode, final String withDefa,
+    public static NormalizedNode<?, ?> readData(final String identifier, final String content,
+                                                final RestconfStrategy strategy, final String withDefa,
                                                 final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(transactionNode, schemaContext, uriInfo);
+            createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
         }
-        return ReadDataTransactionUtil.readData(content, transactionNode, withDefa, schemaContext);
+        return ReadDataTransactionUtil.readData(content, strategy, withDefa, schemaContext);
     }
 
-    private static void createAllYangNotificationStreams(final TransactionVarsWrapper transactionNode,
-            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
-        final DOMDataTreeReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
-        final boolean exist = SubscribeToStreamUtil.checkExist(schemaContext, wTx);
+    private static void createAllYangNotificationStreams(final RestconfStrategy strategy,
+                                                         final EffectiveModelContext schemaContext,
+                                                         final UriInfo uriInfo) {
+        strategy.prepareReadWriteExecution();
+        final boolean exist = checkExist(schemaContext, strategy);
 
         for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
             final NotificationListenerAdapter notifiStreamXML =
-                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                            NotificationOutputType.XML);
+                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
+                    NotificationOutputType.XML);
             final NotificationListenerAdapter notifiStreamJSON =
-                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                            NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, wTx, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, wTx, exist, notifiStreamJSON);
+                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
+                    NotificationOutputType.JSON);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamXML);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamJSON);
         }
-        SubscribeToStreamUtil.submitData(wTx);
+        try {
+            strategy.commit().get();
+        } catch (final InterruptedException | ExecutionException e) {
+            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
+        }
     }
 
     private static void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo, final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
-            final NotificationListenerAdapter listener) {
+                                                           final UriInfo uriInfo, final RestconfStrategy strategy,
+                                                           final boolean exist,
+                                                           final NotificationListenerAdapter listener) {
         final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
         final NormalizedNode<?, ?> mapToStreams =
-                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                    listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
-                    listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
-        SubscribeToStreamUtil.writeDataToDS(schemaContext,
-                listener.getSchemaPath().getLastComponent().getLocalName(), readWriteTransaction, exist, mapToStreams);
+            RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+                listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
+                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
+        writeDataToDS(schemaContext,
+            listener.getSchemaPath().getLastComponent().getLocalName(), strategy, exist, mapToStreams);
+    }
+
+    private static boolean checkExist(final EffectiveModelContext schemaContext, final RestconfStrategy strategy) {
+        try {
+            return strategy.exists(LogicalDatastoreType.OPERATIONAL,
+                IdentifierCodec.deserialize(Rfc8040.MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
+        } catch (final InterruptedException | ExecutionException exception) {
+            throw new RestconfDocumentedException("Problem while checking data if exists", exception);
+        }
+    }
+
+    private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
+                                      final RestconfStrategy strategy, final boolean exist,
+                                      final NormalizedNode mapToStreams) {
+        String pathId;
+        if (exist) {
+            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
+        } else {
+            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
+        }
+        strategy.merge(LogicalDatastoreType.OPERATIONAL,
+            IdentifierCodec.deserialize(pathId, schemaContext), mapToStreams);
     }
 
     @Override
@@ -245,19 +271,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        final EffectiveModelContext ref;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-            ref = this.schemaContextHandler.get();
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = mountPoint.getEffectiveModelContext();
-        }
+        final EffectiveModelContext ref = mountPoint == null
+                ? this.schemaContextHandler.get()
+                : mountPoint.getEffectiveModelContext();
 
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
-        return PutDataTransactionUtil.putData(payload, ref, transactionNode, checkedParms.insert, checkedParms.point);
+        final RestconfStrategy strategy = getRestconfStrategy(payload.getInstanceIdentifierContext(), mountPoint);
+        return PutDataTransactionUtil.putData(payload, ref, strategy, checkedParms.insert, checkedParms.point);
     }
 
     private static QueryParams checkQueryParameters(final UriInfo uriInfo) {
@@ -321,11 +340,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
-
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
-        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode,
+        final RestconfStrategy strategy = getRestconfStrategy(payload.getInstanceIdentifierContext(),
+                payload.getInstanceIdentifierContext().getMountPoint());
+        return PostDataTransactionUtil.postData(uriInfo, payload, strategy,
                 getSchemaContext(mountPoint), checkedParms.insert, checkedParms.point);
     }
 
@@ -335,16 +353,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 identifier, this.schemaContextHandler.get(), Optional.of(this.mountPointServiceHandler.get()));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-        }
-
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
-                localTransactionChainHandler);
-        return DeleteDataTransactionUtil.deleteData(transactionNode);
+        final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, mountPoint);
+        return DeleteDataTransactionUtil.deleteData(strategy);
     }
 
     @Override
@@ -355,9 +365,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
         final DOMMountPoint mountPoint = requireNonNull(context).getInstanceIdentifierContext().getMountPoint();
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                context.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
-        return PatchDataTransactionUtil.patchData(context, transactionNode, getSchemaContext(mountPoint));
+        final RestconfStrategy strategy = getRestconfStrategy(context.getInstanceIdentifierContext(), mountPoint);
+        return PatchDataTransactionUtil.patchData(context, strategy, getSchemaContext(mountPoint));
     }
 
     @Override
@@ -372,34 +381,35 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        final EffectiveModelContext ref;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-            ref = this.schemaContextHandler.get();
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = mountPoint.getEffectiveModelContext();
-        }
+        final EffectiveModelContext ref = mountPoint == null
+                ? this.schemaContextHandler.get()
+                : mountPoint.getEffectiveModelContext();
+        final RestconfStrategy strategy = getRestconfStrategy(payload.getInstanceIdentifierContext(), mountPoint);
 
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
-
-        return PlainPatchDataTransactionUtil.patchData(payload, transactionNode, ref);
-    }
-
-    private TransactionChainHandler getTransactionChainHandler(final DOMMountPoint mountPoint) {
-        return mountPoint == null ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
+        return PlainPatchDataTransactionUtil.patchData(payload, strategy, ref);
     }
 
     private EffectiveModelContext getSchemaContext(final DOMMountPoint mountPoint) {
         return mountPoint == null ? schemaContextHandler.get() : mountPoint.getEffectiveModelContext();
     }
 
+    public synchronized RestconfStrategy getRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
+                                                final DOMMountPoint mountPoint) {
+        if (mountPoint != null) {
+            final Optional<NetconfDataTreeService> service = mountPoint.getService(NetconfDataTreeService.class);
+            if (service.isPresent()) {
+                return new NetconfRestconfStrategy(service.get(), instanceIdentifier);
+            }
+        }
+        final TransactionChainHandler transactionChain = mountPoint == null
+                ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
+        return new MdsalRestconfStrategy(instanceIdentifier, transactionChain);
+    }
+
     /**
      * Prepare transaction chain to access data of mount point.
-     * @param mountPoint
-     *            mount point reference
+     *
+     * @param mountPoint mount point reference
      * @return {@link TransactionChainHandler}
      */
     private static TransactionChainHandler transactionChainOfMountPoint(final @NonNull DOMMountPoint mountPoint) {
@@ -416,10 +426,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     /**
      * Invoke Action operation.
      *
-     * @param payload
-     *             {@link NormalizedNodeContext} - the body of the operation
-     * @param uriInfo
-     *             URI info
+     * @param payload {@link NormalizedNodeContext} - the body of the operation
+     * @param uriInfo URI info
      * @return {@link NormalizedNodeContext} wrapped in {@link Response}
      */
     public Response invokeAction(final NormalizedNodeContext payload, final UriInfo uriInfo) {

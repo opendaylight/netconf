@@ -142,7 +142,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         final ProxyDOMDataBroker proxyDataBroker = new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(),
             actorResponseWaitTime);
         salProvider.getMountInstance().onTopologyDeviceConnected(currentMountContext.getEffectiveModelContext(),
-            proxyDataBroker, deviceRpc, notificationService, deviceAction);
+            proxyDataBroker, null, deviceRpc, notificationService, deviceAction);
     }
 
     protected DOMDataBroker newDeviceDataBroker() {
