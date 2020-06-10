@@ -31,13 +31,16 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -58,7 +61,10 @@ public class ReadDataTransactionUtilTest {
     private static final YangInstanceIdentifier.NodeIdentifier NODE_IDENTIFIER = new YangInstanceIdentifier
             .NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
 
-    private TransactionVarsWrapper wrapper;
+    private RestconfStrategy mdsalStrategy;
+    private RestconfStrategy netconfStrategy;
+    @Mock
+    private NetconfDataTreeService netconfService;
     @Mock
     private DOMTransactionChain transactionChain;
     @Mock
@@ -88,17 +94,22 @@ public class ReadDataTransactionUtilTest {
 
         DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
-        wrapper = new TransactionVarsWrapper(this.context, null, new TransactionChainHandler(mockDataBroker));
+        mdsalStrategy = new MdsalRestconfStrategy(this.context, new TransactionChainHandler(mockDataBroker));
+        netconfStrategy = new NetconfRestconfStrategy(this.netconfService, this.context);
     }
 
     @Test
     public void readDataConfigTest() {
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(this.netconfService).getConfig(DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+        NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, mdsalStrategy, schemaContext);
+        assertEquals(DATA.data3, normalizedNode);
+
+        normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, netconfStrategy, schemaContext);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -108,10 +119,16 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(this.netconfService).getConfig(DATA.path);
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).get(DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+        NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, mdsalStrategy, schemaContext);
+        assertEquals(DATA.data3, normalizedNode);
+
+        normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, netconfStrategy, schemaContext);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -121,10 +138,16 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(this.netconfService).get(DATA.path2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+        NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, mdsalStrategy, schemaContext);
+        assertEquals(DATA.data2, normalizedNode);
+
+        normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, netconfStrategy, schemaContext);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -132,10 +155,15 @@ public class ReadDataTransactionUtilTest {
     public void readDataNonConfigTest() {
         doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(this.netconfService).get(DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.NONCONFIG;
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+        NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, mdsalStrategy, schemaContext);
+        assertEquals(DATA.data2, normalizedNode);
+
+        normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, netconfStrategy, schemaContext);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -145,16 +173,22 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(this.netconfService).getConfig(DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(this.netconfService).get(DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
                 .withChild(DATA.contentLeaf)
                 .withChild(DATA.contentLeaf2)
                 .build();
+        NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, mdsalStrategy, schemaContext);
+        assertEquals(checkingData, normalizedNode);
+
+        normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, netconfStrategy, schemaContext);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -164,15 +198,21 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(this.netconfService).getConfig(DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(this.netconfService).get(DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
-                RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
                 .withChild(DATA.contentLeaf)
                 .withChild(DATA.contentLeaf2)
                 .build();
+        NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
+                RestconfDataServiceConstant.ReadData.ALL, mdsalStrategy, schemaContext);
+        assertEquals(checkingData, normalizedNode);
+
+        normalizedNode = ReadDataTransactionUtil.readData(
+                RestconfDataServiceConstant.ReadData.ALL, netconfStrategy, schemaContext);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -182,15 +222,21 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
         doReturn(immediateFluentFuture(Optional.of(DATA.listData2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.listData))).when(this.netconfService).get(DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.listData2))).when(this.netconfService).getConfig(DATA.path3);
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         final MapNode checkingData = Builders
                 .mapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
                 .withChild(DATA.checkData)
                 .build();
+        NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, mdsalStrategy, schemaContext);
+        assertEquals(checkingData, normalizedNode);
+
+        normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, netconfStrategy, schemaContext);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -200,14 +246,19 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
         doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode1))).when(this.netconfService).get(DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode2))).when(this.netconfService)
+                .getConfig(DATA.path3);
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
-
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
-
         final MapNode expectedData = Builders.orderedMapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(DATA.listQname)).withChild(DATA.checkData)
                 .build();
+        NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil
+                .readData(RestconfDataServiceConstant.ReadData.ALL, mdsalStrategy, schemaContext);
+        assertEquals(expectedData, normalizedNode);
+
+        normalizedNode = ReadDataTransactionUtil
+                .readData(RestconfDataServiceConstant.ReadData.ALL, netconfStrategy, schemaContext);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -217,17 +268,22 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
         doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode1))).when(this.netconfService).get(DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode2))).when(this.netconfService)
+                .getConfig(DATA.path3);
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
-
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
-
         final UnkeyedListNode expectedData = Builders.unkeyedListBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(DATA.listQname))
                 .withChild(Builders.unkeyedListEntryBuilder().withNodeIdentifier(
                         new YangInstanceIdentifier.NodeIdentifier(DATA.listQname))
                         .withChild(DATA.unkeyedListEntryNode1.getValue().iterator().next())
                         .withChild(DATA.unkeyedListEntryNode2.getValue().iterator().next()).build()).build();
+        NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil
+                .readData(RestconfDataServiceConstant.ReadData.ALL, mdsalStrategy, schemaContext);
+        assertEquals(expectedData, normalizedNode);
+
+        normalizedNode = ReadDataTransactionUtil
+                .readData(RestconfDataServiceConstant.ReadData.ALL, netconfStrategy, schemaContext);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -237,15 +293,21 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.leafSetNodePath);
         doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.leafSetNodePath);
+        doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode1))).when(this.netconfService)
+                .get(DATA.leafSetNodePath);
+        doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode2))).when(this.netconfService)
+                .getConfig(DATA.leafSetNodePath);
         doReturn(DATA.leafSetNodePath).when(context).getInstanceIdentifier();
-
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
-
         final LeafSetNode<String> expectedData = Builders.<String>leafSetBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(DATA.leafListQname)).withValue(
                         ImmutableList.<LeafSetEntryNode<String>>builder().addAll(DATA.leafSetNode1.getValue())
                         .addAll(DATA.leafSetNode2.getValue()).build()).build();
+        NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil
+                .readData(RestconfDataServiceConstant.ReadData.ALL, mdsalStrategy, schemaContext);
+        assertEquals(expectedData, normalizedNode);
+
+        normalizedNode = ReadDataTransactionUtil
+                .readData(RestconfDataServiceConstant.ReadData.ALL, netconfStrategy, schemaContext);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -255,15 +317,21 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.leafSetNodePath);
         doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.leafSetNodePath);
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode1))).when(this.netconfService)
+                .get(DATA.leafSetNodePath);
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode2))).when(this.netconfService)
+                .getConfig(DATA.leafSetNodePath);
         doReturn(DATA.leafSetNodePath).when(context).getInstanceIdentifier();
-
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
-
         final LeafSetNode<String> expectedData = Builders.<String>orderedLeafSetBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(DATA.leafListQname)).withValue(
                         ImmutableList.<LeafSetEntryNode<String>>builder().addAll(DATA.orderedLeafSetNode1.getValue())
                         .addAll(DATA.orderedLeafSetNode2.getValue()).build()).build();
+        NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil
+                .readData(RestconfDataServiceConstant.ReadData.ALL, mdsalStrategy, schemaContext);
+        assertEquals(expectedData, normalizedNode);
+
+        normalizedNode = ReadDataTransactionUtil
+                .readData(RestconfDataServiceConstant.ReadData.ALL, netconfStrategy, schemaContext);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -271,18 +339,27 @@ public class ReadDataTransactionUtilTest {
     public void readDataWrongPathOrNoContentTest() {
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
-        final NormalizedNode<?, ?> normalizedNode =
-                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
+        NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, mdsalStrategy, schemaContext);
+        assertNull(normalizedNode);
+
+        normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, netconfStrategy, schemaContext);
         assertNull(normalizedNode);
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void readDataFailTest() {
         final String valueOfContent = RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
-                valueOfContent, wrapper, schemaContext);
+        NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
+                valueOfContent, mdsalStrategy, schemaContext);
+        assertNull(normalizedNode);
+
+        normalizedNode = ReadDataTransactionUtil.readData(
+                valueOfContent, netconfStrategy, schemaContext);
         assertNull(normalizedNode);
     }
 

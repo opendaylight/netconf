@@ -14,7 +14,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
-final class TxTestUtils {
+public final class TxTestUtils {
 
     private static final QName Q_NAME_1 = QName.create("test:namespace", "2013-07-22", "c");
     private static final QName Q_NAME_2 = QName.create(Q_NAME_1, "a");
@@ -29,7 +29,7 @@ final class TxTestUtils {
                 .build();
     }
 
-    static YangInstanceIdentifier getLeafId() {
+    public static YangInstanceIdentifier getLeafId() {
         return YangInstanceIdentifier.builder()
                 .node(Q_NAME_1)
                 .node(Q_NAME_2)
@@ -42,11 +42,10 @@ final class TxTestUtils {
                 .build();
     }
 
-    static LeafNode<String> getLeafNode() {
+    public static LeafNode<String> getLeafNode() {
         return Builders.<String>leafBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Q_NAME_2))
                 .withValue("data")
                 .build();
     }
-
 }
