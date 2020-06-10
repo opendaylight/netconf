@@ -9,9 +9,12 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -24,13 +27,15 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -39,6 +44,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -46,9 +52,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class PutDataTransactionUtilTest {
-
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
-
     @Mock
     private DOMTransactionChain transactionChain;
     @Mock
@@ -59,6 +63,8 @@ public class PutDataTransactionUtilTest {
     private DOMDataTreeWriteTransaction write;
     @Mock
     private DOMDataBroker mockDataBroker;
+    @Mock
+    private NetconfDataTreeService netconfService;
 
     private TransactionChainHandler transactionChainHandler;
     private SchemaContextRef refSchemaCtx;
@@ -164,7 +170,7 @@ public class PutDataTransactionUtilTest {
     }
 
     @Test
-    public void testValidInputData() throws Exception {
+    public void testValidInputData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
@@ -172,7 +178,7 @@ public class PutDataTransactionUtilTest {
     }
 
     @Test
-    public void testValidTopLevelNodeName() throws Exception {
+    public void testValidTopLevelNodeName() {
         InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
@@ -184,7 +190,7 @@ public class PutDataTransactionUtilTest {
     }
 
     @Test(expected = RestconfDocumentedException.class)
-    public void testValidTopLevelNodeNamePathEmpty() throws Exception {
+    public void testValidTopLevelNodeNamePathEmpty() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
@@ -192,7 +198,7 @@ public class PutDataTransactionUtilTest {
     }
 
     @Test(expected = RestconfDocumentedException.class)
-    public void testValidTopLevelNodeNameWrongTopIdentifier() throws Exception {
+    public void testValidTopLevelNodeNameWrongTopIdentifier() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
@@ -200,7 +206,7 @@ public class PutDataTransactionUtilTest {
     }
 
     @Test
-    public void testValidateListKeysEqualityInPayloadAndUri() throws Exception {
+    public void testValidateListKeysEqualityInPayloadAndUri() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid3, this.schemaNode3, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildListEntry);
@@ -208,7 +214,7 @@ public class PutDataTransactionUtilTest {
     }
 
     @Test
-    public void testPutContainerData() throws Exception {
+    public void testPutContainerData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
@@ -223,8 +229,7 @@ public class PutDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
-                null);
+                new MdsalRestconfStrategy(iidContext, transactionChainHandler), null, null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -232,7 +237,40 @@ public class PutDataTransactionUtilTest {
     }
 
     @Test
-    public void testPutleafData() throws Exception {
+    public void testPutCreateContainerData() {
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
+
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid2);
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+
+        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
+    }
+
+    @Test
+    public void testPutReplaceContainerData() {
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
+
+        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))))
+                .when(this.netconfService).getConfig(this.iid2);
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+
+        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
+    }
+
+    @Test
+    public void testPutLeafData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
@@ -247,8 +285,7 @@ public class PutDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
-                null);
+                new MdsalRestconfStrategy(iidContext, transactionChainHandler), null, null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -256,7 +293,40 @@ public class PutDataTransactionUtilTest {
     }
 
     @Test
-    public void testPutListData() throws Exception {
+    public void testPutCreateLeafData() {
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
+
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid);
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+
+        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
+    }
+
+    @Test
+    public void testPutReplaceLeafData() {
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
+
+        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))))
+                .when(this.netconfService).getConfig(this.iid);
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+
+        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
+    }
+
+    @Test
+    public void testPutListData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
@@ -270,9 +340,42 @@ public class PutDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
-                null);
+                new MdsalRestconfStrategy(iidContext, transactionChainHandler), null, null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());
+    }
+
+    @Test
+    public void testPutCreateListData() {
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
+
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService)
+                .getConfig(this.iid2);
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+
+        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        verify(this.netconfService).getConfig(this.iid2);
+        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, this.iid2,
+                payload.getData(), Optional.empty());
+    }
+
+    @Test
+    public void testPutReplaceListData() {
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
+
+        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(this.netconfService)
+                .getConfig(this.iid2);
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+
+        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        verify(this.netconfService).getConfig(this.iid2);
+        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION, this.iid2,
+                payload.getData(), Optional.empty());
     }
 }

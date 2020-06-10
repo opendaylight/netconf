@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
@@ -83,6 +84,11 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         final InstanceIdentifierContext<?> pathContext = context.getInstanceIdentifierContext();
         if (context.getData() == null) {
             return;
+        }
+        if (httpHeaders != null) {
+            for (final Map.Entry<String, Object> entry : context.getNewHeaders().entrySet()) {
+                httpHeaders.add(entry.getKey(), entry.getValue());
+            }
         }
 
         XMLStreamWriter xmlWriter;
