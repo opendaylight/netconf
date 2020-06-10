@@ -12,6 +12,7 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
@@ -455,20 +457,37 @@ public final class ReadDataTransactionUtil {
      */
     private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
             final @NonNull TransactionVarsWrapper transactionNode, final boolean closeTransactionChain) {
+        final NetconfDataTreeService netconfDataTreeService = transactionNode.getNetconfDataTreeService();
+        if (netconfDataTreeService != null) {
+            return readDataViaNetconfService(transactionNode, netconfDataTreeService);
+        } else {
+            final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
+            try (DOMDataTreeReadTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
+                final FluentFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = tx.read(
+                    transactionNode.getLogicalDatastoreType(),
+                    transactionNode.getInstanceIdentifier().getInstanceIdentifier());
+                if (closeTransactionChain) {
+                    //Method close transactionChain inside of TransactionVarsWrapper, if is provide as a parameter.
+                    FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                            dataFactory, transactionNode.getTransactionChain());
+                } else {
+                    FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                            dataFactory);
+                }
+            }
+            return dataFactory.build();
+        }
+    }
+
+    private static @Nullable NormalizedNode<?, ?> readDataViaNetconfService(
+            final @NonNull TransactionVarsWrapper transactionNode,
+            final @NonNull NetconfDataTreeService netconfDataTreeService) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        try (DOMDataTreeReadTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
-            final FluentFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = tx.read(
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> configData = netconfDataTreeService.readData(
                 transactionNode.getLogicalDatastoreType(),
                 transactionNode.getInstanceIdentifier().getInstanceIdentifier());
-            if (closeTransactionChain) {
-                //Method close transactionChain inside of TransactionVarsWrapper, if is provide as a parameter.
-                FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                        dataFactory, transactionNode.getTransactionChain());
-            } else {
-                FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                        dataFactory);
-            }
-        }
+        FutureCallbackTx.addCallback(configData, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                dataFactory);
         return dataFactory.build();
     }
 
