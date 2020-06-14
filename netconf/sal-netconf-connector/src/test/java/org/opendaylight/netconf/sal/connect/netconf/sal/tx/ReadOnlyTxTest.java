@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import java.net.InetSocketAddress;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -84,5 +85,21 @@ public class ReadOnlyTxTest {
         final ReadOnlyTx tx2 =
                 new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
         Assert.assertNotEquals(tx1.getIdentifier(), tx2.getIdentifier());
+    }
+
+    @Ignore("TODO")
+    @Test
+    public void testReadWithXPath() {
+//        final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(MountPointContext.class));
+//
+//        final ReadOnlyTx readOnlyTx =
+//                new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+//
+//        readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, NetconfXPathContext.empty());
+//        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
+//                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
+//        readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, NetconfXPathContext.empty());
+//        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
+//                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(ContainerNode.class));
     }
 }
