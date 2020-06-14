@@ -48,6 +48,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -397,6 +398,32 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</rpc>");
     }
 
+    @Ignore("TODO")
+    @Test
+    public void testGetConfigRequestWithXPath() throws Exception {
+//        final String namespace = "xmlns:ns1=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
+//        final String xpath = "/ns1:netconf-state/ns1:schemas";
+//      NetconfXPathContext netconfXPathContext = new NetconfXPathContext(xpath);
+//      netconfXPathContext.addNamespace("ns1", namespace);
+//      final DataContainerChild<?, ?> filter = toFilterStructure(netconfXPathContext, SCHEMA);
+//
+//      final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
+//
+//      final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_CONFIG_QNAME),
+//              NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
+//
+//      assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+//              + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+//              + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"xpath\""
+//              + namespace
+//              + "select=\"/ns1:netconf-state/ns1:schemas\"/>\n"
+//              + "<source>\n"
+//              + "<running/>\n"
+//              + "</source>\n"
+//              + "</get-config>"
+//              + "</rpc>");
+    }
+
     @Test
     public void testEditConfigRequest() throws Exception {
         final List<DataContainerChild<?, ?>> values = Lists.newArrayList(
@@ -476,6 +503,28 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</filter>\n"
                 + "</get>"
                 + "</rpc>");
+    }
+
+    @Ignore("TODO")
+    @Test
+    public void testGetRequestWithXPath() throws Exception {
+//        final String namespace = "xmlns:ns1=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
+//        final String xpath = "/ns1:netconf-state/ns1:capabilities/ns1:capability[text()='a:b:c']";
+//        final QName capability = QName.create(Capabilities.QNAME, "capability");
+//        NetconfXPathContext netconfXPathContext = new NetconfXPathContext(xpath);
+//        netconfXPathContext.addNamespace("ns1", namespace);
+//        final DataContainerChild<?, ?> filter = toFilterStructure(netconfXPathContext, SCHEMA);
+//
+//        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_QNAME),
+//                NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, filter));
+//
+//        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+//                + "<get xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+//                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"xpath\""
+//                + namespace
+//                + "select=\"/ns1:netconf-state/ns1:capabilities/ns1:capability[text()='a:b:c']\"/>\n"
+//                + "</get>"
+//                + "</rpc>");
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {

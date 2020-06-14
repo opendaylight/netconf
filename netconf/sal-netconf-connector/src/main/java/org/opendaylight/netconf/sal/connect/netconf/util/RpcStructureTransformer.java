@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import java.util.Optional;
 import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -36,6 +37,16 @@ interface RpcStructureTransformer {
      * @return filter structure
      */
     DataContainerChild<?,?> toFilterStructure(YangInstanceIdentifier path);
+
+    /**
+     * Transforms xpath to filter structure.
+     *
+     * @param xpathContext xpath context, contains xpath and xpath namespaces mapper
+     * @return filter structure
+     */
+    default DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext xpathContext) {
+        throw new UnsupportedOperationException("XPath not supported");
+    }
 
     /**
      * Selects data specified by path from data node. Data must be product of get-config rpc with filter created by

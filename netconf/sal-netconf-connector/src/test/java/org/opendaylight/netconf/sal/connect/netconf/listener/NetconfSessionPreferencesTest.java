@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -164,6 +165,14 @@ public class NetconfSessionPreferencesTest {
 
         final NetconfSessionPreferences sessionCaps1 = NetconfSessionPreferences.fromStrings(caps1);
         assertCaps(sessionCaps1, 0, 4);
+    }
+
+    @Ignore("TODO")
+    @Test
+    public void testXPathCapabilityExists() {
+        final NetconfSessionPreferences sessionPreferences = NetconfSessionPreferences
+                .fromStrings(Lists.newArrayList("urn:ietf:params:netconf:capability:xpath:1.0"));
+        // assertThat(sessionPreferences.isXPathSupported(), Matchers.is(true));
     }
 
     private static void assertCaps(final NetconfSessionPreferences sessionCaps1, final int nonModuleCaps,
