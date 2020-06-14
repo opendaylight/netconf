@@ -23,6 +23,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
@@ -182,12 +183,34 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
+    @Ignore("TODO")
+    @Test
+    public void testGetConfigRunningDataWithXPath() throws Exception {
+//        NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/c");
+//        netconfXPathContext.addNamespace("nxpnma", CONTAINER_Q_NAME.getNamespace());
+//        final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
+//                .getConfigRunningData(callback, netconfXPathContext).get();
+//        Assert.assertTrue(dataOpt.isPresent());
+//        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+    }
+
     @Test
     public void testGetData() throws Exception {
         final Optional<NormalizedNode<?, ?>> dataOpt =
                 baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
         Assert.assertTrue(dataOpt.isPresent());
         Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+    }
+
+    @Ignore("TODO")
+    @Test
+    public void testGetDataWithXPath() throws Exception {
+//        NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/c");
+//        netconfXPathContext.addNamespace("nxpnma", CONTAINER_Q_NAME.getNamespace());
+//        final Optional<NormalizedNode<?, ?>> dataOpt =
+//                baseOps.getData(callback, netconfXPathContext).get();
+//        Assert.assertTrue(dataOpt.isPresent());
+//        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
     @Test
@@ -209,6 +232,15 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 .build();
         baseOps.getConfigCandidate(callback, Optional.of(id));
         verifyMessageSent("getConfig_candidate-filter", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
+    }
+
+    @Ignore("TODO")
+    @Test
+    public void testGetConfigCandidateWithXPath() throws Exception {
+//        NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/c");
+//        netconfXPathContext.addNamespace("nxpnma", CONTAINER_Q_NAME.getNamespace());
+//        baseOps.getConfigCandidate(callback, netconfXPathContext);
+//        verifyMessageSent("getConfig_candidate-filter", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
     @Test
