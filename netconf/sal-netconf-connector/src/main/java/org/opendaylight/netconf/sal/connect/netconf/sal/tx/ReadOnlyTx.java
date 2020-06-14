@@ -16,7 +16,6 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -25,7 +24,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class ReadOnlyTx implements DOMDataTreeReadTransaction {
+public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
 
     private static final Logger LOG  = LoggerFactory.getLogger(ReadOnlyTx.class);
 
