@@ -52,4 +52,25 @@
         <argument ref="encryptionService"/>
         <argument ref="deviceActionFactory"/>
     </bean>
+
+    <!-- Configuration for NetConf Call-Home TLS -->
+    <bean id="netconfCallHomeTlsConfiguration" class="org.opendaylight.netconf.callhome.mount.tls.Configuration">
+        <property name="host" value="0.0.0.0" />
+        <property name="port" value="4335" />
+        <property name="timeout" value="10000" />
+        <property name="maxConnections" value="64" />
+    </bean>
+
+    <bean id="netconfCallHomeService" class="org.opendaylight.netconf.callhome.mount.tls.NetconfCallHomeTlsService"
+          init-method="init"
+          destroy-method="close">
+        <argument ref="netconfCallHomeTlsConfiguration" />
+        <argument ref="dataBroker" />
+        <argument value="topology-netconf"/>
+        <argument ref="eventExecutor"/>
+        <argument ref="keepAliveExecutor"/>
+        <argument ref="processingExecutor"/>
+        <argument ref="callhomeDispatcher" />
+    </bean>
+
 </blueprint>
