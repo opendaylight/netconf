@@ -66,6 +66,10 @@ module odl-netconf-callhome-server {
           description "BASE-64 encoded public key which device will use during connection.";
           type string;
         }
+        leaf tls-key-id {
+          description "Key identifier inside the NetConf keystore which will be used during two-way TLS authentication.";
+          type string;
+        }
         unique ssh-host-key;
         uses credentials;
       }
