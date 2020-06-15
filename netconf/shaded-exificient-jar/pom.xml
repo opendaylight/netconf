@@ -204,10 +204,10 @@
                                     <pattern>org.apache.xml</pattern>
                                     <shadedPattern>org.opendaylight.netconf.shaded.apache.xml</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>org.w3c.dom.ElementTraversal</pattern>
-                                    <shadedPattern>org.opendaylight.netconf.shaded.org.w3c.dom.ElementTraversal</shadedPattern>
-                                </relocation>
+<!--                                <relocation>-->
+<!--                                    <pattern>org.w3c.dom.ElementTraversal</pattern>-->
+<!--                                    <shadedPattern>org.opendaylight.netconf.shaded.org.w3c.dom.ElementTraversal</shadedPattern>-->
+<!--                                </relocation>-->
                                 <relocation>
                                     <pattern>org.xmlpull</pattern>
                                     <shadedPattern>org.opendaylight.netconf.shaded.xmlpull</shadedPattern>
