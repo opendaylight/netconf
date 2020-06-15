@@ -57,7 +57,7 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
                     TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(keyStore);
 
-            final SSLContext sslCtx = SSLContext.getInstance("TLS");
+            final SSLContext sslCtx = SSLContext.getInstance("TLSv1.2");
             sslCtx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
             final SSLEngine engine = sslCtx.createSSLEngine();
             engine.setUseClientMode(true);
@@ -75,7 +75,8 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
             }
 
             engine.setEnabledProtocols(enabledProtocols);
-            engine.setEnabledCipherSuites(engine.getSupportedCipherSuites());
+            //engine.setEnabledCipherSuites(engine.getSupportedCipherSuites());
+            engine.setEnabledCipherSuites(new String[]{"TLS_RSA_WITH_AES_256_CBC_SHA256"});
             engine.setEnableSessionCreation(true);
             return new SslHandler(engine);
         } catch (GeneralSecurityException | IOException exc) {
