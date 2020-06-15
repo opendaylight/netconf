@@ -43,8 +43,12 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.Transport;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Ssh;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Tls;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.TlsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.tls.TlsClientParams;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.tls.TlsClientParamsBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -249,6 +253,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             SshClientParams params = new SshClientParamsBuilder().setHostKey(hostKey).build();
             Transport sshTransport = new SshBuilder().setSshClientParams(params).build();
             deviceBuilder.setTransport(sshTransport);
+        } else if (cfgDevice.getTransport() instanceof Tls) {
+            deviceBuilder.setTransport(cfgDevice.getTransport());
         } else if (cfgDevice.getSshHostKey() != null) {
             deviceBuilder.setSshHostKey(cfgDevice.getSshHostKey());
         }
