@@ -13,16 +13,16 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
-final class TlsClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
+public final class TlsClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
     public static final String CHANNEL_ACTIVE_SENTRY = "channelActiveSentry";
 
     private final SslHandlerFactory sslHandlerFactory;
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
     private final NetconfClientSessionListener sessionListener;
 
-    TlsClientChannelInitializer(final SslHandlerFactory sslHandlerFactory,
-                                final NetconfClientSessionNegotiatorFactory negotiatorFactory,
-                                final NetconfClientSessionListener sessionListener) {
+    public TlsClientChannelInitializer(final SslHandlerFactory sslHandlerFactory,
+                                       final NetconfClientSessionNegotiatorFactory negotiatorFactory,
+                                       final NetconfClientSessionListener sessionListener) {
         this.sslHandlerFactory = sslHandlerFactory;
         this.negotiatorFactory = negotiatorFactory;
         this.sessionListener = sessionListener;
