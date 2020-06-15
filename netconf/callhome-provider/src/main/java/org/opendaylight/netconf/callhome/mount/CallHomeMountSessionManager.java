@@ -35,7 +35,7 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
     CallHomeMountSessionContext createSession(final CallHomeProtocolSessionContext session,
             final CallHomeChannelActivator activator, final CloseCallback onCloseHandler) {
             final CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(session.getSessionId(),
-            session, activator, devCtxt -> onClosed(devCtxt, onCloseHandler));
+                session, activator, devCtxt -> onClosed(devCtxt, onCloseHandler));
 
             // If the session initated over SSH transport protocol SSH host-key should to be unique among devices
             if (session.getTransportType() == TransportType.SSH) {
