@@ -31,6 +31,12 @@
                interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
     <reference id="baseSchemas"
                interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
+    <reference id="globalBossGroup"
+               interface="io.netty.channel.EventLoopGroup"
+               odl:type="global-boss-group"/>
+    <reference id="globalWorkerGroup"
+               interface="io.netty.channel.EventLoopGroup"
+               odl:type="global-worker-group"/>
 
     <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"
           init-method="init"
@@ -52,4 +58,23 @@
         <argument ref="encryptionService"/>
         <argument ref="deviceActionFactory"/>
     </bean>
+
+    <!-- Configuration for NetConf Call-Home TLS -->
+    <bean id="netconfCallHomeTlsConfiguration" class="org.opendaylight.netconf.callhome.mount.tls.Configuration">
+        <property name="host" value="0.0.0.0" />
+        <property name="port" value="4335" />
+        <property name="timeout" value="10000" />
+        <property name="maxConnections" value="64" />
+    </bean>
+
+    <bean id="netconfCallHomeService" class="org.opendaylight.netconf.callhome.mount.tls.NetconfCallHomeTlsService"
+          init-method="init"
+          destroy-method="close">
+        <argument ref="netconfCallHomeTlsConfiguration" />
+        <argument ref="dataBroker" />
+        <argument ref="callhomeDispatcher" />
+        <argument ref="globalBossGroup"/>
+        <argument ref="globalWorkerGroup"/>
+    </bean>
+
 </blueprint>
