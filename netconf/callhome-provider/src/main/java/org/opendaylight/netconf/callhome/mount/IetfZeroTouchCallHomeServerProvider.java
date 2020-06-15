@@ -43,6 +43,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.Transport;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Ssh;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Tls;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -249,6 +250,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             final SshClientParams params = new SshClientParamsBuilder().setHostKey(hostKey).build();
             final Transport sshTransport = new SshBuilder().setSshClientParams(params).build();
             deviceBuilder.setTransport(sshTransport);
+        } else if (cfgDevice.getTransport() instanceof Tls) {
+            deviceBuilder.setTransport(cfgDevice.getTransport());
         } else if (cfgDevice.getSshHostKey() != null) {
             deviceBuilder.setSshHostKey(cfgDevice.getSshHostKey());
         }
