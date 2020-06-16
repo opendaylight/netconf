@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Jamo Luhrsen <jluhrsen@gmail.com>
+Code-Review+2: Tomas Cere <tomas.cere@pantheon.tech>
+Submitted-by: Tomas Cere <tomas.cere@pantheon.tech>
+Submitted-at: Tue, 16 Jun 2020 07:54:21 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/90271
+Project: netconf
+Branch: refs/heads/stable/magnesium
