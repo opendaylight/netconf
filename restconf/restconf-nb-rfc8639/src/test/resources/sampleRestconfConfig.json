@@ -1,0 +1,17 @@
+{
+    "restconf":{
+        "http11Port":8181,
+        "http2Port":8888,
+        "restconfServletContextPath":"/restconfSCP",
+        "servletConfig": {
+            "servletPath":"/*",
+            "contextPath":"/restconf"
+        },
+        "replayBufferMaxSize":9000,
+        "httpBasicAuthenticationEnabled":false,
+        "userCredentials":{
+            "admin":"admin"
+        },
+        "inetAddress":"localhost"
+    }
+}
