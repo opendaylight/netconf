@@ -1135,3 +1135,321 @@ blueprint configuration file.
 The device **must** initiate the connection and the server will not try to re-establish the
 connection in case of a drop. By requirement, the server cannot assume it has connectivity
 to the device due to NAT or firewalls among others.
+
+RESTCONF Event Notifications
+----------------------------
+
+RESTCONF Northbound supports YANG-defined event notifications as defined in the specification `Subscription
+to YANG Notifications <https://tools.ietf.org/html/rfc8639>`_.
+
+Subscription to notification event streams is done via SSE (Server-sent-events) when using HTTP/1.1 or via
+HTTP/2 streams when using HTTP/2 protocol.
+
+Clients can subscribe to and receive content from notification streams that are supported by the RESTCONF server.
+This mechanism is through the use of a subscription. Currently, only the dynamic subscription mechanism is supported.
+Subscriptions are created, modified or deleted using the subscription RPC operations defined within
+the "ietf-subscribed-notifications" YANG module (and augmented from "ietf-yang-push" YANG module).
+These RPCs are described in more detail further below.
+
+Establishing a subscription
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before subscribing to a notifications stream, the client needs to create a stream subscription. This is done via
+the "establish-subscription" RPC operation.
+
+Here is an example of a POST request for invocation of such operation:
+
+.. code-block:: none
+
+    POST
+    /restconf/operations/ietf-subscribed-notifications:establish-subscription
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+    {
+      "ietf-subscribed-notifications:input" : {
+        "stream": "toaster:toasterRestocked",
+        "encoding": "encode-json"
+      }
+    }
+
+The server returns a reply with the RPC output containing the subscription-result and the identifier of the
+created subscription. In case the subscription could not be created, a negative subscription-result is returned
+within the RPC output.
+
+.. code-block:: json
+
+    {
+      "output" : {
+        "subscription-result": "ietf-subscribed-notifications:ok",
+        "identifier": 123
+      }
+    }
+
+The identifier is then used by the client to subscribe to the specified event stream and start receiving
+notifications. In order to do this, the client issues the following request using the GET method for HTTP/1.1 or
+POST method for HTTP/2 connections:
+
+.. code-block:: none
+
+    POST
+    /restconf/notification/toaster:toasterRestocked/123
+    Content-Type: application/json
+    Accept: application/json
+
+The server will now start sending event notifications back to the client within a SSE event stream if HTTP/1.1
+was used for the request or within a HTTP/2 stream in case the request was made with HTTP/2.
+
+Notification with JSON encoding:
+
+.. code-block:: json
+
+    {
+      "ietf-restconf:notification": {
+        "toaster:toasterRestocked": {
+          "amountOfBread":100
+        }
+      },
+      "event-time": "2018-03-07T13:33:06.141+01:00"
+    }
+
+Notification with XML encoding:
+
+.. code-block:: xml
+
+    <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+      <eventTime>2018-03-07T14:05:06.119+01:00</eventTime>
+      <toasterRestocked xmlns="http://netconfcentral.org/ns/toaster">
+          <amountOfBread>100</amountOfBread>
+      </toasterRestocked>
+    </notification>
+
+The "establish-subscription" RPC requires at least the input parameter "stream" to be present in the request
+message-body. This parameter specifies for which notification stream is the subscription established. The value of
+the parameter must consist of a YANG module name and a name of the notification in that module separated by a colon.
+Each subscription belongs to exactly one notification stream.
+Other input parameters that are supported for this RPC are encoding, replay-start-time, stop-time and period.
+They are described further below.
+
+The data encoding of notifications can be specified with the "establish-subscription" input parameter "encoding".
+Notifications can be streamed in either XML or JSON encoding (supported parameter values are "encode-xml" or
+"encode-json"). If the "encoding" parameter is not present in the RPC input or an unsupported value is used,
+the server will default to "encode-xml" format.
+
+If the client wants to receive notifications in periodic intervals, "period" parameter must be present in
+the "establish-subscription" RPC input. This parameter is augmented into the RPC from the "ietf-yang-push" YANG module,
+so the module name prefix has to be prepended to the parameter name. Value of "period" must be a uint32 number.
+
+Here is an example of request message-body for establishing a periodic subscription:
+
+.. code-block:: json
+
+    {
+      "ietf-subscribed-notifications:input" : {
+        "stream": "toaster:toasterRestocked",
+        "encoding": "encode-json",
+        "ietf-yang-push:period": 3
+      }
+    }
+
+In this case, notifications will be sent to the client every three seconds.
+
+Another parameter which may be specified in "establish-subscription" RPC input is the "replay-start-time".
+The inclusion of this parameter within an "establish-subscription" RPC indicates a replay request.
+A subscription established through such request is also capable of passing along recently generated event records.
+In other words, as the subscription initializes itself, it sends any previously generated content from within target
+event stream which meets the time frame criteria. These historical event records are then followed by event records
+generated after the subscription has been established. All event records are delivered in the order generated.
+
+Here is an example of request message-body for establishing a replay request:
+
+.. code-block:: json
+
+    {
+      "ietf-subscribed-notifications:input" : {
+        "stream": "toaster:toasterRestocked",
+        "encoding": "encode-json",
+        "replay-start-time": "2018-03-07T14:05:00.00Z"
+      }
+    }
+
+The client will receive all notifications which have been generated for the target event stream since the date and
+time specified in the "replay-start-time" value up to the present, followed by a "replay-completed" notification.
+The date and time value is in UTC format.
+
+.. code-block:: json
+
+    {
+      "ietf-restconf:notification": {
+        "toaster:toasterRestocked": {
+          "amountOfBread":100
+        }
+      },
+      "event-time":"2018-03-07T14:05:06.096+01:00"
+    }
+    {
+      "ietf-restconf:notification": {
+        "toaster:toasterRestocked": {
+          "amountOfBread":100
+        }
+      },
+      "event-time":"2018-03-07T14:13:00.777+01:00"
+    }
+    {
+      "ietf-restconf:notification": {
+        "ietf-subscribed-notifications: replay-completed": {
+          "identifier": 123
+          }
+        },
+      "event-time":"2018-03-07T14:23:05.856+01:00"
+    }
+
+Active subscriptions can also be scheduled to stop using the "stop-time" parameter. The value of this parameter is
+a date and time in UTC format.
+
+Here is an example of request message-body for establishing a subscription that is scheduled to stop:
+
+.. code-block:: json
+
+    {
+      "ietf-subscribed-notifications:input" : {
+        "stream": "toaster:toasterRestocked",
+        "encoding": "encode-json",
+        "stop-time": "2018-01-24T08:55:00.00Z"
+      }
+    }
+
+The subscription will cease to exist once the specified date and time is reached. A "subscription-completed"
+notification is sent back to the client afterwards.
+
+.. code-block:: json
+
+    {
+      "ietf-restconf:notification": {
+        "ietf-subscribed-notifications: subscription-completed": {
+          "identifier": 123
+          }
+        },
+      "event-time":"2018-03-07T15:13:05.347+01:00"
+    }
+
+The value of "stop-time" parameter must be for a future time, otherwise it will be ignored. However, if combined with
+"replay-start-time", it can point to the past, but it must be later than the "replay-start-time". The combination of
+these two parameters will result into a replay of notifications from within the time frame specified with
+"replay-start-time" and "stop-time".
+
+Modifying a subscription
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once a subscription has been established, the client can modify some of its properties using the "modify-subscription"
+RPC. The identifier of the subscription must be specified in the RPC input. This operation can only be performed using
+the same transport session as the one that was used for establishing the subscription. RESTCONF Northbound
+currently supports modification of "period" and "stop-time" parameters.
+
+Here is an example of a request payload for changing the terms of an existing subscription:
+
+.. code-block:: json
+
+    {
+      "ietf-subscribed-notifications:input" : {
+        "identifier": 123,
+        "ietf-yang-push:period": 5,
+        "stop-time": "2018-01-24T08:55:00.00Z"
+      }
+    }
+
+The server will respond with a corresponding RPC output specifying whether the operation was successful or not.
+
+.. code-block:: json
+
+    {
+      "output" : {
+        "subscription-result": "ietf-subscribed-notifications:ok"
+      }
+    }
+
+Deleting a subscription
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Once a subscription has been established, the client can remove it using the "delete-subscription" RPC operation.
+The identifier of the subscription must be specified in the RPC input.
+
+Here is an example of a request which cancels an existing subscription with the specified identifier:
+
+.. code-block:: none
+
+    POST
+    /restconf/operations/ietf-subscribed-notifications:delete-subscription
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+    {
+      "ietf-subscribed-notifications:input" : {
+        "identifier": 123
+      }
+    }
+
+After a successful deletion request, no more notifications will be sent for the subscription.
+
+However, a subscription can only be deleted using the same transport session as the one that was used for subscription
+establishment.
+
+Killing a subscription
+~~~~~~~~~~~~~~~~~~~~~~
+
+Once a subscription has been established, the client can remove it using the "kill-subscription" RPC operation.
+The identifier of the subscription must be specified in the RPC input.
+
+Here is an example of a request which terminates an existing subscription with the specified identifier:
+
+.. code-block:: none
+
+    POST
+    /restconf/operations/ietf-subscribed-notifications:kill-subscription
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+    {
+      "ietf-subscribed-notifications:input" : {
+        "identifier": 123
+      }
+    }
+
+If the operation is successful, a "subscription-terminated" notification is sent back to the client.
+
+.. code-block:: json
+
+    {
+      "ietf-restconf:notification": {
+        "ietf-subscribed-notifications:subscription-terminated": {
+          "identifier":123
+        }
+      },
+      "event-time":"2018-03-07T14:13:53.895+01:00"
+    }
+
+Unlike the "delete-subscription" RPC, "kill-subscription" can cancel any subscription even when the transport session
+being used is not the same as the one that was used for subscription creation.
+
+
+Retrieving information about all active subscriptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Information about active notification stream subscriptions can be obtained using the following GET request on
+subscriptions container:
+
+.. code-block:: none
+
+    GET
+    /restconf/data/ietf-subscribed-notifications:subscriptions
+    Content-Type: application/json
+    Accept: application/json
+
+Subscriptions are removed from the list once they expire (reaching stop-time) or when they are terminated by
+a "kill-subscription" or "delete-subscription" operation.
