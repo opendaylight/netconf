@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ca58cc9_1b040f6f",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-06-18T17:45:11Z",
+      "side": 1,
+      "message": "looks like indentation is off",
+      "revId": "f917b84793b371bb7c23cfed67bb9c24c5ba8e59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
