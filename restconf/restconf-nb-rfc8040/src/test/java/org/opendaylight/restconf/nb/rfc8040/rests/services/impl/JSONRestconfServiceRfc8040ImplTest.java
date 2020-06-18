@@ -189,14 +189,14 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         doReturn(mockTxChain).when(mockDOMDataBroker).createTransactionChain(any());
 
-        final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockDOMDataBroker);
+        final TransactionChainHandler TransactionChainHandler = new TransactionChainHandler(mockDOMDataBroker);
 
         final DOMMountPointServiceHandler mountPointServiceHandler =
                 new DOMMountPointServiceHandler(mockMountPointService);
 
         final DOMNotificationService mockNotificationService = mock(DOMNotificationService.class);
         final ServicesWrapper servicesWrapper = ServicesWrapper.newInstance(schemaContextHandler,
-                mountPointServiceHandler, txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
+                mountPointServiceHandler, TransactionChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
                 new RpcServiceHandler(mockRpcService), new ActionServiceHandler(mockActionService),
                 new NotificationServiceHandler(mockNotificationService), domSchemaService);
 
