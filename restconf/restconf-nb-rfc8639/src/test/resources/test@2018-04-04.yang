@@ -1,0 +1,13 @@
+module test{
+  yang-version 1;
+  namespace "t:s:t";
+  prefix "tst";
+
+  revision 2018-04-04 {
+    description
+      "Initial version";
+  }
+  
+  notification test {
+  }
+}

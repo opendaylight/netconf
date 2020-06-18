@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+    <bean id="rfc8639RestconfApp" class="org.opendaylight.restconf.nb.rfc8639.RFC8639RestconfApp" init-method="init">
+        <argument ref="txChainHandler"/>
+        <argument ref="schemaCtxHandler"/>
+        <argument ref="dOMNotificationService"/>
+        <argument ref="dOMSchemaService"/>
+        <argument ref="dOMMountPointService"/>
+        <argument ref="dOMRpcProviderService"/>
+    </bean>
+
+    <bean id="txChainHandler" class="org.opendaylight.restconf.nb.rfc8639.handlers.RFC8639TransactionChainHandler"
+      destroy-method="close">
+        <argument ref="dOMDataBroker"/>
+    </bean>
+
+    <bean id="schemaCtxHandler" class="org.opendaylight.restconf.nb.rfc8639.handlers.RFC8639SchemaContextHandler"
+      init-method="init" destroy-method="close">
+        <argument ref="txChainHandler"/>
+        <argument ref="dOMSchemaService"/>
+    </bean>
+
+    <bean id="rfc8639webInitializer" class="org.opendaylight.restconf.nb.rfc8639.RFC8639WebInitializer" 
+      destroy-method="close">
+        <argument ref="webServer"/>
+        <argument ref="webContextSecurer"/>
+        <argument ref="servletSupport"/>
+        <argument ref="rfc8639RestconfApp"/>
+    </bean>
+
+    <reference id="dOMDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"/>
+    <reference id="dOMMountPointService" interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
+    <reference id="dOMNotificationService" interface="org.opendaylight.mdsal.dom.api.DOMNotificationService"/>
+    <reference id="dOMRpcProviderService" interface="org.opendaylight.mdsal.dom.api.DOMRpcProviderService"/>
+    <reference id="dOMSchemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
+
+    <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
+    <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
+    <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport"/>
+</blueprint>
