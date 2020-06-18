@@ -78,6 +78,7 @@ import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.restconf.common.util.OperationsResourceUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -299,8 +300,10 @@ public final class RestconfImpl implements RestconfService {
         final CollectionNodeBuilder<MapEntryNode, MapNode> listStreamsBuilder =
                 Builders.mapBuilder((ListSchemaNode) streamSchemaNode);
 
-        for (final String streamName : availableStreams) {
-            listStreamsBuilder.withChild(toStreamEntryNode(streamName, streamSchemaNode));
+        if (availableStreams != null && !availableStreams.isEmpty()) {
+            for (final String streamName : availableStreams) {
+                listStreamsBuilder.withChild(toStreamEntryNode(streamName, streamSchemaNode));
+            }
         }
 
         final DataSchemaNode streamsContainerSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
@@ -1457,7 +1460,8 @@ public final class RestconfImpl implements RestconfService {
         instanceDataChildrenByName = ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "events");
         final DataSchemaNode eventsSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(eventsSchemaNode instanceof LeafSchemaNode);
-        streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) eventsSchemaNode).build());
+        streamNodeValues.withChild(
+                Builders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue(Empty.getInstance()).build());
 
         return streamNodeValues.build();
     }
