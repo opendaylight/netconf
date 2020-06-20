@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -42,10 +43,23 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
     }
 
+    private FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(final NetconfXPathContext xpathContext,
+            final YangInstanceIdentifier path) {
+        return remapException(netconfOps.getConfigRunningData(new NetconfRpcFutureCallback("Data read", id),
+                xpathContext, Optional.ofNullable(path)));
+    }
+
     private FluentFuture<Optional<NormalizedNode<?, ?>>> readOperationalData(
             final YangInstanceIdentifier path) {
         return remapException(netconfOps.getData(
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
+    }
+
+    private FluentFuture<Optional<NormalizedNode<?, ?>>> readOperationalData(NetconfXPathContext xpathContext,
+            YangInstanceIdentifier path) {
+        return remapException(
+                netconfOps.getData(new NetconfRpcFutureCallback("Data read", id), xpathContext,
+                        Optional.ofNullable(path)));
     }
 
     private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
@@ -79,6 +93,21 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
                 return readConfigurationData(path);
             case OPERATIONAL:
                 return readOperationalData(path);
+            default:
+                LOG.info("Unknown datastore type: {}.", store);
+                throw new IllegalArgumentException(String.format(
+                    "%s, Cannot read data %s for %s datastore, unknown datastore type", id, path, store));
+        }
+    }
+
+    @Override
+    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+            NetconfXPathContext xpathContext, YangInstanceIdentifier path) {
+        switch (store) {
+            case CONFIGURATION:
+                return readConfigurationData(xpathContext, path);
+            case OPERATIONAL:
+                return readOperationalData(xpathContext, path);
             default:
                 LOG.info("Unknown datastore type: {}.", store);
                 throw new IllegalArgumentException(String.format(

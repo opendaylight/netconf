@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
@@ -24,12 +25,15 @@ public interface NetconfReadOnlyTransaction extends DOMDataTreeReadTransaction {
      * Reads data from provided logical data store located at the provided XPath.
      *
      * @param store        Logical data store from which read should occur.
-     * @param xpathContext XPath which identifies subtree which client want to read
+     * @param xpathContext Context which identifies XPath which client wants to read
+     * @param path         Define parent of specific nodes which client wants to
+     *                     read or top node and allows to transform data from
+     *                     response back to {@link NormalizedNode}
      * @return FluentFuture containing the result of the read. The Future blocks
      *         until the commit operation is complete.
      */
     default FluentFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
-            NetconfXPathContext xpathContext) {
+            NetconfXPathContext xpathContext, YangInstanceIdentifier path) {
         throw new UnsupportedOperationException("Not supported");
     }
 }
