@@ -58,11 +58,11 @@ class _Hsfod(_collections.OrderedDict):
     def __init__(self, *args, **kwargs):
         """Put arguments to OrderedDict, sort, pass to super, cache values."""
         self_unsorted = _collections.OrderedDict(*args, **kwargs)
-        items_sorted = sorted(self_unsorted.items(), key=repr)
+        items_sorted = sorted(list(self_unsorted.items()), key=repr)
         sup = super(_Hsfod, self)  # possibly something else than OrderedDict
         sup.__init__(items_sorted)
         # Repr string is used for sorting, keys are more important than values.
-        self.__repr = '{' + repr(self.keys()) + ':' + repr(self.values()) + '}'
+        self.__repr = '{' + repr(list(self.keys())) + ':' + repr(list(self.values())) + '}'
         self.__hash = hash(self.__repr)
 
     def __repr__(self):
@@ -139,11 +139,11 @@ def sort_bits(obj, keys_with_bits=[]):
     TODO: Should this docstring include links to support dict and OrderedDict safety?
     """
     if isinstance(obj, dict):
-        for key, value in obj.iteritems():
+        for key, value in obj.items():
             # Unicode is not str and vice versa, isinstance has to check for both.
             # Luckily, "in" recognizes equivalent strings in different encodings.
             # Type "bytes" is added for Python 3 compatibility.
-            if key in keys_with_bits and isinstance(value, (unicode, str, bytes)):
+            if key in keys_with_bits and isinstance(value, (str, bytes)):
                 obj[key] = " ".join(sorted(value.split(" ")))
             else:
                 sort_bits(value, keys_with_bits)
@@ -163,11 +163,11 @@ def hide_volatile(obj, keys_with_volatiles=[]):
     :return: corrected
     """
     if isinstance(obj, dict):
-        for key, value in obj.iteritems():
+        for key, value in obj.items():
             # Unicode is not str and vice versa, isinstance has to check for both.
             # Luckily, "in" recognizes equivalent strings in different encodings.
             # Type "bytes" is added for Python 3 compatibility.
-            if key in keys_with_volatiles and isinstance(value, (unicode, str, bytes, int, bool)):
+            if key in keys_with_volatiles and isinstance(value, (str, bytes, int, bool)):
                 obj[key] = "*"
             else:
                 hide_volatile(value, keys_with_volatiles)
