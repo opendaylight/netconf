@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -68,5 +69,10 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     public DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier path) {
         // FIXME: propagate MountPointContext
         return NetconfMessageTransformUtil.toFilterStructure(path, mountContext.getSchemaContext());
+    }
+
+    @Override
+    public DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext xpathContext) {
+        return NetconfMessageTransformUtil.toFilterStructure(xpathContext);
     }
 }
