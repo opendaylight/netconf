@@ -40,6 +40,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.netconf.util.NodeContainerProxy;
@@ -91,6 +92,7 @@ public final class NetconfMessageTransformUtil {
     public static final QName CREATE_SUBSCRIPTION_RPC_QNAME =
             QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
     private static final String SUBTREE = "subtree";
+    private static final String XPATH = "xpath";
 
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
@@ -160,6 +162,7 @@ public final class NetconfMessageTransformUtil {
     public static final SchemaPath NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
     public static final QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
     public static final SchemaPath NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
+    public static final QName NETCONF_SELECT_QNAME = QName.create(NETCONF_QNAME, "select").intern();
     public static final QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
     public static final QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
     public static final QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
@@ -240,6 +243,20 @@ public final class NetconfMessageTransformUtil {
         return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
                 .build();
     }
+
+    public static DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext netconfXPathContext) {
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
+                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
+        netconfXPathContext.getNamespaces()
+                .forEach(q -> element.setAttributeNS(q.getNamespaceURI(), q.getLocalPart(), q.getPrefix()));
+        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                XPATH);
+        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_SELECT_QNAME.getLocalName(),
+                netconfXPathContext.getXpathWithPrefixes());
+        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
+                .build();
+    }
+
 
     public static void checkValidReply(final NetconfMessage input, final NetconfMessage output)
             throws NetconfDocumentedException {
@@ -379,7 +396,7 @@ public final class NetconfMessageTransformUtil {
         final Deque<Builder> builders = new ArrayDeque<>(args.size());
 
         // Step one: open builders
-        for (PathArgument arg : args) {
+        for (final PathArgument arg : args) {
             builders.push(ImmutableNormalizedMetadata.builder().withIdentifier(arg));
         }
 
@@ -495,7 +512,7 @@ public final class NetconfMessageTransformUtil {
             if (next instanceof NodeWithValue) {
                 actualElement.setNodeValue(((NodeWithValue) next).getValue().toString());
             } else if (next instanceof NodeIdentifierWithPredicates) {
-                for (Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).entrySet()) {
+                for (final Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).entrySet()) {
                     final Element entryElement = document.createElementNS(entry.getKey().getNamespace().toString(),
                             entry.getKey().getLocalName());
                     entryElement.setTextContent(entry.getValue().toString());
