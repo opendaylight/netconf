@@ -23,7 +23,6 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
@@ -38,6 +37,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractTestModelTest;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
@@ -183,15 +183,15 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
-    @Ignore("TODO")
     @Test
     public void testGetConfigRunningDataWithXPath() throws Exception {
-//        NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/c");
-//        netconfXPathContext.addNamespace("nxpnma", CONTAINER_Q_NAME.getNamespace());
-//        final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
-//                .getConfigRunningData(callback, netconfXPathContext).get();
-//        Assert.assertTrue(dataOpt.isPresent());
-//        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+        final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
+        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
+                .getConfigRunningData(callback, netconfXPathContext, Optional.of(YangInstanceIdentifier.empty()))
+                .get();
+        Assert.assertTrue(dataOpt.isPresent());
+        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
     @Test
@@ -202,15 +202,15 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
-    @Ignore("TODO")
     @Test
     public void testGetDataWithXPath() throws Exception {
-//        NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/c");
-//        netconfXPathContext.addNamespace("nxpnma", CONTAINER_Q_NAME.getNamespace());
-//        final Optional<NormalizedNode<?, ?>> dataOpt =
-//                baseOps.getData(callback, netconfXPathContext).get();
-//        Assert.assertTrue(dataOpt.isPresent());
-//        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+        final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
+        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        netconfXPathContext.addNamespace(cNamespace);
+        final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
+                .getData(callback, netconfXPathContext, Optional.of(YangInstanceIdentifier.empty())).get();
+        Assert.assertTrue(dataOpt.isPresent());
+        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
     @Test
@@ -234,13 +234,13 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         verifyMessageSent("getConfig_candidate-filter", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
-    @Ignore("TODO")
     @Test
     public void testGetConfigCandidateWithXPath() throws Exception {
-//        NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/c");
-//        netconfXPathContext.addNamespace("nxpnma", CONTAINER_Q_NAME.getNamespace());
-//        baseOps.getConfigCandidate(callback, netconfXPathContext);
-//        verifyMessageSent("getConfig_candidate-filter", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
+        final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
+        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        netconfXPathContext.addNamespace(cNamespace);
+        baseOps.getConfigCandidate(callback, netconfXPathContext);
+        verifyMessageSent("getConfig_candidate-xpath", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
     @Test

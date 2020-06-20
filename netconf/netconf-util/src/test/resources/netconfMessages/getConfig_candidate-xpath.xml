@@ -1,0 +1,21 @@
+<!--
+  ~ Copyright (c) 2020 Lumina Networks, Inc.  All rights reserved.
+  ~
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  ~ and is available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+
+<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <get-config>
+        <source>
+            <candidate/>
+        </source>
+        <filter
+          xmlns:ns0="xmlns"
+          ns0:nxpcrpc0="test:namespace"
+          xmlns:ns1="urn:ietf:params:xml:ns:netconf:base:1.0"
+          ns1:select="/nxpcrpc0:c"
+          xmlns:ns2="urn:ietf:params:xml:ns:netconf:base:1.0" ns2:type="xpath"/>
+    </get-config>
+</rpc>
