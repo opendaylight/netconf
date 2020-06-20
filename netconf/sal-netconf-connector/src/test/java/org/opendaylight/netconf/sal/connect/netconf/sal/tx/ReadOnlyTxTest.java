@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import java.net.InetSocketAddress;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,6 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -87,19 +87,21 @@ public class ReadOnlyTxTest {
         Assert.assertNotEquals(tx1.getIdentifier(), tx2.getIdentifier());
     }
 
-    @Ignore("TODO")
     @Test
     public void testReadWithXPath() {
-//        final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(MountPointContext.class));
-//
-//        final ReadOnlyTx readOnlyTx =
-//                new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
-//
-//        readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, NetconfXPathContext.empty());
-//        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-//                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
-//        readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, NetconfXPathContext.empty());
-//        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-//                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(ContainerNode.class));
+        final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(MountPointContext.class));
+
+        final ReadOnlyTx readOnlyTx = new ReadOnlyTx(netconfOps,
+                new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+
+        readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, NetconfXPathContext.empty(),
+                YangInstanceIdentifier.empty());
+        verify(rpc).invokeRpc(
+                Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)),
+                any(ContainerNode.class));
+        readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, NetconfXPathContext.empty(), YangInstanceIdentifier.empty());
+        verify(rpc).invokeRpc(
+                Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_QNAME)),
+                any(ContainerNode.class));
     }
 }
