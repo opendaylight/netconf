@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext.CloseCallback;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
+import org.opendaylight.netconf.callhome.protocol.TransportType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,21 +34,24 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
 
     CallHomeMountSessionContext createSession(final CallHomeProtocolSessionContext session,
             final CallHomeChannelActivator activator, final CloseCallback onCloseHandler) {
-        final CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(session.getSessionName(),
+            final CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(session.getSessionId(),
             session, activator, devCtxt -> onClosed(devCtxt, onCloseHandler));
 
-        final PublicKey remoteKey = session.getRemoteServerKey();
-        final CallHomeMountSessionContext existing = contextByPublicKey.putIfAbsent(remoteKey, deviceContext);
-        if (existing != null) {
-            // Check if the sshkey of the incoming netconf server is present. If present return null, else store the
-            // session. The sshkey is the uniqueness of the callhome sessions not the uniqueid/devicename.
-            LOG.error("SSH Host Key {} is associated with existing session {}, closing session {}", remoteKey, existing,
-                session);
-            session.terminate();
-            return null;
-        }
+            // If the session initated over SSH transport protocol SSH host-key should to be unique among devices
+            if (session.getTransportType() == TransportType.SSH) {
+                final PublicKey remoteKey = session.getRemoteServerKey();
+                final CallHomeMountSessionContext existing = contextByPublicKey.putIfAbsent(remoteKey, deviceContext);
+                if (existing != null) {
+                    // Check if the sshkey of the incoming netconf server is present. If present return null, else store the
+                    // session. The sshkey is the uniqueness of the callhome sessions not the uniqueid/devicename.
+                    LOG.error("SSH Host Key {} is associated with existing session {}, closing session {}", remoteKey, existing,
+                        session);
+                    session.terminate();
+                    return null;
+                }
+            }
 
-        final InetSocketAddress remoteAddress = session.getRemoteAddress();
+        final SocketAddress remoteAddress = session.getRemoteAddress();
         final CallHomeMountSessionContext prev = contextByAddress.put(remoteAddress, deviceContext);
         if (prev != null) {
             LOG.warn("Remote {} replaced context {} with {}", remoteAddress, prev, deviceContext);
@@ -59,7 +63,9 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
     public void onClosed(final CallHomeMountSessionContext deviceContext) {
         final CallHomeProtocolSessionContext session = deviceContext.getProtocol();
         contextByAddress.remove(session.getRemoteAddress(), deviceContext);
-        contextByPublicKey.remove(session.getRemoteServerKey(), deviceContext);
+        if (session.getTransportType() == TransportType.SSH) {
+            contextByPublicKey.remove(session.getRemoteServerKey(), deviceContext);
+        }
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
