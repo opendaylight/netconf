@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import com.google.common.base.Preconditions;
 import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
@@ -74,6 +76,23 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
      * @throws IOException If there is an I/O problem with the keystore data
      */
     public java.security.KeyStore getJavaKeyStore() throws GeneralSecurityException, IOException {
+        return getJavaKeyStore(Collections.emptySet());
+    }
+
+    /**
+     * Using private keys and trusted certificates to create a new JDK <code>KeyStore</code> which
+     * will be used by TLS clients to create <code>SSLEngine</code>. The private keys are essential
+     * to create JDK <code>KeyStore</code> while the trusted certificates are optional.
+     *
+     * @param allowedKeys Set of keys to include during KeyStore generation, empty set will creatr
+     *                   a KeyStore with all possible keys.
+     * @return A JDK KeyStore object
+     * @throws GeneralSecurityException If any security exception occurred
+     * @throws IOException If there is an I/O problem with the keystore data
+     */
+    public java.security.KeyStore getJavaKeyStore(Set<String> allowedKeys) throws GeneralSecurityException, IOException {
+        Preconditions.checkNotNull(allowedKeys);
+
         final java.security.KeyStore keyStore = java.security.KeyStore.getInstance("JKS");
 
         keyStore.load(null, null);
@@ -84,6 +103,9 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
             }
 
             for (Map.Entry<String, PrivateKey> entry : privateKeys.entrySet()) {
+                if (!allowedKeys.isEmpty() && !allowedKeys.contains(entry.getKey())) {
+                    continue;
+                }
                 final java.security.PrivateKey key = getJavaPrivateKey(entry.getValue().getData());
 
                 final List<X509Certificate> certificateChain =
