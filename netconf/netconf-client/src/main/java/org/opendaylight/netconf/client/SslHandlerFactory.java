@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.client;
 
 import io.netty.handler.ssl.SslHandler;
+import java.util.Set;
 
 public interface SslHandlerFactory {
     /**
@@ -15,4 +16,6 @@ public interface SslHandlerFactory {
      * into the channel pipeline when the channel is active.
      */
     SslHandler createSslHandler();
+
+    SslHandler createSslHandler(Set<String> allowedKeys);
 }
