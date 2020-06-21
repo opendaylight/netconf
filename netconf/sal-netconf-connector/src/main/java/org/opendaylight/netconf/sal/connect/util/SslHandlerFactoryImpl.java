@@ -15,6 +15,7 @@ import io.netty.handler.ssl.SslHandler;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.util.Collections;
 import java.util.Set;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -30,6 +31,10 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
     private final NetconfKeystoreAdapter keystoreAdapter;
     private final @Nullable Specification specification;
 
+    public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter) {
+        this(keystoreAdapter, null);
+    }
+
     public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter, final Specification specification) {
         this.keystoreAdapter = requireNonNull(keystoreAdapter);
         this.specification = specification;
@@ -37,8 +42,13 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
 
     @Override
     public SslHandler createSslHandler() {
+        return createSslHandler(Collections.emptySet());
+    }
+
+    @Override
+    public SslHandler createSslHandler(Set<String> allowedKeys) {
         try {
-            final KeyStore keyStore = keystoreAdapter.getJavaKeyStore();
+            final KeyStore keyStore = keystoreAdapter.getJavaKeyStore(allowedKeys);
 
             final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(keyStore, "".toCharArray());
