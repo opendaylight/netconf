@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
-import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.security.PublicKey;
 
 /**
@@ -20,7 +20,7 @@ public interface CallHomeProtocolSessionContext {
      *
      * @return Returns application-provided session identifier
      */
-    String getSessionName();
+    String getSessionId();
 
     /**
      * Returns public key provided by remote SSH Server for this session.
@@ -34,17 +34,17 @@ public interface CallHomeProtocolSessionContext {
      *
      * @return remote socket address associated with this session.
      */
-    InetSocketAddress getRemoteAddress();
-
-    /**
-     * Returns version string provided by remote server.
-     *
-     * @return Version string provided by remote server.
-     */
-    String getRemoteServerVersion();
+    SocketAddress getRemoteAddress();
 
     /**
      * Terminate this session.
      */
     void terminate();
+
+    /**
+     * Returns transport type for this session.
+     *
+     * @return {@link TransportType} for this session.
+     */
+    TransportType getTransportType();
 }

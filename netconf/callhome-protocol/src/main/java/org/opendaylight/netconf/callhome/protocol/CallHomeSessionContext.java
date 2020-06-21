@@ -96,6 +96,11 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         removeSelf();
     }
 
+    @Override
+    public TransportType getTransportType() {
+        return TransportType.SSH;
+    }
+
     private void channelOpenFailed(final Throwable throwable) {
         LOG.error("Unable to open netconf subsystem, disconnecting.", throwable);
         sshSession.close(false);
@@ -130,17 +135,12 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     }
 
     @Override
-    public String getRemoteServerVersion() {
-        return sshSession.getServerVersion();
-    }
-
-    @Override
     public InetSocketAddress getRemoteAddress() {
         return remoteAddress;
     }
 
     @Override
-    public String getSessionName() {
+    public String getSessionId() {
         return authorization.getSessionName();
     }
 
@@ -163,7 +163,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         }
 
         void remove(final CallHomeSessionContext session) {
-            sessions.remove(session.getSessionName(), session);
+            sessions.remove(session.getSessionId(), session);
         }
 
         ReverseSshChannelInitializer getChannelInitializer(final NetconfClientSessionListener listener) {
@@ -178,7 +178,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
                 final CallHomeAuthorization authorization, final SocketAddress remoteAddress) {
             CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
                     remoteAddress, this);
-            CallHomeSessionContext preexisting = sessions.putIfAbsent(session.getSessionName(), session);
+            CallHomeSessionContext preexisting = sessions.putIfAbsent(session.getSessionId(), session);
             // If preexisting is null - session does not exist, so we can safely create new one, otherwise we return
             // null and incoming connection will be rejected.
             return preexisting == null ? session : null;
