@@ -33,21 +33,22 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
 
     CallHomeMountSessionContext createSession(final CallHomeProtocolSessionContext session,
             final CallHomeChannelActivator activator, final CloseCallback onCloseHandler) {
-        final CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(session.getSessionName(),
+        final CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(session.getSessionId(),
             session, activator, devCtxt -> onClosed(devCtxt, onCloseHandler));
 
         final PublicKey remoteKey = session.getRemoteServerKey();
         final CallHomeMountSessionContext existing = contextByPublicKey.putIfAbsent(remoteKey, deviceContext);
         if (existing != null) {
-            // Check if the sshkey of the incoming netconf server is present. If present return null, else store the
-            // session. The sshkey is the uniqueness of the callhome sessions not the uniqueid/devicename.
-            LOG.error("SSH Host Key {} is associated with existing session {}, closing session {}", remoteKey, existing,
-                session);
+            // Check if the sshkey or certificate of the incoming netconf server is present. If present return null,
+            // else store the session. The sshkey/certificate is the uniqueness of the callhome sessions not the
+            // uniqueid/devicename
+            LOG.error("Server Host Key/Certificate {} is associated with existing session {}, closing session {}",
+                remoteKey, existing, session);
             session.terminate();
             return null;
         }
 
-        final InetSocketAddress remoteAddress = session.getRemoteAddress();
+        final SocketAddress remoteAddress = session.getRemoteAddress();
         final CallHomeMountSessionContext prev = contextByAddress.put(remoteAddress, deviceContext);
         if (prev != null) {
             LOG.warn("Remote {} replaced context {} with {}", remoteAddress, prev, deviceContext);
