@@ -31,10 +31,16 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
 
     private final NetconfBaseOps netconfOps;
     private final RemoteDeviceId id;
+    private final boolean xpathSupported;
 
     public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id) {
+        this(netconfOps, id, false);
+    }
+
+    public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id, boolean xpathSupported) {
         this.netconfOps = netconfOps;
         this.id = id;
+        this.xpathSupported = xpathSupported;
     }
 
     private FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(
@@ -46,7 +52,7 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
     private FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(final NetconfXPathContext xpathContext,
             final YangInstanceIdentifier path) {
         return remapException(netconfOps.getConfigRunningData(new NetconfRpcFutureCallback("Data read", id),
-                xpathContext, Optional.ofNullable(path)));
+                xpathContext, Optional.ofNullable(path), xpathSupported));
     }
 
     private FluentFuture<Optional<NormalizedNode<?, ?>>> readOperationalData(
@@ -59,7 +65,7 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
             YangInstanceIdentifier path) {
         return remapException(
                 netconfOps.getData(new NetconfRpcFutureCallback("Data read", id), xpathContext,
-                        Optional.ofNullable(path)));
+                        Optional.ofNullable(path), xpathSupported));
     }
 
     private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {

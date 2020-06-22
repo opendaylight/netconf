@@ -36,6 +36,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     private final boolean rollbackSupport;
     private final boolean candidateSupported;
     private final boolean runningWritable;
+    private final boolean xpathSupported;
 
     private boolean isLockAllowed = true;
 
@@ -48,6 +49,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
         candidateSupported = netconfSessionPreferences.isCandidateSupported();
         runningWritable = netconfSessionPreferences.isRunningWritable();
         rollbackSupport = netconfSessionPreferences.isRollbackSupported();
+        xpathSupported = netconfSessionPreferences.isXPathSupported();
         Preconditions.checkArgument(candidateSupported || runningWritable,
             "Device %s has advertised neither :writable-running nor :candidate capability."
                     + "At least one of these should be advertised. Failed to establish a session.", id.getName());
@@ -55,7 +57,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     @Override
     public DOMDataTreeReadTransaction newReadOnlyTransaction() {
-        return new ReadOnlyTx(netconfOps, id);
+        return new ReadOnlyTx(netconfOps, id, xpathSupported);
     }
 
     @Override

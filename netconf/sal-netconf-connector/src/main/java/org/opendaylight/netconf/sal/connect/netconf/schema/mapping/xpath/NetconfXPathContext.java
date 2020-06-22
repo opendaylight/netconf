@@ -19,7 +19,7 @@ import javax.xml.namespace.QName;
  */
 public class NetconfXPathContext {
 
-    private static final String XMLNS = "xmlns";
+    public static final String XMLNS = "xmlns";
     private static final String BASE_NS_PREFIX = "nxpcrpc";
 
     private final List<QName> namespaces;
