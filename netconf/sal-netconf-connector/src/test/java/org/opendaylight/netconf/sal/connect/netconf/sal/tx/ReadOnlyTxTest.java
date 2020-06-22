@@ -92,14 +92,13 @@ public class ReadOnlyTxTest {
         final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(MountPointContext.class));
 
         final ReadOnlyTx readOnlyTx = new ReadOnlyTx(netconfOps,
-                new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+                new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)), true);
 
-        readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, NetconfXPathContext.empty(),
-                YangInstanceIdentifier.empty());
+        readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, NetconfXPathContext.empty());
         verify(rpc).invokeRpc(
                 Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)),
                 any(ContainerNode.class));
-        readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, NetconfXPathContext.empty(), YangInstanceIdentifier.empty());
+        readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, NetconfXPathContext.empty());
         verify(rpc).invokeRpc(
                 Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_QNAME)),
                 any(ContainerNode.class));

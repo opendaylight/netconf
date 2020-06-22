@@ -186,9 +186,11 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     @Test
     public void testGetConfigRunningDataWithXPath() throws Exception {
         final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
-        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        final NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext =
+                new NetconfXPathContext<>("/" + cNamespace + ":c");
+        netconfXPathContext.setPath(YangInstanceIdentifier.empty());
         final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
-                .getConfigRunningData(callback, netconfXPathContext, Optional.of(YangInstanceIdentifier.empty()))
+                .getConfigRunningData(callback, netconfXPathContext, true)
                 .get();
         Assert.assertTrue(dataOpt.isPresent());
         Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
@@ -205,10 +207,12 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     @Test
     public void testGetDataWithXPath() throws Exception {
         final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
-        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        final NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext = new NetconfXPathContext<>(
+                "/" + cNamespace + ":c");
+        netconfXPathContext.setPath(YangInstanceIdentifier.empty());
         netconfXPathContext.addNamespace(cNamespace);
         final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
-                .getData(callback, netconfXPathContext, Optional.of(YangInstanceIdentifier.empty())).get();
+                .getData(callback, netconfXPathContext, true).get();
         Assert.assertTrue(dataOpt.isPresent());
         Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
@@ -237,9 +241,10 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     @Test
     public void testGetConfigCandidateWithXPath() throws Exception {
         final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
-        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        final NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext = new NetconfXPathContext<>(
+                "/" + cNamespace + ":c");
         netconfXPathContext.addNamespace(cNamespace);
-        baseOps.getConfigCandidate(callback, netconfXPathContext);
+        baseOps.getConfigCandidate(callback, netconfXPathContext, true);
         verifyMessageSent("getConfig_candidate-xpath", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 

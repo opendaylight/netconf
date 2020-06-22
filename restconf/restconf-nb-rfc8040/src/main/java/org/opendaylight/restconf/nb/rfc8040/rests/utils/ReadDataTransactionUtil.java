@@ -10,14 +10,18 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAMS_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
@@ -27,6 +31,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.NetconfReadOnlyTransaction;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
@@ -457,9 +463,15 @@ public final class ReadDataTransactionUtil {
             final @NonNull TransactionVarsWrapper transactionNode, final boolean closeTransactionChain) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
         try (DOMDataTreeReadTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
-            final FluentFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = tx.read(
-                transactionNode.getLogicalDatastoreType(),
-                transactionNode.getInstanceIdentifier().getInstanceIdentifier());
+            final FluentFuture<Optional<NormalizedNode<?, ?>>> listenableFuture;
+            if (tx instanceof NetconfReadOnlyTransaction && !transactionNode.getFieldsFilter().isEmpty()) {
+                final NetconfXPathContext<YangInstanceIdentifier> xPathContext = prepareXPathContext(transactionNode);
+                listenableFuture = ((NetconfReadOnlyTransaction) tx).read(transactionNode.getLogicalDatastoreType(),
+                        xPathContext);
+            } else {
+                listenableFuture = tx.read(transactionNode.getLogicalDatastoreType(),
+                        transactionNode.getInstanceIdentifier().getInstanceIdentifier());
+            }
             if (closeTransactionChain) {
                 //Method close transactionChain inside of TransactionVarsWrapper, if is provide as a parameter.
                 FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
@@ -470,6 +482,61 @@ public final class ReadDataTransactionUtil {
             }
         }
         return dataFactory.build();
+    }
+
+    @VisibleForTesting
+    public static NetconfXPathContext<YangInstanceIdentifier> prepareXPathContext(
+            final TransactionVarsWrapper transactionNode) {
+        final StringBuilder sb = new StringBuilder();
+        final List<String> namespaces = new ArrayList<>();
+        transactionNode.getInstanceIdentifier().getInstanceIdentifier().getPathArguments().forEach(p -> {
+            if (p instanceof NodeIdentifierWithPredicates) {
+                ((NodeIdentifierWithPredicates) p).entrySet().forEach(entry -> {
+                    sb.append('[');
+                    appendQNameWithNs(sb, namespaces, entry.getKey());
+                    sb.append("/text()='");
+                    sb.append(entry.getValue());
+                    sb.append("']");
+                });
+                return;
+            }
+            final QName nodeType = p.getNodeType();
+            appendQNameWithNs(sb, namespaces, nodeType);
+        });
+        final StringBuilder baseXPath = new StringBuilder(sb.toString());
+        final List<String> xpathParts = new ArrayList<>();
+        final Iterator<Set<QName>> qnames = transactionNode.getFieldsFilter().iterator();
+        while (qnames.hasNext()) {
+            final Set<QName> filters = qnames.next();
+            if (qnames.hasNext()) {
+                final QName path = filters.iterator().next();
+                final String ns = path.getNamespace().toString();
+                namespaces.add(ns);
+                baseXPath.append("/").append(ns).append(":").append(path.getLocalName());
+            } else {
+                filters.forEach(filter -> {
+                    final StringBuilder sbXPathPart = new StringBuilder(baseXPath);
+                    final String ns = filter.getNamespace().toString();
+                    namespaces.add(ns);
+                    sbXPathPart.append("/").append(ns).append(":").append(filter.getLocalName());
+                    xpathParts.add(sbXPathPart.toString());
+                });
+            }
+        }
+        final NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext = new NetconfXPathContext<>(
+                xpathParts.stream().collect(Collectors.joining(" | ")));
+        namespaces.forEach(netconfXPathContext::addNamespace);
+        netconfXPathContext.setPath(transactionNode.getInstanceIdentifier().getInstanceIdentifier());
+        return netconfXPathContext;
+    }
+
+    private static void appendQNameWithNs(final StringBuilder sb, final List<String> namespaces, final QName nodeType) {
+        final String namespace = nodeType.getNamespace().toString();
+        namespaces.add(namespace);
+        sb.append("/");
+        sb.append(namespace);
+        sb.append(":");
+        sb.append(nodeType.getLocalName());
     }
 
     /**

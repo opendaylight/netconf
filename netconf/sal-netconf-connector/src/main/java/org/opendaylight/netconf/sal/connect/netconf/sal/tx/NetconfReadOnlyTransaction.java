@@ -33,7 +33,7 @@ public interface NetconfReadOnlyTransaction extends DOMDataTreeReadTransaction {
      *         until the commit operation is complete.
      */
     default FluentFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
-            NetconfXPathContext xpathContext, YangInstanceIdentifier path) {
+            NetconfXPathContext<YangInstanceIdentifier> xpathContext) {
         throw new UnsupportedOperationException("Not supported");
     }
 }

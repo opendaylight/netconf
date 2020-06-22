@@ -19,14 +19,17 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
@@ -83,6 +86,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public final class NetconfMessageTransformUtil {
+
+    private static final Pattern START_KEY = Pattern.compile("\\[");
+
+    private static final Pattern OR = Pattern.compile("\\|");
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
 
@@ -246,19 +253,126 @@ public final class NetconfMessageTransformUtil {
                 .build();
     }
 
-    public static DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext netconfXPathContext) {
+    public static DataContainerChild<?, ?> toFilterStructure(
+            NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext,
+            boolean xpathSupported) {
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
                 Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        netconfXPathContext.getNamespaces()
-                .forEach(q -> element.setAttributeNS(q.getNamespaceURI(), q.getLocalPart(), q.getPrefix()));
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
-                XPATH);
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_SELECT_QNAME.getLocalName(),
-                netconfXPathContext.getXpathWithPrefixes());
+        if (xpathSupported) {
+            netconfXPathContext.getNamespaces()
+                    .forEach(q -> element.setAttributeNS(q.getNamespaceURI(), q.getLocalPart(), q.getPrefix()));
+            element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                    XPATH);
+            element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_SELECT_QNAME.getLocalName(),
+                    netconfXPathContext.getXpathWithPrefixes());
+        } else {
+            element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                    SUBTREE);
+
+            writeElementSubtree(netconfXPathContext, element);
+            LOG.debug("Netconf device does not support the XPath. It will be used subtree instead.");
+        }
+
         return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
                 .build();
     }
 
+
+    private static Element writeElementSubtree(NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext,
+            Element element) {
+        final String[] expressions = netconfXPathContext.getXpathWithPrefixes().replaceAll("\\s+", "")
+                .split(OR.pattern());
+        final Map<Integer, List<String>> expressionsMap = new LinkedHashMap<>();
+        int countI = 0;
+        Element elementNew = element;
+        for (final String expression : expressions) {
+            final List<String> expressionParts = new ArrayList<>();
+            boolean isKey = false;
+            StringBuilder sbKey = null;
+            for (final String expressionPart : expression.split("/")) {
+                if (!expressionPart.isEmpty()) {
+                    if (expressionPart.endsWith("[") && !isKey) {
+                        isKey = true;
+                        sbKey = new StringBuilder(expressionPart);
+                        continue;
+                    }
+                    if (expressionPart.endsWith("]") && sbKey != null) {
+                        isKey = false;
+                        expressionParts.add(sbKey.append("/").append(expressionPart).toString());
+                        continue;
+                    }
+                    if (!isKey) {
+                        expressionParts.add(expressionPart);
+                    } else {
+                        sbKey.append("/").append(expressionPart);
+                    }
+                }
+            }
+            expressionsMap.put(countI, expressionParts);
+            countI++;
+        }
+        int actualPart = 0;
+        for (int j = 0; j < expressionsMap.get(0).size(); j++) {
+            int countL = 0;
+            actualPart = j;
+            for (int k = 1; k < expressions.length; k++) {
+                if (expressionsMap.get(0).get(j).equals(expressionsMap.get(k).get(j))) {
+                    countL++;
+                }
+            }
+            if (countL != expressions.length - 1) {
+                break;
+            }
+            final String elementStrWithNs = expressionsMap.get(0).get(j);
+            final String[] elementStrWithNsArray;
+            if (elementStrWithNs.endsWith("]")) {
+                elementStrWithNsArray = elementStrWithNs.split(START_KEY.pattern())[0].split(":");
+            } else {
+                elementStrWithNsArray = elementStrWithNs.split(":");
+            }
+            final String originalNs = netconfXPathContext.getNamespaces().stream()
+                    .filter(q -> q.getLocalPart().equals(elementStrWithNsArray[0])).findAny().get().getPrefix();
+
+            final Element child = elementNew.getOwnerDocument().createElementNS(originalNs, elementStrWithNsArray[1]);
+            elementNew.appendChild(child);
+            elementNew = child;
+            if (elementStrWithNs.endsWith("]")) {
+                final String[] keys = elementStrWithNs.split(START_KEY.pattern());
+                for (int i = 1; i < keys.length; i++) {
+                    final String key = keys[i];
+                    final String[] keyValues = key.split("/");
+                    final String[] keyStrWithNsArray = keyValues[1].split(":");
+                    final String originalKeyNs = netconfXPathContext.getNamespaces().stream()
+                            .filter(q -> q.getLocalPart().equals(keyStrWithNsArray[0])).findAny().get().getPrefix();
+
+                    final Element keyElement = elementNew.getOwnerDocument().createElementNS(originalKeyNs,
+                            keyStrWithNsArray[1]);
+                    keyElement.appendChild(keyElement.getOwnerDocument()
+                            .createTextNode(keyValues[2].split("=")[1].replaceAll("'", "").replace("]", "")));
+                    elementNew.appendChild(keyElement);
+                }
+            }
+        }
+        final Element lastElement = elementNew;
+        for (final Entry<Integer, List<String>> entry : expressionsMap.entrySet()) {
+            Element entryElement = lastElement;
+            for (int j = actualPart; j < entry.getValue().size(); j++) {
+                for (int k = 1; k < expressions.length; k++) {
+                    final String elementStrWithNs = expressionsMap.get(entry.getKey()).get(j);
+                    final String[] elementStrWithNsArray = elementStrWithNs.split(":");
+                    final String originalNs = netconfXPathContext.getNamespaces().stream()
+                            .filter(q -> q.getLocalPart().equals(elementStrWithNsArray[0])).findAny().get().getPrefix();
+
+                    final Element child = entryElement.getOwnerDocument().createElementNS(
+                            originalNs,
+                            elementStrWithNsArray[1]);
+                    entryElement.appendChild(child);
+                    entryElement = child;
+                }
+            }
+        }
+        return element;
+    }
 
     public static void checkValidReply(final NetconfMessage input, final NetconfMessage output)
             throws NetconfDocumentedException {

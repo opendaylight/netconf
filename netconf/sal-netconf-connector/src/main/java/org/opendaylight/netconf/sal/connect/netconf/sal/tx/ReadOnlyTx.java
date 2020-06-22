@@ -31,10 +31,16 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
 
     private final NetconfBaseOps netconfOps;
     private final RemoteDeviceId id;
+    private final boolean xpathSupported;
 
     public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id) {
+        this(netconfOps, id, false);
+    }
+
+    public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id, boolean xpathSupported) {
         this.netconfOps = netconfOps;
         this.id = id;
+        this.xpathSupported = xpathSupported;
     }
 
     private FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(
@@ -43,10 +49,10 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
     }
 
-    private FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(final NetconfXPathContext xpathContext,
-            final YangInstanceIdentifier path) {
+    private FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(
+            final NetconfXPathContext<YangInstanceIdentifier> xpathContext) {
         return remapException(netconfOps.getConfigRunningData(new NetconfRpcFutureCallback("Data read", id),
-                xpathContext, Optional.ofNullable(path)));
+                xpathContext, xpathSupported));
     }
 
     private FluentFuture<Optional<NormalizedNode<?, ?>>> readOperationalData(
@@ -55,11 +61,10 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
     }
 
-    private FluentFuture<Optional<NormalizedNode<?, ?>>> readOperationalData(NetconfXPathContext xpathContext,
-            YangInstanceIdentifier path) {
+    private FluentFuture<Optional<NormalizedNode<?, ?>>> readOperationalData(
+            NetconfXPathContext<YangInstanceIdentifier> xpathContext) {
         return remapException(
-                netconfOps.getData(new NetconfRpcFutureCallback("Data read", id), xpathContext,
-                        Optional.ofNullable(path)));
+                netconfOps.getData(new NetconfRpcFutureCallback("Data read", id), xpathContext, xpathSupported));
     }
 
     private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
@@ -102,16 +107,16 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
 
     @Override
     public FluentFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
-            NetconfXPathContext xpathContext, YangInstanceIdentifier path) {
+            NetconfXPathContext<YangInstanceIdentifier> xpathContext) {
         switch (store) {
             case CONFIGURATION:
-                return readConfigurationData(xpathContext, path);
+                return readConfigurationData(xpathContext);
             case OPERATIONAL:
-                return readOperationalData(xpathContext, path);
+                return readOperationalData(xpathContext);
             default:
                 LOG.info("Unknown datastore type: {}.", store);
                 throw new IllegalArgumentException(String.format(
-                    "%s, Cannot read data %s for %s datastore, unknown datastore type", id, path, store));
+                        "%s, Cannot read data %s for %s datastore, unknown datastore type", id, store));
         }
     }
 

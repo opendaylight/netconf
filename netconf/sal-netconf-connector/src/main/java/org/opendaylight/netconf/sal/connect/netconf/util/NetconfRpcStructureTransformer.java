@@ -45,7 +45,7 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
             final NormalizedNodeResult node;
             try {
                 node = NetconfUtil.transformDOMSourceToNormalizedNode(mountContext,
-                    ((DOMSourceAnyxmlNode)data).getValue());
+                        ((DOMSourceAnyxmlNode) data).getValue());
                 return NormalizedNodes.findNode(node.getResult(), path.getPathArguments());
             } catch (final XMLStreamException | URISyntaxException | IOException | SAXException e) {
                 LOG.error("Cannot parse anyxml.", e);
@@ -72,7 +72,8 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext xpathContext) {
-        return NetconfMessageTransformUtil.toFilterStructure(xpathContext);
+    public DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext<YangInstanceIdentifier> xpathContext,
+            boolean xpathSupported) {
+        return NetconfMessageTransformUtil.toFilterStructure(xpathContext, xpathSupported);
     }
 }

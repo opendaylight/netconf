@@ -41,10 +41,13 @@ interface RpcStructureTransformer {
     /**
      * Transforms xpath to filter structure.
      *
-     * @param xpathContext xpath context, contains xpath and xpath namespaces mapper
+     * @param xpathContext   xpath context, contains xpath and xpath namespaces
+     *                       mapper
+     * @param xpathSupported device supports xpath
      * @return filter structure
      */
-    default DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext xpathContext) {
+    default DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext<YangInstanceIdentifier> xpathContext,
+            boolean xpathSupported) {
         throw new UnsupportedOperationException("XPath not supported");
     }
 

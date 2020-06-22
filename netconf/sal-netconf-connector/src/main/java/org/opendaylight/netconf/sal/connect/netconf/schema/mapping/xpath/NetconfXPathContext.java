@@ -10,22 +10,27 @@ package org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.namespace.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
  * Holder of XPath context for get or get-config RPC.
  *
+ * @param <T> specific type for path
+ *
  */
-public class NetconfXPathContext {
+public class NetconfXPathContext<T> {
 
-    private static final String XMLNS = "xmlns";
+    public static final String XMLNS = "xmlns";
     private static final String BASE_NS_PREFIX = "nxpcrpc";
 
     private final List<QName> namespaces;
     private final AtomicInteger atomicInteger;
 
     private String xpathWithNSPrefixes;
+    private Optional<T> path = Optional.empty();
 
     public NetconfXPathContext(String xpath) {
         namespaces = new ArrayList<>();
@@ -54,8 +59,17 @@ public class NetconfXPathContext {
         return xpathWithNSPrefixes;
     }
 
-    public static NetconfXPathContext empty() {
-        return new NetconfXPathContext("/*");
+    public static NetconfXPathContext<YangInstanceIdentifier> empty() {
+        final NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext = new NetconfXPathContext<>("/*");
+        netconfXPathContext.setPath(YangInstanceIdentifier.empty());
+        return netconfXPathContext;
     }
 
+    public void setPath(T path) {
+        this.path = Optional.of(path);
+    }
+
+    public Optional<T> getPath() {
+        return path;
+    }
 }

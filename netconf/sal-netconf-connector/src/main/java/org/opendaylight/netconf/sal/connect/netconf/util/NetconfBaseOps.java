@@ -208,11 +208,12 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<? extends DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback,
-            final QName datastore, NetconfXPathContext netconfXPathContext) {
+            final QName datastore, NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext,
+            boolean xpathSupported) {
         requireNonNull(callback);
         requireNonNull(datastore);
 
-        final DataContainerChild<?, ?> node = transformer.toFilterStructure(netconfXPathContext);
+        final DataContainerChild<?, ?> node = transformer.toFilterStructure(netconfXPathContext, xpathSupported);
         final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_CONFIG_PATH,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore), node));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
@@ -225,8 +226,8 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(FutureCallback<DOMRpcResult> callback,
-            NetconfXPathContext xpathContext, Optional<YangInstanceIdentifier> path) {
-        return extractData(path, getConfigRunning(callback, xpathContext));
+            NetconfXPathContext<YangInstanceIdentifier> xpathContext, boolean xpathSupported) {
+        return extractData(xpathContext.getPath(), getConfigRunning(callback, xpathContext, xpathSupported));
     }
 
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
@@ -235,8 +236,8 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(NetconfRpcFutureCallback callback,
-            NetconfXPathContext netconfXPathContext, Optional<YangInstanceIdentifier> path) {
-        return extractData(path, get(callback, netconfXPathContext));
+            NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext, boolean xpathSupported) {
+        return extractData(netconfXPathContext.getPath(), get(callback, netconfXPathContext, xpathSupported));
     }
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
@@ -256,8 +257,8 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<? extends DOMRpcResult> getConfigRunning(FutureCallback<DOMRpcResult> callback,
-            NetconfXPathContext xpathContext) {
-        return getConfig(callback, NETCONF_RUNNING_QNAME, xpathContext);
+            NetconfXPathContext<YangInstanceIdentifier> xpathContext, boolean xpathSupported) {
+        return getConfig(callback, NETCONF_RUNNING_QNAME, xpathContext, xpathSupported);
     }
 
     public ListenableFuture<? extends DOMRpcResult> getConfigCandidate(final FutureCallback<DOMRpcResult> callback,
@@ -266,8 +267,8 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<? extends DOMRpcResult> getConfigCandidate(NetconfRpcFutureCallback callback,
-            NetconfXPathContext netconfXPathContext) {
-        return getConfig(callback, NETCONF_CANDIDATE_QNAME, netconfXPathContext);
+            NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext, boolean xpathSupported) {
+        return getConfig(callback, NETCONF_CANDIDATE_QNAME, netconfXPathContext, xpathSupported);
     }
 
     public ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
@@ -284,11 +285,13 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
-            final NetconfXPathContext netconfXPathContext) {
+            final NetconfXPathContext<YangInstanceIdentifier> netconfXPathContext,
+            boolean xpathSupported) {
         requireNonNull(callback);
 
         final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_PATH,
-                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, toFilterStructure(netconfXPathContext)));
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
+                        toFilterStructure(netconfXPathContext, xpathSupported)));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
