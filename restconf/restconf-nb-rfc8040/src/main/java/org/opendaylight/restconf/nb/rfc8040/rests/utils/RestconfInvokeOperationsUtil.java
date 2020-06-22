@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import javax.ws.rs.core.Response.Status;
@@ -24,6 +26,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -134,7 +137,9 @@ public final class RestconfInvokeOperationsUtil {
         if (!mountPointService.isPresent()) {
             throw new RestconfDocumentedException("DomAction service is missing.");
         }
-        return prepareActionResult(mountPointService.get().invokeAction(schemaPath, prepareDataTreeId(yangIId), data));
+
+        return prepareActionResult(mountPointService.get().invokeAction(schemaPath,
+            prepareDataTreeId(yangIId, schemaPath), data));
     }
 
     /**
@@ -149,9 +154,9 @@ public final class RestconfInvokeOperationsUtil {
      * @return {@link DOMActionResult}
      */
     public static DOMActionResult invokeAction(final ContainerNode data, final SchemaPath schemaPath,
-        final ActionServiceHandler actionServiceHandler, final YangInstanceIdentifier yangIId) {
-        return prepareActionResult(actionServiceHandler.get().invokeAction(schemaPath, prepareDataTreeId(yangIId),
-            data));
+            final ActionServiceHandler actionServiceHandler, final YangInstanceIdentifier yangIId) {
+        return prepareActionResult(actionServiceHandler.get().invokeAction(schemaPath,
+            prepareDataTreeId(yangIId, schemaPath), data));
     }
 
     /**
@@ -196,9 +201,22 @@ public final class RestconfInvokeOperationsUtil {
      *
      * @param yangIId
      *             {@link YangInstanceIdentifier}
+     * @param schemaPath
+     *              {@link SchemaPath}
      * @return {@link DOMDataTreeIdentifier} domDataTreeIdentifier
      */
-    private static DOMDataTreeIdentifier prepareDataTreeId(final YangInstanceIdentifier yangIId) {
-        return new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent());
+    private static DOMDataTreeIdentifier prepareDataTreeId(final YangInstanceIdentifier yangIId,
+            final SchemaPath schemaPath) {
+        final List<PathArgument> pathArg = new ArrayList<>();
+        for (PathArgument path : yangIId.getPathArguments()) {
+            if (path.getNodeType().getLocalName().equals(schemaPath.getLastComponent().getLocalName())) {
+                break;
+            }
+            pathArg.add(path);
+        }
+        YangInstanceIdentifier yangInstanceIdentifier = YangInstanceIdentifier.builder().append(pathArg).build();
+        DOMDataTreeIdentifier domDataTreeIdentifier = new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL,
+            yangInstanceIdentifier);
+        return domDataTreeIdentifier;
     }
 }
