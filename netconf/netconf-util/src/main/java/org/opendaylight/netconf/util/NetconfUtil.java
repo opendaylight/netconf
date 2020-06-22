@@ -165,6 +165,12 @@ public final class NetconfUtil {
 
     public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final MountPointContext mountContext,
             final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
+        return transformDOMSourceToNormalizedNode(mountContext, value, true);
+    }
+
+    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final MountPointContext mountContext,
+            final DOMSource value, boolean isStrict) throws XMLStreamException, URISyntaxException, IOException,
+            SAXException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final XmlCodecFactory codecs = XmlCodecFactory.create(mountContext);
@@ -172,7 +178,7 @@ public final class NetconfUtil {
         // FIXME: we probably need to propagate MountPointContext here and not just the child nodes
         final ContainerSchemaNode dataRead = new NodeContainerProxy(NETCONF_DATA_QNAME,
             mountContext.getSchemaContext().getChildNodes());
-        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead)) {
+        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead, isStrict)) {
             xmlParserStream.traverse(value);
         }
         return resultHolder;

@@ -139,8 +139,8 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext xpathContext) {
-        return NetconfMessageTransformUtil.toFilterStructure(xpathContext);
+    public DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext xpathContext, boolean xpathSupported) {
+        return NetconfMessageTransformUtil.toFilterStructure(xpathContext, xpathSupported);
     }
 
     private static void checkDataValidForPath(final YangInstanceIdentifier dataPath, final Element dataNode) {
