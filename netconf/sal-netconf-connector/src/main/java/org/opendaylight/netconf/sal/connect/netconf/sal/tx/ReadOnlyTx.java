@@ -31,10 +31,16 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
 
     private final NetconfBaseOps netconfOps;
     private final RemoteDeviceId id;
+    private final boolean xpathSupported;
 
     public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id) {
+        this(netconfOps, id, false);
+    }
+
+    public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id, boolean xpathSupported) {
         this.netconfOps = netconfOps;
         this.id = id;
+        this.xpathSupported = xpathSupported;
     }
 
     private FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(
@@ -103,6 +109,9 @@ public final class ReadOnlyTx implements NetconfReadOnlyTransaction {
     @Override
     public FluentFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
             NetconfXPathContext xpathContext, YangInstanceIdentifier path) {
+        if (!xpathSupported) {
+            return read(store, path);
+        }
         switch (store) {
             case CONFIGURATION:
                 return readConfigurationData(xpathContext, path);

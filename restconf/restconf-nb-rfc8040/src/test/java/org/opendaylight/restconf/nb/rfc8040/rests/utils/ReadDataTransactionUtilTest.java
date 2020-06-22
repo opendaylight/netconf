@@ -18,10 +18,15 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriInfo;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -31,6 +36,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.NetconfReadOnlyTransaction;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.xpath.NetconfXPathContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -41,6 +48,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWr
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -86,7 +94,7 @@ public class ReadDataTransactionUtilTest {
         when(containerChildNode.getQName()).thenReturn(containerChildQName);
         when(containerSchemaNode.getDataChildByName(containerChildQName)).thenReturn(containerChildNode);
 
-        DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
+        final DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
         wrapper = new TransactionVarsWrapper(this.context, null, new TransactionChainHandler(mockDataBroker));
     }
@@ -494,5 +502,106 @@ public class ReadDataTransactionUtilTest {
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
         assertNull(writerParameters.getWithDefault());
         assertFalse(writerParameters.isTagged());
+    }
+
+    @Test
+    public void readDataConfigWithXPathTest() {
+        final DOMTransactionChain domTransactionChain = Mockito.mock(DOMTransactionChain.class);
+        final NetconfReadOnlyTransaction netconfReadTx = Mockito.mock(NetconfReadOnlyTransaction.class);
+        when(domTransactionChain.newReadOnlyTransaction()).thenReturn(netconfReadTx);
+        when(netconfReadTx.read(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(immediateFluentFuture(Optional.of(DATA.data3)));
+        final DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
+        Mockito.doReturn(domTransactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        final TransactionVarsWrapper transactionVarsWrapper = new TransactionVarsWrapper(this.context, null,
+                new TransactionChainHandler(mockDataBroker));
+        doReturn(DATA.path).when(context).getInstanceIdentifier();
+        final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
+        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent,
+                transactionVarsWrapper, schemaContext);
+        assertEquals(DATA.data3, normalizedNode);
+    }
+
+    @Test
+    public void prepareXPathWithoutFieldsTest() {
+        final TransactionVarsWrapper transactionNode = createBaseTransactionNodeWithIdentifier();
+        final NetconfXPathContext xpathContext = ReadDataTransactionUtil.prepareXPathContext(transactionNode);
+        xpathContext.addNamespace("ns:uri");
+        MatcherAssert.assertThat(xpathContext.getXpathWithPrefixes(),
+                Matchers.equalTo("/nxpcrpc0:cont/nxpcrpc1:cont-in"));
+    }
+
+    @Test
+    public void prepareXPathWithSingleSimpleFieldTest() {
+        final TransactionVarsWrapper transactionNode = createBaseTransactionNodeWithIdentifier();
+        transactionNode.setFieldsFilter(
+                Collections.singletonList(Collections.singleton(QName.create("ns:uri:b", "2020-02-22", "field"))));
+        final NetconfXPathContext xpathContext = ReadDataTransactionUtil.prepareXPathContext(transactionNode);
+        xpathContext.addNamespace("ns:uri");
+        MatcherAssert.assertThat(xpathContext.getXpathWithPrefixes(),
+                Matchers.equalTo("/nxpcrpc0:cont/nxpcrpc1:cont-in/nxpcrpc1:field"));
+    }
+
+    @Test
+    public void prepareXPathWithSingleComplexFieldTest() {
+        final TransactionVarsWrapper transactionNode = createBaseTransactionNodeWithIdentifier();
+        final Set<QName> complexField = new LinkedHashSet<>();
+        complexField.add(QName.create("ns:uri:b", "2020-02-22", "cont-field"));
+        complexField.add(QName.create("ns:uri:b", "2020-02-22", "field"));
+        transactionNode.setFieldsFilter(Collections.singletonList(complexField));
+        final NetconfXPathContext xpathContext = ReadDataTransactionUtil.prepareXPathContext(transactionNode);
+        xpathContext.addNamespace("ns:uri");
+        MatcherAssert.assertThat(xpathContext.getXpathWithPrefixes(),
+                Matchers.equalTo("/nxpcrpc0:cont/nxpcrpc1:cont-in/nxpcrpc1:cont-field/nxpcrpc1:field"));
+    }
+
+    @Test
+    public void prepareXPathWithMultiSingleFieldsTest() {
+        final TransactionVarsWrapper transactionNode = createBaseTransactionNodeWithIdentifier();
+        final ArrayList<Set<QName>> fields = new ArrayList<>();
+        fields.add(Collections.singleton(QName.create("ns:uri:b", "2020-02-22", "field1")));
+        fields.add(Collections.singleton(QName.create("ns:uri:b", "2020-02-22", "field2")));
+        transactionNode.setFieldsFilter(fields);
+        final NetconfXPathContext xpathContext = ReadDataTransactionUtil.prepareXPathContext(transactionNode);
+        xpathContext.addNamespace("ns:uri");
+        MatcherAssert.assertThat(xpathContext.getXpathWithPrefixes(),
+                Matchers.equalTo("/nxpcrpc0:cont/nxpcrpc1:cont-in/nxpcrpc1:field1"
+                        + " | /nxpcrpc0:cont/nxpcrpc1:cont-in/nxpcrpc1:field2"));
+    }
+
+    @Test
+    public void prepareXPathWithMultiComplexFieldsTest() {
+        final TransactionVarsWrapper transactionNode = createBaseTransactionNodeWithIdentifier();
+        final ArrayList<Set<QName>> fields = new ArrayList<>();
+        final Set<QName> complexField1 = new LinkedHashSet<>();
+        complexField1.add(QName.create("ns:uri:b", "2020-02-22", "cont-field1"));
+        complexField1.add(QName.create("ns:uri:b", "2020-02-22", "field1"));
+
+        final Set<QName> complexField2 = new LinkedHashSet<>();
+        complexField2.add(QName.create("ns:uri:b", "2020-02-22", "cont-field2"));
+        complexField2.add(QName.create("ns:uri:b", "2020-02-22", "field2"));
+
+        fields.add(complexField1);
+        fields.add(complexField2);
+
+        transactionNode.setFieldsFilter(fields);
+
+        final NetconfXPathContext xpathContext = ReadDataTransactionUtil.prepareXPathContext(transactionNode);
+        xpathContext.addNamespace("ns:uri");
+        MatcherAssert.assertThat(xpathContext.getXpathWithPrefixes(),
+                Matchers.equalTo("/nxpcrpc0:cont/nxpcrpc1:cont-in/nxpcrpc1:cont-field1/nxpcrpc1:field1"
+                        + " | /nxpcrpc0:cont/nxpcrpc1:cont-in/nxpcrpc1:cont-field2/nxpcrpc1:field2"));
+    }
+
+    private TransactionVarsWrapper createBaseTransactionNodeWithIdentifier() {
+        final InstanceIdentifierContext<?> instanceIdentifier = Mockito.mock(InstanceIdentifierContext.class);
+        when(instanceIdentifier.getInstanceIdentifier()).thenReturn(
+                YangInstanceIdentifier.create(
+                        NodeIdentifier.create(QName.create("ns:uri:a", "2020-06-22", "cont")),
+                        NodeIdentifier.create(QName.create("ns:uri:b", "2020-02-22", "cont-in"))));
+        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
+        when(txHandler.get()).thenReturn(transactionChain);
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, null, txHandler);
+        return transactionNode;
     }
 }

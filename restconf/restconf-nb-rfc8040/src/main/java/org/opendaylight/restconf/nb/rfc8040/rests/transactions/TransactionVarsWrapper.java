@@ -7,11 +7,15 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * This class represent delegation wrapper for transaction variables.
@@ -21,9 +25,11 @@ public final class TransactionVarsWrapper {
 
     private final InstanceIdentifierContext<?> instanceIdentifier;
     private final DOMMountPoint mountPoint;
-    private LogicalDatastoreType configuration = null;
     private final DOMTransactionChain transactionChain;
     private final TransactionChainHandler transactionChainHandler;
+
+    private LogicalDatastoreType configuration = null;
+    private final List<Set<QName>> fieldsFilter;
 
     /**
      * Set base type of variables, which ones we need for transaction.
@@ -44,6 +50,7 @@ public final class TransactionVarsWrapper {
         this.mountPoint = mountPoint;
         this.transactionChainHandler = transactionChainHandler;
         transactionChain = transactionChainHandler.get();
+        fieldsFilter = new ArrayList<>();
     }
 
     /**
@@ -95,5 +102,13 @@ public final class TransactionVarsWrapper {
 
     public TransactionChainHandler getTransactionChainHandler() {
         return transactionChainHandler;
+    }
+
+    public void setFieldsFilter(List<Set<QName>> fieldsFilter) {
+        this.fieldsFilter.addAll(fieldsFilter);
+    }
+
+    public List<Set<QName>> getFieldsFilter() {
+        return fieldsFilter;
     }
 }
