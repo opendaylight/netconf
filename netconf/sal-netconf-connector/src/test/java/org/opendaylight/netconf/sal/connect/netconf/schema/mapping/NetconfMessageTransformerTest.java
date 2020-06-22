@@ -409,7 +409,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfXPathContext netconfXPathContext = new NetconfXPathContext(xpath);
         netconfXPathContext.addNamespace(namespace);
 
-        final DataContainerChild<?, ?> filter = NetconfMessageTransformUtil.toFilterStructure(netconfXPathContext);
+        final DataContainerChild<?, ?> filter = NetconfMessageTransformUtil.toFilterStructure(netconfXPathContext,
+                true);
 
         final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
@@ -523,7 +524,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfXPathContext netconfXPathContext = new NetconfXPathContext(xpath);
         netconfXPathContext.addNamespace(namespace);
 
-        final DataContainerChild<?, ?> filter = toFilterStructure(netconfXPathContext);
+        final DataContainerChild<?, ?> filter = toFilterStructure(netconfXPathContext, true);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_QNAME),
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filter));

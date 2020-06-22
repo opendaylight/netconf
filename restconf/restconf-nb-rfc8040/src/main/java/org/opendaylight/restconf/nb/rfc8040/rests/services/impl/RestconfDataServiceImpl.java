@@ -137,6 +137,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 instanceIdentifier, mountPoint, getTransactionChainHandler(mountPoint));
+        if (parameters.getFields() != null) {
+            transactionNode.setFieldsFilter(parameters.getFields());
+        }
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(identifier, parameters.getContent(),
                 transactionNode, parameters.getWithDefault(), schemaContextRef, uriInfo);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
