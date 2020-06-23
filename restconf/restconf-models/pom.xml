@@ -26,7 +26,6 @@
     <module>ietf-restconf-monitoring</module>
     <module>ietf-restconf</module>
     <module>ietf-ip</module>
-    <module>ietf-netconf-acm</module>
     <module>ietf-network-instance</module>
     <module>ietf-subscribed-notifications</module>
     <module>ietf-yang-schema-mount</module>
