@@ -60,7 +60,9 @@ public class NetconfCallHomeTlsService {
                 .setMaxConnections(config.getMaxConnections())
                 .setSslHandlerFactory(sslHandlerFactory)
                 .setEventExecutor(eventExecutor)
-                .setSubsystemListener(subsystemListener).build();
+                .setSubsystemListener(subsystemListener)
+                .setTlsAllowedDevicesMonitor(new TlsAllowedDevicesMonitorImpl(dataBroker))
+                .build();
             server.setup();
 
             LOG.info("Initializing Call Home TLS server instance completed successfuly");

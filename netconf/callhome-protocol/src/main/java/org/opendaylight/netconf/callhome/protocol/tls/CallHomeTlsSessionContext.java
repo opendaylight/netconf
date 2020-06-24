@@ -39,15 +39,15 @@ public class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext
 
     private volatile boolean activated;
     private final TransportType transportType;
-    private final String channelId;
+    private final String deviceId;
     private final Channel channel;
     private final PublicKey publicKey;
     private SocketAddress socketAddress;
 
-    public CallHomeTlsSessionContext(final Channel channel, final SslHandlerFactory sslHandlerFactory,
+    public CallHomeTlsSessionContext(String deviceId, final Channel channel, final SslHandlerFactory sslHandlerFactory,
                                      final CallHomeNetconfSubsystemListener subsystemListener) {
         this.channel = requireNonNull(channel, "channel");
-        this.channelId = channel.id().asLongText();
+        this.deviceId = deviceId;
         this.socketAddress = channel.remoteAddress();
         this.publicKey = createPublicKey(channel);
         this.sslHandlerFactory = requireNonNull(sslHandlerFactory, "sslHandlerFactory");
@@ -56,7 +56,7 @@ public class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext
     }
 
     void openNetconfChannel(Channel ch) {
-        LOG.debug("Opening NETCONF Subsystem on TLS connection {}", channelId);
+        LOG.debug("Opening NETCONF Subsystem on TLS connection {}", deviceId);
         subsystemListener.onNetconfSubsystemOpened(this,
             listener -> doActivate(ch, listener));
     }
@@ -99,7 +99,7 @@ public class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext
 
     @Override
     public String getSessionId() {
-        return channelId;
+        return deviceId;
     }
 
     private PublicKey createPublicKey(Channel ch) {
