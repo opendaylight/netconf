@@ -70,6 +70,10 @@ module odl-netconf-callhome-server {
           description "Key identifier inside the NetConf keystore which will be used during two-way TLS authentication.";
           type string;
         }
+        leaf tls-cert-id {
+          description "Certificate identifier inside which will be used during two-way TLS authentication.";
+          type string;
+        }
         unique ssh-host-key;
         uses credentials;
       }

@@ -17,6 +17,7 @@ public class NetconfCallHomeTlsServerBuilder {
     private Integer maxConnections = 64;
     private SslHandlerFactory sslHandlerFactory;
     private CallHomeNetconfSubsystemListener subsystemListener;
+    private TlsAllowedDevicesMonitor allowedDevicesMonitor;
 
     public NetconfCallHomeTlsServerBuilder setHost(String host) {
         this.host = host;
@@ -48,7 +49,13 @@ public class NetconfCallHomeTlsServerBuilder {
         return this;
     }
 
+    public NetconfCallHomeTlsServerBuilder setAllowedDevicesMonitor(TlsAllowedDevicesMonitor allowedDevicesMonitor) {
+        this.allowedDevicesMonitor = allowedDevicesMonitor;
+        return this;
+    }
+
     public NetconfCallHomeTlsServer build() {
-        return new NetconfCallHomeTlsServer(host, port, timeout, maxConnections, sslHandlerFactory, subsystemListener);
+        return new NetconfCallHomeTlsServer(host, port, timeout, maxConnections, sslHandlerFactory, subsystemListener,
+            allowedDevicesMonitor);
     }
 }
