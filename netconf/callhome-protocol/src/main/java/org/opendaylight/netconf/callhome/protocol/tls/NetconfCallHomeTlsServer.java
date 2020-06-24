@@ -16,6 +16,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -24,6 +25,7 @@ import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
+import java.security.cert.Certificate;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -39,12 +41,14 @@ public class NetconfCallHomeTlsServer {
     private final SslHandlerFactory sslHandlerFactory;
     private final EventExecutor eventExecutor;
     private final CallHomeNetconfSubsystemListener subsystemListener;
+    private final TlsAllowedDevicesMonitor tlsAllowedDevicesMonitor;
     private ChannelFuture cf;
     private EventLoopGroup group;
 
     public NetconfCallHomeTlsServer(String host, Integer port, Integer timeout, Integer maxConnections,
                                     SslHandlerFactory sslHandlerFactory, EventExecutor eventExecutor,
-                                    CallHomeNetconfSubsystemListener subsystemListener) {
+                                    CallHomeNetconfSubsystemListener subsystemListener,
+                                    TlsAllowedDevicesMonitor tlsAllowedDevicesMonitor) {
         this.host = requireNonNull(host);
         this.port = requireNonNull(port);
         this.timeout = requireNonNull(timeout);
@@ -52,6 +56,7 @@ public class NetconfCallHomeTlsServer {
         this.sslHandlerFactory = requireNonNull(sslHandlerFactory);
         this.eventExecutor = requireNonNull(eventExecutor);
         this.subsystemListener = requireNonNull(subsystemListener);
+        this.tlsAllowedDevicesMonitor = requireNonNull(tlsAllowedDevicesMonitor);
     }
 
     public void setup() {
@@ -78,16 +83,25 @@ public class NetconfCallHomeTlsServer {
         }
     }
 
-    GenericFutureListener<Future<Channel>> handshakeListener = new GenericFutureListener<>() {
+    private GenericFutureListener<Future<Channel>> handshakeListener = new GenericFutureListener<>() {
         @Override
         public void operationComplete(Future<Channel> future) throws Exception {
             if (future.isSuccess()) {
                 LOG.debug("SSL handshake completed successfully, accepting connection...");
-                Channel channel = future.get();
-                CallHomeTlsSessionContext tlsSessionContext = new CallHomeTlsSessionContext(channel,
-                    sslHandlerFactory, subsystemListener);
-                tlsSessionContext.openNetconfChannel(channel);
 
+                Channel channel = future.get();
+                Certificate cert = channel.pipeline().get(SslHandler.class).engine().getSession()
+                    .getPeerCertificates()[0];
+                String deviceId = tlsAllowedDevicesMonitor.findDeviceIdByCertificate(cert);
+                if (deviceId == null) {
+                    LOG.error("Unable to identify connected device by provided certificate");
+                    channel.close();
+                }
+                else {
+                    CallHomeTlsSessionContext tlsSessionContext = new CallHomeTlsSessionContext(deviceId, channel,
+                        sslHandlerFactory, subsystemListener);
+                    tlsSessionContext.openNetconfChannel(channel);
+                }
             } else {
                 LOG.debug("SSL handshake failed, rejecting connection...");
                 future.get().close();
