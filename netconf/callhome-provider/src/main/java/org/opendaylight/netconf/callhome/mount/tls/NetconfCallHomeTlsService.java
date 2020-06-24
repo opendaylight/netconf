@@ -14,6 +14,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServer;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServerBuilder;
+import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
     private final CallHomeNetconfSubsystemListener subsystemListener;
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workerGroup;
+    private final TlsAllowedDevicesMonitor allowedDevicesMonitor;
 
     private NetconfCallHomeTlsServer server;
 
@@ -38,7 +40,8 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
         this.subsystemListener = requireNonNull(subsystemListener);
         this.bossGroup = requireNonNull(bossGroup);
         this.workerGroup = requireNonNull(workerGroup);
-        this.sslHandlerFactory = new SslHandlerFactoryAdapter(dataBroker);
+        this.allowedDevicesMonitor = new TlsAllowedDevicesMonitorImpl(dataBroker);
+        this.sslHandlerFactory = new SslHandlerFactoryAdapter(dataBroker, allowedDevicesMonitor);
     }
 
     public void init() {
@@ -53,6 +56,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
             .setSubsystemListener(subsystemListener)
             .setBossGroup(bossGroup)
             .setWorkerGroup(workerGroup)
+            .setAllowedDevicesMonitor(allowedDevicesMonitor)
             .build();
         server.start();
 
@@ -62,5 +66,6 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
     @Override
     public void close() {
         server.stop();
+        allowedDevicesMonitor.close();
     }
 }
