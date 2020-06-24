@@ -20,6 +20,7 @@ public class NetconfCallHomeTlsServerBuilder {
     private CallHomeNetconfSubsystemListener subsystemListener;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+    private TlsAllowedDevicesMonitor allowedDevicesMonitor;
 
     public NetconfCallHomeTlsServerBuilder setHost(String host) {
         this.host = host;
@@ -61,8 +62,13 @@ public class NetconfCallHomeTlsServerBuilder {
         return this;
     }
 
+    public NetconfCallHomeTlsServerBuilder setAllowedDevicesMonitor(TlsAllowedDevicesMonitor allowedDevicesMonitor) {
+        this.allowedDevicesMonitor = allowedDevicesMonitor;
+        return this;
+    }
+
     public NetconfCallHomeTlsServer build() {
         return new NetconfCallHomeTlsServer(host, port, timeout, maxConnections, sslHandlerFactory, subsystemListener,
-            bossGroup, workerGroup);
+            bossGroup, workerGroup, allowedDevicesMonitor);
     }
 }
