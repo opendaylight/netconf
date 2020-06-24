@@ -15,9 +15,13 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.net.InetSocketAddress;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.util.Optional;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.slf4j.Logger;
@@ -35,12 +39,14 @@ public class NetconfCallHomeTlsServer {
     private final CallHomeNetconfSubsystemListener subsystemListener;
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workerGroup;
+    private final TlsAllowedDevicesMonitor allowedDevicesMonitor;
     private ChannelFuture cf;
 
     NetconfCallHomeTlsServer(final String host, final Integer port, final Integer timeout, final Integer maxConnections,
                              final SslHandlerFactory sslHandlerFactory,
                              final CallHomeNetconfSubsystemListener subsystemListener,
-                             final EventLoopGroup bossGroup, final EventLoopGroup workerGroup) {
+                             final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
+                             final TlsAllowedDevicesMonitor allowedDevicesMonitor) {
         this.host = requireNonNull(host);
         this.port = requireNonNull(port);
         this.timeout = requireNonNull(timeout);
@@ -49,6 +55,7 @@ public class NetconfCallHomeTlsServer {
         this.subsystemListener = requireNonNull(subsystemListener);
         this.bossGroup = requireNonNull(bossGroup);
         this.workerGroup = requireNonNull(workerGroup);
+        this.allowedDevicesMonitor = requireNonNull(allowedDevicesMonitor);
     }
 
     public void start() {
@@ -69,9 +76,19 @@ public class NetconfCallHomeTlsServer {
             if (future.isSuccess()) {
                 LOG.debug("SSL handshake completed successfully, accepting connection...");
                 final Channel channel = future.get();
-                final CallHomeTlsSessionContext tlsSessionContext = new CallHomeTlsSessionContext(channel,
-                    sslHandlerFactory, subsystemListener);
-                tlsSessionContext.openNetconfChannel(channel);
+                // If the ssl handshake was successful it is expected that session contains peer certificate(s)
+                final Certificate cert = channel.pipeline().get(SslHandler.class).engine().getSession()
+                    .getPeerCertificates()[0];
+                final PublicKey publicKey = cert.getPublicKey();
+                final Optional<String> deviceId = allowedDevicesMonitor.findDeviceIdByPublicKey(publicKey);
+                if (deviceId.isEmpty()) {
+                    LOG.error("Unable to identify connected device by provided certificate");
+                    channel.close();
+                } else {
+                    final CallHomeTlsSessionContext tlsSessionContext = new CallHomeTlsSessionContext(deviceId.get(),
+                        channel, sslHandlerFactory, subsystemListener);
+                    tlsSessionContext.openNetconfChannel(channel);
+                }
             } else {
                 LOG.debug("SSL handshake failed, rejecting connection...");
                 future.get().close();
