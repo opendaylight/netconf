@@ -38,15 +38,15 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
     private final AtomicBoolean activated = new AtomicBoolean();
     private final SslHandlerFactory sslHandlerFactory;
     private final CallHomeNetconfSubsystemListener subsystemListener;
-    private final String channelId;
+    private final String deviceId;
     private final Channel channel;
     private final PublicKey publicKey;
     private final SocketAddress socketAddress;
 
-    CallHomeTlsSessionContext(final Channel channel, final SslHandlerFactory sslHandlerFactory,
+    CallHomeTlsSessionContext(final String deviceId, final Channel channel, final SslHandlerFactory sslHandlerFactory,
                               final CallHomeNetconfSubsystemListener subsystemListener) {
         this.channel = requireNonNull(channel, "channel");
-        this.channelId = channel.id().asLongText();
+        this.deviceId = deviceId;
         this.socketAddress = channel.remoteAddress();
         this.publicKey = createPublicKey(channel);
         this.sslHandlerFactory = requireNonNull(sslHandlerFactory, "sslHandlerFactory");
@@ -58,7 +58,7 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
     }
 
     void openNetconfChannel(final Channel ch) {
-        LOG.debug("Opening NETCONF Subsystem on TLS connection {}", channelId);
+        LOG.debug("Opening NETCONF Subsystem on TLS connection {}", deviceId);
         subsystemListener.onNetconfSubsystemOpened(this, listener -> doActivate(ch, listener));
     }
 
@@ -94,7 +94,7 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
 
     @Override
     public String getSessionId() {
-        return channelId;
+        return deviceId;
     }
 
     @Override
