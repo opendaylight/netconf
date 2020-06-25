@@ -1,13 +1,15 @@
 {
     "notification":{
-        "xmlns":"urn:ietf:params:xml:ns:netconf:notification:1.0",
         "data-changed-notification":{
             "xmlns":"urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",
-            "data-change-event":{
-                "path":"/instance-identifier-patch-module:patch-cont",
-                "operation":"deleted"
-            }
+            "data-change-event":[
+                {
+                    "path":"/instance-identifier-patch-module:patch-cont",
+                    "operation":"deleted"
+                }
+            ]
         },
-        "eventTime":"2020-05-31T18:45:05.132101+05:30"
+        "xmlns":"urn:ietf:params:xml:ns:netconf:notification:1.0",
+        "event-time":"2020-10-14T12:34:59.085525+02:00"
     }
 }
