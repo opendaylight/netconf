@@ -1,57 +1,24 @@
 {
-    "notification": {
-        "data-changed-notification": {
-            "data-change-event": [
+    "urn-ietf-params-xml-ns-netconf-notification-1.0:notification":{
+        "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification":{
+            "data-change-event":[
                 {
-                    "data": {
-                        "patch-cont": {
-                            "my-list1": {
-                                "my-leaf11": "Jed",
-                                "my-leaf12": "Bertha",
-                                "name": "Althea"
-                            },
-                            "xmlns": "instance:identifier:patch:module"
+                    "path":"/instance-identifier-patch-module:patch-cont",
+                    "data":{
+                        "instance-identifier-patch-module:patch-cont":{
+                            "my-list1":[
+                                {
+                                    "name":"Althea",
+                                    "my-leaf11":"Jed",
+                                    "my-leaf12":"Bertha"
+                                }
+                            ]
                         }
                     },
-                    "operation": "updated",
-                    "path": "/instance-identifier-patch-module:patch-cont"
-                },
-                {
-                    "data": {
-                        "my-list1": {
-                            "my-leaf11": "Jed",
-                            "my-leaf12": "Bertha",
-                            "name": "Althea",
-                            "xmlns": "instance:identifier:patch:module"
-                        }
-                    },
-                    "operation": "updated",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']"
-                },
-                {
-                    "data": {
-                        "my-leaf12": {
-                            "content": "Bertha",
-                            "xmlns": "instance:identifier:patch:module"
-                        }
-                    },
-                    "operation": "created",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12"
-                },
-                {
-                    "data": {
-                        "name": {
-                            "content": "Althea",
-                            "xmlns": "instance:identifier:patch:module"
-                        }
-                    },
-                    "operation": "updated",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name"
+                    "operation":"updated"
                 }
-            ],
-            "xmlns": "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote"
+            ]
         },
-        "eventTime": "2017-09-18T15:52:25.213+03:00",
-        "xmlns": "urn:ietf:params:xml:ns:netconf:notification:1.0"
+        "event-time":"2020-10-14T11:19:34.549843+02:00"
     }
 }
