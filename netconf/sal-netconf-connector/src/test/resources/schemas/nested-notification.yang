@@ -1,0 +1,25 @@
+module nested-notification {
+    yang-version 1.1;
+    namespace "org:opendaylight:notification:test:ns:yang:nested-notification";
+    prefix "nested";
+
+    description "Test model for testing nested notifications";
+
+    revision "2014-07-08" {
+        description "Initial revision";
+    }
+
+    container interfaces {
+        list interface {
+            key "name";
+            leaf name {
+                type string;
+            }
+            notification interface-enabled {
+                leaf by-user {
+                    type string;
+                }
+            }
+        }
+    }
+}
