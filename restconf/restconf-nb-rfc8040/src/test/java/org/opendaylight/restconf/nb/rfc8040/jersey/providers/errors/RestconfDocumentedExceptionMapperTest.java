@@ -19,6 +19,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.junit.Assert;
@@ -288,7 +289,7 @@ public class RestconfDocumentedExceptionMapperTest {
     public Response expectedResponse;
 
     @Test
-    public void testMappingOfExceptionToResponse() {
+    public void testMappingOfExceptionToResponse() throws JSONException {
         exceptionMapper.setHttpHeaders(httpHeaders);
         final Response response = exceptionMapper.toResponse(thrownException);
         compareResponseWithExpectation(expectedResponse, response);
@@ -301,7 +302,8 @@ public class RestconfDocumentedExceptionMapperTest {
         return httpHeaders;
     }
 
-    private static void compareResponseWithExpectation(final Response expectedResponse, final Response actualResponse) {
+    private static void compareResponseWithExpectation(final Response expectedResponse, final Response actualResponse)
+            throws JSONException {
         final String errorMessage = String.format("Actual response %s doesn't equal to expected response %s",
                 actualResponse, expectedResponse);
         Assert.assertEquals(errorMessage, expectedResponse.getStatus(), actualResponse.getStatus());
