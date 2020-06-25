@@ -713,7 +713,11 @@ public class DefinitionGenerator {
                         setDefaultValue(property, new BigDecimal(stringDefaultValue));
                     } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition) {
                         //uint8,16,32 int8,16,32,64
-                        setDefaultValue(property, Long.valueOf(stringDefaultValue));
+                        if (isHexadecimalOrOctal((RangeRestrictedTypeDefinition)leafTypeDef)) {
+                            setDefaultValue(property, stringDefaultValue);
+                        } else {
+                            setDefaultValue(property, Long.valueOf(stringDefaultValue));
+                        }
                     } else {
                         setDefaultValue(property, stringDefaultValue);
                     }
@@ -841,6 +845,10 @@ public class DefinitionGenerator {
         final Optional<Number> maybeLower = ((RangeRestrictedTypeDefinition<?, ?>) leafTypeDef).getRangeConstraint()
                 .map(RangeConstraint::getAllowedRanges).map(RangeSet::span).map(Range::lowerEndpoint);
 
+        if (isHexadecimalOrOctal(leafTypeDef)) {
+            return STRING_TYPE;
+        }
+
         if (leafTypeDef instanceof DecimalTypeDefinition) {
             maybeLower.ifPresent(number -> setDefaultValue(property, (BigDecimal) number));
             return NUMBER_TYPE;
@@ -863,6 +871,15 @@ public class DefinitionGenerator {
             setDefaultValue(property, 0);
         }
         return INTEGER_TYPE;
+    }
+
+    private boolean isHexadecimalOrOctal(RangeRestrictedTypeDefinition typeDef) {
+        final Optional<?> optDefaultValue = typeDef.getDefaultValue();
+        if (optDefaultValue.isPresent()) {
+            final String defaultValue = ((String)optDefaultValue.get());
+            return defaultValue.startsWith("0") || defaultValue.startsWith("-0");
+        }
+        return false;
     }
 
     private String processInstanceIdentifierType(final DataSchemaNode node, final ObjectNode property,
