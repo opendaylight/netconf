@@ -1,31 +1,13 @@
 {
-    "notification": {
-        "data-changed-notification": {
-            "data-change-event": [
+    "urn-ietf-params-xml-ns-netconf-notification-1.0:notification":{
+        "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification":{
+            "data-change-event":[
                 {
-                    "operation": "deleted",
-                    "path": "/instance-identifier-patch-module:patch-cont"
-                },
-                {
-                    "operation": "deleted",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']"
-                },
-                {
-                    "operation": "deleted",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name"
-                },
-                {
-                    "operation": "deleted",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12"
-                },
-                {
-                    "operation": "deleted",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11"
+                    "path":"/instance-identifier-patch-module:patch-cont",
+                    "operation":"deleted"
                 }
-            ],
-            "xmlns": "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote"
+            ]
         },
-        "eventTime": "2017-09-17T14:18:53.404+03:00",
-        "xmlns": "urn:ietf:params:xml:ns:netconf:notification:1.0"
+        "event-time":"2020-10-14T11:20:33.271836+02:00"
     }
 }
