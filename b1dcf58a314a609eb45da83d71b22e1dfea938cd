@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2768bc58_ce093740",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-06-25T17:10:38Z",
+      "side": 1,
+      "message": "make summary line 50 chars or less. If all the details\nwont fit there, then add a body after a blank line with\nall the details. I think this patch is a simple 50 char\nsummary though.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 13
+      },
+      "revId": "b1dcf58a314a609eb45da83d71b22e1dfea938cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
