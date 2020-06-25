@@ -48,6 +48,54 @@
     },
     {
       "key": {
+        "uuid": "de3d79ee_c6985b86",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4112a38c_acd0f0f8",
+      "range": {
+        "startLine": 7,
+        "startChar": 9,
+        "endLine": 7,
+        "endChar": 15
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d23ddd0_b43ae3b1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78a63a3a_f05b73c3",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 7
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ed78c5a4_87620559",
         "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
         "patchSetId": 13
@@ -91,6 +139,30 @@
       "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b7ffc88_3deb5a06",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/NetconfCallHomeTlsServer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55645de2_7da2e44b",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 65
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -163,6 +235,30 @@
     },
     {
       "key": {
+        "uuid": "9e0108c6_1faf95cf",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/NetconfCallHomeTlsServer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "It makes sense. However, I\u0027m not sure about executor.submit(this) approach, maybe use lambda?",
+      "parentUuid": "97c337a3_15f91a46",
+      "range": {
+        "startLine": 93,
+        "startChar": 8,
+        "endLine": 94,
+        "endChar": 43
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "63bbe873_6f979201",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/TlsAuthChannelInitializer.java",
         "patchSetId": 13
@@ -183,6 +279,30 @@
       "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3eef1966_192d9f7e",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/TlsAuthChannelInitializer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63bbe873_6f979201",
+      "range": {
+        "startLine": 20,
+        "startChar": 32,
+        "endLine": 20,
+        "endChar": 36
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -209,6 +329,30 @@
     },
     {
       "key": {
+        "uuid": "9bf835f9_b8b1b7d8",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/TlsClientChannelInitializer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05515e72_0f4e71c2",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 43
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2f0f78e6_1ddbac39",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/NetconfCallHomeTlsService.java",
         "patchSetId": 13
@@ -229,6 +373,30 @@
       "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a8cb99a_f2a49a19",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/NetconfCallHomeTlsService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f0f78e6_1ddbac39",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 34
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -255,6 +423,30 @@
     },
     {
       "key": {
+        "uuid": "a2d59ad0_adba1635",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/NetconfCallHomeTlsService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af5da1c4_aea849c9",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 29,
+        "endChar": 50
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5b9f82e_f34e4ea7",
         "filename": "netconf/shaded-exificient-jar/pom.xml",
         "patchSetId": 13
@@ -275,6 +467,30 @@
       "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fdfe4785_34591490",
+        "filename": "netconf/shaded-exificient-jar/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-06-25T22:23:50Z",
+      "side": 1,
+      "message": "My bad, it was disabled for correct build on the local machine. Fixed.",
+      "parentUuid": "e5b9f82e_f34e4ea7",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 210,
+        "endChar": 52
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
