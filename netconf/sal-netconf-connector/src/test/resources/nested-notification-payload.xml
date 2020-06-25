@@ -1,0 +1,11 @@
+<notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+    <eventTime>2008-07-08T00:01:00Z</eventTime>
+    <interfaces xmlns="org:opendaylight:notification:test:ns:yang:nested-notification">
+        <interface>
+            <name>eth1</name>
+            <interface-enabled>
+                <by-user>fred</by-user>
+            </interface-enabled>
+        </interface>
+    </interfaces>
+</notification>
