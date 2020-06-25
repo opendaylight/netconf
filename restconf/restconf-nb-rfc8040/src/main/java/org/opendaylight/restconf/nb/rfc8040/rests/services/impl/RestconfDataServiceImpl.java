@@ -159,7 +159,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             return Response.status(200)
                     .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
-                        + type.getLocalName() + '"')
+                        + "-" + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
         }
