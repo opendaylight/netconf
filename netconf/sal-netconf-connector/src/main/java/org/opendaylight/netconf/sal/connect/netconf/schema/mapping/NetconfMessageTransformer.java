@@ -13,26 +13,37 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
+import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Streams;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
@@ -50,6 +61,7 @@ import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangConstants;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -65,6 +77,8 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -75,6 +89,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
@@ -104,6 +120,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
         this.actions = Maps.uniqueIndex(getActions(schemaContext), ActionDefinition::getPath);
+
+        // RFC6020 normal notifications
         this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
             node -> node.getQName().withoutRevision());
         this.baseSchema = baseSchema;
@@ -136,7 +154,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     @Override
     public synchronized DOMNotification toNotification(final NetconfMessage message) {
-        final Map.Entry<Instant, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
+        final Entry<Instant, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
         final QName notificationNoRev;
         try {
             notificationNoRev = QName.create(
@@ -145,8 +163,21 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             throw new IllegalArgumentException(
                     "Unable to parse notification " + message + ", cannot find namespace", e);
         }
-        final Collection<? extends NotificationDefinition> notificationDefinitions =
+
+        Collection<? extends NotificationDefinition> notificationDefinitions =
                 mappedNotifications.get(notificationNoRev);
+        Element element = stripped.getValue().getDomElement();
+
+        NestedNotificationInfo nestedNotificationInfo = null;
+        if (notificationDefinitions.isEmpty()) {
+            // check if notification is nested notification
+            Optional<NestedNotificationInfo> nestedNotificationOptional = findNestedNotification(message, element);
+            if (nestedNotificationOptional.isPresent()) {
+                nestedNotificationInfo = nestedNotificationOptional.get();
+                notificationDefinitions = Collections.singletonList(nestedNotificationInfo.notificationDefinition);
+                element = (Element) nestedNotificationInfo.notificationNode;
+            }
+        }
         Preconditions.checkArgument(notificationDefinitions.size() > 0,
                 "Unable to parse notification %s, unknown notification. Available notifications: %s",
                 notificationDefinitions, mappedNotifications.keySet());
@@ -156,7 +187,6 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final ContainerSchemaNode notificationAsContainerSchemaNode =
                 NetconfMessageTransformUtil.createSchemaForNotification(mostRecentNotification);
 
-        final Element element = stripped.getValue().getDomElement();
         final ContainerNode content;
         try {
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
@@ -169,7 +199,118 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 | UnsupportedOperationException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
         }
+
+        if (nestedNotificationInfo != null) {
+            return new NetconfDeviceTreeNotification(content, mostRecentNotification.getPath(), stripped.getKey(),
+                nestedNotificationInfo.domDataTreeIdentifier);
+        }
+
         return new NetconfDeviceNotification(content, stripped.getKey());
+    }
+
+    private Optional<NestedNotificationInfo> findNestedNotification(final NetconfMessage message,
+            final Element element) {
+        final Iterator<? extends Module> modules = mountContext.getSchemaContext()
+                .findModules(URI.create(element.getNamespaceURI())).iterator();
+        if (!modules.hasNext()) {
+            throw new IllegalArgumentException(
+                    "Unable to parse notification " + message + ", cannot find top level module");
+        }
+        final Module module = modules.next();
+        final QName topLevelNodeQName = QName.create(element.getNamespaceURI(), element.getLocalName());
+        for (DataSchemaNode childNode : module.getChildNodes()) {
+            if (topLevelNodeQName.isEqualWithoutRevision(childNode.getQName())) {
+                return Optional.of(traverseXmlNodeContainingNotification(element, childNode,
+                    YangInstanceIdentifier.builder()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private NestedNotificationInfo traverseXmlNodeContainingNotification(final Node xmlNode,
+            final SchemaNode schemaNode, final YangInstanceIdentifier.InstanceIdentifierBuilder builder) {
+        if (schemaNode instanceof ContainerSchemaNode) {
+            ContainerSchemaNode dataContainerNode = (ContainerSchemaNode) schemaNode;
+            builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+
+            Entry<Node, SchemaNode> xmlContainerChildPair = findXmlContainerChildPair(xmlNode, dataContainerNode);
+            return traverseXmlNodeContainingNotification(xmlContainerChildPair.getKey(),
+                    xmlContainerChildPair.getValue(), builder);
+        } else if (schemaNode instanceof ListSchemaNode) {
+            ListSchemaNode listSchemaNode = (ListSchemaNode) schemaNode;
+            builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+
+            Map<QName, Object> listKeys = findXmlListKeys(xmlNode, listSchemaNode);
+            builder.nodeWithKey(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()), listKeys);
+
+            Entry<Node, SchemaNode> xmlListChildPair = findXmlListChildPair(xmlNode, listSchemaNode);
+            return traverseXmlNodeContainingNotification(xmlListChildPair.getKey(),
+                    xmlListChildPair.getValue(), builder);
+        } else if (schemaNode instanceof NotificationDefinition) {
+            builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+
+            NotificationDefinition notificationDefinition = (NotificationDefinition) schemaNode;
+            return new NestedNotificationInfo(notificationDefinition,
+                    new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, builder.build()), xmlNode);
+        }
+        throw new IllegalStateException("No notification found");
+    }
+
+    private static Entry<Node, SchemaNode> findXmlContainerChildPair(final Node xmlNode,
+            final ContainerSchemaNode container) {
+        final NodeList nodeList = xmlNode.getChildNodes();
+        final Map<QName, SchemaNode> childrenWithoutRevision =
+                Streams.concat(container.getChildNodes().stream(), container.getNotifications().stream())
+                    .collect(Collectors.toMap(child -> child.getQName().withoutRevision(), Function.identity()));
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node currentNode = nodeList.item(i);
+            if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
+                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                SchemaNode schemaChildNode = childrenWithoutRevision.get(currentNodeQName);
+                if (schemaChildNode != null) {
+                    return new AbstractMap.SimpleEntry<>(currentNode, schemaChildNode);
+                }
+            }
+        }
+        throw new IllegalStateException("No container child found.");
+    }
+
+    private static Map<QName, Object> findXmlListKeys(final Node xmlNode, final ListSchemaNode listSchemaNode) {
+        Map<QName, Object> listKeys = new HashMap<>();
+        NodeList nodeList = xmlNode.getChildNodes();
+        Set<QName> keyDefinitionsWithoutRevision = listSchemaNode.getKeyDefinition().stream()
+                .map(QName::withoutRevision).collect(Collectors.toSet());
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node currentNode = nodeList.item(i);
+            if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
+                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                if (keyDefinitionsWithoutRevision.contains(currentNodeQName)) {
+                    listKeys.put(currentNodeQName, currentNode.getFirstChild().getNodeValue());
+                }
+            }
+        }
+        if (listKeys.isEmpty()) {
+            throw new IllegalStateException("Notification cannot be contained in list without key statement.");
+        }
+        return listKeys;
+    }
+
+    private static Entry<Node, SchemaNode> findXmlListChildPair(final Node xmlNode, final ListSchemaNode list) {
+        final NodeList nodeList = xmlNode.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node currentNode = nodeList.item(i);
+            if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
+                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                for (SchemaNode childNode : Iterables.concat(list.getChildNodes(), list.getNotifications())) {
+                    if (!list.getKeyDefinition().contains(childNode.getQName())
+                            && currentNodeQName.isEqualWithoutRevision(childNode.getQName())) {
+                        return new AbstractMap.SimpleEntry<>(currentNode, childNode);
+                    }
+                }
+            }
+        }
+        throw new IllegalStateException("No list child found.");
     }
 
     private static NotificationDefinition getMostRecentNotification(
@@ -334,7 +475,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         }
     }
 
-    static class NetconfDeviceNotification implements DOMNotification, DOMEvent {
+    @Beta
+    public static class NetconfDeviceNotification implements DOMNotification, DOMEvent {
         private final ContainerNode content;
         private final SchemaPath schemaPath;
         private final Instant eventTime;
@@ -343,6 +485,12 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             this.content = content;
             this.eventTime = eventTime;
             this.schemaPath = toPath(content.getNodeType());
+        }
+
+        NetconfDeviceNotification(final ContainerNode content, final SchemaPath schemaPath, final Instant eventTime) {
+            this.content = content;
+            this.eventTime = eventTime;
+            this.schemaPath = schemaPath;
         }
 
         @Override
@@ -358,6 +506,34 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         @Override
         public Instant getEventInstant() {
             return eventTime;
+        }
+    }
+
+    @Beta
+    public static class NetconfDeviceTreeNotification extends NetconfDeviceNotification {
+        private final DOMDataTreeIdentifier domDataTreeIdentifier;
+
+        NetconfDeviceTreeNotification(final ContainerNode content, final SchemaPath schemaPath, final Instant eventTime,
+                final DOMDataTreeIdentifier domDataTreeIdentifier) {
+            super(content, schemaPath, eventTime);
+            this.domDataTreeIdentifier = domDataTreeIdentifier;
+        }
+
+        public DOMDataTreeIdentifier getDomDataTreeIdentifier() {
+            return domDataTreeIdentifier;
+        }
+    }
+
+    private static final class NestedNotificationInfo {
+        private final NotificationDefinition notificationDefinition;
+        private final DOMDataTreeIdentifier domDataTreeIdentifier;
+        private final Node notificationNode;
+
+        NestedNotificationInfo(final NotificationDefinition notificationDefinition,
+                final DOMDataTreeIdentifier domDataTreeIdentifier, final Node notificationNode) {
+            this.notificationDefinition = notificationDefinition;
+            this.domDataTreeIdentifier = domDataTreeIdentifier;
+            this.notificationNode = notificationNode;
         }
     }
 }
