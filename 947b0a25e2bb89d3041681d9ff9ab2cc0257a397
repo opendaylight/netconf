@@ -259,6 +259,30 @@
     },
     {
       "key": {
+        "uuid": "9ed964b7_58e99945",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/NetconfCallHomeTlsServer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-26T09:06:48Z",
+      "side": 1,
+      "message": "executor.submit(this) should be fine, you can also move the submit into NetconfCallHomeTlsService and remove the start() method altogether",
+      "parentUuid": "9e0108c6_1faf95cf",
+      "range": {
+        "startLine": 93,
+        "startChar": 8,
+        "endLine": 94,
+        "endChar": 43
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "63bbe873_6f979201",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/TlsAuthChannelInitializer.java",
         "patchSetId": 13
@@ -444,6 +468,52 @@
       "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "90099adf_650e7a3c",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/SslHandlerFactoryAdapter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-26T09:06:48Z",
+      "side": 1,
+      "message": "If I\u0027m not mistakend this would only remove the key from ALLOWED_KEYS, we should also kill the connection(if its running) when a device config is removed.",
+      "range": {
+        "startLine": 102,
+        "startChar": 16,
+        "endLine": 102,
+        "endChar": 62
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7e07542_87a1655b",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/SslHandlerFactoryAdapter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-06-26T09:06:48Z",
+      "side": 1,
+      "message": "Also what happens if this is null? When you change the yang to choice, you could do instanceof check above this and only add it into ALLOWED_KEYS when its a tls device. Same would need to be done for the ssh devices so they only react when ssh device is added.",
+      "range": {
+        "startLine": 109,
+        "startChar": 66,
+        "endLine": 109,
+        "endChar": 89
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     },
     {
       "key": {
