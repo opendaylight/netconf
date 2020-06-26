@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "62a26700_ed0187e1",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/RestconfNotifApplication.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-06-26T13:07:55Z",
+      "side": 1,
+      "message": "yes this will be better thanks",
+      "parentUuid": "7cb0cfa3_0604f06c",
+      "range": {
+        "startLine": 32,
+        "startChar": 13,
+        "endLine": 32,
+        "endChar": 37
+      },
+      "revId": "125ad30b3fe93ea8633a6f185163844a27728ace",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cc1cb7b5_e4d2ed3d",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
         "patchSetId": 9
@@ -45,6 +69,30 @@
       "revId": "125ad30b3fe93ea8633a6f185163844a27728ace",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89fcd88d_8781d919",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-06-26T13:07:55Z",
+      "side": 1,
+      "message": "yes im thinking about this. Nice will be send it as event but RFC:\nThe SSE specification supports the following additional fields:\n \"event\", \"id\", and \"retry\". A RESTCONF server MAY send the \"retry\"\n field, and if it does, RESTCONF clients SHOULD use it. A RESTCONF\n server SHOULD NOT send the \"event\" or \"id\" fields, as there are no\n meaningful values that could be used for them that would not be\n redundant to the contents of the notification itself.\n\nis this situation meaningful?  \n\nBut probably best will be now send it as comment",
+      "parentUuid": "cc1cb7b5_e4d2ed3d",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 5
+      },
+      "revId": "125ad30b3fe93ea8633a6f185163844a27728ace",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
