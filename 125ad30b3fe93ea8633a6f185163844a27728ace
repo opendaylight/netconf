@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7cb0cfa3_0604f06c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/RestconfNotifApplication.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2020-06-26T10:59:15Z",
+      "side": 1,
+      "message": "Can you define in jdoc why we need the next implementation of application ? It can be confusing for new users.\nOn the other side I would prefer an abstract class behind Appplication implementation where we can use generic class for specific wrapper types. Example:\n\npublic abstract class BaseRestconfApplication\u003cT\u003e extends Application {\n\n    private final SchemaContextHandler schemaContextHandler;\n    private final DOMMountPointServiceHandler mountPointServiceHandler;\n    private final T servicesNotifWrapper;\n\n    @Inject\n    public BaseRestconfApplication(SchemaContextHandler schemaContextHandler,\n            DOMMountPointServiceHandler mountPointServiceHandler, T servicesNotifWrapper) {\n        this.schemaContextHandler \u003d schemaContextHandler;\n        this.mountPointServiceHandler \u003d mountPointServiceHandler;\n        this.servicesNotifWrapper \u003d servicesNotifWrapper;\n    }\n....\n\nThe RestconfNotifApplication example now:\n@Singleton\npublic class RestconfNotifApplication extends BaseRestconfApplication\u003cServicesNotifWrapper\u003e {\n\n    @Inject\n    public RestconfNotifApplication(SchemaContextHandler schemaContextHandler,\n            DOMMountPointServiceHandler mountPointServiceHandler, ServicesNotifWrapper servicesNotifWrapper) {\n        super(schemaContextHandler, mountPointServiceHandler, servicesNotifWrapper);\n    }\n}\n\nand the RestconfApplication:\n@Singleton\npublic class RestconfApplication extends BaseRestconfApplication\u003cServicesWrapper\u003e {\n\n    @Inject\n    public RestconfApplication(SchemaContextHandler schemaContextHandler,\n            DOMMountPointServiceHandler mountPointServiceHandler, ServicesWrapper servicesWrapper) {\n        super(schemaContextHandler, mountPointServiceHandler, servicesWrapper);\n    }\n}\n\nIn this way we can simple create new apps here with its own services - except of mdsal services.",
+      "range": {
+        "startLine": 32,
+        "startChar": 13,
+        "endLine": 32,
+        "endChar": 37
+      },
+      "revId": "125ad30b3fe93ea8633a6f185163844a27728ace",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc1cb7b5_e4d2ed3d",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2020-06-26T10:59:15Z",
+      "side": 1,
+      "message": "I was thinking about two options here. The first one talks about sending just \u0027comment\u0027 instead of \u0027data\u0027 and the second option  can send data with \u0027timestamp info\u0027 and with event type \u0027ping\u0027 maybe. However I\u0027m really not sure about the results on the client side here..",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 5
+      },
+      "revId": "125ad30b3fe93ea8633a6f185163844a27728ace",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
