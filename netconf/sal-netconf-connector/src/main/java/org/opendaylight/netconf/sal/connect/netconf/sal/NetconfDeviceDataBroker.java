@@ -19,6 +19,7 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.AbstractWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.TxChain;
@@ -36,7 +37,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     private final boolean rollbackSupport;
     private final boolean candidateSupported;
     private final boolean runningWritable;
-
+    private AbstractWriteTx abstractWriteTx = null;
     private boolean isLockAllowed = true;
 
     public NetconfDeviceDataBroker(final RemoteDeviceId id, final MountPointContext mountContext,
@@ -60,20 +61,23 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     @Override
     public DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
-        return new ReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
+        ReadWriteTx readWriteTx = new ReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
+        readWriteTx.setResultFutures(abstractWriteTx.getResultsFutures());
+        return readWriteTx;
     }
 
     @Override
     public DOMDataTreeWriteTransaction newWriteOnlyTransaction() {
         if (candidateSupported) {
             if (runningWritable) {
-                return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
+                abstractWriteTx = new WriteCandidateRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
             } else {
-                return new WriteCandidateTx(id, netconfOps, rollbackSupport, isLockAllowed);
+                abstractWriteTx = new WriteCandidateTx(id, netconfOps, rollbackSupport, isLockAllowed);
             }
         } else {
-            return new WriteRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
+            abstractWriteTx = new WriteRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
         }
+        return abstractWriteTx;
     }
 
     @Override

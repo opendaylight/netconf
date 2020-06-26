@@ -9,20 +9,32 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReadWriteTx implements DOMDataTreeReadWriteTransaction {
 
+    private static final Logger LOG  = LoggerFactory.getLogger(ReadWriteTx.class);
+
     private final DOMDataTreeReadTransaction delegateReadTx;
     private final DOMDataTreeWriteTransaction delegateWriteTx;
+    private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
 
     public ReadWriteTx(final DOMDataTreeReadTransaction delegateReadTx,
             final DOMDataTreeWriteTransaction delegateWriteTx) {
@@ -60,12 +72,43 @@ public class ReadWriteTx implements DOMDataTreeReadWriteTransaction {
     @Override
     public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
-        return delegateReadTx.read(store, path);
+        final SettableFuture<Optional<NormalizedNode<?, ?>>> resultFuture = SettableFuture.create();
+        if (getResultsFutures()) {
+            return delegateReadTx.read(store, path);
+        }
+        else {
+            resultFuture.setException(new ReadFailedException(String.format("Lock transaction failed")));
+        }
+        return FluentFuture.from(resultFuture);
     }
 
     @Override
     public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         return delegateReadTx.exists(store, path);
+    }
+
+    public void setResultFutures(List<ListenableFuture<? extends DOMRpcResult>> resultFutures) {
+        this.resultsFutures = resultFutures;
+    }
+
+    public boolean getResultsFutures() {
+        boolean status = true;
+        if (!resultsFutures.isEmpty()) {
+            for (ListenableFuture<? extends DOMRpcResult> domRpcResultListenableFuture : resultsFutures) {
+                try {
+                    if (!domRpcResultListenableFuture.get().getErrors().isEmpty()) {
+                        status = domRpcResultListenableFuture.get().getErrors().isEmpty();
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    LOG.error("Exception while getting rpc results", e);
+                } catch (ExecutionException e) {
+                    LOG.error("Exception while getting rpc results", e);
+                }
+
+            }
+        }
+        return status;
     }
 
     @Override
