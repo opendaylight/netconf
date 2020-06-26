@@ -22,6 +22,30 @@
       "revId": "b1dcf58a314a609eb45da83d71b22e1dfea938cd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e984217b_1ff6792c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-06-26T22:52:56Z",
+      "side": 1,
+      "message": "sorry, I wasn\u0027t clear :)   one line is summary only, 50 chars or less and\nstands on it\u0027s own to be clearly understood in something like a git log.\n\nthen next is a blank line. If you need more explanation, then after the blank\nline you can write the fullness of what you want. 72 chars per line is standard\nfor that.\n\nThanh likes to point people at this:\nhttps://chris.beams.io/posts/git-commit/",
+      "parentUuid": "2768bc58_ce093740",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 13
+      },
+      "revId": "b1dcf58a314a609eb45da83d71b22e1dfea938cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
