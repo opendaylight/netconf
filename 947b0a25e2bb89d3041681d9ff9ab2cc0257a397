@@ -283,6 +283,30 @@
     },
     {
       "key": {
+        "uuid": "46447f15_f76d1d4c",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/NetconfCallHomeTlsServer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-06-26T10:19:19Z",
+      "side": 1,
+      "message": "EventLoopGroup is an executor -- so why would we need this?",
+      "parentUuid": "9ed964b7_58e99945",
+      "range": {
+        "startLine": 93,
+        "startChar": 8,
+        "endLine": 94,
+        "endChar": 43
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "63bbe873_6f979201",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/TlsAuthChannelInitializer.java",
         "patchSetId": 13
