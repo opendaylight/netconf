@@ -93,6 +93,30 @@
       "revId": "125ad30b3fe93ea8633a6f185163844a27728ace",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "562073a2_0ea5da8b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2020-06-26T13:26:09Z",
+      "side": 1,
+      "message": "Ah, I missed this info there. No, I don\u0027t think its meaningful situation (mainly from the client side). So yea, comment shall be better for now.",
+      "parentUuid": "89fcd88d_8781d919",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 5
+      },
+      "revId": "125ad30b3fe93ea8633a6f185163844a27728ace",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
