@@ -22,6 +22,30 @@
       "revId": "be6c89005cc46d1e3d117b330fef20477f19c048",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8bcf7527_c0992f7f",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/TransactionServicesNotifWrapper.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-06-27T22:53:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b48949f_29e6c69a",
+      "range": {
+        "startLine": 10,
+        "startChar": 17,
+        "endLine": 10,
+        "endChar": 49
+      },
+      "revId": "be6c89005cc46d1e3d117b330fef20477f19c048",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
