@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3b48949f_29e6c69a",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/TransactionServicesNotifWrapper.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2020-06-27T21:14:40Z",
+      "side": 1,
+      "message": "Also, why did we need this marker? If we do, can you comment it correctly?",
+      "range": {
+        "startLine": 10,
+        "startChar": 17,
+        "endLine": 10,
+        "endChar": 49
+      },
+      "revId": "be6c89005cc46d1e3d117b330fef20477f19c048",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
