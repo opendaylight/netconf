@@ -33,6 +33,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.Global;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.Global.MountPointNamingStrategy;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.SshTransport;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -157,8 +158,8 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
 
         private void deleteDevice(final Device dataBefore) {
-            if (dataBefore != null) {
-                final String publicKey = dataBefore.getSshHostKey();
+            if (dataBefore != null && dataBefore.getTransport() instanceof SshTransport) {
+                final String publicKey = ((SshTransport) dataBefore.getTransport()).getSshHostKey();
                 if (publicKey != null) {
                     LOG.debug("Removing device {}", dataBefore.getUniqueId());
                     removeDevice(publicKey, dataBefore);
@@ -169,12 +170,14 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
 
         private void writeDevice(final Device dataAfter) {
-            final String publicKey = dataAfter.getSshHostKey();
-            if (publicKey != null) {
-                LOG.debug("Adding device {}", dataAfter.getUniqueId());
-                addDevice(publicKey, dataAfter);
-            } else {
-                LOG.debug("Ignoring addition of device {}, no host key present", dataAfter.getUniqueId());
+            if (dataAfter.getTransport() instanceof SshTransport) {
+                final String publicKey = ((SshTransport) dataAfter.getTransport()).getSshHostKey();
+                if (publicKey != null) {
+                    LOG.debug("Adding device {}", dataAfter.getUniqueId());
+                    addDevice(publicKey, dataAfter);
+                } else {
+                    LOG.debug("Ignoring addition of device {}, no host key present", dataAfter.getUniqueId());
+                }
             }
         }
 
