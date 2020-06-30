@@ -40,6 +40,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.Endpoint;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.Ssh;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.SshBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.ssh.SshClientParams;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.ssh.SshClientParamsBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -220,9 +225,16 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             devStatus = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();
         }
 
-        tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIID, new DeviceBuilder()
-            .addAugmentation(devStatus).setSshHostKey(cfgDevice.getSshHostKey())
-            .setUniqueId(cfgDevice.getUniqueId()).build());
+        DeviceBuilder deviceBuilder = new DeviceBuilder().addAugmentation(devStatus)
+            .setUniqueId(cfgDevice.getUniqueId());
+        if (cfgDevice.getEndpoint() != null) {
+            deviceBuilder.setEndpoint(cfgDevice.getEndpoint());
+        }
+        else if (cfgDevice.getSshHostKey() != null) {
+            deviceBuilder.setSshHostKey(cfgDevice.getSshHostKey());
+        }
+
+        tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIID, deviceBuilder.build());
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
