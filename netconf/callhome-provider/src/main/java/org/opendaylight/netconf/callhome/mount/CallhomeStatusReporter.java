@@ -38,6 +38,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.Endpoint;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.Ssh;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.SshBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.ssh.SshClientParams;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.ssh.SshClientParamsBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -193,10 +198,12 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         } catch (IOException e) {
             LOG.warn("Unable to encode public key to ssh format.", e);
         }
+        SshClientParams sshParams = new SshClientParamsBuilder().setHostKey(sshEncodedKey).build();
+        Endpoint endpoint = new SshBuilder().setSshClientParams(sshParams).build();
         return new DeviceBuilder()
                 .setUniqueId(id)
                 .withKey(new DeviceKey(id))
-                .setSshHostKey(sshEncodedKey)
+                .setEndpoint(endpoint)
                 .addAugmentation(new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILEDNOTALLOWED).build())
                 .build();
     }
@@ -243,9 +250,16 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     private static Device deviceWithStatus(final Device opDev, final DeviceStatus status) {
+        SshClientParamsBuilder sshClientParamsBuilder = new SshClientParamsBuilder();
+        if (opDev.getEndpoint() instanceof Ssh) {
+            String sshEncodedKey = ((Ssh) opDev.getEndpoint()).getSshClientParams().getHostKey();
+            sshClientParamsBuilder.setHostKey(sshEncodedKey);
+        }
+        SshClientParams params = sshClientParamsBuilder.build();
+        Endpoint endpoint = new SshBuilder().setSshClientParams(params).build();
         return new DeviceBuilder()
                 .setUniqueId(opDev.getUniqueId())
-                .setSshHostKey(opDev.getSshHostKey())
+                .setEndpoint(endpoint)
                 .addAugmentation(new Device1Builder().setDeviceStatus(status).build())
                 .build();
     }
@@ -294,26 +308,28 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         AuthorizedKeysDecoder decoder = new AuthorizedKeysDecoder();
 
         for (Device device : getDevicesAsList()) {
-            String keyString = device.getSshHostKey();
-            if (keyString == null) {
-                LOG.info("Whitelist device {} does not have a host key, skipping it", device.getUniqueId());
-                continue;
-            }
+            if (device.getEndpoint() instanceof Ssh) {
+                String keyString = ((Ssh) device.getEndpoint()).getSshClientParams().getHostKey();
+                if (keyString == null) {
+                    LOG.info("Whitelist device {} does not have a host key, skipping it", device.getUniqueId());
+                    continue;
+                }
 
-            try {
-                PublicKey pubKey = decoder.decodePublicKey(keyString);
-                if (sshKey.getAlgorithm().equals(pubKey.getAlgorithm()) && sshKey.equals(pubKey)) {
-                    Device failedDevice = withFailedAuthStatus(device);
-                    if (failedDevice == null) {
+                try {
+                    PublicKey pubKey = decoder.decodePublicKey(keyString);
+                    if (sshKey.getAlgorithm().equals(pubKey.getAlgorithm()) && sshKey.equals(pubKey)) {
+                        Device failedDevice = withFailedAuthStatus(device);
+                        if (failedDevice == null) {
+                            return;
+                        }
+                        LOG.info("Setting auth failed status for callhome device id:{}.", failedDevice.getUniqueId());
+                        setDeviceStatus(failedDevice);
                         return;
                     }
-                    LOG.info("Setting auth failed status for callhome device id:{}.", failedDevice.getUniqueId());
-                    setDeviceStatus(failedDevice);
+                } catch (GeneralSecurityException e) {
+                    LOG.error("Failed decoding a device key with host key: {}", keyString, e);
                     return;
                 }
-            } catch (GeneralSecurityException e) {
-                LOG.error("Failed decoding a device key with host key: {}", keyString, e);
-                return;
             }
         }
 
