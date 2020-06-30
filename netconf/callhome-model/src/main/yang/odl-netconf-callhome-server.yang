@@ -62,12 +62,28 @@ module odl-netconf-callhome-server {
           description "Identifier of device, which will be used to identify device.";
           type string;
         }
-        leaf ssh-host-key {
-          description "BASE-64 encoded public key which device will use during connection.";
+        choice transport {
+          default ssh-transport;
+          case ssh-transport {
+            leaf ssh-host-key {
+              description "BASE-64 encoded public key which device will use during connection.";
+              type string;
+            }
+          }
+          case tls-transport {
+            leaf tls-cert-id {
+              description "Certificate identifier inside which will be used during two-way TLS authentication.";
+              type string;
+            }
+          }
+        }
+        leaf tls-key-id {
+          description "Key identifier inside the NetConf keystore which will be used during two-way TLS authentication.";
           type string;
         }
-        unique ssh-host-key;
         uses credentials;
+        unique tls-cert-id;
+        unique ssh-host-key;
       }
     }
   }
