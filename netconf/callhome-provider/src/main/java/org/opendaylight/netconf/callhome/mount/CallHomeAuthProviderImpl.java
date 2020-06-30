@@ -33,6 +33,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.Global;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.Global.MountPointNamingStrategy;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.endpoint.Ssh;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -158,7 +159,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         private void deleteDevice(final Device dataBefore) {
             if (dataBefore != null) {
-                final String publicKey = dataBefore.getSshHostKey();
+                String publicKey = getHostPublicKey(dataBefore);
                 if (publicKey != null) {
                     LOG.debug("Removing device {}", dataBefore.getUniqueId());
                     removeDevice(publicKey, dataBefore);
@@ -169,13 +170,24 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
 
         private void writeDevice(final Device dataAfter) {
-            final String publicKey = dataAfter.getSshHostKey();
+            String publicKey = getHostPublicKey(dataAfter);
             if (publicKey != null) {
                 LOG.debug("Adding device {}", dataAfter.getUniqueId());
                 addDevice(publicKey, dataAfter);
             } else {
                 LOG.debug("Ignoring addition of device {}, no host key present", dataAfter.getUniqueId());
             }
+        }
+
+        private String getHostPublicKey(Device device) {
+            String publicKey = null;
+            if (device.getEndpoint() instanceof Ssh) {
+                publicKey = ((Ssh) device.getEndpoint()).getSshClientParams().getHostKey();
+            }
+            else {
+                publicKey = device.getSshHostKey();
+            }
+            return publicKey;
         }
 
         abstract void addDevice(String publicKey, Device device);
