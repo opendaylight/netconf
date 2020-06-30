@@ -927,12 +927,6 @@ particular mount point.
 NETCONF Call Home
 -----------------
 
-.. important::
-
-    The call home feature is experimental and will change in a future
-    release. In particular, the Yang models will change to those specified
-    in the `RFC 8071 <https://tools.ietf.org/html/rfc8071>`__
-
 Call Home Installation
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -947,8 +941,10 @@ configuring Call Home & testing its functionality.
 
 .. note::
 
-    In order to test Call Home functionality we recommend Netopeer.
-    See `Netopeer Call Home <https://github.com/CESNET/netopeer/wiki/CallHome>`__ to learn how to enable call-home on Netopeer.
+    In order to test Call Home functionality we recommend Netopeer or
+    Netopeer2. See `Netopeer Call Home <https://github.com/CESNET/netopeer/wiki/CallHome>`__
+    or `Netopeer2 <https://github.com/CESNET/netopeer2>`__ to learn how to
+    enable call-home on Netopeer.
 
 Northbound Call-Home API
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -959,12 +955,16 @@ following describes this configuration.
 Global Configuration
 ^^^^^^^^^^^^^^^^^^^^
 
+.. important::
+  The global configuration is not a part of the `RFC 8071
+  <https://tools.ietf.org/html/rfc8071>`__ and, therefore, subject to change.
+
 Configuring global credentials
 ''''''''''''''''''''''''''''''
 
-ODL Call-Home server allows user to configure global credentials, which
-will be used for devices which does not have device-specific credentials
-configured.
+ODL Call-Home server allows user to configure global credentials, which will be
+used for connected over SSH transport protocol devices which does not have
+device-specific credentials configured.
 
 This is done by creating
 ``/odl-netconf-callhome-server:netconf-callhome-server/global/credentials``
@@ -972,7 +972,7 @@ with username and passwords specified.
 
 *Configuring global username & passwords to try*
 
-.. code-block:: none
+.. code-block::
 
     PUT
     /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/global/credentials HTTP/1.1
@@ -1009,7 +1009,7 @@ This is a debug feature and should not be used in production. Besides being an o
 security issue, this also causes the Call-Home Server to drastically increase its output
 to the log.
 
-.. code-block:: none
+.. code-block::
 
     POST
     /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/global HTTP/1.1
@@ -1027,8 +1027,12 @@ to the log.
 Device-Specific Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Allowing Device & Configuring Name
-''''''''''''''''''''''''''''''''''
+Netconf Call Home server supports both of the secure transports used
+by the Network Configuration Protocol (NETCONF) - Secure Shell (SSH),
+and Transport Layer Security (TLS).
+
+Configure device to connect over SSH protocol
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Netconf Call Home Server uses device provided SSH server key (host key)
 to identify device. The pairing of name and server key is configured in
@@ -1041,9 +1045,76 @@ not found, the connection between the Call Home server and the device is dropped
 immediately. In either case, the device that connects to the Call home server
 leaves a record of its presence in the operational store.
 
+Configuring Device with Device-specific Credentials
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Adding specific device to the allowed list is done by creating
+``/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/{device}``
+with device-id and connection parameters inside the ssh-client-params container.
+
+*Configuring Device with Credentials*
+
+.. code-block::
+
+    PUT
+    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+    {
+      "device": {
+        "unique-id": "example",
+        "ssh-client-params": {
+          "credentials": {
+            "username": "example",
+            "passwords": [ "password" ]
+          },
+          "ssh-host-key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQDHoH1jMjltOJnCt999uaSfc48ySutaD3ISJ9fSECe1Spdq9o9mxj0kBTTTq+2V8hPspuW75DNgN+V/rgJeoUewWwCAasRx9X4eTcRrJrwOQKzb5Fk+UKgQmenZ5uhLAefi2qXX/agFCtZi99vw+jHXZStfHm9TZCAf2zi+HIBzoVksSNJD0VvPo66EAvLn5qKWQD4AdpQQbKqXRf5/W8diPySbYdvOP2/7HFhDukW8yV/7ZtcywFUIu3gdXsrzwMnTqnATSLPPuckoi0V2jd8dQvEcu1DY+rRqmqu0tEkFBurlRZDf1yhNzq5xWY3OXcjgDGN+RxwuWQK3cRimcosH"
+        }
+      }
+    }
+
+Configuring Device with Global Credentials
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+
+It is possible to omit 'username' and 'password' for ssh-client-params,
+in such case values from global credentials will be used.
+
 *Example of configuring device*
 
-.. code-block:: none
+.. code-block::
+
+    PUT
+    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+    {
+      "device": {
+        "unique-id": "example",
+        "ssh-client-params": {
+          "host-key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQDHoH1jMjltOJnCt999uaSfc48ySutaD3ISJ9fSECe1Spdq9o9mxj0kBTTTq+2V8hPspuW75DNgN+V/rgJeoUewWwCAasRx9X4eTcRrJrwOQKzb5Fk+UKgQmenZ5uhLAefi2qXX/agFCtZi99vw+jHXZStfHm9TZCAf2zi+HIBzoVksSNJD0VvPo66EAvLn5qKWQD4AdpQQbKqXRf5/W8diPySbYdvOP2/7HFhDukW8yV/7ZtcywFUIu3gdXsrzwMnTqnATSLPPuckoi0V2jd8dQvEcu1DY+rRqmqu0tEkFBurlRZDf1yhNzq5xWY3OXcjgDGN+RxwuWQK3cRimcosH"
+        }
+      }
+    }
+
+Deprecated configuration models for devices accessed with SSH protocol
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+With `RFC 8071 <https://tools.ietf.org/html/rfc8071>`__ alignment and adding
+support for TLS transport following configuration models has been marked
+deprecated.
+
+Configuring Device with Global Credentials
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+
+*Example of configuring device*
+
+.. code-block::
 
     PUT
     /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example HTTP/1.1
@@ -1068,7 +1139,7 @@ device-specific configuration. Format is same as in global credentials.
 
 *Configuring Device with Credentials*
 
-.. code-block:: none
+.. code-block::
 
     PUT
     /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example HTTP/1.1
@@ -1087,6 +1158,117 @@ device-specific configuration. Format is same as in global credentials.
         "ssh-host-key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQDHoH1jMjltOJnCt999uaSfc48ySutaD3ISJ9fSECe1Spdq9o9mxj0kBTTTq+2V8hPspuW75DNgN+V/rgJeoUewWwCAasRx9X4eTcRrJrwOQKzb5Fk+UKgQmenZ5uhLAefi2qXX/agFCtZi99vw+jHXZStfHm9TZCAf2zi+HIBzoVksSNJD0VvPo66EAvLn5qKWQD4AdpQQbKqXRf5/W8diPySbYdvOP2/7HFhDukW8yV/7ZtcywFUIu3gdXsrzwMnTqnATSLPPuckoi0V2jd8dQvEcu1DY+rRqmqu0tEkFBurlRZDf1yhNzq5xWY3OXcjgDGN+RxwuWQK3cRimcosH"
       }
     }
+
+Configure device to connect over TLS protocol
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Netconf Call Home Server allows devices to use TLS transport protocol to
+establish a connection towards the NETCONF device. This communication
+requires proper setup to make two-way TLS authentication possible for client
+and server.
+
+The initial step is to configure certificates and keys for two-way TLS by
+storing them within the netconf-keystore.
+
+*Adding a client private key credential to the netconf-keystore*
+
+.. code-block::
+
+    POST
+    /rests/operations/netconf-keystore:add-keystore-entry HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "input": {
+      "key-credential": [
+        {
+          "key-id": "example-client-key-id",
+          "private-key": "base64encoded-private-key",
+          "passphrase": "passphrase"
+        }
+      ]
+    }
+  }
+
+*Associate a private key with a client and CA certificates chain*
+
+.. code-block::
+
+    POST
+    /rests/operations/netconf-keystore:add-private-key HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "input": {
+      "private-key": [
+        {
+          "name": "example-client-key-id",
+          "data": "key-data",
+          "certificate-chain": [
+            "certificate-data"
+          ]
+        }
+      ]
+    }
+  }
+
+*Add a list of trusted CA and server certificates*
+
+.. code-block::
+
+    POST
+    /rests/operations/netconf-keystore:add-trusted-certificate HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "input": {
+      "trusted-certificate": [
+        {
+          "name": "example-ca-certificate",
+          "certificate": "ca-certificate-data"
+        },
+        {
+          "name": "example-server-certificate",
+          "certificate": "server-certificate-data"
+        }
+      ]
+    }
+  }
+
+In a second step, it is required to create an allowed device associated with
+a server certificate and client key. The server certificate will be used to
+identify and pin the NETCONF device during SSL handshake and should be unique
+among the allowed devices.
+
+*Add device configuration for TLS protocol to allowed devices list*
+
+.. code-block::
+
+    PUT
+    /restconf/config/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device/example-device HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "device": {
+      "unique-id": "example-device",
+      "tls-client-params": {
+        "key-id": "example-client-key-id",
+        "certificate-id": "example-server-certificate"
+      }
+    }
+  }
 
 Operational Status
 ^^^^^^^^^^^^^^^^^^
