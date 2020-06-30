@@ -220,9 +220,16 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             devStatus = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();
         }
 
-        tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIID, new DeviceBuilder()
-            .addAugmentation(devStatus).setSshHostKey(cfgDevice.getSshHostKey())
-            .setUniqueId(cfgDevice.getUniqueId()).build());
+        DeviceBuilder deviceBuilder = new DeviceBuilder().addAugmentation(devStatus)
+            .setUniqueId(cfgDevice.getUniqueId());
+        if (cfgDevice.getEndpoint() != null) {
+            deviceBuilder.setEndpoint(cfgDevice.getEndpoint());
+        }
+        else if (cfgDevice.getSshHostKey() != null) {
+            deviceBuilder.setSshHostKey(cfgDevice.getSshHostKey());
+        }
+
+        tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIID, deviceBuilder.build());
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
