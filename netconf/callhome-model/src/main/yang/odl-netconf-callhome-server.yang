@@ -63,11 +63,43 @@ module odl-netconf-callhome-server {
           type string;
         }
         leaf ssh-host-key {
-          description "BASE-64 encoded public key which device will use during connection.";
+          description "BASE-64 encoded public key which device will use during connection.
+                       Deprecated, a 'host-key' from the  'ssh-client-params' containers should be used instead.";
+          status deprecated;
           type string;
         }
         unique ssh-host-key;
         uses credentials;
+
+        choice transport {
+          description "Provides connectivity details for one of the supported transport protocols";
+          case ssh {
+            container ssh-client-params {
+              leaf host-key {
+                mandatory true;
+                description "BASE-64 encoded public key which device will use during connection.";
+                type string;
+              }
+              uses credentials;
+            }
+          }
+          case tls {
+            container tls-client-params {
+              leaf certificate-id {
+                mandatory true;
+                description "Certificate identifier which will be used during two-way TLS authentication.";
+                type string;
+              }
+              leaf key-id {
+                mandatory true;
+                description "Key identifier inside the NetConf keystore which will be used during two-way TLS authentication.";
+                type string;
+              }
+            }
+          }
+        }
+        unique certificate-id;
+        unique host-key;
       }
     }
   }
