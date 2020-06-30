@@ -14,6 +14,9 @@ import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -33,6 +36,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.Global;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.Global.MountPointNamingStrategy;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Ssh;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -73,16 +78,30 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     public CallHomeAuthorization provideAuth(final SocketAddress remoteAddress, final PublicKey serverKey) {
         Device deviceSpecific = deviceConfig.get(serverKey);
         String sessionName;
-        Credentials deviceCred;
+        String username = null;
+        Set<String> passwords = new HashSet<>();
 
         if (deviceSpecific != null) {
             sessionName = deviceSpecific.getUniqueId();
-            deviceCred = deviceSpecific.getCredentials();
+            if (deviceSpecific.getTransport() instanceof Ssh) {
+                SshClientParams clientParams = ((Ssh) deviceSpecific.getTransport()).getSshClientParams();
+                username = clientParams.getUsername();
+                Optional.ofNullable(clientParams.getPasswords()).ifPresent(passwords::addAll);
+            }
+            else {
+                Credentials credentials = Optional.ofNullable(deviceSpecific.getCredentials())
+                    .orElse(globalConfig.getCredentials());
+                if (credentials != null) {
+                    username = credentials.getUsername();
+                    Optional.ofNullable(credentials.getPasswords()).ifPresent(passwords::addAll);
+                }
+            }
         } else {
             String syntheticId = fromRemoteAddress(remoteAddress);
             if (globalConfig.allowedUnknownKeys()) {
                 sessionName = syntheticId;
-                deviceCred = null;
+                username = globalConfig.getCredentials().getUsername();
+                Optional.ofNullable(globalConfig.getCredentials().getPasswords()).ifPresent(passwords::addAll);
                 statusReporter.asForceListedDevice(syntheticId, serverKey);
             } else {
                 Device opDevice = deviceOp.get(serverKey);
@@ -95,17 +114,13 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
             }
         }
 
-        final Credentials credentials = deviceCred != null ? deviceCred : globalConfig.getCredentials();
-
-        if (credentials == null) {
-            LOG.info("No credentials found for {}, rejecting.", remoteAddress);
+        if (username == null || passwords.isEmpty()) {
+            LOG.info("No username/password credentials found for {}, rejecting.", remoteAddress);
             return CallHomeAuthorization.rejected();
         }
 
-        Builder authBuilder = CallHomeAuthorization.serverAccepted(sessionName, credentials.getUsername());
-        for (String password : credentials.getPasswords()) {
-            authBuilder.addPassword(password);
-        }
+        Builder authBuilder = CallHomeAuthorization.serverAccepted(sessionName, username);
+        passwords.forEach(authBuilder::addPassword);
         return authBuilder.build();
     }
 
@@ -158,7 +173,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         private void deleteDevice(final Device dataBefore) {
             if (dataBefore != null) {
-                final String publicKey = dataBefore.getSshHostKey();
+                String publicKey = getHostPublicKey(dataBefore);
                 if (publicKey != null) {
                     LOG.debug("Removing device {}", dataBefore.getUniqueId());
                     removeDevice(publicKey, dataBefore);
@@ -169,12 +184,21 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
 
         private void writeDevice(final Device dataAfter) {
-            final String publicKey = dataAfter.getSshHostKey();
+            String publicKey = getHostPublicKey(dataAfter);
             if (publicKey != null) {
                 LOG.debug("Adding device {}", dataAfter.getUniqueId());
                 addDevice(publicKey, dataAfter);
             } else {
                 LOG.debug("Ignoring addition of device {}, no host key present", dataAfter.getUniqueId());
+            }
+        }
+
+        private String getHostPublicKey(Device device) {
+            if (device.getTransport() instanceof Ssh) {
+                return  ((Ssh) device.getTransport()).getSshClientParams().getHostKey();
+            }
+            else {
+                return device.getSshHostKey();
             }
         }
 
