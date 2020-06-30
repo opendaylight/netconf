@@ -38,6 +38,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.Transport;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Ssh;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -68,7 +73,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
 
     @Override
     public void onDataTreeChanged(final Collection<DataTreeModification<Node>> changes) {
-        for (DataTreeModification<Node> change: changes) {
+        for (DataTreeModification<Node> change : changes) {
             final DataObjectModification<Node> rootNode = change.getRootNode();
             final InstanceIdentifier<Node> identifier = change.getRootPath().getRootIdentifier();
             switch (rootNode.getModificationType()) {
@@ -187,17 +192,20 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     private static Device newDevice(final String id, final PublicKey serverKey, final Device1.DeviceStatus status) {
+        // used only for netconf devices that are connected via SSH transport and global credentials
         String sshEncodedKey = serverKey.toString();
         try {
             sshEncodedKey = AuthorizedKeysDecoder.encodePublicKey(serverKey);
         } catch (IOException e) {
             LOG.warn("Unable to encode public key to ssh format.", e);
         }
+        final SshClientParams sshParams = new SshClientParamsBuilder().setHostKey(sshEncodedKey).build();
+        final Transport transport = new SshBuilder().setSshClientParams(sshParams).build();
         return new DeviceBuilder()
                 .setUniqueId(id)
                 .withKey(new DeviceKey(id))
-                .setSshHostKey(sshEncodedKey)
-                .addAugmentation(new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILEDNOTALLOWED).build())
+                .setTransport(transport)
+                .addAugmentation(new Device1Builder().setDeviceStatus(status).build())
                 .build();
     }
 
@@ -222,8 +230,8 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
 
     private static InstanceIdentifier<Device> buildDeviceInstanceIdentifier(final NodeId nodeId) {
         return InstanceIdentifier.create(NetconfCallhomeServer.class)
-                .child(AllowedDevices.class)
-                .child(Device.class, new DeviceKey(nodeId.getValue()));
+            .child(AllowedDevices.class)
+            .child(Device.class, new DeviceKey(nodeId.getValue()));
     }
 
     private static Device withConnectedStatus(final Device opDev) {
@@ -243,11 +251,15 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     private static Device deviceWithStatus(final Device opDev, final DeviceStatus status) {
-        return new DeviceBuilder()
-                .setUniqueId(opDev.getUniqueId())
-                .setSshHostKey(opDev.getSshHostKey())
-                .addAugmentation(new Device1Builder().setDeviceStatus(status).build())
-                .build();
+        final DeviceBuilder deviceBuilder = new DeviceBuilder()
+            .setUniqueId(opDev.getUniqueId())
+            .addAugmentation(new Device1Builder().setDeviceStatus(status).build());
+        if (opDev.getTransport() != null) {
+            deviceBuilder.setTransport(opDev.getTransport());
+        } else {
+            deviceBuilder.setSshHostKey(opDev.getSshHostKey());
+        }
+        return deviceBuilder.build();
     }
 
     private void setDeviceStatus(final Device device) {
@@ -293,8 +305,13 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     public void reportFailedAuth(final PublicKey sshKey) {
         AuthorizedKeysDecoder decoder = new AuthorizedKeysDecoder();
 
-        for (Device device : getDevicesAsList()) {
-            String keyString = device.getSshHostKey();
+        for (final Device device : getDevicesAsList()) {
+            final String keyString;
+            if (device.getTransport() instanceof Ssh) {
+                keyString = ((Ssh) device.getTransport()).getSshClientParams().getHostKey();
+            } else {
+                keyString = device.getSshHostKey();
+            }
             if (keyString == null) {
                 LOG.info("Whitelist device {} does not have a host key, skipping it", device.getUniqueId());
                 continue;
