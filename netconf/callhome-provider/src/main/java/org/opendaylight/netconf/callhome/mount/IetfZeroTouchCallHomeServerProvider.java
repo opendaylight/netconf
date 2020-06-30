@@ -40,6 +40,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.Transport;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Ssh;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -220,9 +225,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             devStatus = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();
         }
 
-        tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIID, new DeviceBuilder()
-            .addAugmentation(devStatus).setSshHostKey(cfgDevice.getSshHostKey())
-            .setUniqueId(cfgDevice.getUniqueId()).build());
+        final Device opDevice = createOperationalDevice(cfgDevice, devStatus);
+        tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIID, opDevice);
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -234,5 +238,20 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
                 LOG.warn("Failed to commit device {} status update", cfgDevice.key(), cause);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private Device createOperationalDevice(final Device cfgDevice, final Device1 devStatus) {
+        final DeviceBuilder deviceBuilder = new DeviceBuilder()
+            .addAugmentation(devStatus)
+            .setUniqueId(cfgDevice.getUniqueId());
+        if (cfgDevice.getTransport() instanceof Ssh) {
+            final String hostKey = ((Ssh) cfgDevice.getTransport()).getSshClientParams().getHostKey();
+            final SshClientParams params = new SshClientParamsBuilder().setHostKey(hostKey).build();
+            final Transport sshTransport = new SshBuilder().setSshClientParams(params).build();
+            deviceBuilder.setTransport(sshTransport);
+        } else if (cfgDevice.getSshHostKey() != null) {
+            deviceBuilder.setSshHostKey(cfgDevice.getSshHostKey());
+        }
+        return deviceBuilder.build();
     }
 }
