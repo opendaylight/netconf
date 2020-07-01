@@ -213,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "ae5d7dbc_b57e5e2f",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/NetconfCallHomeTlsServer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-01T21:54:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51c1b094_825dc0cb",
+      "range": {
+        "startLine": 67,
+        "startChar": 27,
+        "endLine": 67,
+        "endChar": 33
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d69fbc14_a61220ff",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/NetconfCallHomeTlsServer.java",
         "patchSetId": 13
@@ -233,6 +257,30 @@
       "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e4bc62be_4d28cc1f",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/NetconfCallHomeTlsServer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-01T21:54:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d69fbc14_a61220ff",
+      "range": {
+        "startLine": 68,
+        "startChar": 12,
+        "endLine": 68,
+        "endChar": 46
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -328,6 +376,30 @@
       "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e955369e_73284bbb",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/tls/NetconfCallHomeTlsServer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-01T21:54:13Z",
+      "side": 1,
+      "message": "Yes, it was a bit of over-engineering from my side. This has been fixed.",
+      "parentUuid": "46447f15_f76d1d4c",
+      "range": {
+        "startLine": 93,
+        "startChar": 8,
+        "endLine": 94,
+        "endChar": 43
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -566,6 +638,30 @@
     },
     {
       "key": {
+        "uuid": "327aca1a_81f881d4",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/SslHandlerFactoryAdapter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-01T21:54:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7a87765_60a37dfa",
+      "range": {
+        "startLine": 102,
+        "startChar": 16,
+        "endLine": 102,
+        "endChar": 62
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a7e07542_87a1655b",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/SslHandlerFactoryAdapter.java",
         "patchSetId": 13
@@ -601,6 +697,30 @@
       "side": 1,
       "message": "This has been fixed with new yang models.",
       "parentUuid": "a7e07542_87a1655b",
+      "range": {
+        "startLine": 109,
+        "startChar": 66,
+        "endLine": 109,
+        "endChar": 89
+      },
+      "revId": "947b0a25e2bb89d3041681d9ff9ab2cc0257a397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4cdd2cf4_996f9da9",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/SslHandlerFactoryAdapter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-01T21:54:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27c8df20_6428a110",
       "range": {
         "startLine": 109,
         "startChar": 66,
