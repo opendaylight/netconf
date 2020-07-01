@@ -328,9 +328,6 @@ public class TesttoolParameters {
                             if (!file.renameTo(correctNameFile)) {
                                 throw new IllegalStateException("Failed to rename '%s'." + file);
                             }
-                        } else {
-                            throw new IllegalStateException(String.format("Cannot read content of  \"%s\"",
-                                    file.getName()));
                         }
                     } catch (final IOException e) {
                         // print error to console (test tool is running from console)
