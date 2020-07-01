@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f52c943_20e49235",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/tls/SslHandlerFactoryAdapter.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-01T21:56:03Z",
+      "side": 1,
+      "message": "This is a temporary listener(migrated to separate service with the next change-set).",
+      "revId": "33a6dde35f1717853492675adbe6305e1aeebf10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
