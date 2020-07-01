@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "05a91ee5_da8e11d3",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-07-01T21:41:59Z",
+      "side": 1,
+      "message": "we hit this when line \u003d\u003d null. is that always what we will get if our file is non-text?",
+      "revId": "4c21689aba5d009c36765dd614643a6c8f89915c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
