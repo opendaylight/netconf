@@ -76,7 +76,7 @@ public class NetconfDeviceTopologyAdapterTest {
         SCHEMA_CONTEXT = YangParserTestUtils.parseYangResources(NetconfDeviceTopologyAdapterTest.class,
             "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
             "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang",
-            "/schemas/network-topology-augment-test@2016-08-08.yang");
+            "/schemas/network-topology-augment-test@2016-08-08.yang", "/schemas/netconf-node-optional.yang");
     }
 
     @AfterClass
