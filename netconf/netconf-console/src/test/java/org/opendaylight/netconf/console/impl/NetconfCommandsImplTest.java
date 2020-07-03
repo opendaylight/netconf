@@ -77,7 +77,7 @@ public class NetconfCommandsImplTest {
     public static void beforeClass() {
         SCHEMA_CONTEXT = YangParserTestUtils.parseYangResources(NetconfCommandsImplTest.class,
             "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
-            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang");
+            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang", "/schemas/netconf-node-optional.yang");
     }
 
     @AfterClass
