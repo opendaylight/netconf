@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5cbba91a_30222804",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-03T19:53:25Z",
+      "side": 1,
+      "message": "the only reason for this messy if/else statements is backward compatibility.",
+      "revId": "5fc2c41d7b193c9fab5d2f105a529e826fcdfe9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
