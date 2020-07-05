@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "48eff6f9_1af5bf8e",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/SessionHandlerInterface.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-07-05T21:19:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "339134df_27b6d91c",
+      "range": {
+        "startLine": 23,
+        "startChar": 14,
+        "endLine": 23,
+        "endChar": 21
+      },
+      "revId": "ad32eb4d5df8547cae15e1ab188bdcee291c0aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09cf2915_3e0bf0d6",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
         "patchSetId": 13
@@ -36,6 +60,30 @@
       "writtenOn": "2020-07-05T20:44:03Z",
       "side": 1,
       "message": "Update @return",
+      "range": {
+        "startLine": 131,
+        "startChar": 8,
+        "endLine": 131,
+        "endChar": 14
+      },
+      "revId": "ad32eb4d5df8547cae15e1ab188bdcee291c0aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59e2ecf3_df75ce65",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-07-05T21:19:25Z",
+      "side": 1,
+      "message": "Yes now im look this method is not good i must rework it \n\nthanks",
+      "parentUuid": "09cf2915_3e0bf0d6",
       "range": {
         "startLine": 131,
         "startChar": 8,
@@ -68,6 +116,30 @@
       "revId": "ad32eb4d5df8547cae15e1ab188bdcee291c0aaa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef140887_9e9d7bd5",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/websockets/WebSocketInitializer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-07-05T21:19:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f4de019_6b3d10dd",
+      "range": {
+        "startLine": 34,
+        "startChar": 14,
+        "endLine": 34,
+        "endChar": 36
+      },
+      "revId": "ad32eb4d5df8547cae15e1ab188bdcee291c0aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
