@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b11fd224_9889811e",
+        "filename": "features/restconf/odl-restconf-nb-rfc8040/src/main/feature/feature.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2020-07-06T07:09:05Z",
+      "side": 1,
+      "message": "tab + whitespaces",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 1
+      },
+      "revId": "428641b3f7b7eedabab75fdee59bfe3eb63c4bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
