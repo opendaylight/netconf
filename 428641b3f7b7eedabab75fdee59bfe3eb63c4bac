@@ -22,6 +22,52 @@
       "revId": "428641b3f7b7eedabab75fdee59bfe3eb63c4bac",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cd1865e0_aa7cf790",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-06T11:08:02Z",
+      "side": 1,
+      "message": "Please declare  empty string \"\" as static and use in class",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 34
+      },
+      "revId": "428641b3f7b7eedabab75fdee59bfe3eb63c4bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e707dc9_bc915c3a",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-06T11:08:02Z",
+      "side": 1,
+      "message": "can be used StringBuilder ?",
+      "range": {
+        "startLine": 139,
+        "startChar": 12,
+        "endLine": 140,
+        "endChar": 29
+      },
+      "revId": "428641b3f7b7eedabab75fdee59bfe3eb63c4bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
