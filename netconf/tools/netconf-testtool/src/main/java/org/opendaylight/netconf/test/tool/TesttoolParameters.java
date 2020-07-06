@@ -34,6 +34,7 @@ import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 
 @SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
 public class TesttoolParameters {
@@ -49,6 +50,7 @@ public class TesttoolParameters {
     private static final Pattern REVISION_DATE_PATTERN = Pattern.compile("revision\\s+\"?(\\d{4}-\\d{2}-\\d{2})\"?");
 
     private static final String RESOURCE = "/config-template.json";
+    private static final String YANG = YangConstants.RFC6020_YANG_FILE_EXTENSION;
     @Arg(dest = "edit-content")
     public File editContent;
     @Arg(dest = "async")
@@ -308,6 +310,7 @@ public class TesttoolParameters {
             final File[] filesArray = schemasDir.listFiles();
             final List<File> files = filesArray != null ? Arrays.asList(filesArray) : Collections.emptyList();
             for (final File file : files) {
+                checkArgument(file.getName().endsWith(YANG), "Invalid file extension: %s", file.getName());
                 final Matcher matcher = YANG_FILENAME_PATTERN.matcher(file.getName());
                 if (!matcher.matches()) {
                     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -319,18 +322,13 @@ public class TesttoolParameters {
                             final Matcher m = REVISION_DATE_PATTERN.matcher(line);
                             Preconditions.checkState(m.find());
                             String moduleName = file.getAbsolutePath();
-                            if (file.getName().endsWith(".yang")) {
-                                moduleName = moduleName.substring(0, moduleName.length() - 5);
-                            }
+                            moduleName = moduleName.substring(0, moduleName.length() - 5);
                             final String revision = m.group(1);
-                            final String correctName = moduleName + "@" + revision + ".yang";
+                            final String correctName = moduleName + "@" + revision + YANG;
                             final File correctNameFile = new File(correctName);
                             if (!file.renameTo(correctNameFile)) {
                                 throw new IllegalStateException("Failed to rename '%s'." + file);
                             }
-                        } else {
-                            throw new IllegalStateException(String.format("Cannot read content of  \"%s\"",
-                                    file.getName()));
                         }
                     } catch (final IOException e) {
                         // print error to console (test tool is running from console)
