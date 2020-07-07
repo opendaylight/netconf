@@ -18,11 +18,10 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,15 +41,15 @@ public final class PlainPatchDataTransactionUtil {
      *
      * @param payload
      *             data to put
-     * @param schemaContextRef
-     *             reference to {@link SchemaContext}
+     * @param schemaContext
+     *             reference to {@link EffectiveModelContext}
      * @param transactionNode
      *             wrapper of variables for transaction
      * @return {@link Response}
      */
     public static Response patchData(final NormalizedNodeContext payload,
                                      final TransactionVarsWrapper transactionNode,
-                                     final SchemaContextRef schemaContextRef) {
+                                     final EffectiveModelContext schemaContext) {
 
         final DOMTransactionChain transactionChain = transactionNode.getTransactionChain();
         final DOMDataTreeReadWriteTransaction tx = transactionChain.newReadWriteTransaction();
@@ -59,8 +58,7 @@ public final class PlainPatchDataTransactionUtil {
         NormalizedNode<?, ?> data = payload.getData();
 
         try {
-            mergeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                    path, data, tx, schemaContextRef);
+            mergeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION, path, data, tx, schemaContext);
         } catch (final RestconfDocumentedException e) {
             tx.cancel();
             transactionChain.close();
@@ -85,15 +83,15 @@ public final class PlainPatchDataTransactionUtil {
      * @param path Path for data to be merged
      * @param payload Data to be merged
      * @param writeTransaction Transaction
-     * @param schemaContextRef Soft reference for global schema context
+     * @param schemaContext global schema context
      */
     private static void mergeDataWithinTransaction(final LogicalDatastoreType dataStore,
                                                    final YangInstanceIdentifier path,
                                                    final NormalizedNode<?, ?> payload,
                                                    final DOMDataTreeWriteTransaction writeTransaction,
-                                                   final SchemaContextRef schemaContextRef) {
+                                                   final EffectiveModelContext schemaContext) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", dataStore.name(), path, payload);
-        TransactionUtil.ensureParentsByMerge(path, schemaContextRef.get(), writeTransaction);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
         writeTransaction.merge(dataStore, path, payload);
     }
 }

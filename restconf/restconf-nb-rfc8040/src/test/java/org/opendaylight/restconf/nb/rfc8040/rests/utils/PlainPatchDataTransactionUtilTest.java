@@ -29,7 +29,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -61,7 +60,6 @@ public class PlainPatchDataTransactionUtilTest {
     private DOMDataBroker mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
-    private SchemaContextRef refSchemaCtx;
     private LeafNode leafGap;
     private ContainerNode jukeboxContainerWithPlayer;
     private ContainerNode jukeboxContainerWithPlaylist;
@@ -74,9 +72,7 @@ public class PlainPatchDataTransactionUtilTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
-        this.schema = this.refSchemaCtx.get();
+        this.schema = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
         final QName qnJukebox = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName qnPlayer = QName.create(qnJukebox, "player");
@@ -176,7 +172,7 @@ public class PlainPatchDataTransactionUtilTest {
 
         PlainPatchDataTransactionUtil.patchData(payload,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
-                this.refSchemaCtx);
+                this.schema);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -199,7 +195,7 @@ public class PlainPatchDataTransactionUtilTest {
 
         PlainPatchDataTransactionUtil.patchData(payload,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
-                this.refSchemaCtx);
+                this.schema);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -222,7 +218,7 @@ public class PlainPatchDataTransactionUtilTest {
 
         PlainPatchDataTransactionUtil.patchData(payload,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler),
-                this.refSchemaCtx);
+                this.schema);
 
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData());
     }

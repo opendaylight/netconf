@@ -22,7 +22,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -57,8 +56,8 @@ public final class PostDataTransactionUtil {
      *             data
      * @param transactionNode
      *             wrapper for transaction data
-     * @param schemaContextRef
-     *             reference to actual {@link SchemaContext}
+     * @param schemaContext
+     *             reference to current {@link EffectiveModelContext}
      * @param point
      *             point
      * @param insert
@@ -66,12 +65,12 @@ public final class PostDataTransactionUtil {
      * @return {@link Response}
      */
     public static Response postData(final UriInfo uriInfo, final NormalizedNodeContext payload,
-            final TransactionVarsWrapper transactionNode, final SchemaContextRef schemaContextRef, final String insert,
-            final String point) {
+            final TransactionVarsWrapper transactionNode, final EffectiveModelContext schemaContext,
+            final String insert, final String point) {
         final FluentFuture<? extends CommitInfo> future = submitData(
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
-                transactionNode, schemaContextRef.get(), insert, point);
-        final URI location = resolveLocation(uriInfo, transactionNode, schemaContextRef, payload.getData());
+                transactionNode, schemaContext, insert, point);
+        final URI location = resolveLocation(uriInfo, transactionNode, schemaContext, payload.getData());
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory,
@@ -311,12 +310,12 @@ public final class PostDataTransactionUtil {
      *             uri info
      * @param transactionNode
      *             wrapper for data of transaction
-     * @param schemaContextRef
+     * @param schemaContext
      *            reference to {@link SchemaContext}
      * @return {@link URI}
      */
     private static URI resolveLocation(final UriInfo uriInfo, final TransactionVarsWrapper transactionNode,
-            final SchemaContextRef schemaContextRef, final NormalizedNode<?, ?> data) {
+            final EffectiveModelContext schemaContext, final NormalizedNode<?, ?> data) {
         if (uriInfo == null) {
             return null;
         }
@@ -332,7 +331,7 @@ public final class PostDataTransactionUtil {
 
         return uriInfo.getBaseUriBuilder()
                 .path("data")
-                .path(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContextRef.get()))
+                .path(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext))
                 .build();
     }
 

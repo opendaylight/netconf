@@ -21,7 +21,6 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.CreateStreamUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
@@ -62,7 +61,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
-        final SchemaContextRef refSchemaCtx = new SchemaContextRef(this.schemaContextHandler.get());
+        final EffectiveModelContext refSchemaCtx = this.schemaContextHandler.get();
         final SchemaPath schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();

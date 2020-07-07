@@ -43,7 +43,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
@@ -130,9 +129,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response readData(final String identifier, final UriInfo uriInfo) {
-        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
+        final EffectiveModelContext schemaContextRef = this.schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextRef.get(), Optional.of(this.mountPointServiceHandler.get()));
+                identifier, schemaContextRef, Optional.of(this.mountPointServiceHandler.get()));
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
@@ -183,13 +182,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final TransactionChainHandler localTransactionChainHandler;
-        final SchemaContextRef ref;
+        final EffectiveModelContext ref;
         if (mountPoint == null) {
             localTransactionChainHandler = this.transactionChainHandler;
-            ref = new SchemaContextRef(this.schemaContextHandler.get());
+            ref = this.schemaContextHandler.get();
         } else {
             localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = new SchemaContextRef(mountPoint.getEffectiveModelContext());
+            ref = mountPoint.getEffectiveModelContext();
         }
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
@@ -310,13 +309,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final TransactionChainHandler localTransactionChainHandler;
-        final SchemaContextRef ref;
+        final EffectiveModelContext ref;
         if (mountPoint == null) {
             localTransactionChainHandler = this.transactionChainHandler;
-            ref = new SchemaContextRef(this.schemaContextHandler.get());
+            ref = this.schemaContextHandler.get();
         } else {
             localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = new SchemaContextRef(mountPoint.getEffectiveModelContext());
+            ref = mountPoint.getEffectiveModelContext();
         }
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
@@ -329,9 +328,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return mountPoint == null ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
     }
 
-    private SchemaContextRef getSchemaContext(final DOMMountPoint mountPoint) {
-        return mountPoint == null ? new SchemaContextRef(schemaContextHandler.get())
-                : new SchemaContextRef(mountPoint.getEffectiveModelContext());
+    private EffectiveModelContext getSchemaContext(final DOMMountPoint mountPoint) {
+        return mountPoint == null ? schemaContextHandler.get() : mountPoint.getEffectiveModelContext();
     }
 
     /**

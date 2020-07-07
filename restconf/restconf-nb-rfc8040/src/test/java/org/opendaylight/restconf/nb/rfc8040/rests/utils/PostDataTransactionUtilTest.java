@@ -41,7 +41,6 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -77,7 +76,6 @@ public class PostDataTransactionUtilTest {
     private DOMDataBroker mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
-    private SchemaContextRef refSchemaCtx;
     private ContainerNode buildBaseCont;
     private EffectiveModelContext schema;
     private YangInstanceIdentifier iid2;
@@ -87,9 +85,8 @@ public class PostDataTransactionUtilTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
-        this.schema = this.refSchemaCtx.get();
+        this.schema =
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerQname = QName.create(baseQName, "player");
@@ -163,7 +160,7 @@ public class PostDataTransactionUtilTest {
         final TransactionVarsWrapper wrapper =
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
         final Response response =
-                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
+                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.schema, null, null);
         assertEquals(201, response.getStatus());
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -186,7 +183,7 @@ public class PostDataTransactionUtilTest {
         final TransactionVarsWrapper wrapper =
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
         final Response response =
-                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
+                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.schema, null, null);
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), "UTF-8"),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
@@ -214,7 +211,7 @@ public class PostDataTransactionUtilTest {
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
 
         try {
-            PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
+            PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.schema, null, null);
             fail("Expected RestconfDocumentedException");
         } catch (final RestconfDocumentedException e) {
             assertEquals(1, e.getErrors().size());

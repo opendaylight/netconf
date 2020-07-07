@@ -21,7 +21,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -43,13 +42,13 @@ public class CreateStreamUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/streams";
 
     private NormalizedNodeContext payload;
-    private SchemaContextRef refSchemaCtx;
+    private EffectiveModelContext refSchemaCtx;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+        this.refSchemaCtx =
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
     }
 
     @Test
@@ -80,7 +79,7 @@ public class CreateStreamUtilTest {
 
     private NormalizedNodeContext prepareDomPayload(final String rpcName, final String inputOutput,
             final String toasterValue, final String inputOutputName) {
-        final EffectiveModelContext schema = this.refSchemaCtx.get();
+        final EffectiveModelContext schema = this.refSchemaCtx;
         final Module rpcModule = schema.findModules("sal-remote").iterator().next();
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), rpcName);
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(), inputOutput);
