@@ -36,8 +36,8 @@ class TestData {
     final MapNode listData2;
     final OrderedMapNode orderedMapNode1;
     final OrderedMapNode orderedMapNode2;
-    final LeafNode contentLeaf;
-    final LeafNode contentLeaf2;
+    final LeafNode<?> contentLeaf;
+    final LeafNode<?> contentLeaf2;
     final MapEntryNode checkData;
     final SchemaPath rpc;
     final SchemaPath errorRpc;
@@ -165,7 +165,7 @@ class TestData {
         final QName errorRpcQname = QName.create(rpcQname, "error-rpc");
         rpc = SchemaPath.create(true, rpcQname);
         errorRpc = SchemaPath.create(true, errorRpcQname);
-        final LeafNode contentLeafNode = Builders.leafBuilder()
+        final LeafNode<?> contentLeafNode = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQname, "content")))
                 .withValue("test")
                 .build();
@@ -173,7 +173,7 @@ class TestData {
                 .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQname, "input")))
                 .withChild(contentLeafNode)
                 .build();
-        final LeafNode resultLeafNode = Builders.leafBuilder()
+        final LeafNode<?> resultLeafNode = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQname, "content")))
                 .withValue("operation result")
                 .build();

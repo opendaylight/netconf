@@ -355,17 +355,17 @@ public final class ReadDataTransactionUtil {
                 final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (keys.contains(child.getNodeType())) {
-                    leafBuilder.withValue(((LeafNode) child).getValue());
+                    leafBuilder.withValue(((LeafNode<?>) child).getValue());
                     builder.withChild(leafBuilder.build());
                 } else {
                     if (trim) {
                         if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(((LeafNode) child).getValue());
+                            leafBuilder.withValue(((LeafNode<?>) child).getValue());
                             builder.withChild(leafBuilder.build());
                         }
                     } else {
                         if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(((LeafNode) child).getValue());
+                            leafBuilder.withValue(((LeafNode<?>) child).getValue());
                             builder.withChild(leafBuilder.build());
                         }
                     }
@@ -411,12 +411,12 @@ public final class ReadDataTransactionUtil {
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(((LeafNode) child).getValue());
+                        leafBuilder.withValue(((LeafNode<?>) child).getValue());
                         builder.withChild(leafBuilder.build());
                     }
                 } else {
                     if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(((LeafNode) child).getValue());
+                        leafBuilder.withValue(((LeafNode<?>) child).getValue());
                         builder.withChild(leafBuilder.build());
                     }
                 }

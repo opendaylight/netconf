@@ -60,7 +60,7 @@ public class PutDataTransactionUtilTest {
     private DOMDataBroker mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
-    private LeafNode buildLeaf;
+    private LeafNode<?> buildLeaf;
     private ContainerNode buildBaseCont;
     private ContainerNode buildBaseContWithList;
     private MapEntryNode buildListEntry;

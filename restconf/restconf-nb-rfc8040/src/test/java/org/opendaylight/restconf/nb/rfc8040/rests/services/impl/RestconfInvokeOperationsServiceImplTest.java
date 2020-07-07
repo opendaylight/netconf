@@ -78,7 +78,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void testInvokeRpcWithNonEmptyOutput() {
         final String identifier = "invoke-rpc-module:rpcTest";
         final ContainerNode result = mock(ContainerNode.class);
-        final LeafNode outputChild = mock(LeafNode.class);
+        final LeafNode<?> outputChild = mock(LeafNode.class);
         when(result.getValue()).thenReturn(Collections.singleton(outputChild));
 
         final NormalizedNodeContext payload = prepNNC(result);

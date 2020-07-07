@@ -181,11 +181,10 @@ public class RestconfMappingNodeUtilTest {
      */
     private static void verifyDeviations(final ContainerNode containerNode) {
         int deviationsFound = 0;
-        for (final DataContainerChild child : containerNode.getValue()) {
+        for (final DataContainerChild<?, ?> child : containerNode.getValue()) {
             if (child instanceof MapNode) {
                 for (final MapEntryNode mapEntryNode : ((MapNode) child).getValue()) {
-                    for (final DataContainerChild dataContainerChild : mapEntryNode
-                            .getValue()) {
+                    for (final DataContainerChild<?, ?> dataContainerChild : mapEntryNode.getValue()) {
                         if (dataContainerChild.getNodeType()
                                 .equals(IetfYangLibrary.SPECIFIC_MODULE_DEVIATION_LIST_QNAME)) {
                             deviationsFound++;

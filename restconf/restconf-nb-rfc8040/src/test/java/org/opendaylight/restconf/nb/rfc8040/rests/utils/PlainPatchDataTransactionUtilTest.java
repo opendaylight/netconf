@@ -60,7 +60,7 @@ public class PlainPatchDataTransactionUtilTest {
     private DOMDataBroker mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
-    private LeafNode leafGap;
+    private LeafNode<?> leafGap;
     private ContainerNode jukeboxContainerWithPlayer;
     private ContainerNode jukeboxContainerWithPlaylist;
     private EffectiveModelContext schema;

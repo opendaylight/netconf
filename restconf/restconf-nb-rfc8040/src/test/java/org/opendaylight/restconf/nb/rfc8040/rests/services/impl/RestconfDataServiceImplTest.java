@@ -140,7 +140,7 @@ public class RestconfDataServiceImplTest {
         final QName containerLibraryQName = QName.create(this.baseQName, "library");
         final QName listPlaylistQName = QName.create(this.baseQName, "playlist");
 
-        final LeafNode buildLeaf = Builders.leafBuilder()
+        final LeafNode<?> buildLeaf = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(this.leafQname))
                 .withValue(0.2)
                 .build();
