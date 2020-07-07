@@ -64,6 +64,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -267,9 +268,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response deleteData(final String identifier) {
-        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextRef.get(), Optional.of(this.mountPointServiceHandler.get()));
+                identifier, this.schemaContextHandler.get(), Optional.of(this.mountPointServiceHandler.get()));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final TransactionChainHandler localTransactionChainHandler;
@@ -373,15 +373,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         final DOMActionResult response;
-        final SchemaContextRef schemaContextRef;
+        final EffectiveModelContext schemaContextRef;
         if (mountPoint != null) {
             response = RestconfInvokeOperationsUtil.invokeActionViaMountPoint(mountPoint, (ContainerNode) data,
                 schemaPath, yangIIdContext);
-            schemaContextRef = new SchemaContextRef(mountPoint.getEffectiveModelContext());
+            schemaContextRef = mountPoint.getEffectiveModelContext();
         } else {
             response = RestconfInvokeOperationsUtil.invokeAction((ContainerNode) data, schemaPath,
                 this.actionServiceHandler, yangIIdContext);
-            schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
+            schemaContextRef = this.schemaContextHandler.get();
         }
         final DOMActionResult result = RestconfInvokeOperationsUtil.checkActionResponse(response);
 
@@ -400,6 +400,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         return Response.status(200).entity(new NormalizedNodeContext(new InstanceIdentifierContext<>(yangIIdContext,
-                resultNodeSchema, mountPoint, schemaContextRef.get()), resultData)).build();
+                resultNodeSchema, mountPoint, schemaContextRef), resultData)).build();
     }
 }

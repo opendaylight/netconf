@@ -12,14 +12,12 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Implementation of {@link RestconfSchemaService}.
- *
  */
 @Path("/")
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
@@ -47,8 +45,7 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
     @Override
     public SchemaExportContext getSchema(final String identifier) {
-        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
-        return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextRef.get(), identifier,
+        return ParserIdentifier.toSchemaExportContextFromIdentifier(this.schemaContextHandler.get(), identifier,
                 this.domMountPointServiceHandler.get(), sourceProvider);
     }
 

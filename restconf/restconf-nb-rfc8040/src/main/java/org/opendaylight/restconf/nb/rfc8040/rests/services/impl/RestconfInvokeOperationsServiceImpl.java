@@ -28,6 +28,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperations
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -65,10 +66,9 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final SchemaPath schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
-        DOMRpcResult response;
 
-        SchemaContextRef schemaContextRef;
-
+        final DOMRpcResult response;
+        final EffectiveModelContext schemaContextRef;
         if (mountPoint == null) {
             if (namespace.equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE.getNamespace())) {
                 if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCRIPTION)) {
@@ -81,10 +81,10 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                 response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath,
                         this.rpcServiceHandler);
             }
-            schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
+            schemaContextRef = this.schemaContextHandler.get();
         } else {
             response = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(mountPoint, payload.getData(), schemaPath);
-            schemaContextRef = new SchemaContextRef(mountPoint.getEffectiveModelContext());
+            schemaContextRef = mountPoint.getEffectiveModelContext();
         }
 
         final DOMRpcResult result = RestconfInvokeOperationsUtil.checkResponse(response);
@@ -99,8 +99,8 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         if (resultData != null && ((ContainerNode) resultData).getValue().isEmpty()) {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         } else {
-            return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, resultNodeSchema,
-                    mountPoint, schemaContextRef.get()), resultData);
+            return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint,
+                    schemaContextRef), resultData);
         }
     }
 }
