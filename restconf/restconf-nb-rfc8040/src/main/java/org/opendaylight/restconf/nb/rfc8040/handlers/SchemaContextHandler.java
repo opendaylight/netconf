@@ -43,9 +43,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of {@link SchemaContextHandler}.
  */
 @Singleton
-@SuppressWarnings("checkstyle:FinalClass")
 public class SchemaContextHandler implements SchemaContextListenerHandler, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
     private final AtomicInteger moduleSetId = new AtomicInteger(0);
