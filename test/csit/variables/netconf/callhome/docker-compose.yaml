@@ -1,17 +1,13 @@
-# Controller needs to be provisoned with the unique-id of the device(netopeer) and public key.
-# The way this is done with docker compose is:
-# 1. A new docker instance is spawned and public key is generated.
-# 2. We create new pair of keys to ensure it is different than the snapshot of the image.
-# 3. Execute script to send REST to provision netopeer unique-id + public key + credentials in controller.
-# 4. Start netopeer.
-
-netopeer:
-  image: sdnhub/netopeer
-  hostname: netopeer
-  command: sh -c "apt-get update;apt-get install curl --force-yes -y;echo -e 'y/n' | ssh-keygen -q -N '' -f /etc/ssh/ssh_host_rsa_key;/root/whitelist_add.sh $${HOSTNAME};/root/credentials_set.sh -global root root;/root/netopeer/server/netopeer-server -v 3"
+netopeer2-server:
+  image: sysrepo/sysrepo-netopeer2:latest
+  hostname: netopeer2
+  command: sh -c "
+      /root/init_configuration.sh &&
+      exec netopeer2-server -d -v3"
   environment:
-     - controller_ip=ODL_SYSTEM_IP
+     - CALL_HOME_SERVER_IP=ODL_SYSTEM_IP
+     - CALL_HOME_SSH_PORT=6666
+     - CALL_HOME_TLS_PORT=4335
   volumes:
-    - ./datastore-server.xml:/usr/local/etc/netopeer/cfgnetopeer/datastore-server.xml
-    - ./whitelist_add.sh:/root/whitelist_add.sh
-    - ./credentials_set.sh:/root/credentials_set.sh
+    - ./configuration-files:/root/configuration-files
+    - ./init_configuration.sh:/root/init_configuration.sh
