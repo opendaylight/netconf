@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "b750b8c7_ecdf40e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-07T17:23:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0d76e46_e3bbed7c",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 53
+      },
+      "revId": "03dfba8c311797ccd7c8f24877f11fa422a214d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a94e7be8_6ff9c6f0",
         "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
         "patchSetId": 3
@@ -65,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e6244626_c2372356",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-07T17:23:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a94e7be8_6ff9c6f0",
+      "revId": "03dfba8c311797ccd7c8f24877f11fa422a214d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "499e98e3_b02b7a3e",
         "filename": "netconf/sal-netconf-connector/src/test/resources/schemas/netconf-node-optional.yang",
         "patchSetId": 3
@@ -76,6 +118,24 @@
       "writtenOn": "2020-07-07T09:53:08Z",
       "side": 1,
       "message": "why are we duplicating this resource?",
+      "revId": "03dfba8c311797ccd7c8f24877f11fa422a214d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "abdf4e4c_a1f02193",
+        "filename": "netconf/sal-netconf-connector/src/test/resources/schemas/netconf-node-optional.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-07T17:23:55Z",
+      "side": 1,
+      "message": "now, netconf-node-topology.yang uses this yang file.",
+      "parentUuid": "499e98e3_b02b7a3e",
       "revId": "03dfba8c311797ccd7c8f24877f11fa422a214d1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
