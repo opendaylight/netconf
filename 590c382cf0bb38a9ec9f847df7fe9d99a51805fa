@@ -68,6 +68,29 @@
       "revId": "590c382cf0bb38a9ec9f847df7fe9d99a51805fa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fef6f560_3da1dde8",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-07T16:14:43Z",
+      "side": 1,
+      "message": "superfluous compare",
+      "range": {
+        "startLine": 290,
+        "startChar": 95,
+        "endLine": 290,
+        "endChar": 103
+      },
+      "revId": "590c382cf0bb38a9ec9f847df7fe9d99a51805fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
