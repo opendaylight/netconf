@@ -7,13 +7,15 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
-import java.util.ArrayList;
+import com.google.common.collect.Iterators;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -43,14 +45,12 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetRevisionNotSuppliedTest() {
-        try {
-            ParserIdentifier.validateAndGetRevision(new ArrayList<String>().iterator());
-            fail("Test should fail due to not supplied module revision");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.validateAndGetRevision(Collections.emptyIterator()));
+
+        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 
     /**
@@ -59,12 +59,9 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetRevisionNotParsableTest() {
-        try {
-            ParserIdentifier.validateAndGetRevision(Arrays.asList("not-parsable-as-date").iterator());
-            fail("Test should fail due to not parsable module revision");
-        } catch (final RestconfDocumentedException e) {
-            assertTrue(e.getMessage().contains("Supplied revision is not in expected date format YYYY-mm-dd"));
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.validateAndGetRevision(Iterators.singletonIterator("not-parsable-as-date")));
+        assertThat(ex.getMessage(), containsString("Supplied revision is not in expected date format YYYY-mm-dd"));
     }
 
     /**
@@ -83,14 +80,11 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModulNameNotSuppliedTest() {
-        try {
-            ParserIdentifier.validateAndGetModulName(new ArrayList<String>().iterator());
-            fail("Test should fail due to not supplied module name");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.validateAndGetModulName(Collections.emptyIterator()));
+        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 
     /**
@@ -100,15 +94,12 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModuleNameNotParsableFirstTest() {
-        try {
-            ParserIdentifier.validateAndGetModulName(
-                    Arrays.asList("01-not-parsable-as-name-on-firts-char").iterator());
-            fail("Test should fail due to not parsable module name on the first character");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator(
+                "01-not-parsable-as-name-on-firts-char")));
+        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 
     /**
@@ -118,15 +109,12 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModuleNameNotParsableNextTest() {
-        try {
-            ParserIdentifier.validateAndGetModulName(
-                    Arrays.asList("not-parsable-as-name-after-first-char*").iterator());
-            fail("Test should fail due to not parsable module name on any character after the first character");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator(
+                "not-parsable-as-name-after-first-char*")));
+        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 
     /**
@@ -135,14 +123,11 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModuleNameNotParsableXmlTest() {
-        try {
-            ParserIdentifier.validateAndGetModulName(Arrays.asList("xMl-module-name").iterator());
-            fail("Test should fail due to module name beginning with 'xMl'");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator("xMl-module-name")));
+        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 
     /**
@@ -151,13 +136,10 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModuleNameEmptyTest() {
-        try {
-            ParserIdentifier.validateAndGetModulName(Arrays.asList("").iterator());
-            fail("Test should fail due to empty module name");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator("")));
+        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 }
