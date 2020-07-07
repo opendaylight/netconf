@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -262,16 +263,14 @@ public class JSONRestconfServiceRfc8040ImplTest {
         verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
     }
 
-    @Test(expected = OperationFailedException.class)
-    @SuppressWarnings("checkstyle:IllegalThrows")
-    public void testPutFailure() throws Throwable {
+    public void testPutFailure() throws IOException {
         doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock")))
                 .when(mockReadWriteTx).commit();
 
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
 
-        this.service.put(uriPath, payload);
+        assertThrows(OperationFailedException.class, () -> this.service.put(uriPath, payload));
     }
 
     @SuppressWarnings("rawtypes")
@@ -410,8 +409,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     }
 
     @Test
-    @SuppressWarnings("checkstyle:IllegalThrows")
-    public void testPatchFailure() throws Throwable {
+    public void testPatchFailure() throws IOException, OperationFailedException {
         doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock")))
                 .when(mockReadWriteTx).commit();
 
