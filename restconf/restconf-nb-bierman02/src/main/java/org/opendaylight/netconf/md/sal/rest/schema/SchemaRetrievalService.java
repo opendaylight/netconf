@@ -13,6 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 
 /**
  * Retrieval of the YANG modules which server supports.
@@ -23,11 +24,10 @@ import org.opendaylight.restconf.common.schema.SchemaExportContext;
 @Beta
 public interface SchemaRetrievalService {
 
-    String YANG_MEDIA_TYPE = "application/yang";
     String YIN_MEDIA_TYPE = "application/yin+xml";
 
     @GET
-    @Produces({YIN_MEDIA_TYPE,YANG_MEDIA_TYPE})
+    @Produces({YIN_MEDIA_TYPE, YangConstants.RFC6020_YANG_MEDIA_TYPE})
     @Path("/modules/module/{identifier:.+}/schema")
     SchemaExportContext getSchema(@PathParam("identifier") String mountAndModuleId);
 }
