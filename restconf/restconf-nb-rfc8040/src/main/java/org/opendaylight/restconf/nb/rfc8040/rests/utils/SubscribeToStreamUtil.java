@@ -95,7 +95,6 @@ public final class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Stream location for listening.
      */
-    @SuppressWarnings("rawtypes")
     public static URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
@@ -127,11 +126,11 @@ public final class SubscribeToStreamUtil {
                 false);
         notificationListenerAdapter.get().setCloseVars(
                 handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
-        final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                notificationListenerAdapter.get().getSchemaPath().getLastComponent(),
-                schemaContext.getNotifications(), notificationQueryParams.getStart(),
-                notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext),
-                exist);
+        final NormalizedNode<?, ?> mapToStreams =
+                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+                    notificationListenerAdapter.get().getSchemaPath().getLastComponent(),
+                    schemaContext.getNotifications(), notificationQueryParams.getStart(),
+                    notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext), exist);
         writeDataToDS(schemaContext,
                 notificationListenerAdapter.get().getSchemaPath().getLastComponent().getLocalName(), writeTransaction,
                 exist, mapToStreams);
@@ -174,7 +173,6 @@ public final class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Location for listening.
      */
-    @SuppressWarnings("rawtypes")
     public static URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
@@ -214,7 +212,7 @@ public final class SubscribeToStreamUtil {
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
 
-        final NormalizedNode mapToStreams = RestconfMappingNodeUtil
+        final NormalizedNode<?, ?> mapToStreams = RestconfMappingNodeUtil
                 .mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
                         notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
                         getMonitoringModule(schemaContext), exist, schemaContext);
@@ -248,10 +246,9 @@ public final class SubscribeToStreamUtil {
         return Instant.from(accessor);
     }
 
-    @SuppressWarnings("rawtypes")
     static void writeDataToDS(final SchemaContext schemaContext, final String name,
             final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
-            final NormalizedNode mapToStreams) {
+            final NormalizedNode<?, ?> mapToStreams) {
         String pathId;
         if (exist) {
             pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;

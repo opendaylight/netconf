@@ -146,7 +146,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     /**
      * Adds values to data changed notification event element.
      */
-    @SuppressWarnings("checkstyle:hiddenField")
     private void addValuesToDataChangedNotificationEventElement(final Document doc,
             final Element dataChangedNotificationEventElement, final Collection<DataTreeCandidate> dataTreeCandidates,
             final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
@@ -232,7 +231,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @param schemaContext Schema context.
      * @return {@link Node} represented by changed event element.
      */
-    private Node createDataChangeEventElement(final Document doc, final YangInstanceIdentifier eventPath,
+    private static Node createDataChangeEventElement(final Document doc, final YangInstanceIdentifier eventPath,
             final SchemaContext schemaContext) {
         final Element dataChangeEventElement = doc.createElement("data-change-event");
         final Element pathElement = doc.createElement("path");
@@ -288,8 +287,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @param element       {@link Element}
      * @param schemaContext Schema context.
      */
-    @SuppressWarnings("rawtypes")
-    private void addPathAsValueToElement(final YangInstanceIdentifier eventPath, final Element element,
+    private static void addPathAsValueToElement(final YangInstanceIdentifier eventPath, final Element element,
             final SchemaContext schemaContext) {
         final StringBuilder textContent = new StringBuilder();
 
@@ -305,16 +303,10 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                     final String predicateValue = String.valueOf(entry.getValue());
                     textContent.append("[");
                     writeIdentifierWithNamespacePrefix(textContent, keyValue, schemaContext);
-                    textContent.append("='");
-                    textContent.append(predicateValue);
-                    textContent.append("'");
-                    textContent.append("]");
+                    textContent.append("='").append(predicateValue).append("']");
                 }
             } else if (pathArgument instanceof NodeWithValue) {
-                textContent.append("[.='");
-                textContent.append(((NodeWithValue) pathArgument).getValue());
-                textContent.append("'");
-                textContent.append("]");
+                textContent.append("[.='").append(((NodeWithValue<?>) pathArgument).getValue()).append("']");
             }
         }
         element.setTextContent(textContent.toString());

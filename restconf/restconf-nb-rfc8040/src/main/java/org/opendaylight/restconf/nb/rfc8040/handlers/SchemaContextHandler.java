@@ -80,7 +80,6 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
     }
 
     @Override
-    @SuppressWarnings("checkstyle:hiddenField")
     public void onModelContextUpdated(final EffectiveModelContext context) {
         schemaContext = requireNonNull(context);
 

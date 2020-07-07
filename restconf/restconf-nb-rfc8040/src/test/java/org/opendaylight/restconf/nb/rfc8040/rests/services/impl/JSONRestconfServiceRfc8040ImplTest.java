@@ -209,7 +209,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 StandardCharsets.UTF_8).read();
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPut() throws Exception {
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
@@ -219,7 +218,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<NormalizedNode<?, ?>> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
 
         verify(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), capturedPath.capture(),
                 capturedNode.capture());
@@ -237,7 +236,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
         verifyLeafNode(actualNode, DESC_QNAME, "some interface");
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPutBehindMountPoint() throws Exception {
         setupTestMountPoint();
@@ -249,7 +247,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<NormalizedNode<?, ?>> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
 
         verify(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), capturedPath.capture(),
                 capturedNode.capture());
@@ -273,7 +271,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
         assertThrows(OperationFailedException.class, () -> this.service.put(uriPath, payload));
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPost() throws Exception {
         final String uriPath = null;
@@ -283,7 +280,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<NormalizedNode<?, ?>> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
 
         verify(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), capturedPath.capture(),
                 capturedNode.capture());
@@ -310,7 +307,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
         verifyLeafNode(entryNode, DESC_QNAME, "some interface");
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPostBehindMountPoint() throws Exception {
         setupTestMountPoint();
@@ -322,7 +318,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<NormalizedNode<?, ?>> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
 
         verify(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), capturedPath.capture(),
                 capturedNode.capture());
@@ -352,7 +348,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
         }
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPatch() throws Exception {
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
@@ -362,7 +357,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<NormalizedNode<?, ?>> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
 
         verify(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), capturedPath.capture(),
                 capturedNode.capture());
@@ -381,7 +376,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
         assertTrue(patchResult.get().contains("\"ok\":[null]"));
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPatchBehindMountPoint() throws Exception {
         setupTestMountPoint();
@@ -393,7 +387,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<NormalizedNode<?, ?>> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
 
         verify(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), capturedPath.capture(),
                 capturedNode.capture());
@@ -466,7 +460,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
             () -> this.service.get("/ietf-interfaces:interfaces/invalid", LogicalDatastoreType.CONFIGURATION));
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testInvokeRpcWithInput() throws IOException, OperationFailedException {
         final SchemaPath path = SchemaPath.create(true, MAKE_TOAST_QNAME);
@@ -481,7 +474,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         assertEquals("Output present", false, output.isPresent());
 
-        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<NormalizedNode<?, ?>> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(mockRpcService).invokeRpc(eq(path), capturedNode.capture());
 
         assertTrue("Expected ContainerNode. Actual " + capturedNode.getValue().getClass(),

@@ -388,8 +388,8 @@ public final class RestconfMappingNodeUtil {
      * @param leafListSchema
      *             leaf list schema
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static void fillLeafListCapa(final ListNodeBuilder builder, final LeafListSchemaNode leafListSchema) {
+    private static void fillLeafListCapa(final ListNodeBuilder<Object, LeafSetEntryNode<Object>> builder,
+            final LeafListSchemaNode leafListSchema) {
         builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.DEPTH));
         builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.FIELDS));
         builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.FILTER));
@@ -406,8 +406,8 @@ public final class RestconfMappingNodeUtil {
      *             value of leaf entry
      * @return entry node
      */
-    @SuppressWarnings("rawtypes")
-    private static LeafSetEntryNode leafListEntryBuild(final LeafListSchemaNode leafListSchema, final String value) {
+    private static LeafSetEntryNode<Object> leafListEntryBuild(final LeafListSchemaNode leafListSchema,
+            final String value) {
         return Builders.leafSetEntryBuilder(leafListSchema).withValue(value).build();
     }
 
@@ -454,8 +454,7 @@ public final class RestconfMappingNodeUtil {
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    @SuppressWarnings("rawtypes")
-    public static NormalizedNode mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
+    public static NormalizedNode<?, ?> mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
             final Collection<? extends NotificationDefinition> notifications, final Instant start,
             final String outputType, final URI uri, final Module monitoringModule, final boolean existParent) {
         for (final NotificationDefinition notificationDefinition : notifications) {
@@ -555,8 +554,7 @@ public final class RestconfMappingNodeUtil {
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    @SuppressWarnings("rawtypes")
-    public static NormalizedNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
+    public static NormalizedNode<?, ?> mapDataChangeNotificationStreamByIetfRestconfMonitoring(
             final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
             final Module monitoringModule, final boolean existParent, final EffectiveModelContext schemaContext) {
         final SchemaNode schemaNode = ParserIdentifier
