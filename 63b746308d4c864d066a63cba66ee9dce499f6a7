@@ -69,6 +69,30 @@
       "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4cff4efe_b9001711",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2020-07-07T16:04:27Z",
+      "side": 1,
+      "message": "He means to do not use String.format() here. You can use it this way directly:\ncheckArgument(file.getName().endsWith(YANG), \"Invalid file extension: %s\", file.getName());",
+      "parentUuid": "17a1e6bd_87880b6d",
+      "range": {
+        "startLine": 312,
+        "startChar": 61,
+        "endLine": 312,
+        "endChar": 75
+      },
+      "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
