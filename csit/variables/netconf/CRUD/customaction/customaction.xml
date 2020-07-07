@@ -19,5 +19,24 @@
          </rpc-reply>
       </output>
    </rpc>
+   <!-- Augmentation case example -->
+   <rpc>
+     <input>
+        <action xmlns="urn:ietf:params:xml:ns:yang:1">
+            <cont xmlns="ns:main">
+                <cont1 xmlns="ns:augment:main:a">
+                    <reset>
+                        <delay>600</delay>
+                    </reset>
+                </cont1>
+            </cont>
+        </action>
+    </input>
+    <output>
+        <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" xmlns:sys="ns:augment:main:a">
+            <ok />
+        </rpc-reply>
+    </output>
+   </rpc>
 </rpcs>
 
