@@ -45,6 +45,30 @@
       "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17a1e6bd_87880b6d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-07T15:48:22Z",
+      "side": 1,
+      "message": "Can you please explain more what is wrong here ? Do I need to use if condition and throw exception instead of checkArgument ?",
+      "parentUuid": "463bcc17_b4b45530",
+      "range": {
+        "startLine": 312,
+        "startChar": 61,
+        "endLine": 312,
+        "endChar": 75
+      },
+      "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
