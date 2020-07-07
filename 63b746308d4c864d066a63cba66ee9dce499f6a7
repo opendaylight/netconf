@@ -93,6 +93,30 @@
       "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c29ffc9_919aef24",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-07T17:08:39Z",
+      "side": 1,
+      "message": "Great! I will correct it thanks.",
+      "parentUuid": "4cff4efe_b9001711",
+      "range": {
+        "startLine": 312,
+        "startChar": 61,
+        "endLine": 312,
+        "endChar": 75
+      },
+      "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
