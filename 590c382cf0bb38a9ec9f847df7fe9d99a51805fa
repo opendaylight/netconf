@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e71407fa_a0c809ad",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/context/WriterParameters.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-07T16:12:32Z",
+      "side": 1,
+      "message": "this needs documentation, what exactly is this?",
+      "range": {
+        "startLine": 57,
+        "startChar": 4,
+        "endLine": 57,
+        "endChar": 50
+      },
+      "revId": "590c382cf0bb38a9ec9f847df7fe9d99a51805fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb259333_9ebcd5d8",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-07T16:12:32Z",
+      "side": 1,
+      "message": "Please do not use String as a universal datatype",
+      "range": {
+        "startLine": 238,
+        "startChar": 78,
+        "endLine": 238,
+        "endChar": 98
+      },
+      "revId": "590c382cf0bb38a9ec9f847df7fe9d99a51805fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3eaa05b_dbe50299",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-07T16:12:32Z",
+      "side": 1,
+      "message": "This is wrong...",
+      "range": {
+        "startLine": 260,
+        "startChar": 20,
+        "endLine": 260,
+        "endChar": 46
+      },
+      "revId": "590c382cf0bb38a9ec9f847df7fe9d99a51805fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
