@@ -39,6 +39,29 @@
       "revId": "5fc2c41d7b193c9fab5d2f105a529e826fcdfe9e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d9dbc723_23139930",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-07T17:27:20Z",
+      "side": 1,
+      "message": "} else {\n\nhere and elsewhere, please fix your IDE setup",
+      "range": {
+        "startLine": 199,
+        "startChar": 12,
+        "endLine": 200,
+        "endChar": 18
+      },
+      "revId": "5fc2c41d7b193c9fab5d2f105a529e826fcdfe9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
