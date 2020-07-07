@@ -42,7 +42,6 @@ public final class Rfc8040 {
         public static final String DATA = "application/yang-data";
         public static final String YANG_PATCH = "application/yang.patch";
         public static final String YANG_PATCH_STATUS = "application/yang.patch-status";
-        public static final String YIN = "application/yin";
     }
 
     /**
