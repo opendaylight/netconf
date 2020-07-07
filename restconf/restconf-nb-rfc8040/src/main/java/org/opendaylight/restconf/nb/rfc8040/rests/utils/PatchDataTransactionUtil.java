@@ -27,7 +27,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PatchData;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -35,7 +34,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,11 +50,11 @@ public final class PatchDataTransactionUtil {
      * {@link TransactionVarsWrapper} provided as a parameter.
      * @param context Patch context to be processed
      * @param transactionNode Wrapper for transaction
-     * @param schemaContextRef Soft reference for global schema context
+     * @param schemaContext Global schema context
      * @return {@link PatchStatusContext}
      */
     public static PatchStatusContext patchData(final PatchContext context, final TransactionVarsWrapper transactionNode,
-                                               final SchemaContextRef schemaContextRef) {
+                                               final EffectiveModelContext schemaContext) {
         final List<PatchStatusEntity> editCollection = new ArrayList<>();
         boolean noError = true;
         final DOMTransactionChain transactionChain = transactionNode.getTransactionChain();
@@ -67,7 +66,7 @@ public final class PatchDataTransactionUtil {
                     case CREATE:
                         try {
                             createDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(), tx, schemaContextRef);
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), tx, schemaContext);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -89,7 +88,7 @@ public final class PatchDataTransactionUtil {
                     case MERGE:
                         try {
                             mergeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(), tx, schemaContextRef);
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), tx, schemaContext);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -100,7 +99,7 @@ public final class PatchDataTransactionUtil {
                     case REPLACE:
                         try {
                             replaceDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(), schemaContextRef, tx);
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), schemaContext, tx);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -160,15 +159,15 @@ public final class PatchDataTransactionUtil {
      * @param path Path for data to be created
      * @param payload Data to be created
      * @param rwTransaction Transaction
-     * @param schemaContextRef Soft reference for global schema context
+     * @param schemaContext Global schema context
      */
     private static void createDataWithinTransaction(final LogicalDatastoreType dataStore,
                                                     final YangInstanceIdentifier path,
                                                     final NormalizedNode<?, ?> payload,
                                                     final DOMDataTreeReadWriteTransaction rwTransaction,
-                                                    final SchemaContextRef schemaContextRef) {
+                                                    final EffectiveModelContext schemaContext) {
         LOG.trace("POST {} within Restconf Patch: {} with payload {}", dataStore.name(), path, payload);
-        createData(payload, schemaContextRef.get(), path, rwTransaction, dataStore, true);
+        createData(payload, schemaContext, path, rwTransaction, dataStore, true);
     }
 
     /**
@@ -191,15 +190,15 @@ public final class PatchDataTransactionUtil {
      * @param path Path for data to be merged
      * @param payload Data to be merged
      * @param writeTransaction Transaction
-     * @param schemaContextRef Soft reference for global schema context
+     * @param schemaContext Global schema context
      */
     private static void mergeDataWithinTransaction(final LogicalDatastoreType dataStore,
                                                    final YangInstanceIdentifier path,
                                                    final NormalizedNode<?, ?> payload,
                                                    final DOMDataTreeWriteTransaction writeTransaction,
-                                                   final SchemaContextRef schemaContextRef) {
+                                                   final EffectiveModelContext schemaContext) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", dataStore.name(), path, payload);
-        TransactionUtil.ensureParentsByMerge(path, schemaContextRef.get(), writeTransaction);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
         writeTransaction.merge(dataStore, path, payload);
     }
 
@@ -221,16 +220,16 @@ public final class PatchDataTransactionUtil {
      * @param dataStore Datastore to write data to
      * @param path Path for data to be created
      * @param payload Data to be created
-     * @param schemaContextRef Soft reference for global schema context
+     * @param path Path for data to be created
      * @param rwTransaction Transaction
      */
     private static void replaceDataWithinTransaction(final LogicalDatastoreType dataStore,
                                                      final YangInstanceIdentifier path,
                                                      final NormalizedNode<?, ?> payload,
-                                                     final SchemaContextRef schemaContextRef,
+                                                     final EffectiveModelContext schemaContext,
                                                      final DOMDataTreeReadWriteTransaction rwTransaction) {
         LOG.trace("PUT {} within Restconf Patch: {} with payload {}", dataStore.name(), path, payload);
-        createData(payload, schemaContextRef.get(), path, rwTransaction, dataStore, false);
+        createData(payload, schemaContext, path, rwTransaction, dataStore, false);
     }
 
     /**
@@ -243,7 +242,7 @@ public final class PatchDataTransactionUtil {
      * @param dataStore Datastore to write data to
      * @param errorIfExists Enable checking for existence of data (throws error if already exists)
      */
-    private static void createData(final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
+    private static void createData(final NormalizedNode<?, ?> payload, final EffectiveModelContext schemaContext,
                                    final YangInstanceIdentifier path,
                                    final DOMDataTreeReadWriteTransaction rwTransaction,
                                    final LogicalDatastoreType dataStore, final boolean errorIfExists) {

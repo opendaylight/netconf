@@ -34,11 +34,11 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -58,8 +58,8 @@ public class RestconfInvokeOperationsServiceImplTest {
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        final SchemaContextRef contextRef = new SchemaContextRef(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+        final EffectiveModelContext contextRef =
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
         final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
         when(txHandler.get()).thenReturn(domTx);
@@ -68,7 +68,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler,
             mock(DOMSchemaService.class));
-        schemaContextHandler.onModelContextUpdated(contextRef.get());
+        schemaContextHandler.onModelContextUpdated(contextRef);
         this.invokeOperationsService =
                 new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
         when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);

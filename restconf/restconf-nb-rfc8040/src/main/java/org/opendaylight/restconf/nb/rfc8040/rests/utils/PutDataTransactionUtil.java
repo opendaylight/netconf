@@ -26,7 +26,6 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -147,8 +146,8 @@ public final class PutDataTransactionUtil {
      *
      * @param payload
      *             data to put
-     * @param schemaCtxRef
-     *             reference to {@link SchemaContext}
+     * @param schemaContext
+     *             reference to {@link EffectiveModelContext}
      * @param transactionNode
      *             wrapper of variables for transaction
      * @param point
@@ -157,10 +156,9 @@ public final class PutDataTransactionUtil {
      *             query parameter
      * @return {@link Response}
      */
-    public static Response putData(final NormalizedNodeContext payload, final SchemaContextRef schemaCtxRef,
+    public static Response putData(final NormalizedNodeContext payload, final EffectiveModelContext schemaContext,
                                final TransactionVarsWrapper transactionNode, final String insert, final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-        final EffectiveModelContext schemaContext = schemaCtxRef.get();
 
         final DOMDataTreeReadWriteTransaction readWriteTransaction =
                 transactionNode.getTransactionChain().newReadWriteTransaction();

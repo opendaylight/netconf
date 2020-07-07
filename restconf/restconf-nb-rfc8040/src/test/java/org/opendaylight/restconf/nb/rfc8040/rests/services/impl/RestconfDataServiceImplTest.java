@@ -62,7 +62,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -79,6 +78,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -90,7 +90,7 @@ public class RestconfDataServiceImplTest {
     private ContainerNode buildBaseCont;
     private ContainerNode buildBaseContConfig;
     private ContainerNode buildBaseContOperational;
-    private SchemaContextRef contextRef;
+    private EffectiveModelContext contextRef;
     private YangInstanceIdentifier iidBase;
     private DataSchemaNode schemaNode;
     private RestconfDataServiceImpl dataService;
@@ -181,9 +181,9 @@ public class RestconfDataServiceImplTest {
                 .node(this.baseQName)
                 .build();
 
-        this.contextRef = new SchemaContextRef(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
-        this.schemaNode = DataSchemaContextTree.from(this.contextRef.get()).getChild(this.iidBase).getDataSchemaNode();
+        this.contextRef =
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+        this.schemaNode = DataSchemaContextTree.from(this.contextRef).getChild(this.iidBase).getDataSchemaNode();
 
         doReturn(CommitInfo.emptyFluentFuture()).when(this.write).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
@@ -200,14 +200,14 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(transactionChainHandler,
                 Mockito.mock(DOMSchemaService.class));
 
-        schemaContextHandler.onModelContextUpdated(this.contextRef.get());
+        schemaContextHandler.onModelContextUpdated(this.contextRef);
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
                 new DOMMountPointServiceHandler(mountPointService), this.delegRestconfSubscrService,
                 this.actionServiceHandler);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doCallRealMethod().when(this.mountPoint).getSchemaContext();
-        doReturn(this.contextRef.get()).when(this.mountPoint).getEffectiveModelContext();
+        doReturn(this.contextRef).when(this.mountPoint).getEffectiveModelContext();
         doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint).getService(DOMDataBroker.class);
         doReturn(this.mountTransactionChain).when(this.mountDataBroker)
                 .createTransactionChain(any(DOMTransactionChainListener.class));
@@ -357,7 +357,7 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testPutData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef.get());
+                new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
         doReturn(immediateTrueFluentFuture()).when(this.readWrite)
@@ -375,7 +375,7 @@ public class RestconfDataServiceImplTest {
 //        doReturn(this.transactionChainHandler.get()).when(dataBroker)
 //                .createTransactionChain(RestConnectorProvider.TRANSACTION_CHAIN_LISTENER);
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, mountPoint, this.contextRef.get());
+                new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, mountPoint, this.contextRef);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
         doReturn(immediateTrueFluentFuture()).when(this.readWrite)
@@ -412,7 +412,7 @@ public class RestconfDataServiceImplTest {
 
         doReturn(new MultivaluedHashMap<String, String>()).when(this.uriInfo).getQueryParameters();
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iidBase, null, null, this.contextRef.get());
+                new InstanceIdentifierContext<>(this.iidBase, null, null, this.contextRef);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildList);
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
@@ -457,7 +457,7 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testPatchData() throws Exception {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef.get());
+                new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(this.iidBase)
                 .node(this.containerPlayerQname)
@@ -485,7 +485,7 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testPatchDataMountPoint() throws Exception {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(
-                this.iidBase, this.schemaNode, this.mountPoint, this.contextRef.get());
+                this.iidBase, this.schemaNode, this.mountPoint, this.contextRef);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(this.iidBase)
                 .node(this.containerPlayerQname)
@@ -513,7 +513,7 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testPatchDataDeleteNotExist() throws Exception {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef.get());
+                new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(this.iidBase)
                 .node(this.containerPlayerQname)

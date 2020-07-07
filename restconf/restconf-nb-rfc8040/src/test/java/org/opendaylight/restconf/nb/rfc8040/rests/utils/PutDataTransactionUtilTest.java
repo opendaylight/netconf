@@ -29,7 +29,6 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -61,7 +60,6 @@ public class PutDataTransactionUtilTest {
     private DOMDataBroker mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
-    private SchemaContextRef refSchemaCtx;
     private LeafNode buildLeaf;
     private ContainerNode buildBaseCont;
     private ContainerNode buildBaseContWithList;
@@ -77,9 +75,8 @@ public class PutDataTransactionUtilTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
-        this.schema = this.refSchemaCtx.get();
+        this.schema =
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerQname = QName.create(baseQName, "player");
@@ -222,7 +219,7 @@ public class PutDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
-        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+        PutDataTransactionUtil.putData(payload, this.schema,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
@@ -246,7 +243,7 @@ public class PutDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
-        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+        PutDataTransactionUtil.putData(payload, this.schema,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
@@ -269,7 +266,7 @@ public class PutDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
+        PutDataTransactionUtil.putData(payload, this.schema,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);

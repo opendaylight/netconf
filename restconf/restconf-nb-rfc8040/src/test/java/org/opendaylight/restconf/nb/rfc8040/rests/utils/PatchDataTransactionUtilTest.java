@@ -39,7 +39,6 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -50,6 +49,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -67,7 +67,7 @@ public class PatchDataTransactionUtilTest {
     private DOMDataBroker mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
-    private SchemaContextRef refSchemaCtx;
+    private EffectiveModelContext refSchemaCtx;
     private YangInstanceIdentifier instanceIdContainer;
     private YangInstanceIdentifier instanceIdCreateAndDelete;
     private YangInstanceIdentifier instanceIdMerge;
@@ -83,8 +83,8 @@ public class PatchDataTransactionUtilTest {
         doReturn(transactionChain).when(mockDataBroker).createTransactionChain(any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
-        this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+        this.refSchemaCtx = YangParserTestUtils.parseYangFiles(
+            TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerPlayerQName = QName.create(baseQName, "player");
         final QName leafGapQName = QName.create(baseQName, "gap");
@@ -183,7 +183,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityRemove);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.instanceIdMerge, null, null, this.refSchemaCtx.get());
+                new InstanceIdentifierContext<>(this.instanceIdMerge, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
@@ -212,7 +212,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityDelete);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
+                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
@@ -235,7 +235,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityDelete);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
+                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
@@ -260,7 +260,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityMerge);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
+                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
         final PatchStatusContext patchStatusContext =

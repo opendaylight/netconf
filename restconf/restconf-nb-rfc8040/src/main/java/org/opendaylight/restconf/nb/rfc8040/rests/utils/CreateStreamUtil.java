@@ -18,7 +18,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.DataChangeScope;
-import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -32,6 +31,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -64,7 +64,7 @@ public final class CreateStreamUtil {
      *                         }
      *                     }
      *                     </pre>
-     * @param refSchemaCtx Reference to {@link SchemaContext} - {@link SchemaContextRef}.
+     * @param refSchemaCtx Reference to {@link EffectiveModelContext}.
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON:
      *     <pre>
      *     {@code
@@ -77,7 +77,7 @@ public final class CreateStreamUtil {
      *     </pre>
      */
     public static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodeContext payload,
-            final SchemaContextRef refSchemaCtx) {
+            final EffectiveModelContext refSchemaCtx) {
         // parsing out of container with settings and path
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
         final QName qname = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
@@ -85,7 +85,7 @@ public final class CreateStreamUtil {
 
         // building of stream name
         final StringBuilder streamNameBuilder = new StringBuilder(
-                prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx).get(), data));
+                prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx), data));
         final NotificationOutputType outputType = prepareOutputType(data);
         if (outputType.equals(NotificationOutputType.JSON)) {
             streamNameBuilder.append('/').append(outputType.getName());
@@ -206,12 +206,12 @@ public final class CreateStreamUtil {
      * Create YANG notification stream using notification definition in YANG schema.
      *
      * @param notificationDefinition YANG notification definition.
-     * @param refSchemaCtx           Reference to {@link SchemaContext} - {@link SchemaContextRef}.
+     * @param refSchemaCtx           Reference to {@link EffectiveModelContext}
      * @param outputType             Output type (XML or JSON).
      * @return {@link NotificationListenerAdapter}
      */
     public static NotificationListenerAdapter createYangNotifiStream(
-            final NotificationDefinition notificationDefinition, final SchemaContextRef refSchemaCtx,
+            final NotificationDefinition notificationDefinition, final EffectiveModelContext refSchemaCtx,
             final NotificationOutputType outputType) {
         final String streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
                 requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()));
@@ -222,11 +222,11 @@ public final class CreateStreamUtil {
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,
-            final SchemaContextRef refSchemaCtx, final String outputType) {
+            final EffectiveModelContext refSchemaCtx, final String outputType) {
         final QName notificationDefinitionQName = notificationDefinition.getQName();
-        final Module module = refSchemaCtx.findModuleByNamespaceAndRevision(
+        final Module module = refSchemaCtx.findModule(
                 notificationDefinitionQName.getModule().getNamespace(),
-                notificationDefinitionQName.getModule().getRevision());
+                notificationDefinitionQName.getModule().getRevision()).orElse(null);
         requireNonNull(module, String.format("Module for namespace %s does not exist.",
                 notificationDefinitionQName.getModule().getNamespace()));
 
