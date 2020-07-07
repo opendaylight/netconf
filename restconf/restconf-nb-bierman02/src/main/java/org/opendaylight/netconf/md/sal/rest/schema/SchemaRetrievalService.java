@@ -23,11 +23,8 @@ import org.opendaylight.yangtools.yang.common.YangConstants;
 @Deprecated
 @Beta
 public interface SchemaRetrievalService {
-
-    String YIN_MEDIA_TYPE = "application/yin+xml";
-
     @GET
-    @Produces({YIN_MEDIA_TYPE, YangConstants.RFC6020_YANG_MEDIA_TYPE})
+    @Produces({YangConstants.RFC6020_YIN_MEDIA_TYPE, YangConstants.RFC6020_YANG_MEDIA_TYPE})
     @Path("/modules/module/{identifier:.+}/schema")
     SchemaExportContext getSchema(@PathParam("identifier") String mountAndModuleId);
 }
