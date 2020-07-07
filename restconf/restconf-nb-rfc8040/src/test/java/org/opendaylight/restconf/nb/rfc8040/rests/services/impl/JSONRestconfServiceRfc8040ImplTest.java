@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -262,16 +263,14 @@ public class JSONRestconfServiceRfc8040ImplTest {
         verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
     }
 
-    @Test(expected = OperationFailedException.class)
-    @SuppressWarnings("checkstyle:IllegalThrows")
-    public void testPutFailure() throws Throwable {
+    public void testPutFailure() throws IOException {
         doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock")))
                 .when(mockReadWriteTx).commit();
 
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
 
-        this.service.put(uriPath, payload);
+        assertThrows(OperationFailedException.class, () -> this.service.put(uriPath, payload));
     }
 
     @SuppressWarnings("rawtypes")
@@ -410,8 +409,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     }
 
     @Test
-    @SuppressWarnings("checkstyle:IllegalThrows")
-    public void testPatchFailure() throws Throwable {
+    public void testPatchFailure() throws IOException, OperationFailedException {
         doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock")))
                 .when(mockReadWriteTx).commit();
 
@@ -426,7 +424,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     }
 
     @Test
-    public void testDelete() throws Exception {
+    public void testDelete() throws OperationFailedException {
         doReturn(immediateTrueFluentFuture()).when(mockReadWriteTx).exists(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
@@ -443,20 +441,17 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 new Object[]{INTERFACE_QNAME, NAME_QNAME, "eth0"});
     }
 
-    @Test(expected = OperationFailedException.class)
-    public void testDeleteFailure() throws Exception {
-        final String invalidUriPath = "ietf-interfaces:interfaces/invalid";
-
-        this.service.delete(invalidUriPath);
+    public void testDeleteFailure() {
+        assertThrows(OperationFailedException.class, () -> this.service.delete("ietf-interfaces:interfaces/invalid"));
     }
 
     @Test
-    public void testGetConfig() throws Exception {
+    public void testGetConfig() throws OperationFailedException {
         testGet(LogicalDatastoreType.CONFIGURATION);
     }
 
     @Test
-    public void testGetOperational() throws Exception {
+    public void testGetOperational() throws OperationFailedException {
         testGet(LogicalDatastoreType.OPERATIONAL);
     }
 
@@ -466,15 +461,14 @@ public class JSONRestconfServiceRfc8040ImplTest {
         this.service.get(uriPath, LogicalDatastoreType.CONFIGURATION);
     }
 
-    @Test(expected = OperationFailedException.class)
-    public void testGetFailure() throws Exception {
-        final String invalidUriPath = "/ietf-interfaces:interfaces/invalid";
-        this.service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION);
+    public void testGetFailure() {
+        assertThrows(OperationFailedException.class,
+            () -> this.service.get("/ietf-interfaces:interfaces/invalid", LogicalDatastoreType.CONFIGURATION));
     }
 
     @SuppressWarnings("rawtypes")
     @Test
-    public void testInvokeRpcWithInput() throws Exception {
+    public void testInvokeRpcWithInput() throws IOException, OperationFailedException {
         final SchemaPath path = SchemaPath.create(true, MAKE_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
@@ -498,7 +492,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     }
 
     @Test
-    public void testInvokeRpcWithNoInput() throws Exception {
+    public void testInvokeRpcWithNoInput() throws OperationFailedException {
         final SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
@@ -514,7 +508,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     }
 
     @Test
-    public void testInvokeRpcWithOutput() throws Exception {
+    public void testInvokeRpcWithOutput() throws OperationFailedException {
         final SchemaPath path = SchemaPath.create(true, TEST_OUTPUT_QNAME);
 
         final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
@@ -535,15 +529,13 @@ public class JSONRestconfServiceRfc8040ImplTest {
         verify(mockRpcService).invokeRpc(eq(path), any());
     }
 
-    @Test(expected = OperationFailedException.class)
-    public void testInvokeRpcFailure() throws Exception {
+    public void testInvokeRpcFailure() {
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException("testExeption");
         doReturn(immediateFailedFluentFuture(exception)).when(mockRpcService).invokeRpc(any(SchemaPath.class),
                 any(NormalizedNode.class));
 
-        final String uriPath = "toaster:cancel-toast";
-
-        this.service.invokeRpc(uriPath, Optional.empty());
+        assertThrows(OperationFailedException.class,
+            () -> this.service.invokeRpc("toaster:cancel-toast", Optional.empty()));
     }
 
     void testGet(final LogicalDatastoreType datastoreType) throws OperationFailedException {
