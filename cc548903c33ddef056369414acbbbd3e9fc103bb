@@ -22,6 +22,30 @@
       "revId": "cc548903c33ddef056369414acbbbd3e9fc103bb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "128cf7e8_3f2515c4",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-07T18:56:47Z",
+      "side": 1,
+      "message": "Not required to check null or empty because map.keyset() return empty set if no value is there.\nSo reverted this change",
+      "parentUuid": "fcf82812_98999213",
+      "range": {
+        "startLine": 303,
+        "startChar": 12,
+        "endLine": 303,
+        "endChar": 67
+      },
+      "revId": "cc548903c33ddef056369414acbbbd3e9fc103bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
