@@ -18,10 +18,11 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.model.export.YinExportUtils;
 
 @Provider
-@Produces({ SchemaRetrievalService.YIN_MEDIA_TYPE })
+@Produces({ YangConstants.RFC6020_YIN_MEDIA_TYPE })
 public class SchemaExportContentYinBodyWriter implements MessageBodyWriter<SchemaExportContext> {
 
     @Override
@@ -46,6 +47,5 @@ public class SchemaExportContentYinBodyWriter implements MessageBodyWriter<Schem
         } catch (final XMLStreamException e) {
             throw new IllegalStateException(e);
         }
-
     }
 }
