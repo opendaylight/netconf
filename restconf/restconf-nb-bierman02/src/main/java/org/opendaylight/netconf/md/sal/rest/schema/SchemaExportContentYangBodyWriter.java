@@ -19,11 +19,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 
 @Provider
-@Produces({ SchemaRetrievalService.YANG_MEDIA_TYPE })
+@Produces({ YangConstants.RFC6020_YANG_MEDIA_TYPE })
 public class SchemaExportContentYangBodyWriter implements MessageBodyWriter<SchemaExportContext> {
 
     @Override
