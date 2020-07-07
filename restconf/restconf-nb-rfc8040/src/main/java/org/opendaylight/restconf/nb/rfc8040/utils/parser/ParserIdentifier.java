@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static com.google.common.base.Verify.verifyNotNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import java.time.format.DateTimeParseException;
@@ -16,6 +17,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
@@ -28,7 +30,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
-import org.opendaylight.restconf.nb.rfc8040.utils.validations.RestconfValidation;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -236,8 +238,8 @@ public final class ParserIdentifier {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
-            final String moduleName = RestconfValidation.validateAndGetModulName(componentIter);
-            final Revision revision = RestconfValidation.validateAndGetRevision(componentIter);
+            final String moduleName = validateAndGetModulName(componentIter);
+            final Revision revision = validateAndGetRevision(componentIter);
             final Module module = schemaContext.findModule(moduleName, revision).orElse(null);
             return new SchemaExportContext(schemaContext, module, sourceProvider);
         } else {
@@ -257,13 +259,54 @@ public final class ParserIdentifier {
 
                 pathBuilder.append(current);
             }
-            final InstanceIdentifierContext<?> point = ParserIdentifier
-                    .toInstanceIdentifier(pathBuilder.toString(), schemaContext, Optional.of(domMountPointService));
-            final String moduleName = RestconfValidation.validateAndGetModulName(componentIter);
-            final Revision revision = RestconfValidation.validateAndGetRevision(componentIter);
+            final InstanceIdentifierContext<?> point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
+                Optional.of(domMountPointService));
+            final String moduleName = validateAndGetModulName(componentIter);
+            final Revision revision = validateAndGetRevision(componentIter);
             final Module module = point.getMountPoint().getSchemaContext().findModule(moduleName, revision)
                     .orElse(null);
             return new SchemaExportContext(point.getMountPoint().getSchemaContext(), module, sourceProvider);
         }
+    }
+
+    /**
+     * Validation and parsing of revision.
+     *
+     * @param revisionDate iterator
+     * @return A Revision
+     */
+    @VisibleForTesting
+    static Revision validateAndGetRevision(final Iterator<String> revisionDate) {
+        RestconfDocumentedException.throwIf(!revisionDate.hasNext(), "Revision date must be supplied.",
+            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        try {
+            return Revision.of(revisionDate.next());
+        } catch (final DateTimeParseException e) {
+            throw new RestconfDocumentedException("Supplied revision is not in expected date format YYYY-mm-dd", e);
+        }
+    }
+
+    /**
+     * Validation of name.
+     *
+     * @param moduleName iterator
+     * @return {@link String}
+     */
+    @VisibleForTesting
+    static String validateAndGetModulName(final Iterator<String> moduleName) {
+        RestconfDocumentedException.throwIf(!moduleName.hasNext(), "Module name must be supplied.", ErrorType.PROTOCOL,
+            ErrorTag.INVALID_VALUE);
+        final String name = moduleName.next();
+
+        RestconfDocumentedException.throwIf(
+            name.isEmpty() || !ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(name.charAt(0)),
+            "Identifier must start with character from set 'a-zA-Z_", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        RestconfDocumentedException.throwIf(name.toUpperCase(Locale.ROOT).startsWith("XML"),
+            "Identifier must NOT start with XML ignore case.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        RestconfDocumentedException.throwIf(
+            !ParserBuilderConstants.Deserializer.IDENTIFIER.matchesAllOf(name.substring(1)),
+            "Supplied name has not expected identifier format.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+
+        return name;
     }
 }

@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.restconf.nb.rfc8040.utils.validations;
+package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,7 +21,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 /**
- * Unit test for {@link RestconfValidation}.
+ * Unit test for {@link ParserIdentifier}'s validate methods.
  */
 public class RestconfValidationTest {
     private static final List<String> REVISIONS = Arrays.asList("2014-01-01", "2015-01-01", "2016-01-01");
@@ -33,7 +32,7 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetRevisionTest() {
-        final Revision revision = RestconfValidation.validateAndGetRevision(REVISIONS.iterator());
+        final Revision revision = ParserIdentifier.validateAndGetRevision(REVISIONS.iterator());
         assertNotNull("Correct module revision should be validated", revision);
         assertEquals(Revision.of("2014-01-01"), revision);
     }
@@ -45,7 +44,7 @@ public class RestconfValidationTest {
     @Test
     public void validateAndGetRevisionNotSuppliedTest() {
         try {
-            RestconfValidation.validateAndGetRevision(new ArrayList<String>().iterator());
+            ParserIdentifier.validateAndGetRevision(new ArrayList<String>().iterator());
             fail("Test should fail due to not supplied module revision");
         } catch (final RestconfDocumentedException e) {
             assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
@@ -61,7 +60,7 @@ public class RestconfValidationTest {
     @Test
     public void validateAndGetRevisionNotParsableTest() {
         try {
-            RestconfValidation.validateAndGetRevision(Arrays.asList("not-parsable-as-date").iterator());
+            ParserIdentifier.validateAndGetRevision(Arrays.asList("not-parsable-as-date").iterator());
             fail("Test should fail due to not parsable module revision");
         } catch (final RestconfDocumentedException e) {
             assertTrue(e.getMessage().contains("Supplied revision is not in expected date format YYYY-mm-dd"));
@@ -73,7 +72,7 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModulNameTest() {
-        final String moduleName = RestconfValidation.validateAndGetModulName(NAMES.iterator());
+        final String moduleName = ParserIdentifier.validateAndGetModulName(NAMES.iterator());
         assertNotNull("Correct module name should be validated", moduleName);
         assertEquals("_module-1", moduleName);
     }
@@ -85,7 +84,7 @@ public class RestconfValidationTest {
     @Test
     public void validateAndGetModulNameNotSuppliedTest() {
         try {
-            RestconfValidation.validateAndGetModulName(new ArrayList<String>().iterator());
+            ParserIdentifier.validateAndGetModulName(new ArrayList<String>().iterator());
             fail("Test should fail due to not supplied module name");
         } catch (final RestconfDocumentedException e) {
             assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
@@ -102,7 +101,7 @@ public class RestconfValidationTest {
     @Test
     public void validateAndGetModuleNameNotParsableFirstTest() {
         try {
-            RestconfValidation.validateAndGetModulName(
+            ParserIdentifier.validateAndGetModulName(
                     Arrays.asList("01-not-parsable-as-name-on-firts-char").iterator());
             fail("Test should fail due to not parsable module name on the first character");
         } catch (final RestconfDocumentedException e) {
@@ -120,7 +119,7 @@ public class RestconfValidationTest {
     @Test
     public void validateAndGetModuleNameNotParsableNextTest() {
         try {
-            RestconfValidation.validateAndGetModulName(
+            ParserIdentifier.validateAndGetModulName(
                     Arrays.asList("not-parsable-as-name-after-first-char*").iterator());
             fail("Test should fail due to not parsable module name on any character after the first character");
         } catch (final RestconfDocumentedException e) {
@@ -137,7 +136,7 @@ public class RestconfValidationTest {
     @Test
     public void validateAndGetModuleNameNotParsableXmlTest() {
         try {
-            RestconfValidation.validateAndGetModulName(Arrays.asList("xMl-module-name").iterator());
+            ParserIdentifier.validateAndGetModulName(Arrays.asList("xMl-module-name").iterator());
             fail("Test should fail due to module name beginning with 'xMl'");
         } catch (final RestconfDocumentedException e) {
             assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
@@ -153,7 +152,7 @@ public class RestconfValidationTest {
     @Test
     public void validateAndGetModuleNameEmptyTest() {
         try {
-            RestconfValidation.validateAndGetModulName(Arrays.asList("").iterator());
+            ParserIdentifier.validateAndGetModulName(Arrays.asList("").iterator());
             fail("Test should fail due to empty module name");
         } catch (final RestconfDocumentedException e) {
             assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
