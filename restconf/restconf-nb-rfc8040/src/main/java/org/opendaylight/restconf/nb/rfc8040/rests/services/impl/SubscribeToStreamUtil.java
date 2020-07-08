@@ -289,12 +289,14 @@ final class SubscribeToStreamUtil {
         final String scheme = uriInfo.getAbsolutePath().getScheme();
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
         switch (scheme) {
-            case RestconfStreamsConstants.SCHEMA_UPGRADE_SECURED_URI:
-                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_SECURED_URI);
+            case "https":
+                // Secured HTTP goes to Secured WebSockets
+                uriBuilder.scheme("wss");
                 break;
-            case RestconfStreamsConstants.SCHEMA_UPGRADE_URI:
+            case "http":
             default:
-                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI);
+                // Unsecured HTTP and others go to unsecured WebSockets
+                uriBuilder.scheme("ws");
         }
         return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + RestconfConstants.SLASH + streamName)
                 .build();
