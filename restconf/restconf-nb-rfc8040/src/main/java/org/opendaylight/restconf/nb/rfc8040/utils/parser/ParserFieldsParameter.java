@@ -25,12 +25,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public final class ParserFieldsParameter {
-    private static final char COLON = ':';
-    private static final char SEMICOLON = ';';
-    private static final char SLASH = '/';
-    private static final char STARTING_PARENTHESIS = '(';
-    private static final char CLOSING_PARENTHESIS = ')';
-
     private ParserFieldsParameter() {
 
     }
@@ -84,32 +78,28 @@ public final class ParserFieldsParameter {
         while (currentPosition < input.length()) {
             final char currentChar = input.charAt(currentPosition);
 
-            if (ParserConstants.YANG_IDENTIFIER_PART.matches(currentChar) || currentChar == '/') {
-                if (currentChar == SLASH) {
-                    // add parsed identifier to results for current level
-                    currentNode = addChildToResult(
-                            currentNode,
-                            input.substring(startPosition, currentPosition), currentQNameModule, currentLevel);
-                    // go one level down
-                    currentLevel = prepareQNameLevel(parsed, currentLevel);
-
-                    currentPosition++;
-                    startPosition = currentPosition;
-                } else {
-                    currentPosition++;
-                }
-
+            if (ParserConstants.YANG_IDENTIFIER_PART.matches(currentChar)) {
+                currentPosition++;
                 continue;
             }
 
             switch (currentChar) {
-                case COLON :
+                case '/':
+                    // add parsed identifier to results for current level
+                    currentNode = addChildToResult(currentNode, input.substring(startPosition, currentPosition),
+                        currentQNameModule, currentLevel);
+                    // go one level down
+                    currentLevel = prepareQNameLevel(parsed, currentLevel);
+
+                    currentPosition++;
+                    break;
+                case ':':
                     // new namespace and revision found
                     currentQNameModule = context.findModules(
                             input.substring(startPosition, currentPosition)).iterator().next().getQNameModule();
                     currentPosition++;
                     break;
-                case STARTING_PARENTHESIS:
+                case '(':
                     // add current child to parsed results for current level
                     final DataSchemaContextNode<?> child = addChildToResult(
                             currentNode,
@@ -128,7 +118,7 @@ public final class ParserFieldsParameter {
                     currentPosition = closingParenthesis + 1;
                     if (currentPosition != input.length()) {
                         if (currentPosition + 1 < input.length()) {
-                            if (input.charAt(currentPosition) == SEMICOLON) {
+                            if (input.charAt(currentPosition) == ';') {
                                 currentPosition++;
                             } else {
                                 throw new RestconfDocumentedException(
@@ -147,7 +137,7 @@ public final class ParserFieldsParameter {
                     }
 
                     break;
-                case SEMICOLON:
+                case ';':
                     // complete identifier found
                     addChildToResult(
                             currentNode,
@@ -193,14 +183,14 @@ public final class ParserFieldsParameter {
                 final Set<QName> nextLevel = new HashSet<>();
                 parsedQNames.add(nextLevel);
                 return nextLevel;
-            } else {
-                return parsedQNames.get(index + 1);
             }
-        } else {
-            final Set<QName> nextLevel = new HashSet<>();
-            parsedQNames.add(nextLevel);
-            return nextLevel;
+
+            return parsedQNames.get(index + 1);
         }
+
+        final Set<QName> nextLevel = new HashSet<>();
+        parsedQNames.add(nextLevel);
+        return nextLevel;
     }
 
     /**
@@ -271,11 +261,11 @@ public final class ParserFieldsParameter {
         while (position < input.length()) {
             final char currentChar = input.charAt(position);
 
-            if (currentChar == STARTING_PARENTHESIS) {
+            if (currentChar == '(') {
                 count++;
             }
 
-            if (currentChar == CLOSING_PARENTHESIS) {
+            if (currentChar == ')') {
                 count--;
             }
 
