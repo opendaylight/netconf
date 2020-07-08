@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.SLASH;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
@@ -95,7 +94,7 @@ public final class YangInstanceIdentifierDeserializer {
             final QName qname = prepareQName();
 
             // this is the last identifier (input is consumed) or end of identifier (slash)
-            if (allCharsConsumed() || currentChar() == SLASH) {
+            if (allCharsConsumed() || currentChar() == '/') {
                 prepareIdentifier(qname, path);
                 path.add(current == null ? NodeIdentifier.create(qname) : current.getIdentifier());
             } else if (currentChar() == '=') {
@@ -123,7 +122,7 @@ public final class YangInstanceIdentifierDeserializer {
         skipCurrentChar();
 
         // read key value separated by comma
-        while (keys.hasNext() && !allCharsConsumed() && currentChar() != SLASH) {
+        while (keys.hasNext() && !allCharsConsumed() && currentChar() != '/') {
 
             // empty key value
             if (currentChar() == ',') {
@@ -319,11 +318,11 @@ public final class YangInstanceIdentifierDeserializer {
     private void validArg() {
         // every identifier except of the first MUST start with slash
         if (offset != 0) {
-            checkValid(SLASH == currentChar(), ErrorTag.MALFORMED_MESSAGE, "Identifier must start with '/'.");
+            checkValid('/' == currentChar(), ErrorTag.MALFORMED_MESSAGE, "Identifier must start with '/'.");
 
             // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
             // multiple slashes into a single one
-            while (!allCharsConsumed() && SLASH == currentChar()) {
+            while (!allCharsConsumed() && '/' == currentChar()) {
                 skipCurrentChar();
             }
 
