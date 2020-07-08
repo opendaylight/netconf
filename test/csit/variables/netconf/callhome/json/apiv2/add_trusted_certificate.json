@@ -1,0 +1,14 @@
+{
+    "input": {
+        "trusted-certificate": [
+            {
+                "name": "ca",
+                "certificate": "{ca-certificate}"
+            },
+            {
+                "name": "tls-device-certificate",
+                "certificate": "{device-certificate}"
+            }
+        ]
+    }
+}
