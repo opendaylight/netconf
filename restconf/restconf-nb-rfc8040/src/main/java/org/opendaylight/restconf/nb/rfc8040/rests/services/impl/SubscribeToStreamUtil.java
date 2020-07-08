@@ -277,7 +277,7 @@ final class SubscribeToStreamUtil {
     private static Map<String, String> mapValuesFromUri(final String identifier) {
         final HashMap<String, String> result = new HashMap<>();
         for (final String token : RestconfConstants.SLASH_SPLITTER.split(identifier)) {
-            final String[] paramToken = token.split(String.valueOf(RestconfStreamsConstants.EQUAL));
+            final String[] paramToken = token.split("=");
             if (paramToken.length == 2) {
                 result.put(paramToken[0], paramToken[1]);
             }
