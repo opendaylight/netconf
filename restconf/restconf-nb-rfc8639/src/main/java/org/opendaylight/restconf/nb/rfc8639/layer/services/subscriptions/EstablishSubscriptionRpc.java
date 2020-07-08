@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -33,8 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8639.layer.web.jetty.server.ServletInfo;
+import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.util.services.SubscribedNotificationsUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
@@ -55,7 +53,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -68,36 +65,38 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
     private static final Logger LOG = LoggerFactory.getLogger(EstablishSubscriptionRpc.class);
     private static final NodeIdentifier OUTPUT = NodeIdentifier.create(EstablishSubscriptionOutput.QNAME);
 
+    private String getSessionId() {
+        return "0";
+    }
+
     private final NotificationsHolder notificationsHolder;
     private final Map<QName, ReplayBuffer> replayBuffersForNotifications;
     private final DOMNotificationService domNotificationService;
     private final DOMMountPointService domMountPointService;
-    private final TransactionChainHandler transactionChainHandler;
+    private final TxChainHandler transactionChainHandler;
     private final DOMSchemaService domSchemaService;
-    private final ServletInfo servletInfo;
     private final ListeningExecutorService executorService;
 
     public EstablishSubscriptionRpc(final NotificationsHolder notificationsHolder,
             final Map<QName, ReplayBuffer> replayBuffersForNotifications,
             final DOMNotificationService domNotificationService, final DOMSchemaService domSchemaService,
-            final DOMMountPointService domMountPointService, final TransactionChainHandler transactionChainHandler,
-            final ServletInfo servletInfo, final ListeningExecutorService executorService) {
+            final DOMMountPointService domMountPointService, final TxChainHandler transactionChainHandler,
+            final ListeningExecutorService executorService) {
         this.notificationsHolder = notificationsHolder;
         this.replayBuffersForNotifications = replayBuffersForNotifications;
         this.domNotificationService = domNotificationService;
         this.domSchemaService = domSchemaService;
         this.domMountPointService = domMountPointService;
         this.transactionChainHandler = transactionChainHandler;
-        this.servletInfo = servletInfo;
         this.executorService = executorService;
     }
 
     @SuppressWarnings("serial")
     @Override
-    public @NonNull FluentFuture<DOMRpcResult> invokeRpc(final DOMRpcIdentifier rpc,
-            final NormalizedNode<?, ?> input) {
-        final ListenableFuture<DOMRpcResult> futureWithDOMRpcResult = this.executorService
-                .submit(() -> processRpc(input));
+    public @NonNull FluentFuture<DOMRpcResult> invokeRpc(final @NonNull DOMRpcIdentifier rpc,
+            final @NonNull NormalizedNode<?, ?> input) {
+        final ListenableFuture<DOMRpcResult> futureWithDOMRpcResult = this.executorService.submit(() ->
+                processRpc(input));
         return FluentFuture.from(futureWithDOMRpcResult);
     }
 
@@ -138,7 +137,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
         }
         final NotificationDefinition notificationDef = notificationDefOpt.get();
         final NotificationStreamListener listener = new NotificationStreamListener(wrapper.getSchemaContext(),
-                this.servletInfo.getSessionId(), notificationDef, this.transactionChainHandler, encoding);
+                getSessionId(), notificationDef, this.transactionChainHandler, encoding);
 
         final ListenerRegistration<NotificationStreamListener> registration = wrapper.getDomNotificationService()
                 .registerNotificationListener(listener, ImmutableSet.of(notificationDef.getPath()));
@@ -226,7 +225,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
                 if (replayStartTime.isBefore(oldestNotificationTimeStamp)) {
                     LOG.error("Parameter replay-start-time ({}) is earlier than the oldest record stored within the "
                                     + "publisher's replay buffer for the notification {}."
-                            + "The oldest record in the buffer is {}.",
+                                    + "The oldest record in the buffer is {}.",
                             replayStartTime, notificationDef.getQName(), oldestNotificationTimeStamp);
                     listener.setReplayStartTime(oldestNotificationTimeStamp);
                     listener.setReplayBufferForStream(replayBufferForStream);
@@ -323,7 +322,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
                 replayStartTime,
                 stopTime,
                 period,
-                this.servletInfo.getSessionId(),
+                getSessionId(),
                 subscribedNotificationsModule
         );
 
@@ -344,7 +343,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
 
     @VisibleForTesting
     public Optional<StreamWrapper> getNotificationDefinitionForStreamName(final String rawStreamName) {
-        final EffectiveModelContext modelContext;
+        SchemaContext schemaContext;
         final DOMNotificationService service;
         String[] prefixAndName;
         if (rawStreamName.contains("yang-ext:mount")) {
@@ -358,7 +357,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
 
             if (mountPointOpt.isPresent()) {
                 final DOMMountPoint domMountPoint = mountPointOpt.get();
-                modelContext = domMountPoint.getEffectiveModelContext();
+                schemaContext = domMountPoint.getSchemaContext();
                 final Optional<DOMNotificationService> domNotifiServiceOpt = domMountPoint
                         .getService(DOMNotificationService.class);
                 if (!domNotifiServiceOpt.isPresent()) {
@@ -406,7 +405,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
                 return Optional.empty();
             }
         } else {
-            modelContext = this.domSchemaService.getGlobalContext();
+            schemaContext = this.domSchemaService.getGlobalContext();
             service = this.domNotificationService;
             prefixAndName = rawStreamName.split(":");
         }
@@ -417,7 +416,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
         }
         final String moduleName = prefixAndName[0];
         final String notificationStreamName = prefixAndName[1];
-        final Optional<? extends Module> moduleOpt = modelContext.findModules(moduleName).stream().findFirst();
+        final Optional<? extends Module> moduleOpt = schemaContext.findModules(moduleName).stream().findFirst();
         if (!moduleOpt.isPresent()) {
             LOG.error("Stream name parameter prefix {} does not correspond to any module in schema.", moduleName);
             return Optional.empty();
@@ -426,7 +425,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
                 moduleOpt.get().getNotifications().stream()
                         .filter(notification -> notification.getQName().getLocalName().equals(notificationStreamName))
                         .findFirst();
-        return Optional.of(new StreamWrapper(modelContext, notificationDefOpt, service));
+        return Optional.of(new StreamWrapper(schemaContext, notificationDefOpt, service));
     }
 
     private static YangInstanceIdentifier createTopologyNodeYIID(final String topologyId, final String nodeId) {
@@ -434,7 +433,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
                 YangInstanceIdentifier.builder();
         builder.node(NetworkTopology.QNAME).node(Topology.QNAME).nodeWithKey(Topology.QNAME, QName.create(
                 Topology.QNAME, "topology-id"), topologyId).node(Node.QNAME)
-        .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), nodeId);
+                .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), nodeId);
         return builder.build();
     }
 

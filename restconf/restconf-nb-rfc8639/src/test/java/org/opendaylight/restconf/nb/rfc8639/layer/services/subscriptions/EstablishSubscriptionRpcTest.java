@@ -43,9 +43,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.EstablishSubscriptionRpc.StreamWrapper;
-import org.opendaylight.restconf.nb.rfc8639.layer.web.jetty.server.ServletInfo;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -62,7 +61,6 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class EstablishSubscriptionRpcTest {
 
     private NotificationsHolder notificationsHolder;
-    private ServletInfo servletInfo;
     private ListeningExecutorService executor;
     private Map<QName, ReplayBuffer> replayBuffersForNotifications;
 
@@ -70,7 +68,7 @@ public class EstablishSubscriptionRpcTest {
     private DOMTransactionChain domTransactionChain;
 
     @Mock
-    private TransactionChainHandler transactionChainHandler;
+    private TxChainHandler transactionChainHandler;
 
     @Mock
     private DOMMountPointService domMountPointService;
@@ -88,8 +86,6 @@ public class EstablishSubscriptionRpcTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         this.notificationsHolder = new NotificationsHolder(new SubscriptionIdGenerator.Random());
-        this.servletInfo = new ServletInfo();
-        this.servletInfo.setSessionId("sessionId");
         this.executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1));
         this.replayBuffersForNotifications = new HashMap<>();
     }
@@ -126,7 +122,7 @@ public class EstablishSubscriptionRpcTest {
     public void processRpcTest() {
         final EstablishSubscriptionRpc establishSubscriptionRpc = new EstablishSubscriptionRpc(this.notificationsHolder,
                 this.replayBuffersForNotifications, this.domNotificationService, this.domSchemaService,
-                this.domMountPointService, this.transactionChainHandler, this.servletInfo, this.executor);
+                this.domMountPointService, this.transactionChainHandler, this.executor);
         final EffectiveModelContext schemaContext = YangParserTestUtils.parseYangResources(
                 getClass(),
                 "/ietf-interfaces@2018-02-20.yang",
@@ -184,7 +180,7 @@ public class EstablishSubscriptionRpcTest {
         doReturn(modules).when(this.mockEffectiveModelContext).findModules("test");
         final EstablishSubscriptionRpc establishSubscriptionRpc = new EstablishSubscriptionRpc(this.notificationsHolder,
                 this.replayBuffersForNotifications, this.domNotificationService, this.domSchemaService,
-                this.domMountPointService, this.transactionChainHandler, this.servletInfo, this.executor);
+                this.domMountPointService, this.transactionChainHandler, this.executor);
         final Optional<StreamWrapper> wrapperOpt = establishSubscriptionRpc
                 .getNotificationDefinitionForStreamName(stream);
         assertTrue(wrapperOpt.isPresent());

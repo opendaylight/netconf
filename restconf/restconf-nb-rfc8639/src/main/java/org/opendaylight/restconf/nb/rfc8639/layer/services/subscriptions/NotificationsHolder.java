@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 
 import com.google.common.base.Verify;
@@ -37,8 +36,8 @@ public final class NotificationsHolder {
                         "Registration of establish subscription failed.");
             }
         }
-        LOG.debug("Registration of {} has been completed successfully. Assigned id {}.", registeredNotification,
-                subscriptionId);
+        LOG.debug("Registration of {} has been completed successfully. Assigned id {}.",
+                registeredNotification, subscriptionId);
         return subscriptionId;
     }
 

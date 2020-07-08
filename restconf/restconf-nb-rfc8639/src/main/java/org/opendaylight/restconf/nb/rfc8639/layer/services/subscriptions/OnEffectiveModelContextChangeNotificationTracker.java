@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 
 import com.google.common.collect.Collections2;
@@ -24,7 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.util.services.SubscribedNotificationsUtil;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -43,13 +42,13 @@ public class OnEffectiveModelContextChangeNotificationTracker implements Effecti
 
     private final Map<QName, ListenerRegistration<NotificationListener>> registrationsForNotifications;
     private final DOMNotificationService domNotificationService;
-    private final TransactionChainHandler transactionChainHandler;
+    private final TxChainHandler transactionChainHandler;
     private final Map<QName, ReplayBuffer> replayBuffersForNotifications;
     private final InetSocketAddress inetSocketAddress;
     private final long replayBufferMaxSize;
 
     public OnEffectiveModelContextChangeNotificationTracker(final DOMNotificationService domNotificationService,
-            final TransactionChainHandler transactionChainHandler,
+            final TxChainHandler transactionChainHandler,
             final Map<QName, ReplayBuffer> replayBuffersForNotifications, long replayBufferMaxSize,
             final InetSocketAddress inetSocketAddress) {
         this.domNotificationService = domNotificationService;
@@ -175,7 +174,7 @@ public class OnEffectiveModelContextChangeNotificationTracker implements Effecti
 
         @Override
         public URI getBaseUri() {
-            return UriBuilder.fromUri("https://" + this.inetSocketAddress.getHostName()).build();
+            return UriBuilder.fromUri("http://" + this.inetSocketAddress.getHostName()).build();
         }
     }
 }
