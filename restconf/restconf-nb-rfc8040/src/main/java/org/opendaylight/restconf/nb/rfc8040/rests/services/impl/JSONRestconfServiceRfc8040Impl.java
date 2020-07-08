@@ -18,7 +18,6 @@ import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
@@ -54,12 +53,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of the JSONRestconfService interface using the restconf Draft18 implementation.
+ * Implementation of the JSONRestconfService interface using the RFC8040 implementation.
  *
  * @author Thomas Pantelis
  */
 @Singleton
-public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, AutoCloseable {
+public final class JSONRestconfServiceRfc8040Impl implements JSONRestconfService {
     private static final Logger LOG = LoggerFactory.getLogger(JSONRestconfServiceRfc8040Impl.class);
 
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
@@ -215,11 +214,6 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
             propagateExceptionAs(uriPath, e, "PATCH");
         }
         return Optional.ofNullable(output);
-    }
-
-    @Override
-    @PreDestroy
-    public void close() {
     }
 
     private NormalizedNodeContext toNormalizedNodeContext(final String uriPath, final @Nullable String payload,
