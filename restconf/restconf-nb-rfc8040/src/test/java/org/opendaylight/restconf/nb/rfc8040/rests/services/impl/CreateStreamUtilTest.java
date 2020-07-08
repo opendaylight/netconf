@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-package org.opendaylight.restconf.nb.rfc8040.rests.utils;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -38,7 +37,6 @@ import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class CreateStreamUtilTest {
-
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/streams";
 
     private NormalizedNodeContext payload;

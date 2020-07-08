@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.utils;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
@@ -18,6 +18,8 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.DataChangeScope;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.ResolveEnumUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -41,8 +43,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class for creation of data-change-event or YANG notification streams.
  */
-public final class CreateStreamUtil {
-
+final class CreateStreamUtil {
     private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
 
     private CreateStreamUtil() {
@@ -76,7 +77,7 @@ public final class CreateStreamUtil {
      *     }
      *     </pre>
      */
-    public static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodeContext payload,
+    static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodeContext payload,
             final EffectiveModelContext refSchemaCtx) {
         // parsing out of container with settings and path
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
@@ -96,8 +97,8 @@ public final class CreateStreamUtil {
         ListenersBroker.getInstance().registerDataChangeListener(path, streamName, outputType);
 
         // building of output
-        final QName outputQname = QName.create(qname, RestconfStreamsConstants.OUTPUT_CONTAINER_NAME);
-        final QName streamNameQname = QName.create(qname, RestconfStreamsConstants.OUTPUT_STREAM_NAME);
+        final QName outputQname = QName.create(qname, "output");
+        final QName streamNameQname = QName.create(qname, "stream-name");
 
         final ContainerNode output = ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(new NodeIdentifier(outputQname))
@@ -129,10 +130,10 @@ public final class CreateStreamUtil {
             final SchemaContext schemaContext, final ContainerNode data) {
         LogicalDatastoreType datastoreType = parseEnum(
                 data, LogicalDatastoreType.class, RestconfStreamsConstants.DATASTORE_PARAM_NAME);
-        datastoreType = datastoreType == null ? RestconfStreamsConstants.DEFAULT_DS : datastoreType;
+        datastoreType = datastoreType == null ? LogicalDatastoreType.CONFIGURATION : datastoreType;
 
         DataChangeScope scope = parseEnum(data, DataChangeScope.class, RestconfStreamsConstants.SCOPE_PARAM_NAME);
-        scope = scope == null ? RestconfStreamsConstants.DEFAULT_SCOPE : scope;
+        scope = scope == null ? DataChangeScope.BASE : scope;
 
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
                 + "/"
@@ -210,9 +211,8 @@ public final class CreateStreamUtil {
      * @param outputType             Output type (XML or JSON).
      * @return {@link NotificationListenerAdapter}
      */
-    public static NotificationListenerAdapter createYangNotifiStream(
-            final NotificationDefinition notificationDefinition, final EffectiveModelContext refSchemaCtx,
-            final NotificationOutputType outputType) {
+    static NotificationListenerAdapter createYangNotifiStream(final NotificationDefinition notificationDefinition,
+            final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType) {
         final String streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
                 requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()));
         final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()

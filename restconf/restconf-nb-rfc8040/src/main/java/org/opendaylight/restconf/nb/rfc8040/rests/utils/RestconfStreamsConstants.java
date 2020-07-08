@@ -9,8 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -37,9 +35,6 @@ public final class RestconfStreamsConstants {
     public static final String DATASTORE_PARAM_NAME = "datastore";
     public static final String SCOPE_PARAM_NAME = "scope";
     public static final String OUTPUT_TYPE_PARAM_NAME = "notification-output-type";
-    public static final String OUTPUT_CONTAINER_NAME = "output";
-    public static final String OUTPUT_STREAM_NAME = "stream-name";
-
 
     public static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER = new AugmentationIdentifier(ImmutableSet.of(
             QName.create(SAL_REMOTE_AUGMENT, SCOPE_PARAM_NAME),
@@ -48,9 +43,6 @@ public final class RestconfStreamsConstants {
 
     public static final QName LOCATION_QNAME = QName.create(SUBSCRIBE_TO_NOTIFICATION, "location");
     public static final QName NOTIFI_QNAME = QName.create(SUBSCRIBE_TO_NOTIFICATION, "notifi");
-
-    public static final DataChangeScope DEFAULT_SCOPE = DataChangeScope.BASE;
-    public static final LogicalDatastoreType DEFAULT_DS = LogicalDatastoreType.CONFIGURATION;
 
     public static final String DS_URI = '/' + DATASTORE_PARAM_NAME + '=';
     public static final String SCOPE_URI = '/' + SCOPE_PARAM_NAME + '=';
