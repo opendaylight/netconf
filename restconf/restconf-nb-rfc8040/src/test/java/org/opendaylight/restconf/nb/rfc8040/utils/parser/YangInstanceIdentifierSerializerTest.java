@@ -20,7 +20,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -243,12 +242,12 @@ public class YangInstanceIdentifierSerializerTest {
 
         for (final char c : genDelims) {
             assertTrue("Current character is reserved and should be percent encoded",
-                    ParserBuilderConstants.Serializer.PERCENT_ENCODE_CHARS.matches(c));
+                    YangInstanceIdentifierSerializer.PERCENT_ENCODE_CHARS.matches(c));
         }
 
         for (final char c : subDelims) {
             assertTrue("Current character is reserved and should be percent encoded",
-                    ParserBuilderConstants.Serializer.PERCENT_ENCODE_CHARS.matches(c));
+                    YangInstanceIdentifierSerializer.PERCENT_ENCODE_CHARS.matches(c));
         }
     }
 

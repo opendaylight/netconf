@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -14,8 +16,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Serializer;
+import org.opendaylight.yangtools.concepts.Serializer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -31,6 +32,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Serializer for {@link YangInstanceIdentifier} to {@link String} for restconf.
  */
 public final class YangInstanceIdentifierSerializer {
+    // RFC8040 specifies that reserved characters need to be percent-encoded
+    @VisibleForTesting
+    static final CharMatcher PERCENT_ENCODE_CHARS =
+            CharMatcher.anyOf(ParserConstants.RFC3986_RESERVED_CHARACTERS).precomputed();
 
     private YangInstanceIdentifierSerializer() {
         throw new UnsupportedOperationException("Util class.");
@@ -52,13 +57,12 @@ public final class YangInstanceIdentifierSerializer {
         final StringBuilder path = new StringBuilder();
 
         QNameModule parentModule = null;
-        for (int i = 0; i < data.getPathArguments().size(); i++) {
+        for (final PathArgument arg : data.getPathArguments()) {
             // get module of the parent
             if (!variables.getCurrent().isMixin()) {
                 parentModule = variables.getCurrent().getDataSchemaNode().getQName().getModule();
             }
 
-            final PathArgument arg = data.getPathArguments().get(i);
             variables.setCurrent(variables.getCurrent().getChild(arg));
             RestconfDocumentedException.throwIf(variables.getCurrent() == null, ErrorType.APPLICATION,
                     ErrorTag.UNKNOWN_ELEMENT, "Invalid input '%s': schema for argument '%s' (after '%s') not found",
@@ -75,8 +79,7 @@ public final class YangInstanceIdentifierSerializer {
                     path.append(RestconfConstants.SLASH);
                 }
 
-                path.append(prefixForNamespace(arg.getNodeType(), schemaContext));
-                path.append(ParserBuilderConstants.Deserializer.COLON);
+                path.append(prefixForNamespace(arg.getNodeType(), schemaContext)).append(':');
             } else {
                 path.append(RestconfConstants.SLASH);
             }
@@ -95,10 +98,10 @@ public final class YangInstanceIdentifierSerializer {
 
     private static void prepareNodeWithValue(final StringBuilder path, final PathArgument arg) {
         path.append(arg.getNodeType().getLocalName());
-        path.append(ParserBuilderConstants.Deserializer.EQUAL);
+        path.append('=');
 
         String value = String.valueOf(((NodeWithValue<String>) arg).getValue());
-        if (Serializer.PERCENT_ENCODE_CHARS.matchesAnyOf(value)) {
+        if (PERCENT_ENCODE_CHARS.matchesAnyOf(value)) {
             value = parsePercentEncodeChars(value);
         }
         path.append(value);
@@ -109,17 +112,17 @@ public final class YangInstanceIdentifierSerializer {
 
         final Iterator<Entry<QName, Object>> iterator = ((NodeIdentifierWithPredicates) arg).entrySet().iterator();
         if (iterator.hasNext()) {
-            path.append(ParserBuilderConstants.Deserializer.EQUAL);
+            path.append('=');
         }
 
         while (iterator.hasNext()) {
             String valueOf = String.valueOf(iterator.next().getValue());
-            if (Serializer.PERCENT_ENCODE_CHARS.matchesAnyOf(valueOf)) {
+            if (PERCENT_ENCODE_CHARS.matchesAnyOf(valueOf)) {
                 valueOf = parsePercentEncodeChars(valueOf);
             }
             path.append(valueOf);
             if (iterator.hasNext()) {
-                path.append(ParserBuilderConstants.Deserializer.COMMA);
+                path.append(',');
             }
         }
     }
@@ -133,16 +136,16 @@ public final class YangInstanceIdentifierSerializer {
      */
     private static String parsePercentEncodeChars(final String valueOf) {
         final StringBuilder sb = new StringBuilder();
-        int start = 0;
-        while (start < valueOf.length()) {
-            if (Serializer.PERCENT_ENCODE_CHARS.matches(valueOf.charAt(start))) {
-                final String format = String.format("%x", (int) valueOf.charAt(start));
-                final String upperCase = format.toUpperCase(Locale.ROOT);
-                sb.append(ParserBuilderConstants.Deserializer.PERCENT_ENCODING + upperCase);
+
+        for (int i = 0; i < valueOf.length(); ++i) {
+            final char ch = valueOf.charAt(i);
+
+            if (PERCENT_ENCODE_CHARS.matches(ch)) {
+                final String upperCase = String.format("%x", (int) ch).toUpperCase(Locale.ROOT);
+                sb.append('%').append(upperCase);
             } else {
-                sb.append(valueOf.charAt(start));
+                sb.append(ch);
             }
-            start++;
         }
         return sb.toString();
     }

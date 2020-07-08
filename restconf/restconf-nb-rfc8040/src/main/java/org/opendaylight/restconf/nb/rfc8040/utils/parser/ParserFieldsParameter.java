@@ -18,7 +18,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
@@ -85,7 +84,7 @@ public final class ParserFieldsParameter {
         while (currentPosition < input.length()) {
             final char currentChar = input.charAt(currentPosition);
 
-            if (Deserializer.IDENTIFIER.matches(currentChar) || currentChar == '/') {
+            if (ParserConstants.YANG_IDENTIFIER_PART.matches(currentChar) || currentChar == '/') {
                 if (currentChar == SLASH) {
                     // add parsed identifier to results for current level
                     currentNode = addChildToResult(
