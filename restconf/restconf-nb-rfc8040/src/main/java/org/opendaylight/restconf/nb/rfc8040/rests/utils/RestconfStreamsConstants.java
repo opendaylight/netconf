@@ -52,9 +52,8 @@ public final class RestconfStreamsConstants {
     public static final DataChangeScope DEFAULT_SCOPE = DataChangeScope.BASE;
     public static final LogicalDatastoreType DEFAULT_DS = LogicalDatastoreType.CONFIGURATION;
 
-    public static final char EQUAL = '=';
-    public static final String DS_URI = '/' + DATASTORE_PARAM_NAME + EQUAL;
-    public static final String SCOPE_URI = '/' + SCOPE_PARAM_NAME + EQUAL;
+    public static final String DS_URI = '/' + DATASTORE_PARAM_NAME + '=';
+    public static final String SCOPE_URI = '/' + SCOPE_PARAM_NAME + '=';
 
     public static final String DATA_SUBSCRIPTION = "data-change-event-subscription";
     public static final String CREATE_DATA_SUBSCRIPTION = "create-" + DATA_SUBSCRIPTION;
