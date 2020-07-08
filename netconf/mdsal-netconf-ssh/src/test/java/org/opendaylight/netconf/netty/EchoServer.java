@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -20,6 +19,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import org.opendaylight.netconf.util.NetconfConfiguration;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public class EchoServer implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(EchoServer.class);
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
+    @Override
     public void run() {
         // Configure the server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -44,7 +44,7 @@ public class EchoServer implements Runnable {
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<LocalChannel>() {
                         @Override
-                        public void initChannel(LocalChannel ch) throws Exception {
+                        public void initChannel(final LocalChannel ch) throws Exception {
                             ch.pipeline().addLast(new EchoServerHandler());
                         }
                     });
@@ -55,7 +55,7 @@ public class EchoServer implements Runnable {
 
             // Wait until the server socket is closed.
             future.channel().closeFuture().sync();
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             // Shut down all event loops to terminate all threads.
@@ -64,7 +64,7 @@ public class EchoServer implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws InterruptedException, IOException {
         new Thread(new EchoServer()).start();
         Thread.sleep(1000);
         EchoClientHandler clientHandler = new EchoClientHandler();

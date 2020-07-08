@@ -16,9 +16,11 @@ import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.pars
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.EnumMap;
 import java.util.concurrent.ExecutorService;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -53,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public abstract class AbstractNetconfOperationTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfOperationTest.class);
@@ -114,12 +117,11 @@ public abstract class AbstractNetconfOperationTest {
         return transactionProvider;
     }
 
-    @SuppressWarnings("illegalCatch")
     private static Document getReplyOk() {
         Document doc;
         try {
             doc = XmlFileLoader.xmlFileToDocument("messages/mapping/rpc-reply_ok.xml");
-        } catch (final Exception e) {
+        } catch (final IOException | SAXException | ParserConfigurationException e) {
             LOG.debug("unable to load rpc reply ok.", e);
             doc = XmlUtil.newDocument();
         }

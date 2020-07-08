@@ -9,6 +9,7 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -54,6 +55,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
@@ -252,7 +254,6 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
      * @param input   input container schema node, or null if rpc does not take any input
      * @return parsed rpc into normalized node, or null if input schema is null
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
     private @Nullable ContainerNode rpcToNNode(final XmlElement element,
             final @Nullable ContainerSchemaNode input) throws DocumentedException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
@@ -261,7 +262,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
-        } catch (final Exception ex) {
+        } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
             throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex, ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }

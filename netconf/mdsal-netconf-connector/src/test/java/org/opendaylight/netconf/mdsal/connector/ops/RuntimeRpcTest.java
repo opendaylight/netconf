@@ -18,9 +18,11 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.FluentFuture;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import javax.xml.parsers.ParserConfigurationException;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -69,23 +71,21 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RuntimeRpcTest {
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpcTest.class);
     private static final String SESSION_ID_FOR_REPORTING = "netconf-test-session1";
-    private static final Document RPC_REPLY_OK = RuntimeRpcTest.getReplyOk();
+    private static final Document RPC_REPLY_OK = getReplyOk();
 
-    @SuppressWarnings("illegalCatch")
     private static Document getReplyOk() {
-        Document doc;
         try {
-            doc = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/runtimerpc-ok-reply.xml");
-        } catch (final Exception e) {
+            return XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/runtimerpc-ok-reply.xml");
+        } catch (final IOException | SAXException | ParserConfigurationException e) {
             LOG.debug("unable to load rpc reply ok.", e);
-            doc = XmlUtil.newDocument();
+            return XmlUtil.newDocument();
         }
-        return doc;
     }
 
     private static final DOMRpcService RPC_SERVICE_VOID_INVOKER = new DOMRpcService() {

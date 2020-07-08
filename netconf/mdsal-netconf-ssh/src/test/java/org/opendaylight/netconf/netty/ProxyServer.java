@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -26,11 +25,11 @@ import org.opendaylight.netconf.util.NetconfConfiguration;
 public class ProxyServer implements Runnable {
     private final ProxyHandlerFactory proxyHandlerFactory;
 
-    public ProxyServer(ProxyHandlerFactory proxyHandlerFactory) {
+    public ProxyServer(final ProxyHandlerFactory proxyHandlerFactory) {
         this.proxyHandlerFactory = proxyHandlerFactory;
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
+    @Override
     public void run() {
         // Configure the server.
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -44,7 +43,7 @@ public class ProxyServer implements Runnable {
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        public void initChannel(SocketChannel ch) throws Exception {
+                        public void initChannel(final SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(proxyHandlerFactory.create(bossGroup, localAddress));
                         }
                     });
@@ -55,7 +54,7 @@ public class ProxyServer implements Runnable {
 
             // Wait until the server socket is closed.
             future.channel().closeFuture().sync();
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             // Shut down all event loops to terminate all threads.
@@ -68,12 +67,12 @@ public class ProxyServer implements Runnable {
         ChannelHandler create(EventLoopGroup bossGroup, LocalAddress localAddress);
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         ProxyHandlerFactory proxyHandlerFactory = ProxyServerHandler::new;
         start(proxyHandlerFactory);
     }
 
-    public static void start(ProxyHandlerFactory proxyHandlerFactory) {
+    public static void start(final ProxyHandlerFactory proxyHandlerFactory) {
         new Thread(new EchoServer()).start();
         new Thread(new ProxyServer(proxyHandlerFactory)).start();
     }

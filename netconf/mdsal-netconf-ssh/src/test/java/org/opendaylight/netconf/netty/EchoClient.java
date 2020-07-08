@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.netty;
 
 import io.netty.bootstrap.Bootstrap;
@@ -28,24 +27,21 @@ import org.slf4j.LoggerFactory;
 public class EchoClient extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(EchoClient.class);
 
-
     private final ChannelInitializer<LocalChannel> channelInitializer;
 
-
     public EchoClient(final ChannelHandler clientHandler) {
-        channelInitializer = new ChannelInitializer<LocalChannel>() {
+        channelInitializer = new ChannelInitializer<>() {
             @Override
-            public void initChannel(LocalChannel ch) throws Exception {
+            public void initChannel(final LocalChannel ch) throws Exception {
                 ch.pipeline().addLast(clientHandler);
             }
         };
     }
 
-    public EchoClient(ChannelInitializer<LocalChannel> channelInitializer) {
+    public EchoClient(final ChannelInitializer<LocalChannel> channelInitializer) {
         this.channelInitializer = channelInitializer;
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void run() {
         // Configure the client.
@@ -63,7 +59,7 @@ public class EchoClient extends Thread {
 
             // Wait until the connection is closed.
             future.channel().closeFuture().sync();
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             LOG.error("Error in client", e);
             throw new RuntimeException("Error in client", e);
         } finally {

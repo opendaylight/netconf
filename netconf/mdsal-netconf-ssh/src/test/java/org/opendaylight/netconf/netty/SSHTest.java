@@ -105,7 +105,7 @@ public class SSHTest {
 
     public EchoClientHandler connectClient(final InetSocketAddress address) {
         final EchoClientHandler echoClientHandler = new EchoClientHandler();
-        final ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<NioSocketChannel>() {
+        final ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<>() {
             @Override
             public void initChannel(final NioSocketChannel ch) throws Exception {
                 ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(new LoginPasswordHandler("a", "a")));

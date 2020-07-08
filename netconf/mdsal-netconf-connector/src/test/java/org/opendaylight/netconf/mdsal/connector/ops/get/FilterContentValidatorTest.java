@@ -8,6 +8,10 @@
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
 import static java.util.Objects.requireNonNull;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -22,12 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.model.InitializationError;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -81,21 +85,25 @@ public class FilterContentValidatorTest {
         validator = new FilterContentValidator(currentContext);
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Test
-    public void testValidate() throws Exception {
-        if (expected.startsWith("success")) {
-            final String expId = expected.replace("success=", "");
-            final YangInstanceIdentifier actual = validator.validate(filterContent);
-            Assert.assertEquals(fromString(expId), actual);
-        } else if (expected.startsWith("error")) {
-            try {
-                validator.validate(filterContent);
-                Assert.fail(XmlUtil.toString(filterContent) + " is not valid and should throw exception.");
-            } catch (final Exception e) {
-                final String expectedExceptionClass = expected.replace("error=", "");
-                Assert.assertEquals(expectedExceptionClass, e.getClass().getName());
-            }
+    public void testValidateSuccess() throws DocumentedException {
+        assumeThat(expected, startsWith("success"));
+
+        final String expId = expected.replace("success=", "");
+        final YangInstanceIdentifier actual = validator.validate(filterContent);
+        assertEquals(fromString(expId), actual);
+    }
+
+    @Test
+    public void testValidateError() {
+        assumeThat(expected, startsWith("error"));
+
+        try {
+            validator.validate(filterContent);
+            fail(XmlUtil.toString(filterContent) + " is not valid and should throw exception.");
+        } catch (final DocumentedException e) {
+            final String expectedExceptionClass = expected.replace("error=", "");
+            assertEquals(expectedExceptionClass, e.getClass().getName());
         }
     }
 

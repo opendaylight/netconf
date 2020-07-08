@@ -8,11 +8,13 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
@@ -32,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 abstract class AbstractEdit extends AbstractConfigOperation {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEdit.class);
@@ -44,7 +47,6 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         this.schemaContext = schemaContext;
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     protected void parseIntoNormalizedNode(final DataSchemaNode schemaNode, final XmlElement element,
                                          final NormalizedNodeStreamWriter writer) throws DocumentedException {
         if (!(schemaNode instanceof ContainerSchemaNode) && !(schemaNode instanceof ListSchemaNode)) {
@@ -57,7 +59,7 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext.getCurrentContext(), schemaNode);
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
-        } catch (final Exception ex) {
+        } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
             throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex, ErrorType.PROTOCOL,
                 ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }

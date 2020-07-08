@@ -154,13 +154,12 @@ public class SshProxyServer implements AutoCloseable {
             super(manager, group);
         }
 
-        @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
         protected void doCloseImmediately() {
             try {
                 group().shutdownNow();
                 group().awaitTermination(5, TimeUnit.SECONDS);
-            } catch (final Exception e) {
+            } catch (final IOException | InterruptedException e) {
                 log.debug("Exception caught while closing channel group", e);
             } finally {
                 super.doCloseImmediately();
