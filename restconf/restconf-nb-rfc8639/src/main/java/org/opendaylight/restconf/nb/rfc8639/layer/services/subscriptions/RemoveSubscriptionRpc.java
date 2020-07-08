@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 
 import com.google.common.util.concurrent.FluentFuture;
@@ -18,7 +17,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcImplementation;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.nb.rfc8639.layer.web.jetty.server.ServletInfo;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -38,21 +36,23 @@ public final class RemoveSubscriptionRpc implements DOMRpcImplementation {
     private static final NodeIdentifier OUTPUT = NodeIdentifier.create(DeleteSubscriptionOutput.QNAME);
 
     private final NotificationsHolder notificationsHolder;
-    private final ServletInfo servletInfo;
     private final ListeningExecutorService executorService;
     private final boolean isKill;
 
-    public RemoveSubscriptionRpc(final NotificationsHolder notificationsHolder, final ServletInfo servletInfo,
+    private String getSessionId() {
+        return "0";
+    }
+
+    public RemoveSubscriptionRpc(final NotificationsHolder notificationsHolder,
             final boolean isKill, final ListeningExecutorService executorService) {
         this.notificationsHolder = notificationsHolder;
-        this.servletInfo = servletInfo;
         this.executorService = executorService;
         this.isKill = isKill;
     }
 
     @Override
-    public @NonNull FluentFuture<DOMRpcResult> invokeRpc(final DOMRpcIdentifier rpc,
-                                                         final NormalizedNode<?, ?> input) {
+    public @NonNull FluentFuture<DOMRpcResult> invokeRpc(@NonNull final DOMRpcIdentifier rpc,
+            @NonNull final NormalizedNode<?, ?> input) {
         final ListenableFuture<DOMRpcResult> futureWithDOMRpcResult = executorService.submit(() -> processRpc(input));
         return FluentFuture.from(futureWithDOMRpcResult);
     }
@@ -74,7 +74,7 @@ public final class RemoveSubscriptionRpc implements DOMRpcImplementation {
         }
 
         final NotificationStreamListener listener = notificationWrapper.getSubscriptionNotificationListener();
-        if (listener.deleteSubscription(this.servletInfo.getSessionId(), this.isKill)) {
+        if (listener.deleteSubscription(getSessionId(), this.isKill)) {
             this.notificationsHolder.removeNotification(subscriptionId);
 
             final NotificationDefinition notificationDefinition = listener.getNotificationDefinition();

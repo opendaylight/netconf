@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8639.util.services;
 
 import com.google.common.collect.Sets;
@@ -36,8 +35,8 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.Encoding;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.SubscribedNotificationsModuleUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
@@ -73,14 +72,10 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class SubscribedNotificationsUtil {
     private static final String PREFIXED_NOTIFICATION_STREAM_NAME_STR = "[a-zA-Z_0-9\\-]+:[a-zA-Z_0-9\\-]+";
     private static final XMLOutputFactory XML_FACTORY;
-
-    private static final Logger LOG = LoggerFactory.getLogger(SubscribedNotificationsUtil.class);
 
     static {
         XML_FACTORY = XMLOutputFactory.newInstance();
@@ -172,10 +167,10 @@ public final class SubscribedNotificationsUtil {
      *            - to resolve transaction
      * @return resolved transaction chain handler
      */
-    public static TransactionChainHandler resolveMountPointTransaction(final DOMMountPoint mountPoint) {
+    public static TxChainHandler resolveMountPointTransaction(final DOMMountPoint mountPoint) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return new TransactionChainHandler(domDataBrokerService.get());
+            return new TxChainHandler(domDataBrokerService.get());
         }
 
         final String errMsg = "DOM data broker service isn't available for mount point " + mountPoint.getIdentifier();

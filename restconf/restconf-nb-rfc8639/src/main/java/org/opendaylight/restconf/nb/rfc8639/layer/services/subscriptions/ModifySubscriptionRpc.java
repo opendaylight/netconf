@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 
 import static org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.SubscribedNotificationsModuleUtils.IDENTIFIER_LEAF_ID;
@@ -28,9 +27,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8639.layer.web.jetty.server.ServletInfo;
+import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.util.services.SubscribedNotificationsUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -53,25 +51,27 @@ public final class ModifySubscriptionRpc implements DOMRpcImplementation {
     private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
     private static final NodeIdentifier OUTPUT = NodeIdentifier.create(ModifySubscriptionOutput.QNAME);
 
+    private String getSessionId() {
+        return "0";
+    }
+
     private final NotificationsHolder notificationsHolder;
     private final DOMSchemaService domSchemaService;
-    private final TransactionChainHandler transactionChainHandler;
-    private final ServletInfo servletInfo;
+    private final TxChainHandler transactionChainHandler;
     private final ListeningExecutorService executorService;
 
     public ModifySubscriptionRpc(final NotificationsHolder notificationsHolder,
-            final DOMSchemaService domSchemaService, final TransactionChainHandler transactionChainHandler,
-            final ServletInfo servletInfo, final ListeningExecutorService executorService) {
+            final DOMSchemaService domSchemaService, final TxChainHandler transactionChainHandler,
+            final ListeningExecutorService executorService) {
         this.notificationsHolder = notificationsHolder;
         this.domSchemaService = domSchemaService;
         this.transactionChainHandler = transactionChainHandler;
-        this.servletInfo = servletInfo;
         this.executorService = executorService;
     }
 
     @Override
-    public @NonNull FluentFuture<DOMRpcResult> invokeRpc(final DOMRpcIdentifier rpc,
-            final NormalizedNode<?, ?> input) {
+    public @NonNull FluentFuture<DOMRpcResult> invokeRpc(@NonNull final DOMRpcIdentifier rpc,
+            @NonNull final NormalizedNode<?, ?> input) {
         final ListenableFuture<DOMRpcResult> futureWithDOMRpcResult = executorService.submit(() -> processRpc(input));
         return FluentFuture.from(futureWithDOMRpcResult);
     }
@@ -94,7 +94,7 @@ public final class ModifySubscriptionRpc implements DOMRpcImplementation {
 
         final NotificationStreamListener listener = notificationWrapper.getSubscriptionNotificationListener();
 
-        if (listener.hasEqualSessionId(servletInfo.getSessionId())) {
+        if (listener.hasEqualSessionId(getSessionId())) {
             final Optional<NormalizedNode<?, ?>> stopTimeOpt = SubscribedNotificationsModuleUtils.getStopTime(input);
             if (stopTimeOpt.isPresent()) {
                 final Instant stopTime = Instant.parse(((LeafNode<String>) stopTimeOpt.get()).getValue());

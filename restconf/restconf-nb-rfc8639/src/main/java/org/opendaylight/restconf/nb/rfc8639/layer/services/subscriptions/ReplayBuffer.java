@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 
 import java.time.Instant;
@@ -17,7 +16,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.util.services.SubscribedNotificationsUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -33,11 +32,11 @@ public class ReplayBuffer {
     private static final Logger LOG = LoggerFactory.getLogger(ReplayBuffer.class);
 
     private final NavigableMap<Instant, DOMNotification> timeStampToNotification;
-    private final TransactionChainHandler transactionChainHandler;
+    private final TxChainHandler transactionChainHandler;
     private final SchemaContext schemaContext;
     private final long replayBufferMaxSize;
 
-    public ReplayBuffer(final long replayBufferMaxSize, final TransactionChainHandler transactionChainHandler,
+    public ReplayBuffer(final long replayBufferMaxSize, final TxChainHandler transactionChainHandler,
             final SchemaContext schemaContext) {
         timeStampToNotification = new TreeMap<>();
         this.transactionChainHandler = transactionChainHandler;
