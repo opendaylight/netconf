@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.utils;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -43,6 +43,8 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.NotificationQueryParams;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.ResolveEnumUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
@@ -68,8 +70,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Subscribe to stream util class.
  */
-public final class SubscribeToStreamUtil {
-
+final class SubscribeToStreamUtil {
     private static final Logger LOG = LoggerFactory.getLogger(SubscribeToStreamUtil.class);
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
@@ -95,7 +96,7 @@ public final class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Stream location for listening.
      */
-    public static URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
+    static URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
@@ -145,7 +146,7 @@ public final class SubscribeToStreamUtil {
      * @param schemaHandler Schema context handler.
      * @return InstanceIdentifier of Location leaf.
      */
-    public static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
+    static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
         final Optional<Module> module = schemaHandler.get()
                 .findModule(RestconfStreamsConstants.NOTIFI_QNAME.getModule());
         Preconditions.checkState(module.isPresent());
@@ -173,7 +174,7 @@ public final class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Location for listening.
      */
-    public static URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
+    static URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
         final LogicalDatastoreType datastoreType = parseURIEnum(
@@ -234,7 +235,7 @@ public final class SubscribeToStreamUtil {
      * @param entry Start-time or stop-time as string in {@link DateAndTime} format.
      * @return Parsed {@link Instant} by entry.
      */
-    public static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
+    static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
         final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
         final String value = event.getValue();
         final TemporalAccessor accessor;
@@ -360,5 +361,4 @@ public final class SubscribeToStreamUtil {
         }
         return ResolveEnumUtil.resolveEnum(clazz, value);
     }
-
 }
