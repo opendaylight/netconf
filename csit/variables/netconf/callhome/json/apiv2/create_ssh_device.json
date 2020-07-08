@@ -1,0 +1,12 @@
+{
+    "device": {
+        "unique-id": "{device_name}",
+        "ssh-client-params": {
+          "credentials": {
+              "username": "{username}",
+              "passwords": [ "{password}" ]
+          },
+          "host-key": "{hostkey}"
+        }
+    }
+}
