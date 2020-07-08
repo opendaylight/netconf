@@ -60,7 +60,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -151,8 +150,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
-            final String streamName = value.substring(
-                    value.indexOf(NOTIFICATION_STREAM + RestconfConstants.SLASH));
+            final String streamName = value.substring(value.indexOf(NOTIFICATION_STREAM + '/'));
             this.delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
         }
         if (node == null) {

@@ -298,8 +298,7 @@ final class SubscribeToStreamUtil {
                 // Unsecured HTTP and others go to unsecured WebSockets
                 uriBuilder.scheme("ws");
         }
-        return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + RestconfConstants.SLASH + streamName)
-                .build();
+        return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/' + streamName).build();
     }
 
     /**

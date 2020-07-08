@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.restconf.common.util.DataChangeScope;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -54,8 +53,8 @@ public final class RestconfStreamsConstants {
     public static final LogicalDatastoreType DEFAULT_DS = LogicalDatastoreType.CONFIGURATION;
 
     public static final char EQUAL = '=';
-    public static final String DS_URI = RestconfConstants.SLASH + DATASTORE_PARAM_NAME + EQUAL;
-    public static final String SCOPE_URI = RestconfConstants.SLASH + SCOPE_PARAM_NAME + EQUAL;
+    public static final String DS_URI = '/' + DATASTORE_PARAM_NAME + EQUAL;
+    public static final String SCOPE_URI = '/' + SCOPE_PARAM_NAME + EQUAL;
 
     public static final String DATA_SUBSCRIPTION = "data-change-event-subscription";
     public static final String CREATE_DATA_SUBSCRIPTION = "create-" + DATA_SUBSCRIPTION;
