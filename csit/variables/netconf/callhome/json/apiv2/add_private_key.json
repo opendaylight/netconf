@@ -1,0 +1,13 @@
+{
+    "input": {
+        "private-key": [
+            {
+                "name": "tls-device-key",
+                "data": "{client-key}",
+                "certificate-chain": [
+                    "{certificate-chain}"
+                ]
+            }
+        ]
+    }
+}

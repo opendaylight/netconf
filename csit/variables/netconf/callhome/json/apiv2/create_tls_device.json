@@ -1,0 +1,9 @@
+{
+    "device": {
+        "unique-id": "{device_name}",
+        "tls-client-params": {
+            "key-id": "{key_id}",
+            "certificate-id": "{certificate_id}"
+        }
+    }
+}
