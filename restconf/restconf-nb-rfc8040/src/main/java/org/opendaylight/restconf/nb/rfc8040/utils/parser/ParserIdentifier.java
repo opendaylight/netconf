@@ -181,8 +181,7 @@ public final class ParserIdentifier {
      */
     public static Entry<String, Revision> makeQNameFromIdentifier(final String identifier) {
         // check if more than one slash is not used as path separator
-        if (identifier.contains(
-                String.valueOf(RestconfConstants.SLASH).concat(String.valueOf(RestconfConstants.SLASH)))) {
+        if (identifier.contains("//")) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
             throw new RestconfDocumentedException(
                     "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
@@ -193,7 +192,7 @@ public final class ParserIdentifier {
         final String moduleNameAndRevision;
         if (mountIndex >= 0) {
             moduleNameAndRevision = identifier.substring(mountIndex + RestconfConstants.MOUNT.length())
-                    .replaceFirst(String.valueOf(RestconfConstants.SLASH), "");
+                    .replaceFirst("/", "");
         } else {
             moduleNameAndRevision = identifier;
         }
