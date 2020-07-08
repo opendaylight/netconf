@@ -33,11 +33,9 @@ import org.slf4j.LoggerFactory;
  * Listens on changes in NetconfState/Sessions/Session datastore and publishes them.
  */
 public class SessionNotificationProducer extends OperationalDatastoreListener<Session> {
-
     private static final InstanceIdentifier<Session> SESSION_INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class);
     private static final Logger LOG = LoggerFactory.getLogger(SessionNotificationProducer.class);
-
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     private final ListenerRegistration<?> sessionListenerRegistration;
@@ -50,7 +48,6 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
         this.sessionListenerRegistration = registerOnChanges(dataBroker);
     }
 
-    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Override
     public void onDataTreeChanged(final Collection<DataTreeModification<Session>> changes) {
         for (DataTreeModification<Session> change : changes) {
@@ -96,7 +93,6 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
                 .build();
         baseNotificationPublisherRegistration.onSessionEnded(sessionEnd);
     }
-
 
     /**
      * Invoked by blueprint.
