@@ -36,6 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMActionService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
@@ -87,6 +88,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private DOMActionService deviceAction;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
+    private NetconfDataTreeService netconfService;
     //readTxActor can be shared
     private ActorRef readTxActor;
     private List<SchemaSourceRegistration<YangTextSchemaSource>> registeredSchemas;
@@ -119,6 +121,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             final CreateInitialMasterActorData masterActorData = (CreateInitialMasterActorData) message;
             sourceIdentifiers = masterActorData.getSourceIndentifiers();
             this.deviceDataBroker = masterActorData.getDeviceDataBroker();
+            this.netconfService = masterActorData.getNetconfDataTreeService();
             final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
             this.deviceRpc = masterActorData.getDeviceRpc();

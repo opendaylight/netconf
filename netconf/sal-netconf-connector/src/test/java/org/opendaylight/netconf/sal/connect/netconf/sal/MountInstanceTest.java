@@ -76,7 +76,8 @@ public class MountInstanceTest {
 
     @Test
     public void testOnTopologyDeviceConnected() {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
+            notificationService, null);
         verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
         verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
@@ -94,12 +95,14 @@ public class MountInstanceTest {
     }
 
     @Test
-    public void testOnTopologyDeviceDisconnected() throws Exception {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
+    public void testOnTopologyDeviceDisconnected() {
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
+            notificationService, null);
         mountInstance.onTopologyDeviceDisconnected();
         verify(registration).close();
         try {
-            mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
+            mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
+                notificationService, null);
         } catch (final IllegalStateException e) {
             LOG.warn("Operation failed.", e);
             Assert.fail("Topology registration still present after disconnect ");
@@ -107,20 +110,20 @@ public class MountInstanceTest {
     }
 
     @Test
-    public void testClose() throws Exception {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
+    public void testClose() {
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
+            notificationService, null);
         mountInstance.close();
         verify(registration).close();
     }
 
     @Test
-    public void testPublishNotification() throws Exception {
-        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
+    public void testPublishNotification() {
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
+            notificationService, null);
         verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
         mountInstance.publish(notification);
         verify(notificationService).publishNotification(notification);
     }
-
-
 }
