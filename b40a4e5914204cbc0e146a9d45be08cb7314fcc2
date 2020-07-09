@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "76a2367c_74f620aa",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfDataTreeService.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-09T07:20:04Z",
+      "side": 1,
+      "message": "This is not at NETCONF protocol level, it should not be in netconf-api, but rather in a separate artifact -- netconf-dom-api?",
+      "range": {
+        "startLine": 26,
+        "startChar": 16,
+        "endLine": 26,
+        "endChar": 58
+      },
+      "revId": "b40a4e5914204cbc0e146a9d45be08cb7314fcc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
