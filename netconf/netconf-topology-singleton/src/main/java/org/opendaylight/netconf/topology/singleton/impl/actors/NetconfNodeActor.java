@@ -36,6 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMActionService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
@@ -58,6 +59,7 @@ import org.opendaylight.netconf.topology.singleton.messages.action.InvokeActionM
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessage;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NetconfDataTreeServiceRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
@@ -87,6 +89,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private DOMActionService deviceAction;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
+    private NetconfDataTreeService netconfService;
     //readTxActor can be shared
     private ActorRef readTxActor;
     private List<SchemaSourceRegistration<YangTextSchemaSource>> registeredSchemas;
@@ -115,26 +118,23 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         LOG.debug("{}:  received message {}", id, message);
 
         if (message instanceof CreateInitialMasterActorData) { // master
-
             final CreateInitialMasterActorData masterActorData = (CreateInitialMasterActorData) message;
             sourceIdentifiers = masterActorData.getSourceIndentifiers();
             this.deviceDataBroker = masterActorData.getDeviceDataBroker();
+            this.netconfService = masterActorData.getNetconfDataTreeService();
             final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
             this.deviceRpc = masterActorData.getDeviceRpc();
             this.deviceAction = masterActorData.getDeviceAction();
 
             sender().tell(new MasterActorDataInitialized(), self());
-
             LOG.debug("{}: Master is ready.", id);
-
         } else if (message instanceof RefreshSetupMasterActorData) {
             setup = ((RefreshSetupMasterActorData) message).getNetconfTopologyDeviceSetup();
             id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
             sender().tell(new MasterActorDataInitialized(), self());
         } else if (message instanceof AskForMasterMountPoint) { // master
             AskForMasterMountPoint askForMasterMountPoint = (AskForMasterMountPoint) message;
-
             // only master contains reference to deviceDataBroker
             if (deviceDataBroker != null) {
                 LOG.debug("{}: Sending RegisterMountPoint reply to {}", id, askForMasterMountPoint.getSlaveActorRef());
@@ -144,12 +144,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 LOG.warn("{}: Received {} but we don't appear to be the master", id, askForMasterMountPoint);
                 sender().tell(new Failure(new NotMasterException(self())), self());
             }
-
         } else if (message instanceof YangTextSchemaSourceRequest) { // master
-
             final YangTextSchemaSourceRequest yangTextSchemaSourceRequest = (YangTextSchemaSourceRequest) message;
             sendYangTextSchemaSourceProxy(yangTextSchemaSourceRequest.getSourceIdentifier(), sender());
-
         } else if (message instanceof NewReadTransactionRequest) { // master
             sender().tell(new Success(readTxActor), self());
         } else if (message instanceof NewWriteTransactionRequest) { // master
@@ -160,7 +157,6 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             } catch (final Exception t) {
                 sender().tell(new Failure(t), self());
             }
-
         } else if (message instanceof NewReadWriteTransactionRequest) {
             try {
                 final DOMDataTreeReadWriteTransaction tx = deviceDataBroker.newReadWriteTransaction();
@@ -190,6 +186,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             schemaRegistry = ((RefreshSlaveActor) message).getSchemaRegistry();
             setup = ((RefreshSlaveActor) message).getSetup();
             schemaRepository = ((RefreshSlaveActor) message).getSchemaRepository();
+        } else if (message instanceof NetconfDataTreeServiceRequest) {
+            ActorRef netconfActor = context()
+                .actorOf(NetconfDataTreeServiceActor.props(netconfService, writeTxIdleTimeout));
+            sender().tell(new Success(netconfActor), self());
         }
     }
 

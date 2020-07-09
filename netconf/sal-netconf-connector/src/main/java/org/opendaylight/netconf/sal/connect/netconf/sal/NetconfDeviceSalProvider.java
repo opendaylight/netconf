@@ -118,12 +118,6 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             this.id = requireNonNull(id);
         }
 
-        public void onTopologyDeviceConnected(final EffectiveModelContext initialCtx,
-                final DOMDataBroker broker, final DOMRpcService rpc,
-                final NetconfDeviceNotificationService newNotificationService) {
-            onTopologyDeviceConnected(initialCtx, broker, null, rpc, newNotificationService, null);
-        }
-
         public synchronized void onTopologyDeviceConnected(final EffectiveModelContext initialCtx,
                 final DOMDataBroker broker, final NetconfDataTreeService netconfService, final DOMRpcService rpc,
                 final NetconfDeviceNotificationService newNotificationService, final DOMActionService deviceAction) {

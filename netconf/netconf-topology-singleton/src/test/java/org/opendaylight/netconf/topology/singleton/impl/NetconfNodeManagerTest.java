@@ -387,7 +387,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     private void initializeMaster() {
         TestKit kit = new TestKit(masterSystem);
 
-        testMasterActorRef.tell(new CreateInitialMasterActorData(mockDeviceDataBroker, SOURCE_IDENTIFIERS,
+        testMasterActorRef.tell(new CreateInitialMasterActorData(mockDeviceDataBroker, null, SOURCE_IDENTIFIERS,
                 mockRpcService, mockActionService), kit.getRef());
 
         kit.expectMsgClass(MasterActorDataInitialized.class);

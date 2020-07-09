@@ -283,8 +283,8 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
             final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
         resultsFutures.add(netconfOps.commit(new NetconfRpcFutureCallback("Commit", id)));
 
-        final ListenableFuture<RpcResult<Void>> txResult = resultsToTxStatus(id, resultsFutures);
-        Futures.addCallback(txResult, new FutureCallback<>() {
+        final ListenableFuture<RpcResult<Void>> result = resultsToStatus(id, resultsFutures);
+        Futures.addCallback(result, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
                 unlock();
@@ -296,11 +296,10 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
                 unlock();
             }
         }, MoreExecutors.directExecutor());
-
-        return txResult;
+        return result;
     }
 
-    private static ListenableFuture<RpcResult<Void>> resultsToTxStatus(
+    private static ListenableFuture<RpcResult<Void>> resultsToStatus(
             final RemoteDeviceId id, List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
         final SettableFuture<RpcResult<Void>> transformed = SettableFuture.create();
 
