@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "af0a7cd6_c767ce9c",
+        "filename": "features/restconf/odl-restconf-nb-rfc8040/src/main/feature/feature.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-07-09T14:43:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b11fd224_9889811e",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 1
+      },
+      "revId": "428641b3f7b7eedabab75fdee59bfe3eb63c4bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cd1865e0_aa7cf790",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
         "patchSetId": 14
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "b05293ed_eb09b3c4",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-07-09T14:43:46Z",
+      "side": 1,
+      "message": "changed to StringBuilder",
+      "parentUuid": "cd1865e0_aa7cf790",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 34
+      },
+      "revId": "428641b3f7b7eedabab75fdee59bfe3eb63c4bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9e707dc9_bc915c3a",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
         "patchSetId": 14
@@ -68,6 +116,30 @@
       "revId": "428641b3f7b7eedabab75fdee59bfe3eb63c4bac",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4fba54ce_73ad259f",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandler.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-07-09T14:43:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e707dc9_bc915c3a",
+      "range": {
+        "startLine": 139,
+        "startChar": 12,
+        "endLine": 140,
+        "endChar": 29
+      },
+      "revId": "428641b3f7b7eedabab75fdee59bfe3eb63c4bac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
