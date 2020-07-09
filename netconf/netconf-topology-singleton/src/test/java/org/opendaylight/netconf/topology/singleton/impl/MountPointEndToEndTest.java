@@ -28,6 +28,7 @@ import akka.util.Timeout;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -39,7 +40,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.SucceededFuture;
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -102,6 +103,7 @@ import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -380,9 +382,11 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
 
         final MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
+        final ArrayList<String> capabilities = Lists.newArrayList(
+            NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
 
         masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
-                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService.getRpcService());
+                NetconfSessionPreferences.fromStrings(capabilities), deviceRpcService.getRpcService());
 
         DOMMountPoint masterMountPoint = awaitMountPoint(masterMountPointService);
 
@@ -455,9 +459,11 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
 
         MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
+        final ArrayList<String> capabilities = Lists.newArrayList(
+            NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
 
         masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
-                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService.getRpcService());
+                NetconfSessionPreferences.fromStrings(capabilities), deviceRpcService.getRpcService());
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
 

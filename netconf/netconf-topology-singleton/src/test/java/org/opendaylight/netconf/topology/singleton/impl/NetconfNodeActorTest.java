@@ -30,6 +30,8 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -45,6 +47,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteSource;
 import com.google.common.net.InetAddresses;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -53,6 +56,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -81,6 +85,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
@@ -103,6 +108,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -155,6 +161,9 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Mock
     private DOMDataBroker mockDOMDataBroker;
+
+    @Mock
+    private NetconfDataTreeService netconfService;
 
     @Mock
     private SchemaSourceRegistration<?> mockSchemaSourceReg1;
@@ -596,7 +605,6 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testSlaveNewTransactionRequests() {
-
         doReturn(mock(DOMDataTreeReadTransaction.class)).when(mockDOMDataBroker).newReadOnlyTransaction();
         doReturn(mock(DOMDataTreeReadWriteTransaction.class)).when(mockDOMDataBroker).newReadWriteTransaction();
         doReturn(mock(DOMDataTreeWriteTransaction.class)).when(mockDOMDataBroker).newWriteOnlyTransaction();
@@ -620,6 +628,50 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(mockDOMDataBroker).newWriteOnlyTransaction();
     }
 
+    @Test
+    public void testSlaveNewNetconfDataTreeServiceRequest() {
+        initializeMaster(Collections.emptyList());
+        registerSlaveMountPoint();
+
+        ArgumentCaptor<NetconfDataTreeService> netconfCaptor = ArgumentCaptor.forClass(NetconfDataTreeService.class);
+        verify(mockMountPointBuilder).addService(eq(NetconfDataTreeService.class), netconfCaptor.capture());
+
+        final NetconfDataTreeService slaveNetconfService = netconfCaptor.getValue();
+        assertTrue(slaveNetconfService instanceof ProxyNetconfDataTreeService);
+
+        final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
+        final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
+        final NormalizedNode<?, ?> NODE = Builders.containerBuilder()
+            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont"))).build();
+
+        final FluentFuture<Optional<Object>> result = immediateFluentFuture(Optional.of(NODE));
+        doReturn(result).when(netconfService).get(PATH);
+        doReturn(result).when(netconfService).getConfig(PATH);
+        doReturn(emptyFluentFuture()).when(netconfService).commit(any());
+
+        slaveNetconfService.get(PATH);
+        slaveNetconfService.getConfig(PATH);
+        slaveNetconfService.lock();
+        slaveNetconfService.merge(STORE, PATH, NODE, Optional.empty());
+        slaveNetconfService.replace(STORE, PATH, NODE, Optional.empty());
+        slaveNetconfService.create(STORE, PATH, NODE, Optional.empty());
+        slaveNetconfService.delete(STORE, PATH);
+        slaveNetconfService.remove(STORE, PATH);
+        slaveNetconfService.discardChanges();
+        slaveNetconfService.commit(Collections.emptyList());
+
+        verify(netconfService, timeout(1000)).get(PATH);
+        verify(netconfService, timeout(1000)).getConfig(PATH);
+        verify(netconfService, timeout(1000)).lock();
+        verify(netconfService, timeout(1000)).merge(STORE, PATH, NODE, Optional.empty());
+        verify(netconfService, timeout(1000)).replace(STORE, PATH, NODE, Optional.empty());
+        verify(netconfService, timeout(1000)).create(STORE, PATH, NODE, Optional.empty());
+        verify(netconfService, timeout(1000)).delete(STORE, PATH);
+        verify(netconfService, timeout(1000)).remove(STORE, PATH);
+        verify(netconfService, timeout(1000)).discardChanges();
+        verify(netconfService, timeout(1000)).commit(any());
+    }
+
     private ActorRef registerSlaveMountPoint() {
         SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
@@ -637,18 +689,17 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(mockMountPointBuilder, timeout(5000)).register();
         verify(mockMountPointBuilder).addInitialSchemaContext(mockSchemaContext);
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), any());
+        verify(mockMountPointBuilder).addService(eq(NetconfDataTreeService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMNotificationService.class), any());
 
         testKit.expectMsgClass(Success.class);
-
         return slaveRef;
     }
 
     private void initializeMaster(final List<SourceIdentifier> sourceIdentifiers) {
-        masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, sourceIdentifiers,
+        masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, netconfService, sourceIdentifiers,
                 mockDOMRpcService, mockDOMActionService), testKit.getRef());
-
         testKit.expectMsgClass(MasterActorDataInitialized.class);
     }
 

@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -50,9 +51,11 @@ public class SlaveSalFacade {
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
         final ProxyDOMDataBroker netconfDeviceDataBroker = new ProxyDOMDataBroker(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
+        final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
+            actorSystem.dispatcher(), actorResponseWaitTime);
 
         salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
-            null, deviceRpc, notificationService, deviceAction);
+            proxyNetconfService, deviceRpc, notificationService, deviceAction);
 
         LOG.info("{}: Slave mount point registered.", id);
     }
