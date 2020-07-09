@@ -113,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "512ae4dc_0bc7bb5c",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-07-09T17:20:09Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "2d186edb_0c518691",
+      "revId": "03dfba8c311797ccd7c8f24877f11fa422a214d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a94e7be8_6ff9c6f0",
         "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
         "patchSetId": 3
