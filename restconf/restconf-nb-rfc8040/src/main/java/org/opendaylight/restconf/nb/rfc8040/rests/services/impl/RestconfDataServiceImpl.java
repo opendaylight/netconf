@@ -43,6 +43,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.DataResourceIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -135,7 +136,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response readData(final String identifier, final UriInfo uriInfo) {
+    public Response readData(final DataResourceIdentifier identifier, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContextRef = this.schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(this.mountPointServiceHandler.get()));
@@ -232,7 +233,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response putData(final DataResourceIdentifier identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
         requireNonNull(payload);
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
@@ -309,7 +311,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response postData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response postData(final DataResourceIdentifier identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
         return postData(payload, uriInfo);
     }
 
@@ -330,7 +333,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response deleteData(final String identifier) {
+    public Response deleteData(final DataResourceIdentifier identifier) {
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, this.schemaContextHandler.get(), Optional.of(this.mountPointServiceHandler.get()));
 
@@ -348,7 +351,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public PatchStatusContext patchData(final String identifier, final PatchContext context, final UriInfo uriInfo) {
+    public PatchStatusContext patchData(final DataResourceIdentifier identifier, final PatchContext context,
+            final UriInfo uriInfo) {
         return patchData(context, uriInfo);
     }
 
@@ -361,7 +365,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response patchData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response patchData(final DataResourceIdentifier identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
         requireNonNull(payload);
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload

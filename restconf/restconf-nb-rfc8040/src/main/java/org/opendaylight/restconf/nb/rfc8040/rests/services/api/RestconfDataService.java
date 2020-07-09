@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.DataResourceIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.api.UpdateHandlers;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -48,7 +49,7 @@ public interface RestconfDataService extends UpdateHandlers {
     @Path("/data/{identifier:.+}")
     @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
             Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    Response readData(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    Response readData(@Encoded @PathParam("identifier") DataResourceIdentifier identifier, @Context UriInfo uriInfo);
 
     /**
      * Get target data resource from data root.
@@ -76,7 +77,7 @@ public interface RestconfDataService extends UpdateHandlers {
     @Path("/data/{identifier:.+}")
     @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
             Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    Response putData(@Encoded @PathParam("identifier") DataResourceIdentifier identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
     /**
@@ -94,8 +95,8 @@ public interface RestconfDataService extends UpdateHandlers {
     @Path("/data/{identifier:.+}")
     @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
             Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    Response postData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
-            @Context UriInfo uriInfo);
+    Response postData(@Encoded @PathParam("identifier") DataResourceIdentifier identifier,
+            NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
     /**
      * Create a data resource.
@@ -121,7 +122,7 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @DELETE
     @Path("/data/{identifier:.+}")
-    Response deleteData(@Encoded @PathParam("identifier") String identifier);
+    Response deleteData(@Encoded @PathParam("identifier") DataResourceIdentifier identifier);
 
     /**
      * Ordered list of edits that are applied to the target datastore by the
@@ -141,8 +142,8 @@ public interface RestconfDataService extends UpdateHandlers {
             Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML })
     @Produces({ Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
             Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML })
-    PatchStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PatchContext context,
-                                 @Context UriInfo uriInfo);
+    PatchStatusContext patchData(@Encoded @PathParam("identifier") DataResourceIdentifier identifier,
+            PatchContext context, @Context UriInfo uriInfo);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server.
@@ -175,6 +176,6 @@ public interface RestconfDataService extends UpdateHandlers {
     @Path("/data/{identifier:.+}")
     @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
             Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    Response patchData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
-                       @Context UriInfo uriInfo);
+    Response patchData(@Encoded @PathParam("identifier") DataResourceIdentifier identifier,
+            NormalizedNodeContext payload, @Context UriInfo uriInfo);
 }

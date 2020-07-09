@@ -16,6 +16,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.DataResourceIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -111,17 +112,19 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
     }
 
     @Override
-    public Response readData(final String identifier, final UriInfo uriInfo) {
+    public Response readData(final DataResourceIdentifier identifier, final UriInfo uriInfo) {
         return this.delegRestconfDataService.readData(identifier, uriInfo);
     }
 
     @Override
-    public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response putData(final DataResourceIdentifier identifier,
+            final NormalizedNodeContext payload, final UriInfo uriInfo) {
         return this.delegRestconfDataService.putData(identifier, payload, uriInfo);
     }
 
     @Override
-    public Response postData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response postData(final DataResourceIdentifier identifier,
+            final NormalizedNodeContext payload, final UriInfo uriInfo) {
         return this.delegRestconfDataService.postData(identifier, payload, uriInfo);
     }
 
@@ -131,12 +134,13 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
     }
 
     @Override
-    public Response deleteData(final String identifier) {
+    public Response deleteData(final DataResourceIdentifier identifier) {
         return this.delegRestconfDataService.deleteData(identifier);
     }
 
     @Override
-    public PatchStatusContext patchData(final String identifier, final PatchContext context, final UriInfo uriInfo) {
+    public PatchStatusContext patchData(final DataResourceIdentifier identifier, final PatchContext context,
+            final UriInfo uriInfo) {
         return this.delegRestconfDataService.patchData(identifier, context, uriInfo);
     }
 
@@ -146,7 +150,8 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
     }
 
     @Override
-    public Response patchData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response patchData(final DataResourceIdentifier identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
         return this.delegRestconfDataService.patchData(identifier, payload, uriInfo);
     }
 
