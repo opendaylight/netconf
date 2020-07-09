@@ -646,7 +646,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     private void initializeMaster(final List<SourceIdentifier> sourceIdentifiers) {
-        masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, sourceIdentifiers,
+        masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, null, sourceIdentifiers,
                 mockDOMRpcService, mockDOMActionService), testKit.getRef());
 
         testKit.expectMsgClass(MasterActorDataInitialized.class);
