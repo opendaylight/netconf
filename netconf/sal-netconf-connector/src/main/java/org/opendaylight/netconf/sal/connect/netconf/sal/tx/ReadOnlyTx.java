@@ -49,7 +49,7 @@ public final class ReadOnlyTx implements DOMDataTreeReadTransaction {
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
     }
 
-    private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
+    public static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
         final SettableFuture<T> ret = SettableFuture.create();
         Futures.addCallback(input, new FutureCallback<T>() {
 
