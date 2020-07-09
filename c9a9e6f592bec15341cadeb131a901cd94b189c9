@@ -70,6 +70,52 @@
       "revId": "c9a9e6f592bec15341cadeb131a901cd94b189c9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "45628eb2_0463634a",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-09T15:34:49Z",
+      "side": 1,
+      "message": "this is a huge antipattern. refactor these things into two implementations and inject proper implementation",
+      "range": {
+        "startLine": 102,
+        "startChar": 12,
+        "endLine": 102,
+        "endChar": 32
+      },
+      "revId": "c9a9e6f592bec15341cadeb131a901cd94b189c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9a2f4736_de8afae6",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-09T15:34:49Z",
+      "side": 1,
+      "message": "i.e. here we\u0027d have a base abstract class and two implementations, each providing the appropriate URI",
+      "range": {
+        "startLine": 124,
+        "startChar": 17,
+        "endLine": 124,
+        "endChar": 65
+      },
+      "revId": "c9a9e6f592bec15341cadeb131a901cd94b189c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
