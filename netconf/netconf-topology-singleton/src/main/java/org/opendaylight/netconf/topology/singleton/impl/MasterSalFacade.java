@@ -24,9 +24,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDataTreeServiceImpl;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
@@ -54,6 +56,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private DOMRpcService deviceRpc = null;
     private DOMDataBroker deviceDataBroker = null;
+    private NetconfDataTreeService netconfService = null;
     private DOMActionService deviceAction = null;
 
     MasterSalFacade(final RemoteDeviceId id,
@@ -136,17 +139,24 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
         deviceDataBroker = newDeviceDataBroker();
+        netconfService = newNetconfDataTreeService();
 
         // We need to create ProxyDOMDataBroker so accessing mountpoint
         // on leader node would be same as on follower node
         final ProxyDOMDataBroker proxyDataBroker = new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(),
             actorResponseWaitTime);
+        final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
+            actorSystem.dispatcher(), actorResponseWaitTime);
         salProvider.getMountInstance().onTopologyDeviceConnected(currentMountContext.getEffectiveModelContext(),
-            proxyDataBroker, null, deviceRpc, notificationService, deviceAction);
+            proxyDataBroker, proxyNetconfService, deviceRpc, notificationService, deviceAction);
     }
 
     protected DOMDataBroker newDeviceDataBroker() {
         return new NetconfDeviceDataBroker(id, currentMountContext, deviceRpc, netconfSessionPreferences);
+    }
+
+    protected NetconfDataTreeService newNetconfDataTreeService() {
+        return new NetconfDataTreeServiceImpl(id, currentMountContext, deviceRpc, netconfSessionPreferences);
     }
 
     private Future<Object> sendInitialDataToActor() {
@@ -159,8 +169,8 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
             masterActorRef);
 
         // send initial data to master actor
-        return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,
-                deviceRpc, deviceAction), actorResponseWaitTime);
+        return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, netconfService,
+            sourceIdentifiers, deviceRpc, deviceAction), actorResponseWaitTime);
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
