@@ -21,7 +21,7 @@ support notifications from mounted NETCONF devices.**
 
     It may also be useful to read the generic `OpenDaylight MD-SAL app
     development
-    tutorial <https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:MD-SAL_App_Tutorial>`__
+    tutorial <https://wiki-archive.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:MD-SAL_App_Tutorial>`__
     before diving into this chapter. This guide assumes awareness of
     basic OpenDaylight application development.
 
@@ -37,10 +37,10 @@ repositories:
 
 or checked out from the official OpenDaylight repository:
 
--  https://git.opendaylight.org/gerrit/#/admin/projects/coretutorials
+-  https://git.opendaylight.org/gerrit/admin/repos/coretutorials
 
 **The application was built using the** `project startup maven
-archetype <https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:Startup_Project_Archetype>`__
+archetype <https://wiki-archive.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:Startup_Project_Archetype>`__
 **and demonstrates how to:**
 
 -  preconfigure connectors to NETCONF devices
@@ -60,7 +60,7 @@ archetype <https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:Sta
 
 Detailed information about the structure of the application can be found
 at:
-https://wiki.opendaylight.org/view/Controller_Core_Functionality_Tutorials:Tutorials:Netconf_Mount
+https://wiki-archive.opendaylight.org/view/Controller_Core_Functionality_Tutorials:Tutorials:Netconf_Mount
 
 .. note::
 
@@ -235,4 +235,4 @@ returns it from ``showNode``.
 
     More information can be found in the source code of ncmount sample
     app + on wiki:
-    https://wiki.opendaylight.org/view/Controller_Core_Functionality_Tutorials:Tutorials:Netconf_Mount
+    https://wiki-archive.opendaylight.org/view/Controller_Core_Functionality_Tutorials:Tutorials:Netconf_Mount
