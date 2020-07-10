@@ -22,6 +22,30 @@
       "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d41b9ea_c4f59cbc",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-07-10T09:21:34Z",
+      "side": 1,
+      "message": "Right, missed this, since we are fixing up the model, might as well correct the naming.",
+      "parentUuid": "c37b30de_918feb00",
+      "range": {
+        "startLine": 87,
+        "startChar": 24,
+        "endLine": 87,
+        "endChar": 33
+      },
+      "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
