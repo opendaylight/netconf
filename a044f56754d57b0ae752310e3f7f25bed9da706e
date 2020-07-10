@@ -118,6 +118,30 @@
       "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91196616_dcf09a4b",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-10T11:18:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff69893e_4ff5307d",
+      "range": {
+        "startLine": 87,
+        "startChar": 24,
+        "endLine": 87,
+        "endChar": 33
+      },
+      "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
