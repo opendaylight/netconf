@@ -94,6 +94,30 @@
       "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff69893e_4ff5307d",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-10T10:26:22Z",
+      "side": 1,
+      "message": "That makes perfect sense, thank you. I was using JSON in testing so it was not obvious for me.",
+      "parentUuid": "1c83ffaa_f29c5b89",
+      "range": {
+        "startLine": 87,
+        "startChar": 24,
+        "endLine": 87,
+        "endChar": 33
+      },
+      "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
