@@ -70,6 +70,30 @@
       "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c83ffaa_f29c5b89",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-07-10T10:00:09Z",
+      "side": 1,
+      "message": "In Java world having an array called with the plural makes sense however here\u0027s an example how the leaf list would be encoded in xml:\n\u003cpasswords\u003epw1\u003c/passwords\u003e\n\u003cpasswords\u003epw2\u003c/passwords\u003e\n\nThe plural doesn\u0027t make much sense in this context, since the elements are individual passwords.\nUsually the norm in yang world is to have lists in singular because of the way its going to be encoded and if needed wrap the list in a container thats called with the plural but I dont think we need it here.",
+      "parentUuid": "43522156_991fbdcb",
+      "range": {
+        "startLine": 87,
+        "startChar": 24,
+        "endLine": 87,
+        "endChar": 33
+      },
+      "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
