@@ -46,6 +46,30 @@
       "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43522156_991fbdcb",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2020-07-10T09:35:51Z",
+      "side": 1,
+      "message": "The type is leaf-list, which is used to define an array so plural looks ok. Could you please explain why do you think it\u0027s wrong?",
+      "parentUuid": "4d41b9ea_c4f59cbc",
+      "range": {
+        "startLine": 87,
+        "startChar": 24,
+        "endLine": 87,
+        "endChar": 33
+      },
+      "revId": "a044f56754d57b0ae752310e3f7f25bed9da706e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
