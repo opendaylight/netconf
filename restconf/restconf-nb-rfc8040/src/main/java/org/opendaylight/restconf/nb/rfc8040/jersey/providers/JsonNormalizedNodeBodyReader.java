@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
+import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -112,7 +113,9 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
                 iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getNodeType()));
                 iiToDataList.add(result.getIdentifier());
             } else {
-                iiToDataList.add(result.getIdentifier());
+                if (!(parentSchema instanceof OperationDefinition)) {
+                    iiToDataList.add(result.getIdentifier());
+                }
             }
         } else {
             if (result instanceof MapNode) {
