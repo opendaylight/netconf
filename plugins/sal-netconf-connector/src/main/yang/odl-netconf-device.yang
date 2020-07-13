@@ -219,6 +219,13 @@ module odl-netconf-device {
   }
 
   grouping connection-oper {
+    leaf session-id {
+      config false;
+      type uint32 {
+        range "1..max";
+      }
+    }
+
     leaf connection-status {
       config false;
       type enumeration {
