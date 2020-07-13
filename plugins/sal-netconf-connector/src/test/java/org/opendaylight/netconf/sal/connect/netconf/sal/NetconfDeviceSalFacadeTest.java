@@ -32,6 +32,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -76,7 +77,7 @@ public class NetconfDeviceSalFacadeTest {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(
-            List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
+            List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()), Uint32.ONE);
 
         final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
         deviceFacade.onDeviceConnected(

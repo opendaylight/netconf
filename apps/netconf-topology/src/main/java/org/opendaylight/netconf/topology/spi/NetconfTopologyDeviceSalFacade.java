@@ -32,13 +32,12 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         super.onDeviceConnected(deviceSchema, sessionPreferences, services);
-        datastoreAdapter.updateDeviceData(true, deviceSchema.capabilities());
-
+        datastoreAdapter.updateDeviceData(true, deviceSchema.capabilities(), sessionPreferences.sessionId());
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty());
+        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), null);
         super.onDeviceDisconnected();
     }
 
