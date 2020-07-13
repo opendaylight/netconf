@@ -34,6 +34,7 @@ import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterA
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
@@ -105,7 +106,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     @Override
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
-        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty());
+        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), Uint32.ZERO);
         mount.onDeviceDisconnected();
     }
 
@@ -173,6 +174,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private void updateDeviceData() {
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
         LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
-        datastoreAdapter.updateClusteredDeviceData(true, masterAddress, currentSchema.capabilities());
+        datastoreAdapter.updateClusteredDeviceData(true, masterAddress, currentSchema.capabilities(),
+                netconfSessionPreferences.sessionId());
     }
 }
