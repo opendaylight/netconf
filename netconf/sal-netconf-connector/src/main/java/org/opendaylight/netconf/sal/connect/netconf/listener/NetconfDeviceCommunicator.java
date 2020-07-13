@@ -100,6 +100,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.debug("{}: Session established", id);
             currentSession = session;
 
+            // FIXME here we have the session id from hello message
             var netconfSessionPreferences = NetconfSessionPreferences.fromNetconfSession(session);
             LOG.trace("{}: Session advertised capabilities: {}", id, netconfSessionPreferences);
 
