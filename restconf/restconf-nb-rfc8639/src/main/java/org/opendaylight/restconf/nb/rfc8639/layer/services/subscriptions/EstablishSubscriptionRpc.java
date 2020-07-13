@@ -357,7 +357,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
 
             if (mountPointOpt.isPresent()) {
                 final DOMMountPoint domMountPoint = mountPointOpt.get();
-                schemaContext = domMountPoint.getSchemaContext();
+                schemaContext = domMountPoint.getEffectiveModelContext();
                 final Optional<DOMNotificationService> domNotifiServiceOpt = domMountPoint
                         .getService(DOMNotificationService.class);
                 if (!domNotifiServiceOpt.isPresent()) {
