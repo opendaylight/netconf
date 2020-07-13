@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -144,7 +145,7 @@ public class NetconfDeviceTopologyAdapterTest {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
-        adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
+        adapter.updateDeviceData(true, new NetconfDeviceCapabilities(), 5);
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
         verify(writeTx, times(1))
@@ -177,7 +178,7 @@ public class NetconfDeviceTopologyAdapterTest {
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
         wtx.commit().get(5, TimeUnit.SECONDS);
 
-        adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
+        adapter.updateDeviceData(true, new NetconfDeviceCapabilities(), 5);
         Optional<NormalizedNode<?, ?>> testNode = domDataBroker.newReadOnlyTransaction()
                 .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).get(2, TimeUnit.SECONDS);
 
