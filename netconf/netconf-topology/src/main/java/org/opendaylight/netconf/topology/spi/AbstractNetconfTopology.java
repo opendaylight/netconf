@@ -382,4 +382,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }
+
+
 }

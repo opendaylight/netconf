@@ -44,6 +44,7 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -109,9 +110,10 @@ public class NetconfDeviceSalFacadeTest {
     @Test
     public void testOnDeviceConnected() {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
+        final Uint32 sessionId = Uint32.valueOf(5L);
 
         final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(
-            List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
+            List.of(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()),sessionId);
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
         deviceFacade.onDeviceConnected(

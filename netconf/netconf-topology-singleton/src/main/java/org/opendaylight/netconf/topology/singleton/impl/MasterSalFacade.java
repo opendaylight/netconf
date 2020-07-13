@@ -107,7 +107,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     @Override
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, NetconfDeviceCapabilities.empty());
+        salProvider.getTopologyDatastoreAdapter()
+                .updateDeviceData(false, NetconfDeviceCapabilities.empty());
         unregisterMasterMountPoint();
     }
 
@@ -177,7 +178,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
         LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
         salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress,
-            currentSchema.capabilities());
+                currentSchema.capabilities(), netconfSessionPreferences.getSessionId());
     }
 
     private void unregisterMasterMountPoint() {

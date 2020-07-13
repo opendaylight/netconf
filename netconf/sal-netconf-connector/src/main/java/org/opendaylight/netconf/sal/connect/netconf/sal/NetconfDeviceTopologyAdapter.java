@@ -38,6 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,8 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         commitTransaction(writeTx, "init");
     }
 
-    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
+    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities,
+            final Uint32 sessionId) {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
@@ -77,21 +79,25 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         // FIXME: this needs to be tied together with node's operational existence
         writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
             id.getTopologyBindingPath().augmentation(NetconfNode.class),
-            newNetconfNodeBuilder(up, capabilities).build());
+            newNetconfNodeBuilder(up, capabilities, sessionId).build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
         commitTransaction(writeTx, "update");
     }
 
+    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
+        updateDeviceData(up, capabilities, Uint32.ZERO);
+    }
+
     public void updateClusteredDeviceData(final boolean up, final String masterAddress,
-                                          final NetconfDeviceCapabilities capabilities) {
+                                          final NetconfDeviceCapabilities capabilities, final Uint32 sessionId) {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
         writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
             id.getTopologyBindingPath().augmentation(NetconfNode.class),
-            newNetconfNodeBuilder(up, capabilities)
+            newNetconfNodeBuilder(up, capabilities, sessionId)
                 .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
                     .setNetconfMasterNode(masterAddress)
                     .build())
@@ -140,26 +146,32 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         commitTransaction(writeTx, "update-failed-device");
     }
 
-    private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities) {
-        return new NetconfNodeBuilder()
-            .setHost(id.getHost())
-            .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
-            .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
-            .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
-                .setAvailableCapability(ImmutableList.<AvailableCapability>builder()
-                    .addAll(capabilities.nonModuleBasedCapabilities())
-                    .addAll(capabilities.resolvedCapabilities())
-                    .build())
-                .build())
-            .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder()
-                .setUnavailableCapability(capabilities.unresolvedCapabilites().entrySet().stream()
-                    .map(unresolved -> new UnavailableCapabilityBuilder()
-                        // FIXME: better conversion than 'toString' ?
-                        .setCapability(unresolved.getKey().toString())
-                        .setFailureReason(unresolved.getValue())
+    private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities,
+            final Uint32 sessionId) {
+        NetconfNodeBuilder nodeBuilder = new NetconfNodeBuilder()
+                .setHost(id.getHost())
+                .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
+                .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
+                .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
+                        .setAvailableCapability(ImmutableList.<AvailableCapability>builder()
+                                .addAll(capabilities.nonModuleBasedCapabilities())
+                                .addAll(capabilities.resolvedCapabilities())
+                                .build())
                         .build())
-                    .collect(Collectors.toUnmodifiableList()))
-                .build());
+                .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder()
+                        .setUnavailableCapability(capabilities.unresolvedCapabilites().entrySet().stream()
+                                .map(unresolved -> new UnavailableCapabilityBuilder()
+                                        // FIXME: better conversion than 'toString' ?
+                                        .setCapability(unresolved.getKey().toString())
+                                        .setFailureReason(unresolved.getValue())
+                                        .build())
+                                .collect(Collectors.toUnmodifiableList()))
+                        .build());
+
+        if (!sessionId.equals(Uint32.ZERO)) {
+            nodeBuilder.setSessionId(sessionId);
+        }
+        return nodeBuilder;
     }
 
     private void commitTransaction(final WriteTransaction transaction, final String txType) {
