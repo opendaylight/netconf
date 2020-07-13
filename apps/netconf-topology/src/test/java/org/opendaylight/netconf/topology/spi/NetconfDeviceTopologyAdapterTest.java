@@ -36,6 +36,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceTopologyAdapterTest {
@@ -85,7 +86,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testDeviceUpdate() throws Exception {
-        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty());
+        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), Uint32.ONE);
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
