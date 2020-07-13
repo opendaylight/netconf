@@ -25,6 +25,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,8 @@ import org.slf4j.LoggerFactory;
 // FIXME: propagate to API with immutable semantics
 public record NetconfSessionPreferences(
         @NonNull ImmutableMap<String, CapabilityOrigin> nonModuleCaps,
-        @NonNull ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps) {
+        @NonNull ImmutableMap<QName, CapabilityOrigin> moduleBasedCaps,
+        @NonNull Uint32 sessionId) {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPreferences.class);
     private static final ParameterMatcher MODULE_PARAM = new ParameterMatcher("module=");
     private static final ParameterMatcher REVISION_PARAM = new ParameterMatcher("revision=");
@@ -42,19 +44,32 @@ public record NetconfSessionPreferences(
     public NetconfSessionPreferences {
         requireNonNull(nonModuleCaps);
         requireNonNull(moduleBasedCaps);
+        requireNonNull(sessionId);
     }
 
     public static @NonNull NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
-        return fromStrings(session.getServerCapabilities());
+        return fromStrings(session.getServerCapabilities(), Uint32.valueOf(session.getSessionId()));
     }
 
-    public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {
+    public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities,
+            final Uint32 sessionId) {
         // we do not know origin of capabilities from only Strings, so we set it to default value
-        return fromStrings(capabilities, CapabilityOrigin.DeviceAdvertised);
+        return fromStrings(capabilities, CapabilityOrigin.DeviceAdvertised, sessionId);
     }
 
     public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities,
             final CapabilityOrigin capabilityOrigin) {
+        // we do not know origin of capabilities from only Strings, so we set it to default value
+        return fromStrings(capabilities, capabilityOrigin, Uint32.ZERO);
+    }
+
+    public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {
+        // we do not know origin of capabilities from only Strings, so we set it to default value
+        return fromStrings(capabilities, Uint32.ZERO);
+    }
+
+    public static @NonNull NetconfSessionPreferences fromStrings(final Collection<String> capabilities,
+            final CapabilityOrigin capabilityOrigin, final Uint32 sessionId) {
         final var moduleBasedCaps = new HashMap<QName, CapabilityOrigin>();
         final var nonModuleCaps = new HashMap<String, CapabilityOrigin>();
 
@@ -102,7 +117,8 @@ public record NetconfSessionPreferences(
                     cachedQName(namespace, moduleName), capabilityOrigin);
         }
 
-        return new NetconfSessionPreferences(ImmutableMap.copyOf(nonModuleCaps), ImmutableMap.copyOf(moduleBasedCaps));
+        return new NetconfSessionPreferences(ImmutableMap.copyOf(nonModuleCaps), ImmutableMap.copyOf(moduleBasedCaps),
+                sessionId);
     }
 
     public @Nullable CapabilityOrigin capabilityOrigin(final QName capability) {
@@ -178,7 +194,8 @@ public record NetconfSessionPreferences(
                 + netconfSessionModuleCapabilities.moduleBasedCaps.size());
         mergedCaps.putAll(moduleBasedCaps);
         mergedCaps.putAll(netconfSessionModuleCapabilities.moduleBasedCaps);
-        return new NetconfSessionPreferences(nonModuleCaps, ImmutableMap.copyOf(mergedCaps));
+        return new NetconfSessionPreferences(nonModuleCaps, ImmutableMap.copyOf(mergedCaps),
+                netconfSessionModuleCapabilities.sessionId());
     }
 
     /**
@@ -188,11 +205,12 @@ public record NetconfSessionPreferences(
      * @return new instance of preferences with replaced module-based capabilities
      */
     public NetconfSessionPreferences replaceModuleCaps(final NetconfSessionPreferences netconfSessionPreferences) {
-        return new NetconfSessionPreferences(nonModuleCaps, netconfSessionPreferences.moduleBasedCaps);
+        return new NetconfSessionPreferences(nonModuleCaps, netconfSessionPreferences.moduleBasedCaps,
+                netconfSessionPreferences.sessionId());
     }
 
     public NetconfSessionPreferences replaceModuleCaps(final Map<QName, CapabilityOrigin> newModuleBasedCaps) {
-        return new NetconfSessionPreferences(nonModuleCaps, ImmutableMap.copyOf(newModuleBasedCaps));
+        return new NetconfSessionPreferences(nonModuleCaps, ImmutableMap.copyOf(newModuleBasedCaps), sessionId());
     }
 
     /**
@@ -207,7 +225,8 @@ public record NetconfSessionPreferences(
                 nonModuleCaps.size() + netconfSessionNonModuleCapabilities.nonModuleCaps.size());
         mergedCaps.putAll(nonModuleCaps);
         mergedCaps.putAll(netconfSessionNonModuleCapabilities.nonModuleCaps);
-        return new NetconfSessionPreferences(ImmutableMap.copyOf(mergedCaps), moduleBasedCaps);
+        return new NetconfSessionPreferences(ImmutableMap.copyOf(mergedCaps), moduleBasedCaps,
+        netconfSessionNonModuleCapabilities.sessionId());
     }
 
     /**
@@ -217,7 +236,8 @@ public record NetconfSessionPreferences(
      * @return new instance of preferences with replaced non-module based capabilities
      */
     public NetconfSessionPreferences replaceNonModuleCaps(final NetconfSessionPreferences netconfSessionPreferences) {
-        return new NetconfSessionPreferences(netconfSessionPreferences.nonModuleCaps, moduleBasedCaps);
+        return new NetconfSessionPreferences(netconfSessionPreferences.nonModuleCaps, moduleBasedCaps,
+                netconfSessionPreferences.sessionId());
     }
 
     private static QName cachedQName(final String namespace, final String revision, final String moduleName) {
