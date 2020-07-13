@@ -86,19 +86,21 @@ public final class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCl
                 .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, netconfService,
                         deviceRpc, notificationService, deviceAction);
         salProvider.getTopologyDatastoreAdapter()
-                .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+                .updateDeviceDataToConnected(netconfSessionPreferences.getNetconfDeviceCapabilities(),
+                    netconfSessionPreferences.getSessionId());
     }
 
     @Override
     public synchronized void onDeviceReconnected(final NetconfSessionPreferences netconfSessionPreferences,
             final NetconfNode node) {
         salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connecting,
-                netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, node);
+                netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, node,
+                netconfSessionPreferences.getSessionId());
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateDeviceDataToConnecting(new NetconfDeviceCapabilities());
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
         closeLockChangeListener();
     }
