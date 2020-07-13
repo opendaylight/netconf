@@ -27,6 +27,7 @@ import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARA
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ListenableFuture;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -38,7 +39,6 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -55,6 +55,7 @@ import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
@@ -71,6 +72,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -80,26 +82,26 @@ import org.w3c.dom.Element;
 public class NetconfDeviceCommunicatorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicatorTest.class);
-
-    @Mock
-    NetconfClientSession mockSession;
+    private static final Uint32 SESSION_ID = Uint32.ONE;
 
     @Mock
     RemoteDevice<NetconfDeviceCommunicator> mockDevice;
 
-    NetconfDeviceCommunicator communicator;
+    private NetconfClientSession spySession;
+    private NetconfDeviceCommunicator communicator;
 
     @Before
     public void setUp() throws Exception {
         communicator = new NetconfDeviceCommunicator(
                 new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
+        spySession = spy(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
+                SESSION_ID.toJava(), Set.of()));
     }
 
     void setupSession() {
-        doReturn(Collections.<String>emptySet()).when(mockSession).getServerCapabilities();
         doNothing().when(mockDevice).onRemoteSessionUp(any(NetconfSessionPreferences.class),
                 any(NetconfDeviceCommunicator.class));
-        communicator.onSessionUp(mockSession);
+        communicator.onSessionUp(spySession);
     }
 
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequest() throws Exception {
@@ -118,7 +120,7 @@ public class NetconfDeviceCommunicatorTest {
         ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture)
                 .addListener(any(GenericFutureListener.class));
-        doReturn(mockChannelFuture).when(mockSession).sendMessage(same(message));
+        doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture =
                 communicator.sendRequest(message, QName.create("", "mockRpc"));
@@ -135,14 +137,14 @@ public class NetconfDeviceCommunicatorTest {
             NetconfMessageTransformUtil.NETCONF_ROLLBACK_ON_ERROR_URI.toString(),
             NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString(),
             testCapability);
-        doReturn(serverCapabilities).when(mockSession).getServerCapabilities();
+        doReturn(serverCapabilities).when(spySession).getServerCapabilities();
 
         final var netconfSessionPreferences = ArgumentCaptor.forClass(NetconfSessionPreferences.class);
         doNothing().when(mockDevice).onRemoteSessionUp(netconfSessionPreferences.capture(), eq(communicator));
 
-        communicator.onSessionUp(mockSession);
+        communicator.onSessionUp(spySession);
 
-        verify(mockSession).getServerCapabilities();
+        verify(spySession).getServerCapabilities();
         verify(mockDevice).onRemoteSessionUp(netconfSessionPreferences.capture(), eq(communicator));
 
         NetconfSessionPreferences actualCapabilites = netconfSessionPreferences.getValue();
@@ -153,6 +155,7 @@ public class NetconfDeviceCommunicatorTest {
                 actualCapabilites.moduleBasedCaps().keySet());
         assertTrue(actualCapabilites.isRollbackSupported());
         assertTrue(actualCapabilites.isMonitoringSupported());
+        assertEquals(SESSION_ID, actualCapabilites.sessionId());
     }
 
     @SuppressWarnings("unchecked")
@@ -165,7 +168,7 @@ public class NetconfDeviceCommunicatorTest {
 
         doNothing().when(mockDevice).onRemoteSessionDown();
 
-        communicator.onSessionDown(mockSession, new Exception("mock ex"));
+        communicator.onSessionDown(spySession, new Exception("mock ex"));
 
         verifyErrorRpcResult(resultFuture1.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
         verifyErrorRpcResult(resultFuture2.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
@@ -174,7 +177,7 @@ public class NetconfDeviceCommunicatorTest {
 
         reset(mockDevice);
 
-        communicator.onSessionDown(mockSession, new Exception("mock ex"));
+        communicator.onSessionDown(spySession, new Exception("mock ex"));
 
         verify(mockDevice, never()).onRemoteSessionDown();
     }
@@ -189,7 +192,7 @@ public class NetconfDeviceCommunicatorTest {
 
         String reasonText = "testing terminate";
         NetconfTerminationReason reason = new NetconfTerminationReason(reasonText);
-        communicator.onSessionTerminated(mockSession, reason);
+        communicator.onSessionTerminated(spySession, reason);
 
         RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED);
         assertEquals("RpcError message", reasonText, rpcError.getMessage());
@@ -216,11 +219,11 @@ public class NetconfDeviceCommunicatorTest {
 
         ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
-        doReturn(mockChannelFuture).when(mockSession).sendMessage(same(message));
+        doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
 
-        verify(mockSession).sendMessage(same(message));
+        verify(spySession).sendMessage(same(message));
 
         assertNotNull("ListenableFuture is null", resultFuture);
 
@@ -278,7 +281,7 @@ public class NetconfDeviceCommunicatorTest {
 
         ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
-        doReturn(mockChannelFuture).when(mockSession).sendMessage(same(message));
+        doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest(message, rpc);
 
@@ -315,7 +318,7 @@ public class NetconfDeviceCommunicatorTest {
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture3 = sendRequest(messageID3, true);
 
         //response messages 1,2 are omitted
-        communicator.onMessage(mockSession, createSuccessResponseMessage(messageID3));
+        communicator.onMessage(spySession, createSuccessResponseMessage(messageID3));
 
         verifyResponseMessage(resultFuture3.get(), messageID3);
     }
@@ -330,8 +333,8 @@ public class NetconfDeviceCommunicatorTest {
         String messageID2 = UUID.randomUUID().toString();
         final ListenableFuture<RpcResult<NetconfMessage>> resultFuture2 = sendRequest(messageID2, true);
 
-        communicator.onMessage(mockSession, createSuccessResponseMessage(messageID1));
-        communicator.onMessage(mockSession, createSuccessResponseMessage(messageID2));
+        communicator.onMessage(spySession, createSuccessResponseMessage(messageID1));
+        communicator.onMessage(spySession, createSuccessResponseMessage(messageID2));
 
         verifyResponseMessage(resultFuture1.get(), messageID1);
         verifyResponseMessage(resultFuture2.get(), messageID2);
@@ -344,7 +347,7 @@ public class NetconfDeviceCommunicatorTest {
         String messageID = UUID.randomUUID().toString();
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID, true);
 
-        communicator.onMessage(mockSession, createErrorResponseMessage(messageID));
+        communicator.onMessage(spySession, createErrorResponseMessage(messageID));
 
         RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE);
         assertEquals("RpcError message", "Missing attribute", rpcError.getMessage());
@@ -362,7 +365,7 @@ public class NetconfDeviceCommunicatorTest {
         String messageID = UUID.randomUUID().toString();
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID, true);
 
-        communicator.onMessage(mockSession, createMultiErrorResponseMessage(messageID));
+        communicator.onMessage(spySession, createMultiErrorResponseMessage(messageID));
 
         RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.PROTOCOL, ErrorTag.OPERATION_FAILED);
 
@@ -438,7 +441,7 @@ public class NetconfDeviceCommunicatorTest {
         String messageID = UUID.randomUUID().toString();
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID, true);
 
-        communicator.onMessage(mockSession, createSuccessResponseMessage(UUID.randomUUID().toString()));
+        communicator.onMessage(spySession, createSuccessResponseMessage(UUID.randomUUID().toString()));
 
         RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
         assertFalse("RpcError message non-empty", Strings.isNullOrEmpty(rpcError.getMessage()));
@@ -464,7 +467,7 @@ public class NetconfDeviceCommunicatorTest {
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(notWorkingMessageID, false);
         assertEquals("ListenableFuture is null", false, resultFuture instanceof UncancellableFuture);
 
-        communicator.onMessage(mockSession, createSuccessResponseMessage(messageID.get(0)));
+        communicator.onMessage(spySession, createSuccessResponseMessage(messageID.get(0)));
 
         resultFuture = sendRequest(messageID.get(0), false);
         assertNotNull("ListenableFuture is null", resultFuture);

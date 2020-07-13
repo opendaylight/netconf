@@ -15,6 +15,7 @@ import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceSchema;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**
  * {@link NetconfDeviceSalFacade} specialization for netconf topology.
@@ -32,13 +33,13 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         super.onDeviceConnected(deviceSchema, sessionPreferences, services);
-        datastoreAdapter.updateDeviceData(true, deviceSchema.capabilities());
+        datastoreAdapter.updateDeviceData(true, deviceSchema.capabilities(), sessionPreferences.sessionId());
 
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty());
+        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), Uint32.ZERO);
         super.onDeviceDisconnected();
     }
 
