@@ -117,8 +117,8 @@ public final class NetconfNodeUtils {
             overrideNonModuleCaps = false;
         }
 
-        return new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined),
-            overrideYangModuleCaps, overrideNonModuleCaps);
+        return new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined,
+                node.getSessionId()), overrideYangModuleCaps, overrideNonModuleCaps);
     }
 
     @Deprecated(forRemoval = true)
