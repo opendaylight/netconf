@@ -103,7 +103,7 @@ public final class NetconfNodeUtils {
 
         //non-module capabilities should not exist in yang module capabilities
         final var sessionPreferences = NetconfSessionPreferences.fromStrings(capabilities,
-            CapabilityOrigin.DeviceAdvertised);
+            CapabilityOrigin.DeviceAdvertised, node.getSessionId());
         final var nonModulePrefs = sessionPreferences.nonModuleCaps();
         if (!nonModulePrefs.isEmpty()) {
             throw new IllegalArgumentException("List yang-module-capabilities/capability should contain only module "
@@ -121,8 +121,8 @@ public final class NetconfNodeUtils {
         // FIXME: UserPreferences is constructor parameter of NetconfDeviceCommunicator and NetconfSessionPreferences
         // are created in NetconfDeviceCommunicator#onSessionUp from session. What are we doing here?
         // IMO we should rework UserPreferences and NetconfSessionPreferences and this method.
-        return new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined),
-            overrideYangModuleCaps, overrideNonModuleCaps);
+        return new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined,
+                node.getSessionId()), overrideYangModuleCaps, overrideNonModuleCaps);
     }
 
     @Deprecated(forRemoval = true)

@@ -14,7 +14,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.Transaction;
@@ -44,6 +43,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,14 +88,15 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         return nodePath().augmentation(NetconfNode.class);
     }
 
-    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
+    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities,
+            final Uint32 sessionId) {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
 
         // FIXME: this needs to be tied together with node's operational existence
         writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
-            newNetconfNodeBuilder(up, capabilities).build());
+            newNetconfNodeBuilder(up, capabilities, sessionId).build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
@@ -103,12 +104,12 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     }
 
     public void updateClusteredDeviceData(final boolean up, final String masterAddress,
-                                          final NetconfDeviceCapabilities capabilities) {
+            final NetconfDeviceCapabilities capabilities, final Uint32 sessionId) {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
         writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
-            newNetconfNodeBuilder(up, capabilities)
+            newNetconfNodeBuilder(up, capabilities, sessionId)
                 .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
                     .setNetconfMasterNode(masterAddress)
                     .build())
@@ -156,7 +157,8 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         commitTransaction(writeTx, "update-failed-device");
     }
 
-    private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities) {
+    private NetconfNodeBuilder newNetconfNodeBuilder(final boolean up, final NetconfDeviceCapabilities capabilities,
+            final Uint32 sessionId) {
         return new NetconfNodeBuilder()
             .setHost(id.host())
             .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
@@ -174,8 +176,9 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
                         .setCapability(unresolved.getKey().toString())
                         .setFailureReason(unresolved.getValue())
                         .build())
-                    .collect(Collectors.toUnmodifiableList()))
-                .build());
+                    .toList())
+                .build())
+            .setSessionId(sessionId);
     }
 
     private void commitTransaction(final WriteTransaction transaction, final String txType) {
