@@ -443,7 +443,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         return Optional.of(new UserPreferences(NetconfSessionPreferences
-            .fromStrings(capabilities, CapabilityOrigin.UserDefined), overrideYangModuleCaps, overrideNonModuleCaps));
+            .fromStrings(capabilities, CapabilityOrigin.UserDefined, -1), overrideYangModuleCaps,
+            overrideNonModuleCaps));
     }
 
     protected static class NetconfConnectorDTO implements AutoCloseable {

@@ -226,6 +226,11 @@ module netconf-node-topology {
 
     grouping netconf-node-connection-status {
 
+        leaf session-id {
+            config false;
+            type uint32;
+        }
+
         leaf connection-status {
             config false;
             type enumeration {
