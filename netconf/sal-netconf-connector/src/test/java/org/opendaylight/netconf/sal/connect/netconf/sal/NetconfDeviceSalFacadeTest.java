@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
@@ -60,7 +61,9 @@ public class NetconfDeviceSalFacadeTest {
 
         doReturn(netconfDeviceTopologyAdapter).when(salProvider).getTopologyDatastoreAdapter();
         doNothing().when(netconfDeviceTopologyAdapter)
-                .updateDeviceData(any(Boolean.class), any(NetconfDeviceCapabilities.class));
+            .updateDeviceDataToConnecting(any(NetconfDeviceCapabilities.class));
+        doNothing().when(netconfDeviceTopologyAdapter)
+            .updateDeviceDataToConnected(any(NetconfDeviceCapabilities.class), anyLong());
 
         doReturn(mountInstance).when(salProvider).getMountInstance();
         doNothing().when(mountInstance).onTopologyDeviceDisconnected();
@@ -70,7 +73,7 @@ public class NetconfDeviceSalFacadeTest {
     public void testOnDeviceDisconnected() {
         deviceFacade.onDeviceDisconnected();
 
-        verify(netconfDeviceTopologyAdapter).updateDeviceData(eq(false), any(NetconfDeviceCapabilities.class));
+        verify(netconfDeviceTopologyAdapter).updateDeviceDataToConnecting(any(NetconfDeviceCapabilities.class));
         verify(mountInstance, times(1)).onTopologyDeviceDisconnected();
 
     }
@@ -93,9 +96,9 @@ public class NetconfDeviceSalFacadeTest {
     @Test
     public void testOnDeviceConnected() {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
-
+        final long sessionId = 5L;
         final NetconfSessionPreferences netconfSessionPreferences =
-                NetconfSessionPreferences.fromStrings(getCapabilities());
+                NetconfSessionPreferences.fromStrings(getCapabilities(), sessionId);
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
         deviceFacade.onDeviceConnected(new EmptyMountPointContext(schemaContext), netconfSessionPreferences, deviceRpc,
@@ -105,7 +108,8 @@ public class NetconfDeviceSalFacadeTest {
                 any(DOMDataBroker.class), any(NetconfDataTreeService.class), eq(deviceRpc),
                 any(NetconfDeviceNotificationService.class), isNull());
         verify(netconfDeviceTopologyAdapter,
-                times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+                times(1))
+            .updateDeviceDataToConnected(netconfSessionPreferences.getNetconfDeviceCapabilities(), sessionId);
     }
 
     @Test
