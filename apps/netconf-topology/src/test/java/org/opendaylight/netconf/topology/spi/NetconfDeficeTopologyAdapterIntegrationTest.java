@@ -38,6 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -114,7 +115,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
         wtx.commit().get(5, TimeUnit.SECONDS);
 
-        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty());
+        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), Uint32.ZERO);
 
         assertEquals(Optional.of(dataTestId), domDataBroker.newReadOnlyTransaction()
             .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf)
