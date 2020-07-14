@@ -45,6 +45,14 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
           <groupId>org.awaitility</groupId>
           <artifactId>awaitility</artifactId>
       </dependency>
+      <dependency>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+      </dependency>
   </dependencies>
 
   <build>

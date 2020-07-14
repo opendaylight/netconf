@@ -20,6 +20,9 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -39,6 +42,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MdsalNetconfOperationServiceFactory.class);
@@ -52,6 +56,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
+    @Inject
     public MdsalNetconfOperationServiceFactory(
             final DOMSchemaService schemaService,
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
@@ -78,6 +83,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
+    @PreDestroy
     public void close() {
         try {
             currentSchemaContext.close();

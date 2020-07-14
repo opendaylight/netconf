@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
@@ -25,6 +27,7 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NetconfNorthboundSshServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundSshServer.class);
@@ -37,6 +40,7 @@ public class NetconfNorthboundSshServer {
     private final ChannelFuture localServer;
     private final SshProxyServer sshProxyServer;
 
+    @Inject
     public NetconfNorthboundSshServer(final NetconfServerDispatcher netconfServerDispatcher,
                                       final EventLoopGroup workerGroup,
                                       final EventExecutor eventExecutor,
