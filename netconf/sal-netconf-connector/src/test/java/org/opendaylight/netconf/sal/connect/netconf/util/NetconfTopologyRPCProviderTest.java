@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -48,12 +49,14 @@ public class NetconfTopologyRPCProviderTest {
     private AAAEncryptionService encryptionService;
 
     private NetconfTopologyRPCProvider rpcProvider ;
+    @Mock
+    private RpcProviderService rpcProviderService;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         when(encryptionService.encrypt(TEST_PWD)).thenReturn(ENC_PWD);
-        rpcProvider = new NetconfTopologyRPCProvider(dataBroker, encryptionService, TOPOLOGY_ID);
+        rpcProvider = new NetconfTopologyRPCProvider(dataBroker, encryptionService, TOPOLOGY_ID,rpcProviderService);
     }
 
     @Test

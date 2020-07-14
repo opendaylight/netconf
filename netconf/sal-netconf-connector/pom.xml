@@ -142,8 +142,29 @@
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-test-util</artifactId>
     </dependency>
-  </dependencies>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.aries.blueprint</groupId>
+      <artifactId>blueprint-maven-plugin-annotation</artifactId>
+      <optional>true</optional>
+    </dependency>
 
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.aries.blueprint</groupId>
+        <artifactId>blueprint-maven-plugin</artifactId>
+        <configuration>
+          <scanPaths>org.opendaylight.netconf.sal.connect</scanPaths>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <scm>
     <connection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</connection>
     <developerConnection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</developerConnection>

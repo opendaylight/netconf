@@ -14,8 +14,13 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.config.ConfigProperty;
+import org.apache.aries.blueprint.annotation.service.Reference;
+import org.apache.aries.blueprint.annotation.service.Service;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -46,6 +51,8 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
+@Service(classes = NetconfNodeTopologyService.class)
 public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
@@ -53,9 +60,11 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     private final AAAEncryptionService encryptionService;
     private final DataBroker dataBroker;
 
-    public NetconfTopologyRPCProvider(final DataBroker dataBroker,
-                                      final AAAEncryptionService encryptionService,
-                                      final String topologyId) {
+    public NetconfTopologyRPCProvider(@Reference final DataBroker dataBroker,
+                                      @Reference final AAAEncryptionService encryptionService,
+                                      @ConfigProperty(value = "topology-netconf") final String topologyId,
+                                      @Reference RpcProviderService rpc) {
+        rpc.registerRpcImplementation(NetconfNodeTopologyService.class,this);
         this.dataBroker = dataBroker;
         this.encryptionService = requireNonNull(encryptionService);
         this.topologyPath = InstanceIdentifier.builder(NetworkTopology.class)

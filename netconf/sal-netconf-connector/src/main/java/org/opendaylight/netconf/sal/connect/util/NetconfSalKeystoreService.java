@@ -14,8 +14,10 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -62,10 +64,11 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
     private final InstanceIdentifier<Keystore> keystoreIid = InstanceIdentifier.create(Keystore.class);
 
-    public NetconfSalKeystoreService(final DataBroker dataBroker,
-                                     final AAAEncryptionService encryptionService) {
+    public NetconfSalKeystoreService(@Reference final DataBroker dataBroker,
+                                     @Reference final AAAEncryptionService encryptionService,
+                                     @Reference RpcProviderService rpcProviderService) {
         LOG.info("Starting NETCONF keystore service.");
-
+        rpcProviderService.registerRpcImplementation(NetconfSalKeystoreService.class,this);
         this.dataBroker = dataBroker;
         this.encryptionService = encryptionService;
 
