@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Reference;
+import org.apache.aries.blueprint.annotation.service.Service;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
@@ -32,14 +34,15 @@ import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 /**
  * Simple single-node implementation of the {@link SchemaResourceManager} contract. Operates on the specified base
  * root directory, where a number of independent subdirectories are created, each for a global default and anything
  * encountered based on configuration.
  */
+
 @Beta
 @Singleton
+@Service(classes = SchemaResourceManager.class)
 public final class DefaultSchemaResourceManager implements SchemaResourceManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSchemaResourceManager.class);
 
@@ -51,12 +54,16 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     private final String rootDirectory;
 
     @Inject
-    public DefaultSchemaResourceManager(final YangParserFactory parserFactory) {
+    public DefaultSchemaResourceManager(@Reference final YangParserFactory parserFactory) {
         this(parserFactory, "cache", "schema");
+        LOG.info("DefaultSchemaResourceManager parserFactory  >>>>>>>>>>>>>>>>>>>>>>>>>>>> {}", parserFactory);
     }
 
-    public DefaultSchemaResourceManager(final YangParserFactory parserFactory, final String rootDirectory,
+    @Inject
+    public DefaultSchemaResourceManager(@Reference final YangParserFactory parserFactory, final String rootDirectory,
             final String defaultSubdirectory) {
+        LOG.info("DefaultSchemaResourceManager parserFactory  >>>>>>>>>>>>>>>>>>>>>>>>>>>> {}", parserFactory);
+
         this.parserFactory = requireNonNull(parserFactory);
         this.rootDirectory = requireNonNull(rootDirectory);
         this.defaultSubdirectory = requireNonNull(defaultSubdirectory);
