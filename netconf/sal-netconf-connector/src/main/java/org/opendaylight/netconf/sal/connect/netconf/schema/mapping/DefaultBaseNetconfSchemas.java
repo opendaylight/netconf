@@ -11,6 +11,8 @@ import com.google.common.annotations.Beta;
 import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Reference;
+import org.apache.aries.blueprint.annotation.service.Service;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -18,12 +20,13 @@ import org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory;
 
 @Beta
 @Singleton
+@Service(classes = BaseNetconfSchemas.class)
 public final class DefaultBaseNetconfSchemas implements BaseNetconfSchemas {
     private final @NonNull BaseSchema withoutNotifications;
     private final @NonNull BaseSchema withNotifications;
 
     @Inject
-    public DefaultBaseNetconfSchemas(final YangParserFactory parserFactory) {
+    public DefaultBaseNetconfSchemas(@Reference final YangParserFactory parserFactory) {
         withoutNotifications = new BaseSchema(withoutNotifications(parserFactory));
         withNotifications = new BaseSchema(withNotifications(parserFactory));
     }

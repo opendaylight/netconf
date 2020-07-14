@@ -15,6 +15,8 @@ import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Service;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
@@ -36,6 +38,8 @@ import org.slf4j.LoggerFactory;
  * transforms replied NETCONF message  to action result, and using {@link RemoteDeviceCommunicator} that is responsible
  * for sending of built RPCs to NETCONF client.
  */
+@Singleton
+@Service(classes = DeviceActionFactory.class)
 public class DeviceActionFactoryImpl implements DeviceActionFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeviceActionFactoryImpl.class);

@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -59,6 +60,8 @@ public class NetconfSalKeystoreServiceTest {
     private DataBroker dataBroker;
     @Mock
     private AAAEncryptionService encryptionService;
+    @Mock
+    private RpcProviderService rpcProviderService;
 
     @Before
     public void setUp() {
@@ -71,7 +74,8 @@ public class NetconfSalKeystoreServiceTest {
     @Test
     public void testAddPrivateKey() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        NetconfSalKeystoreService keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService);
+        NetconfSalKeystoreService keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService,
+                rpcProviderService);
 
         final AddPrivateKeyInput input = getPrivateKeyInput();
         keystoreService.addPrivateKey(input);
@@ -83,7 +87,8 @@ public class NetconfSalKeystoreServiceTest {
     @Test
     public void testAddTrustedCertificate() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        NetconfSalKeystoreService keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService);
+        NetconfSalKeystoreService keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService,
+                rpcProviderService);
 
         final AddTrustedCertificateInput input = getTrustedCertificateInput();
         keystoreService.addTrustedCertificate(input);
