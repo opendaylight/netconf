@@ -27,8 +27,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.util.services.SubscribedNotificationsUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -57,11 +57,11 @@ public final class ModifySubscriptionRpc implements DOMRpcImplementation {
 
     private final NotificationsHolder notificationsHolder;
     private final DOMSchemaService domSchemaService;
-    private final TxChainHandler transactionChainHandler;
+    private final TransactionChainHandler transactionChainHandler;
     private final ListeningExecutorService executorService;
 
     public ModifySubscriptionRpc(final NotificationsHolder notificationsHolder,
-            final DOMSchemaService domSchemaService, final TxChainHandler transactionChainHandler,
+            final DOMSchemaService domSchemaService, final TransactionChainHandler transactionChainHandler,
             final ListeningExecutorService executorService) {
         this.notificationsHolder = notificationsHolder;
         this.domSchemaService = domSchemaService;
