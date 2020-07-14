@@ -20,6 +20,10 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
@@ -45,6 +49,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataTreeChangeListener<AllowedDevices> {
     private static final String APPNAME = "CallHomeServer";
     static final InstanceIdentifier<AllowedDevices> ALL_DEVICES = InstanceIdentifier.create(NetconfCallhomeServer.class)
@@ -64,6 +69,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     private int port = 0; // 0 = use default in NetconfCallHomeBuilder
     private final CallhomeStatusReporter statusReporter;
 
+    @Inject
     public IetfZeroTouchCallHomeServerProvider(final DataBroker dataBroker,
             final CallHomeMountDispatcher mountDispacher) {
         this.dataBroker = dataBroker;
@@ -72,6 +78,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         this.statusReporter = new CallhomeStatusReporter(dataBroker);
     }
 
+    @PostConstruct
     public void init() {
         // Register itself as a listener to changes in Devices subtree
         try {
@@ -124,6 +131,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     }
 
     @Override
+    @PreDestroy
     public void close() {
         authProvider.close();
         statusReporter.close();

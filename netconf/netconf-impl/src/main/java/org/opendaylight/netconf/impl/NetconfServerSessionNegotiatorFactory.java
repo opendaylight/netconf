@@ -16,6 +16,8 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -29,6 +31,7 @@ import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 
+@Singleton
 public class NetconfServerSessionNegotiatorFactory
     implements NetconfSessionNegotiatorFactory<NetconfServerSession, NetconfServerSessionListener> {
 
@@ -47,6 +50,7 @@ public class NetconfServerSessionNegotiatorFactory
     private final NetconfMonitoringService monitoringService;
     private final Set<String> baseCapabilities;
 
+    @Inject
     public NetconfServerSessionNegotiatorFactory(final Timer timer,
             final NetconfOperationServiceFactory netconfOperationProvider,
             final SessionIdProvider idProvider, final long connectionTimeoutMillis,

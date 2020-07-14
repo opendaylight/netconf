@@ -16,6 +16,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -48,6 +52,7 @@ import org.slf4j.LoggerFactory;
  * Listens for updates on global schema context, transforms context to ietf-yang-library/yang-library and
  * writes this state to operational data store.
  */
+@Singleton
 public class SchemaServiceToMdsalWriter implements EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaServiceToMdsalWriter.class);
     private static final InstanceIdentifier<YangLibrary> YANG_LIBRARY_INSTANCE_IDENTIFIER =
@@ -57,6 +62,7 @@ public class SchemaServiceToMdsalWriter implements EffectiveModelContextListener
     private final AtomicInteger moduleSetId;
     private final DataBroker dataBroker;
 
+    @Inject
     public SchemaServiceToMdsalWriter(final DOMSchemaService schemaService,
                                       final DataBroker dataBroker) {
         this.schemaService = schemaService;
@@ -65,6 +71,7 @@ public class SchemaServiceToMdsalWriter implements EffectiveModelContextListener
     }
 
     @Override
+    @PreDestroy
     public void close() {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, YANG_LIBRARY_INSTANCE_IDENTIFIER);
@@ -85,6 +92,7 @@ public class SchemaServiceToMdsalWriter implements EffectiveModelContextListener
     /**
      * Invoked by blueprint.
      */
+    @PostConstruct
     public void start() {
         schemaService.registerSchemaContextListener(this);
     }

@@ -10,6 +10,10 @@ package org.opendaylight.netconf.mdsal.notification.impl;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ExecutionException;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -29,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * Listens on changes in netconf notification stream availability and writes
  * changes to the data store.
  */
+@Singleton
 public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNotificationCollector
         .NetconfNotificationStreamListener {
 
@@ -40,6 +45,7 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     private final DataBroker dataBroker;
     private NotificationRegistration notificationRegistration;
 
+    @Inject
     public NotificationToMdsalWriter(final NetconfNotificationCollector netconfNotificationCollector,
                                      final DataBroker dataBroker) {
         this.netconfNotificationCollector = netconfNotificationCollector;
@@ -47,6 +53,7 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     }
 
     @Override
+    @PreDestroy
     public void close() {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(Netconf.class));
@@ -69,6 +76,7 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     /**
      * Invoked by blueprint.
      */
+    @PostConstruct
     public void start() {
         notificationRegistration = netconfNotificationCollector.registerStreamListener(this);
     }

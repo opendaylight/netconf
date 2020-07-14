@@ -9,6 +9,9 @@
 package org.opendaylight.netconf.mdsal.notification.impl;
 
 import java.util.Collection;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -29,6 +32,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
  *             Use {@link YangLibraryNotificationProducerRFC8525}.
  */
 @Deprecated(forRemoval = true)
+@Singleton
 public final class YangLibraryNotificationProducer extends OperationalDatastoreListener<ModulesState>
     implements AutoCloseable {
 
@@ -38,6 +42,7 @@ public final class YangLibraryNotificationProducer extends OperationalDatastoreL
     private final ListenerRegistration<?> yangLibraryChangeListenerRegistration;
     private final YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
 
+    @Inject
     public YangLibraryNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
                                            final DataBroker dataBroker) {
         super(MODULES_STATE_INSTANCE_IDENTIFIER);
@@ -63,6 +68,7 @@ public final class YangLibraryNotificationProducer extends OperationalDatastoreL
      * Invoked by blueprint.
      */
     @Override
+    @PostConstruct
     public void close() {
         if (yangLibraryPublisherRegistration != null) {
             yangLibraryPublisherRegistration.close();

@@ -10,12 +10,16 @@ package org.opendaylight.yanglib.impl;
 
 import java.util.Collections;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Application;
 import org.opendaylight.yanglib.api.YangLibService;
 
+@Singleton
 public class YangLibRestApp extends Application {
     private final YangLibService yangLibService;
 
+    @Inject
     public YangLibRestApp(YangLibService yangLibService) {
         this.yangLibService = yangLibService;
     }

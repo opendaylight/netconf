@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.impl.osgi;
 
 import java.util.Optional;
+import javax.annotation.PreDestroy;
+import javax.inject.Singleton;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
@@ -17,6 +19,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 
+@Singleton
 public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, AutoCloseable {
 
     private final NetconfCapabilityMonitoringService capabilityMonitoring;
@@ -80,6 +83,7 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     }
 
     @Override
+    @PreDestroy
     public void close() {
         capabilityMonitoring.close();
         sessionMonitoring.close();

@@ -13,6 +13,8 @@ import io.netty.util.concurrent.Future;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
@@ -20,6 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NetconfClientDispatcherImpl
         extends AbstractNetconfDispatcher<NetconfClientSession, NetconfClientSessionListener>
         implements NetconfClientDispatcher {
@@ -28,6 +31,7 @@ public class NetconfClientDispatcherImpl
 
     private final Timer timer;
 
+    @Inject
     public NetconfClientDispatcherImpl(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
                                        final Timer timer) {
         super(bossGroup, workerGroup);

@@ -12,6 +12,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
 import java.util.function.Consumer;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Writes netconf server state changes received from NetconfMonitoringService to netconf-state datastore subtree.
  */
+@Singleton
 public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringService.CapabilitiesListener,
         NetconfMonitoringService.SessionsListener {
 
@@ -44,6 +48,7 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
     private final NetconfMonitoringService serverMonitoringDependency;
     private final DataBroker dataBroker;
 
+    @Inject
     public MonitoringToMdsalWriter(final NetconfMonitoringService serverMonitoringDependency,
                                    final DataBroker dataBroker) {
         this.serverMonitoringDependency = serverMonitoringDependency;
@@ -54,6 +59,7 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
      * Invoked using blueprint.
      */
     @Override
+    @PreDestroy
     public void close() {
         runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL,
                 InstanceIdentifier.create(NetconfState.class)));

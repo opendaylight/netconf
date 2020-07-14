@@ -23,6 +23,10 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -58,6 +62,7 @@ import org.slf4j.LoggerFactory;
  * along with source identifier to
  * ietf-netconf-yang-library/modules-state/module list.
  */
+@Singleton
 public class YangLibProvider implements AutoCloseable, SchemaSourceListener, YangLibService {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibProvider.class);
 
@@ -69,6 +74,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     private final SharedSchemaRepository schemaRepository;
     private SchemaListenerRegistration schemaListenerRegistration;
 
+    @Inject
     public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker,
             final YangParserFactory parserFactory) {
         this.yanglibConfig = requireNonNull(yanglibConfig);
@@ -77,12 +83,14 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     }
 
     @Override
+    @PreDestroy
     public void close() {
         if (schemaListenerRegistration != null) {
             schemaListenerRegistration.close();
         }
     }
 
+    @PostConstruct
     public void init() {
         if (Strings.isNullOrEmpty(yanglibConfig.getCacheFolder())) {
             LOG.info("No cache-folder set in yanglib-config - yang library services will not be available");

@@ -14,6 +14,8 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -53,6 +55,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSalKeystoreService.class);
@@ -62,6 +65,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
     private final InstanceIdentifier<Keystore> keystoreIid = InstanceIdentifier.create(Keystore.class);
 
+    @Inject
     public NetconfSalKeystoreService(final DataBroker dataBroker,
                                      final AAAEncryptionService encryptionService) {
         LOG.info("Starting NETCONF keystore service.");
