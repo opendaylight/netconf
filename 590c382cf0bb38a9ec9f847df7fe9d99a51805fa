@@ -71,6 +71,30 @@
     },
     {
       "key": {
+        "uuid": "8392a967_87bf3d9b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2020-07-14T17:32:38Z",
+      "side": 1,
+      "message": "It means, you should not use strings this way. Try to use node type directly. Anyway, you can call getNodeType directly from the NormalizedNode. On the other side, if you want to map a value to a key (child to parent), you should use the Map here (java.util.Map) and its implementation of HashMap or LinkedHashMap (insertion-order).",
+      "parentUuid": "c3eaa05b_dbe50299",
+      "range": {
+        "startLine": 260,
+        "startChar": 20,
+        "endLine": 260,
+        "endChar": 46
+      },
+      "revId": "590c382cf0bb38a9ec9f847df7fe9d99a51805fa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "fef6f560_3da1dde8",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
         "patchSetId": 6
