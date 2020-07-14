@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -47,12 +49,14 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NetconfCommandsImpl implements NetconfCommands {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCommandsImpl.class);
 
     private final DataBroker dataBroker;
 
+    @Inject
     public NetconfCommandsImpl(final DataBroker db) {
         LOG.debug("NetconfConsoleProviderImpl initialized");
         this.dataBroker = db;

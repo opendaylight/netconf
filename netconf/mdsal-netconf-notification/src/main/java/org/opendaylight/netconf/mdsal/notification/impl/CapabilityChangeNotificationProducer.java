@@ -13,6 +13,9 @@ import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -34,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * Listens on capabilities changes in data store and publishes them to base
  * netconf notification stream listener.
  */
+@Singleton
 public final class CapabilityChangeNotificationProducer extends OperationalDatastoreListener<Capabilities>
     implements AutoCloseable {
 
@@ -44,6 +48,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     private final ListenerRegistration<?> capabilityChangeListenerRegistration;
 
+    @Inject
     public CapabilityChangeNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
                                                 final DataBroker dataBroker) {
         super(CAPABILITIES_INSTANCE_IDENTIFIER);
@@ -99,6 +104,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
      * Invoked by blueprint.
      */
     @Override
+    @PostConstruct
     public void close() {
         if (baseNotificationPublisherRegistration != null) {
             baseNotificationPublisherRegistration.close();

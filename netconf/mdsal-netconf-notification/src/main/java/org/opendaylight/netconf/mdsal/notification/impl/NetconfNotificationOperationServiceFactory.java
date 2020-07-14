@@ -10,6 +10,9 @@ package org.opendaylight.netconf.mdsal.notification.impl;
 
 import java.util.Collections;
 import java.util.Set;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -18,11 +21,13 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 
+@Singleton
 public class NetconfNotificationOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private final NetconfNotificationRegistry netconfNotificationRegistry;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
+    @Inject
     public NetconfNotificationOperationServiceFactory(
             final NetconfNotificationRegistry netconfNotificationRegistry,
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener) {
@@ -53,6 +58,7 @@ public class NetconfNotificationOperationServiceFactory implements NetconfOperat
     }
 
     @Override
+    @PreDestroy
     public void close() {
         this.netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
     }

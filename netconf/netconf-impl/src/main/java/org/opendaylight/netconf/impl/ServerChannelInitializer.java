@@ -9,16 +9,19 @@ package org.opendaylight.netconf.impl;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.netconf.impl.util.DeserializerExceptionHandler;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
+@Singleton
 public class ServerChannelInitializer extends AbstractChannelInitializer<NetconfServerSession> {
 
     public static final String DESERIALIZER_EX_HANDLER_KEY = "deserializerExHandler";
 
     private final NetconfServerSessionNegotiatorFactory negotiatorFactory;
 
-
+    @Inject
     public ServerChannelInitializer(NetconfServerSessionNegotiatorFactory negotiatorFactory) {
         this.negotiatorFactory = negotiatorFactory;
 

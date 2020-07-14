@@ -12,14 +12,19 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalServerChannel;
 import java.net.InetSocketAddress;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
 
+
+@Singleton
 public class NetconfServerDispatcherImpl extends AbstractNetconfDispatcher<NetconfServerSession,
         NetconfServerSessionListener> implements NetconfServerDispatcher {
 
     private final ServerChannelInitializer initializer;
 
+    @Inject
     public NetconfServerDispatcherImpl(ServerChannelInitializer serverChannelInitializer, EventLoopGroup bossGroup,
                                        EventLoopGroup workerGroup) {
         super(bossGroup, workerGroup);

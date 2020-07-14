@@ -10,6 +10,9 @@ package org.opendaylight.netconf.mdsal.notification.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Collection;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -32,6 +35,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Listens on changes in NetconfState/Sessions/Session datastore and publishes them.
  */
+@Singleton
 public class SessionNotificationProducer extends OperationalDatastoreListener<Session> {
     private static final InstanceIdentifier<Session> SESSION_INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class);
@@ -40,6 +44,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     private final ListenerRegistration<?> sessionListenerRegistration;
 
+    @Inject
     public SessionNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
                                        final DataBroker dataBroker) {
         super(SESSION_INSTANCE_IDENTIFIER);
@@ -97,6 +102,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
     /**
      * Invoked by blueprint.
      */
+    @PreDestroy
     public void close() {
         if (baseNotificationPublisherRegistration != null) {
             baseNotificationPublisherRegistration.close();

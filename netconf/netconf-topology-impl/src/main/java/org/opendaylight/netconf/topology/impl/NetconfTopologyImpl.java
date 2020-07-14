@@ -12,6 +12,10 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -49,6 +53,7 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NetconfTopologyImpl extends AbstractNetconfTopology
         implements DataTreeChangeListener<Node>, AutoCloseable {
 
@@ -66,6 +71,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, baseSchemas, null);
     }
 
+    @Inject
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor,
@@ -79,6 +85,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     }
 
     @Override
+    @PreDestroy
     public void close() {
         // close all existing connectors, delete whole topology in datastore?
         for (final NetconfConnectorDTO connectorDTO : activeConnectors.values()) {
@@ -100,6 +107,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     /**
      * Invoked by blueprint.
      */
+    @PostConstruct
     public void init() {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
         initTopology(wtx, LogicalDatastoreType.CONFIGURATION);

@@ -13,6 +13,10 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistry;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
@@ -39,6 +43,7 @@ import org.slf4j.LoggerFactory;
  * NetconfEventSourceManager implements DataChangeListener. On topology changes, it manages creation,
  * updating and removing registrations of event sources.
  */
+@Singleton
 public final class NetconfEventSourceManager implements DataTreeChangeListener<Node>, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceManager.class);
@@ -57,6 +62,7 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
     private final DataBroker dataBroker;
     private final BindingNormalizedNodeSerializer serializer;
 
+    @Inject
     public NetconfEventSourceManager(final DataBroker dataBroker,
                                      final BindingNormalizedNodeSerializer serializer,
                                      final DOMNotificationPublishService domPublish,
@@ -72,6 +78,7 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
     /**
      * Invoked by blueprint.
      */
+    @PostConstruct
     public void initialize() {
         listenerRegistration = verifyNotNull(dataBroker).registerDataTreeChangeListener(DataTreeIdentifier.create(
                 LogicalDatastoreType.OPERATIONAL, NETCONF_DEVICE_PATH), this);
@@ -156,6 +163,7 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
     }
 
     @Override
+    @PreDestroy
     public void close() {
         listenerRegistration.close();
         for (final NetconfEventSourceRegistration reg : registrationMap.values()) {
