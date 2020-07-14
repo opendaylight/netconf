@@ -14,6 +14,8 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -46,6 +48,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
@@ -53,6 +56,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     private final AAAEncryptionService encryptionService;
     private final DataBroker dataBroker;
 
+    @Inject
     public NetconfTopologyRPCProvider(final DataBroker dataBroker,
                                       final AAAEncryptionService encryptionService,
                                       final String topologyId) {

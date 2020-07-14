@@ -9,7 +9,9 @@
 package org.opendaylight.netconf.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
+import javax.inject.Singleton;
 
+@Singleton
 public final class SessionIdProvider {
 
     private final AtomicLong sessionCounter = new AtomicLong(0);

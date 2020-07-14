@@ -214,6 +214,12 @@
       <plugin>
         <groupId>org.apache.aries.blueprint</groupId>
         <artifactId>blueprint-maven-plugin</artifactId>
+        <configuration>
+          <scanPaths>
+            <scanPath>org.opendaylight.netconf.md.sal.rest.schema</scanPath>
+            <scanPath>org.opendaylight.netconf.sal</scanPath>
+          </scanPaths>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>

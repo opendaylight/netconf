@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
@@ -31,6 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * NetconfOperationService aggregator. Makes a collection of operation services accessible as one.
  */
+@Singleton
 public class AggregatedNetconfOperationServiceFactory
         implements NetconfOperationServiceFactory, NetconfOperationServiceFactoryListener, AutoCloseable {
 
@@ -44,6 +48,7 @@ public class AggregatedNetconfOperationServiceFactory
     public AggregatedNetconfOperationServiceFactory() {
     }
 
+    @Inject
     public AggregatedNetconfOperationServiceFactory(final List<NetconfOperationServiceFactory> mappers) {
         mappers.forEach(this::onAddNetconfOperationServiceFactory);
     }
@@ -110,6 +115,7 @@ public class AggregatedNetconfOperationServiceFactory
     }
 
     @Override
+    @PreDestroy
     public synchronized void close() throws Exception {
         factories.clear();
         for (AutoCloseable reg : registrations.values()) {

@@ -12,6 +12,7 @@ import static com.google.common.base.Verify.verify;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
@@ -39,6 +40,7 @@ public final class NotificationsTransformUtil {
     private final SchemaContext schemaContext;
     private final BindingNormalizedNodeSerializer serializer;
 
+    @Inject
     public NotificationsTransformUtil(final YangParserFactory parserFactory, final BindingRuntimeGenerator generator,
             final BindingDOMCodecFactory codecFactory) {
         final BindingRuntimeContext ctx = BindingRuntimeHelpers.createRuntimeContext(parserFactory, generator,

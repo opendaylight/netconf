@@ -11,10 +11,13 @@ package org.opendaylight.netconf.util;
 import java.net.InetSocketAddress;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NetconfConfigurationImpl implements NetconfConfiguration, ManagedService {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConfigurationImpl.class);
@@ -31,6 +34,7 @@ public class NetconfConfigurationImpl implements NetconfConfiguration, ManagedSe
 
     private NetconfConfigurationHolder netconfConfiguration;
 
+    @Inject
     public NetconfConfigurationImpl(final String tcpServerAddress, final String tcpServerPort,
                                     final String sshServerAddress, final String sshServerPort,
                                     final String privateKeyPath) throws NumberFormatException {

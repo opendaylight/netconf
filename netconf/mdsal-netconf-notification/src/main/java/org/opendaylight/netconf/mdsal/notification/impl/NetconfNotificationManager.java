@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -158,6 +159,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     }
 
     @Override
+    @PreDestroy
     public synchronized void close() {
         // Unregister all listeners
         for (final GenericNotificationListenerReg genericNotificationListenerReg : notificationListeners.values()) {

@@ -21,6 +21,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -64,6 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
 
+@Singleton
 public class NetconfTopologyManager
         implements ClusteredDataTreeChangeListener<Node>, NetconfTopologySingletonService, AutoCloseable {
 
@@ -94,6 +99,7 @@ public class NetconfTopologyManager
     private String privateKeyPath;
     private String privateKeyPassphrase;
 
+    @Inject
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
                                   final DOMRpcProviderService rpcProviderRegistry,
                                   final DOMActionProviderService actionProviderService,
@@ -125,6 +131,7 @@ public class NetconfTopologyManager
     }
 
     // Blueprint init method
+    @PostConstruct
     public void init() {
         dataChangeListenerRegistration = registerDataTreeChangeListener();
     }
@@ -222,6 +229,7 @@ public class NetconfTopologyManager
     }
 
     @Override
+    @PreDestroy
     public void close() {
         if (dataChangeListenerRegistration != null) {
             dataChangeListenerRegistration.close();

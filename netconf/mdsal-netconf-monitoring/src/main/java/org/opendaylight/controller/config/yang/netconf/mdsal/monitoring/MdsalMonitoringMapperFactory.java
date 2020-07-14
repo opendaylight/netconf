@@ -9,6 +9,9 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
 import java.util.Collections;
 import java.util.Set;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -18,6 +21,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 
+@Singleton
 public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private final MonitoringToMdsalWriter monitoringToMdsalWriter;
@@ -26,6 +30,7 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
 
     private static final Set<Capability> CAPABILITIES = Collections.emptySet();
 
+    @Inject
     public MdsalMonitoringMapperFactory(
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
             final NetconfMonitoringService netconfMonitoringService,
@@ -69,6 +74,7 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
      * Invoked using blueprint.
      */
     @Override
+    @PreDestroy
     public void close() {
         monitoringToMdsalWriter.close();
         netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);

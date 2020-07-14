@@ -7,6 +7,9 @@
  */
 package org.opendaylight.yanglib.impl;
 
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.web.ServletDetails;
@@ -22,9 +25,11 @@ import org.opendaylight.aaa.web.servlet.ServletSupport;
  *
  * @author Thomas Pantelis
  */
+@Singleton
 public class WebInitializer {
     private final WebContextRegistration registration;
 
+    @Inject
     public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
             Application webApp) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("yanglib").supportsSessions(true)
@@ -36,6 +41,7 @@ public class WebInitializer {
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
 
+    @PreDestroy
     public void close() {
         registration.close();
     }
