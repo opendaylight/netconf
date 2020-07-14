@@ -13,16 +13,13 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementation;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.EstablishSubscriptionRpc;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.ModifySubscriptionRpc;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.NotificationsHolder;
@@ -37,7 +34,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
-@Singleton
 public class RestconfAppConfig {
     private static final DOMRpcIdentifier RPC_ESTABLISH = DOMRpcIdentifier.create(SchemaPath.create(
             true, QName.create(EstablishSubscriptionInput.QNAME.getModule(), "establish-subscription")));
@@ -48,13 +44,12 @@ public class RestconfAppConfig {
     private static final DOMRpcIdentifier RPC_KILL = DOMRpcIdentifier.create(SchemaPath.create(
             true, QName.create(KillSubscriptionInput.QNAME.getModule(), "kill-subscription")));
 
-    @Inject
     public RestconfAppConfig(
-            final TxChainHandler transactionChainHandler,
-            final @Reference DOMNotificationService domNotificationService,
-            final @Reference DOMSchemaService domSchemaService,
-            final @Reference DOMMountPointService domMountPointService,
-            final @Reference DOMRpcProviderService domRpcProviderService) {
+            final TransactionChainHandler transactionChainHandler,
+            final DOMNotificationService domNotificationService,
+            final DOMSchemaService domSchemaService,
+            final DOMMountPointService domMountPointService,
+            final DOMRpcProviderService domRpcProviderService) {
         final NotificationsHolder notificationsHolder = new NotificationsHolder(new Random());
         final Map<QName, ReplayBuffer> replayBuffersForNotifications = new HashMap<>();
         final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(

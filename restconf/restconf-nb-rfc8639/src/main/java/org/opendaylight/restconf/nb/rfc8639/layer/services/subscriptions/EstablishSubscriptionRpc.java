@@ -32,7 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
-import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.util.services.SubscribedNotificationsUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
@@ -73,14 +73,14 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
     private final Map<QName, ReplayBuffer> replayBuffersForNotifications;
     private final DOMNotificationService domNotificationService;
     private final DOMMountPointService domMountPointService;
-    private final TxChainHandler transactionChainHandler;
+    private final TransactionChainHandler transactionChainHandler;
     private final DOMSchemaService domSchemaService;
     private final ListeningExecutorService executorService;
 
     public EstablishSubscriptionRpc(final NotificationsHolder notificationsHolder,
             final Map<QName, ReplayBuffer> replayBuffersForNotifications,
             final DOMNotificationService domNotificationService, final DOMSchemaService domSchemaService,
-            final DOMMountPointService domMountPointService, final TxChainHandler transactionChainHandler,
+            final DOMMountPointService domMountPointService, final TransactionChainHandler transactionChainHandler,
             final ListeningExecutorService executorService) {
         this.notificationsHolder = notificationsHolder;
         this.replayBuffersForNotifications = replayBuffersForNotifications;

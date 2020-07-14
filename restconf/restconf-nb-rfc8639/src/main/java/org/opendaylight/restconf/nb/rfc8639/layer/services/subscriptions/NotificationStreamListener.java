@@ -51,8 +51,8 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.util.services.SubscribedNotificationsUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ReplayCompleted;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionCompleted;
@@ -94,7 +94,7 @@ public class NotificationStreamListener implements DOMNotificationListener {
     private final SchemaContext schemaContext;
     private final String establishedSessionId;
     private final NotificationDefinition notificationDef;
-    private final TxChainHandler transactionChainHandler;
+    private final TransactionChainHandler transactionChainHandler;
     private final Encoding encoding;
 
     private ListenerRegistration<NotificationStreamListener> registration;
@@ -108,7 +108,7 @@ public class NotificationStreamListener implements DOMNotificationListener {
     private Uint32 subscriptionId;
 
     public NotificationStreamListener(final SchemaContext schemaContext, final String establishedSessionId,
-            final NotificationDefinition notificationDef, final TxChainHandler transactionChainHandler,
+            final NotificationDefinition notificationDef, final TransactionChainHandler transactionChainHandler,
             final Encoding encoding) {
         this.schemaContext = schemaContext;
         this.establishedSessionId = establishedSessionId;

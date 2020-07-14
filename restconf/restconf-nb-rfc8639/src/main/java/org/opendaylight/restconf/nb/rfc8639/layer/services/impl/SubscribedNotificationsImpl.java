@@ -13,7 +13,7 @@ import javax.ws.rs.Path;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8639.handlers.SchemaCtxHandler;
+import org.opendaylight.restconf.nb.rfc8639.handlers.RFC8639SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.api.SubscribedNotifications;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.NotificationsHolder;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.RegisteredNotificationWrapper;
@@ -24,10 +24,10 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 @Path("/")
 public class SubscribedNotificationsImpl implements SubscribedNotifications {
 
-    private final SchemaCtxHandler schemaContextHandler;
+    private final RFC8639SchemaContextHandler schemaContextHandler;
     private final NotificationsHolder holder;
 
-    public SubscribedNotificationsImpl(final SchemaCtxHandler schemaContextHandler,
+    public SubscribedNotificationsImpl(final RFC8639SchemaContextHandler schemaContextHandler,
             final NotificationsHolder holder) {
         this.schemaContextHandler = schemaContextHandler;
         this.holder = holder;

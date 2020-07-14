@@ -43,7 +43,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.nb.rfc8639.handlers.TxChainHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.EstablishSubscriptionRpc.StreamWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -68,7 +68,7 @@ public class EstablishSubscriptionRpcTest {
     private DOMTransactionChain domTransactionChain;
 
     @Mock
-    private TxChainHandler transactionChainHandler;
+    private TransactionChainHandler transactionChainHandler;
 
     @Mock
     private DOMMountPointService domMountPointService;
