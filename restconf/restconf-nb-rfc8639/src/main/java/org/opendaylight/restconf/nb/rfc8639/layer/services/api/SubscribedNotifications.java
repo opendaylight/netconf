@@ -7,12 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8639.layer.services.api;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 
@@ -25,14 +25,16 @@ public interface SubscribedNotifications {
      *            - name of stream
      * @param subscriptionId
      *            - ID of subscription
-     * @param httpServletRequest
-     *            - request with information about opened session
+     * @param uriInfo
+     *            - URI information
      *
      * @return event output which enable write notifications to the client on session
      */
     @GET
-    @Path("/notification/{streamName}/{subscriptionId}/")
+    @Path("/notification/{streamName:.+}/{subscriptionId:.+}")
     @Produces(SseFeature.SERVER_SENT_EVENTS)
-    EventOutput listen(@PathParam("streamName") String streamName,
-            @PathParam("subscriptionId") String subscriptionId, @Context HttpServletRequest httpServletRequest);
+    EventOutput listen(
+            @PathParam("streamName") String streamName,
+            @PathParam("subscriptionId") String subscriptionId,
+            @Context UriInfo uriInfo);
 }

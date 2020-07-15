@@ -8,8 +8,8 @@
 package org.opendaylight.restconf.nb.rfc8639.layer.services.impl;
 
 import java.util.regex.Matcher;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -34,8 +34,10 @@ public class SubscribedNotificationsImpl implements SubscribedNotifications {
     }
 
     @Override
-    public EventOutput listen(final String streamName, final String subscriptionId,
-            final HttpServletRequest httpServletRequest) {
+    public EventOutput listen(
+            final String streamName,
+            final String subscriptionId,
+            final UriInfo uriInfo) {
         Uint32 subscriptionIdNum;
         try {
             subscriptionIdNum = Uint32.valueOf(subscriptionId);

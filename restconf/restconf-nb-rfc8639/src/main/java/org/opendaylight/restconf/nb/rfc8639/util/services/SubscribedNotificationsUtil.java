@@ -102,8 +102,8 @@ public final class SubscribedNotificationsUtil {
         final URI baseUri = uriInfo.getBaseUri();
 
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-        final UriBuilder uriToServer = uriBuilder.port(baseUri.getPort()).scheme("https");
-        return uriToServer.replacePath("/restconf/notification/" + streamName).build();
+        final UriBuilder uriToServer = uriBuilder.port(baseUri.getPort()).scheme("http");
+        return uriToServer.replacePath("/notifications/notification/" + streamName).build();
     }
 
     /**
