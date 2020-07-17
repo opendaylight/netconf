@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "619589ae_9cced6ee",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-17T12:33:45Z",
+      "side": 1,
+      "message": "this is extremenly fishy:\n- why are we ignoring case here?\n- why do parent/child devolve to a simple String?\n- we should NOT use String to hold that relationship but rather define a correct type, because ...",
+      "range": {
+        "startLine": 238,
+        "startChar": 15,
+        "endLine": 238,
+        "endChar": 99
+      },
+      "revId": "49bd7dae9c5f3ed4f8ffd34d1c138f63d25ad848",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b1aa75d9_5780bf92",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-17T12:33:45Z",
+      "side": 1,
+      "message": "we are splitting it here NxM times",
+      "range": {
+        "startLine": 260,
+        "startChar": 20,
+        "endLine": 260,
+        "endChar": 46
+      },
+      "revId": "49bd7dae9c5f3ed4f8ffd34d1c138f63d25ad848",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "167dad4c_a7b96022",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-17T12:33:45Z",
+      "side": 1,
+      "message": "okay, so what would happen in a structure like:\n\ncontainer bar {\n  container foo {\n    leaf FOO {\n\n    }\n  }\n\n  container FOO {\n    leaf foo {\n\n    }\n  }\n}\n\n?",
+      "range": {
+        "startLine": 261,
+        "startChar": 36,
+        "endLine": 261,
+        "endChar": 52
+      },
+      "revId": "49bd7dae9c5f3ed4f8ffd34d1c138f63d25ad848",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
