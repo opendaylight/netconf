@@ -14,7 +14,6 @@ import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETC
 
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.Promise;
 import java.util.Collections;
 import java.util.Optional;
@@ -61,8 +60,8 @@ public class Netconf539Test {
             .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
         doReturn(promise).when(promise).setFailure(any());
         doReturn(promise).when(promise).setSuccess(any());
-        negotiator = new TestSessionNegotiator(new NetconfSessionPreferences(serverHello), promise, channel,
-            new HashedWheelTimer(), listener, 100L);
+        negotiator = new TestSessionNegotiator(new NetconfSessionPreferences(serverHello), promise, channel, listener,
+            100L);
     }
 
     @Test

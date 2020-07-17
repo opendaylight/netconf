@@ -17,11 +17,9 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.util.Timeout;
-import io.netty.util.Timer;
-import io.netty.util.TimerTask;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
+import io.netty.util.concurrent.ScheduledFuture;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -54,7 +52,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
     private final Promise<S> promise;
     private final L sessionListener;
-    private Timeout timeout;
+    private final long connectionTimeoutMillis;
 
     /**
      * Possible states for Finite State Machine.
@@ -64,16 +62,14 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     private State state = State.IDLE;
-    private final Timer timer;
-    private final long connectionTimeoutMillis;
+    private ScheduledFuture<?> timeout;
 
     protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise,
-                                               final Channel channel, final Timer timer,
-                                               final L sessionListener, final long connectionTimeoutMillis) {
+                                               final Channel channel, final L sessionListener,
+                                               final long connectionTimeoutMillis) {
         this.channel = requireNonNull(channel);
         this.promise = requireNonNull(promise);
         this.sessionPreferences = sessionPreferences;
-        this.timer = timer;
         this.sessionListener = sessionListener;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
     }
@@ -119,47 +115,42 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         replaceHelloMessageOutboundHandler();
         changeState(State.OPEN_WAIT);
 
-        timeout = this.timer.newTimeout(new TimerTask() {
-            @Override
-            @SuppressWarnings("checkstyle:hiddenField")
-            public void run(final Timeout timeout) {
-                synchronized (this) {
-                    if (state != State.ESTABLISHED) {
+        timeout = channel.eventLoop().schedule(this::runTimeout, connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+    }
 
-                        LOG.debug("Connection timeout after {}, session is in state {}", timeout, state);
+    private synchronized void runTimeout() {
+        if (state != State.ESTABLISHED) {
 
-                        // Do not fail negotiation if promise is done or canceled
-                        // It would result in setting result of the promise second time and that throws exception
-                        if (!isPromiseFinished()) {
-                            LOG.warn("Netconf session was not established after {}", connectionTimeoutMillis);
-                            changeState(State.FAILED);
+            LOG.debug("Connection timeout after {}, session is in state {}", timeout, state);
 
-                            channel.close().addListener((GenericFutureListener<ChannelFuture>) future -> {
-                                if (future.isSuccess()) {
-                                    LOG.debug("Channel {} closed: success", future.channel());
-                                } else {
-                                    LOG.warn("Channel {} closed: fail", future.channel());
-                                }
-                            });
-                        }
-                    } else if (channel.isOpen()) {
-                        channel.pipeline().remove(NAME_OF_EXCEPTION_HANDLER);
+            // Do not fail negotiation if promise is done or canceled
+            // It would result in setting result of the promise second time and that throws exception
+            if (!isPromiseFinished()) {
+                LOG.warn("Netconf session was not established after {}", connectionTimeoutMillis);
+                changeState(State.FAILED);
+
+                channel.close().addListener((GenericFutureListener<ChannelFuture>) future -> {
+                    if (future.isSuccess()) {
+                        LOG.debug("Channel {} closed: success", future.channel());
+                    } else {
+                        LOG.warn("Channel {} closed: fail", future.channel());
                     }
-                }
+                });
             }
+        } else if (channel.isOpen()) {
+            channel.pipeline().remove(NAME_OF_EXCEPTION_HANDLER);
+        }
+    }
 
-            private boolean isPromiseFinished() {
-                return promise.isDone() || promise.isCancelled();
-            }
-
-        }, connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+    private boolean isPromiseFinished() {
+        return promise.isDone() || promise.isCancelled();
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void cancelTimeout() {
         if (timeout != null) {
-            timeout.cancel();
+            timeout.cancel(false);
         }
     }
 

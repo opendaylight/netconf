@@ -20,9 +20,6 @@
     <reference id="globalWorkerGroup"
                interface="io.netty.channel.EventLoopGroup"
                odl:type="global-worker-group"/>
-    <reference id="global-timer"
-               interface="io.netty.util.Timer"
-               odl:type="global-timer"/>
     <reference id="scheduledThreadPool"
                interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
                odl:type="global-netconf-ssh-scheduled-executor"/>
@@ -62,7 +59,6 @@
 
     <bean id="netconfServerSessionNegotiatorFactory"
           class="org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory">
-        <argument ref="global-timer"/>
         <argument ref="aggregatedNetconfOperationServiceFactoryMappers"/>
         <argument ref="sessionIdProvider"/>
         <argument value="${connection-timeout-millis}"/>

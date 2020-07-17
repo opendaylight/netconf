@@ -12,7 +12,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.netty.channel.Channel;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.Set;
@@ -39,27 +38,22 @@ public class NetconfServerSessionNegotiatorFactory
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0
     );
 
-    private final Timer timer;
-
     private final SessionIdProvider idProvider;
     private final NetconfOperationServiceFactory aggregatedOpService;
     private final long connectionTimeoutMillis;
     private final NetconfMonitoringService monitoringService;
     private final Set<String> baseCapabilities;
 
-    public NetconfServerSessionNegotiatorFactory(final Timer timer,
-            final NetconfOperationServiceFactory netconfOperationProvider,
+    public NetconfServerSessionNegotiatorFactory(final NetconfOperationServiceFactory netconfOperationProvider,
             final SessionIdProvider idProvider, final long connectionTimeoutMillis,
             final NetconfMonitoringService monitoringService) {
-        this(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, null);
+        this(netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, null);
     }
 
-    public NetconfServerSessionNegotiatorFactory(final Timer timer,
-                                                 final NetconfOperationServiceFactory netconfOperationProvider,
+    public NetconfServerSessionNegotiatorFactory(final NetconfOperationServiceFactory netconfOperationProvider,
                                                  final SessionIdProvider idProvider, final long connectionTimeoutMillis,
                                                  final NetconfMonitoringService monitoringService,
                                                  final Set<String> baseCapabilities) {
-        this.timer = timer;
         this.aggregatedOpService = netconfOperationProvider;
         this.idProvider = idProvider;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
@@ -102,7 +96,7 @@ public class NetconfServerSessionNegotiatorFactory
         NetconfServerSessionPreferences proposal =
             new NetconfServerSessionPreferences(createHelloMessage(sessionId, monitoringService), sessionId);
 
-        return new NetconfServerSessionNegotiator(proposal, promise, channel, timer,
+        return new NetconfServerSessionNegotiator(proposal, promise, channel,
                 getListener(Long.toString(sessionId), channel.parent().localAddress()), connectionTimeoutMillis);
     }
 

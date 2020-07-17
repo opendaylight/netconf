@@ -26,16 +26,9 @@ public class NetconfClientDispatcherImpl
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientDispatcherImpl.class);
 
-    private final Timer timer;
-
     public NetconfClientDispatcherImpl(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
                                        final Timer timer) {
         super(bossGroup, workerGroup);
-        this.timer = timer;
-    }
-
-    protected Timer getTimer() {
-        return timer;
     }
 
     @Override
@@ -128,7 +121,7 @@ public class NetconfClientDispatcherImpl
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
         final List<Uri> odlHelloCapabilities = cfg.getOdlHelloCapabilities();
         if (odlHelloCapabilities == null || odlHelloCapabilities.isEmpty()) {
-            return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
+            return new NetconfClientSessionNegotiatorFactory(cfg.getAdditionalHeader(),
                     cfg.getConnectionTimeoutMillis());
         } else {
             // LinkedHashSet since perhaps the device cares about order of hello message capabilities.
@@ -137,7 +130,7 @@ public class NetconfClientDispatcherImpl
             for (final Uri uri : odlHelloCapabilities) {
                 stringCapabilities.add(uri.getValue());
             }
-            return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
+            return new NetconfClientSessionNegotiatorFactory(cfg.getAdditionalHeader(),
                     cfg.getConnectionTimeoutMillis(), stringCapabilities);
         }
     }

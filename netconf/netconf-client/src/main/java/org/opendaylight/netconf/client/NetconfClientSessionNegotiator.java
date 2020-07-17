@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import com.google.common.base.Strings;
@@ -18,7 +17,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Set;
 import javax.xml.xpath.XPathConstants;
@@ -58,10 +56,9 @@ public class NetconfClientSessionNegotiator extends
     protected NetconfClientSessionNegotiator(final NetconfClientSessionPreferences sessionPreferences,
                                              final Promise<NetconfClientSession> promise,
                                              final Channel channel,
-                                             final Timer timer,
                                              final NetconfClientSessionListener sessionListener,
                                              final long connectionTimeoutMillis) {
-        super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        super(sessionPreferences, promise, channel, sessionListener, connectionTimeoutMillis);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
