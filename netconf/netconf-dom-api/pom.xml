@@ -32,5 +32,9 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-xpath</artifactId>
+        </dependency>
     </dependencies>
 </project>
