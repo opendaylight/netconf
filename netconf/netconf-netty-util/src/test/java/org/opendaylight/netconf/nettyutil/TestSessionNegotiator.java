@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.nettyutil;
 
 import io.netty.channel.Channel;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfSessionListener;
@@ -23,10 +22,9 @@ final class TestSessionNegotiator extends
 
     TestSessionNegotiator(final NetconfSessionPreferences sessionPreferences,
                           final Promise<TestingNetconfSession> promise, final Channel channel,
-                          final Timer timer,
                           final NetconfSessionListener<TestingNetconfSession> sessionListener,
                           final long connectionTimeoutMillis) {
-        super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        super(sessionPreferences, promise, channel, sessionListener, connectionTimeoutMillis);
     }
 
     @Override

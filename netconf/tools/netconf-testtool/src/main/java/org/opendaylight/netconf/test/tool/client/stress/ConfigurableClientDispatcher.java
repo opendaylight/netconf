@@ -62,7 +62,7 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
 
     @Override
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
-        return new NetconfClientSessionNegotiatorFactory(getTimer(), cfg.getAdditionalHeader(),
+        return new NetconfClientSessionNegotiatorFactory(cfg.getAdditionalHeader(),
             cfg.getConnectionTimeoutMillis(), capabilities);
     }
 }

@@ -12,8 +12,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import io.netty.channel.Channel;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import org.junit.Test;
@@ -23,14 +21,13 @@ public class NetconfClientSessionNegotiatorFactoryTest {
     @Test
     public void testGetSessionNegotiator() throws Exception {
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        Timer timer = new HashedWheelTimer();
         NetconfSessionListenerFactory<NetconfClientSessionListener> listenerFactory =
                 mock(NetconfSessionListenerFactory.class);
         doReturn(sessionListener).when(listenerFactory).getSessionListener();
 
         Channel channel = mock(Channel.class);
         Promise<NetconfClientSession> promise = mock(Promise.class);
-        NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
+        NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(
                 Optional.empty(), 200L);
 
         NetconfClientSessionNegotiator sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory,

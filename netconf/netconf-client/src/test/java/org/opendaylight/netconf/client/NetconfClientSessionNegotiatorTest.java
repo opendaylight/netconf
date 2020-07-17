@@ -137,7 +137,7 @@ public class NetconfClientSessionNegotiatorTest {
         long timeout = 10L;
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         Timer timer = new HashedWheelTimer();
-        return new NetconfClientSessionNegotiator(preferences, promise, channel, timer, sessionListener, timeout);
+        return new NetconfClientSessionNegotiator(preferences, promise, channel, sessionListener, timeout);
     }
 
     private static NetconfHelloMessage createHelloMsg(final String name) throws Exception {
