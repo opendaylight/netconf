@@ -33,6 +33,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -112,9 +113,21 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     }
 
     @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(NetconfXPathContext xpathContext) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
         return netconfOps.getConfigRunningData(
                 new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path));
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(NetconfXPathContext xpathContext) {
+        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -335,7 +348,7 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
                                       final RemoteDeviceId id) {
         DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
         DocumentedException.ErrorSeverity errSeverity = DocumentedException.ErrorSeverity.ERROR;
-        StringBuilder msgBuilder = new StringBuilder();
+        final StringBuilder msgBuilder = new StringBuilder();
         boolean errorsEncouneterd = false;
         String errorTag = "operation-failed";
 
