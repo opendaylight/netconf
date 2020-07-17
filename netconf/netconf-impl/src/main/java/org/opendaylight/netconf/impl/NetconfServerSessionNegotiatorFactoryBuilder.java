@@ -16,7 +16,6 @@ import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 
 public class NetconfServerSessionNegotiatorFactoryBuilder {
-    private Timer timer;
     private SessionIdProvider idProvider;
     private NetconfOperationServiceFactory aggregatedOpService;
     private long connectionTimeoutMillis;
@@ -26,8 +25,8 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
     public NetconfServerSessionNegotiatorFactoryBuilder() {
     }
 
+    @Deprecated(forRemoval = true)
     public NetconfServerSessionNegotiatorFactoryBuilder setTimer(final Timer timer) {
-        this.timer = timer;
         return this;
     }
 
@@ -61,13 +60,12 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
 
     public NetconfServerSessionNegotiatorFactory build() {
         validate();
-        return new NetconfServerSessionNegotiatorFactory(timer, aggregatedOpService, idProvider,
+        return new NetconfServerSessionNegotiatorFactory(aggregatedOpService, idProvider,
                 connectionTimeoutMillis, monitoringService, baseCapabilities);
     }
 
 
     private void validate() {
-        requireNonNull(timer, "timer not initialized");
         requireNonNull(aggregatedOpService, "NetconfOperationServiceFactory not initialized");
         requireNonNull(idProvider, "SessionIdProvider not initialized");
         checkArgument(connectionTimeoutMillis > 0, "connection time out <=0");

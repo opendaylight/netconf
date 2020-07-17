@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +13,6 @@ import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.File;
@@ -104,9 +102,8 @@ public class TestToolTest {
 
     @BeforeClass
     public static void setUpClass() {
-        HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
         nettyGroup = new NioEventLoopGroup(1, new DefaultThreadFactory(NetconfClientDispatcher.class));
-        dispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup, hashedWheelTimer);
+        dispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup);
     }
 
     @AfterClass

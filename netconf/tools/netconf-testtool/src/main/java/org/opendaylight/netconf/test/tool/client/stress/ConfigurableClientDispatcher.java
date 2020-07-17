@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import io.netty.channel.EventLoopGroup;
-import io.netty.util.Timer;
 import java.util.Set;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
@@ -19,8 +18,8 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
     private final Set<String> capabilities;
 
     private ConfigurableClientDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
-            final Timer timer, final Set<String> capabilities) {
-        super(bossGroup, workerGroup, timer);
+            final Set<String> capabilities) {
+        super(bossGroup, workerGroup);
         this.capabilities = capabilities;
     }
 
@@ -28,8 +27,8 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
      * EXI + chunked framing.
      */
     public static ConfigurableClientDispatcher createChunkedExi(final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup, final Timer timer) {
-        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
+            final EventLoopGroup workerGroup) {
+        return new ConfigurableClientDispatcher(bossGroup, workerGroup,
             NetconfClientSessionNegotiatorFactory.EXI_CLIENT_CAPABILITIES);
     }
 
@@ -37,8 +36,8 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
      * EXI + ]]gt;]]gt; framing.
      */
     public static ConfigurableClientDispatcher createLegacyExi(final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup, final Timer timer) {
-        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
+            final EventLoopGroup workerGroup) {
+        return new ConfigurableClientDispatcher(bossGroup, workerGroup,
             NetconfClientSessionNegotiatorFactory.LEGACY_EXI_CLIENT_CAPABILITIES);
     }
 
@@ -46,8 +45,8 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
      * Chunked framing.
      */
     public static ConfigurableClientDispatcher createChunked(final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup, final Timer timer) {
-        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
+            final EventLoopGroup workerGroup) {
+        return new ConfigurableClientDispatcher(bossGroup, workerGroup,
             NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES);
     }
 
@@ -55,14 +54,14 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
      * ]]gt;]]gt; framing.
      */
     public static ConfigurableClientDispatcher createLegacy(final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup, final Timer timer) {
-        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
+            final EventLoopGroup workerGroup) {
+        return new ConfigurableClientDispatcher(bossGroup, workerGroup,
             NetconfClientSessionNegotiatorFactory.LEGACY_FRAMING_CLIENT_CAPABILITIES);
     }
 
     @Override
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
-        return new NetconfClientSessionNegotiatorFactory(getTimer(), cfg.getAdditionalHeader(),
+        return new NetconfClientSessionNegotiatorFactory(cfg.getAdditionalHeader(),
             cfg.getConnectionTimeoutMillis(), capabilities);
     }
 }

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import static org.junit.Assert.assertNotNull;
@@ -16,8 +15,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoopGroup;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Future;
@@ -36,7 +33,6 @@ public class NetconfClientDispatcherImplTest {
     public void testNetconfClientDispatcherImpl() throws Exception {
         EventLoopGroup bossGroup = Mockito.mock(EventLoopGroup.class);
         EventLoopGroup workerGroup = Mockito.mock(EventLoopGroup.class);
-        Timer timer = new HashedWheelTimer();
 
         ChannelFuture chf = Mockito.mock(ChannelFuture.class);
         Channel ch = Mockito.mock(Channel.class);
@@ -85,7 +81,7 @@ public class NetconfClientDispatcherImplTest {
                 .withConnectStrategyFactory(reconnectStrategyFactory)
                 .withAuthHandler(handler).build();
 
-        NetconfClientDispatcherImpl dispatcher = new NetconfClientDispatcherImpl(bossGroup, workerGroup, timer);
+        NetconfClientDispatcherImpl dispatcher = new NetconfClientDispatcherImpl(bossGroup, workerGroup);
         Future<NetconfClientSession> sshSession = dispatcher.createClient(cfg);
         Future<NetconfClientSession> tcpSession = dispatcher.createClient(cfg2);
 

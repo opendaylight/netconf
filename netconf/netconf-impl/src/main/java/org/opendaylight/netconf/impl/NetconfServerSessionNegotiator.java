@@ -10,7 +10,6 @@ package org.opendaylight.netconf.impl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.local.LocalAddress;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -36,10 +35,9 @@ public class NetconfServerSessionNegotiator
     protected NetconfServerSessionNegotiator(
             NetconfServerSessionPreferences sessionPreferences,
             Promise<NetconfServerSession> promise, Channel channel,
-            Timer timer, NetconfServerSessionListener sessionListener,
+            NetconfServerSessionListener sessionListener,
             long connectionTimeoutMillis) {
-        super(sessionPreferences, promise, channel, timer, sessionListener,
-                connectionTimeoutMillis);
+        super(sessionPreferences, promise, channel, sessionListener, connectionTimeoutMillis);
     }
 
     @Override

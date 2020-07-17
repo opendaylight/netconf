@@ -16,7 +16,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.util.HashedWheelTimer;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +78,6 @@ public class NetconfDeviceSimulator implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSimulator.class);
 
     private final NioEventLoopGroup nettyThreadgroup;
-    private final HashedWheelTimer hashedWheelTimer;
     private final List<Channel> devicesChannels = new ArrayList<>();
     private final List<SshProxyServer> sshWrappers = new ArrayList<>();
     private final ScheduledExecutorService minaTimerExecutor;
@@ -92,7 +90,6 @@ public class NetconfDeviceSimulator implements Closeable {
     public NetconfDeviceSimulator(final Configuration configuration) {
         this.configuration = configuration;
         this.nettyThreadgroup = new NioEventLoopGroup();
-        this.hashedWheelTimer = new HashedWheelTimer();
         this.minaTimerExecutor = Executors.newScheduledThreadPool(configuration.getThreadPoolSize(),
                 new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build());
         this.nioExecutor = ThreadUtils
@@ -120,8 +117,7 @@ public class NetconfDeviceSimulator implements Closeable {
         final Set<String> serverCapabilities = configuration.getCapabilities();
 
         final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new TesttoolNegotiationFactory(
-                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
-                configuration.getGenerateConfigsTimeout(),
+                aggregatedNetconfOperationServiceFactory, idProvider, configuration.getGenerateConfigsTimeout(),
                 monitoringService1, serverCapabilities);
 
         final ServerChannelInitializer serverChannelInitializer =

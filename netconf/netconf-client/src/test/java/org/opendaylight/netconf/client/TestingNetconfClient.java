@@ -11,7 +11,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Sets;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.Closeable;
@@ -32,7 +31,6 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
-
 
 /**
  * Synchronous netconf client suitable for testing.
@@ -105,10 +103,8 @@ public class TestingNetconfClient implements Closeable {
     }
 
     public static void main(final String[] args) throws Exception {
-        HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
         NioEventLoopGroup nettyGroup = new NioEventLoopGroup();
-        NetconfClientDispatcherImpl netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup,
-                hashedWheelTimer);
+        NetconfClientDispatcherImpl netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup);
         LoginPasswordHandler authHandler = new LoginPasswordHandler("admin", "admin");
         TestingNetconfClient client = new TestingNetconfClient("client", netconfClientDispatcher,
                 getClientConfig("127.0.0.1", 1830, true, Optional.of(authHandler)));

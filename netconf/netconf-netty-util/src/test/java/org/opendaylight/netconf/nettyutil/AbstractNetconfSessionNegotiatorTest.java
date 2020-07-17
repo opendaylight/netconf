@@ -27,7 +27,6 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 import java.util.ArrayList;
@@ -85,7 +84,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         prefs = new NetconfSessionPreferences(helloBase11);
         doReturn(promise).when(promise).setFailure(any());
         doReturn(promise).when(promise).setSuccess(any());
-        negotiator = new TestSessionNegotiator(prefs, promise, channel, new HashedWheelTimer(), listener, 100L);
+        negotiator = new TestSessionNegotiator(prefs, promise, channel, listener, 100L);
     }
 
     @Test

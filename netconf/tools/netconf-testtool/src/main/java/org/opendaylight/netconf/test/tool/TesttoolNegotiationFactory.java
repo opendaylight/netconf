@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
-import io.netty.util.Timer;
 import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,17 +24,17 @@ public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFa
 
     private final Map<SocketAddress, NetconfOperationService> cachedOperationServices = new HashMap<>();
 
-    public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
+    public TesttoolNegotiationFactory(final NetconfOperationServiceFactory netconfOperationProvider,
             final SessionIdProvider idProvider, final long connectionTimeoutMillis,
             final NetconfMonitoringService monitoringService) {
-        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService,
+        super(netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService,
             NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES);
     }
 
-    public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
+    public TesttoolNegotiationFactory(final NetconfOperationServiceFactory netconfOperationProvider,
             final SessionIdProvider idProvider, final long connectionTimeoutMillis,
             final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
-        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis,
+        super(netconfOperationProvider, idProvider, connectionTimeoutMillis,
             monitoringService, baseCapabilities);
     }
 

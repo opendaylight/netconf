@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import ch.qos.logback.classic.Level;
@@ -13,8 +12,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -155,9 +152,8 @@ public final class StressClient {
         }
 
         final NioEventLoopGroup nioGroup = new NioEventLoopGroup();
-        final Timer timer = new HashedWheelTimer();
 
-        final NetconfClientDispatcherImpl netconfClientDispatcher = configureClientDispatcher(nioGroup, timer);
+        final NetconfClientDispatcherImpl netconfClientDispatcher = configureClientDispatcher(nioGroup);
 
         final List<StressClientCallable> callables = new ArrayList<>(threadAmount);
         for (final List<NetconfMessage> messages : allPreparedMessages) {
@@ -187,7 +183,6 @@ public final class StressClient {
         LOG.info("Requests per second: {}", params.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS));
 
         // Cleanup
-        timer.stop();
         try {
             nioGroup.shutdownGracefully().get(20L, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -229,20 +224,19 @@ public final class StressClient {
         return netconfMessage;
     }
 
-    private static NetconfClientDispatcherImpl configureClientDispatcher(final NioEventLoopGroup nioGroup,
-            final Timer timer) {
+    private static NetconfClientDispatcherImpl configureClientDispatcher(final NioEventLoopGroup nioGroup) {
         final NetconfClientDispatcherImpl netconfClientDispatcher;
         if (params.exi) {
             if (params.legacyFraming) {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup);
             } else {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup);
             }
         } else {
             if (params.legacyFraming) {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup);
             } else {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup);
             }
         }
         return netconfClientDispatcher;

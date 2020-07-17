@@ -148,10 +148,9 @@ public class ConcurrentClientsTest {
     }
 
     @Before
-    public void setUp() throws Exception {
-        hashedWheelTimer = new HashedWheelTimer();
+    public void setUp() throws InterruptedException {
         nettyGroup = new NioEventLoopGroup(nettyThreads);
-        netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup, hashedWheelTimer);
+        netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup);
 
         AggregatedNetconfOperationServiceFactory factoriesListener = new AggregatedNetconfOperationServiceFactory();
 
@@ -163,7 +162,6 @@ public class ConcurrentClientsTest {
 
         NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new
                 NetconfServerSessionNegotiatorFactoryBuilder()
-                .setTimer(hashedWheelTimer)
                 .setAggregatedOpService(factoriesListener)
                 .setIdProvider(idProvider)
                 .setConnectionTimeoutMillis(5000)

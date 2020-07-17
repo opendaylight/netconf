@@ -12,13 +12,11 @@
 
     <reference id="globalBossGroup" interface="io.netty.channel.EventLoopGroup" odl:type="global-boss-group"/>
     <reference id="globalWorkerGroup" interface="io.netty.channel.EventLoopGroup" odl:type="global-worker-group"/>
-    <reference id="timer" interface="io.netty.util.Timer" odl:type="global-timer"/>
 
     <bean id="netconfClientDispatcherImpl"
           class="org.opendaylight.netconf.client.NetconfClientDispatcherImpl">
         <argument ref="globalBossGroup"/>
         <argument ref="globalWorkerGroup"/>
-        <argument ref="timer"/>
     </bean>
     <service ref="netconfClientDispatcherImpl"
              interface="org.opendaylight.netconf.client.NetconfClientDispatcher"

@@ -7,11 +7,8 @@
  */
 package org.opendaylight.netconf.client;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.collect.ImmutableSet;
 import io.netty.channel.Channel;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
@@ -69,33 +66,27 @@ public class NetconfClientSessionNegotiatorFactory
     private final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader;
     private final Set<String> clientCapabilities;
     private final long connectionTimeoutMillis;
-    private final Timer timer;
     private final EXIParameters options;
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
-                                                 final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
+    public NetconfClientSessionNegotiatorFactory(final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis) {
-        this(timer, additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS);
+        this(additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS);
     }
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
-                                                 final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
+    public NetconfClientSessionNegotiatorFactory(final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final Set<String> capabilities) {
-        this(timer, additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS, capabilities);
+        this(additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS, capabilities);
 
     }
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
-                                                 final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
+    public NetconfClientSessionNegotiatorFactory(final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions) {
-        this(timer, additionalHeader, connectionTimeoutMillis, exiOptions, EXI_CLIENT_CAPABILITIES);
+        this(additionalHeader, connectionTimeoutMillis, exiOptions, EXI_CLIENT_CAPABILITIES);
     }
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
-                                                 final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
+    public NetconfClientSessionNegotiatorFactory(final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions,
                                                  final Set<String> capabilities) {
-        this.timer = requireNonNull(timer);
         this.additionalHeader = additionalHeader;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.options = exiOptions;
@@ -115,7 +106,7 @@ public class NetconfClientSessionNegotiatorFactory
         NetconfHelloMessage helloMessage = NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader);
 
         NetconfClientSessionPreferences proposal = new NetconfClientSessionPreferences(helloMessage, startExiMessage);
-        return new NetconfClientSessionNegotiator(proposal, promise, channel, timer,
+        return new NetconfClientSessionNegotiator(proposal, promise, channel,
                 sessionListenerFactory.getSessionListener(), connectionTimeoutMillis);
     }
 }
