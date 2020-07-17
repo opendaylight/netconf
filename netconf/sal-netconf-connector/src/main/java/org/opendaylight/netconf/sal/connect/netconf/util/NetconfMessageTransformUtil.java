@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
@@ -44,6 +46,7 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.netconf.util.NodeContainerProxy;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -61,6 +64,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -84,17 +88,21 @@ import org.w3c.dom.Element;
 public final class NetconfMessageTransformUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
-
+    private static final Pattern START_KEY = Pattern.compile("\\[");
+    //it is necessary to use the pattern for '|' otherwise the splitter considers it as the 'or' operation
+    private static final Pattern OR = Pattern.compile("\\|");
+    private static final Pattern WHITESPACES = Pattern.compile("\\s+");
     public static final String MESSAGE_ID_PREFIX = "m";
     public static final String MESSAGE_ID_ATTR = "message-id";
+    public static final String EVENT_TIME = "eventTime";
 
     public static final QName CREATE_SUBSCRIPTION_RPC_QNAME =
             QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
     private static final String SUBTREE = "subtree";
+    private static final String XPATH = "xpath";
 
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
-    public static final String EVENT_TIME = "eventTime";
 
     private NetconfMessageTransformUtil() {
 
@@ -160,6 +168,7 @@ public final class NetconfMessageTransformUtil {
     public static final SchemaPath NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
     public static final QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
     public static final SchemaPath NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
+    public static final QName NETCONF_SELECT_QNAME = QName.create(NETCONF_QNAME, "select").intern();
     public static final QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
     public static final QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
     public static final QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
@@ -239,6 +248,214 @@ public final class NetconfMessageTransformUtil {
 
         return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
                 .build();
+    }
+
+    /**
+     * Creates a filter {@link AnyxmlNode} node for get and get-config operations
+     * with XPath as the data path. If the device does not support XPath, a subtree
+     * filter type is created in which the subtree can also contain specific
+     * elements (not only one).
+     *
+     * @param netconfXPathContext Netconf XPath context
+     * @param xpathSupported      is XPath supported by device
+     * @return {@link AnyxmlNode} with a specific filter type for the data
+     *         path (subtree or XPath)
+     */
+    public static DataContainerChild<?, ?> toFilterStructure(final NetconfXPathContext netconfXPathContext,
+            final boolean xpathSupported) {
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
+                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
+        if (xpathSupported) {
+            netconfXPathContext.getNamespaces()
+                    .forEach(q -> element.setAttributeNS(q.getNamespace(), q.getNamespacePrefix(), q.getName()));
+            element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                    XPATH);
+            element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_SELECT_QNAME.getLocalName(),
+                    netconfXPathContext.getXpathWithPrefixes());
+        } else {
+            element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                    SUBTREE);
+
+            writeElementSubtree(netconfXPathContext, element);
+            LOG.debug("Netconf device does not support the XPath. It will be used subtree instead.");
+        }
+
+        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
+                .build();
+    }
+
+    /**
+     * Write the subtree data type into the filter element instead of
+     * XPath data type. Can be use just for get or get-config operations
+     * if device doesn't support XPath. Subtree can contain specific
+     * elements from specific subtree.
+     *
+     * @param netconfXPathContext Netconf XPath context
+     * @param element             filter element
+     */
+    private static void writeElementSubtree(final NetconfXPathContext netconfXPathContext,
+            final Element element) {
+        final String[] expressions = netconfXPathContext.getXpathWithPrefixes().replaceAll(WHITESPACES.pattern(),
+                "")
+                .split(OR.pattern());
+        final List<List<String>> expressionsList = createExpressionsPartsList(expressions);
+        Element actualElement = element;
+        int actualPart = 0;
+        for (int j = 0; j < expressionsList.get(0).size(); j++) {
+            // counting how deep is the common base path
+            int countL = 0;
+
+            // save the value of the actual level of deep
+            actualPart = j;
+
+            // find common base path for all XPath expressions with comparing all levels of
+            // the expressions parts with
+            // the first one expression
+            for (int k = 1; k < expressions.length; k++) {
+                if (expressionsList.get(0).get(j).equals(expressionsList.get(k).get(j))) {
+                    countL++;
+                }
+            }
+
+            if (countL != expressions.length - 1) {
+                break;
+            }
+
+            final String expressionPart = expressionsList.get(0).get(j);
+
+            // splitting the expression part by colon where on the first place is prefix
+            // (namespace) and the second one is created by local name
+            final String[] splittedExpressionPart = splitExpressionPartByColon(expressionPart);
+
+            // find the namespaces by prefix
+            final String originalNs = netconfXPathContext.getNamespaces().stream()
+                    .filter(q -> q.getNamespacePrefix().equals(splittedExpressionPart[0])).findAny().get().getName();
+
+            // create new element for actual node from the namespaces and local name
+            final Element child = actualElement.getOwnerDocument().createElementNS(originalNs,
+                    splittedExpressionPart[1]);
+            actualElement.appendChild(child);
+            actualElement = child;
+
+            // check if there exists also value for the node
+            if (expressionPart.endsWith("]")) {
+                final String[] nodeValueArray = expressionPart.split(START_KEY.pattern());
+
+                // go through the all parts of the node values
+                for (int i = 1; i < nodeValueArray.length; i++) {
+                    final String nodeValue = nodeValueArray[i];
+                    final String[] nodeValuePartsArray = nodeValue.split("/");
+
+                    // if node value parts contains just one value, then it's direct value for the
+                    // node otherwise, it point to the child with value
+                    if (nodeValuePartsArray.length == 1) {
+                        appendTextNode(actualElement, getValueFromXPathTextFunction(nodeValuePartsArray[0]));
+                    } else {
+                        // child is composed from the prefix (namespace) and the local name followed by value
+                        final String[] childIdentifierParts = nodeValuePartsArray[1].split(":");
+                        final String originalKeyNs = netconfXPathContext.getNamespaces().stream()
+                                .filter(q -> q.getNamespacePrefix().equals(
+                                        childIdentifierParts[0]))
+                                .findAny().get().getName();
+
+                        // create and append the child element and the value of the child element
+                        final Element childElement = actualElement.getOwnerDocument().createElementNS(
+                                originalKeyNs,
+                                childIdentifierParts[1]);
+                        appendTextNode(childElement, getValueFromXPathTextFunction(nodeValuePartsArray[2]));
+                        actualElement.appendChild(childElement);
+                    }
+                }
+            }
+        }
+
+        // need to finish creating and appending new elements based on different paths
+        final Element lastBasePathElement = actualElement;
+        for (final List<String> entry : expressionsList) {
+            Element entryElement = lastBasePathElement;
+            for (int j = actualPart; j < entry.size(); j++) {
+                for (int k = 1; k < expressions.length; k++) {
+                    final String expressionPart = expressionsList.get(expressionsList.indexOf(entry)).get(j);
+                    final String[] expressionPartsArray = expressionPart.split(":");
+                    final String originalNs = netconfXPathContext.getNamespaces().stream()
+                            .filter(q -> q.getNamespacePrefix().equals(expressionPartsArray[0]))
+                            .findAny().get().getName();
+
+                    final Element child = entryElement.getOwnerDocument().createElementNS(originalNs,
+                            expressionPartsArray[1]);
+                    entryElement.appendChild(child);
+                    entryElement = child;
+                }
+            }
+        }
+    }
+
+    private static String[] splitExpressionPartByColon(final String expressionPart) {
+        final String[] splittedExpressionPart;
+        final boolean endsWithLeftSquareBracket = expressionPart.endsWith("]");
+        if (endsWithLeftSquareBracket && !expressionPart.contains("[")) {
+            splittedExpressionPart = expressionPart.split(START_KEY.pattern())[0].split(":");
+        } else {
+            splittedExpressionPart = expressionPart.split(":");
+        }
+        if (endsWithLeftSquareBracket && expressionPart.contains("[")) {
+            splittedExpressionPart[1] = splittedExpressionPart[1].split(START_KEY.pattern())[0];
+        }
+        return splittedExpressionPart;
+    }
+
+    private static void appendTextNode(Element parent, String value) {
+        parent.appendChild(parent.getOwnerDocument().createTextNode(value));
+    }
+
+    /**
+     * Value of XPath part. Example: text()=yourvalue
+     *
+     * @param XPath part with value
+     * @return yourvalue as string
+     */
+    private static String getValueFromXPathTextFunction(String text) {
+        final String value = text.split("=")[1].replaceAll("'", "");
+        // need to remove last char because it ends with ']'
+        return value.substring(0, value.length() - 1);
+    }
+
+    /**
+     * Parsing XPath expressions and creating map with specific expressions parts.
+     * The one expression part consists of two parts. The first one is created by
+     * prefix (namespace). The second one is composed by local name and can contains
+     * also specific value for the node or for the direct children.
+     *
+     * @param expressions array of XPath expressions splitted by " | "
+     * @return map with list of expressions parts
+     */
+    private static List<List<String>> createExpressionsPartsList(final String[] expressions) {
+        final List<List<String>> expressionsLists = new ArrayList<>();
+        for (final String expression : expressions) {
+            final List<String> expressionParts = new ArrayList<>();
+            boolean isKey = false;
+            StringBuilder sbKey = null;
+            for (final String expressionPart : expression.split("/")) {
+                if (!expressionPart.isEmpty()) {
+                    if (expressionPart.endsWith("[") && !isKey) {
+                        isKey = true;
+                        sbKey = new StringBuilder(expressionPart);
+                        continue;
+                    } else if (expressionPart.endsWith("]") && sbKey != null) {
+                        isKey = false;
+                        expressionParts.add(sbKey.append("/").append(expressionPart).toString());
+                        continue;
+                    }
+                    if (!isKey) {
+                        expressionParts.add(expressionPart);
+                    } else {
+                        sbKey.append("/").append(expressionPart);
+                    }
+                }
+            }
+            expressionsLists.add(expressionParts);
+        }
+        return expressionsLists;
     }
 
     public static void checkValidReply(final NetconfMessage input, final NetconfMessage output)
