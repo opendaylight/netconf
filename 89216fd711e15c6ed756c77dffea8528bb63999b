@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "651ce38a_f1b68904",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/ReflectionTestUtils.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-17T09:50:07Z",
+      "side": 1,
+      "message": "This is completely inappropriate",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 25
+      },
+      "revId": "89216fd711e15c6ed756c77dffea8528bb63999b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f87adcde_d1f4a5ae",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/ReflectionTestUtils.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-17T09:50:07Z",
+      "side": 1,
+      "message": "ReflectiveOperationException",
+      "range": {
+        "startLine": 25,
+        "startChar": 96,
+        "endLine": 25,
+        "endChar": 105
+      },
+      "revId": "89216fd711e15c6ed756c77dffea8528bb63999b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
