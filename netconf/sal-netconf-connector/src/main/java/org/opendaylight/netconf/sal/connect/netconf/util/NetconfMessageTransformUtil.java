@@ -44,6 +44,7 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.netconf.util.NodeContainerProxy;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -61,6 +62,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -84,17 +86,17 @@ import org.w3c.dom.Element;
 public final class NetconfMessageTransformUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
-
     public static final String MESSAGE_ID_PREFIX = "m";
     public static final String MESSAGE_ID_ATTR = "message-id";
+    public static final String EVENT_TIME = "eventTime";
 
     public static final QName CREATE_SUBSCRIPTION_RPC_QNAME =
             QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
     private static final String SUBTREE = "subtree";
+    private static final String XPATH = "xpath";
 
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
-    public static final String EVENT_TIME = "eventTime";
 
     private NetconfMessageTransformUtil() {
 
@@ -160,6 +162,7 @@ public final class NetconfMessageTransformUtil {
     public static final SchemaPath NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
     public static final QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
     public static final SchemaPath NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
+    public static final QName NETCONF_SELECT_QNAME = QName.create(NETCONF_QNAME, "select").intern();
     public static final QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
     public static final QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
     public static final QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
@@ -236,6 +239,30 @@ public final class NetconfMessageTransformUtil {
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
+
+        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
+                .build();
+    }
+
+    /**
+     * Creates a filter {@link AnyxmlNode} node for get and get-config operations
+     * with XPath as the data path. If the device does not support XPath, a subtree
+     * filter type is created in which the subtree can also contain specific
+     * elements (not only one).
+     *
+     * @param netconfXPathContext Netconf XPath context
+     * @return {@link AnyxmlNode} with a specific filter type for the data
+     *         path (subtree or XPath)
+     */
+    public static DataContainerChild<?, ?> toFilterStructure(final NetconfXPathContext netconfXPathContext) {
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
+                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
+        netconfXPathContext.getNamespaces()
+                .forEach(q -> element.setAttributeNS(q.getNamespace(), q.getNamespacePrefix(), q.getName()));
+        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                XPATH);
+        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_SELECT_QNAME.getLocalName(),
+                netconfXPathContext.getXpathWithPrefixes());
 
         return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
                 .build();

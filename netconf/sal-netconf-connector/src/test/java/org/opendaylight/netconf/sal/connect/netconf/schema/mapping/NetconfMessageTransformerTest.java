@@ -18,8 +18,11 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_LOCK_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
@@ -60,6 +63,7 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYa
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.util.NetconfUtil;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
@@ -353,7 +357,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_CONFIG_QNAME),
-                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, source, filter));
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -381,7 +385,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_CONFIG_QNAME),
-                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, source, filter));
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -395,6 +399,42 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</source>\n"
                 + "</get-config>"
                 + "</rpc>");
+    }
+
+    @Test
+    public void testGetConfigRequestWithXPath() throws Exception {
+        getConfigXPathTest("<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                        + "<get-config>\n"
+                        + "<source>\n"
+                        + "<running/>\n"
+                        + "</source>\n"
+                        + "<filter"
+                        + " xmlns:ns0=\"xmlns\""
+                        + " ns0:nxpcrpc0=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\""
+                        + " xmlns:ns1=\"urn:ietf:params:xml:ns:netconf:base:1.0\""
+                        + " ns1:select=\"/nxpcrpc0:netconf-state/nxpcrpc0:schemas\""
+                        + " xmlns:ns2=\"urn:ietf:params:xml:ns:netconf:base:1.0\""
+                        + " ns2:type=\"xpath\"/>"
+                        + "</get-config>"
+                        + "</rpc>", true);
+    }
+
+    private void getConfigXPathTest(String expectedMessage, boolean xpathSupported) throws Exception {
+        final List<Set<QName>> filtersList = Collections.emptyList();
+        final NetconfXPathContext netconfXPathContext =
+                NetconfXPathContext.createXPathContext(
+                        YangInstanceIdentifier.create(
+                                NodeIdentifier.create(NetconfState.QNAME),
+                                NodeIdentifier.create(Schemas.QNAME)), filtersList);
+
+        final DataContainerChild<?, ?> filter = NetconfMessageTransformUtil.toFilterStructure(netconfXPathContext);
+
+        final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
+
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_CONFIG_QNAME),
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, source, filter));
+
+        assertSimilarXml(netconfMessage, expectedMessage);
     }
 
     @Test
@@ -423,7 +463,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 
         final ContainerNode wrap =
-                NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_QNAME, editConfigStructure, target);
+                NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_NODEID, editConfigStructure, target);
         final NetconfMessage netconfMessage =
                 netconfMessageTransformer.toRpcRequest(toPath(NETCONF_EDIT_CONFIG_QNAME), wrap);
 
@@ -463,7 +503,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                     new NodeWithValue<>(capability, "a:b:c")), SCHEMA);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_QNAME),
-                NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, filter));
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filter));
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                 + "<get xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -476,6 +516,39 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</filter>\n"
                 + "</get>"
                 + "</rpc>");
+    }
+
+    @Test
+    public void testGetRequestWithXPath() throws Exception {
+        getXPathTest("<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<get>\n"
+                + "<filter"
+                + " xmlns:ns0=\"xmlns\""
+                + " ns0:nxpcrpc0=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\""
+                + " xmlns:ns1=\"urn:ietf:params:xml:ns:netconf:base:1.0\""
+                + " ns1:select=\"/nxpcrpc0:netconf-state/nxpcrpc0:capabilities/nxpcrpc0:capability[text()='a:b:c']\""
+                + " xmlns:ns2=\"urn:ietf:params:xml:ns:netconf:base:1.0\""
+                + " ns2:type=\"xpath\"/>\n"
+                + "</get>\n"
+                + "</rpc>", true);
+    }
+
+    private void getXPathTest(String expectedMessage, boolean xpathSupported) throws Exception {
+        final List<Set<QName>> filtersList = Collections.emptyList();
+        final NetconfXPathContext netconfXPathContext =
+                NetconfXPathContext.createXPathContext(
+                        YangInstanceIdentifier.create(
+                                NodeIdentifier.create(NetconfState.QNAME),
+                                NodeIdentifier.create(Capabilities.QNAME),
+                                new NodeWithValue<>(QName.create(Capabilities.QNAME, "capability"), "a:b:c")),
+                        filtersList);
+
+        final DataContainerChild<?, ?> filter = toFilterStructure(netconfXPathContext);
+
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_QNAME),
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filter));
+
+        assertSimilarXml(netconfMessage, expectedMessage);
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
