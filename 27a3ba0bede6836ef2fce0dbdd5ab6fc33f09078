@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "49f3c669_428e9d99",
+        "filename": "netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-17T12:52:06Z",
+      "side": 1,
+      "message": "Which, btw, is already listed above, so this declaration should not even be here.",
+      "parentUuid": "e42c81d8_8bcd8aeb",
+      "range": {
+        "startLine": 148,
+        "startChar": 6,
+        "endLine": 148,
+        "endChar": 31
+      },
+      "revId": "27a3ba0bede6836ef2fce0dbdd5ab6fc33f09078",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7c8b5207_f93a155b",
         "filename": "netconf/sal-netconf-connector/pom.xml",
         "patchSetId": 4
