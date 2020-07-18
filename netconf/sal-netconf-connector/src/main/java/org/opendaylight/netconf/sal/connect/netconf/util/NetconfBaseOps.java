@@ -48,6 +48,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.KeepaliveDOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.input.source.ConfigSource;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
@@ -206,14 +207,37 @@ public final class NetconfBaseOps {
         return future;
     }
 
+    public ListenableFuture<? extends DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback,
+            final QName datastore, final NetconfXPathContext netconfXPathContext, final boolean xpathSupported) {
+        requireNonNull(callback);
+        requireNonNull(datastore);
+
+        final DataContainerChild<?, ?> node = transformer.toFilterStructure(netconfXPathContext, xpathSupported);
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_CONFIG_PATH,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore), node));
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
+        return future;
+    }
+
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
             final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, getConfigRunning(callback, filterPath));
     }
 
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
+            final FutureCallback<DOMRpcResult> callback, final NetconfXPathContext xpathContext,
+            final boolean xpathSupported) {
+        return extractData(xpathContext.getPath(), getConfigRunning(callback, xpathContext, xpathSupported));
+    }
+
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
                                                                     final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, get(callback, filterPath));
+    }
+
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final NetconfRpcFutureCallback callback,
+            final NetconfXPathContext netconfXPathContext, final boolean xpathSupported) {
+        return extractData(netconfXPathContext.getPath(), get(callback, netconfXPathContext, xpathSupported));
     }
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
@@ -232,9 +256,19 @@ public final class NetconfBaseOps {
         return getConfig(callback, NETCONF_RUNNING_QNAME, filterPath);
     }
 
+    public ListenableFuture<? extends DOMRpcResult> getConfigRunning(final FutureCallback<DOMRpcResult> callback,
+            final NetconfXPathContext xpathContext, final boolean xpathSupported) {
+        return getConfig(callback, NETCONF_RUNNING_QNAME, xpathContext, xpathSupported);
+    }
+
     public ListenableFuture<? extends DOMRpcResult> getConfigCandidate(final FutureCallback<DOMRpcResult> callback,
             final Optional<YangInstanceIdentifier> filterPath) {
         return getConfig(callback, NETCONF_CANDIDATE_QNAME, filterPath);
+    }
+
+    public ListenableFuture<? extends DOMRpcResult> getConfigCandidate(final NetconfRpcFutureCallback callback,
+            final NetconfXPathContext netconfXPathContext, final boolean xpathSupported) {
+        return getConfig(callback, NETCONF_CANDIDATE_QNAME, netconfXPathContext, xpathSupported);
     }
 
     public ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
@@ -246,6 +280,17 @@ public final class NetconfBaseOps {
                     ? NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
                         toFilterStructure(filterPath.get(), mountContext.getSchemaContext()))
                     : NetconfMessageTransformUtil.GET_RPC_CONTENT);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
+        return future;
+    }
+
+    public ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
+            final NetconfXPathContext netconfXPathContext, final boolean xpathSupported) {
+        requireNonNull(callback);
+
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_PATH,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
+                        toFilterStructure(netconfXPathContext, xpathSupported)));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
