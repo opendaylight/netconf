@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -33,6 +34,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -58,7 +60,7 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
                                       final DOMRpcService rpc,
                                       final NetconfSessionPreferences netconfSessionPreferences) {
         this.id = id;
-        this.netconfOps = new NetconfBaseOps(rpc, mountContext);
+        this.netconfOps = new NetconfBaseOps(rpc, mountContext, netconfSessionPreferences.isXPathSupported());
         // get specific attributes from netconf preferences and get rid of it
         // no need to keep the entire preferences object, its quite big with all the capability QNames
         candidateSupported = netconfSessionPreferences.isCandidateSupported();
@@ -112,9 +114,19 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     }
 
     @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(@NonNull final NetconfXPathContext xpathContext) {
+        return netconfOps.getData(new NetconfRpcFutureCallback("Data read", id), xpathContext);
+    }
+
+    @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
         return netconfOps.getConfigRunningData(
                 new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path));
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(@NonNull final NetconfXPathContext xpathContext) {
+        return netconfOps.getConfigRunningData(new NetconfRpcFutureCallback("Data read", id), xpathContext);
     }
 
     @Override
