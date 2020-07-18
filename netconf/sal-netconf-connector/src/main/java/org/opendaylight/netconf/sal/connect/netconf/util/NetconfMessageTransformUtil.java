@@ -327,7 +327,7 @@ public final class NetconfMessageTransformUtil {
                 elementStrWithNsArray = elementStrWithNs.split(":");
             }
             final String originalNs = netconfXPathContext.getNamespaces().stream()
-                    .filter(q -> q.getName().equals(elementStrWithNsArray[0])).findAny().get().getNamespacePrefix();
+                    .filter(q -> q.getNamespacePrefix().equals(elementStrWithNsArray[0])).findAny().get().getName();
 
             final Element child = elementNew.getOwnerDocument().createElementNS(originalNs, elementStrWithNsArray[1]);
             elementNew.appendChild(child);
@@ -339,7 +339,7 @@ public final class NetconfMessageTransformUtil {
                     final String[] keyValues = key.split("/");
                     final String[] keyStrWithNsArray = keyValues[1].split(":");
                     final String originalKeyNs = netconfXPathContext.getNamespaces().stream()
-                            .filter(q -> q.getName().equals(keyStrWithNsArray[0])).findAny().get().getNamespacePrefix();
+                            .filter(q -> q.getNamespacePrefix().equals(keyStrWithNsArray[0])).findAny().get().getName();
 
                     final Element keyElement = elementNew.getOwnerDocument().createElementNS(originalKeyNs,
                             keyStrWithNsArray[1]);
@@ -357,8 +357,8 @@ public final class NetconfMessageTransformUtil {
                     final String elementStrWithNs = expressionsMap.get(entry.getKey()).get(j);
                     final String[] elementStrWithNsArray = elementStrWithNs.split(":");
                     final String originalNs = netconfXPathContext.getNamespaces().stream()
-                            .filter(q -> q.getName().equals(elementStrWithNsArray[0])).findAny().get()
-                            .getNamespacePrefix();
+                            .filter(q -> q.getNamespacePrefix().equals(elementStrWithNsArray[0])).findAny().get()
+                            .getName();
 
                     final Element child = entryElement.getOwnerDocument().createElementNS(
                             originalNs,

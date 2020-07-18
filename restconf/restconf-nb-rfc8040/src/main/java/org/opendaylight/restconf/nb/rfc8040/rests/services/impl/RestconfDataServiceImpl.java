@@ -148,9 +148,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, mountPoint);
-        final NormalizedNode<?, ?> node = readData(identifier, parameters.getContent(),
-                strategy, parameters.getWithDefault(), schemaContextRef, uriInfo);
+        final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, parameters, mountPoint);
+        final NormalizedNode<?, ?> node = readData(identifier, parameters, strategy, schemaContextRef, uriInfo);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
@@ -190,13 +189,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param uriInfo       uri info
      * @return {@link NormalizedNode}
      */
-    public static NormalizedNode<?, ?> readData(final String identifier, final String content,
-                                                final RestconfStrategy strategy, final String withDefa,
+    public static NormalizedNode<?, ?> readData(final String identifier, final WriterParameters parameters,
+                                                final RestconfStrategy strategy,
                                                 final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
             createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
         }
-        return ReadDataTransactionUtil.readData(content, strategy, withDefa, schemaContext);
+        return ReadDataTransactionUtil.readData(strategy.getParameters().getContent(), strategy, schemaContext);
     }
 
     private static void createAllYangNotificationStreams(final RestconfStrategy strategy,
@@ -394,16 +393,20 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     public synchronized RestconfStrategy getRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
-                                                final DOMMountPoint mountPoint) {
+            final DOMMountPoint mountPoint) {
+        return getRestconfStrategy(instanceIdentifier, null, mountPoint);
+    }
+
+    public synchronized RestconfStrategy getRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
+                                                WriterParameters parameters, final DOMMountPoint mountPoint) {
         if (mountPoint != null) {
             final Optional<NetconfDataTreeService> service = mountPoint.getService(NetconfDataTreeService.class);
             if (service.isPresent()) {
-                return new NetconfRestconfStrategy(service.get(), instanceIdentifier);
+                return new NetconfRestconfStrategy(service.get(), instanceIdentifier, parameters);
             }
         }
-        final TransactionChainHandler transactionChain = mountPoint == null
-                ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
-        return new MdsalRestconfStrategy(instanceIdentifier, transactionChain);
+        return new MdsalRestconfStrategy(instanceIdentifier, parameters,
+                mountPoint == null ? transactionChainHandler : transactionChainOfMountPoint(mountPoint));
     }
 
     /**
