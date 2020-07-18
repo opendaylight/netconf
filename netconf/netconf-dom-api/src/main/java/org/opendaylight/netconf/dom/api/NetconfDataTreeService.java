@@ -16,12 +16,14 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
  * Interface for base and additional operations for netconf (e.g. get, get-config, edit-config, (un)lock, commit etc).
  * &lt;edit-config&gt; operation is extended according it's attributes (merge, replace, create, delete, remove).
+ * If device supports the XPath, allows to use it (for get and get-config operations).
  * According to RFC-6241.
  */
 public interface NetconfDataTreeService extends DOMService {
@@ -56,12 +58,30 @@ public interface NetconfDataTreeService extends DOMService {
     ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path);
 
     /**
+     * The &lt;get&gt; operation via XPath - must be supported with XPath capability.
+     * Retrieve running configuration and device state information.
+     *
+     * @param xpathContext get operation with use of the XPath
+     * @return result of &lt;get&gt; operation
+     */
+    ListenableFuture<Optional<NormalizedNode<?, ?>>> get(@NonNull NetconfXPathContext xpathContext);
+
+    /**
      * The &lt;get-config&gt; operation.
      * Retrieve all or part of a specified configuration datastore.
      *
      * @return result of &lt;get-config&gt; operation
      */
     ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path);
+
+    /**
+     * The &lt;get-config&gt; operation via XPath - must be supported with XPath capability.
+     * Retrieve all or part of a specified configuration datastore.
+     *
+     * @param xpathContext get-config operation with use of the XPath
+     * @return result of &lt;get-config&gt; operation
+     */
+    ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(@NonNull NetconfXPathContext xpathContext);
 
     /**
      * The &lt;edit-config&gt; operation with "merge" attribute.
