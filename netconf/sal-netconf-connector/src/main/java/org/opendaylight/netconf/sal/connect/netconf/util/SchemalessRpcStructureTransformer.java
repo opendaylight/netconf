@@ -26,6 +26,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
@@ -135,6 +136,11 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
                 .withNodeIdentifier(NETCONF_FILTER_NODEID)
                 .withValue(new DOMSource(document.getDocumentElement()))
                 .build();
+    }
+
+    @Override
+    public DataContainerChild<?, ?> toFilterStructure(NetconfXPathContext xpathContext, boolean xpathSupported) {
+        return NetconfMessageTransformUtil.toFilterStructure(xpathContext, xpathSupported);
     }
 
     private static void checkDataValidForPath(final YangInstanceIdentifier dataPath, final Element dataNode) {
