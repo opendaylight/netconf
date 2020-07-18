@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.util;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +41,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfUtil;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -96,7 +99,14 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         callback = new NetconfRpcFutureCallback("prefix", id);
-        baseOps = new NetconfBaseOps(rpc, new EmptyMountPointContext(SCHEMA_CONTEXT));
+        baseOps = new NetconfBaseOps(rpc, new EmptyMountPointContext(SCHEMA_CONTEXT), true);
+    }
+
+    @After
+    public void clear() {
+        callback = null;
+        baseOps = null;
+        reset(listener);
     }
 
     @Test
@@ -183,9 +193,27 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
+    public void testGetConfigRunningDataWithXPath() throws Exception {
+        final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
+                .getConfigRunningData(callback, NetconfXPathContext.empty())
+                .get();
+        Assert.assertTrue(dataOpt.isPresent());
+        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+    }
+
+    @Test
     public void testGetData() throws Exception {
         final Optional<NormalizedNode<?, ?>> dataOpt =
                 baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
+        Assert.assertTrue(dataOpt.isPresent());
+        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+    }
+
+    @Test
+    public void testGetDataWithXPath() throws Exception {
+        final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
+                .getData(callback, NetconfXPathContext.empty())
+                .get();
         Assert.assertTrue(dataOpt.isPresent());
         Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
