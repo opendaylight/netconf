@@ -15,7 +15,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -46,6 +48,16 @@ public interface RestconfStrategy {
      * @return a ListenableFuture containing the result of the read
      */
     ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store, YangInstanceIdentifier path);
+
+    /**
+     * Read data from the datastore - supported just by Netconf devices and for fields query parameter.
+     *
+     * @param store the logical data store which should be modified
+     * @param netconfXPathContext context for xpath
+     * @return a ListenableFuture containing the result of the read
+     */
+    ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+            NetconfXPathContext netconfXPathContext);
 
     /**
      * Check if data already exists in the datastore.
@@ -111,6 +123,13 @@ public interface RestconfStrategy {
      * @return {@link InstanceIdentifierContext}
      */
     InstanceIdentifierContext<?> getInstanceIdentifier();
+
+    /**
+     * Get parameters extended the instance identifier.
+     *
+     * @return {@link WriterParameters}
+     */
+    @Nullable WriterParameters getParameters();
 
     /**
      * Get transaction chain handler for creating new transaction chain.
