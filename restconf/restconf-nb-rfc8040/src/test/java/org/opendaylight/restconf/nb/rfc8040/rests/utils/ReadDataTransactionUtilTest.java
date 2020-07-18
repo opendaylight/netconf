@@ -17,6 +17,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
 import java.util.Optional;
@@ -31,7 +33,9 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeExtensionService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -572,4 +576,29 @@ public class ReadDataTransactionUtilTest {
         assertNull(writerParameters.getWithDefault());
         assertFalse(writerParameters.isTagged());
     }
+
+    @Test
+    public void readDataConfigWithXPathTest() {
+        final NetconfDataTreeExtensionService extension = Mockito.mock(NetconfDataTreeExtensionService.class);
+        final ClassToInstanceMap<NetconfDataTreeExtensionService> extensionsMap
+            = ImmutableClassToInstanceMap.of(NetconfDataTreeExtensionService.class, extension);
+        when(netconfService.getExtensions()).thenReturn(extensionsMap);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(extension)
+                .getConfig(Mockito.any(NetconfXPathContext.class));
+        doReturn(DATA.path).when(context).getInstanceIdentifier();
+        final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
+        WriterParameters params =
+                new WriterParameters.WriterParametersBuilder()
+                .setFields(Collections.singletonList(Collections.emptySet()))
+                .setContent(valueOfContent)
+                .build();
+
+        NetconfRestconfStrategy netconfStrategyLocal =
+                new NetconfRestconfStrategy(this.netconfService, this.context, params);
+
+        NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, netconfStrategyLocal, schemaContext);
+        assertEquals(DATA.data3, normalizedNode);
+    }
+
 }

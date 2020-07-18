@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
@@ -21,11 +22,13 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -176,47 +179,33 @@ public final class ReadDataTransactionUtil {
     /**
      * Read specific type of data from data store via transaction.
      *
-     * @param valueOfContent type of data to read (config, state, all)
+     * @param contentType    type of data to read (config, state, all)
      * @param strategy       {@link RestconfStrategy} - wrapper for variables
      * @param schemaContext  schema context
      * @return {@link NormalizedNode}
      */
-    public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
-            final @NonNull RestconfStrategy strategy, final SchemaContext schemaContext) {
-        return readData(valueOfContent, strategy, null, schemaContext);
-    }
-
-    /**
-     * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} if any
-     * inside of object {@link RestconfStrategy} provided as a parameter.
-     *
-     * @param valueOfContent type of data to read (config, state, all)
-     * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa       vaule of with-defaults parameter
-     * @param ctx            schema context
-     * @return {@link NormalizedNode}
-     */
-    public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
-                                                          final @NonNull RestconfStrategy strategy,
-                                                          final String withDefa, final SchemaContext ctx) {
-        switch (valueOfContent) {
+    public static @Nullable NormalizedNode<?, ?> readData(final String contentType,
+            final @NonNull RestconfStrategy strategy,
+            final SchemaContext schemaContext) {
+        final String withDefa = strategy.getParameters() == null ? null : strategy.getParameters().getWithDefault();
+        switch (contentType) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
                 if (withDefa == null) {
                     return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true);
                 } else {
                     return prepareDataByParamWithDef(
                             readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true),
-                            strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
+                            strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, schemaContext);
                 }
             case RestconfDataServiceConstant.ReadData.NONCONFIG:
                 return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, true);
             case RestconfDataServiceConstant.ReadData.ALL:
-                return readAllData(strategy, withDefa, ctx);
+                return readAllData(strategy, withDefa, schemaContext);
             default:
                 strategy.cancel();
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
-                                "Invalid content parameter: " + valueOfContent, null,
+                                "Invalid content parameter: " + contentType, null,
                                 "The content parameter value must be either config, nonconfig or all (default)"));
         }
     }
@@ -358,8 +347,20 @@ public final class ReadDataTransactionUtil {
             final LogicalDatastoreType store,
             final boolean closeTransactionChain) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(
-                store, strategy.getInstanceIdentifier().getInstanceIdentifier());
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture;
+
+        //if the user reads data from the Netconf device and he uses the 'fields' query parameter also,
+        //then the Netconf plugin allows to read data by use of the XPath for get or get-config operations
+        final List<Set<QName>> fields = strategy.getParameters() != null ? strategy.getParameters().getFields() : null;
+        if (strategy instanceof NetconfRestconfStrategy && fields != null && !fields.isEmpty()) {
+            listenableFuture = strategy.read(store,
+                    NetconfXPathContext.createXPathContext(
+                            strategy.getInstanceIdentifier().getInstanceIdentifier(),
+                            strategy.getParameters().getFields()));
+        } else {
+            listenableFuture = strategy.read(
+                    store, strategy.getInstanceIdentifier().getInstanceIdentifier());
+        }
         if (closeTransactionChain) {
             //Method close transactionChain if any
             FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,

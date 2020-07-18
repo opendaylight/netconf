@@ -153,9 +153,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, mountPoint);
-        final NormalizedNode<?, ?> node = readData(identifier, parameters.getContent(),
-                strategy, parameters.getWithDefault(), schemaContextRef, uriInfo);
+        final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, parameters, mountPoint);
+        final NormalizedNode<?, ?> node = readData(identifier, parameters, strategy, schemaContextRef, uriInfo);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
@@ -188,24 +187,24 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * streams then put streams from actual schema context to datastore.
      *
      * @param identifier    identifier of data to read
-     * @param content       type of data to read (config, state, all)
+     * @param parameters    additional parameters for specific transaction
      * @param strategy      {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa      value of with-defaults parameter
      * @param schemaContext schema context
      * @param uriInfo       uri info
      * @return {@link NormalizedNode}
      */
-    private NormalizedNode<?, ?> readData(final String identifier, final String content,
-            final RestconfStrategy strategy, final String withDefa, final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo) {
+    public NormalizedNode<?, ?> readData(final String identifier, final WriterParameters parameters,
+                                                final RestconfStrategy strategy,
+                                                final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
             createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
         }
-        return ReadDataTransactionUtil.readData(content, strategy, withDefa, schemaContext);
+        return ReadDataTransactionUtil.readData(strategy.getParameters().getContent(), strategy, schemaContext);
     }
 
     private void createAllYangNotificationStreams(final RestconfStrategy strategy,
-            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
+                                                         final EffectiveModelContext schemaContext,
+                                                         final UriInfo uriInfo) {
         strategy.prepareReadWriteExecution();
         final boolean exist = checkExist(schemaContext, strategy);
 
@@ -249,15 +248,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
                                       final RestconfStrategy strategy, final boolean exist,
-                                      final NormalizedNode<?, ?> mapToStreams) {
-        final String pathId;
+                                      final NormalizedNode mapToStreams) {
+        String pathId;
         if (exist) {
             pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
         } else {
             pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
         }
-        strategy.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
-            mapToStreams);
+        strategy.merge(LogicalDatastoreType.OPERATIONAL,
+            IdentifierCodec.deserialize(pathId, schemaContext), mapToStreams);
     }
 
     @Override
@@ -266,7 +265,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
+        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
+                .getInstanceIdentifierContext();
 
         PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
         PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
@@ -395,17 +395,21 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return mountPoint == null ? schemaContextHandler.get() : mountPoint.getEffectiveModelContext();
     }
 
+    public RestconfStrategy getRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
+            final DOMMountPoint mountPoint) {
+        return getRestconfStrategy(instanceIdentifier, null, mountPoint);
+    }
+
     public synchronized RestconfStrategy getRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
-                                                final DOMMountPoint mountPoint) {
+            final WriterParameters parameters, final DOMMountPoint mountPoint) {
         if (mountPoint != null) {
             final Optional<NetconfDataTreeService> service = mountPoint.getService(NetconfDataTreeService.class);
             if (service.isPresent()) {
-                return new NetconfRestconfStrategy(service.get(), instanceIdentifier);
+                return new NetconfRestconfStrategy(service.get(), instanceIdentifier, parameters);
             }
         }
-        final TransactionChainHandler transactionChain = mountPoint == null
-                ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
-        return new MdsalRestconfStrategy(instanceIdentifier, transactionChain);
+        return new MdsalRestconfStrategy(instanceIdentifier, parameters,
+                mountPoint == null ? transactionChainHandler : transactionChainOfMountPoint(mountPoint));
     }
 
     /**
