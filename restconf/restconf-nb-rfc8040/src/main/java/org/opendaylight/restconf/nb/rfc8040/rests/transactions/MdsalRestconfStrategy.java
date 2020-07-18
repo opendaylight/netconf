@@ -13,12 +13,15 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -32,11 +35,19 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 public class MdsalRestconfStrategy implements RestconfStrategy {
     private final InstanceIdentifierContext<?> instanceIdentifier;
     private final DOMTransactionChain transactionChain;
-    private DOMDataTreeReadWriteTransaction rwTx;
     private final TransactionChainHandler transactionChainHandler;
+    private final WriterParameters parameters;
+    private DOMDataTreeReadWriteTransaction rwTx;
 
     public MdsalRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
+            final TransactionChainHandler transactionChainHandler) {
+        this(instanceIdentifier, null, transactionChainHandler);
+    }
+
+    public MdsalRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
+                                 @Nullable final WriterParameters parameters,
                                  final TransactionChainHandler transactionChainHandler) {
+        this.parameters = parameters;
         this.instanceIdentifier = requireNonNull(instanceIdentifier);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         transactionChain = transactionChainHandler.get();
@@ -61,6 +72,12 @@ public class MdsalRestconfStrategy implements RestconfStrategy {
         try (DOMDataTreeReadTransaction tx = transactionChain.newReadOnlyTransaction()) {
             return tx.read(store, path);
         }
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+            NetconfXPathContext netconfXPathContext) {
+        throw new UnsupportedOperationException("Can be used just with Netconf device.");
     }
 
     @Override
@@ -109,7 +126,12 @@ public class MdsalRestconfStrategy implements RestconfStrategy {
     }
 
     @Override
+    public WriterParameters getParameters() {
+        return parameters;
+    }
+
+    @Override
     public RestconfStrategy buildStrategy(final InstanceIdentifierContext<?> instanceIdentifierContext) {
-        return new MdsalRestconfStrategy(instanceIdentifierContext, this.transactionChainHandler);
+        return new MdsalRestconfStrategy(instanceIdentifierContext, this.parameters, this.transactionChainHandler);
     }
 }

@@ -18,13 +18,16 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -42,8 +45,17 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
 
     private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures;
 
+    private final WriterParameters parameters;
+
     public NetconfRestconfStrategy(final NetconfDataTreeService netconfService,
-                                   final InstanceIdentifierContext<?> instanceIdentifier) {
+            final InstanceIdentifierContext<?> instanceIdentifier) {
+        this(netconfService, instanceIdentifier, null);
+    }
+
+    public NetconfRestconfStrategy(final NetconfDataTreeService netconfService,
+                                   final InstanceIdentifierContext<?> instanceIdentifier,
+                                   @Nullable final WriterParameters parameters) {
+        this.parameters = parameters;
         this.netconfService = requireNonNull(netconfService);
         this.instanceIdentifier = requireNonNull(instanceIdentifier);
     }
@@ -72,6 +84,22 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
                 throw new IllegalArgumentException(String.format(
                         "%s, Cannot read data %s for %s datastore, unknown datastore type",
                         netconfService.getDeviceId(), path, store));
+        }
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+            NetconfXPathContext netconfXPathContext) {
+        switch (store) {
+            case CONFIGURATION:
+                return netconfService.getConfig(netconfXPathContext);
+            case OPERATIONAL:
+                return netconfService.get(netconfXPathContext);
+            default:
+                LOG.info("Unknown datastore type: {}.", store);
+                throw new IllegalArgumentException(String.format(
+                        "%s, Cannot read data %s for %s datastore, unknown datastore type",
+                        netconfService.getDeviceId(), netconfXPathContext.getPath(), store));
         }
     }
 
@@ -123,6 +151,11 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
         return instanceIdentifier;
     }
 
+    @Override
+    public WriterParameters getParameters() {
+        return parameters;
+    }
+
     /**
      * As we are not using any transactions here, always return null.
      */
@@ -133,7 +166,7 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
 
     @Override
     public RestconfStrategy buildStrategy(final InstanceIdentifierContext<?> instanceIdentifierContext) {
-        return new NetconfRestconfStrategy(this.netconfService, instanceIdentifierContext);
+        return new NetconfRestconfStrategy(this.netconfService, instanceIdentifierContext, this.parameters);
     }
 
     private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
