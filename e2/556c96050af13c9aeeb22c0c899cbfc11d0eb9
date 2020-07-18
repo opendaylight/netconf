@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Sat, 18 Jul 2020 05:07:33 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/91384
+Project: netconf
+Branch: refs/heads/stable/magnesium
