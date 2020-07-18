@@ -101,10 +101,9 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any(ContainerNode.class));
     }
 
-    @Ignore
     @Test
     public void getXPathTest() {
-        netconService.get((NetconfXPathContext) null);
+        netconService.get(NetconfXPathContext.empty());
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any(ContainerNode.class));
     }
 
@@ -114,10 +113,9 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
     }
 
-    @Ignore
     @Test
     public void getConfigXPathTest() {
-        netconService.getConfig((NetconfXPathContext) null);
+        netconService.getConfig(NetconfXPathContext.empty());
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
     }
 
@@ -187,8 +185,10 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     private NetconfDataTreeServiceImpl getNetconService() {
-        final NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(
-                Collections.singletonList(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
+        final ArrayList<String> caps = new ArrayList<>();
+        caps.add(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+        caps.add(NetconfMessageTransformUtil.NETCONF_XPATH_URI.toString());
+        final NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(caps);
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         return new NetconfDataTreeServiceImpl(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
