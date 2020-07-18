@@ -48,6 +48,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.KeepaliveDOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.input.source.ConfigSource;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
@@ -74,10 +75,16 @@ public final class NetconfBaseOps {
     private final DOMRpcService rpc;
     private final MountPointContext mountContext;
     private final RpcStructureTransformer transformer;
+    private final boolean xpathSupported;
 
     public NetconfBaseOps(final DOMRpcService rpc, final MountPointContext mountContext) {
+        this(rpc, mountContext, false);
+    }
+
+    public NetconfBaseOps(final DOMRpcService rpc, final MountPointContext mountContext, final boolean xpathSupported) {
         this.rpc = rpc;
         this.mountContext = mountContext;
+        this.xpathSupported = xpathSupported;
 
         if (rpc instanceof KeepaliveDOMRpcService
                 && ((KeepaliveDOMRpcService) rpc).getDeviceRpc() instanceof SchemalessNetconfDeviceRpc) {
@@ -206,14 +213,59 @@ public final class NetconfBaseOps {
         return future;
     }
 
+    /**
+     * Get configuration data from the specific datastore of device with use of the XPath.
+     *
+     * @param callback allows to asynchronously set the result {@link DOMRpcResult}
+     * @param datastore datastore type
+     * @param netconfXPathContext XPath context
+     * @return object which allows to asynchronously set the result {@link DOMRpcResult}
+     */
+    public ListenableFuture<? extends DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback,
+            final QName datastore, final NetconfXPathContext netconfXPathContext) {
+        requireNonNull(callback);
+        requireNonNull(datastore);
+
+        final DataContainerChild<?, ?> node =
+                NetconfMessageTransformUtil.toFilterStructure(netconfXPathContext, xpathSupported);
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_CONFIG_PATH,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore), node));
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
+        return future;
+    }
+
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
             final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, getConfigRunning(callback, filterPath));
     }
 
+    /**
+     * Extracting obtained configuration data from the running datastore of device with use of the XPath.
+     *
+     * @param callback allows to asynchronously set the result {@link DOMRpcResult}
+     * @param xpathContext XPath context
+     * @return object which allows to asynchronously set the result {@link DOMRpcResult}
+     */
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
+            final FutureCallback<DOMRpcResult> callback, final NetconfXPathContext xpathContext) {
+        return extractData(xpathContext.getPath(), getConfigRunning(callback, xpathContext));
+    }
+
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
                                                                     final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, get(callback, filterPath));
+    }
+
+    /**
+     * Extracting obtained operational data from the datastore of device with use of the XPath.
+     *
+     * @param callback allows to asynchronously set the result {@link DOMRpcResult}
+     * @param netconfXPathContext XPath context
+     * @return object which allows to asynchronously set the result {@link DOMRpcResult}
+     */
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
+            final NetconfXPathContext netconfXPathContext) {
+        return extractData(netconfXPathContext.getPath(), get(callback, netconfXPathContext));
     }
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
@@ -232,9 +284,33 @@ public final class NetconfBaseOps {
         return getConfig(callback, NETCONF_RUNNING_QNAME, filterPath);
     }
 
+    /**
+     * Obtain configuration data from the running datastore of device with use of the XPath.
+     *
+     * @param callback allows to asynchronously set the result {@link DOMRpcResult}
+     * @param xpathContext XPath context
+     * @return object which allows to asynchronously set the result {@link DOMRpcResult}
+     */
+    public ListenableFuture<? extends DOMRpcResult> getConfigRunning(final FutureCallback<DOMRpcResult> callback,
+            final NetconfXPathContext xpathContext) {
+        return getConfig(callback, NETCONF_RUNNING_QNAME, xpathContext);
+    }
+
     public ListenableFuture<? extends DOMRpcResult> getConfigCandidate(final FutureCallback<DOMRpcResult> callback,
             final Optional<YangInstanceIdentifier> filterPath) {
         return getConfig(callback, NETCONF_CANDIDATE_QNAME, filterPath);
+    }
+
+    /**
+     * Obtain configuration data from the candidate datastore of device with use of the XPath.
+     *
+     * @param callback allows to asynchronously set the result {@link DOMRpcResult}
+     * @param netconfXPathContext XPath context
+     * @return object which allows to asynchronously set the result {@link DOMRpcResult}
+     */
+    public ListenableFuture<? extends DOMRpcResult> getConfigCandidate(final NetconfRpcFutureCallback callback,
+            final NetconfXPathContext netconfXPathContext) {
+        return getConfig(callback, NETCONF_CANDIDATE_QNAME, netconfXPathContext);
     }
 
     public ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
@@ -246,6 +322,24 @@ public final class NetconfBaseOps {
                     ? NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
                         toFilterStructure(filterPath.get(), mountContext.getSchemaContext()))
                     : NetconfMessageTransformUtil.GET_RPC_CONTENT);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
+        return future;
+    }
+
+    /**
+     * Obtain operational data from the datastore of device with use of the XPath.
+     *
+     * @param callback allows to asynchronously set the result {@link DOMRpcResult}
+     * @param netconfXPathContext XPath context
+     * @return object which allows to asynchronously set the result {@link DOMRpcResult}
+     */
+    public ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
+            final NetconfXPathContext netconfXPathContext) {
+        requireNonNull(callback);
+
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_PATH,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
+                        toFilterStructure(netconfXPathContext, xpathSupported)));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
