@@ -11,6 +11,8 @@ import akka.actor.ActorRef;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeExtensionService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.netconf.ProxyNetconfService;
@@ -137,5 +140,10 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     private void isLocked() {
         Preconditions.checkState(proxyNetconfService != null,
             "%s: Device's datastore must be locked first", id);
+    }
+
+    @Override
+    public @NonNull ClassToInstanceMap<NetconfDataTreeExtensionService> getExtensions() {
+        return ImmutableClassToInstanceMap.of();
     }
 }

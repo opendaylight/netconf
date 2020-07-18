@@ -13,8 +13,8 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMExtensibleService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -22,9 +22,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 /**
  * Interface for base and additional operations for netconf (e.g. get, get-config, edit-config, (un)lock, commit etc).
  * &lt;edit-config&gt; operation is extended according it's attributes (merge, replace, create, delete, remove).
+ * If device supports the XPath, allows to use it (for get and get-config operations).
  * According to RFC-6241.
  */
-public interface NetconfDataTreeService extends DOMService {
+public interface NetconfDataTreeService
+        extends DOMExtensibleService<NetconfDataTreeService, NetconfDataTreeExtensionService> {
 
     /**
      * The &lt;lock&gt; operation.

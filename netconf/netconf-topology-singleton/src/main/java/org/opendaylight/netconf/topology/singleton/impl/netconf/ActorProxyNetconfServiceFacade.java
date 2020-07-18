@@ -15,6 +15,8 @@ import akka.dispatch.OnComplete;
 import akka.pattern.AskTimeoutException;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,6 +31,7 @@ import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeExtensionService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -227,5 +230,10 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
         settableFuture.set(new DefaultDOMRpcResult());
         return settableFuture;
+    }
+
+    @Override
+    public @NonNull ClassToInstanceMap<NetconfDataTreeExtensionService> getExtensions() {
+        return ImmutableClassToInstanceMap.of();
     }
 }

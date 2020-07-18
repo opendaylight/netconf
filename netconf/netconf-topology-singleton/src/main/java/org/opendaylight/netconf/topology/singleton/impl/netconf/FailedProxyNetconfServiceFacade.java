@@ -10,6 +10,8 @@ package org.opendaylight.netconf.topology.singleton.impl.netconf;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +23,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeExtensionService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -114,5 +117,10 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
     @Override
     public @NonNull Object getDeviceId() {
         return id;
+    }
+
+    @Override
+    public @NonNull ClassToInstanceMap<NetconfDataTreeExtensionService> getExtensions() {
+        return ImmutableClassToInstanceMap.of();
     }
 }

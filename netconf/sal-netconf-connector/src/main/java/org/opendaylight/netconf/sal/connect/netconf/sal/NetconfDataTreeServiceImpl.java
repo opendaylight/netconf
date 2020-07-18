@@ -10,6 +10,8 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -28,6 +30,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeExtensionService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
@@ -51,6 +54,7 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     private final boolean rollbackSupport;
     private final boolean candidateSupported;
     private final boolean runningWritable;
+    private final ClassToInstanceMap<NetconfDataTreeExtensionService> extensions;
 
     private boolean isLockAllowed = true;
 
@@ -67,6 +71,13 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
         Preconditions.checkArgument(candidateSupported || runningWritable,
                 "Device %s has advertised neither :writable-running nor :candidate capability."
                         + "At least one of these should be advertised. Failed to establish a session.", id.getName());
+
+        if (netconfSessionPreferences.isXPathSupported()) {
+            extensions = ImmutableClassToInstanceMap.of(NetconfDataTreeExtensionService.class,
+                    new NetconfDataTreeExtensionServiceImpl(netconfOps, id));
+        } else {
+            extensions = ImmutableClassToInstanceMap.of();
+        }
     }
 
     @Override
@@ -383,5 +394,10 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
             return;
         }
         transformed.set(RpcResultBuilder.<Void>success().build());
+    }
+
+    @Override
+    public ClassToInstanceMap<NetconfDataTreeExtensionService> getExtensions() {
+        return extensions;
     }
 }
