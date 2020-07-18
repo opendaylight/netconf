@@ -23,7 +23,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Assert;
@@ -45,10 +44,12 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.TxTestUtils;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -94,13 +95,25 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     public void get() {
-        netconService.get(null);
+        netconService.get((YangInstanceIdentifier) null);
+        verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any(ContainerNode.class));
+    }
+
+    @Test
+    public void getXPathTest() {
+        netconService.get(NetconfXPathContext.empty());
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any(ContainerNode.class));
     }
 
     @Test
     public void getConfig() {
-        netconService.getConfig(null);
+        netconService.getConfig((YangInstanceIdentifier) null);
+        verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
+    }
+
+    @Test
+    public void getConfigXPathTest() {
+        netconService.getConfig(NetconfXPathContext.empty());
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
     }
 
@@ -164,14 +177,16 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     public void commit() {
-        List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
+        final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
         netconService.commit(resultsFutures);
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_COMMIT_QNAME)), any(ContainerNode.class));
     }
 
     private NetconfDataTreeServiceImpl getNetconService() {
-        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(
-                Collections.singletonList(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
+        final ArrayList<String> caps = new ArrayList<>();
+        caps.add(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+        caps.add(NetconfMessageTransformUtil.NETCONF_XPATH_URI.toString());
+        final NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(caps);
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         return new NetconfDataTreeServiceImpl(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
