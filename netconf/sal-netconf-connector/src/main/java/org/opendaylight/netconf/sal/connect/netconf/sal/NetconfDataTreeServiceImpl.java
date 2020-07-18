@@ -52,6 +52,7 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     private final boolean rollbackSupport;
     private final boolean candidateSupported;
     private final boolean runningWritable;
+    private boolean xpathSupported;
 
     private boolean isLockAllowed = true;
 
@@ -65,6 +66,7 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
         candidateSupported = netconfSessionPreferences.isCandidateSupported();
         runningWritable = netconfSessionPreferences.isRunningWritable();
         rollbackSupport = netconfSessionPreferences.isRollbackSupported();
+        xpathSupported = netconfSessionPreferences.isXPathSupported();
         Preconditions.checkArgument(candidateSupported || runningWritable,
                 "Device %s has advertised neither :writable-running nor :candidate capability."
                         + "At least one of these should be advertised. Failed to establish a session.", id.getName());
@@ -114,8 +116,7 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(NetconfXPathContext xpathContext) {
-        // TODO
-        throw new UnsupportedOperationException();
+        return netconfOps.getData(new NetconfRpcFutureCallback("Data read", id), xpathContext, xpathSupported);
     }
 
     @Override
@@ -126,8 +127,8 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(NetconfXPathContext xpathContext) {
-        // TODO
-        throw new UnsupportedOperationException();
+        return netconfOps.getConfigRunningData(new NetconfRpcFutureCallback("Data read", id), xpathContext,
+                xpathSupported);
     }
 
     @Override
