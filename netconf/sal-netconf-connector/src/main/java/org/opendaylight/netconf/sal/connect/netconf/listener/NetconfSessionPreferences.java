@@ -138,6 +138,15 @@ public final class NetconfSessionPreferences {
     }
 
     /**
+     * Check if a device supports the XPath, from the obtained capabilities.
+     *
+     * @return true if device support the XPath, false otherwise
+     */
+    public boolean isXPathSupported() {
+        return containsNonModuleCapability(NetconfMessageTransformUtil.NETCONF_XPATH_URI.toString());
+    }
+
+    /**
      * Merge module-based list of capabilities with current list of module-based capabilities.
      *
      * @param netconfSessionModuleCapabilities capabilities to merge into this
