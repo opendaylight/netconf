@@ -191,6 +191,8 @@ public final class NetconfMessageTransformUtil {
     public static final URI NETCONF_RUNNING_WRITABLE_URI = URI
             .create("urn:ietf:params:netconf:capability:writable-running:1.0");
 
+    public static final URI NETCONF_XPATH_URI = URI.create("urn:ietf:params:netconf:capability:xpath:1.0");
+
     public static final QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
     public static final SchemaPath NETCONF_LOCK_PATH = toPath(NETCONF_LOCK_QNAME);
@@ -516,7 +518,7 @@ public final class NetconfMessageTransformUtil {
         final Deque<Builder> builders = new ArrayDeque<>(args.size());
 
         // Step one: open builders
-        for (PathArgument arg : args) {
+        for (final PathArgument arg : args) {
             builders.push(ImmutableNormalizedMetadata.builder().withIdentifier(arg));
         }
 
@@ -632,7 +634,7 @@ public final class NetconfMessageTransformUtil {
             if (next instanceof NodeWithValue) {
                 actualElement.setNodeValue(((NodeWithValue) next).getValue().toString());
             } else if (next instanceof NodeIdentifierWithPredicates) {
-                for (Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).entrySet()) {
+                for (final Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).entrySet()) {
                     final Element entryElement = document.createElementNS(entry.getKey().getNamespace().toString(),
                             entry.getKey().getLocalName());
                     entryElement.setTextContent(entry.getValue().toString());
