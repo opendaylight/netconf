@@ -39,6 +39,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfUtil;
+import org.opendaylight.netconf.xpath.NetconfXPathContext;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -183,9 +184,35 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
+    public void testGetConfigRunningDataWithXPath() throws Exception {
+        final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
+        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        netconfXPathContext.addNamespace(cNamespace);
+        netconfXPathContext.setPath(YangInstanceIdentifier.empty());
+        final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
+                .getConfigRunningData(callback, netconfXPathContext, true)
+                .get();
+        Assert.assertTrue(dataOpt.isPresent());
+        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+    }
+
+    @Test
     public void testGetData() throws Exception {
         final Optional<NormalizedNode<?, ?>> dataOpt =
                 baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
+        Assert.assertTrue(dataOpt.isPresent());
+        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+    }
+
+    @Test
+    public void testGetDataWithXPath() throws Exception {
+        final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
+        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        netconfXPathContext.addNamespace(cNamespace);
+        netconfXPathContext.setPath(YangInstanceIdentifier.empty());
+        final Optional<NormalizedNode<?, ?>> dataOpt = baseOps
+                .getData(callback, netconfXPathContext, true)
+                .get();
         Assert.assertTrue(dataOpt.isPresent());
         Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
@@ -200,6 +227,15 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     public void testGetConfigCandidate() throws Exception {
         baseOps.getConfigCandidate(callback, Optional.empty());
         verifyMessageSent("getConfig_candidate", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
+    }
+
+    @Test
+    public void testGetConfigCandidateWithXPath() throws Exception {
+        final String cNamespace = CONTAINER_Q_NAME.getNamespace().toString();
+        final NetconfXPathContext netconfXPathContext = new NetconfXPathContext("/" + cNamespace + ":c");
+        netconfXPathContext.addNamespace(cNamespace);
+        baseOps.getConfigCandidate(callback, netconfXPathContext, true);
+        verifyMessageSent("getConfig_candidate-xpath", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
     @Test
