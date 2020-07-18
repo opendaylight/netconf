@@ -38,8 +38,10 @@ interface RpcStructureTransformer {
     DataContainerChild<?,?> toFilterStructure(YangInstanceIdentifier path);
 
     /**
-     * Selects data specified by path from data node. Data must be product of get-config rpc with filter created by
+     * Selects data specified by path from data node. Data must be product of
+     * get-config rpc with filter created by
      * {@link #toFilterStructure(YangInstanceIdentifier)} with same path.
+     *
      * @param data data
      * @param path path to select
      * @return selected data
