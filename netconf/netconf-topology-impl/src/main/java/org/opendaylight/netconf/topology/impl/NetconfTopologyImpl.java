@@ -12,6 +12,11 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.config.ConfigProperty;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -49,6 +54,7 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NetconfTopologyImpl extends AbstractNetconfTopology
         implements DataTreeChangeListener<Node>, AutoCloseable {
 
@@ -56,29 +62,23 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
 
     private ListenerRegistration<NetconfTopologyImpl> datastoreListenerRegistration = null;
 
-    public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-            final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-            final ThreadPool processingExecutor,
-            final SchemaResourceManager schemaRepositoryProvider,
-            final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas) {
-        this(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, baseSchemas, null);
-    }
-
-    public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-            final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-            final ThreadPool processingExecutor,
-            final SchemaResourceManager schemaRepositoryProvider,
-            final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas,
-            final DeviceActionFactory deviceActionFactory) {
+    public NetconfTopologyImpl(@ConfigProperty(value = "topology-netconf") final String topologyId,
+            @Reference(filter = "type=netconf-client-dispatcher") final NetconfClientDispatcher clientDispatcher,
+            @Reference(filter = "type=global-event-executor") final EventExecutor eventExecutor,
+            @Reference(filter = "type=global-netconf-ssh-scheduled-executor")
+            final ScheduledThreadPool keepaliveExecutor,
+            @Reference(filter = "type=global-netconf-processing-executor") final ThreadPool processingExecutor,
+            @Reference final SchemaResourceManager schemaRepositoryProvider, @Reference final DataBroker dataBroker,
+            @Reference final DOMMountPointService mountPointService,
+            @Reference final AAAEncryptionService encryptionService, @Reference final BaseNetconfSchemas baseSchemas,
+            @Reference final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
                 baseSchemas);
     }
 
     @Override
+    @PreDestroy
     public void close() {
         // close all existing connectors, delete whole topology in datastore?
         for (final NetconfConnectorDTO connectorDTO : activeConnectors.values()) {
@@ -100,6 +100,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     /**
      * Invoked by blueprint.
      */
+    @PostConstruct
     public void init() {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
         initTopology(wtx, LogicalDatastoreType.CONFIGURATION);
