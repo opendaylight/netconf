@@ -17,6 +17,7 @@ module callhome-status{
               enum FAILED_NOT_ALLOWED;
               enum FAILED;
               enum DISCONNECTED;
+              enum FAILED_CERTIFICATE_TO_DEVICE_MAPPING;
           }
           default DISCONNECTED;
         }

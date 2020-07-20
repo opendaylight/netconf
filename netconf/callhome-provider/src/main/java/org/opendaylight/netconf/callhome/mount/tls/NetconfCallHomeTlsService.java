@@ -9,7 +9,9 @@ package org.opendaylight.netconf.callhome.mount.tls;
 
 import io.netty.channel.EventLoopGroup;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.netconf.callhome.mount.CallhomeStatusReporter;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
+import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServer;
 import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServerBuilder;
 import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
@@ -28,6 +30,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workerGroup;
     private final TlsAllowedDevicesMonitor allowedDevicesMonitor;
+    private final StatusRecorder statusRecorder;
 
     public NetconfCallHomeTlsService(final Configuration config,
                                      final DataBroker dataBroker,
@@ -40,6 +43,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
         this.workerGroup = workerGroup;
         this.allowedDevicesMonitor = new TlsAllowedDevicesMonitorImpl(dataBroker);
         this.sslHandlerFactory = new SslHandlerFactoryAdapter(dataBroker, allowedDevicesMonitor);
+        this.statusRecorder = new CallhomeStatusReporter(dataBroker);
     }
 
     public void init() {
@@ -55,6 +59,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
             .setBossGroup(bossGroup)
             .setWorkerGroup(workerGroup)
             .setAllowedDevicesMonitor(allowedDevicesMonitor)
+            .setStatusRecorder(statusRecorder)
             .build();
         server.start();
 
