@@ -9,6 +9,7 @@ package org.opendaylight.netconf.callhome.protocol.tls;
 
 import io.netty.channel.EventLoopGroup;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
+import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 
 public class NetconfCallHomeTlsServerBuilder {
@@ -21,6 +22,7 @@ public class NetconfCallHomeTlsServerBuilder {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private TlsAllowedDevicesMonitor allowedDevicesMonitor;
+    private StatusRecorder statusRecorder;
 
     public NetconfCallHomeTlsServerBuilder setHost(final String host) {
         this.host = host;
@@ -67,8 +69,13 @@ public class NetconfCallHomeTlsServerBuilder {
         return this;
     }
 
+    public NetconfCallHomeTlsServerBuilder setStatusRecorder(final StatusRecorder statusRecorder) {
+        this.statusRecorder = statusRecorder;
+        return this;
+    }
+
     public NetconfCallHomeTlsServer build() {
         return new NetconfCallHomeTlsServer(host, port, timeout, maxConnections, sslHandlerFactory, subsystemListener,
-            bossGroup, workerGroup, allowedDevicesMonitor);
+            bossGroup, workerGroup, allowedDevicesMonitor, statusRecorder);
     }
 }
