@@ -23,6 +23,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.Optional;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
+import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +41,15 @@ public class NetconfCallHomeTlsServer {
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workerGroup;
     private final TlsAllowedDevicesMonitor allowedDevicesMonitor;
+    private final StatusRecorder statusRecorder;
     private ChannelFuture cf;
 
     NetconfCallHomeTlsServer(final String host, final Integer port, final Integer timeout, final Integer maxConnections,
                              final SslHandlerFactory sslHandlerFactory,
                              final CallHomeNetconfSubsystemListener subsystemListener,
                              final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
-                             final TlsAllowedDevicesMonitor allowedDevicesMonitor) {
+                             final TlsAllowedDevicesMonitor allowedDevicesMonitor,
+                             final StatusRecorder statusRecorder) {
         this.host = requireNonNull(host);
         this.port = requireNonNull(port);
         this.timeout = requireNonNull(timeout);
@@ -56,6 +59,7 @@ public class NetconfCallHomeTlsServer {
         this.bossGroup = requireNonNull(bossGroup);
         this.workerGroup = requireNonNull(workerGroup);
         this.allowedDevicesMonitor = requireNonNull(allowedDevicesMonitor);
+        this.statusRecorder = requireNonNull(statusRecorder);
     }
 
     public void start() {
@@ -83,6 +87,12 @@ public class NetconfCallHomeTlsServer {
                 final Optional<String> deviceId = allowedDevicesMonitor.findDeviceIdByPublicKey(publicKey);
                 if (deviceId.isEmpty()) {
                     LOG.error("Unable to identify connected device by provided certificate");
+                    // create a fake operational device with a syntheticNodeId and publicKey as certificate identifier
+                    if (channel.remoteAddress() instanceof InetSocketAddress) {
+                        final InetSocketAddress addr = ((InetSocketAddress) channel.remoteAddress());
+                        final String syntheticNodeId = String.format("%s:%d", addr.getHostString(), addr.getPort());
+                        statusRecorder.reportTlsFailedCertificateMapping(publicKey, syntheticNodeId);
+                    }
                     channel.close();
                 } else {
                     final CallHomeTlsSessionContext tlsSessionContext = new CallHomeTlsSessionContext(deviceId.get(),

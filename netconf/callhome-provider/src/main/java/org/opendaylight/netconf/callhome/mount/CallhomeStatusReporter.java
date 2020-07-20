@@ -12,6 +12,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -41,8 +42,12 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.Transport;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Ssh;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.SshBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.Tls;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.TlsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.tls.TlsClientParams;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.device.transport.tls.TlsClientParamsBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -55,7 +60,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusRecorder, AutoCloseable {
+public class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusRecorder, AutoCloseable {
     private static final InstanceIdentifier<Topology> NETCONF_TOPO_IID =
             InstanceIdentifier.create(NetworkTopology.class).child(Topology.class,
                     new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
@@ -65,7 +70,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     private final DataBroker dataBroker;
     private final ListenerRegistration<CallhomeStatusReporter> reg;
 
-    CallhomeStatusReporter(final DataBroker broker) {
+    public CallhomeStatusReporter(final DataBroker broker) {
         this.dataBroker = broker;
         this.reg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
             NETCONF_TOPO_IID.child(Node.class)), this);
@@ -188,6 +193,25 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     void asUnlistedDevice(final String id, final PublicKey serverKey) {
         NodeId nid = new NodeId(id);
         Device device = newDevice(id, serverKey, Device1.DeviceStatus.FAILEDNOTALLOWED);
+        writeDevice(nid, device);
+    }
+
+    @Override
+    public void reportTlsFailedCertificateMapping(final PublicKey publicKey, final String nodeId) {
+        final NodeId nid = new NodeId(nodeId);
+        final String encodedKey = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+        final TlsClientParams tlsClientParams = new TlsClientParamsBuilder()
+            .setCertificateId("UNKNOWN:PUBLIC_KEY:" + encodedKey)
+            .setKeyId("UNKNOWN")
+            .build();
+        final Tls tls = new TlsBuilder().setTlsClientParams(tlsClientParams).build();
+        final Device device = new DeviceBuilder()
+            .setUniqueId(nodeId)
+            .setTransport(tls)
+            .addAugmentation(new Device1Builder()
+                .setDeviceStatus(DeviceStatus.FAILEDCERTIFICATETODEVICEMAPPING)
+                .build())
+            .build();
         writeDevice(nid, device);
     }
 
