@@ -19,10 +19,16 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.net.InetSocketAddress;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.Optional;
+import javax.xml.bind.DatatypeConverter;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
+import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +46,15 @@ public class NetconfCallHomeTlsServer {
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workerGroup;
     private final TlsAllowedDevicesMonitor allowedDevicesMonitor;
+    private final StatusRecorder statusRecorder;
     private ChannelFuture cf;
 
     NetconfCallHomeTlsServer(final String host, final Integer port, final Integer timeout, final Integer maxConnections,
                              final SslHandlerFactory sslHandlerFactory,
                              final CallHomeNetconfSubsystemListener subsystemListener,
                              final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
-                             final TlsAllowedDevicesMonitor allowedDevicesMonitor) {
+                             final TlsAllowedDevicesMonitor allowedDevicesMonitor,
+                             final StatusRecorder statusRecorder) {
         this.host = requireNonNull(host);
         this.port = requireNonNull(port);
         this.timeout = requireNonNull(timeout);
@@ -56,6 +64,7 @@ public class NetconfCallHomeTlsServer {
         this.bossGroup = requireNonNull(bossGroup);
         this.workerGroup = requireNonNull(workerGroup);
         this.allowedDevicesMonitor = requireNonNull(allowedDevicesMonitor);
+        this.statusRecorder = requireNonNull(statusRecorder);
     }
 
     public void start() {
@@ -83,6 +92,11 @@ public class NetconfCallHomeTlsServer {
                 final Optional<String> deviceId = allowedDevicesMonitor.findDeviceIdByPublicKey(publicKey);
                 if (deviceId.isEmpty()) {
                     LOG.error("Unable to identify connected device by provided certificate");
+                    // create a fake operational device with a certificate fingeprint as NodeId
+                    if (cert instanceof X509Certificate) {
+                        final Optional<String> syntheticNodeId = getFingerprint((X509Certificate)cert);
+                        syntheticNodeId.ifPresent(statusRecorder::reportTlsFailedCertificateMapping);
+                    }
                     channel.close();
                 } else {
                     final CallHomeTlsSessionContext tlsSessionContext = new CallHomeTlsSessionContext(deviceId.get(),
@@ -117,5 +131,19 @@ public class NetconfCallHomeTlsServer {
         } catch (final InterruptedException e) {
             LOG.error("Error during shutdown of the Call-Home TLS server {}", e.getLocalizedMessage());
         }
+    }
+
+    private Optional<String> getFingerprint(X509Certificate certificate) {
+        try {
+            final MessageDigest md = MessageDigest.getInstance("SHA-1");
+            final byte[] der = certificate.getEncoded();
+            md.update(der);
+            final byte[] digest = md.digest();
+            final String digestHex = DatatypeConverter.printHexBinary(digest);
+            return Optional.of(digestHex.toLowerCase());
+        } catch (CertificateEncodingException | NoSuchAlgorithmException e) {
+            LOG.error("Can't get a fingerprint for certificate", e);
+        }
+        return Optional.empty();
     }
 }
