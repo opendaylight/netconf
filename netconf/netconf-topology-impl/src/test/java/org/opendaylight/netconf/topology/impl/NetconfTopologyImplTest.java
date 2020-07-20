@@ -283,7 +283,7 @@ public class NetconfTopologyImplTest {
                                           final AAAEncryptionService encryptionService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
                     processingExecutor, schemaRepositoryProvider, dataBroker,
-                  mountPointService, encryptionService, BASE_SCHEMAS);
+                  mountPointService, encryptionService, BASE_SCHEMAS, null);
         }
 
         @Override
