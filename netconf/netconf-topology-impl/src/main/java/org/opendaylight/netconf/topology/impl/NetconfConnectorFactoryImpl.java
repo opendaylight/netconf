@@ -9,6 +9,8 @@ package org.opendaylight.netconf.topology.impl;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Service;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -35,6 +37,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by adetalhouet on 2016-11-03.
  */
+@Singleton
+@Service(classes = NetconfConnectorFactory.class)
 public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConnectorFactoryImpl.class);
