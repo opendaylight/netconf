@@ -188,6 +188,30 @@
       "revId": "c9a9e6f592bec15341cadeb131a901cd94b189c9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd1e3f0_8ebf0cd8",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T10:09:25Z",
+      "side": 1,
+      "message": "Actually what I meant was turn *this* class into a proper OOP thing, not introduce another indirection.",
+      "parentUuid": "c4d1c16d_7c096280",
+      "range": {
+        "startLine": 124,
+        "startChar": 17,
+        "endLine": 124,
+        "endChar": 65
+      },
+      "revId": "c9a9e6f592bec15341cadeb131a901cd94b189c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
