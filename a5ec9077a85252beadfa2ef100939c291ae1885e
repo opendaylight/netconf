@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "5510a2bd_b524fc02",
+        "filename": "features/restconf/odl-restconf-nb-rfc8639/pom.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:32:44Z",
+      "side": 1,
+      "message": "import appropriate artifacts and these bundles are packaged in features, i.e. fix this up so that target/features/feature.xml does *not* list these bundles",
+      "range": {
+        "startLine": 78,
+        "startChar": 12,
+        "endLine": 78,
+        "endChar": 36
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4e6a31c8_2f1d8ed4",
         "filename": "restconf/restconf-models/ietf-ip/src/main/yang/ietf-ip@2018-02-22.yang",
         "patchSetId": 8
