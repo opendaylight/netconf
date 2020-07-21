@@ -140,6 +140,29 @@
     },
     {
       "key": {
+        "uuid": "110740ff_4a802277",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/handlers/RFC8639SchemaContextHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:34:23Z",
+      "side": 1,
+      "message": "what is the value of this class?",
+      "range": {
+        "startLine": 14,
+        "startChar": 13,
+        "endLine": 14,
+        "endChar": 40
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4cf7dc53_f8c9a392",
         "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/layer/services/impl/SubscribedNotificationsImpl.java",
         "patchSetId": 8
