@@ -117,6 +117,98 @@
     },
     {
       "key": {
+        "uuid": "4cf7dc53_f8c9a392",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/layer/services/impl/SubscribedNotificationsImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:31:29Z",
+      "side": 1,
+      "message": "can these ever be null? if not, requireNonNull -- and use it everywhere a field is being initialized this way",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 0
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "36d49abf_d47905c7",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/layer/services/impl/SubscribedNotificationsImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:31:29Z",
+      "side": 1,
+      "message": "this is waste of terminal space -- you are using 4 lines instead of 1 line",
+      "range": {
+        "startLine": 38,
+        "startChar": 12,
+        "endLine": 40,
+        "endChar": 33
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bfed3c14_fe7772fc",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/layer/services/impl/SubscribedNotificationsImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:31:29Z",
+      "side": 1,
+      "message": "this is final I assume",
+      "range": {
+        "startLine": 41,
+        "startChar": 7,
+        "endLine": 41,
+        "endChar": 14
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed01224d_bf1c2586",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/layer/services/impl/SubscribedNotificationsImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:31:29Z",
+      "side": 1,
+      "message": "\u0027e\u0027 is what we usually use",
+      "range": {
+        "startLine": 44,
+        "startChar": 45,
+        "endLine": 44,
+        "endChar": 54
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2d8760b7_0d3d4913",
         "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/util/services/SubscribedNotificationsUtil.java",
         "patchSetId": 8
