@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "150769b8_b06b4703",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:57Z",
+      "side": 1,
+      "message": "this needs a proper JIRA ticket",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 27
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4e6a31c8_2f1d8ed4",
         "filename": "restconf/restconf-models/ietf-ip/src/main/yang/ietf-ip@2018-02-22.yang",
         "patchSetId": 8
