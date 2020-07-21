@@ -117,6 +117,29 @@
     },
     {
       "key": {
+        "uuid": "2d8760b7_0d3d4913",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/util/services/SubscribedNotificationsUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:26:38Z",
+      "side": 1,
+      "message": "most of these methods are called from a single place or a single package. move them to the sole callers and let\u0027s see what remains here.",
+      "range": {
+        "startLine": 76,
+        "startChar": 19,
+        "endLine": 76,
+        "endChar": 46
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3d32663a_bb5bd6c3",
         "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/util/services/SubscribedNotificationsUtil.java",
         "patchSetId": 8
@@ -133,6 +156,29 @@
         "startChar": 7,
         "endLine": 89,
         "endChar": 63
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bbd3c963_70190b29",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/util/services/SubscribedNotificationsUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:26:38Z",
+      "side": 1,
+      "message": "why are we producing a String, and where is this called from?",
+      "range": {
+        "startLine": 382,
+        "startChar": 18,
+        "endLine": 382,
+        "endChar": 46
       },
       "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
