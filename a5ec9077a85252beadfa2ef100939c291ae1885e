@@ -1,0 +1,205 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e6a31c8_2f1d8ed4",
+        "filename": "restconf/restconf-models/ietf-ip/src/main/yang/ietf-ip@2018-02-22.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "this model is already packaged in mdsal, use it from there",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 14
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ca400437_fc6fcb1b",
+        "filename": "restconf/restconf-models/ietf-network-instance/src/main/yang/ietf-network-instance@2019-01-21.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "this model is already packaged in mdsal, use it from there",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 28
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23df1da2_b365d03e",
+        "filename": "restconf/restconf-models/ietf-subscribed-notifications/src/main/java/org/opendaylight/yang/gen/v1/urn/ietf/params/xml/ns/yang/ietf/netconf/acm/rev180214/nacm/rule/list/rule/rule/type/NotificationNotificationNameBuilder.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "implement these classes properly",
+      "range": {
+        "startLine": 27,
+        "startChar": 9,
+        "endLine": 27,
+        "endChar": 71
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "81ec8304_f35c603b",
+        "filename": "restconf/restconf-models/ietf-yang-schema-mount/src/main/yang/ietf-yang-schema-mount@2019-01-14.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "this model is already packaged in mdsal, use it from there",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 29
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d428e71_0d64c030",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/resources/log4j.properties",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "why is this here?!",
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d092254_284d7469",
+        "filename": "restconf/restconf-nb-rfc8639/src/test/java/org/opendaylight/restconf/nb/rfc8639/layer/services/subscriptions/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "use @RunWith(MockitoJUnitRunner.StrictStubs.class) instead",
+      "range": {
+        "startLine": 87,
+        "startChar": 8,
+        "endLine": 87,
+        "endChar": 43
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5bb048d4_d00c782c",
+        "filename": "restconf/restconf-nb-rfc8639/src/test/java/org/opendaylight/restconf/nb/rfc8639/layer/services/subscriptions/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "just init the field",
+      "range": {
+        "startLine": 90,
+        "startChar": 42,
+        "endLine": 90,
+        "endChar": 61
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "77219712_f43f897e",
+        "filename": "restconf/restconf-nb-rfc8639/src/test/java/org/opendaylight/restconf/nb/rfc8639/layer/services/subscriptions/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "just lose the \u0027this\u0027 prefix everywhere, it is a waste of space",
+      "range": {
+        "startLine": 95,
+        "startChar": 13,
+        "endLine": 95,
+        "endChar": 34
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "50afc097_efd4e4d7",
+        "filename": "restconf/restconf-nb-rfc8639/src/test/java/org/opendaylight/restconf/nb/rfc8639/layer/services/subscriptions/EstablishSubscriptionRpcTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:17:27Z",
+      "side": 1,
+      "message": "prefer doReturn(domMPOpt).when(domMountPointService).getMountPoint(any()) instead",
+      "range": {
+        "startLine": 103,
+        "startChar": 8,
+        "endLine": 103,
+        "endChar": 71
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
