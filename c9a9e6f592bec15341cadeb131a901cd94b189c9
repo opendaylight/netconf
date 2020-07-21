@@ -212,6 +212,30 @@
       "revId": "c9a9e6f592bec15341cadeb131a901cd94b189c9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8da30b4d_064deefb",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8737
+      },
+      "writtenOn": "2020-07-21T13:11:29Z",
+      "side": 1,
+      "message": "yes is possible encapsulate this to Configuration and inject it with this but still im hit problem most of call chain is static method\n1) public Response readData(...)\n2) public static NormalizedNode\u003c?, ?\u003e readData(...)\n3) private static void createAllYangNotificationStreams(...)\n4) private static void writeNotificationStreamToDatastore(...)\n\nIdeal way will be remove static for this 3 methods. When i look on call hierarchy all of them is called only through this one chain. Due to still there will be some extra parameter without this change(Configuration, boolean, UrlResolver, ...). Is there any specific reason why this is static? When i go through history looks like all this methods was in ReadDataTransactionUtil but now i think is no reason for static here.",
+      "parentUuid": "5cd1e3f0_8ebf0cd8",
+      "range": {
+        "startLine": 124,
+        "startChar": 17,
+        "endLine": 124,
+        "endChar": 65
+      },
+      "revId": "c9a9e6f592bec15341cadeb131a901cd94b189c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
