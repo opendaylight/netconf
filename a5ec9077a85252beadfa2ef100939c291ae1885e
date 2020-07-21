@@ -117,6 +117,52 @@
     },
     {
       "key": {
+        "uuid": "3d32663a_bb5bd6c3",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/util/services/SubscribedNotificationsUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:22:43Z",
+      "side": 1,
+      "message": "replace this with a comment",
+      "range": {
+        "startLine": 89,
+        "startChar": 7,
+        "endLine": 89,
+        "endChar": 63
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eb73aa92_54e63445",
+        "filename": "restconf/restconf-nb-rfc8639/src/main/java/org/opendaylight/restconf/nb/rfc8639/util/services/SubscribedNotificationsUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-21T09:22:43Z",
+      "side": 1,
+      "message": "We have Java 8, this is not how you write this. Also it misses a message as to what is being done",
+      "range": {
+        "startLine": 389,
+        "startChar": 8,
+        "endLine": 393,
+        "endChar": 9
+      },
+      "revId": "a5ec9077a85252beadfa2ef100939c291ae1885e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5d428e71_0d64c030",
         "filename": "restconf/restconf-nb-rfc8639/src/main/resources/log4j.properties",
         "patchSetId": 8
