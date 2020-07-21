@@ -69,6 +69,30 @@
       "revId": "27a3ba0bede6836ef2fce0dbdd5ab6fc33f09078",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "630a05c9_ec719f47",
+        "filename": "netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8351
+      },
+      "writtenOn": "2020-07-21T17:47:00Z",
+      "side": 1,
+      "message": "can you pls cite an example?",
+      "parentUuid": "7c8b5207_f93a155b",
+      "range": {
+        "startLine": 158,
+        "startChar": 2,
+        "endLine": 166,
+        "endChar": 14
+      },
+      "revId": "27a3ba0bede6836ef2fce0dbdd5ab6fc33f09078",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
