@@ -93,6 +93,30 @@
       "revId": "27a3ba0bede6836ef2fce0dbdd5ab6fc33f09078",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "560aa077_d1789c01",
+        "filename": "netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-22T22:29:55Z",
+      "side": 1,
+      "message": "Google has quite a few hits, for example https://enroute.osgi.org/FAQ/300-declarative-services.html",
+      "parentUuid": "630a05c9_ec719f47",
+      "range": {
+        "startLine": 158,
+        "startChar": 2,
+        "endLine": 166,
+        "endChar": 14
+      },
+      "revId": "27a3ba0bede6836ef2fce0dbdd5ab6fc33f09078",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
