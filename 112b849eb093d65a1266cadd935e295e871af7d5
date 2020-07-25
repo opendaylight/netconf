@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7696b6f3_bff98f1b",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8351
+      },
+      "writtenOn": "2020-07-25T05:30:09Z",
+      "side": 1,
+      "message": "Pls remove the empty line here",
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18e4e4d9_f84f312d",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8351
+      },
+      "writtenOn": "2020-07-25T05:30:09Z",
+      "side": 1,
+      "message": "Debug log here as it is a failsafe",
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3af671b_9b91d9b8",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8351
+      },
+      "writtenOn": "2020-07-25T05:30:09Z",
+      "side": 1,
+      "message": "Do we need a else with a warn/debug log?",
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
