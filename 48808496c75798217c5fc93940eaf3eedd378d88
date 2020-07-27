@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a3e5815_cc834696",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:37:24Z",
+      "side": 1,
+      "message": "this is not a proper commit message",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 17
+      },
+      "revId": "48808496c75798217c5fc93940eaf3eedd378d88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "836579ba_f07ed948",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfBaseOps.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:37:24Z",
+      "side": 1,
+      "message": "missing javadoc, here and in all new public methods",
+      "range": {
+        "startLine": 210,
+        "startChar": 4,
+        "endLine": 210,
+        "endChar": 61
+      },
+      "revId": "48808496c75798217c5fc93940eaf3eedd378d88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4cf26b6d_9d50df7e",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfRpcStructureTransformer.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:37:24Z",
+      "side": 1,
+      "message": "bounce to a util method? what use is this?!",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 5
+      },
+      "revId": "48808496c75798217c5fc93940eaf3eedd378d88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd0c9f6b_cedd357c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/RpcStructureTransformer.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:37:24Z",
+      "side": 1,
+      "message": "undocumented exception",
+      "range": {
+        "startLine": 50,
+        "startChar": 8,
+        "endLine": 50,
+        "endChar": 71
+      },
+      "revId": "48808496c75798217c5fc93940eaf3eedd378d88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cd3073b0_b94ab634",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfBaseOpsTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:37:24Z",
+      "side": 1,
+      "message": "static import",
+      "range": {
+        "startLine": 109,
+        "startChar": 8,
+        "endLine": 109,
+        "endChar": 21
+      },
+      "revId": "48808496c75798217c5fc93940eaf3eedd378d88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
