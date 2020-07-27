@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3e49d84f_6560213c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:38:35Z",
+      "side": 1,
+      "message": "missing javadoc on public method",
+      "range": {
+        "startLine": 140,
+        "startChar": 4,
+        "endLine": 140,
+        "endChar": 39
+      },
+      "revId": "980651202713377bca74ddf5823d775243ff4cc8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ea8d5880_4df70bc1",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:38:35Z",
+      "side": 1,
+      "message": "useless change, please fix your editor setup",
+      "range": {
+        "startLine": 521,
+        "startChar": 13,
+        "endLine": 521,
+        "endChar": 20
+      },
+      "revId": "980651202713377bca74ddf5823d775243ff4cc8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
