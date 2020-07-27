@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "527bd227_b8081597",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:38:51Z",
+      "side": 1,
+      "message": "this is not a proper commit message",
+      "range": {
+        "startLine": 7,
+        "startChar": 1,
+        "endLine": 7,
+        "endChar": 71
+      },
+      "revId": "980651202713377bca74ddf5823d775243ff4cc8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3e49d84f_6560213c",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
         "patchSetId": 9
