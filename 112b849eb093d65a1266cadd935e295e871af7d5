@@ -19,6 +19,144 @@
     },
     {
       "key": {
+        "uuid": "bfbad092_73ac1a72",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "superfluous empty line",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 2
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6024abb6_e5819f86",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "this should only be a comment",
+      "range": {
+        "startLine": 26,
+        "startChar": 8,
+        "endLine": 26,
+        "endChar": 62
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "464efaaa_635b0525",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "missing final here and everywhere else",
+      "range": {
+        "startLine": 40,
+        "startChar": 40,
+        "endLine": 40,
+        "endChar": 72
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8af25759_9b364e35",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "does not match javadoc",
+      "range": {
+        "startLine": 47,
+        "startChar": 82,
+        "endLine": 47,
+        "endChar": 87
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3b2dc605_290abb03",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "superfluous local",
+      "range": {
+        "startLine": 54,
+        "startChar": 8,
+        "endLine": 54,
+        "endChar": 30
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "139269fb_545eb700",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "rework to remove duplicate hasNext()",
+      "range": {
+        "startLine": 61,
+        "startChar": 7,
+        "endLine": 63,
+        "endChar": 35
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "18e4e4d9_f84f312d",
         "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
         "patchSetId": 5
@@ -36,6 +174,29 @@
     },
     {
       "key": {
+        "uuid": "811d2fb8_729a1a00",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "fluent StringBuilder",
+      "range": {
+        "startLine": 90,
+        "startChar": 20,
+        "endLine": 92,
+        "endChar": 36
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a3af671b_9b91d9b8",
         "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
         "patchSetId": 5
@@ -47,6 +208,207 @@
       "writtenOn": "2020-07-25T05:30:09Z",
       "side": 1,
       "message": "Do we need a else with a warn/debug log?",
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38aec777_d865e77f",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/DOMToXpathTransformUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "fluent StringBuilder",
+      "range": {
+        "startLine": 104,
+        "startChar": 7,
+        "endLine": 104,
+        "endChar": 23
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "adb67dad_cd19a0c2",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "should be final",
+      "range": {
+        "startLine": 23,
+        "startChar": 6,
+        "endLine": 23,
+        "endChar": 13
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "96ca39d0_ff4e34a6",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "well known XML constant, should use it from XMLConstants",
+      "range": {
+        "startLine": 25,
+        "startChar": 32,
+        "endLine": 25,
+        "endChar": 48
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "96340377_7174a22c",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "magic prefix without explaniantion",
+      "range": {
+        "startLine": 26,
+        "startChar": 49,
+        "endLine": 26,
+        "endChar": 58
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "680b068b_3eeba7e0",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "errr ... global static?!",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 73
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc5647f0_ea9d5a9b",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "can this be null?",
+      "range": {
+        "startLine": 71,
+        "startChar": 18,
+        "endLine": 71,
+        "endChar": 27
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cdc61a99_a540b15d",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "Okay, this lacks documentation around use in baseline javadoc. Why would be need to ever synchronize this?!",
+      "range": {
+        "startLine": 80,
+        "startChar": 11,
+        "endLine": 80,
+        "endChar": 24
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c1bbd0f_4cc24ff3",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/XPathQName.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "missing javadoc",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 24
+      },
+      "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "47369fb6_cd49a7ac",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/XPathQName.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:29:47Z",
+      "side": 1,
+      "message": "missing nullness assumptions",
       "revId": "112b849eb093d65a1266cadd935e295e871af7d5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
