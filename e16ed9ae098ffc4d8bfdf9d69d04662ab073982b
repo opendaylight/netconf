@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f00ad1e5_dcdc2e80",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDataTreeServiceImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:40:02Z",
+      "side": 1,
+      "message": "no, this should be a separate method. get out of the \u0027special case boolean\u0027 mindset already!",
+      "range": {
+        "startLine": 119,
+        "startChar": 95,
+        "endLine": 119,
+        "endChar": 109
+      },
+      "revId": "e16ed9ae098ffc4d8bfdf9d69d04662ab073982b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
