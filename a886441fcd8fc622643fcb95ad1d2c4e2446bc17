@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c9bac75_4e9bb623",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:43:54Z",
+      "side": 1,
+      "message": "duplicate synchronized ... what the heck?!",
+      "range": {
+        "startLine": 399,
+        "startChar": 11,
+        "endLine": 399,
+        "endChar": 60
+      },
+      "revId": "a886441fcd8fc622643fcb95ad1d2c4e2446bc17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5b32a25_7e80e652",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/MdsalRestconfStrategy.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:43:54Z",
+      "side": 1,
+      "message": "this is not documented AFAICT",
+      "range": {
+        "startLine": 80,
+        "startChar": 8,
+        "endLine": 80,
+        "endChar": 89
+      },
+      "revId": "a886441fcd8fc622643fcb95ad1d2c4e2446bc17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "69946f1d_8a7a9964",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/NetconfRestconfStrategy.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:43:54Z",
+      "side": 1,
+      "message": "keep the order of assignments",
+      "range": {
+        "startLine": 58,
+        "startChar": 8,
+        "endLine": 58,
+        "endChar": 37
+      },
+      "revId": "a886441fcd8fc622643fcb95ad1d2c4e2446bc17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3bc7f42b_c0f3b3cc",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:43:54Z",
+      "side": 1,
+      "message": "this deserves an explanation. Honesty, I do not like this check and I bet it can be refactored to something way more reasoable.",
+      "range": {
+        "startLine": 350,
+        "startChar": 7,
+        "endLine": 354,
+        "endChar": 55
+      },
+      "revId": "a886441fcd8fc622643fcb95ad1d2c4e2446bc17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
