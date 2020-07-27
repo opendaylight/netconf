@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5b92ddde_75d3f12c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:34:16Z",
+      "side": 1,
+      "message": "duplicate check for endsWith, use charAt()",
+      "range": {
+        "startLine": 293,
+        "startChar": 24,
+        "endLine": 293,
+        "endChar": 51
+      },
+      "revId": "18e7133381c939921ff6d2d1b9a37fefa189413b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "369c5495_11cb4bcb",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:34:16Z",
+      "side": 1,
+      "message": "this certainly deserves a lot of documentation, above, and below",
+      "range": {
+        "startLine": 322,
+        "startChar": 0,
+        "endLine": 326,
+        "endChar": 13
+      },
+      "revId": "18e7133381c939921ff6d2d1b9a37fefa189413b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7717ae39_399908e5",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:34:16Z",
+      "side": 1,
+      "message": "seriously, can you off-hand tell me what this is doing?! how do you know there is a [1] after split?!",
+      "range": {
+        "startLine": 343,
+        "startChar": 40,
+        "endLine": 343,
+        "endChar": 106
+      },
+      "revId": "18e7133381c939921ff6d2d1b9a37fefa189413b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ed8af88_2a8e1fc4",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:34:16Z",
+      "side": 1,
+      "message": "utter duplicate above. again: what is going on here?!",
+      "range": {
+        "startLine": 353,
+        "startChar": 33,
+        "endLine": 353,
+        "endChar": 114
+      },
+      "revId": "18e7133381c939921ff6d2d1b9a37fefa189413b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}

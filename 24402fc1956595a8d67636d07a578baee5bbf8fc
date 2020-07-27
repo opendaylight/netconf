@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "04b18dd3_37ff9111",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-07-27T00:34:16Z",
+      "side": 1,
+      "message": "please do not litter",
+      "range": {
+        "startLine": 399,
+        "startChar": 13,
+        "endLine": 399,
+        "endChar": 19
+      },
+      "revId": "24402fc1956595a8d67636d07a578baee5bbf8fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
