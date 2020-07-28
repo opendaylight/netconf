@@ -55,10 +55,6 @@ public class WebInitializer {
                         RestconfStreamsConstants.YANG_NOTIFICATION_STREAM_PATTERN)).build())
                 // Allows user to add javax.servlet.Filter(s) in front of REST services
                 .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
-                    .addUrlPattern("/*").asyncSupported(true).build())
-                .addFilter(FilterDetails.builder().filter(new org.eclipse.jetty.servlets.GzipFilter())
-                    .putInitParam("mimeTypes",
-                        "application/xml,application/yang.data+xml,xml,application/json,application/yang.data+json")
                     .addUrlPattern("/*").asyncSupported(true).build());
 
         webContextSecurer.requireAuthentication(webContextBuilder, true , "/*");

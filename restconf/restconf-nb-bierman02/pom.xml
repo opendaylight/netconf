@@ -158,10 +158,6 @@
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>aaa-filterchain</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlets</artifactId>
-    </dependency>
 
     <!-- Testing Dependencies -->
     <dependency>

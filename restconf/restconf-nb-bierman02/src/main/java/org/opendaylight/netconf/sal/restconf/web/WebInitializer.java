@@ -45,11 +45,6 @@ public class WebInitializer {
 
                 // Allows user to add javax.servlet.Filter(s) in front of REST services
                 .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
-                    .addUrlPattern("/*").build())
-
-                .addFilter(FilterDetails.builder().filter(new org.eclipse.jetty.servlets.GzipFilter())
-                    .putInitParam("mimeTypes",
-                        "application/xml,application/yang.data+xml,xml,application/json,application/yang.data+json")
                     .addUrlPattern("/*").build());
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/*");
