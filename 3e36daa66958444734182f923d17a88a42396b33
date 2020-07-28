@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "292fd9a4_c22b67d7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-07-28T21:10:11Z",
+      "side": 1,
+      "message": "can you follow the following format for commit messages please:\n\nline 1: clear concise present tense line summarizing the entire patch. it can be generic so you can fit it all in 52 characters.\nline 2: blank\nlines 3-x: all the gory details you think are necessary to help explain the patch, especially if\n           the changes are complicated and/or not a lot of comments in the code.\n\none guide that we have shared in the past for commit messages is here (I really like it):\nhttps://chris.beams.io/posts/git-commit/",
+      "revId": "3e36daa66958444734182f923d17a88a42396b33",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
