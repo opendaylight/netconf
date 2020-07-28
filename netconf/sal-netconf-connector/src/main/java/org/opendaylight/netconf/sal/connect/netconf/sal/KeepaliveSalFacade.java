@@ -93,16 +93,18 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     }
 
     /**
-     * Just cancel current keepalive task.
+     * Just cancel current keepalive task if exists.
      * If its already started, let it finish ... not such a big deal.
      *
      * <p>
      * Then schedule next keepalive.
      */
-    void resetKeepalive() {
+    synchronized void resetKeepalive() {
         LOG.trace("{}: Resetting netconf keepalive timer", id);
         if (currentKeepalive != null) {
             currentKeepalive.cancel(false);
+        } else {
+            LOG.trace("{}: Keepalive does not exist", id);
         }
         scheduleKeepalives();
     }
@@ -110,7 +112,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     /**
      * Cancel current keepalive and also reset current deviceRpc.
      */
-    private void stopKeepalives() {
+    private synchronized void stopKeepalives() {
         if (currentKeepalive != null) {
             currentKeepalive.cancel(false);
         }
@@ -142,7 +144,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         salFacade.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc1, deviceAction);
 
         LOG.debug("{}: Netconf session initiated, starting keepalives", id);
-        scheduleKeepalives();
+        resetKeepalive();
     }
 
     private void scheduleKeepalives() {
@@ -266,12 +268,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         private ScheduledFuture<?> schedule;
 
         public void initScheduler(final Runnable runnable) {
-            if (currentKeepalive != null) {
-                currentKeepalive.cancel(true);
-            } else {
-                LOG.trace("Keepalive does not exist.");
-            }
-            scheduleKeepalives();
+            resetKeepalive();
             //Listening on the result should be done before the keepalive rpc will be send
             final long delay = keepaliveDelaySeconds * 1000 - 500;
             schedule = executor.schedule(runnable, delay, TimeUnit.MILLISECONDS);
