@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bc333d4e_52f1f2ce",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-07-29T19:14:34Z",
+      "side": 0,
+      "message": "this info is lost with these changes",
+      "range": {
+        "startLine": 24,
+        "startChar": 29,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "bc8f0f5ec11559d07892632612630697d8235009",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc5aaf96_24a4a129",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-07-29T19:14:34Z",
+      "side": 0,
+      "message": "this seems like a decent section to hold on to",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 72
+      },
+      "revId": "bc8f0f5ec11559d07892632612630697d8235009",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5852750c_5e249bbd",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-07-29T19:14:34Z",
+      "side": 0,
+      "message": "this is still relevant",
+      "range": {
+        "startLine": 104,
+        "startChar": 4,
+        "endLine": 105,
+        "endChar": 11
+      },
+      "revId": "bc8f0f5ec11559d07892632612630697d8235009",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}

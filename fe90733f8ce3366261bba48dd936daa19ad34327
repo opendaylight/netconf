@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df48e534_c94cf2c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-07-29T19:14:34Z",
+      "side": 1,
+      "message": "use present tense, so \"update\" or \"rework\"\n\nthen a blank line followed by a body explaining a few more\ndetails about what is changing in this patch.\n\nhere is a good guide we ask people to follow:\nhttps://chris.beams.io/posts/git-commit/",
+      "revId": "fe90733f8ce3366261bba48dd936daa19ad34327",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "61e278e0_d891c9e6",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-07-29T19:14:34Z",
+      "side": 1,
+      "message": "this section does not exist. I think you may have more work you are planning to bring that will include this, but for now we can\u0027t have this dead link.",
+      "range": {
+        "startLine": 59,
+        "startChar": 75,
+        "endLine": 60,
+        "endChar": 28
+      },
+      "revId": "fe90733f8ce3366261bba48dd936daa19ad34327",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
