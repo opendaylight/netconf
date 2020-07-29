@@ -11,99 +11,75 @@
 NETCONF User Guide
 ==================
 
-Overview
---------
+The Network Configuration (NETCONF) protocol is a network management protocol developed and
+standardized by the Internet Engineering Task Force (IETF). NETCONF is designed to install,
+update, and delete the configurations of network devices. Operating on top of the Remote
+Procedure Call (RPC) layer using XML encoding, NETCONF provides a set of operational tools
+that can be used to edit and query configuration data of devices.
+NETCONF can operate either as a :ref:`southbound` or as a :ref:`northbound`.
 
-NETCONF is an XML-based protocol used for configuration and monitoring
-devices in the network. The base NETCONF protocol is described in
-`RFC-6241 <http://tools.ietf.org/html/rfc6241>`__.
+For more information on NETCONF, refer to `RFC 6241 <https://tools.ietf.org/html/rfc6241>`_.
+NETCONF can be conceptually partitioned into the following four layers:
 
-**NETCONF in OpenDaylight:.**
+.. list-table:: NETCONF Layers
+   :widths: 20 60
+   :header-rows: 1
 
-OpenDaylight supports the NETCONF protocol as a northbound server as
-well as a southbound plugin. It also includes a set of test tools for
-simulating NETCONF devices and clients.
+   * - **Layer**
+     - **Description**
+   * - **Content layer**
+     - This layer includes both configuration and notification data.
+   * - **Operations layer**
+     - This layer defines a set of base-protocol operations to retrieve
+       and edit config data.
+   * - **Messages layer**
+     - This layer is a mechanism that encodes RPCs and notifications.
+   * - **Secure Transport layer**
+     - This layer provides a secure and reliable for messaging between
+       clients and servers.
 
-Southbound (netconf-connector)
-------------------------------
+.. _southbound:
 
-The NETCONF southbound plugin is capable of connecting to remote NETCONF
-devices and exposing their configuration/operational datastores, RPCs
-and notifications as MD-SAL mount points. These mount points allow
-applications and remote users (over RESTCONF) to interact with the
-mounted devices.
+Southbound Plugin
+-----------------
 
-In terms of RFCs, the connector supports:
+As a southbound plugin (NETCONF-connector) NETCONF can connect to remote NETCONF
+devices to expose their configuration/operational datastores, RPCs, and
+notifications as an MD-SAL mount point. Mount points allow apps and remote
+users to interact with the mounted devices over RESTCONF. The connector
+supports these added RPCs:
 
--  `RFC-6241 <http://tools.ietf.org/html/rfc6241>`__
+* `RFC-5277 <http://tools.ietf.org/html/rfc5277>`_
+* `RFC-6022 <http://tools.ietf.org/html/rfc6022>`_
+* `draft-ietf-netconf-yang-library-06 <https://tools.ietf.org/html/draft-ietf-netconf-yang-library-06>`_
 
--  `RFC-5277 <https://tools.ietf.org/html/rfc5277>`__
+By using the YANG modeling language, the NETCONF-connector is fully model-driven.
+Thus, in addition to the above RFCs, it also supports any data/RPC/notifications that
+are described by the YANG model implemented in devices. To activate the NETCONF
+southbound plugin, install the ``odl-netconf-connector-all`` Karaf feature. Refer to
+:ref:`create-added-netconf`.
 
--  `RFC-6022 <https://tools.ietf.org/html/rfc6022>`__
+NETCONF-Connector
+-----------------
 
--  `draft-ietf-netconf-yang-library-06 <https://tools.ietf.org/html/draft-ietf-netconf-yang-library-06>`__
+Users can configure the NETCONF-connector using either NETCONF or RESTCONF; however,
+this guide focuses on using RESTCONF. In addition, there are two different
+endpoints related to the RESTCONF protocol:
 
-**Netconf-connector is fully model-driven (utilizing the YANG modeling
-language) so in addition to the above RFCs, it supports any
-data/RPC/notifications described by a YANG model that is implemented by
-the device.**
+* ``http://localhost:8181/restconf`` is related to `draft-bierman-netconf-restconf-02
+  <https://tools.ietf.org/html/draft-bierman-netconf-restconf-02>`_. It can be activated
+  by installing the ``odl-restconf-nb-bierman02`` Karaf feature.
 
-.. tip::
+* ``http://localhost:8181/rests`` is related to `RFC-8040 <http://tools.ietf.org/html/rfc8040>`_.
+  It can be activated by installing the ``odl-restconf-nb-rfc8040`` Karaf feature.
 
-    NETCONF southbound can be activated by installing
-    ``odl-netconf-connector-all`` Karaf feature.
+For `RFC-8040 <http://tools.ietf.org/html/rfc8040>`_, the resources to configure and
+operate datastores start with ``/rests/data/``, for example:
 
-Netconf-connector configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-There are 2 ways for configuring netconf-connector: NETCONF or RESTCONF.
-This guide focuses on using RESTCONF.
-
-.. important::
-
-    There are 2 different endpoints related to RESTCONF protocols:
-
-    - | ``http://localhost:8181/restconf`` is related to `draft-bierman-netconf-restconf-02 <https://tools.ietf.org/html/draft-bierman-netconf-restconf-02>`__,
-      | can be activated by installing ``odl-restconf-nb-bierman02``
-       Karaf feature.
-      | This user guide uses this approach.
-
-    - | ``http://localhost:8181/rests`` is related to `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__,
-      | can be activated by installing ``odl-restconf-nb-rfc8040``
-       Karaf feature.
-
-    | In case of `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__
-     resources for configuration and operational datastores start
-     ``/rests/data/``,
-    | e. g. GET
-     http://localhost:8181/rests/data/network-topology:network-topology
-     with response of both datastores. It's allowed to use query
-     parameters to distinguish between them.
-    | e. g. GET
-     http://localhost:8181/rests/data/network-topology:network-topology?content=config
-     for configuration datastore
-    | and GET
-     http://localhost:8181/rests/data/network-topology:network-topology?content=nonconfig
-     for operational datastore.
-
-    | Also in case of `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__,
-     if a data node in the path expression is a YANG leaf-list or list
-     node, the path segment has to be constructed by having leaf-list or
-     list node name, followed by an "=" character, then followed by the
-     leaf-list or list value. Any reserved characters must be
-     percent-encoded.
-    | e. g. GET
-     http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf?content=config
-     for retrieving data from configuration datastore for
-     topology-netconf value of topology list is equivalent to the deprecated request
-    | |ss| GET |se|
-     http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf,
-     which is related to `draft-bierman-netconf-restconf-02
-     <https://tools.ietf.org/html/draft-bierman-netconf-restconf-02>`__.
-
-    Examples in the `Spawning new NETCONF connectors`_ section include both bierman02 and rfc8040
-    formats
-
+* ``GET http://localhost:8181/rests/data/network-topology:network-topology`` with
+  response of both datastores; that is, configuration and operational.
+* ``GET http://localhost:8181/rests/data/network-topology:network-topology?content=config`` for configuration datastore.
+* ``GET http://localhost:8181/rests/data/network-topology:network-topology?content=nonconfig`` for operational datastore.
 
 Default configuration
 ^^^^^^^^^^^^^^^^^^^^^
