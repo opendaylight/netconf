@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31e21e3a_f804c7c7",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/netconf/authprovider/OSGiPasswordAuthProvider.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8351
+      },
+      "writtenOn": "2020-07-30T10:42:13Z",
+      "side": 1,
+      "message": "If you look at the blueprint, that had a type name for this instance netconf-auth-provider. Dont we need to retain that?",
+      "revId": "6a4980396755bef84b8fee761f470892e918a584",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
