@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a6373497_f0f2d192",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 2759
+      },
+      "writtenOn": "2020-07-30T00:45:03Z",
+      "side": 1,
+      "message": "Best to use present tense in commit message summary lines and also capitalize the first letter, for example: \"Modularize the NETCONF user guide\"",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 12
+      },
+      "revId": "d67ccbe1bf6f63ab455f2cb365cd558e2d059fbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fcf4417f_6a32dddc",
+        "filename": "docs/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 2759
+      },
+      "writtenOn": "2020-07-30T00:45:03Z",
+      "side": 1,
+      "message": "Why create an entirely new section just for a single user-guide?\n\nJust put user-guide/index in the existing toctree.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 10
+      },
+      "revId": "d67ccbe1bf6f63ab455f2cb365cd558e2d059fbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3fb7fd6a_04b1b8a1",
+        "filename": "docs/user-guide/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 2759
+      },
+      "writtenOn": "2020-07-30T00:45:03Z",
+      "side": 1,
+      "message": "Is everything here sections that were here previously or is there new stuff?\n\nIf there\u0027s new stuff can we split the new stuff into a separate patch and make this patch only focusing on modularizing the user-guide?\n\nIt\u0027s difficult to review a patch that has too many different things changing all at once.",
+      "revId": "d67ccbe1bf6f63ab455f2cb365cd558e2d059fbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
