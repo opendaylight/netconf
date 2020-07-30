@@ -104,6 +104,24 @@
       "revId": "d67ccbe1bf6f63ab455f2cb365cd558e2d059fbf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a6a448e8_5235cc45",
+        "filename": "docs/user-guide/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 2759
+      },
+      "writtenOn": "2020-07-30T01:41:33Z",
+      "side": 1,
+      "message": "Do it in 2 separate patches. One to re-arrange the contents and a 2nd one to add new information. It\u0027s best practice to keep your patches small and one topic at a time.\n\nThink about this from a reviewers point of view as if you were the one reviewing this patch. The current patch in it\u0027s current form is impossible to know what is new information and what was re-arranged information because the old user-guide.rst is just a giant red delete in review. And every other file looks like a brand new file in this review. Reviewers have no chance of properly reviewing this patch.\n\nIf you split the patch into 2 separate patches one that only re-arranges the information people can review this patch from a perspective of the information getting reorganized.\n\nWhile the 2nd patch to add new information will allow people to review that patch from a perspective of reviewing what is actually new that\u0027s changing.",
+      "parentUuid": "a3453dd3_079df3d3",
+      "revId": "d67ccbe1bf6f63ab455f2cb365cd558e2d059fbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
