@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "a35dd19f_593f0dd6",
+        "filename": "docs/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8466
+      },
+      "writtenOn": "2020-07-30T01:02:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "fcf4417f_6a32dddc",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 10
+      },
+      "revId": "d67ccbe1bf6f63ab455f2cb365cd558e2d059fbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fb7fd6a_04b1b8a1",
         "filename": "docs/user-guide/index.rst",
         "patchSetId": 2
@@ -59,6 +83,24 @@
       "writtenOn": "2020-07-30T00:45:03Z",
       "side": 1,
       "message": "Is everything here sections that were here previously or is there new stuff?\n\nIf there\u0027s new stuff can we split the new stuff into a separate patch and make this patch only focusing on modularizing the user-guide?\n\nIt\u0027s difficult to review a patch that has too many different things changing all at once.",
+      "revId": "d67ccbe1bf6f63ab455f2cb365cd558e2d059fbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3453dd3_079df3d3",
+        "filename": "docs/user-guide/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8466
+      },
+      "writtenOn": "2020-07-30T01:02:56Z",
+      "side": 1,
+      "message": "It is marriage of what was in LSC and in ODL. Mostly existing.\nWell, that was the point of breaking it up into smaller sections. I thought that is what we agreed on when I was changing this document",
+      "parentUuid": "3fb7fd6a_04b1b8a1",
       "revId": "d67ccbe1bf6f63ab455f2cb365cd558e2d059fbf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
