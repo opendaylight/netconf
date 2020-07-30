@@ -8,5 +8,12 @@ NetConf
    :maxdepth: 1
 
    developer-guide
-   user-guide
    testtool
+
+User Guide
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   user-guide/index
