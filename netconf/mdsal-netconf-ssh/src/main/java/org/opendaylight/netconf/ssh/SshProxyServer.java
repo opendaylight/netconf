@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,8 +34,8 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2Acceptor;
 import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2Connector;
 import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2ServiceFactoryFactory;
+import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController.HeartbeatType;
 import org.opendaylight.netconf.shaded.sshd.common.util.closeable.AbstractCloseable;
-import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 
 /**
@@ -89,10 +90,15 @@ public class SshProxyServer implements AutoCloseable {
 
         sshServer.setIoServiceFactoryFactory(nioServiceWithPoolFactoryFactory);
         sshServer.setScheduledExecutorService(minaTimerExecutor);
-        sshServer.getProperties().put(ServerFactoryManager.IDLE_TIMEOUT,
-            String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
-        sshServer.getProperties().put(ServerFactoryManager.AUTH_TIMEOUT,
-            String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
+
+        final int idleTimeout = sshProxyServerConfiguration.getIdleTimeout();
+        sshServer.getProperties().put(FactoryManager.IDLE_TIMEOUT, String.valueOf(idleTimeout));
+        if (idleTimeout > 0) {
+            final long heartBeat = idleTimeout * 333333L;
+            sshServer.setSessionHeartbeat(HeartbeatType.IGNORE, Duration.ofNanos(heartBeat));
+        }
+
+        sshServer.getProperties().put(FactoryManager.AUTH_TIMEOUT, String.valueOf(idleTimeout));
 
         final RemoteNetconfCommand.NetconfCommandFactory netconfCommandFactory =
                 new RemoteNetconfCommand.NetconfCommandFactory(clientGroup,
