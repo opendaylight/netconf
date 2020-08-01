@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a8db6040_9a6d63c6",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:41:22Z",
+      "side": 1,
+      "message": "why do we need this to be atomic?",
+      "range": {
+        "startLine": 37,
+        "startChar": 18,
+        "endLine": 37,
+        "endChar": 69
+      },
+      "revId": "25eda160ecec1959eaa9d49a23cffe7ab0e70875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1931c56b_e6bd6c27",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:41:22Z",
+      "side": 1,
+      "message": "This does not \u0027allow\u0027, it plain creates an empty context.",
+      "range": {
+        "startLine": 44,
+        "startChar": 7,
+        "endLine": 44,
+        "endChar": 13
+      },
+      "revId": "25eda160ecec1959eaa9d49a23cffe7ab0e70875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f79f2ea_db471c48",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:41:22Z",
+      "side": 1,
+      "message": "misordered constructor vs. static factory method. Furthermore both are visible -- please make your mind up as to which mode of operation is to be used.",
+      "range": {
+        "startLine": 63,
+        "startChar": 4,
+        "endLine": 64,
+        "endChar": 58
+      },
+      "revId": "25eda160ecec1959eaa9d49a23cffe7ab0e70875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a95905c_7dee3647",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:41:22Z",
+      "side": 1,
+      "message": "typo\nfurthermore why is this special-cased? shouldn\u0027t it be an IAE?",
+      "range": {
+        "startLine": 91,
+        "startChar": 42,
+        "endLine": 91,
+        "endChar": 51
+      },
+      "revId": "25eda160ecec1959eaa9d49a23cffe7ab0e70875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e89195a9_5bf99c73",
+        "filename": "netconf/netconf-xpath/src/main/java/org/opendaylight/netconf/xpath/NetconfXPathContext.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:41:22Z",
+      "side": 1,
+      "message": "misordered TYPE_USE annotation, all over the place",
+      "range": {
+        "startLine": 127,
+        "startChar": 24,
+        "endLine": 127,
+        "endChar": 39
+      },
+      "revId": "25eda160ecec1959eaa9d49a23cffe7ab0e70875",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
