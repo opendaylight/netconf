@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e2f2bc98_7325bffd",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:50:15Z",
+      "side": 1,
+      "message": "so this is literal \u0027|\u0027, why would we use a pattern to split on it?!",
+      "range": {
+        "startLine": 92,
+        "startChar": 25,
+        "endLine": 92,
+        "endChar": 61
+      },
+      "revId": "5837cf0ce4ee7b29b7753eabef7c30091d922ea7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "686a33fa_20262433",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:50:15Z",
+      "side": 1,
+      "message": "so we compile this expression each and every time?",
+      "range": {
+        "startLine": 285,
+        "startChar": 91,
+        "endLine": 285,
+        "endChar": 97
+      },
+      "revId": "5837cf0ce4ee7b29b7753eabef7c30091d922ea7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b462e234_a75660cc",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:50:15Z",
+      "side": 1,
+      "message": "this is massively inefficient.",
+      "range": {
+        "startLine": 398,
+        "startChar": 34,
+        "endLine": 398,
+        "endChar": 71
+      },
+      "revId": "5837cf0ce4ee7b29b7753eabef7c30091d922ea7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d13cb396_df26f9b8",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:50:15Z",
+      "side": 1,
+      "message": "what is guarding this?",
+      "range": {
+        "startLine": 398,
+        "startChar": 15,
+        "endLine": 398,
+        "endChar": 33
+      },
+      "revId": "5837cf0ce4ee7b29b7753eabef7c30091d922ea7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9f396a16_45af63f6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:50:15Z",
+      "side": 1,
+      "message": "wow, really?",
+      "range": {
+        "startLine": 410,
+        "startChar": 19,
+        "endLine": 410,
+        "endChar": 45
+      },
+      "revId": "5837cf0ce4ee7b29b7753eabef7c30091d922ea7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
