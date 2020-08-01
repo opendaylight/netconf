@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a9db2b2_e07590c8",
+        "filename": "netconf/netconf-dom-api/src/main/java/org/opendaylight/netconf/dom/api/NetconfDataTreeService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-01T12:52:08Z",
+      "side": 1,
+      "message": "since this is not always present it should be a separate DOMServiceExtension. That solves the mess with throwing (undocumented!) UnsupportedOperationExceptions.",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 100
+      },
+      "revId": "abd4134a72ce11d9a62081a47340bbd3f0d31118",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
