@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "136a9767_2d4d6946",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/AbstractRestconfApplication.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-02T20:53:01Z",
+      "side": 1,
+      "message": "are any of these allowed be nulls?\n\nif not, use explicit requireNonNull() -- here and everywhere where a field is being initialized.",
+      "range": {
+        "startLine": 42,
+        "startChar": 8,
+        "endLine": 44,
+        "endChar": 52
+      },
+      "revId": "cf70479bcbe2a6b5cce95c015eb9ce530a9ba35d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "57e775bb_1585ff47",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataStreamServiceImpl.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-02T20:53:01Z",
+      "side": 1,
+      "message": "why not just retain the configuration?",
+      "range": {
+        "startLine": 39,
+        "startChar": 26,
+        "endLine": 39,
+        "endChar": 39
+      },
+      "revId": "cf70479bcbe2a6b5cce95c015eb9ce530a9ba35d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0d7ad17d_0a2f0404",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/UrlResolverFactory.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-02T20:53:01Z",
+      "side": 1,
+      "message": "build() implies a Builder pattern, which is not. What is wrong with just keeping this a static method in UrlResolver?",
+      "range": {
+        "startLine": 24,
+        "startChar": 23,
+        "endLine": 24,
+        "endChar": 30
+      },
+      "revId": "cf70479bcbe2a6b5cce95c015eb9ce530a9ba35d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
