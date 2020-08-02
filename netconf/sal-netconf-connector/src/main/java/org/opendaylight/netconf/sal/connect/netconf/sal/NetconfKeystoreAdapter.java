@@ -7,11 +7,13 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -62,8 +64,7 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
     }
 
     public Optional<KeyCredential> getKeypairFromId(final String keyId) {
-        final KeyCredential keypair = pairs.get(keyId);
-        return Optional.ofNullable(keypair);
+        return Optional.ofNullable(pairs.get(keyId));
     }
 
     /**
@@ -75,7 +76,7 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
      * @throws GeneralSecurityException If any security exception occurred
      * @throws IOException If there is an I/O problem with the keystore data
      */
-    public java.security.KeyStore getJavaKeyStore() throws GeneralSecurityException, IOException {
+    public KeyStore getJavaKeyStore() throws GeneralSecurityException, IOException {
         return getJavaKeyStore(Collections.emptySet());
     }
 
@@ -90,11 +91,10 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
      * @throws GeneralSecurityException If any security exception occurred
      * @throws IOException If there is an I/O problem with the keystore data
      */
-    public java.security.KeyStore getJavaKeyStore(Set<String> allowedKeys) throws GeneralSecurityException,
-        IOException {
-        Preconditions.checkNotNull(allowedKeys);
+    public KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
+        requireNonNull(allowedKeys);
 
-        final java.security.KeyStore keyStore = java.security.KeyStore.getInstance("JKS");
+        final KeyStore keyStore = KeyStore.getInstance("JKS");
 
         keyStore.load(null, null);
 
@@ -194,7 +194,6 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
     }
 
     private void onPrivateKeyChanged(final DataObjectModification<PrivateKey> objectModification) {
-
         switch (objectModification.getModificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
