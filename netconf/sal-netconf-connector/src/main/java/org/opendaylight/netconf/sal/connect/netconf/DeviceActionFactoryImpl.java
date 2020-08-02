@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static java.util.Objects.requireNonNull;
@@ -15,6 +14,7 @@ import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
@@ -27,6 +27,7 @@ import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,9 @@ import org.slf4j.LoggerFactory;
  * transforms replied NETCONF message  to action result, and using {@link RemoteDeviceCommunicator} that is responsible
  * for sending of built RPCs to NETCONF client.
  */
+@Singleton
+@Component(immediate = true, property = "type=default")
 public class DeviceActionFactoryImpl implements DeviceActionFactory {
-
     private static final Logger LOG = LoggerFactory.getLogger(DeviceActionFactoryImpl.class);
 
     @Override
