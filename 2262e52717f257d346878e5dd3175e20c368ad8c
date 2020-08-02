@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f960699_3c3b54b3",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandlerTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-02T20:35:52Z",
+      "side": 1,
+      "message": "this is immensely verbose way of doing thing ... what would be wrong with using fields in the test itself?",
+      "range": {
+        "startLine": 34,
+        "startChar": 31,
+        "endLine": 34,
+        "endChar": 50
+      },
+      "revId": "2262e52717f257d346878e5dd3175e20c368ad8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6f37e7af_438551db",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandlerTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-02T20:35:52Z",
+      "side": 1,
+      "message": "@Mock",
+      "range": {
+        "startLine": 43,
+        "startChar": 23,
+        "endLine": 43,
+        "endChar": 28
+      },
+      "revId": "2262e52717f257d346878e5dd3175e20c368ad8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2d3856d_54cf2b98",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandlerTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-02T20:35:52Z",
+      "side": 1,
+      "message": "this is VERY verbose",
+      "range": {
+        "startLine": 58,
+        "startChar": 13,
+        "endLine": 58,
+        "endChar": 60
+      },
+      "revId": "2262e52717f257d346878e5dd3175e20c368ad8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "94ebf9b9_20c932dd",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandlerTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-02T20:35:52Z",
+      "side": 1,
+      "message": "a number of these are useless -- found by using mocking annotations and MockitoJUnitRunner.StringStubs",
+      "range": {
+        "startLine": 104,
+        "startChar": 7,
+        "endLine": 104,
+        "endChar": 80
+      },
+      "revId": "2262e52717f257d346878e5dd3175e20c368ad8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "51cfc0a6_43e5b8a0",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/sse/SSESessionHandlerTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-08-02T20:35:52Z",
+      "side": 1,
+      "message": "this is an inferior way of writing this, use\n\ndoReturn(false).when(pingFuture).isCancelled()\n\nit works better with generics and a number of other situations.",
+      "range": {
+        "startLine": 117,
+        "startChar": 8,
+        "endLine": 117,
+        "endChar": 83
+      },
+      "revId": "2262e52717f257d346878e5dd3175e20c368ad8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
