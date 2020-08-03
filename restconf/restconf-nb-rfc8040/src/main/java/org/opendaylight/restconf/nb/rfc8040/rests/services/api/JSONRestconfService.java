@@ -27,7 +27,7 @@ public interface JSONRestconfService {
      * Issues a restconf PUT request to the configuration data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
@@ -37,7 +37,7 @@ public interface JSONRestconfService {
      * Issues a restconf POST request to the configuration data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
@@ -47,7 +47,7 @@ public interface JSONRestconfService {
      * Issues a restconf DELETE request to the configuration data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @throws OperationFailedException if the request fails.
      */
     void delete(String uriPath) throws OperationFailedException;
@@ -56,7 +56,7 @@ public interface JSONRestconfService {
      * Issues a restconf GET request to the given data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @param datastoreType the data store type to read from.
      * @return an Optional containing the data in JSON format if present.
      * @throws OperationFailedException if the request fails.
@@ -78,7 +78,7 @@ public interface JSONRestconfService {
      * Issues a restconf PATCH request to the configuration data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @param payload the payload data in JSON format.
      * @return an Optional containing the patch response data in JSON format.
      * @throws OperationFailedException if the request fails.
