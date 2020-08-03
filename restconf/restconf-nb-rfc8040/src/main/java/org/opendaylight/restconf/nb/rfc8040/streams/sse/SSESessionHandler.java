@@ -7,12 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.sse;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.opendaylight.restconf.nb.rfc8040.streams.SessionHandlerInterface;
@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 public class SSESessionHandler implements SessionHandlerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(SSESessionHandler.class);
     private static final String PING_PAYLOAD = "ping";
-    // FIXME: this should be a simple CharMatcher
-    private static final Pattern NEWLINE = Pattern.compile("(\\r|\\n)");
+
+    private static final CharMatcher CR_OR_LF = CharMatcher.anyOf("\r\n");
 
     private final ScheduledExecutorService executorService;
     private final BaseListenerInterface listener;
@@ -135,7 +135,7 @@ public class SSESessionHandler implements SessionHandlerInterface {
      */
     private String splitMessageToFragments(final String message) {
         StringBuilder outputMessage = new StringBuilder();
-        String inputmessage = NEWLINE.matcher(message).replaceAll("");
+        String inputmessage = CR_OR_LF.removeFrom(message);
         int length = inputmessage.length();
         for (int i = 0; i < length; i += maximumFragmentLength) {
             outputMessage.append(inputmessage.substring(i, Math.min(length, i + maximumFragmentLength))).append("\r\n");
