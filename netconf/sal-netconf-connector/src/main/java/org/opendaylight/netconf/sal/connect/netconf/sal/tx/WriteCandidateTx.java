@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.List;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
@@ -62,6 +63,11 @@ public class WriteCandidateTx extends AbstractWriteTx {
     protected synchronized void init() {
         LOG.trace("{}: Initializing {} transaction", id, getClass().getSimpleName());
         lock();
+    }
+
+    @Override
+    public List<ListenableFuture<? extends DOMRpcResult>> getResultsFutures() {
+        return resultsFutures;
     }
 
     private void lock() {
