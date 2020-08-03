@@ -32,6 +32,8 @@ public final class XmlNetconfConstants {
     public static final String GET = "get";
     public static final String GET_CONFIG = "get-config";
 
+    public static final String LOCK_DENIED = "lock-denied";
+
     public static final String RPC_REPLY_KEY = "rpc-reply";
 
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0 = "urn:ietf:params:xml:ns:netconf:base:1.0";

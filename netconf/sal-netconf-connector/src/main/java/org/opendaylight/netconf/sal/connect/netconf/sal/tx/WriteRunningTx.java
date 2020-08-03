@@ -60,6 +60,11 @@ public class WriteRunningTx extends AbstractWriteTx {
         lock();
     }
 
+    @Override
+    public List<ListenableFuture<? extends DOMRpcResult>> getResultsFutures() {
+        return resultsFutures;
+    }
+
     private void lock() {
         if (isLockAllowed) {
             resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));

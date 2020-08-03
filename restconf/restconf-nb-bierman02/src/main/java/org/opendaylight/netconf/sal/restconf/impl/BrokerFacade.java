@@ -49,6 +49,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -966,8 +967,15 @@ public class BrokerFacade implements Closeable {
             throw new RestconfDocumentedException("Could not determine the existence of path " + path, e);
         } catch (ExecutionException e) {
             rwTransaction.cancel();
-            throw RestconfDocumentedException.decodeAndThrow("Could not determine the existence of path " + path,
-                Throwables.getCauseAs(e, ReadFailedException.class));
+
+            final ReadFailedException cause = Throwables.getCauseAs(e, ReadFailedException.class);
+            // FIXME: this should have a dedicated exception
+            if (cause.getMessage().contains(XmlNetconfConstants.LOCK_DENIED)) {
+                throw RestconfDocumentedException.decodeAndThrow("Error reading data", cause);
+            } else {
+                throw RestconfDocumentedException.decodeAndThrow("Could not determine the existence of path " + path,
+                    cause);
+            }
         }
     }
 
