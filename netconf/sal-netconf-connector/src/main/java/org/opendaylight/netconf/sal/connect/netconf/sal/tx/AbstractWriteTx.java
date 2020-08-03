@@ -89,6 +89,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
     protected abstract void init();
 
+    public abstract List<ListenableFuture<? extends DOMRpcResult>> getResultsFutures();
+
     protected abstract void cleanup();
 
     @Override

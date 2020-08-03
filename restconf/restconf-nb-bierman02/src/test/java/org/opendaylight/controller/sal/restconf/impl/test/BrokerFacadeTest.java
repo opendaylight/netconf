@@ -16,8 +16,10 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -34,6 +36,7 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -55,6 +58,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
@@ -103,6 +107,8 @@ public class BrokerFacadeTest {
     private DOMDataTreeWriteTransaction writeTransaction;
     @Mock
     private DOMDataTreeReadWriteTransaction rwTransaction;
+    @Mock
+    private FluentFuture<Boolean> existsFluentFuture;
 
     private BrokerFacade brokerFacade;
     private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
@@ -298,6 +304,13 @@ public class BrokerFacadeTest {
     private void prepareDataForDelete(final boolean assumeDataExists) {
         when(this.rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, this.instanceID))
                 .thenReturn(immediateBooleanFluentFuture(assumeDataExists));
+    }
+
+    @Test
+    public void testExitsforLockDenied() throws Exception {
+        doThrow(new ExecutionException(XmlNetconfConstants.LOCK_DENIED, null)).when(existsFluentFuture).get();
+        this.rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, this.instanceID);
+        verify(rwTransaction, never()).cancel();
     }
 
     @Test

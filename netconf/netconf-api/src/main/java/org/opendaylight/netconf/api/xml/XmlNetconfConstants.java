@@ -34,6 +34,12 @@ public final class XmlNetconfConstants {
 
     public static final String RPC_REPLY_KEY = "rpc-reply";
 
+    /**
+     * The error-tag reported by device in response to a lock request.
+     */
+    public static final String LOCK_DENIED_ERROR_TAG = "lock-denied";
+
+
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0 = "urn:ietf:params:xml:ns:netconf:base:1.0";
     public static final String URN_IETF_PARAMS_NETCONF_BASE_1_0 = "urn:ietf:params:netconf:base:1.0";
     public static final String URN_IETF_PARAMS_NETCONF_BASE_1_1 = "urn:ietf:params:netconf:base:1.1";

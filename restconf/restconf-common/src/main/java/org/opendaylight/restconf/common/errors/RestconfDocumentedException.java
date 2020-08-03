@@ -167,9 +167,14 @@ public class RestconfDocumentedException extends WebApplicationException {
             final OperationFailedException cause) {
         for (final RpcError error : cause.getErrorList()) {
             if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
-                    && error.getTag().equals(ErrorTag.RESOURCE_DENIED.getTagValue())) {
+                    && ErrorTag.RESOURCE_DENIED.getTagValue().equals(error.getTag())) {
                 throw new RestconfDocumentedException(error.getMessage(), ErrorType.TRANSPORT,
                     ErrorTag.RESOURCE_DENIED_TRANSPORT, cause);
+            }
+            if (error.getErrorType() == RpcError.ErrorType.PROTOCOL
+                && ErrorTag.LOCK_DENIED.getTagValue().equals(error.getTag())) {
+                throw new RestconfDocumentedException(error.getMessage(), ErrorType.TRANSPORT,
+                    ErrorTag.LOCK_DENIED, cause);
             }
         }
         throw new RestconfDocumentedException(message, cause, cause.getErrorList());
