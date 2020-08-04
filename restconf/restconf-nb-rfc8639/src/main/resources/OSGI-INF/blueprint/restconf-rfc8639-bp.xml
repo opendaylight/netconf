@@ -16,12 +16,15 @@
         <argument ref="dOMSchemaService"/>
         <argument ref="dOMMountPointService"/>
         <argument ref="dOMRpcProviderService"/>
+        <argument ref="rpcServiceHandlerService"/>
     </bean>
 
     <reference id="txChainHandlerService" ext:proxy-method='classes'
       interface="org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler"/>
     <reference id="schemaCtxHandlerService" ext:proxy-method='classes'
       interface="org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler"/>
+    <reference id="rpcServiceHandlerService" ext:proxy-method='classes'
+      interface="org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler"/>
 
     <bean id="rfc8639webInitializer" class="org.opendaylight.restconf.nb.rfc8639.RFC8639WebInitializer" 
       destroy-method="close">
