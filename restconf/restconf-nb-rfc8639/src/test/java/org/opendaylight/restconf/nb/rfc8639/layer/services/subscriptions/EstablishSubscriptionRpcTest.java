@@ -7,9 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doReturn;
@@ -21,14 +18,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -38,12 +34,13 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.EstablishSubscriptionRpc.StreamWrapper;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -53,17 +50,23 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class EstablishSubscriptionRpcTest {
+    private static final DOMRpcIdentifier RPC_ESTABLISH = DOMRpcIdentifier.create(SchemaPath.create(
+            true, QName.create(EstablishSubscriptionInput.QNAME.getModule(), "establish-subscription")));
+
     // the application uses only one replay buffer for all notifications
     private static final Map<QName, ReplayBuffer> REPLAY_BUFFERS_FOR_NOTIFICATIONS = new ConcurrentHashMap<>();
 
-    private SubscriptionsHolder subscriptionsHolder;
-    private ListeningExecutorService executor;
+    // the application uses only one subscription holder
+    private static final SubscriptionsHolder SUBSCRIPTIONS_HOLDER = new SubscriptionsHolder(
+            new SubscriptionIdGenerator.Random());
+
+    private static final ListeningExecutorService EXECUTOR = MoreExecutors.listeningDecorator(
+            Executors.newFixedThreadPool(1));
 
     @Mock
     private DOMTransactionChain domTransactionChain;
@@ -81,46 +84,14 @@ public class EstablishSubscriptionRpcTest {
     private DOMNotificationService domNotificationService;
 
     @Mock
-    private EffectiveModelContext mockEffectiveModelContext;
+    private DOMRpcService domRpcService;
 
-    @Before
-    public void setup() {
-        subscriptionsHolder = new SubscriptionsHolder(new SubscriptionIdGenerator.Random());
-        executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1));
-    }
+    private static EffectiveModelContext effectiveModelContext;
 
-    @Test
-    public void getNotificationDefinitionForStreamNameTest() {
-        doReturn(mockEffectiveModelContext).when(domSchemaService).getGlobalContext();
-        resolveNotifiDefWithTests("test:test");
-    }
-
-    @Test
-    public void getNotificationDefinitionForStreamNameWithMPTest() {
-        final DOMMountPoint domMP = mock(DOMMountPoint.class);
-        final Optional<DOMMountPoint> domMPOpt = Optional.of(domMP);
-        doReturn(domMPOpt).when(domMountPointService).getMountPoint(any());
-        doReturn(mockEffectiveModelContext).when(domMP).getEffectiveModelContext();
-        final Optional<DOMNotificationService> domNotifiServiceMPOpt = Optional.of(domNotificationService);
-        doReturn(domNotifiServiceMPOpt).when(domMP).getService(DOMNotificationService.class);
-        final DOMRpcService domRpcService = mock(DOMRpcService.class);
-        final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);
-        final ListenableFuture<? extends DOMRpcResult> rpcResultFuture = Futures.immediateFuture(domRpcResult);
-        doReturn(rpcResultFuture).when(domRpcService).invokeRpc(any(), any());
-        final Optional<DOMRpcService> domRpcServiceOpt = Optional.of(domRpcService);
-        doReturn(domRpcServiceOpt).when(domMP).getService(DOMRpcService.class);
-
-        resolveNotifiDefWithTests(
-                "network-topology:network-topology/topology=topology-netconf/node=device1/yang-ext:mount/test:test");
-    }
-
-    @Test
-    public void processRpcTest() {
-        final EstablishSubscriptionRpc establishSubscriptionRpc = new EstablishSubscriptionRpc(subscriptionsHolder,
-                REPLAY_BUFFERS_FOR_NOTIFICATIONS, domNotificationService, domSchemaService,
-                domMountPointService, transactionChainHandler, executor);
-        final EffectiveModelContext effectiveModelContext = YangParserTestUtils.parseYangResources(
-                getClass(),
+    @BeforeClass
+    public static void beforeClass() {
+        effectiveModelContext = YangParserTestUtils.parseYangResources(
+                EstablishSubscriptionRpcTest.class,
                 "/ietf-interfaces@2018-02-20.yang",
                 "/ietf-inet-types@2013-07-15.yang",
                 "/ietf-ip@2018-02-22.yang",
@@ -132,18 +103,43 @@ public class EstablishSubscriptionRpcTest {
                 "/ietf-yang-types@2013-07-15.yang",
                 "/test@2018-04-04.yang"
         );
+    }
+
+    @Before
+    public void setUp() {
         doReturn(effectiveModelContext).when(domSchemaService).getGlobalContext();
+
+        final ListenableFuture<? extends DOMRpcResult> rpcResultFuture = Futures.immediateFuture(mock(DOMRpcResult.class));
+        doReturn(rpcResultFuture).when(domRpcService).invokeRpc(any(), any());
 
         final DOMDataTreeReadWriteTransaction rwTx = mock(DOMDataTreeReadWriteTransaction.class);
         final FluentFuture<? extends CommitInfo> submitFuture = FluentFuture.from(Futures.immediateFuture(null));
         doReturn(submitFuture).when(rwTx).commit();
         doReturn(domTransactionChain).when(transactionChainHandler).get();
         doReturn(rwTx).when(domTransactionChain).newReadWriteTransaction();
-        doReturn(mock(ListenerRegistration.class)).when(domNotificationService)
-                .registerNotificationListener(any(), anySet());
+        doReturn(mock(ListenerRegistration.class)).when(domNotificationService).registerNotificationListener(any(), anySet());
+    }
 
+    @Test
+    public void establishSubscriptionTest() throws Exception {
+        establishSubscription(createSubscriptionInput("NETCONF"));
+    }
+
+    @Test
+    public void establishSubscriptionMountPointTest() throws Exception {
+        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
+        doReturn(effectiveModelContext).when(mountPoint).getEffectiveModelContext();
+        doReturn(Optional.of(domNotificationService)).when(mountPoint).getService(DOMNotificationService.class);
+        doReturn(Optional.of(domRpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.of(mountPoint)).when(domMountPointService).getMountPoint(any());
+
+        establishSubscription(createSubscriptionInput(
+                "network-topology:network-topology/topology=topology-netconf/node=device1/yang-ext:mount/NETCONF"));
+    }
+
+    private NormalizedNode<?, ?> createSubscriptionInput(final String stream) {
         final LeafNode<Object> leafNode = Builders.leafBuilder().withNodeIdentifier(
-                SubscribedNotificationsModuleUtils.STREAM_LEAF_ID).withValue("test:test").build();
+                SubscribedNotificationsModuleUtils.STREAM_LEAF_ID).withValue(stream).build();
         final AugmentationIdentifier augmentationNodeId = new AugmentationIdentifier(ImmutableSet.of(
                 SubscribedNotificationsModuleUtils.STREAM_LEAF_ID.getNodeType(),
                 SubscribedNotificationsModuleUtils.REPLAY_START_TIME_LEAF_ID.getNodeType()));
@@ -153,36 +149,18 @@ public class EstablishSubscriptionRpcTest {
                 .withNodeIdentifier(SubscribedNotificationsModuleUtils.TARGET_CHOICE_ID)
                 .addChild(augmentationNode)
                 .build();
-        final ContainerNode input = Builders.containerBuilder()
+        return Builders.containerBuilder()
                 .withNodeIdentifier(SubscribedNotificationsModuleUtils.ESTABLISH_SUBSCRIPTION_INPUT)
                 .withChild(containerNode)
                 .build();
-        final DOMRpcResult rpcResult = establishSubscriptionRpc.processRpc(input);
-        final NormalizedNode<?, ?> resultNN = rpcResult.getResult();
-        assertNotNull(resultNN);
     }
 
-    private void resolveNotifiDefWithTests(final String stream) {
-        final Set<Module> modules = new HashSet<>();
-        final Module module = mock(Module.class);
-        final Collection<NotificationDefinition> notifications = new HashSet<>();
-        final NotificationDefinition notification = mock(NotificationDefinition.class);
-        final QName notifiQName = QName.create("t:s:t", "2018-04-04", "test");
-        doReturn(notifiQName).when(notification).getQName();
-        notifications.add(notification);
-        doReturn(notifications).when(module).getNotifications();
-        modules.add(module);
-        doReturn(modules).when(mockEffectiveModelContext).findModules("test");
-        final EstablishSubscriptionRpc establishSubscriptionRpc = new EstablishSubscriptionRpc(subscriptionsHolder,
+    private void establishSubscription(final NormalizedNode<?, ?> input) throws Exception {
+        final EstablishSubscriptionRpc establishSubscriptionRpc = new EstablishSubscriptionRpc(SUBSCRIPTIONS_HOLDER,
                 REPLAY_BUFFERS_FOR_NOTIFICATIONS, domNotificationService, domSchemaService,
-                domMountPointService, transactionChainHandler, executor);
-        final Optional<StreamWrapper> wrapperOpt = establishSubscriptionRpc
-                .getNotificationDefinitionForStreamName(stream);
-        assertTrue(wrapperOpt.isPresent());
-        final StreamWrapper wrapper = wrapperOpt.get();
-        assertEquals(domNotificationService, wrapper.getDomNotificationService());
-        assertEquals(notifiQName, wrapper.getNotificationDefOpt().get().getQName());
-        assertEquals(notification, wrapper.getNotificationDefOpt().get());
-        assertEquals(mockEffectiveModelContext, wrapper.getEffectiveModelContext());
+                domMountPointService, transactionChainHandler, EXECUTOR, domRpcService);
+
+        final DOMRpcResult result = establishSubscriptionRpc.invokeRpc(RPC_ESTABLISH, input).get();
+        Assert.assertTrue(result.getErrors().isEmpty());
     }
 }
