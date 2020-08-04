@@ -80,6 +80,11 @@ import org.slf4j.LoggerFactory;
 public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
     private static final Logger LOG = LoggerFactory.getLogger(EstablishSubscriptionRpc.class);
     private static final NodeIdentifier OUTPUT = NodeIdentifier.create(EstablishSubscriptionOutput.QNAME);
+    private static final QName CREATE_SUBSCRIPTION = QName.create(CreateSubscriptionInput.QNAME,
+            "create-subscription").intern();
+    private static final NodeIdentifier CREATE_SUBSCRIPTION_ID = NodeIdentifier.create(CREATE_SUBSCRIPTION);
+    private static final QName STREAM = QName.create(CREATE_SUBSCRIPTION, "stream").intern();
+    private static final NodeIdentifier STREAM_ID = NodeIdentifier.create(STREAM);
 
     private String getSessionId() {
         return "0";
@@ -92,12 +97,13 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
     private final TransactionChainHandler transactionChainHandler;
     private final DOMSchemaService domSchemaService;
     private final ListeningExecutorService executorService;
+    private final DOMRpcService domRpcService;
 
     public EstablishSubscriptionRpc(final SubscriptionsHolder subscriptionsHolder,
             final Map<QName, ReplayBuffer> replayBuffersForNotifications,
             final DOMNotificationService domNotificationService, final DOMSchemaService domSchemaService,
             final DOMMountPointService domMountPointService, final TransactionChainHandler transactionChainHandler,
-            final ListeningExecutorService executorService) {
+            final ListeningExecutorService executorService, final DOMRpcService domRpcService) {
         this.subscriptionsHolder = requireNonNull(subscriptionsHolder);
         this.replayBuffersForNotifications = requireNonNull(replayBuffersForNotifications);
         this.domNotificationService = requireNonNull(domNotificationService);
@@ -105,6 +111,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
         this.domMountPointService = requireNonNull(domMountPointService);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.executorService = requireNonNull(executorService);
+        this.domRpcService = domRpcService;
     }
 
     @SuppressWarnings("serial")
@@ -411,78 +418,68 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
 
     @VisibleForTesting
     public Optional<StreamWrapper> getNotificationDefinitionForStreamName(final String rawStreamName) {
-        final EffectiveModelContext effectiveModelContext;
-        final DOMNotificationService notificationService;
-        final String[] prefixAndName;
         if (rawStreamName.contains("yang-ext:mount")) {
-            prefixAndName = rawStreamName.split("yang-ext:mount/")[1].split(":");
-            String substring = rawStreamName.substring(rawStreamName.indexOf("topology=") + 9);
-            final String topologyId = substring.substring(0, substring.indexOf('/'));
-            substring = rawStreamName.substring(rawStreamName.indexOf("node=") + 5);
-            final String nodeId = substring.substring(0, substring.indexOf('/'));
+            final String streamName = rawStreamName.split("yang-ext:mount/")[1];
+            final String topologySubstring = rawStreamName.substring(rawStreamName.indexOf("topology=") + 9);
+            final String topologyId = topologySubstring.substring(0, topologySubstring.indexOf('/'));
+            final String nodeSubstring = rawStreamName.substring(rawStreamName.indexOf("node=") + 5);
+            final String nodeId = nodeSubstring.substring(0, topologySubstring.indexOf('/'));
             final YangInstanceIdentifier topologyNodeYIID = createTopologyNodeYIID(topologyId, nodeId);
             final Optional<DOMMountPoint> mountPointOpt = domMountPointService.getMountPoint(topologyNodeYIID);
 
-            if (mountPointOpt.isPresent()) {
-                final DOMMountPoint domMountPoint = mountPointOpt.get();
-                effectiveModelContext = domMountPoint.getEffectiveModelContext();
-                final Optional<DOMNotificationService> domNotifiServiceOpt = domMountPoint
-                        .getService(DOMNotificationService.class);
-                if (domNotifiServiceOpt.isEmpty()) {
-                    LOG.error("Missing DOMNotificationService for specific mount point.");
-                    return Optional.empty();
-                }
-                notificationService = domNotifiServiceOpt.get();
-
-                final DOMRpcService domRpcService = domMountPoint.getService(DOMRpcService.class).get();
-                final QName createSubscription = QName.create(CreateSubscriptionInput.QNAME, "create-subscription");
-                final NodeIdentifier createSubsId = NodeIdentifier.create(createSubscription);
-                final QName streamQName = QName.create(createSubscription, "stream");
-                final NodeIdentifier streamId = NodeIdentifier.create(streamQName);
-                if (prefixAndName.length != 2) {
-                    LOG.error("Stream has to have format : moduleName:notificationName.");
-                    return Optional.empty();
-                }
-                final String streamValue = prefixAndName[0] + ':' + prefixAndName[1];
-                final DataContainerChild<?, ?> stream = Builders.leafBuilder().withNodeIdentifier(streamId)
-                        .withValue(streamValue).build();
-                final ContainerNode rpcInput = Builders.containerBuilder().withNodeIdentifier(createSubsId)
-                        .withChild(stream).build();
-                final ListenableFuture<? extends DOMRpcResult> invokeRpc = domRpcService.invokeRpc(
-                        SchemaPath.create(true, createSubscription), rpcInput);
-
-                Futures.addCallback(invokeRpc, new FutureCallback<DOMRpcResult>() {
-
-                    @Override
-                    public void onSuccess(final DOMRpcResult result) {
-                        if (result.getErrors().isEmpty()) {
-                            LOG.info("Create subscription on device was successful");
-                        } else {
-                            LOG.error("Create subscription on device was not successful");
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(final Throwable thrown) {
-                        throw new RuntimeException(thrown);
-                    }
-                }, Executors.newSingleThreadExecutor());
-            } else {
+            if (mountPointOpt.isEmpty()) {
                 LOG.error("Mount point {} in {} does not exist.", topologyId, nodeId);
                 return Optional.empty();
             }
-        } else {
-            effectiveModelContext = domSchemaService.getGlobalContext();
-            notificationService = domNotificationService;
-            prefixAndName = rawStreamName.split(":");
+
+            final DOMMountPoint domMountPoint = mountPointOpt.get();
+            final Optional<DOMNotificationService> notificationServiceOpt = domMountPoint
+                    .getService(DOMNotificationService.class);
+            if (notificationServiceOpt.isEmpty()) {
+                LOG.error("Missing DOMNotificationService for mount point {}.", topologyNodeYIID);
+                return Optional.empty();
+            }
+
+            final Optional<DOMRpcService> rpcServiceOptional = domMountPoint.getService(DOMRpcService.class);
+            if (rpcServiceOptional.isEmpty()) {
+                LOG.error("Missing DOMRpcService for mount point {}.", topologyNodeYIID);
+                return Optional.empty();
+            }
+
+            subscribeToStream(streamName, rpcServiceOptional.get());
+            return Optional.of(new StreamWrapper(domMountPoint.getEffectiveModelContext(), notificationServiceOpt.get()));
         }
 
-        if (prefixAndName.length != 2) {
-            LOG.error("Stream has to have format : moduleName:notificationName.");
-            return Optional.empty();
-        }
+        subscribeToStream(rawStreamName, domRpcService);
+        return Optional.of(new StreamWrapper(domSchemaService.getGlobalContext(), domNotificationService));
+    }
 
-        return Optional.of(new StreamWrapper(effectiveModelContext, notificationService));
+    private void subscribeToStream(final String streamName, final DOMRpcService domRpcService) {
+        final DataContainerChild<?, ?> stream = Builders.leafBuilder()
+                .withNodeIdentifier(STREAM_ID).withValue(streamName).build();
+
+        final ContainerNode rpcInput = Builders.containerBuilder()
+                .withNodeIdentifier(CREATE_SUBSCRIPTION_ID).withChild(stream).build();
+
+        final ListenableFuture<? extends DOMRpcResult> invokeRpc = domRpcService.invokeRpc(
+                SchemaPath.create(true, CREATE_SUBSCRIPTION), rpcInput);
+
+        Futures.addCallback(invokeRpc, new FutureCallback<DOMRpcResult>() {
+
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (result.getErrors().isEmpty()) {
+                    LOG.info("Create subscription on device was successful");
+                } else {
+                    LOG.error("Create subscription on device was not successful");
+                }
+            }
+
+            @Override
+            public void onFailure(final Throwable thrown) {
+                throw new RuntimeException(thrown);
+            }
+        }, Executors.newSingleThreadExecutor());
     }
 
     private static YangInstanceIdentifier createTopologyNodeYIID(final String topologyId, final String nodeId) {
