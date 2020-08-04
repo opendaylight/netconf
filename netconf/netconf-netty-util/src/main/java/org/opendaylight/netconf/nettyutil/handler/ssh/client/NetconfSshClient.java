@@ -10,6 +10,8 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 import com.google.common.annotations.Beta;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.common.Factory;
+import org.opendaylight.netconf.shaded.sshd.common.forward.PortForwardingEventListener;
+import org.opendaylight.netconf.shaded.sshd.common.util.net.SshdSocketAddress;
 
 /**
  * An extension to {@link SshClient} which uses {@link NetconfSessionFactory} to create sessions (leading towards
@@ -18,6 +20,22 @@ import org.opendaylight.netconf.shaded.sshd.common.Factory;
 @Beta
 public class NetconfSshClient extends SshClient {
     public static final Factory<SshClient> DEFAULT_NETCONF_SSH_CLIENT_FACTORY = NetconfSshClient::new;
+
+    /*
+     * This is a workaround for sshd-core's instantiation of Proxies. AbstractFactoryManager (which is our superclass)
+     * is calling Proxy.newProxyInstance() with getClass().getClassLoader(), i.e. our class loader.
+     *
+     * Since we are not using PortForwardingEventListener, our classloader does not see it (because we do not import
+     * that package), which leads to an instantiation failure.
+     *
+     * Having these dumb fields alleviates the problem, as it forces the packages to be imported by our bundle.
+     *
+     * FIXME: Remove this once we have an SSHD version with  https://issues.apache.org/jira/browse/SSHD-975 fixed
+     */
+    static final class Sshd975Workarounds {
+        static final PortForwardingEventListener PFEL = null;
+        static final SshdSocketAddress SSA = null;
+    }
 
     @Override
     protected NetconfSessionFactory createSessionFactory() {
