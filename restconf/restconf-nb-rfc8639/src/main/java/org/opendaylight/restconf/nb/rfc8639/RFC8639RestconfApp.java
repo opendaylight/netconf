@@ -23,6 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementation;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -67,17 +68,19 @@ public class RFC8639RestconfApp extends Application {
     private final DOMSchemaService domSchemaService;
     private final DOMMountPointService domMountPointService;
     private final DOMRpcProviderService domRpcProviderService;
+    private final DOMRpcService domRpcService;
 
     public RFC8639RestconfApp(final TransactionChainHandler transactionChainHandler,
             final SchemaContextHandler schemaContextHandler, final DOMNotificationService domNotificationService,
             final DOMSchemaService domSchemaService, final DOMMountPointService domMountPointService,
-            final DOMRpcProviderService domRpcProviderService) {
+            final DOMRpcProviderService domRpcProviderService, final DOMRpcService domRpcService) {
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.domNotificationService = requireNonNull(domNotificationService);
         this.domSchemaService = requireNonNull(domSchemaService);
         this.domMountPointService = requireNonNull(domMountPointService);
         this.domRpcProviderService = requireNonNull(domRpcProviderService);
+        this.domRpcService = domRpcService;
     }
 
     public void init() {
@@ -86,7 +89,7 @@ public class RFC8639RestconfApp extends Application {
 
         final DOMRpcImplementation establishSubscriptionRpc = new EstablishSubscriptionRpc(NOTIFICATIONS_HOLDER,
                 REPLAY_BUFFER, domNotificationService, domSchemaService, domMountPointService, transactionChainHandler,
-                executorService);
+                executorService, domRpcService);
         domRpcProviderService.registerRpcImplementation(establishSubscriptionRpc, RPC_ESTABLISH);
 
         final DOMRpcImplementation modifySubscriptionRpc = new ModifySubscriptionRpc(NOTIFICATIONS_HOLDER,
