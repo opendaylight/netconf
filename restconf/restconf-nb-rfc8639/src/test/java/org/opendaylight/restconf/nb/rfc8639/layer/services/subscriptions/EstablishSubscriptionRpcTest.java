@@ -83,6 +83,9 @@ public class EstablishSubscriptionRpcTest {
     @Mock
     private EffectiveModelContext mockEffectiveModelContext;
 
+    @Mock
+    private DOMRpcService domRpcService;
+
     @Before
     public void setup() {
         subscriptionsHolder = new SubscriptionsHolder(new SubscriptionIdGenerator.Random());
@@ -118,7 +121,7 @@ public class EstablishSubscriptionRpcTest {
     public void processRpcTest() {
         final EstablishSubscriptionRpc establishSubscriptionRpc = new EstablishSubscriptionRpc(subscriptionsHolder,
                 REPLAY_BUFFERS_FOR_NOTIFICATIONS, domNotificationService, domSchemaService,
-                domMountPointService, transactionChainHandler, executor);
+                domMountPointService, transactionChainHandler, executor, domRpcService);
         final EffectiveModelContext effectiveModelContext = YangParserTestUtils.parseYangResources(
                 getClass(),
                 "/ietf-interfaces@2018-02-20.yang",
@@ -175,7 +178,7 @@ public class EstablishSubscriptionRpcTest {
         doReturn(modules).when(mockEffectiveModelContext).findModules("test");
         final EstablishSubscriptionRpc establishSubscriptionRpc = new EstablishSubscriptionRpc(subscriptionsHolder,
                 REPLAY_BUFFERS_FOR_NOTIFICATIONS, domNotificationService, domSchemaService,
-                domMountPointService, transactionChainHandler, executor);
+                domMountPointService, transactionChainHandler, executor, domRpcService);
         final Optional<StreamWrapper> wrapperOpt = establishSubscriptionRpc
                 .getNotificationDefinitionForStreamName(stream);
         assertTrue(wrapperOpt.isPresent());
