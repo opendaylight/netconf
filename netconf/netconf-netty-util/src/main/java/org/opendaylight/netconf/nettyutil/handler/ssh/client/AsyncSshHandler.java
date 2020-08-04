@@ -21,11 +21,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,15 +38,15 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     public static final String SUBSYSTEM = "netconf";
 
     public static final int SSH_DEFAULT_NIO_WORKERS = 8;
-    // Disable default timeouts from mina sshd
-    private static final long DEFAULT_TIMEOUT = -1L;
 
     public static final NetconfSshClient DEFAULT_CLIENT;
 
     static {
         final NetconfSshClient c = new NetconfClientBuilder().build();
-        c.getProperties().put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
-        c.getProperties().put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
+        // Disable default timeouts from mina sshd
+        c.getProperties().put(FactoryManager.AUTH_TIMEOUT, "0");
+        c.getProperties().put(FactoryManager.IDLE_TIMEOUT, "0");
+        c.getProperties().put(FactoryManager.NIO2_READ_TIMEOUT, "0");
 
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
