@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c594e0c_51d23016",
+        "filename": "docs/index.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 2759
+      },
+      "writtenOn": "2020-08-06T12:55:00Z",
+      "side": 1,
+      "message": "No need to split off a new toctree section just for a single user-guide. Add this to the toctree above.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 19
+      },
+      "revId": "dffead153c89a96786c23d3cdc7b64652737fcf3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2af65c6d_4889774d",
+        "filename": "docs/index.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 2759
+      },
+      "writtenOn": "2020-08-06T12:55:00Z",
+      "side": 1,
+      "message": "You can delete the old user guide here if all the information has been migrated to the new pages.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 13
+      },
+      "revId": "dffead153c89a96786c23d3cdc7b64652737fcf3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
