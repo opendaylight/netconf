@@ -8,5 +8,5 @@ NetConf
    :maxdepth: 1
 
    developer-guide
-   user-guide
    testtool
+   user-guide/index
