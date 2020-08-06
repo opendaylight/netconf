@@ -499,7 +499,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-nb-rfc8639</artifactId>
-                <version>1.12.0-SNAPSHOT</version>
+                <version>1.13.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -566,14 +566,14 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-restconf-nb-rfc8040</artifactId>
-                <version>1.12.0-SNAPSHOT</version>
+                <version>1.13.0-SNAPSHOT</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-restconf-nb-rfc8639</artifactId>
-                <version>1.12.0-SNAPSHOT</version>
+                <version>1.13.0-SNAPSHOT</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
