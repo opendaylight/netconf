@@ -13,12 +13,12 @@
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>restconf-parent</artifactId>
-        <version>1.12.0-SNAPSHOT</version>
+        <version>1.13.0-SNAPSHOT</version>
         <relativePath>../restconf-parent</relativePath>
     </parent>
 
     <artifactId>restconf-nb-rfc8639</artifactId>
-    <version>1.12.0-SNAPSHOT</version>
+    <version>1.13.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -32,12 +32,12 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>ietf-subscribed-notifications</artifactId>
-            <version>1.12.0-SNAPSHOT</version>
+            <version>1.13.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>ietf-yang-push</artifactId>
-            <version>1.12.0-SNAPSHOT</version>
+            <version>1.13.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
