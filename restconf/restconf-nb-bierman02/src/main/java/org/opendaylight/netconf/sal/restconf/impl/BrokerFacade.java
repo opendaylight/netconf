@@ -104,6 +104,8 @@ public class BrokerFacade implements Closeable {
     private final DOMNotificationService domNotification;
     private final ControllerContext controllerContext;
 
+    private ThreadLocal<Boolean> isMounted = new ThreadLocal<>();
+
     @Inject
     public BrokerFacade(final @Reference DOMRpcService rpcService, final DOMDataBroker domDataBroker,
             final @Reference DOMNotificationService domNotification, final ControllerContext controllerContext) {
@@ -251,11 +253,13 @@ public class BrokerFacade implements Closeable {
         Preconditions.checkNotNull(path);
         Preconditions.checkNotNull(payload);
 
+        isMounted.set(false);
         final DOMDataTreeReadWriteTransaction newReadWriteTransaction = this.domDataBroker.newReadWriteTransaction();
         final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null ? Status.OK
                 : Status.CREATED;
         final FluentFuture<? extends CommitInfo> future = putDataViaTransaction(
                 newReadWriteTransaction, CONFIGURATION, path, payload, globalSchema, insert, point);
+        isMounted.remove();
         return new PutResult(status, future);
     }
 
@@ -286,6 +290,7 @@ public class BrokerFacade implements Closeable {
         Preconditions.checkNotNull(path);
         Preconditions.checkNotNull(payload);
 
+        isMounted.set(true);
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             final DOMDataTreeReadWriteTransaction newReadWriteTransaction =
@@ -295,8 +300,10 @@ public class BrokerFacade implements Closeable {
             final FluentFuture<? extends CommitInfo> future = putDataViaTransaction(
                     newReadWriteTransaction, CONFIGURATION, path, payload, mountPoint.getSchemaContext(), insert,
                     point);
+            isMounted.remove();
             return new PutResult(status, future);
         }
+        isMounted.remove();
         throw dataBrokerUnavailable(path);
     }
 
@@ -460,18 +467,27 @@ public class BrokerFacade implements Closeable {
     public FluentFuture<? extends CommitInfo> commitConfigurationDataPost(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
-        return postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
-                globalSchema, insert, point);
+        isMounted.set(false);
+        FluentFuture<? extends CommitInfo> future =
+                postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
+                                       globalSchema, insert, point);
+        isMounted.remove();
+        return future;
     }
 
     public FluentFuture<? extends CommitInfo> commitConfigurationDataPost(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
+        isMounted.set(true);
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return postDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path,
-                    payload, mountPoint.getSchemaContext(), insert, point);
+            FluentFuture<? extends CommitInfo> future =
+                    postDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path,
+                                           payload, mountPoint.getSchemaContext(), insert, point);
+            isMounted.remove();
+            return future;
         }
+        isMounted.remove();
         throw dataBrokerUnavailable(path);
     }
 
@@ -862,7 +878,7 @@ public class BrokerFacade implements Closeable {
         throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list");
     }
 
-    private static void makeNormalPost(final DOMDataTreeReadWriteTransaction rwTransaction,
+    private void makeNormalPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
         final Collection<? extends NormalizedNode<?, ?>> children;
@@ -877,8 +893,12 @@ public class BrokerFacade implements Closeable {
 
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         if (children.isEmpty()) {
-            rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
+            if (isMounted != null && !isMounted.get()) {
+
+                rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()),
+                                    emptySubtree);
+                ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
+            }
             return;
         }
 
@@ -887,8 +907,11 @@ public class BrokerFacade implements Closeable {
 
         // ... now enqueue modifications. This relies on proper ordering of requests, i.e. these will not affect the
         // result of the existence checks...
-        rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
+        if (isMounted != null && !isMounted.get()) {
+
+            rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+            ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
+        }
         for (final NormalizedNode<?, ?> child : children) {
             // FIXME: we really want a create(YangInstanceIdentifier, NormalizedNode) method in the transaction,
             //        as that would allow us to skip the existence checks
@@ -917,11 +940,13 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private static void simplePostPut(final DOMDataTreeReadWriteTransaction rwTransaction,
+    private void simplePostPut(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
         checkItemDoesNotExists(rwTransaction, datastore, path);
-        ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
+        if (isMounted != null && !isMounted.get()) {
+            ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
+        }
         rwTransaction.put(datastore, path, payload);
     }
 
@@ -1145,12 +1170,14 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private static void makePut(final DOMDataTreeWriteTransaction tx, final LogicalDatastoreType datastore,
+    private void makePut(final DOMDataTreeWriteTransaction tx, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         if (payload instanceof MapNode) {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            ensureParentsByMerge(datastore, path, tx, schemaContext);
+            if (isMounted != null && !isMounted.get()) {
+                tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+                ensureParentsByMerge(datastore, path, tx, schemaContext);
+            }
             for (final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 tx.put(datastore, childPath, child);
@@ -1160,10 +1187,12 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private static void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
+    private void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
             final DOMDataTreeWriteTransaction tx, final SchemaContext schemaContext,
             final NormalizedNode<?, ?> payload) {
-        ensureParentsByMerge(datastore, path, tx, schemaContext);
+        if (isMounted != null && !isMounted.get()) {
+            ensureParentsByMerge(datastore, path, tx, schemaContext);
+        }
         tx.put(datastore, path, payload);
     }
 
