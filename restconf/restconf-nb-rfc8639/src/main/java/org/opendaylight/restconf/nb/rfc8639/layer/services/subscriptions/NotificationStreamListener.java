@@ -76,7 +76,6 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -96,7 +95,7 @@ public class NotificationStreamListener implements DOMNotificationListener {
 
     private final SchemaContext schemaContext;
     private final String establishedSessionId;
-    private final NotificationDefinition notificationDef;
+    private final String streamName;
     private final TransactionChainHandler transactionChainHandler;
     private final Encoding encoding;
 
@@ -110,12 +109,12 @@ public class NotificationStreamListener implements DOMNotificationListener {
     private long period = -1;
     private Uint32 subscriptionId;
 
-    public NotificationStreamListener(final EffectiveModelContext schemaContext, final String establishedSessionId,
-            final NotificationDefinition notificationDef, final TransactionChainHandler transactionChainHandler,
+    public NotificationStreamListener(final String streamName, final EffectiveModelContext schemaContext,
+            final String establishedSessionId, final TransactionChainHandler transactionChainHandler,
             final Encoding encoding) {
         this.schemaContext = requireNonNull(schemaContext);
         this.establishedSessionId = requireNonNull(establishedSessionId);
-        this.notificationDef = requireNonNull(notificationDef);
+        this.streamName = streamName;
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.encoding = requireNonNull(encoding);
     }
@@ -175,8 +174,8 @@ public class NotificationStreamListener implements DOMNotificationListener {
         if ((replayStartTime != null) && (replayBufferForStream != null)) {
             if (replayStartTime.isAfter(replayBufferForStream.getNewestNotificationTimeStamp())) {
                 LOG.warn("Parameter replay-start-time is later than the oldest record stored within the publisher's "
-                                + "replay buffer for the notification {}. The latest record in the buffer is {}.",
-                        notificationDef.getQName(), replayBufferForStream.getNewestNotificationTimeStamp());
+                                + "replay buffer for the stream {}. The latest record in the buffer is {}.",
+                        streamName, replayBufferForStream.getNewestNotificationTimeStamp());
                 sendReplayCompletedNotification();
             } else {
                 pushNotificationsFromReplayBuffer();
@@ -502,10 +501,6 @@ public class NotificationStreamListener implements DOMNotificationListener {
         this.registration = registration;
     }
 
-    public NotificationDefinition getNotificationDefinition() {
-        return notificationDef;
-    }
-
     public void setReplayStartTime(final Instant replayStartTime) {
         this.replayStartTime = replayStartTime;
     }
@@ -559,6 +554,10 @@ public class NotificationStreamListener implements DOMNotificationListener {
 
     public void setSubscriptionId(final Uint32 id) {
         this.subscriptionId = id;
+    }
+
+    public String getStreamName() {
+        return streamName;
     }
 
     private void deleteStreamSubscriptionFromDatastore() {

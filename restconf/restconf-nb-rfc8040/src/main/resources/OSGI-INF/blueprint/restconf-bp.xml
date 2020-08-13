@@ -68,8 +68,6 @@
 
   <service id="txChainHandlerService" ref="transactionChainHandler"
     interface="org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler"/>
-  <service id="schemaCtxHandlerService" ref="schemaContextHandler"
-    interface="org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler"/>
   <service id="rpcServiceHandlerService" ref="rpcServiceHandler"
     interface="org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler"/>
 

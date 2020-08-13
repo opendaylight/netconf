@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,12 +24,10 @@ import org.opendaylight.mdsal.dom.api.DOMRpcImplementation;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.impl.SubscribedNotificationsImpl;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.EstablishSubscriptionRpc;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.ModifySubscriptionRpc;
-import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.OnEffectiveModelContextChangeNotificationTracker;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.RemoveSubscriptionRpc;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.ReplayBuffer;
 import org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions.SubscriptionIdGenerator.Random;
@@ -56,14 +53,10 @@ public class RFC8639RestconfApp extends Application {
     private static final SubscriptionsHolder SUBSCRIPTIONS_HOLDER = new SubscriptionsHolder(new Random());
 
     // replay buffer
-    private static final Map<QName, ReplayBuffer> REPLAY_BUFFER = new ConcurrentHashMap<>();
+    private static final Map<String, ReplayBuffer> REPLAY_BUFFER = new ConcurrentHashMap<>();
     public static final int BUFFER_MAX_SIZE = 10_000;
 
-    // port used to create subscription URIs to listen to
-    public static final int LISTENING_PORT = 8181;
-
     private final TransactionChainHandler transactionChainHandler;
-    private final SchemaContextHandler schemaContextHandler;
     private final DOMNotificationService domNotificationService;
     private final DOMSchemaService domSchemaService;
     private final DOMMountPointService domMountPointService;
@@ -71,11 +64,10 @@ public class RFC8639RestconfApp extends Application {
     private final RpcServiceHandler domRpcServiceHandler;
 
     public RFC8639RestconfApp(final TransactionChainHandler transactionChainHandler,
-            final SchemaContextHandler schemaContextHandler, final DOMNotificationService domNotificationService,
-            final DOMSchemaService domSchemaService, final DOMMountPointService domMountPointService,
-            final DOMRpcProviderService domRpcProviderService, final RpcServiceHandler domRpcServiceHandler) {
+            final DOMNotificationService domNotificationService, final DOMSchemaService domSchemaService,
+            final DOMMountPointService domMountPointService, final DOMRpcProviderService domRpcProviderService,
+            final RpcServiceHandler domRpcServiceHandler) {
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
-        this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.domNotificationService = requireNonNull(domNotificationService);
         this.domSchemaService = requireNonNull(domSchemaService);
         this.domMountPointService = requireNonNull(domMountPointService);
@@ -103,17 +95,12 @@ public class RFC8639RestconfApp extends Application {
         final DOMRpcImplementation killSubscriptionRpc = new RemoveSubscriptionRpc(SUBSCRIPTIONS_HOLDER,
                 executorService, true);
         domRpcProviderService.registerRpcImplementation(killSubscriptionRpc, RPC_KILL);
-
-        final OnEffectiveModelContextChangeNotificationTracker onEffectiveModelContextChangeNotificationTracker =
-                new OnEffectiveModelContextChangeNotificationTracker(domNotificationService,
-                        transactionChainHandler, REPLAY_BUFFER, new InetSocketAddress(LISTENING_PORT), BUFFER_MAX_SIZE);
-        domSchemaService.registerSchemaContextListener(onEffectiveModelContextChangeNotificationTracker);
     }
 
     @Override
     public Set<Object> getSingletons() {
         return ImmutableSet.builder()
-                .add(new SubscribedNotificationsImpl(schemaContextHandler, SUBSCRIPTIONS_HOLDER))
+                .add(new SubscribedNotificationsImpl(SUBSCRIPTIONS_HOLDER))
                 .build();
     }
 }
