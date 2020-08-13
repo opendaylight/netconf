@@ -29,7 +29,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,10 +76,8 @@ public final class RemoveSubscriptionRpc implements DOMRpcImplementation {
         final NotificationStreamListener listener = notificationWrapper.getSubscriptionNotificationListener();
         if (listener.deleteSubscription(getSessionId(), isKill)) {
             subscriptionsHolder.removeNotification(subscriptionId);
-
-            final NotificationDefinition notificationDefinition = listener.getNotificationDefinition();
             LOG.info("Subscription with id {} to notification stream {} has been deleted successfully.", subscriptionId,
-                    notificationDefinition.getQName());
+                    listener.getStreamName());
             return createSuccessResponse();
         } else {
             LOG.info("Subscription can not be deleted by a subscriber who did not establish it.");
