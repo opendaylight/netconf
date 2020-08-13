@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -59,7 +59,7 @@ public class EstablishSubscriptionRpcTest {
             true, QName.create(EstablishSubscriptionInput.QNAME.getModule(), "establish-subscription")));
 
     // the application uses only one replay buffer for all notifications
-    private static final Map<QName, ReplayBuffer> REPLAY_BUFFERS_FOR_NOTIFICATIONS = new ConcurrentHashMap<>();
+    private static final Map<String, ReplayBuffer> REPLAY_BUFFERS_FOR_NOTIFICATIONS = new ConcurrentHashMap<>();
 
     // the application uses only one subscription holder
     private static final SubscriptionsHolder SUBSCRIPTIONS_HOLDER = new SubscriptionsHolder(
@@ -118,7 +118,7 @@ public class EstablishSubscriptionRpcTest {
         doReturn(domTransactionChain).when(transactionChainHandler).get();
         doReturn(rwTx).when(domTransactionChain).newReadWriteTransaction();
         doReturn(mock(ListenerRegistration.class)).when(domNotificationService)
-                .registerNotificationListener(any(), anySet());
+                .registerNotificationListener(any(), anyCollection());
     }
 
     @Test
