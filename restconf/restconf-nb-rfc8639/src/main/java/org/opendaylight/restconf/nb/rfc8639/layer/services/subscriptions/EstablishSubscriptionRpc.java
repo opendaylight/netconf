@@ -10,14 +10,15 @@ package org.opendaylight.restconf.nb.rfc8639.layer.services.subscriptions;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -69,7 +70,7 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +90,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
     }
 
     private final SubscriptionsHolder subscriptionsHolder;
-    private final Map<QName, ReplayBuffer> replayBuffersForNotifications;
+    private final Map<String, ReplayBuffer> replayBuffersForNotifications;
     private final DOMNotificationService domNotificationService;
     private final DOMMountPointService domMountPointService;
     private final TransactionChainHandler transactionChainHandler;
@@ -98,7 +99,7 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
     private final DOMRpcService domRpcService;
 
     public EstablishSubscriptionRpc(final SubscriptionsHolder subscriptionsHolder,
-            final Map<QName, ReplayBuffer> replayBuffersForNotifications,
+            final Map<String, ReplayBuffer> replayBuffersForNotifications,
             final DOMNotificationService domNotificationService, final DOMSchemaService domSchemaService,
             final DOMMountPointService domMountPointService, final TransactionChainHandler transactionChainHandler,
             final ListeningExecutorService executorService, final DOMRpcService domRpcService) {
@@ -149,19 +150,18 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
             encoding = Encoding.ENCODE_XML;
         }
 
-        // TODO get list of all notifications
-        final NotificationDefinition notifications = wrapper.getNotificationDefOpt().get();
-        final NotificationStreamListener listener = new NotificationStreamListener(wrapper.getEffectiveModelContext(),
-                getSessionId(), notifications, transactionChainHandler, encoding);
+        final Set<SchemaPath> notifications = wrapper.getNotifications();
+        final NotificationStreamListener listener = new NotificationStreamListener(rawStreamName,
+                wrapper.getEffectiveModelContext(), getSessionId(), transactionChainHandler, encoding);
 
         final ListenerRegistration<NotificationStreamListener> registration = wrapper.getDomNotificationService()
-                .registerNotificationListener(listener, ImmutableSet.of(notifications.getPath()));
+                .registerNotificationListener(listener, notifications);
         listener.setRegistration(registration);
 
         final RegisteredNotificationWrapper registeredNotificationWrapper = new RegisteredNotificationWrapper(listener,
                 registration);
 
-        final ReplayStartTimeRevision replayStartTimeRevision = evaluateReplay(input, notifications, listener);
+        final ReplayStartTimeRevision replayStartTimeRevision = evaluateReplay(input, rawStreamName, listener);
         if (replayStartTimeRevision == null) {
             return createErrorResponse(ErrorCode.REPLAY_UNSUPPORTED);
         }
@@ -211,21 +211,20 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
      * @return {@link ReplayStartTimeRevision} or {@code null} if replay is not supported
      */
     private ReplayStartTimeRevision evaluateReplay(final NormalizedNode<?, ?> input,
-            final NotificationDefinition notificationDef, final NotificationStreamListener listener) {
+            final String stream, final NotificationStreamListener listener) {
         final Optional<NormalizedNode<?, ?>> replayStartTimeOpt = getReplayStartTime(input);
         if (replayStartTimeOpt.isPresent()) {
             // yangtools json/xml codec ensures that the String value of replay-start-time conforms to the regex
             // pattern of date-and-time type
             final String rawReplayStartTime = ((LeafNode<String>) replayStartTimeOpt.get()).getValue();
             final Instant replayStartTime = Instant.parse(rawReplayStartTime);
-            final ReplayBuffer replayBufferForStream = replayBuffersForNotifications
-                    .get(notificationDef.getQName());
+            final ReplayBuffer replayBufferForStream = replayBuffersForNotifications.get(stream);
 
             if (replayBufferForStream == null) {
-                LOG.info("Replay buffer for notification stream {} does not exist.", notificationDef.getQName());
+                LOG.info("Replay buffer for notification stream {} does not exist.", stream);
                 return null;
             } else if (replayBufferForStream.isEmpty()) {
-                LOG.info("Replay buffer for notification stream {} is empty.", notificationDef.getQName());
+                LOG.info("Replay buffer for notification stream {} is empty.", stream);
                 return null;
             } else {
                 final Instant oldestNotificationTimeStamp = replayBufferForStream.getOldestNotificationTimeStamp();
@@ -233,18 +232,18 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
                     LOG.error("Parameter replay-start-time ({}) is earlier than the oldest record stored within the "
                                     + "publisher's replay buffer for the notification {}."
                                     + "The oldest record in the buffer is {}.",
-                            replayStartTime, notificationDef.getQName(), oldestNotificationTimeStamp);
+                            replayStartTime, stream, oldestNotificationTimeStamp);
                     listener.setReplayStartTime(oldestNotificationTimeStamp);
                     listener.setReplayBufferForStream(replayBufferForStream);
                     LOG.info("Parameter replay-start-time for notification stream {} was set to: {}.",
-                            notificationDef.getQName(), oldestNotificationTimeStamp);
+                            stream, oldestNotificationTimeStamp);
 
                     return new ReplayStartTimeRevision(oldestNotificationTimeStamp, true);
                 } else {
                     listener.setReplayStartTime(replayStartTime);
                     listener.setReplayBufferForStream(replayBufferForStream);
                     LOG.info("Parameter replay-start-time for notification stream {} was set to: {}.",
-                            notificationDef.getQName(), replayStartTime);
+                            stream, replayStartTime);
 
                     return new ReplayStartTimeRevision(replayStartTime, false);
                 }
@@ -499,12 +498,10 @@ public final class EstablishSubscriptionRpc implements DOMRpcImplementation {
             return effectiveModelContext;
         }
 
-        public Optional<? extends NotificationDefinition> getNotificationDefOpt() {
-            // TODO return full collection
-            return Optional.of(effectiveModelContext.getNotifications()
-                    .stream()
-                    .findFirst()
-                    .get());
+        public Set<SchemaPath> getNotifications() {
+            return effectiveModelContext.getNotifications().stream()
+                    .map(SchemaNode::getPath)
+                    .collect(Collectors.toSet());
         }
 
         public DOMNotificationService getDomNotificationService() {

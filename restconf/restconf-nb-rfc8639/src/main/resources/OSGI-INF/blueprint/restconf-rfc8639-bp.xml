@@ -11,7 +11,6 @@
   xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.4.0">
     <bean id="rfc8639RestconfApp" class="org.opendaylight.restconf.nb.rfc8639.RFC8639RestconfApp" init-method="init">
         <argument ref="txChainHandlerService"/>
-        <argument ref="schemaCtxHandlerService"/>
         <argument ref="dOMNotificationService"/>
         <argument ref="dOMSchemaService"/>
         <argument ref="dOMMountPointService"/>
@@ -21,8 +20,6 @@
 
     <reference id="txChainHandlerService" ext:proxy-method='classes'
       interface="org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler"/>
-    <reference id="schemaCtxHandlerService" ext:proxy-method='classes'
-      interface="org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler"/>
     <reference id="rpcServiceHandlerService" ext:proxy-method='classes'
       interface="org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler"/>
 
