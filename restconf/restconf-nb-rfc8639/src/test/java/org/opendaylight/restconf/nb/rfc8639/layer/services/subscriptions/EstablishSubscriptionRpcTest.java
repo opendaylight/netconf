@@ -59,7 +59,7 @@ public class EstablishSubscriptionRpcTest {
             true, QName.create(EstablishSubscriptionInput.QNAME.getModule(), "establish-subscription")));
 
     // the application uses only one replay buffer for all notifications
-    private static final Map<QName, ReplayBuffer> REPLAY_BUFFERS_FOR_NOTIFICATIONS = new ConcurrentHashMap<>();
+    private static final Map<String, ReplayBuffer> REPLAY_BUFFERS_FOR_NOTIFICATIONS = new ConcurrentHashMap<>();
 
     // the application uses only one subscription holder
     private static final SubscriptionsHolder SUBSCRIPTIONS_HOLDER = new SubscriptionsHolder(
