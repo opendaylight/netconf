@@ -59,7 +59,7 @@ public class EstablishSubscriptionRpcTest {
             true, QName.create(EstablishSubscriptionInput.QNAME.getModule(), "establish-subscription")));
 
     // the application uses only one replay buffer for all notifications
-    private static final Map<QName, ReplayBuffer> REPLAY_BUFFERS_FOR_NOTIFICATIONS = new ConcurrentHashMap<>();
+    private static final Map<String, ReplayBuffer> REPLAY_BUFFERS_FOR_NOTIFICATIONS = new ConcurrentHashMap<>();
 
     // the application uses only one subscription holder
     private static final SubscriptionsHolder SUBSCRIPTIONS_HOLDER = new SubscriptionsHolder(
@@ -109,15 +109,16 @@ public class EstablishSubscriptionRpcTest {
     public void setUp() {
         doReturn(effectiveModelContext).when(domSchemaService).getGlobalContext();
 
-        final ListenableFuture<? extends DOMRpcResult> rpcResultFuture = Futures.immediateFuture(mock(DOMRpcResult.class));
-        doReturn(rpcResultFuture).when(domRpcService).invokeRpc(any(), any());
+        final ListenableFuture<? extends DOMRpcResult> rpcResult = Futures.immediateFuture(mock(DOMRpcResult.class));
+        doReturn(rpcResult).when(domRpcService).invokeRpc(any(), any());
 
         final DOMDataTreeReadWriteTransaction rwTx = mock(DOMDataTreeReadWriteTransaction.class);
-        final FluentFuture<? extends CommitInfo> submitFuture = FluentFuture.from(Futures.immediateFuture(null));
-        doReturn(submitFuture).when(rwTx).commit();
+        final FluentFuture<? extends CommitInfo> submit = FluentFuture.from(Futures.immediateFuture(null));
+        doReturn(submit).when(rwTx).commit();
         doReturn(domTransactionChain).when(transactionChainHandler).get();
         doReturn(rwTx).when(domTransactionChain).newReadWriteTransaction();
-        doReturn(mock(ListenerRegistration.class)).when(domNotificationService).registerNotificationListener(any(), anySet());
+        doReturn(mock(ListenerRegistration.class)).when(domNotificationService)
+                .registerNotificationListener(any(), anySet());
     }
 
     @Test
