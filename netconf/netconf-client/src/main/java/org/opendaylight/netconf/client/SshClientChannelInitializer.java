@@ -13,17 +13,18 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
+import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 
 final class SshClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
+
     private final AuthenticationHandler authenticationHandler;
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
     private final NetconfClientSessionListener sessionListener;
-    private final NetconfSshClient sshClient;
+    private final SshClient sshClient;
 
     SshClientChannelInitializer(final AuthenticationHandler authHandler,
             final NetconfClientSessionNegotiatorFactory negotiatorFactory,
-            final NetconfClientSessionListener sessionListener, @Nullable final NetconfSshClient sshClient) {
+            final NetconfClientSessionListener sessionListener, @Nullable final SshClient sshClient) {
         this.authenticationHandler = authHandler;
         this.negotiatorFactory = negotiatorFactory;
         this.sessionListener = sessionListener;
