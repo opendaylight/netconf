@@ -198,6 +198,28 @@ subtree. This metadata can be found at:
 GET
 http://localhost:8181/restconf/operational/network-topology:network-topology/
 
+<network-topology xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+    <topology>
+        <topology-id>flow:1</topology-id>
+    </topology>
+    <topology>
+        <topology-id>topology-netconf</topology-id>
+    </topology>
+</network-topology>
+
+{
+    "network-topology": {
+        "topology": [
+            {
+                "topology-id": "flow:1"
+            },
+            {
+                "topology-id": "topology-netconf"
+            }
+        ]
+    }
+}
+
 Information about connection status, device capabilities, etc. can be
 found there.
 
@@ -443,6 +465,35 @@ Payload:
       <!-- keepalive-delay set to 0 turns off keepalives-->
       <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
     </node>
+
+Headers:
+
+-  Accept: application/json
+
+-  Content-Type: application/json
+
+Payload:
+
+::
+
+	{
+	    "node": [
+	        {
+	            "node-id": "new-netconf-device",
+	            "netconf-node-topology:port": 17830,
+	            "netconf-node-topology:reconnect-on-changed-schema": false,
+	            "netconf-node-topology:connection-timeout-millis": 20000,
+	            "netconf-node-topology:tcp-only": false,
+	            "netconf-node-topology:max-connection-attempts": 0,
+	            "netconf-node-topology:username": "admin",
+	            "netconf-node-topology:password": "admin",
+	            "netconf-node-topology:sleep-factor": 1.5,
+	            "netconf-node-topology:host": "127.0.0.1",
+	            "netconf-node-topology:between-attempts-timeout-millis": 2000,
+	            "netconf-node-topology:keepalive-delay": 120
+	        }
+	    ]
+	}
 
 Note that the device name in <node-id> element must match the last
 element of the restconf URL.
