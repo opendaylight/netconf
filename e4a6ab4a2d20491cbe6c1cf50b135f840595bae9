@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3589796b_39e8f6e0",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 797
+      },
+      "writtenOn": "2020-08-21T14:55:37Z",
+      "side": 1,
+      "message": "This printout is without configuring any connection, so it does not fit here.",
+      "revId": "e4a6ab4a2d20491cbe6c1cf50b135f840595bae9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "496054dd_98da1a36",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 797
+      },
+      "writtenOn": "2020-08-21T14:55:37Z",
+      "side": 1,
+      "message": "Use XML/JSON tabs to separate content",
+      "revId": "e4a6ab4a2d20491cbe6c1cf50b135f840595bae9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
