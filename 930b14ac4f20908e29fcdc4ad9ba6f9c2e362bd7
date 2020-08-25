@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "18643ea9_637d42a2",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 1030,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-08-25T14:08:46Z",
+      "side": 1,
+      "message": "Twice the same word \"supports\"",
+      "revId": "930b14ac4f20908e29fcdc4ad9ba6f9c2e362bd7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9717704_1c849e3a",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-08-25T14:08:46Z",
+      "side": 1,
+      "message": "Should we add new revision according to these changes?",
+      "revId": "930b14ac4f20908e29fcdc4ad9ba6f9c2e362bd7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
