@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.test.tool;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
@@ -14,6 +16,7 @@ import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
@@ -107,12 +110,20 @@ public class DummyMonitoringService implements NetconfMonitoringService {
 
     @Override
     public String getSchemaForCapability(final String moduleName, final Optional<String> revision) {
-
-        for (Capability capability : capabilityMultiMap.get(moduleName)) {
-            if (capability.getRevision().get().equals(revision.get())) {
-                return capability.getCapabilitySchema().get();
+        final List<Capability> capabilityList = capabilityMultiMap.get(moduleName);
+        if (revision.isPresent()) {
+            for (Capability capability : capabilityList) {
+                if (capability.getRevision().orElseThrow().equals(revision.get())) {
+                    return capability.getCapabilitySchema().orElseThrow();
+                }
             }
+        } else {
+            checkState(capabilityList.size() == 1,
+                "Expected 1 capability for module %s, available revisions : %s", moduleName, capabilityList);
+            //Only one revision is present, so return it
+            return capabilityList.iterator().next().getCapabilitySchema().orElseThrow();
         }
+
         throw new IllegalArgumentException(
             "Module with name: " + moduleName + " and revision: " + revision + " does not exist");
     }
