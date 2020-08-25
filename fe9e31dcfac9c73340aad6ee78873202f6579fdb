@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "a674aa6a_c45d4ad6",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/DummyMonitoringService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-08-25T13:45:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1cdd727e_247dd546",
+      "range": {
+        "startLine": 120,
+        "startChar": 12,
+        "endLine": 120,
+        "endChar": 36
+      },
+      "revId": "fe9e31dcfac9c73340aad6ee78873202f6579fdb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a473a20e_6137ae6b",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/DummyMonitoringService.java",
         "patchSetId": 2
@@ -45,6 +69,30 @@
       "revId": "fe9e31dcfac9c73340aad6ee78873202f6579fdb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fc9f77bf_87e001bb",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/DummyMonitoringService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-08-25T13:45:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a473a20e_6137ae6b",
+      "range": {
+        "startLine": 122,
+        "startChar": 30,
+        "endLine": 122,
+        "endChar": 41
+      },
+      "revId": "fe9e31dcfac9c73340aad6ee78873202f6579fdb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
