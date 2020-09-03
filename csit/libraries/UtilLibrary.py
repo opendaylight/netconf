@@ -103,7 +103,7 @@ def delete(url, userId="admin", password="admin"):
 
 def Should_Not_Be_Type_None(var):
     """Keyword to check if the given variable is of type NoneType.  If the
-        variable type does match  raise an assertion so the keyword will fail
+    variable type does match  raise an assertion so the keyword will fail
     """
     if var is None:
         raise AssertionError("the variable passed was type NoneType")
@@ -229,7 +229,7 @@ def kill_controller(ip, username, password, karafHome):
 
 
 def isolate_controller(controllers, username, password, isolated):
-    """ Isolate one controller from the others in the cluster
+    """Isolate one controller from the others in the cluster
 
     :param controllers: A list of ip addresses or host names as strings.
     :param username: Username for the controller to be isolated.
@@ -279,7 +279,7 @@ def isolate_controller(controllers, username, password, isolated):
 
 
 def rejoin_controller(controllers, username, password, isolated):
-    """ Return an isolated controller to the cluster.
+    """Return an isolated controller to the cluster.
 
     :param controllers: A list of ip addresses or host names as strings.
     :param username: Username for the isolated controller.
