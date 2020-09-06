@@ -58,12 +58,14 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream name and register for subscribing.
      *
-     * @param path       Path to data in data store.
-     * @param streamName The name of the stream.
-     * @param outputType Type of output on notification (JSON, XML).
+     * @param listenersBroker Stream listeners register.
+     * @param path            Path to data in data store.
+     * @param streamName      The name of the stream.
+     * @param outputType      Type of output on notification (JSON, XML).
      */
-    ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
-            final NotificationOutputType outputType) {
+    ListenerAdapter(final ListenersBroker listenersBroker, final YangInstanceIdentifier path, final String streamName,
+                    final NotificationOutputType outputType) {
+        super(listenersBroker);
         setLocalNameOfPath(path.getLastPathArgument().getNodeType().getLocalName());
 
         this.outputType = requireNonNull(outputType);

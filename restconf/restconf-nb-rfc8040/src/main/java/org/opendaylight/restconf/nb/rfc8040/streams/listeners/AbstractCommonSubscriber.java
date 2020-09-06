@@ -24,7 +24,13 @@ public abstract class AbstractCommonSubscriber extends AbstractQueryParams imple
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
     private final Set<SessionHandlerInterface> subscribers = new HashSet<>();
+    private final ListenersBroker listenersBroker;
+
     private volatile ListenerRegistration<?> registration;
+
+    AbstractCommonSubscriber(final ListenersBroker listenersBroker) {
+        this.listenersBroker = listenersBroker;
+    }
 
     @Override
     public final synchronized boolean hasSubscribers() {
@@ -42,7 +48,9 @@ public abstract class AbstractCommonSubscriber extends AbstractQueryParams imple
             this.registration.close();
             this.registration = null;
         }
-        deleteDataInDS();
+        if (transactionChainHandler != null && schemaHandler != null) {
+            deleteDataInDS();
+        }
         this.subscribers.clear();
     }
 
@@ -61,7 +69,7 @@ public abstract class AbstractCommonSubscriber extends AbstractQueryParams imple
         LOG.debug("Subscriber {} is removed", subscriber);
         subscribers.remove(subscriber);
         if (!hasSubscribers()) {
-            ListenersBroker.getInstance().removeAndCloseListener(this);
+            listenersBroker.removeAndCloseListener(this);
         }
     }
 

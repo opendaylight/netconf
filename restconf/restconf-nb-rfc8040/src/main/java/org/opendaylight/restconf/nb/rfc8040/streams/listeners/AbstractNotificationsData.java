@@ -53,7 +53,7 @@ abstract class AbstractNotificationsData {
     private static final TransformerFactory TF = TransformerFactory.newInstance();
     private static final XMLOutputFactory OF = XMLOutputFactory.newInstance();
 
-    private TransactionChainHandler transactionChainHandler;
+    protected TransactionChainHandler transactionChainHandler;
     protected SchemaContextHandler schemaHandler;
     private String localName;
 
