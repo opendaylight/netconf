@@ -97,6 +97,9 @@ final class CreateStreamUtil {
      *                     }
      *                     </pre>
      * @param refSchemaCtx Reference to {@link EffectiveModelContext}.
+     * @param transactionChainHandler Transaction chain provider.
+     * @param streamUrlResolver Stream URL resolver.
+     * @param listenersBroker Stream listeners register.
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON:
      *     <pre>
      *     {@code
@@ -111,7 +114,7 @@ final class CreateStreamUtil {
     @NonNull
     static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodeContext payload,
             final EffectiveModelContext refSchemaCtx, final TransactionChainHandler transactionChainHandler,
-            final StreamUrlResolver streamUrlResolver) {
+            final StreamUrlResolver streamUrlResolver, final ListenersBroker listenersBroker) {
         // parsing out of input RPC container that contains settings and path
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
         final QNameModule rpcPayloadModule = payload.getInstanceIdentifierContext().getSchemaNode()
@@ -122,7 +125,7 @@ final class CreateStreamUtil {
         final NotificationOutputType outputType = prepareOutputType(data);
         final String streamName = prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx),
                 data, outputType);
-        ListenersBroker.getInstance().registerDataChangeListener(path, streamName, outputType);
+        listenersBroker.registerDataChangeListener(path, streamName, outputType);
         writeDataChangeStreamMonitoringData(refSchemaCtx, outputType, streamName, path,
                 transactionChainHandler, streamUrlResolver);
         return getDataChangeStreamCreationOutput(streamName);
@@ -274,9 +277,11 @@ final class CreateStreamUtil {
      * @param updatedSchemaContext Actual schema context.
      * @param transaction          Transaction used for reading of existing notification streams.
      * @param streamUrlResolver    Stream URL resolver.
+     * @param listenersBroker      Stream listeners register.
      */
     static void createNotificationStreams(final EffectiveModelContext updatedSchemaContext,
-            final DOMDataTreeReadWriteTransaction transaction, final StreamUrlResolver streamUrlResolver) {
+            final DOMDataTreeReadWriteTransaction transaction, final StreamUrlResolver streamUrlResolver,
+            final ListenersBroker listenersBroker) {
         final Set<String> existingNotificationStreams = getExistingNotificationStreams(transaction);
         final Set<NotificationDefinition> newNotifications = collectAllNotifications(updatedSchemaContext).stream()
                 .filter(notificationDefinition -> !existingNotificationStreams.contains(
@@ -284,7 +289,7 @@ final class CreateStreamUtil {
                 .collect(Collectors.toSet());
         final Map<NotificationDefinition, List<StreamAccessMonitoringData>> streamData = newNotifications.stream()
                 .map(notificationDefinition -> getMonitoringData(updatedSchemaContext,
-                        notificationDefinition, streamUrlResolver))
+                        notificationDefinition, streamUrlResolver, listenersBroker))
                 .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
         final ContainerNode streamsContainer = RestconfMappingNodeUtil.mapNotificationStreams(
                 updatedSchemaContext, streamData);
@@ -297,16 +302,17 @@ final class CreateStreamUtil {
      * @param updatedSchemaContext   Actual schema context.
      * @param notificationDefinition Schema notification.
      * @param streamUrlResolver      Stream URL resolver.
+     * @param listenersBroker        Stream listeners register.
      * @return Notification definition and list of access information (JSON and XML).
      */
     private static SimpleEntry<NotificationDefinition, List<StreamAccessMonitoringData>> getMonitoringData(
             final EffectiveModelContext updatedSchemaContext, final NotificationDefinition notificationDefinition,
-            final StreamUrlResolver streamUrlResolver) {
+            final StreamUrlResolver streamUrlResolver, final ListenersBroker listenersBroker) {
         // creation and registration of streams
         final NotificationListenerAdapter notifiStreamXML = createYangNotifiStream(
-                notificationDefinition, updatedSchemaContext, NotificationOutputType.XML);
+                notificationDefinition, updatedSchemaContext, NotificationOutputType.XML, listenersBroker);
         final NotificationListenerAdapter notifiStreamJSON = createYangNotifiStream(
-                notificationDefinition, updatedSchemaContext, NotificationOutputType.JSON);
+                notificationDefinition, updatedSchemaContext, NotificationOutputType.JSON, listenersBroker);
 
         // building of stream locations
         final URI xmlStreamUri = streamUrlResolver.prepareUriByStreamName(notifiStreamXML.getStreamName());
@@ -368,15 +374,15 @@ final class CreateStreamUtil {
      * @param notificationDefinition YANG notification definition.
      * @param schemaContext          Actual schema context.
      * @param outputType             Output type (XML or JSON).
+     * @param listenersBroker        Stream listeners register.
      * @return {@link NotificationListenerAdapter}
      */
     private static NotificationListenerAdapter createYangNotifiStream(
             final NotificationDefinition notificationDefinition, final EffectiveModelContext schemaContext,
-            final NotificationOutputType outputType) {
+            final NotificationOutputType outputType, final ListenersBroker listenersBroker) {
         final String streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
                 requireNonNull(schemaContext), requireNonNull(outputType.getName()));
-        return ListenersBroker.getInstance().registerNotificationListener(notificationDefinition.getPath(),
-                streamName, outputType);
+        return listenersBroker.registerNotificationListener(notificationDefinition.getPath(), streamName, outputType);
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,

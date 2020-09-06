@@ -27,7 +27,7 @@ class WebSocketFactory implements WebSocketCreator {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketFactory.class);
 
     private final ScheduledExecutorService executorService;
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private final ListenersBroker listenersBroker;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
@@ -38,12 +38,14 @@ class WebSocketFactory implements WebSocketCreator {
      * @param maximumFragmentLength Maximum web-socket fragment length in number of Unicode code units (characters)
      *                              (exceeded message length leads to fragmentation of messages).
      * @param heartbeatInterval     Interval in milliseconds between sending of ping control frames.
+     * @param listenersBroker       Stream listeners register.
      */
     WebSocketFactory(final ScheduledExecutorService executorService, final int maximumFragmentLength,
-            final int heartbeatInterval) {
+                     final int heartbeatInterval, final ListenersBroker listenersBroker) {
         this.executorService = executorService;
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatInterval = heartbeatInterval;
+        this.listenersBroker = listenersBroker;
     }
 
     /**

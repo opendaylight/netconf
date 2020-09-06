@@ -31,13 +31,14 @@ import org.slf4j.LoggerFactory;
 public class RestconfDataStreamServiceImpl implements RestconfDataStreamService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataStreamServiceImpl.class);
 
-    private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
+    private final ListenersBroker listenersBroker;
     private final ScheduledExecutorService executorService;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
     @Inject
-    public RestconfDataStreamServiceImpl(final SSEInitializer configuration) {
+    public RestconfDataStreamServiceImpl(final SSEInitializer configuration, final ListenersBroker listenersBroker) {
+        this.listenersBroker = listenersBroker;
         executorService = configuration.getExecutorService();
         heartbeatInterval = configuration.getHeartbeatInterval();
         maximumFragmentLength = configuration.getMaximumFragmentLength();

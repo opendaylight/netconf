@@ -24,7 +24,13 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
     private final Set<SessionHandlerInterface> subscribers = new HashSet<>();
+    private final ListenersBroker listenersBroker;
+
     private volatile ListenerRegistration<?> registration;
+
+    AbstractCommonSubscriber(final ListenersBroker listenersBroker) {
+        this.listenersBroker = listenersBroker;
+    }
 
     @Override
     public final synchronized boolean hasSubscribers() {
@@ -61,7 +67,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
         LOG.debug("Subscriber {} is removed", subscriber);
         subscribers.remove(subscriber);
         if (!hasSubscribers()) {
-            ListenersBroker.getInstance().removeAndCloseListener(this);
+            listenersBroker.removeAndCloseListener(this);
         }
     }
 

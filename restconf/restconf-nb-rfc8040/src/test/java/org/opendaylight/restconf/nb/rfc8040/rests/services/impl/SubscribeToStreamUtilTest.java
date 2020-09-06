@@ -75,6 +75,7 @@ public class SubscribeToStreamUtilTest {
     private static final QName ROOT_NOTIFY_QNAME = QName.create(EXAMPLE_NOTIFICATIONS_MODULE, "root-notify").intern();
     private static final QName EXAMPLE_CONTAINER_QNAME = QName.create(
             EXAMPLE_NOTIFICATIONS_MODULE, "example-container").intern();
+    private static final ListenersBroker LISTENERS_BROKER = new ListenersBroker();
 
     private static EffectiveModelContext schemaContext;
     private HandlersHolder handlersHolder;
@@ -137,12 +138,13 @@ public class SubscribeToStreamUtilTest {
 
         // preparation of listeners broker state
         final SchemaPath notificationSchemaPath = SchemaPath.create(true, ROOT_NOTIFY_QNAME);
-        final NotificationListenerAdapter listenerAdapter = ListenersBroker.getInstance().registerNotificationListener(
+        final NotificationListenerAdapter listenerAdapter = LISTENERS_BROKER.registerNotificationListener(
                 notificationSchemaPath, streamName, NotificationOutputType.XML);
 
         // subscription test
         final URI actualUri = SubscribeToStreamUtil.subscribeToYangStream(streamName,
-                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo);
+                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo,
+                LISTENERS_BROKER);
         final URI expectedUri = URI.create("ws://127.0.0.1:8181/" + RestconfConstants.BASE_URI_PATTERN
                 + "/notification-stream/example-notifications:root-notify");
         assertNotNull(listenerAdapter.getStart());
@@ -162,7 +164,8 @@ public class SubscribeToStreamUtilTest {
         final SimpleUriInfo uriInfo = new SimpleUriInfo(url, new MultivaluedHashMap<>(Collections.singletonMap(
                 "start-time", startTime)));
         assertThrows(RestconfDocumentedException.class, () -> SubscribeToStreamUtil.subscribeToYangStream(streamName,
-                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo));
+                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo,
+                LISTENERS_BROKER));
     }
 
     @Test
@@ -187,12 +190,13 @@ public class SubscribeToStreamUtilTest {
         final YangInstanceIdentifier containerYiid = YangInstanceIdentifier.builder()
                 .node(EXAMPLE_CONTAINER_QNAME)
                 .build();
-        final ListenerAdapter listenerAdapter = ListenersBroker.getInstance().registerDataChangeListener(
+        final ListenerAdapter listenerAdapter = LISTENERS_BROKER.registerDataChangeListener(
                 containerYiid, streamName, NotificationOutputType.JSON);
 
         // subscription test
         final URI actualUri = SubscribeToStreamUtil.subscribeToDataStream(streamName,
-                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo);
+                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo,
+                LISTENERS_BROKER);
         final URI expectedUri = URI.create("wss://127.0.0.1:8181/" +  RestconfConstants.BASE_URI_PATTERN
                 + "/data-change-event-subscriptions/example-notifications:example-container/"
                 + "datastore=CONFIGURATION/scope=BASE/JSON");
@@ -211,7 +215,8 @@ public class SubscribeToStreamUtilTest {
         final String url = "https://127.0.0.1:8181/" + RestconfConstants.BASE_URI_PATTERN + '/' + streamName;
         final SimpleUriInfo uriInfo = new SimpleUriInfo(url);
         assertThrows(RestconfDocumentedException.class, () -> SubscribeToStreamUtil.subscribeToDataStream(streamName,
-                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo));
+                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo,
+                LISTENERS_BROKER));
     }
 
     @Test
@@ -220,7 +225,8 @@ public class SubscribeToStreamUtilTest {
         final String url = "http://127.0.0.1:8181/" + RestconfConstants.BASE_URI_PATTERN + '/' + streamName;
         final SimpleUriInfo uriInfo = new SimpleUriInfo(url);
         assertThrows(RestconfDocumentedException.class, () -> SubscribeToStreamUtil.subscribeToDataStream(streamName,
-                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo));
+                NotificationQueryParams.fromUriInfo(uriInfo), handlersHolder, StreamUrlResolver.webSockets(), uriInfo,
+                LISTENERS_BROKER));
     }
 
     private static void checkWrittenStartTime(final DOMDataTreeWriteTransaction woTransaction) {

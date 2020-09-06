@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
+import javax.annotation.PreDestroy;
+import javax.inject.Singleton;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -32,28 +34,19 @@ import org.slf4j.LoggerFactory;
  * This singleton class is responsible for creation, removal and searching for {@link ListenerAdapter} or
  * {@link NotificationListenerAdapter} listeners.
  */
+@Singleton
 public final class ListenersBroker {
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
-    private static ListenersBroker listenersBroker;
 
     private final StampedLock dataChangeListenersLock = new StampedLock();
     private final StampedLock notificationListenersLock = new StampedLock();
     private final BiMap<String, ListenerAdapter> dataChangeListeners = HashBiMap.create();
     private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
 
-    private ListenersBroker() {
-    }
-
-    /**
-     * Creation of the singleton listeners broker.
-     *
-     * @return Reusable instance of {@link ListenersBroker}.
-     */
-    public static synchronized ListenersBroker getInstance() {
-        if (listenersBroker == null) {
-            listenersBroker = new ListenersBroker();
-        }
-        return listenersBroker;
+    @PreDestroy
+    public void close() {
+        removeAndCloseAllDataChangeListeners();
+        removeAndCloseAllNotificationListeners();
     }
 
     /**
@@ -149,7 +142,7 @@ public final class ListenersBroker {
         final long stamp = dataChangeListenersLock.writeLock();
         try {
             return dataChangeListeners.computeIfAbsent(streamName, stream -> new ListenerAdapter(
-                    path, stream, outputType));
+                    this, path, stream, outputType));
         } finally {
             dataChangeListenersLock.unlockWrite(stamp);
         }
@@ -173,7 +166,7 @@ public final class ListenersBroker {
         final long stamp = notificationListenersLock.writeLock();
         try {
             return notificationListeners.computeIfAbsent(streamName, stream -> new NotificationListenerAdapter(
-                    schemaPath, stream, outputType.getName()));
+                    this, schemaPath, stream, outputType.getName()));
         } finally {
             notificationListenersLock.unlockWrite(stamp);
         }

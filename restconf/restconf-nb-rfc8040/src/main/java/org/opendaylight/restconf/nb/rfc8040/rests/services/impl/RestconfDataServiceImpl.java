@@ -61,6 +61,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -95,6 +96,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
     private final StreamUrlResolver streamUrlResolver;
+    private final ListenersBroker listenersBroker;
 
     // FIXME: evaluate thread-safety of updates (synchronized) vs. access (mostly unsynchronized) here
     private SchemaContextHandler schemaContextHandler;
@@ -107,13 +109,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final DOMMountPointServiceHandler mountPointServiceHandler,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final ActionServiceHandler actionServiceHandler,
-            final StreamUrlResolver streamUrlResolver) {
+            final StreamUrlResolver streamUrlResolver, final ListenersBroker listenersBroker) {
         this.actionServiceHandler = requireNonNull(actionServiceHandler);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.mountPointServiceHandler = requireNonNull(mountPointServiceHandler);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.streamUrlResolver = requireNonNull(streamUrlResolver);
+        this.listenersBroker = requireNonNull(listenersBroker);
     }
 
     @Override
@@ -190,7 +193,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
             final DOMDataTreeReadWriteTransaction rwTx = Objects.requireNonNull(
                     strategy.getTransactionChain()).newReadWriteTransaction();
-            CreateStreamUtil.createNotificationStreams(schemaContext, rwTx, streamUrlResolver);
+            CreateStreamUtil.createNotificationStreams(schemaContext, rwTx, streamUrlResolver, listenersBroker);
         }
         return ReadDataTransactionUtil.readData(content, strategy, withDefa, schemaContext);
     }

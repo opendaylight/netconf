@@ -46,6 +46,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NotificationListenerTest {
     private static final QNameModule MODULE = QNameModule.create(URI.create("notifi:mod"), Revision.of("2016-11-23"));
+    private static final ListenersBroker LISTENERS_BROKER = new ListenersBroker();
 
     private static SchemaContext SCHEMA_CONTEXT;
 
@@ -217,7 +218,7 @@ public class NotificationListenerTest {
     }
 
     private static String prepareJson(final DOMNotification notificationData, final SchemaPath schemaPathNotifi) {
-        final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
+        final NotificationListenerAdapter notifiAdapter = LISTENERS_BROKER.registerNotificationListener(
                 schemaPathNotifi, "stream-name", NotificationOutputType.JSON);
         return requireNonNull(notifiAdapter.prepareJson(SCHEMA_CONTEXT, notificationData));
     }

@@ -25,6 +25,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -39,6 +40,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
 
     private final StreamUrlResolver streamUrlResolver;
+    private final ListenersBroker listenersBroker;
 
     private volatile RpcServiceHandler rpcServiceHandler;
     private volatile SchemaContextHandler schemaContextHandler;
@@ -46,11 +48,12 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
 
     public RestconfInvokeOperationsServiceImpl(final RpcServiceHandler rpcServiceHandler,
             final SchemaContextHandler schemaContextHandler, final TransactionChainHandler transactionChainHandler,
-            final StreamUrlResolver streamUrlResolver) {
+            final StreamUrlResolver streamUrlResolver, final ListenersBroker listenersBroker) {
         this.rpcServiceHandler = rpcServiceHandler;
         this.schemaContextHandler = schemaContextHandler;
         this.transactionChainHandler = transactionChainHandler;
         this.streamUrlResolver = streamUrlResolver;
+        this.listenersBroker = listenersBroker;
     }
 
     @Override
@@ -80,7 +83,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             if (namespace.equals(RestconfStreamsConstants.SAL_REMOTE_MODULE.getNamespace())) {
                 if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCRIPTION)) {
                     response = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx,
-                            transactionChainHandler, streamUrlResolver);
+                            transactionChainHandler, streamUrlResolver, listenersBroker);
                 } else {
                     throw new RestconfDocumentedException("Not supported operation", ErrorType.RPC,
                             ErrorTag.OPERATION_NOT_SUPPORTED);

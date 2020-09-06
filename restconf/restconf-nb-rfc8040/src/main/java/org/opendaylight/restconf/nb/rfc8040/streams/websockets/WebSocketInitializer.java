@@ -16,6 +16,7 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 
 /**
  * Web-socket servlet listening on ws or wss schemas for created data-change-event or notification streams.
@@ -26,18 +27,21 @@ public class WebSocketInitializer extends WebSocketServlet {
 
     private final ScheduledExecutorService executorService;
     private final Configuration configuration;
+    private final ListenersBroker listenersBroker;
 
     /**
      * Creation of the web-socket initializer.
      *
      * @param scheduledThreadPool    ODL thread pool used for fetching of scheduled executors.
      * @param configuration          Web-socket configuration holder.
+     * @param listenersBroker        Stream listeners register.
      */
     @Inject
     public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool,
-            final Configuration configuration) {
+                                final Configuration configuration, final ListenersBroker listenersBroker) {
         this.executorService = scheduledThreadPool.getExecutor();
         this.configuration = configuration;
+        this.listenersBroker = listenersBroker;
     }
 
     /**
@@ -49,6 +53,6 @@ public class WebSocketInitializer extends WebSocketServlet {
     public void configure(final WebSocketServletFactory factory) {
         factory.getPolicy().setIdleTimeout(configuration.getIdleTimeout());
         factory.setCreator(new WebSocketFactory(executorService, configuration.getMaximumFragmentLength(),
-                configuration.getHeartbeatInterval()));
+                configuration.getHeartbeatInterval(), listenersBroker));
     }
 }

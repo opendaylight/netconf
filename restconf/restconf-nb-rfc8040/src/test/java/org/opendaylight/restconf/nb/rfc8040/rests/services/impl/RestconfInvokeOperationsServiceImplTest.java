@@ -34,6 +34,7 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -73,7 +74,7 @@ public class RestconfInvokeOperationsServiceImplTest {
             mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(contextRef);
         this.invokeOperationsService = new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler,
-                schemaContextHandler, transactionChainHandler, StreamUrlResolver.webSockets());
+                schemaContextHandler, transactionChainHandler, StreamUrlResolver.webSockets(), new ListenersBroker());
         when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);
     }
 

@@ -68,17 +68,19 @@ final class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @param streamUrlResolver       Stream URL resolver.
      * @param uriInfo                 Request URI information.
+     * @param listenersBroker         Stream listeners register.
      * @return Stream location for listening.
      */
     @NonNull
     static URI subscribeToYangStream(final String identifier, final NotificationQueryParams notificationQueryParams,
-            final HandlersHolder handlersHolder, final StreamUrlResolver streamUrlResolver, final UriInfo uriInfo) {
+            final HandlersHolder handlersHolder, final StreamUrlResolver streamUrlResolver, final UriInfo uriInfo,
+            final ListenersBroker listenersBroker) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
-        final Optional<NotificationListenerAdapter> notificationListenerAdapter =
-                ListenersBroker.getInstance().getNotificationListenerFor(streamName);
+        final Optional<NotificationListenerAdapter> notificationListenerAdapter
+                = listenersBroker.getNotificationListenerFor(streamName);
 
         if (notificationListenerAdapter.isEmpty()) {
             throw new RestconfDocumentedException(String.format(
@@ -112,11 +114,13 @@ final class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @param streamUrlResolver       Stream URL resolver.
      * @param uriInfo                 Request URI information.
+     * @param listenersBroker         Stream listeners register.
      * @return Location for listening.
      */
     @NonNull
     static URI subscribeToDataStream(final String identifier, final NotificationQueryParams notificationQueryParams,
-            final HandlersHolder handlersHolder, final StreamUrlResolver streamUrlResolver, final UriInfo uriInfo) {
+            final HandlersHolder handlersHolder, final StreamUrlResolver streamUrlResolver, final UriInfo uriInfo,
+            final ListenersBroker listenersBroker) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
         final LogicalDatastoreType datastoreType = parseURIEnum(
                 LogicalDatastoreType.class,
@@ -137,7 +141,7 @@ final class SubscribeToStreamUtil {
         }
 
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final Optional<ListenerAdapter> listener = ListenersBroker.getInstance().getDataChangeListenerFor(streamName);
+        final Optional<ListenerAdapter> listener = listenersBroker.getDataChangeListenerFor(streamName);
         if (listener.isEmpty()) {
             throw new RestconfDocumentedException(String.format(
                     "Listener for stream with name %s was not found.", streamName),

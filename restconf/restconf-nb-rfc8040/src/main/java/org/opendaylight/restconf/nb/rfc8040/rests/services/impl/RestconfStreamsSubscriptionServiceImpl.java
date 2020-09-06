@@ -37,6 +37,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -60,6 +61,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
 
     private final StreamUrlResolver streamUrlResolver;
+    private final ListenersBroker listenersBroker;
 
     private HandlersHolder handlersHolder;
 
@@ -76,13 +78,17 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      *             handler of {@link DOMTransactionChain}
      * @param streamUrlResolver
      *             stream URL resolver
+     * @param listenersBroker
+     *             stream listeners broker
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
             final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler,
-            final TransactionChainHandler transactionChainHandler, final StreamUrlResolver streamUrlResolver) {
+            final TransactionChainHandler transactionChainHandler, final StreamUrlResolver streamUrlResolver,
+            final ListenersBroker listenersBroker) {
         this.handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationServiceHandler,
                 transactionChainHandler, schemaHandler);
         this.streamUrlResolver = streamUrlResolver;
+        this.listenersBroker = listenersBroker;
     }
 
     @Override
@@ -101,10 +107,10 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         final URI response;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
             response = SubscribeToStreamUtil.subscribeToDataStream(identifier, notificationQueryParams,
-                    this.handlersHolder, streamUrlResolver, uriInfo);
+                    this.handlersHolder, streamUrlResolver, uriInfo, listenersBroker);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             response = SubscribeToStreamUtil.subscribeToYangStream(identifier, notificationQueryParams,
-                    this.handlersHolder, streamUrlResolver, uriInfo);
+                    this.handlersHolder, streamUrlResolver, uriInfo, listenersBroker);
         } else {
             final String msg = "Bad type of notification of sal-remote";
             LOG.warn(msg);

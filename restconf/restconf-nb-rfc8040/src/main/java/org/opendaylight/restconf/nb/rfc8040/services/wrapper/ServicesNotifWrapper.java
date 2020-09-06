@@ -12,6 +12,7 @@ import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSEInitializer;
 
 /**
@@ -29,8 +30,9 @@ public final class ServicesNotifWrapper implements RestconfDataStreamService {
         this.delegRestStream = delegRestStream;
     }
 
-    public static ServicesNotifWrapper newInstance(SSEInitializer configuration) {
-        RestconfDataStreamService delegRestStream = new RestconfDataStreamServiceImpl(configuration);
+    public static ServicesNotifWrapper newInstance(final SSEInitializer configuration,
+                                                   final ListenersBroker listenersBroker) {
+        RestconfDataStreamService delegRestStream = new RestconfDataStreamServiceImpl(configuration, listenersBroker);
         return new ServicesNotifWrapper(delegRestStream);
     }
 

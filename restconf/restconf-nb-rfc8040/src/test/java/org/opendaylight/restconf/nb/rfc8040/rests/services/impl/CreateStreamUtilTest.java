@@ -79,6 +79,7 @@ public class CreateStreamUtilTest {
 
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/streams";
     private static final String PATH_TO_EXAMPLE_NOTIFICATIONS = "/modules/example-notifications.yang";
+    private static final ListenersBroker LISTENERS_BROKER = new ListenersBroker();
 
     private NormalizedNodeContext payload;
     private EffectiveModelContext schemaContext;
@@ -106,14 +107,14 @@ public class CreateStreamUtilTest {
 
         this.payload = prepareDomPayload("create-data-change-event-subscription", "input", "toaster", "path");
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.schemaContext,
-                transactionChainHandler, StreamUrlResolver.webSockets());
+                transactionChainHandler, StreamUrlResolver.webSockets(), LISTENERS_BROKER);
         assertEquals(result.getErrors(), Collections.emptyList());
         final NormalizedNode<?, ?> testedNn = result.getResult();
         assertNotNull(testedNn);
         final NormalizedNodeContext contextRef = prepareDomPayload("create-data-change-event-subscription", "output",
                 "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name");
         assertEquals(contextRef.getData(), testedNn);
-        final Optional<ListenerAdapter> dataChangeListener = ListenersBroker.getInstance().getDataChangeListenerFor(
+        final Optional<ListenerAdapter> dataChangeListener = LISTENERS_BROKER.getDataChangeListenerFor(
                 "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE");
         assertTrue(dataChangeListener.isPresent());
 
@@ -129,14 +130,16 @@ public class CreateStreamUtilTest {
     public void createDataChangeStreamWrongValueTest() {
         this.payload = prepareDomPayload("create-data-change-event-subscription", "input", "String value", "path");
         assertThrows(RestconfDocumentedException.class, () -> CreateStreamUtil.createDataChangeNotifiStream(
-                this.payload, this.schemaContext, transactionChainHandler, StreamUrlResolver.webSockets()));
+                this.payload, this.schemaContext, transactionChainHandler, StreamUrlResolver.webSockets(),
+                LISTENERS_BROKER));
     }
 
     @Test
     public void createDataChangeStreamWrongInputRpcTest() {
         this.payload = prepareDomPayload("create-data-change-event-subscription2", "input", "toaster", "path2");
         assertThrows(RestconfDocumentedException.class, () -> CreateStreamUtil.createDataChangeNotifiStream(
-                this.payload, this.schemaContext, transactionChainHandler, StreamUrlResolver.webSockets()));
+                this.payload, this.schemaContext, transactionChainHandler, StreamUrlResolver.webSockets(),
+                LISTENERS_BROKER));
     }
 
     @Test
@@ -164,7 +167,8 @@ public class CreateStreamUtilTest {
                 .collect(Collectors.toList());
 
         // execution of mapping and testing of the output container
-        CreateStreamUtil.createNotificationStreams(this.schemaContext, rwTransaction, StreamUrlResolver.webSockets());
+        CreateStreamUtil.createNotificationStreams(this.schemaContext, rwTransaction, StreamUrlResolver.webSockets(),
+                LISTENERS_BROKER);
         checkRegisteredYangNotifyStreams(rwTransaction, expectedXmlStreams, expectedJsonStreams);
     }
 
@@ -199,7 +203,8 @@ public class CreateStreamUtilTest {
                 .collect(Collectors.toList());
 
         // execution of mapping and testing of the output container
-        CreateStreamUtil.createNotificationStreams(this.schemaContext, rwTransaction, StreamUrlResolver.webSockets());
+        CreateStreamUtil.createNotificationStreams(this.schemaContext, rwTransaction, StreamUrlResolver.webSockets(),
+                LISTENERS_BROKER);
         checkRegisteredYangNotifyStreams(rwTransaction, expectedXmlStreams, expectedJsonStreams);
     }
 
@@ -222,7 +227,7 @@ public class CreateStreamUtilTest {
 
     private static void checkListenerBroker(final List<String> expectedStreams) {
         expectedStreams.forEach(streamName -> {
-            final Optional<BaseListenerInterface> listener = ListenersBroker.getInstance().getListenerFor(streamName);
+            final Optional<BaseListenerInterface> listener = LISTENERS_BROKER.getListenerFor(streamName);
             assertTrue(listener.isPresent());
         });
     }

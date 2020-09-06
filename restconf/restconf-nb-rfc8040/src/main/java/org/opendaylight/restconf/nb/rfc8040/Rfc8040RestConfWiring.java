@@ -22,6 +22,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServ
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSEInitializer;
 import org.opendaylight.restconf.nb.rfc8040.web.WebInitializer;
 
@@ -50,11 +51,12 @@ public class Rfc8040RestConfWiring {
             final NotificationServiceHandler notificationServiceHandler,
             final SSEInitializer sseInit,
             final Configuration configuration,
-            @Reference final DOMSchemaService domSchemaService) {
+            @Reference final DOMSchemaService domSchemaService,
+            final ListenersBroker listenersBroker) {
         servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, domMountPointServiceHandler,
             transactionChainHandler, domDataBrokerHandler, rpcServiceHandler, actionServiceHandler,
-            notificationServiceHandler, domSchemaService, configuration);
-        servicesNotifWrapper = ServicesNotifWrapper.newInstance(sseInit);
+            notificationServiceHandler, domSchemaService, configuration, listenersBroker);
+        servicesNotifWrapper = ServicesNotifWrapper.newInstance(sseInit, listenersBroker);
     }
 
     public ServicesWrapper getServicesWrapper() {

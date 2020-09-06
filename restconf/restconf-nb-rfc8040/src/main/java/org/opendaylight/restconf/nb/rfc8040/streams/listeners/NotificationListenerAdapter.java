@@ -50,11 +50,14 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     /**
      * Set path of listener and stream name.
      *
-     * @param path       Schema path of YANG notification.
-     * @param streamName Name of the stream.
-     * @param outputType Type of output on notification (JSON or XML).
+     * @param listenersBroker Stream listeners register.
+     * @param path            Schema path of YANG notification.
+     * @param streamName      Name of the stream.
+     * @param outputType      Type of output on notification (JSON or XML).
      */
-    NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
+    NotificationListenerAdapter(final ListenersBroker listenersBroker, final SchemaPath path, final String streamName,
+                                final String outputType) {
+        super(listenersBroker);
         setLocalNameOfPath(path.getLastComponent().getLocalName());
 
         this.outputType = requireNonNull(outputType);

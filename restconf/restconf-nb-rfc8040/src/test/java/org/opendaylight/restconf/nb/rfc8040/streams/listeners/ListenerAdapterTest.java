@@ -97,7 +97,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
                               final NotificationOutputTypeGrouping.NotificationOutputType outputType,
                               final boolean leafNodesOnly) {
-            super(path, streamName, outputType);
+            super(new ListenersBroker(), path, streamName, outputType);
             setQueryParams(EPOCH, null, null, leafNodesOnly);
         }
 
