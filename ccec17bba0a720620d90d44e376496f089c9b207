@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "95bdd477_76a5829b",
+        "filename": "netconf/aaa-authn-odl-plugin/pom.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-09-13T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f38dbbd_d6c7f19c",
+      "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "95413752_3e66225a",
         "filename": "netconf/netconf-client/pom.xml",
         "patchSetId": 8
@@ -33,6 +51,24 @@
       "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9972188_e0cb10ed",
+        "filename": "netconf/netconf-client/pom.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-09-13T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95413752_3e66225a",
+      "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "17e0219a_115a8043",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerDispatcherImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-09-13T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17542732_9c2fa970",
+      "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e9fdcc77_1abcbe2e",
         "filename": "netconf/netconf-topology-impl/src/main/java/org/opendaylight/netconf/topology/impl/NetconfConnectorFactoryImpl.java",
         "patchSetId": 8
@@ -67,6 +121,24 @@
       "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c5c822e3_94223db4",
+        "filename": "netconf/netconf-topology-impl/src/main/java/org/opendaylight/netconf/topology/impl/NetconfConnectorFactoryImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-09-13T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9fdcc77_1abcbe2e",
+      "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "2ca4b376_91f46345",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfConfigurationImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-09-13T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "213e0b90_a14f414e",
+      "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "27a3ad45_8cc9acc7",
         "filename": "netconf/sal-netconf-connector/pom.xml",
         "patchSetId": 8
@@ -101,6 +191,24 @@
       "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a99d381a_57ecc5ff",
+        "filename": "netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-09-13T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27a3ad45_8cc9acc7",
+      "revId": "ccec17bba0a720620d90d44e376496f089c9b207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
