@@ -12,19 +12,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.MERGE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,9 +31,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -56,7 +57,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -198,12 +198,8 @@ public class PatchDataTransactionUtilTest {
     public void testPatchDataCreateAndDelete() {
         doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.instanceIdContainer);
-        Mockito.when(this.netconfService.getConfig(this.instanceIdContainer))
-                .thenReturn(immediateFluentFuture(Optional.empty()));
         doReturn(immediateTrueFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.targetNodeForCreateAndDelete);
-        Mockito.when(this.netconfService.getConfig(this.targetNodeForCreateAndDelete))
-                .thenReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))));
 
         final PatchEntity entityCreate =
                 new PatchEntity("edit1", CREATE, this.instanceIdContainer, this.buildBaseContainerForTests);
@@ -225,8 +221,14 @@ public class PatchDataTransactionUtilTest {
     public void deleteNonexistentDataTest() {
         doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.targetNodeForCreateAndDelete);
-        Mockito.when(this.netconfService.getConfig(this.targetNodeForCreateAndDelete))
-                .thenReturn(immediateFluentFuture(Optional.empty()));
+        final NetconfDocumentedException exception = new NetconfDocumentedException("id",
+            DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.from("data-missing"),
+            DocumentedException.ErrorSeverity.ERROR);
+        final SettableFuture<? extends CommitInfo> ret = SettableFuture.create();
+        ret.setException(new TransactionCommitFailedException(
+            String.format("Commit of transaction %s failed", this), exception));
+
+        Mockito.when(this.netconfService.commit(any())).thenAnswer(invocation -> ret);
 
         final PatchEntity entityDelete = new PatchEntity("edit", DELETE, this.targetNodeForCreateAndDelete);
         final List<PatchEntity> entities = new ArrayList<>();
@@ -236,8 +238,8 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
-        delete(patchContext, new MdsalRestconfStrategy(transactionChainHandler));
-        delete(patchContext, new NetconfRestconfStrategy(netconfService));
+        deleteMdsal(patchContext, new MdsalRestconfStrategy(transactionChainHandler));
+        deleteNetconf(patchContext, new NetconfRestconfStrategy(netconfService));
     }
 
     @Test
@@ -269,7 +271,7 @@ public class PatchDataTransactionUtilTest {
         assertTrue(patchStatusContext.isOk());
     }
 
-    private void delete(final PatchContext patchContext, final RestconfStrategy strategy) {
+    private void deleteMdsal(final PatchContext patchContext, final RestconfStrategy strategy) {
         final PatchStatusContext patchStatusContext =
                 PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
 
@@ -278,5 +280,16 @@ public class PatchDataTransactionUtilTest {
                 patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorType());
         assertEquals(RestconfError.ErrorTag.DATA_MISSING,
                 patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorTag());
+    }
+
+    private void deleteNetconf(PatchContext patchContext, RestconfStrategy strategy) {
+        final PatchStatusContext patchStatusContext =
+            PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
+
+        assertFalse(patchStatusContext.isOk());
+        assertEquals(RestconfError.ErrorType.PROTOCOL,
+            patchStatusContext.getGlobalErrors().get(0).getErrorType());
+        assertEquals(RestconfError.ErrorTag.DATA_MISSING,
+            patchStatusContext.getGlobalErrors().get(0).getErrorTag());
     }
 }
