@@ -65,6 +65,14 @@ public interface RestconfStrategy {
     void delete(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
+     * Remove data from the datastore.
+     *
+     * @param store the logical data store which should be modified
+     * @param path the data object path
+     */
+    void remove(LogicalDatastoreType store, YangInstanceIdentifier path);
+
+    /**
      * Merges a piece of data with the existing data at a specified path.
      *
      * @param store the logical data store which should be modified
@@ -79,8 +87,9 @@ public interface RestconfStrategy {
      * @param store the logical data store which should be modified
      * @param path the data object path
      * @param data the data object to be merged to the specified path
+     * @param mergeParents create parents data if needed
      */
-    void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
+    void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data, boolean mergeParents);
 
     /**
      * Replace a piece of data at the specified path.
@@ -88,8 +97,9 @@ public interface RestconfStrategy {
      * @param store the logical data store which should be modified
      * @param path the data object path
      * @param data the data object to be merged to the specified path
+     * @param mergeParents create parents data if needed
      */
-    void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
+    void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data, boolean mergeParents);
 
     /**
      * Confirm previous operations.

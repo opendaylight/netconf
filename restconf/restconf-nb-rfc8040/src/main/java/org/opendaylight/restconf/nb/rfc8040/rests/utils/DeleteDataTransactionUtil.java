@@ -33,14 +33,12 @@ public final class DeleteDataTransactionUtil {
     public static Response deleteData(final RestconfStrategy strategy) {
         strategy.prepareReadWriteExecution();
         final YangInstanceIdentifier path = strategy.getInstanceIdentifier().getInstanceIdentifier();
-        TransactionUtil.checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
-                RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
         strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
         final FluentFuture<? extends CommitInfo> future = strategy.commit();
         final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
         //This method will close transactionChain if any
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response,
-                strategy.getTransactionChain());
+                strategy.getTransactionChain(), path);
         return response.build();
     }
 }
