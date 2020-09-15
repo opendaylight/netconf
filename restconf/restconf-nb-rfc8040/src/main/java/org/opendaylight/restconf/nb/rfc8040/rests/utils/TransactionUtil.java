@@ -84,13 +84,9 @@ public final class TransactionUtil {
                                        final String operationType) {
         final FluentFuture<Boolean> future = strategy.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
         FutureCallbackTx.addCallback(future, operationType, response);
 
         if (!response.result) {
-            // close transaction
-            strategy.cancel();
-            // throw error
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             throw new RestconfDocumentedException(
                     "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
@@ -111,13 +107,9 @@ public final class TransactionUtil {
                                               final String operationType) {
         final FluentFuture<Boolean> future = strategy.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
         FutureCallbackTx.addCallback(future, operationType, response);
 
         if (response.result) {
-            // close transaction
-            strategy.cancel();
-            // throw error
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             throw new RestconfDocumentedException(
                     "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);

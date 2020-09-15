@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -334,7 +335,7 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
                                       final RemoteDeviceId id) {
         DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
         DocumentedException.ErrorSeverity errSeverity = DocumentedException.ErrorSeverity.ERROR;
-        StringBuilder msgBuilder = new StringBuilder();
+        StringJoiner msgBuilder = new StringJoiner(" ");
         boolean errorsEncouneterd = false;
         String errorTag = "operation-failed";
 
@@ -368,8 +369,8 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
                         errSeverity = DocumentedException.ErrorSeverity.ERROR;
                         break;
                 }
-                msgBuilder.append(error.getMessage());
-                msgBuilder.append(error.getInfo());
+                msgBuilder.add(error.getMessage());
+                msgBuilder.add(error.getInfo());
                 errorTag = error.getTag();
             }
         }

@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -33,14 +34,18 @@ public final class DeleteDataTransactionUtil {
     public static Response deleteData(final RestconfStrategy strategy) {
         strategy.prepareReadWriteExecution();
         final YangInstanceIdentifier path = strategy.getInstanceIdentifier().getInstanceIdentifier();
-        TransactionUtil.checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
-                RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
-        strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
+        try {
+            strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
+        } catch (RestconfDocumentedException e) {
+            // close transaction if any and pass exception further
+            strategy.cancel();
+            throw e;
+        }
         final FluentFuture<? extends CommitInfo> future = strategy.commit();
         final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
         //This method will close transactionChain if any
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response,
-                strategy.getTransactionChain());
+                strategy.getTransactionChain(), path);
         return response.build();
     }
 }
