@@ -21,6 +21,7 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Baseline execution strategy for various RESTCONF operations.
@@ -73,7 +74,7 @@ public abstract class RestconfStrategy {
      * Read data from the datastore.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
+     * @param path  the data object path
      * @return a ListenableFuture containing the result of the read
      */
     public abstract ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
@@ -83,7 +84,7 @@ public abstract class RestconfStrategy {
      * Check if data already exists in the datastore.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
+     * @param path  the data object path
      * @return a FluentFuture containing the result of the check
      */
     public abstract FluentFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
@@ -92,16 +93,24 @@ public abstract class RestconfStrategy {
      * Delete data from the datastore.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
+     * @param path  the data object path
      */
     public abstract void delete(LogicalDatastoreType store, YangInstanceIdentifier path);
+
+    /**
+     * Remove data from the datastore.
+     *
+     * @param store the logical data store which should be modified
+     * @param path  the data object path
+     */
+    public abstract void remove(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
      * Merges a piece of data with the existing data at a specified path.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
-     * @param data the data object to be merged to the specified path
+     * @param path  the data object path
+     * @param data  the data object to be merged to the specified path
      */
     public abstract void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
 
@@ -109,19 +118,25 @@ public abstract class RestconfStrategy {
      * Stores a piece of data at the specified path.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
-     * @param data the data object to be merged to the specified path
+     * @param path  the data object path
+     * @param data  the data object to be merged to the specified path
+     * @param schemaContext  static view of compiled yang files
      */
-    public abstract void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
+    public abstract void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data,
+                SchemaContext schemaContext);
 
     /**
      * Replace a piece of data at the specified path.
      *
-     * @param store the logical data store which should be modified
-     * @param path the data object path
-     * @param data the data object to be merged to the specified path
+     * @param store        the logical data store which should be modified
+     * @param path         the data object path
+     * @param data         the data object to be merged to the specified path
+     * @param schemaContext  static view of compiled yang files
+     * @param mergeParents create parents data if needed
      */
-    public abstract void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
+    public abstract void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data,
+                 SchemaContext schemaContext, boolean mergeParents);
+
 
     /**
      * Get transaction chain for creating specific transaction for specific operation.
