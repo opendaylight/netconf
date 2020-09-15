@@ -166,7 +166,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
         return matcher.replaceAll((data) -> {
             StringBuilder buf = new StringBuilder();
             buf.append("\"");
-            for (byte b : data.group().getBytes()) {
+            for (byte b : data.group().getBytes(StandardCharsets.US_ASCII)) {
                 buf.append(String.format("%02X", b));
             }
             buf.append("\"");
