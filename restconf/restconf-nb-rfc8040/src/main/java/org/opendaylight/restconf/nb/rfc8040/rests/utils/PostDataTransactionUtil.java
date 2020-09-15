@@ -107,8 +107,14 @@ public final class PostDataTransactionUtil {
                         return strategy.commit();
                     }
 
-                    strategy.delete(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
-                    simplePost(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext, strategy);
+                    strategy.remove(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
+                    try {
+                        strategy.create(LogicalDatastoreType.CONFIGURATION, path, data, true);
+                    } catch (RestconfDocumentedException e) {
+                        // close transaction if any and pass exception further
+                        strategy.cancel();
+                        throw e;
+                    }
                     makePost(path, readData, schemaContext, strategy);
                     return strategy.commit();
                 } else {
@@ -121,8 +127,14 @@ public final class PostDataTransactionUtil {
                         return strategy.commit();
                     }
 
-                    strategy.delete(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
-                    simplePost(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext, strategy);
+                    strategy.remove(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
+                    try {
+                        strategy.create(LogicalDatastoreType.CONFIGURATION, path, data, true);
+                    } catch (RestconfDocumentedException e) {
+                        // close transaction if any and pass exception further
+                        strategy.cancel();
+                        throw e;
+                    }
                     makePost(path, readData, schemaContext, strategy);
                     return strategy.commit();
                 }
@@ -196,7 +208,7 @@ public final class PostDataTransactionUtil {
                                                     final EffectiveModelContext schemaContext, final String point,
                                                     final OrderedLeafSetNode<?> readLeafList,
                                                     final boolean before, final RestconfStrategy strategy) {
-        strategy.delete(datastore, path.getParent().getParent());
+        strategy.remove(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
@@ -212,17 +224,25 @@ public final class PostDataTransactionUtil {
         int lastInsertedPosition = 0;
         final NormalizedNode<?, ?> emptySubtree =
                 ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
-        strategy.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        strategy.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree, false);
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (lastInsertedPosition == lastItemPosition) {
-                TransactionUtil.checkItemDoesNotExists(strategy, datastore, path,
-                        RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-                strategy.create(datastore, path, payload);
+                try {
+                    strategy.create(datastore, path, payload, false);
+                } catch (RestconfDocumentedException e) {
+                    // close transaction if any and pass exception further
+                    strategy.cancel();
+                    throw e;
+                }
             }
             final YangInstanceIdentifier childPath = path.getParent().getParent().node(nodeChild.getIdentifier());
-            TransactionUtil.checkItemDoesNotExists(strategy, datastore, childPath,
-                    RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-            strategy.create(datastore, childPath, nodeChild);
+            try {
+                strategy.create(datastore, childPath, nodeChild, false);
+            } catch (RestconfDocumentedException e) {
+                // close transaction if any and pass exception further
+                strategy.cancel();
+                throw e;
+            }
             lastInsertedPosition++;
         }
     }
@@ -232,7 +252,7 @@ public final class PostDataTransactionUtil {
                                                 final EffectiveModelContext schemaContext, final String point,
                                                 final MapNode readList, final boolean before,
                                                 final RestconfStrategy strategy) {
-        strategy.delete(datastore, path.getParent().getParent());
+        strategy.remove(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
@@ -248,17 +268,25 @@ public final class PostDataTransactionUtil {
         int lastInsertedPosition = 0;
         final NormalizedNode<?, ?> emptySubtree =
                 ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
-        strategy.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        strategy.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree, false);
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (lastInsertedPosition == lastItemPosition) {
-                TransactionUtil.checkItemDoesNotExists(strategy, datastore, path,
-                        RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-                strategy.create(datastore, path, payload);
+                try {
+                    strategy.create(datastore, path, payload, false);
+                } catch (RestconfDocumentedException e) {
+                    // close transaction if any and pass exception further
+                    strategy.cancel();
+                    throw e;
+                }
             }
             final YangInstanceIdentifier childPath = path.getParent().getParent().node(mapEntryNode.getIdentifier());
-            TransactionUtil.checkItemDoesNotExists(strategy, datastore, childPath,
-                    RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-            strategy.create(datastore, childPath, mapEntryNode);
+            try {
+                strategy.create(datastore, childPath, mapEntryNode, false);
+            } catch (RestconfDocumentedException e) {
+                // close transaction if any and pass exception further
+                strategy.cancel();
+                throw e;
+            }
             lastInsertedPosition++;
         }
     }
@@ -266,26 +294,29 @@ public final class PostDataTransactionUtil {
     private static void makePost(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
                                  final SchemaContext schemaContext, final RestconfStrategy strategy) {
         if (data instanceof MapNode) {
-            boolean merge = false;
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
+            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            strategy.merge(LogicalDatastoreType.CONFIGURATION,
+                YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree, false);
+
             for (final MapEntryNode child : ((MapNode) data).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-                TransactionUtil.checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, childPath,
-                        RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-                if (!merge) {
-                    merge = true;
-                    TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-                    final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
-                    strategy.merge(LogicalDatastoreType.CONFIGURATION,
-                            YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
+                try {
+                    strategy.create(LogicalDatastoreType.CONFIGURATION, childPath, child, false);
+                } catch (RestconfDocumentedException e) {
+                    // close transaction if any and pass exception further
+                    strategy.cancel();
+                    throw e;
                 }
-                strategy.create(LogicalDatastoreType.CONFIGURATION, childPath, child);
             }
         } else {
-            TransactionUtil.checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
-                    RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-            strategy.create(LogicalDatastoreType.CONFIGURATION, path, data);
+            try {
+                strategy.create(LogicalDatastoreType.CONFIGURATION, path, data, true);
+            } catch (RestconfDocumentedException e) {
+                // close transaction if any and pass exception further
+                strategy.cancel();
+                throw e;
+            }
         }
     }
 
@@ -316,14 +347,5 @@ public final class PostDataTransactionUtil {
                 .path("data")
                 .path(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext))
                 .build();
-    }
-
-    private static void simplePost(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-                                   final NormalizedNode<?, ?> payload,
-                                   final SchemaContext schemaContext, final RestconfStrategy strategy) {
-        TransactionUtil.checkItemDoesNotExists(strategy, datastore, path,
-                RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-        strategy.create(datastore, path, payload);
     }
 }

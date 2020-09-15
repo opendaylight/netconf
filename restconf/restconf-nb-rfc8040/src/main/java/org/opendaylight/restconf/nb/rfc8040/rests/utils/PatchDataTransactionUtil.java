@@ -85,7 +85,7 @@ public final class PatchDataTransactionUtil {
                     case MERGE:
                         try {
                             mergeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(), strategy, schemaContext);
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), strategy);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -169,7 +169,7 @@ public final class PatchDataTransactionUtil {
     }
 
     /**
-     * Check if data exists and remove it within one transaction.
+     * Remove data within one transaction.
      *
      * @param dataStore            Datastore to delete data from
      * @param path                 Path for data to be deleted
@@ -179,7 +179,6 @@ public final class PatchDataTransactionUtil {
                                                     final YangInstanceIdentifier path,
                                                     final RestconfStrategy strategy) {
         LOG.trace("Delete {} within Restconf Patch: {}", dataStore.name(), path);
-        checkItemExistsWithinTransaction(strategy, dataStore, path);
         strategy.delete(dataStore, path);
     }
 
@@ -190,16 +189,13 @@ public final class PatchDataTransactionUtil {
      * @param path          Path for data to be merged
      * @param payload       Data to be merged
      * @param strategy      Object that perform the actual DS operations
-     * @param schemaContext Global schema context
      */
     private static void mergeDataWithinTransaction(final LogicalDatastoreType dataStore,
                                                    final YangInstanceIdentifier path,
                                                    final NormalizedNode<?, ?> payload,
-                                                   final RestconfStrategy strategy,
-                                                   final EffectiveModelContext schemaContext) {
+                                                   final RestconfStrategy strategy) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", dataStore.name(), path, payload);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-        strategy.merge(dataStore, path, payload);
+        strategy.merge(dataStore, path, payload, true);
     }
 
     /**
@@ -213,7 +209,7 @@ public final class PatchDataTransactionUtil {
                                                     final YangInstanceIdentifier path,
                                                     final RestconfStrategy strategy) {
         LOG.trace("Remove {} within Restconf Patch: {}", dataStore.name(), path);
-        strategy.delete(dataStore, path);
+        strategy.remove(dataStore, path);
     }
 
     /**
@@ -251,78 +247,23 @@ public final class PatchDataTransactionUtil {
                                    final LogicalDatastoreType dataStore, final boolean errorIfExists) {
         if (payload instanceof MapNode) {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            strategy.merge(dataStore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+            strategy.merge(dataStore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree, false);
             TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
             for (final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
 
                 if (errorIfExists) {
-                    checkItemDoesNotExistsWithinTransaction(strategy, dataStore, childPath);
-                }
-
-                if (errorIfExists) {
-                    strategy.create(dataStore, childPath, child);
+                    strategy.create(dataStore, childPath, child, false);
                 } else {
-                    strategy.replace(dataStore, childPath, child);
+                    strategy.replace(dataStore, childPath, child, false);
                 }
             }
         } else {
             if (errorIfExists) {
-                checkItemDoesNotExistsWithinTransaction(strategy, dataStore, path);
-            }
-
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-            if (errorIfExists) {
-                strategy.create(dataStore, path, payload);
+                strategy.create(dataStore, path, payload, true);
             } else {
-                strategy.replace(dataStore, path, payload);
+                strategy.replace(dataStore, path, payload, true);
             }
-        }
-    }
-
-    /**
-     * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
-     * data does NOT already exists.
-     *
-     * @param strategy      Object that perform the actual DS operations
-     * @param store         Datastore
-     * @param path          Path to be checked
-     */
-    public static void checkItemExistsWithinTransaction(final RestconfStrategy strategy,
-                                                        final LogicalDatastoreType store,
-                                                        final YangInstanceIdentifier path) {
-        final FluentFuture<Boolean> future = strategy.exists(store, path);
-        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
-        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
-
-        if (!response.result) {
-            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
-            throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                    path);
-        }
-    }
-
-    /**
-     * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
-     * data already exists.
-     *
-     * @param strategy      Object that perform the actual DS operations
-     * @param store         Datastore
-     * @param path          Path to be checked
-     */
-    public static void checkItemDoesNotExistsWithinTransaction(final RestconfStrategy strategy,
-                                                               final LogicalDatastoreType store,
-                                                               final YangInstanceIdentifier path) {
-        final FluentFuture<Boolean> future = strategy.exists(store, path);
-        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
-        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
-
-        if (response.result) {
-            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-            throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
-                    path);
         }
     }
 }

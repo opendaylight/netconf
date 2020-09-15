@@ -257,7 +257,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
         }
         strategy.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
-            mapToStreams);
+            mapToStreams, false);
     }
 
     @Override
