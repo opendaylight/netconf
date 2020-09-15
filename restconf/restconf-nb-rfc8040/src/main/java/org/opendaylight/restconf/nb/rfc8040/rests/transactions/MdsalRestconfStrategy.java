@@ -20,6 +20,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -70,6 +72,13 @@ public class MdsalRestconfStrategy implements RestconfStrategy {
 
     @Override
     public void delete(LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        TransactionUtil.checkItemExists(this, LogicalDatastoreType.CONFIGURATION, path,
+            RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
+        rwTx.delete(store, path);
+    }
+
+    @Override
+    public void remove(LogicalDatastoreType store, final YangInstanceIdentifier path) {
         rwTx.delete(store, path);
     }
 

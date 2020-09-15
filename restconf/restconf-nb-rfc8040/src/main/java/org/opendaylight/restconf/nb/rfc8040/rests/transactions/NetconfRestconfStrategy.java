@@ -88,6 +88,11 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
     }
 
     @Override
+    public void remove(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        resultsFutures.add(netconfService.remove(store, path));
+    }
+
+    @Override
     public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
                       final NormalizedNode<?, ?> data) {
         resultsFutures.add(netconfService.merge(store, path, data, Optional.empty()));
