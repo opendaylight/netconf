@@ -171,7 +171,6 @@ public class PostDataTransactionUtilTest {
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,
                 new NetconfRestconfStrategy(netconfService), this.schema, null, null);
         assertEquals(201, response.getStatus());
-        verify(this.netconfService).getConfig(this.iid2);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
@@ -205,7 +204,6 @@ public class PostDataTransactionUtilTest {
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), "UTF-8"),
                 containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
-        verify(this.netconfService).getConfig(node);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next(),
                 Optional.empty());
     }
@@ -252,7 +250,6 @@ public class PostDataTransactionUtilTest {
             assertTrue(e.getErrors().get(0).getErrorInfo().contains(domException.getMessage()));
         }
 
-        verify(this.netconfService).getConfig(this.iid2);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
