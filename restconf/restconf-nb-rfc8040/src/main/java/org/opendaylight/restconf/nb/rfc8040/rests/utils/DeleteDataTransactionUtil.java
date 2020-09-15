@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DeleteDataTransactionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(DeleteDataTransactionUtil.class);
-    private static final String DELETE_TX_TYPE = "DELETE";
+    public static final String DELETE_TX_TYPE = "DELETE";
 
     private DeleteDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
@@ -39,12 +39,17 @@ public final class DeleteDataTransactionUtil {
      */
     public static Response deleteData(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
         strategy.prepareReadWriteExecution();
-        checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path, DELETE_TX_TYPE);
-        strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
+        try {
+            strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
+        } catch (RestconfDocumentedException e) {
+            // close transaction if any and pass exception further
+            strategy.cancel();
+            throw e;
+        }
         final FluentFuture<? extends CommitInfo> future = strategy.commit();
         final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, strategy.getTransactionChain());
+        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, strategy.getTransactionChain(), path);
         return response.build();
     }
 
@@ -57,21 +62,17 @@ public final class DeleteDataTransactionUtil {
      * @param path          Path to be checked
      * @param operationType Type of operation (READ, POST, PUT, DELETE...)
      */
-    private static void checkItemExists(final RestconfStrategy strategy,
-                                        final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                                        final String operationType) {
+    public static void checkItemExists(final RestconfStrategy strategy,
+                                       final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                                       final String operationType) {
         final FluentFuture<Boolean> future = strategy.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
         FutureCallbackTx.addCallback(future, operationType, response);
 
         if (!response.result) {
-            // close transaction
-            strategy.cancel();
-            // throw error
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             throw new RestconfDocumentedException(
-                    "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
+                "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
         }
     }
 }
