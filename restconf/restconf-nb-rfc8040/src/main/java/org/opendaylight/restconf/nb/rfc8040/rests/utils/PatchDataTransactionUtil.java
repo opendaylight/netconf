@@ -213,7 +213,7 @@ public final class PatchDataTransactionUtil {
                                                     final YangInstanceIdentifier path,
                                                     final RestconfStrategy strategy) {
         LOG.trace("Remove {} within Restconf Patch: {}", dataStore.name(), path);
-        strategy.delete(dataStore, path);
+        strategy.remove(dataStore, path);
     }
 
     /**

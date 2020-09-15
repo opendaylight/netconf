@@ -398,12 +398,7 @@ public final class PutDataTransactionUtil {
                                                               final RestconfStrategy strategy,
                                                               final NormalizedNode<?, ?> data,
                                                               final boolean exists) {
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-        if (exists) {
-            strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data);
-        } else {
-            strategy.create(LogicalDatastoreType.CONFIGURATION, path, data);
-        }
+        strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data);
         return strategy.commit();
     }
 

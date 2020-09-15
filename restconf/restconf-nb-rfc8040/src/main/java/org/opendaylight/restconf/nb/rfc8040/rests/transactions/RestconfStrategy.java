@@ -65,6 +65,14 @@ public interface RestconfStrategy {
     void delete(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
+     * Remove data from the datastore.
+     *
+     * @param store the logical data store which should be modified
+     * @param path the data object path
+     */
+    void remove(LogicalDatastoreType store, YangInstanceIdentifier path);
+
+    /**
      * Merges a piece of data with the existing data at a specified path.
      *
      * @param store the logical data store which should be modified
