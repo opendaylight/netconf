@@ -26,7 +26,12 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +91,11 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
+    public void remove(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        resultsFutures.add(netconfService.remove(store, path));
+    }
+
+    @Override
     public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
                       final NormalizedNode<?, ?> data) {
         resultsFutures.add(netconfService.merge(store, path, data, Optional.empty()));
@@ -93,14 +103,37 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     @Override
     public void create(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                       final NormalizedNode<?, ?> data) {
-        resultsFutures.add(netconfService.create(store, path, data, Optional.empty()));
+                       final NormalizedNode<?, ?> data, final SchemaContext schemaContext) {
+        if (data instanceof MapNode || data instanceof LeafSetNode) {
+            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubTree.getIdentifier()),
+                emptySubTree);
+
+            for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
+                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                resultsFutures.add(netconfService.create(store, childPath, child, Optional.empty()));
+            }
+        } else {
+            resultsFutures.add(netconfService.create(store, path, data, Optional.empty()));
+        }
     }
 
     @Override
     public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                        final NormalizedNode<?, ?> data) {
-        resultsFutures.add(netconfService.replace(store, path, data, Optional.empty()));
+                        final NormalizedNode<?, ?> data, final SchemaContext schemaContext,
+                        final boolean mergeParents) {
+        if (data instanceof MapNode || data instanceof LeafSetNode) {
+            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubTree.getIdentifier()),
+                emptySubTree);
+
+            for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
+                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                resultsFutures.add(netconfService.replace(store, childPath, child, Optional.empty()));
+            }
+        } else {
+            resultsFutures.add(netconfService.replace(store, path, data, Optional.empty()));
+        }
     }
 
     @Override
@@ -136,7 +169,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             @Override
             public void onFailure(final Throwable cause) {
                 ret.setException(cause instanceof ReadFailedException ? cause
-                        : new ReadFailedException("NETCONF operation failed", cause));
+                    : new ReadFailedException("NETCONF operation failed", cause));
             }
         }, MoreExecutors.directExecutor());
         return FluentFuture.from(ret);
