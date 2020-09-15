@@ -106,7 +106,8 @@ public final class EditConfig extends AbstractEdit {
             case CREATE:
                 try {
                     if (rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get().isPresent()) {
-                        throw new DocumentedException("Data already exists, cannot execute CREATE operation",
+                        throw new DocumentedException(
+                            String.format("Data %s already exists, cannot execute CREATE operation", path.toString()),
                             ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
                     }
                     mergeParentMixin(rwtx, path, changeData);
@@ -122,7 +123,8 @@ public final class EditConfig extends AbstractEdit {
             case DELETE:
                 try {
                     if (!rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get().isPresent()) {
-                        throw new DocumentedException("Data is missing, cannot execute DELETE operation",
+                        throw new DocumentedException(
+                            String.format("Data %s is missing, cannot execute DELETE operation", path.toString()),
                             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
                     }
                     rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
