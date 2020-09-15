@@ -51,7 +51,7 @@ public final class PlainPatchDataTransactionUtil {
         NormalizedNode<?, ?> data = payload.getData();
 
         try {
-            mergeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION, path, data, strategy, schemaContext);
+            mergeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION, path, data, strategy);
         } catch (final RestconfDocumentedException e) {
             strategy.cancel();
             throw new IllegalArgumentException(e);
@@ -73,15 +73,13 @@ public final class PlainPatchDataTransactionUtil {
      * @param path          Path for data to be merged
      * @param payload       Data to be merged
      * @param strategy      Object that perform the actual DS operations
-     * @param schemaContext global schema context
      */
     private static void mergeDataWithinTransaction(final LogicalDatastoreType dataStore,
                                                    final YangInstanceIdentifier path,
                                                    final NormalizedNode<?, ?> payload,
-                                                   final RestconfStrategy strategy,
-                                                   final EffectiveModelContext schemaContext) {
+                                                   final RestconfStrategy strategy) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", dataStore.name(), path, payload);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
+        TransactionUtil.ensureParentsByMerge(path, strategy.getInstanceIdentifier().getSchemaContext(), strategy);
         strategy.merge(dataStore, path, payload);
     }
 }

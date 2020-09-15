@@ -42,7 +42,7 @@ public interface RestconfStrategy {
      * Read data from the datastore.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
+     * @param path  the data object path
      * @return a ListenableFuture containing the result of the read
      */
     ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store, YangInstanceIdentifier path);
@@ -51,7 +51,7 @@ public interface RestconfStrategy {
      * Check if data already exists in the datastore.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
+     * @param path  the data object path
      * @return a FluentFuture containing the result of the check
      */
     FluentFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
@@ -60,16 +60,24 @@ public interface RestconfStrategy {
      * Delete data from the datastore.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
+     * @param path  the data object path
      */
     void delete(LogicalDatastoreType store, YangInstanceIdentifier path);
+
+    /**
+     * Remove data from the datastore.
+     *
+     * @param store the logical data store which should be modified
+     * @param path  the data object path
+     */
+    void remove(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
      * Merges a piece of data with the existing data at a specified path.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
-     * @param data the data object to be merged to the specified path
+     * @param path  the data object path
+     * @param data  the data object to be merged to the specified path
      */
     void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
 
@@ -77,19 +85,21 @@ public interface RestconfStrategy {
      * Stores a piece of data at the specified path.
      *
      * @param store the logical data store which should be modified
-     * @param path the data object path
-     * @param data the data object to be merged to the specified path
+     * @param path  the data object path
+     * @param data  the data object to be merged to the specified path
      */
     void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
 
     /**
      * Replace a piece of data at the specified path.
      *
-     * @param store the logical data store which should be modified
-     * @param path the data object path
-     * @param data the data object to be merged to the specified path
+     * @param store        the logical data store which should be modified
+     * @param path         the data object path
+     * @param data         the data object to be merged to the specified path
+     * @param mergeParents create parents data if needed
      */
-    void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
+    void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data,
+                 boolean mergeParents);
 
     /**
      * Confirm previous operations.
