@@ -27,16 +27,12 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
-import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +72,7 @@ public final class PostDataTransactionUtil {
         final URI location = resolveLocation(uriInfo, path, schemaContext, payload.getData());
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, POST_TX_TYPE, dataFactory, strategy.getTransactionChain());
+        FutureCallbackTx.addCallback(future, POST_TX_TYPE, dataFactory, strategy.getTransactionChain(), path);
         return dataFactory.build();
     }
 
@@ -102,105 +98,61 @@ public final class PostDataTransactionUtil {
             return strategy.commit();
         }
 
-        final DataSchemaNode schemaNode = PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
+        PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
+        final NormalizedNode<?, ?> readData;
         switch (insert) {
             case FIRST:
-                if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
-                    final OrderedMapNode readList = (OrderedMapNode) readData;
-                    if (readList == null || readList.getValue().isEmpty()) {
-                        makePost(path, data, schemaContext, strategy);
-                        return strategy.commit();
-                    }
-
-                    strategy.delete(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
-                    simplePost(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext, strategy);
-                    makePost(path, readData, schemaContext, strategy);
-                    return strategy.commit();
-                } else {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
-
-                    final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        makePost(path, data, schemaContext, strategy);
-                        return strategy.commit();
-                    }
-
-                    strategy.delete(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
-                    simplePost(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext, strategy);
-                    makePost(path, readData, schemaContext, strategy);
+                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                    strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
                     return strategy.commit();
                 }
+                checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path);
+                strategy.remove(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
+                strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                strategy.replace(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent(), readData, schemaContext);
+                return strategy.commit();
             case LAST:
                 makePost(path, data, schemaContext, strategy);
                 return strategy.commit();
             case BEFORE:
-                if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
-                    final OrderedMapNode readList = (OrderedMapNode) readData;
-                    if (readList == null || readList.getValue().isEmpty()) {
-                        makePost(path, data, schemaContext, strategy);
-                        return strategy.commit();
-                    }
-
-                    insertWithPointListPost(LogicalDatastoreType.CONFIGURATION, path,
-                            data, schemaContext, point, readList, true, strategy);
-                    return strategy.commit();
-                } else {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
-
-                    final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        makePost(path, data, schemaContext, strategy);
-                        return strategy.commit();
-                    }
-
-                    insertWithPointLeafListPost(LogicalDatastoreType.CONFIGURATION,
-                            path, data, schemaContext, point, readLeafList, true, strategy);
+                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                    strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
                     return strategy.commit();
                 }
+                checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path);
+                insertWithPointPost(path, data, schemaContext, point,
+                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, true, strategy);
+                return strategy.commit();
             case AFTER:
-                if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
-                    final OrderedMapNode readList = (OrderedMapNode) readData;
-                    if (readList == null || readList.getValue().isEmpty()) {
-                        makePost(path, data, schemaContext, strategy);
-                        return strategy.commit();
-                    }
-
-                    insertWithPointListPost(LogicalDatastoreType.CONFIGURATION, path,
-                            data, schemaContext, point, readList, false, strategy);
-                    return strategy.commit();
-                } else {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
-                    final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        makePost(path, data, schemaContext, strategy);
-                        return strategy.commit();
-                    }
-
-                    insertWithPointLeafListPost(LogicalDatastoreType.CONFIGURATION,
-                            path, data, schemaContext, point, readLeafList, true, strategy);
+                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                    strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
                     return strategy.commit();
                 }
+                checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path);
+                insertWithPointPost(path, data, schemaContext, point,
+                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, false, strategy);
+                return strategy.commit();
             default:
                 throw new RestconfDocumentedException(
                     "Used bad value of insert parameter. Possible values are first, last, before or after, but was: "
-                            + insert, RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ATTRIBUTE);
+                        + insert, RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ATTRIBUTE);
         }
     }
 
-    private static void insertWithPointLeafListPost(final LogicalDatastoreType datastore,
-                                                    final YangInstanceIdentifier path,
-                                                    final NormalizedNode<?, ?> payload,
-                                                    final EffectiveModelContext schemaContext, final String point,
-                                                    final OrderedLeafSetNode<?> readLeafList,
-                                                    final boolean before, final RestconfStrategy strategy) {
-        strategy.delete(datastore, path.getParent().getParent());
+    private static void insertWithPointPost(final YangInstanceIdentifier path,
+                                            final NormalizedNode<?, ?> data,
+                                            final EffectiveModelContext schemaContext, final String point,
+                                            final NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>> readList,
+                                            final boolean before, final RestconfStrategy strategy) {
+        final YangInstanceIdentifier parent = path.getParent().getParent();
+        strategy.remove(LogicalDatastoreType.CONFIGURATION, parent);
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
+            ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
-        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+        for (final NormalizedNode<?, ?> nodeChild : readList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
@@ -210,76 +162,27 @@ public final class PostDataTransactionUtil {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final NormalizedNode<?, ?> emptySubtree =
-                ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
-        strategy.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+        final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
+        strategy.merge(LogicalDatastoreType.CONFIGURATION,
+            YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        for (final NormalizedNode<?, ?> nodeChild : readList.getValue()) {
             if (lastInsertedPosition == lastItemPosition) {
-                checkItemDoesNotExists(strategy, datastore, path);
-                strategy.create(datastore, path, payload);
+                strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
             }
-            final YangInstanceIdentifier childPath = path.getParent().getParent().node(nodeChild.getIdentifier());
-            checkItemDoesNotExists(strategy, datastore, childPath);
-            strategy.create(datastore, childPath, nodeChild);
-            lastInsertedPosition++;
-        }
-    }
-
-    private static void insertWithPointListPost(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-                                                final NormalizedNode<?, ?> payload,
-                                                final EffectiveModelContext schemaContext, final String point,
-                                                final MapNode readList, final boolean before,
-                                                final RestconfStrategy strategy) {
-        strategy.delete(datastore, path.getParent().getParent());
-        final InstanceIdentifierContext<?> instanceIdentifier =
-                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
-        int lastItemPosition = 0;
-        for (final MapEntryNode mapEntryNode : readList.getValue()) {
-            if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
-                break;
-            }
-            lastItemPosition++;
-        }
-        if (!before) {
-            lastItemPosition++;
-        }
-        int lastInsertedPosition = 0;
-        final NormalizedNode<?, ?> emptySubtree =
-                ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
-        strategy.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        for (final MapEntryNode mapEntryNode : readList.getValue()) {
-            if (lastInsertedPosition == lastItemPosition) {
-                checkItemDoesNotExists(strategy, datastore, path);
-                strategy.create(datastore, path, payload);
-            }
-            final YangInstanceIdentifier childPath = path.getParent().getParent().node(mapEntryNode.getIdentifier());
-            checkItemDoesNotExists(strategy, datastore, childPath);
-            strategy.create(datastore, childPath, mapEntryNode);
+            final YangInstanceIdentifier childPath = parent.node(nodeChild.getIdentifier());
+            strategy.replace(LogicalDatastoreType.CONFIGURATION, childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
     }
 
     private static void makePost(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
                                  final SchemaContext schemaContext, final RestconfStrategy strategy) {
-        if (data instanceof MapNode) {
-            boolean merge = false;
-            for (final MapEntryNode child : ((MapNode) data).getValue()) {
-                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-                checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, childPath);
-                if (!merge) {
-                    merge = true;
-                    TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-                    final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
-                    strategy.merge(LogicalDatastoreType.CONFIGURATION,
-                            YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
-                }
-                strategy.create(LogicalDatastoreType.CONFIGURATION, childPath, child);
-            }
-        } else {
-            checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path);
-
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-            strategy.create(LogicalDatastoreType.CONFIGURATION, path, data);
+        try {
+            strategy.create(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+        } catch (RestconfDocumentedException e) {
+            // close transaction if any and pass exception further
+            strategy.cancel();
+            throw e;
         }
     }
 
@@ -311,15 +214,6 @@ public final class PostDataTransactionUtil {
                 .build();
     }
 
-    private static void simplePost(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-                                   final NormalizedNode<?, ?> payload,
-                                   final SchemaContext schemaContext, final RestconfStrategy strategy) {
-        checkItemDoesNotExists(strategy, datastore, path);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-        strategy.create(datastore, path, payload);
-    }
-
-
     /**
      * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
      * data already exists.
@@ -327,9 +221,8 @@ public final class PostDataTransactionUtil {
      * @param strategy      Object that perform the actual DS operations
      * @param store         Datastore
      * @param path          Path to be checked
-     * @param operationType Type of operation (READ, POST, PUT, DELETE...)
      */
-    private static void checkItemDoesNotExists(final RestconfStrategy strategy,
+    public static void checkItemDoesNotExists(final RestconfStrategy strategy,
                                                final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final FluentFuture<Boolean> future = strategy.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
@@ -337,13 +230,9 @@ public final class PostDataTransactionUtil {
         FutureCallbackTx.addCallback(future, POST_TX_TYPE, response);
 
         if (response.result) {
-            // close transaction
-            strategy.cancel();
-            // throw error
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             throw new RestconfDocumentedException(
-                    "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
+                "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
         }
     }
-
 }

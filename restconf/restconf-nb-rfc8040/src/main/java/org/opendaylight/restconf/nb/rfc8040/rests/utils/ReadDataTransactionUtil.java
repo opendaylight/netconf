@@ -514,7 +514,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     @SuppressWarnings("unchecked")
-    private static @NonNull NormalizedNode<?, ?> prepareData(final @NonNull NormalizedNode<?, ?> configDataNode,
+    public static @NonNull NormalizedNode<?, ?> prepareData(final @NonNull NormalizedNode<?, ?> configDataNode,
                                                              final @NonNull NormalizedNode<?, ?> stateDataNode) {
         if (configDataNode instanceof OrderedMapNode) {
             final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> builder = Builders
