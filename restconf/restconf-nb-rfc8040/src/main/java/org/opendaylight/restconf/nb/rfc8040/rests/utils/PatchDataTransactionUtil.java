@@ -213,7 +213,7 @@ public final class PatchDataTransactionUtil {
                                                     final YangInstanceIdentifier path,
                                                     final RestconfStrategy strategy) {
         LOG.trace("Remove {} within Restconf Patch: {}", dataStore.name(), path);
-        strategy.delete(dataStore, path);
+        strategy.remove(dataStore, path);
     }
 
     /**
@@ -261,9 +261,9 @@ public final class PatchDataTransactionUtil {
                 }
 
                 if (errorIfExists) {
-                    strategy.create(dataStore, childPath, child);
+                    strategy.create(dataStore, childPath, child, false);
                 } else {
-                    strategy.replace(dataStore, childPath, child);
+                    strategy.replace(dataStore, childPath, child, false);
                 }
             }
         } else {
@@ -273,9 +273,9 @@ public final class PatchDataTransactionUtil {
 
             TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
             if (errorIfExists) {
-                strategy.create(dataStore, path, payload);
+                strategy.create(dataStore, path, payload, false);
             } else {
-                strategy.replace(dataStore, path, payload);
+                strategy.replace(dataStore, path, payload, false);
             }
         }
     }
