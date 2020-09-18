@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "674cbc11_0852057f",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-18T07:50:57Z",
+      "side": 1,
+      "message": "1) static patterns should always be pre-compiled (it is *very* costly to compile them)\n2) can you reformulate this in terms of a CharMatcher (which is a lot faster than Pattern/Matcher) for this simple case?",
+      "range": {
+        "startLine": 164,
+        "startChar": 27,
+        "endLine": 164,
+        "endChar": 74
+      },
+      "revId": "898e09db278063a53fc76dd9f72367738b6dc6f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
