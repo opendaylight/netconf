@@ -1,4 +1,5 @@
 # UUID                                                                 	Group Name
 #
+6216b0bb299404a8adbd834984a2e1481f9f4b87                               	saml/odl-gerrit-netconf-committers
 c9025ab9ddc1e3171919e085449f22c54f8f7b54                               	GitHub Replication
 ldap:cn=odl-gerrit-netconf-committers,ou=Groups,dc=freestandards,dc=org	ldap/odl-gerrit-netconf-committers
