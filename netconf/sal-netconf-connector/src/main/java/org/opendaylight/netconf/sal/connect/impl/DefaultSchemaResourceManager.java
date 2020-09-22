@@ -28,8 +28,8 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.util.InMemorySchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
+import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRSchemaSource;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,15 +100,15 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         // Setup the baseline empty registry
         final SharedSchemaRepository repository = new SharedSchemaRepository(subdir, parserFactory);
 
-        // Teach the registry how to transform YANG text to ASTSchemaSource internally
-        repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));
+        // Teach the registry how to transform YANG text to IRSchemaSource internally
+        repository.registerSchemaSourceListener(TextToIRTransformer.create(repository, repository));
 
-        // Attach a soft cache of ASTSchemaSource instances. This is important during convergence when we are fishing
+        // Attach a soft cache of IRSchemaSource instances. This is important during convergence when we are fishing
         // for a consistent set of modules, as it skips the need to re-parse the text sources multiple times. It also
         // helps establishing different sets of contexts, as they can share this pre-made cache.
         repository.registerSchemaSourceListener(
             // FIXME: add knobs to control cache lifetime explicitly
-            InMemorySchemaSourceCache.createSoftCache(repository, ASTSchemaSource.class));
+            InMemorySchemaSourceCache.createSoftCache(repository, IRSchemaSource.class));
 
         // Attach the filesystem cache, providing persistence capability, so that restarts do not require us to
         // re-populate the cache. This also acts as a side-load capability, as anything pre-populated into that
