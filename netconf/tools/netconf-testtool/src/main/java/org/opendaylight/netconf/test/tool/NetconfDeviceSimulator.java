@@ -69,7 +69,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -285,7 +285,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private Set<Capability> parseSchemasToModuleCapabilities(final SharedSchemaRepository consumer) {
         final Set<SourceIdentifier> loadedSources = new HashSet<>();
-        consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));
+        consumer.registerSchemaSourceListener(TextToIRTransformer.create(consumer, consumer));
         consumer.registerSchemaSourceListener(new SchemaSourceListener() {
             @Override
             public void schemaSourceEncountered(final SchemaSourceRepresentation schemaSourceRepresentation) {
