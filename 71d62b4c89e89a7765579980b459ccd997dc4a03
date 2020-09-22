@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "12680bcc_3947bdbf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:11:19Z",
+      "side": 1,
+      "message": "please remove this line",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 49
+      },
+      "revId": "71d62b4c89e89a7765579980b459ccd997dc4a03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "969a6577_02355d6e",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
         "patchSetId": 14
