@@ -92,7 +92,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 
 /**
  * Unit tests for NetconfNodeManager.
@@ -154,7 +154,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository("master");
         masterSchemaRepository.registerSchemaSourceListener(
-                TextToASTTransformer.create(masterSchemaRepository, masterSchemaRepository));
+                TextToIRTransformer.create(masterSchemaRepository, masterSchemaRepository));
 
         String yangTemplate =
                   "module ID {"
@@ -180,7 +180,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         SharedSchemaRepository slaveSchemaRepository = new SharedSchemaRepository("slave");
         slaveSchemaRepository.registerSchemaSourceListener(
-                TextToASTTransformer.create(slaveSchemaRepository, slaveSchemaRepository));
+                TextToIRTransformer.create(slaveSchemaRepository, slaveSchemaRepository));
 
         NetconfTopologySetup slaveSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
                 .setActorSystem(slaveSystem).setDataBroker(mockDataBroker).setSchemaResourceDTO(

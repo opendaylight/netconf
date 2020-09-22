@@ -125,7 +125,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -192,7 +192,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
         masterSchemaRepository.registerSchemaSourceListener(
-                TextToASTTransformer.create(masterSchemaRepository, masterSchemaRepository));
+                TextToIRTransformer.create(masterSchemaRepository, masterSchemaRepository));
 
         doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
         doReturn(mockRegistry).when(schemaResourceDTO).getSchemaRegistry();
