@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "969a6577_02355d6e",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:07:12Z",
+      "side": 1,
+      "message": "Correct how? For example, why are all AugmentationNode child nodes incorrect for all parents?",
+      "range": {
+        "startLine": 236,
+        "startChar": 28,
+        "endLine": 236,
+        "endChar": 67
+      },
+      "revId": "71d62b4c89e89a7765579980b459ccd997dc4a03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab12fdbb_06d37d47",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:07:12Z",
+      "side": 1,
+      "message": "should be final",
+      "range": {
+        "startLine": 238,
+        "startChar": 53,
+        "endLine": 238,
+        "endChar": 65
+      },
+      "revId": "71d62b4c89e89a7765579980b459ccd997dc4a03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d2270ba_491ffffb",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:07:12Z",
+      "side": 1,
+      "message": "This really is the current node, is it not?",
+      "range": {
+        "startLine": 280,
+        "startChar": 19,
+        "endLine": 280,
+        "endChar": 29
+      },
+      "revId": "71d62b4c89e89a7765579980b459ccd997dc4a03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a9e8514b_bea95ff7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:07:12Z",
+      "side": 1,
+      "message": "this is a very weird reset condition.",
+      "range": {
+        "startLine": 303,
+        "startChar": 28,
+        "endLine": 303,
+        "endChar": 59
+      },
+      "revId": "71d62b4c89e89a7765579980b459ccd997dc4a03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a4846b1e_f8cdbc1c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:07:12Z",
+      "side": 1,
+      "message": "private static final class -- why would this be \u0027protected\u0027 ?",
+      "range": {
+        "startLine": 424,
+        "startChar": 8,
+        "endLine": 424,
+        "endChar": 17
+      },
+      "revId": "71d62b4c89e89a7765579980b459ccd997dc4a03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0fa684e9_844d1172",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:07:12Z",
+      "side": 1,
+      "message": "this seems to be a duplicate of code on line 219",
+      "range": {
+        "startLine": 426,
+        "startChar": 15,
+        "endLine": 426,
+        "endChar": 49
+      },
+      "revId": "71d62b4c89e89a7765579980b459ccd997dc4a03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ecc2b43b_00feafc0",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:07:12Z",
+      "side": 1,
+      "message": "okay, so this is setting global state so that it is picked up by write() ?",
+      "range": {
+        "startLine": 447,
+        "startChar": 20,
+        "endLine": 447,
+        "endChar": 42
+      },
+      "revId": "71d62b4c89e89a7765579980b459ccd997dc4a03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
