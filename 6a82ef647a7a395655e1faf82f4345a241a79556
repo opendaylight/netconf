@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e33526c_878221a8",
+        "filename": "netconf/aaa-authn-odl-plugin/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:15:07Z",
+      "side": 0,
+      "message": "Why is this being removed?",
+      "range": {
+        "startLine": 44,
+        "startChar": 12,
+        "endLine": 45,
+        "endChar": 37
+      },
+      "revId": "6a82ef647a7a395655e1faf82f4345a241a79556",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}

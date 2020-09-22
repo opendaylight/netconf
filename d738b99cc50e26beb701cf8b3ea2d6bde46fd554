@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fede36f6_e8b5854a",
+        "filename": "netconf/callhome-provider/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-09-22T16:15:07Z",
+      "side": 1,
+      "message": "optional\u003dtrue, scope\u003dprovided. ALWAYS.",
+      "range": {
+        "startLine": 41,
+        "startChar": 8,
+        "endLine": 48,
+        "endChar": 21
+      },
+      "revId": "d738b99cc50e26beb701cf8b3ea2d6bde46fd554",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
