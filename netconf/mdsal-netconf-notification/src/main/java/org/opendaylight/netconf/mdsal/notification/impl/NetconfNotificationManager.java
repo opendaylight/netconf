@@ -101,8 +101,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             LOG.debug("Notification of type {} detected: {}", stream, notification);
         }
 
-        for (final GenericNotificationListenerReg listenerReg : notificationListeners.get(BASE_STREAM_NAME)) {
-            listenerReg.getListener().onNotification(BASE_STREAM_NAME, notification);
+        for (final GenericNotificationListenerReg listenerReg : notificationListeners.get(stream)) {
+            listenerReg.getListener().onNotification(stream, notification);
         }
     }
 
@@ -126,7 +126,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             }
         };
 
-        notificationListeners.put(BASE_STREAM_NAME, genericNotificationListenerReg);
+        notificationListeners.put(stream, genericNotificationListenerReg);
         return genericNotificationListenerReg;
     }
 
