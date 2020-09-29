@@ -10,8 +10,10 @@ package org.opendaylight.netconf.mdsal.notification.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -25,19 +27,19 @@ import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.dom.codec.impl.DefaultBindingDOMCodecFactory;
 import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.notification.impl.ops.NotificationsTransformUtil;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
-import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yangtools.yang.model.parser.api.YangParserException;
@@ -45,10 +47,7 @@ import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NetconfNotificationManagerTest {
-
     public static final String RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-    @Mock
-    private NetconfNotificationRegistry notificationRegistry;
 
     @Test
     public void testEventTime() throws Exception {
@@ -159,6 +158,35 @@ public class NetconfNotificationManagerTest {
 
         baseNotificationPublisherRegistration.onCapabilityChanged(notification);
         verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void testCustomNotificationListeners() throws Exception {
+        final NetconfNotificationManager netconfNotificationManager = createManager();
+
+        final StreamNameType testStreamName = new StreamNameType("TEST_STREAM");
+        final Stream testStream = new StreamBuilder().setName(testStreamName).build();
+
+        final NetconfNotificationListener listenerBase = mock(NetconfNotificationListener.class);
+        netconfNotificationManager.registerNotificationListener(
+            NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listenerBase);
+
+        final NetconfNotificationListener listener = mock(NetconfNotificationListener.class);
+        netconfNotificationManager.registerNotificationListener(testStream.getName(), listener);
+
+        doNothing().when(listener).onNotification(eq(testStreamName), any(NetconfNotification.class));
+
+        final NetconfNotification notification = new NetconfNotification(
+            XmlUtil.readXmlToDocument("<notification/>"));
+        netconfNotificationManager.onNotification(testStream.getName(), notification);
+
+        verify(listener).onNotification(eq(testStream.getName()), eq(notification));
+
+        netconfNotificationManager.close();
+        netconfNotificationManager.onNotification(testStream.getName(), notification);
+
+        verifyNoMoreInteractions(listener);
+        verify(listenerBase, never()).onNotification(eq(testStream.getName()), eq(notification));
     }
 
     @Test
