@@ -17,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoOutputStream;
 import org.opendaylight.netconf.shaded.sshd.common.io.WritePendingException;
@@ -33,6 +35,8 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(AsyncSshHandlerWriter.class);
+
+    private static final Pattern NON_ASCII = Pattern.compile("([^\\x20-\\x7E\\x0D\\x0A])+");
 
     // public static final int MAX_PENDING_WRITES = 1000;
     // TODO implement Limiting mechanism for pending writes
@@ -156,9 +160,18 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     }
 
     public static String byteBufToString(final ByteBuf msg) {
-        final String s = msg.toString(StandardCharsets.UTF_8);
+        final String message = msg.toString(StandardCharsets.UTF_8);
         msg.resetReaderIndex();
-        return s;
+        Matcher matcher = NON_ASCII.matcher(message);
+        return matcher.replaceAll((data) -> {
+            StringBuilder buf = new StringBuilder();
+            buf.append("\"");
+            for (byte b : data.group().getBytes(StandardCharsets.US_ASCII)) {
+                buf.append(String.format("%02X", b));
+            }
+            buf.append("\"");
+            return buf.toString();
+        });
     }
 
     private void queueRequest(final ChannelHandlerContext ctx, final ByteBuf msg, final ChannelPromise promise) {
