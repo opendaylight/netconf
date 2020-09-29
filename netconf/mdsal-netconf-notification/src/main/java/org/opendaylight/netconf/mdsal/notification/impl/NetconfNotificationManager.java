@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -101,8 +102,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             LOG.debug("Notification of type {} detected: {}", stream, notification);
         }
 
-        for (final GenericNotificationListenerReg listenerReg : notificationListeners.get(BASE_STREAM_NAME)) {
-            listenerReg.getListener().onNotification(BASE_STREAM_NAME, notification);
+        for (final GenericNotificationListenerReg listenerReg : notificationListeners.get(stream)) {
+            listenerReg.getListener().onNotification(stream, notification);
         }
     }
 
@@ -116,7 +117,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         LOG.trace("Notification listener registered for stream: {}", stream);
 
         final GenericNotificationListenerReg genericNotificationListenerReg =
-                new GenericNotificationListenerReg(listener) {
+                new GenericNotificationListenerReg(listener, stream) {
             @Override
             public void close() {
                 synchronized (NetconfNotificationManager.this) {
@@ -126,7 +127,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             }
         };
 
-        notificationListeners.put(BASE_STREAM_NAME, genericNotificationListenerReg);
+        notificationListeners.put(stream, genericNotificationListenerReg);
         return genericNotificationListenerReg;
     }
 
@@ -160,13 +161,15 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     @Override
     public synchronized void close() {
         // Unregister all listeners
-        for (final GenericNotificationListenerReg genericNotificationListenerReg : notificationListeners.values()) {
-            genericNotificationListenerReg.close();
+        // Use new list to avoid ConcurrentModificationException
+        for (final GenericNotificationListenerReg listenerReg : new ArrayList<>(notificationListeners.values())) {
+            listenerReg.close();
         }
         notificationListeners.clear();
 
         // Unregister all publishers
-        for (final GenericNotificationPublisherReg notificationPublisher : notificationPublishers) {
+        // Use new list to avoid ConcurrentModificationException
+        for (final GenericNotificationPublisherReg notificationPublisher : new ArrayList<>(notificationPublishers)) {
             notificationPublisher.close();
         }
         notificationPublishers.clear();
@@ -352,9 +355,12 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     private class GenericNotificationListenerReg implements NotificationListenerRegistration {
         private final NetconfNotificationListener listener;
+        private final StreamNameType listenedStream;
 
-        GenericNotificationListenerReg(final NetconfNotificationListener listener) {
+        GenericNotificationListenerReg(final NetconfNotificationListener listener,
+                                       final StreamNameType listenedStream) {
             this.listener = listener;
+            this.listenedStream = listenedStream;
         }
 
         public NetconfNotificationListener getListener() {
@@ -363,7 +369,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
         @Override
         public void close() {
-            notificationListeners.remove(BASE_STREAM_NAME, this);
+            notificationListeners.remove(listenedStream, this);
         }
     }
 }
