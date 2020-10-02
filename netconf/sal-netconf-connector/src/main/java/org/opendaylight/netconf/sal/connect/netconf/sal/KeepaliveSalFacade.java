@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -92,21 +93,22 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         this.listener = listener;
     }
 
+    volatile long lastKeepaliveTimeStamp;
+    volatile long lastActivityTimeStamp;
+
     /**
-     * Just cancel current keepalive task if exists.
-     * If its already started, let it finish ... not such a big deal.
-     *
-     * <p>
-     * Then schedule next keepalive.
+     * Re schedule next keepalive or create new if it exists.
      */
     synchronized void resetKeepalive() {
         LOG.trace("{}: Resetting netconf keepalive timer", id);
-        if (currentKeepalive != null) {
-            currentKeepalive.cancel(false);
+        if (currentKeepalive == null || currentKeepalive.isCancelled()) {
+            lastKeepAliveSucceeded.set(true);
+            checkState(currentDeviceRpc != null);
+            LOG.trace("{}: Scheduling keepalives every  {} {}", id, keepaliveDelaySeconds, TimeUnit.SECONDS);
+            currentKeepalive = executor.schedule(new Keepalive(), keepaliveDelaySeconds, TimeUnit.SECONDS);
         } else {
-            LOG.trace("{}: Keepalive does not exist", id);
+            lastActivityTimeStamp = new Date().getTime();
         }
-        scheduleKeepalives();
     }
 
     /**
@@ -147,13 +149,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         resetKeepalive();
     }
 
-    private void scheduleKeepalives() {
-        lastKeepAliveSucceeded.set(true);
-        checkState(currentDeviceRpc != null);
-        LOG.trace("{}: Scheduling keepalives every  {} {}", id, keepaliveDelaySeconds, TimeUnit.SECONDS);
-        currentKeepalive = executor.scheduleWithFixedDelay(new Keepalive(),
-          keepaliveDelaySeconds, keepaliveDelaySeconds, TimeUnit.SECONDS);
-    }
 
     @Override
     public void onDeviceDisconnected() {
@@ -191,17 +186,14 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      */
     private class Keepalive implements Runnable, FutureCallback<DOMRpcResult> {
 
-        @Override
-        public void run() {
-            LOG.trace("{}: Invoking keepalive RPC", id);
-
+        private void proceed() {
             try {
                 final boolean lastJobSucceeded = lastKeepAliveSucceeded.getAndSet(false);
                 if (!lastJobSucceeded) {
                     onFailure(new IllegalStateException("Previous keepalive timed out"));
                 } else {
                     Futures.addCallback(currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD), this,
-                        MoreExecutors.directExecutor());
+                            MoreExecutors.directExecutor());
                 }
             } catch (final NullPointerException e) {
                 LOG.debug("{}: Skipping keepalive while reconnecting", id);
@@ -209,6 +201,26 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                 // Do nothing. The currentDeviceRpc was null and it means we hit the reconnect window and
                 // attempted to send keepalive while we were reconnecting. Next keepalive will be scheduled
                 // after reconnect so no action necessary here.
+            }
+        }
+
+        @Override
+        public void run() {
+            synchronized (KeepaliveSalFacade.this) {
+                LOG.trace("{}: Invoking keepalive RPC", id);
+
+                if (currentKeepalive == null || currentKeepalive.isCancelled()) {
+                    return;
+                }
+
+                if (lastActivityTimeStamp > lastKeepaliveTimeStamp) {
+                    long additionalTime = lastActivityTimeStamp - lastKeepaliveTimeStamp;
+                    currentKeepalive = executor.schedule(this, additionalTime, TimeUnit.SECONDS);
+                } else {
+                    proceed();
+                    currentKeepalive = executor.schedule(this, keepaliveDelaySeconds, TimeUnit.SECONDS);
+                }
+                lastKeepaliveTimeStamp = new Date().getTime();
             }
         }
 
