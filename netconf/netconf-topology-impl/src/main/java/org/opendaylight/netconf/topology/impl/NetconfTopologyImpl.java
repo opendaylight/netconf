@@ -31,9 +31,10 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfMountPointManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfSalFacadeType;
 import org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
@@ -69,10 +70,10 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
-            final BaseNetconfSchemas baseSchemas) {
+            final BaseNetconfSchemas baseSchemas, final NetconfMountPointManager netconfMountPointManager) {
         this(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, rpcProviderService,
-                baseSchemas, null);
+                baseSchemas, null, netconfMountPointManager);
     }
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
@@ -80,10 +81,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
-            final BaseNetconfSchemas baseSchemas, final DeviceActionFactory deviceActionFactory) {
+            final BaseNetconfSchemas baseSchemas, final DeviceActionFactory deviceActionFactory,
+            NetconfMountPointManager netconfMountPointManager) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
-                baseSchemas);
+                baseSchemas, netconfMountPointManager);
         this.rpcProviderService = requireNonNull(rpcProviderService);
     }
 
@@ -108,7 +110,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
 
     @Override
     protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id) {
-        return new NetconfDeviceSalFacade(id, mountPointService, dataBroker, topologyId);
+        return netconfMountPointManager.getInstance(id, mountPointService, dataBroker,
+                topologyId, NetconfSalFacadeType.NETCONFDEVICESALFACADE, null, null, null);
     }
 
     /**
