@@ -175,8 +175,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         // retrieve connection, and disconnect it
         final NetconfConnectorDTO connectorDTO = activeConnectors.remove(nodeId);
-        connectorDTO.getCommunicator().close();
-        connectorDTO.getFacade().close();
+        connectorDTO.close();
         return Futures.immediateFuture(null);
     }
 
@@ -346,6 +345,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.privateKeyPassphrase = privateKeyPassphrase;
     }
 
+    protected static Set<Uri> getDeviceYangLibUri() {
+        return DEVICE_YANG_LIB_URI;
+    }
+
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
                                                                   final NetconfNode node) {
 
@@ -507,6 +510,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                    final Uri uri, List<SchemaSourceRegistration<?>> deviceSchemaSourceRegistration) {
             super(communicator, facade);
             this.uri = requireNonNull(uri);
+            DEVICE_YANG_LIB_URI.add(uri);
             this.deviceSchemaSourceRegistration = requireNonNull(deviceSchemaSourceRegistration);
         }
 
@@ -520,6 +524,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         @Override
         public void close() {
+            super.close();
             DEVICE_YANG_LIB_URI.remove(uri);
             for (SchemaSourceRegistration<?> schemaSourceRegistration : deviceSchemaSourceRegistration) {
                 schemaSourceRegistration.close();
