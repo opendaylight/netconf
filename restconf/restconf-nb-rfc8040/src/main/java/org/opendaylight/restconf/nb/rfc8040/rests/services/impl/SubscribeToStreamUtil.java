@@ -45,8 +45,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +144,7 @@ abstract class SubscribeToStreamUtil {
 
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
-        final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
+        final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
@@ -160,11 +159,11 @@ abstract class SubscribeToStreamUtil {
                 handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
         final NormalizedNode<?, ?> mapToStreams =
                 RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                    notificationListenerAdapter.get().getSchemaPath().getLastComponent(),
+                    notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
                     notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext), exist);
         writeDataToDS(schemaContext,
-                notificationListenerAdapter.get().getSchemaPath().getLastComponent().getLocalName(), writeTransaction,
+                notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
                 exist, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
@@ -231,11 +230,11 @@ abstract class SubscribeToStreamUtil {
         return uri;
     }
 
-    static Module getMonitoringModule(final SchemaContext schemaContext) {
+    static Module getMonitoringModule(final EffectiveModelContext schemaContext) {
         return schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
     }
 
-    private static void writeDataToDS(final SchemaContext schemaContext, final String name,
+    private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
             final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
             final NormalizedNode<?, ?> mapToStreams) {
         String pathId;
@@ -298,7 +297,7 @@ abstract class SubscribeToStreamUtil {
         listener.setRegistration(registration);
     }
 
-    private static boolean checkExist(final SchemaContext schemaContext,
+    private static boolean checkExist(final EffectiveModelContext schemaContext,
                               final DOMDataTreeReadOperations readWriteTransaction) {
         try {
             return readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
@@ -314,7 +313,7 @@ abstract class SubscribeToStreamUtil {
             return;
         }
 
-        final SchemaPath path = listener.getSchemaPath();
+        final Absolute path = listener.getSchemaPath();
         final ListenerRegistration<DOMNotificationListener> registration =
                 notificationServiceHandler.get().registerNotificationListener(listener, path);
         listener.setRegistration(registration);

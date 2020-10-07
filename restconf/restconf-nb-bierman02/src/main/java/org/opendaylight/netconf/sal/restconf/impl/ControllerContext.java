@@ -234,7 +234,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public Module findModuleByName(final DOMMountPoint mountPoint, final String moduleName) {
         Preconditions.checkArgument(moduleName != null && mountPoint != null);
 
-        final SchemaContext mountPointSchema = mountPoint.getSchemaContext();
+        final SchemaContext mountPointSchema = getModelContext(mountPoint);
         if (mountPointSchema == null) {
             return null;
         }
@@ -251,7 +251,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public Module findModuleByNamespace(final DOMMountPoint mountPoint, final URI namespace) {
         Preconditions.checkArgument(namespace != null && mountPoint != null);
 
-        final SchemaContext mountPointSchema = mountPoint.getSchemaContext();
+        final SchemaContext mountPointSchema = getModelContext(mountPoint);
         if (mountPointSchema == null) {
             return null;
         }
@@ -271,7 +271,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         checkPreconditions();
         Preconditions.checkArgument(name != null && revision != null && mountPoint != null);
 
-        final SchemaContext schemaContext = mountPoint.getSchemaContext();
+        final SchemaContext schemaContext = getModelContext(mountPoint);
         return schemaContext == null ? null : schemaContext.findModule(name, revision).orElse(null);
     }
 
@@ -304,7 +304,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         final QName startQName = head.getNodeType();
         final SchemaContext schemaContext;
         if (mount != null) {
-            schemaContext = mount.getSchemaContext();
+            schemaContext = getModelContext(mount);
         } else {
             schemaContext = this.globalSchema;
         }
@@ -314,7 +314,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             if (!(element instanceof AugmentationIdentifier)) {
                 final QName _nodeType = element.getNodeType();
                 final DataSchemaNode potentialNode = childByQName(node, _nodeType);
-                if (!(element instanceof NodeIdentifier && potentialNode instanceof ListSchemaNode)
+                if ((!(element instanceof NodeIdentifier) || !(potentialNode instanceof ListSchemaNode))
                         && !(potentialNode instanceof ChoiceSchemaNode)) {
                     builder.append(convertToRestconfIdentifier(element, potentialNode, mount));
                     if (potentialNode instanceof DataNodeContainer) {
@@ -352,7 +352,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public Collection<? extends Module> getAllModules(final DOMMountPoint mountPoint) {
         checkPreconditions();
 
-        final SchemaContext schemaContext = mountPoint == null ? null : mountPoint.getSchemaContext();
+        final SchemaContext schemaContext = mountPoint == null ? null : getModelContext(mountPoint);
         return schemaContext == null ? null : schemaContext.getModules();
     }
 
@@ -369,7 +369,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public CharSequence toRestconfIdentifier(final QName qname, final DOMMountPoint mount) {
         final SchemaContext schema;
         if (mount != null) {
-            schema = mount.getSchemaContext();
+            schema = getModelContext(mount);
         } else {
             checkPreconditions();
             schema = this.globalSchema;
@@ -389,7 +389,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             return null;
         }
 
-        return toRestconfIdentifier(mountPoint.getSchemaContext(), qname);
+        return toRestconfIdentifier(getModelContext(mountPoint), qname);
     }
 
     public Module getRestconfModule() {
@@ -554,8 +554,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         }
 
         if (strings.isEmpty()) {
-            return createContext(builder.build(), (DataSchemaNode) parentNode,
-                mountPoint,mountPoint != null ? mountPoint.getEffectiveModelContext() : this.globalSchema);
+            return createContext(builder.build(), (DataSchemaNode) parentNode, mountPoint,
+                mountPoint != null ? getModelContext(mountPoint) : this.globalSchema);
         }
 
         final String head = strings.iterator().next();
@@ -591,7 +591,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
                 final DOMMountPoint mount = mountOpt.get();
 
-                final EffectiveModelContext mountPointSchema = mount.getEffectiveModelContext();
+                final EffectiveModelContext mountPointSchema = getModelContext(mount);
                 if (mountPointSchema == null) {
                     throw new RestconfDocumentedException("Mount point does not contain any schema with modules.",
                             ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT);
@@ -630,7 +630,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                             ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
                 }
             } else {
-                final EffectiveModelContext schemaContext = mountPoint.getEffectiveModelContext();
+                final EffectiveModelContext schemaContext = getModelContext(mountPoint);
                 if (schemaContext != null) {
                     module = schemaContext.findModules(moduleName).stream().findFirst().orElse(null);
                 } else {
@@ -654,7 +654,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
                 if (rpc != null) {
                     return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint,
-                            mountPoint != null ? mountPoint.getEffectiveModelContext() : this.globalSchema);
+                            mountPoint != null ? getModelContext(mountPoint) : this.globalSchema);
                 }
             }
 
@@ -733,7 +733,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         }
 
         return createContext(builder.build(), targetNode, mountPoint,
-            mountPoint != null ? mountPoint.getEffectiveModelContext() : this.globalSchema);
+            mountPoint != null ? getModelContext(mountPoint) : this.globalSchema);
     }
 
     private static InstanceIdentifierContext<?> createContext(final YangInstanceIdentifier instance,
@@ -796,7 +796,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         Preconditions.checkNotNull(uriValue);
         Preconditions.checkArgument(node instanceof LeafSchemaNode);
 
-        final SchemaContext schemaContext = mountPoint == null ? this.globalSchema : mountPoint.getSchemaContext();
+        final SchemaContext schemaContext = mountPoint == null ? this.globalSchema : getModelContext(mountPoint);
         final String urlDecoded = urlPathArgDecode(uriValue);
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
@@ -1013,5 +1013,11 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             throw new RestconfDocumentedException("Data normalizer failed. Normalization isn't possible", e);
         }
         return operation.isMixin();
+    }
+
+    private static EffectiveModelContext getModelContext(DOMMountPoint mountPoint) {
+        return mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
     }
 }

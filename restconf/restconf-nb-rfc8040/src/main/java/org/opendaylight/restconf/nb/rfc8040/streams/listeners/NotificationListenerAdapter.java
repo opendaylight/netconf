@@ -28,8 +28,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWrit
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -44,7 +44,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private static final Logger LOG = LoggerFactory.getLogger(NotificationListenerAdapter.class);
 
     private final String streamName;
-    private final SchemaPath path;
+    private final Absolute path;
     private final String outputType;
 
     /**
@@ -54,8 +54,8 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      * @param streamName Name of the stream.
      * @param outputType Type of output on notification (JSON or XML).
      */
-    NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
-        setLocalNameOfPath(path.getLastComponent().getLocalName());
+    NotificationListenerAdapter(final Absolute path, final String streamName, final String outputType) {
+        setLocalNameOfPath(path.lastNodeIdentifier().getLocalName());
 
         this.outputType = requireNonNull(outputType);
         this.path = requireNonNull(path);
@@ -80,7 +80,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
             return;
         }
 
-        final SchemaContext schemaContext = schemaHandler.get();
+        final EffectiveModelContext schemaContext = schemaHandler.get();
         final String xml = prepareXml(schemaContext, notification);
         if (checkFilter(xml)) {
             post(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
@@ -102,7 +102,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      *
      * @return The configured schema path that points to observing YANG notification schema node.
      */
-    public SchemaPath getSchemaPath() {
+    public Absolute getSchemaPath() {
         return this.path;
     }
 
@@ -112,7 +112,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      * @return Transformed notification data in JSON format.
      */
     @VisibleForTesting
-    String prepareJson(final SchemaContext schemaContext, final DOMNotification notification) {
+    String prepareJson(final EffectiveModelContext schemaContext, final DOMNotification notification) {
         final JsonParser jsonParser = new JsonParser();
         final JsonObject json = new JsonObject();
         json.add("ietf-restconf:notification", jsonParser.parse(writeBodyToString(schemaContext, notification)));
@@ -120,7 +120,8 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         return json.toString();
     }
 
-    private static String writeBodyToString(final SchemaContext schemaContext, final DOMNotification notification) {
+    private static String writeBodyToString(final EffectiveModelContext schemaContext,
+            final DOMNotification notification) {
         final Writer writer = new StringWriter();
         final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
                 JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(schemaContext),
@@ -140,7 +141,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      *
      * @return Transformed notification data in XML format.
      */
-    private String prepareXml(final SchemaContext schemaContext, final DOMNotification notification) {
+    private String prepareXml(final EffectiveModelContext schemaContext, final DOMNotification notification) {
         final Document doc = createDocument();
         final Element notificationElement = basePartDoc(doc);
 
@@ -153,9 +154,9 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     private void addValuesToNotificationEventElement(final Document doc, final Element element,
-            final SchemaContext schemaContext, final DOMNotification notification) {
+            final EffectiveModelContext schemaContext, final DOMNotification notification) {
         try {
-            final DOMResult domResult = writeNormalizedNode(notification.getBody(), schemaContext, this.path);
+            final DOMResult domResult = writeNormalizedNode(notification.getBody(), schemaContext, path.asSchemaPath());
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("notification");
             dataElement.appendChild(result);

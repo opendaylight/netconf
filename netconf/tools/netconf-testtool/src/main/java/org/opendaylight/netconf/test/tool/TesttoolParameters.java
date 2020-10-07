@@ -310,7 +310,7 @@ public class TesttoolParameters {
             for (final File file : files) {
                 final Matcher matcher = YANG_FILENAME_PATTERN.matcher(file.getName());
                 if (!matcher.matches()) {
-                    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
                         String line = reader.readLine();
                         while (line != null && !REVISION_DATE_PATTERN.matcher(line).find()) {
                             line = reader.readLine();

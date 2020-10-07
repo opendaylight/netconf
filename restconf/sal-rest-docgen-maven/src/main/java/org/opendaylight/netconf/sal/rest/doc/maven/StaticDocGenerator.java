@@ -14,13 +14,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import javax.ws.rs.core.UriInfo;
 import org.apache.maven.project.MavenProject;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
@@ -33,6 +33,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang2sources.spi.BasicCodeGenerator;
 import org.opendaylight.yangtools.yang2sources.spi.MavenProjectAware;
+import org.opendaylight.yangtools.yang2sources.spi.ModuleResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
     @Override
     @SuppressFBWarnings("DM_DEFAULT_ENCODING")
     public Collection<File> generateSources(final EffectiveModelContext context, final File outputBaseDir,
-            final Set<Module> currentModules, final Function<Module, Optional<String>> moduleResourcePathResolver)
+            final Set<Module> currentModules, final ModuleResourceResolver moduleResourcePathResolver)
                     throws IOException {
         final List<File> result = new ArrayList<>();
 
@@ -81,7 +82,8 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
             LOG.info("File {} already exists.", resourcesJsFile);
         }
 
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resourcesJsFile))) {
+        try (BufferedWriter bufferedWriter =
+                new BufferedWriter(new FileWriter(resourcesJsFile, StandardCharsets.UTF_8))) {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
@@ -112,7 +114,8 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
 
                 final File resourceFile = new File(resourcesDir, name + "(" + revision + ").json");
 
-                try (BufferedWriter resourceFileWriter = new BufferedWriter(new FileWriter(resourceFile))) {
+                try (BufferedWriter resourceFileWriter =
+                        new BufferedWriter(new FileWriter(resourceFile, StandardCharsets.UTF_8))) {
                     resourceFileWriter.write(json);
                 }
 

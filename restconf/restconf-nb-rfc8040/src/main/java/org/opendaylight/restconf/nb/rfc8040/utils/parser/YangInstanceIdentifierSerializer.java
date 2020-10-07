@@ -24,6 +24,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -50,7 +51,7 @@ public final class YangInstanceIdentifierSerializer {
      *             path to data
      * @return {@link String}
      */
-    public static String create(final SchemaContext schemaContext, final YangInstanceIdentifier data) {
+    public static String create(final EffectiveModelContext schemaContext, final YangInstanceIdentifier data) {
         final DataSchemaContextNode<?> current = DataSchemaContextTree.from(schemaContext).getRoot();
         final MainVarsWrapper variables = new MainVarsWrapper(current);
         final StringBuilder path = new StringBuilder();
