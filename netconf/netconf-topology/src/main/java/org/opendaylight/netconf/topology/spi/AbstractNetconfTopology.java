@@ -175,8 +175,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         // retrieve connection, and disconnect it
         final NetconfConnectorDTO connectorDTO = activeConnectors.remove(nodeId);
-        connectorDTO.getCommunicator().close();
-        connectorDTO.getFacade().close();
+        connectorDTO.close();
         return Futures.immediateFuture(null);
     }
 
@@ -520,6 +519,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         @Override
         public void close() {
+            super.close();
             DEVICE_YANG_LIB_URI.remove(uri);
             for (SchemaSourceRegistration<?> schemaSourceRegistration : deviceSchemaSourceRegistration) {
                 schemaSourceRegistration.close();
