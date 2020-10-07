@@ -40,6 +40,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
+import org.opendaylight.yangtools.yang.model.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -216,7 +217,7 @@ public class NetconfNotificationManagerTest {
         verify(streamListener).onStreamUnregistered(NetconfNotificationManager.BASE_STREAM_NAME);
     }
 
-    private static NetconfNotificationManager createManager() {
+    private static NetconfNotificationManager createManager() throws YangParserException {
         return new NetconfNotificationManager(new NotificationsTransformUtil(new YangParserFactoryImpl(),
             new DefaultBindingRuntimeGenerator(), new DefaultBindingDOMCodecFactory()));
     }

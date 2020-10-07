@@ -11,11 +11,11 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -60,7 +60,6 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -77,6 +76,8 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
@@ -84,7 +85,7 @@ import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -108,18 +109,19 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final Multimap<QName, ? extends NotificationDefinition> mappedNotifications;
     private final boolean strictParsing;
-    private final ImmutableMap<SchemaPath, ActionDefinition> actions;
+    private final ImmutableMap<Absolute, ActionDefinition> actions;
 
     public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing,
                                      final BaseSchema baseSchema) {
         this.counter = new MessageCounter();
         this.mountContext = requireNonNull(mountContext);
 
-        final SchemaContext schemaContext = mountContext.getSchemaContext();
+        final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
         this.contextTree = DataSchemaContextTree.from(schemaContext);
 
         this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        this.actions = Maps.uniqueIndex(getActions(schemaContext), ActionDefinition::getPath);
+        this.actions = Maps.uniqueIndex(getActions(schemaContext),
+            action -> Absolute.of(ImmutableList.copyOf(action.getPath().getPathFromRoot())));
 
         // RFC6020 normal notifications
         this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
@@ -129,6 +131,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @VisibleForTesting
+    // FIXME: return Map<Absolute, ActionDefinition> by using only
     static List<ActionDefinition> getActions(final SchemaContext schemaContext) {
         final List<ActionDefinition> builder = new ArrayList<>();
         findAction(schemaContext, builder);
@@ -201,8 +204,10 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         }
 
         if (nestedNotificationInfo != null) {
-            return new NetconfDeviceTreeNotification(content, mostRecentNotification.getPath(), stripped.getKey(),
-                nestedNotificationInfo.domDataTreeIdentifier);
+            return new NetconfDeviceTreeNotification(content,
+                // FIXME: improve this to cache the path
+                Absolute.of(ImmutableList.copyOf(mostRecentNotification.getPath().getPathFromRoot())),
+                stripped.getKey(), nestedNotificationInfo.domDataTreeIdentifier);
         }
 
         return new NetconfDeviceNotification(content, stripped.getKey());
@@ -210,7 +215,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private Optional<NestedNotificationInfo> findNestedNotification(final NetconfMessage message,
             final Element element) {
-        final Iterator<? extends Module> modules = mountContext.getSchemaContext()
+        final Iterator<? extends Module> modules = mountContext.getEffectiveModelContext()
                 .findModules(URI.create(element.getNamespaceURI())).iterator();
         if (!modules.hasNext()) {
             throw new IllegalArgumentException(
@@ -320,14 +325,13 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public NetconfMessage toRpcRequest(final SchemaPath rpc, final NormalizedNode<?, ?> payload) {
+    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode<?, ?> payload) {
         // In case no input for rpc is defined, we can simply construct the payload here
-        final QName rpcQName = rpc.getLastComponent();
 
         // Determine whether a base netconf operation is being invoked
         // and also check if the device exposed model for base netconf.
         // If no, use pre built base netconf operations model
-        final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
+        final boolean needToUseBaseCtx = mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc);
         final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
         if (needToUseBaseCtx) {
             currentMappedRpcs = baseSchema.getMappedRpcs();
@@ -335,30 +339,28 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             currentMappedRpcs = mappedRpcs;
         }
 
-        final RpcDefinition mappedRpc = Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName),
-                "Unknown rpc %s, available rpcs: %s", rpcQName, currentMappedRpcs.keySet());
+        final RpcDefinition mappedRpc = Preconditions.checkNotNull(currentMappedRpcs.get(rpc),
+                "Unknown rpc %s, available rpcs: %s", rpc, currentMappedRpcs.keySet());
         if (mappedRpc.getInput().getChildNodes().isEmpty()) {
-            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter)
+            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter)
                 .getNode().getOwnerDocument());
         }
 
-        Preconditions.checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpcQName);
+        Preconditions.checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
 
         Preconditions.checkArgument(payload instanceof ContainerNode,
-                "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpcQName, payload);
-        // Set the path to the input of rpc for the node stream writer
-        final SchemaPath rpcInput = rpc.createChild(YangConstants.operationInputQName(rpcQName.getModule()));
-        final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
-
+                "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpc, payload);
+        final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter);
         try {
             // If the schema context for netconf device does not contain model for base netconf operations,
             // use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
-            final SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext()
-                    : mountContext.getSchemaContext();
-            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, rpcInput, ctx);
+            final EffectiveModelContext ctx = needToUseBaseCtx ? baseSchema.getEffectiveModelContext()
+                    : mountContext.getEffectiveModelContext();
+            NetconfMessageTransformUtil.writeNormalizedOperationInput((ContainerNode) payload, result, Absolute.of(rpc),
+                ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
-            throw new IllegalStateException("Unable to serialize " + rpcInput, e);
+            throw new IllegalStateException("Unable to serialize input of " + rpc, e);
         }
 
         final Document node = result.getNode().getOwnerDocument();
@@ -367,31 +369,28 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public NetconfMessage toActionRequest(final SchemaPath action, final DOMDataTreeIdentifier domDataTreeIdentifier,
+    public NetconfMessage toActionRequest(final Absolute action, final DOMDataTreeIdentifier domDataTreeIdentifier,
             final NormalizedNode<?, ?> payload) {
         final ActionDefinition actionDef = actions.get(action);
         Preconditions.checkArgument(actionDef != null, "Action does not exist: %s", action);
 
-        final ContainerSchemaNode inputDef = actionDef.getInput();
+        final InputSchemaNode inputDef = actionDef.getInput();
         if (inputDef.getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
-                domDataTreeIdentifier, action, counter,
-                actionDef.getQName()).getNode().getOwnerDocument());
+                domDataTreeIdentifier, counter, actionDef.getQName()).getNode().getOwnerDocument());
         }
 
         Preconditions.checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null", action);
         Preconditions.checkArgument(payload instanceof ContainerNode,
                 "Transforming an action with input: %s, payload has to be a container, but was: %s", action, payload);
 
-        // Set the path to the input of action for the node stream writer
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
-            domDataTreeIdentifier, inputDef.getPath(), counter, actionDef.getQName());
-
+            domDataTreeIdentifier, counter, actionDef.getQName());
         try {
-            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, inputDef.getPath(),
-                mountContext.getSchemaContext());
+            NetconfMessageTransformUtil.writeNormalizedOperationInput((ContainerNode) payload, result, action,
+                mountContext.getEffectiveModelContext());
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
-            throw new IllegalStateException("Unable to serialize " + action, e);
+            throw new IllegalStateException("Unable to serialize input of " + action, e);
         }
 
         return new NetconfMessage(result.getNode().getOwnerDocument());
@@ -402,10 +401,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final SchemaPath rpc) {
+    public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
         final NormalizedNode<?, ?> normalizedNode;
-        final QName rpcQName = rpc.getLastComponent();
-        if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpcQName)) {
+        if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             normalizedNode = Builders.containerBuilder()
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
                     .withChild(Builders.anyXmlBuilder()
@@ -418,15 +416,15 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             // and also check if the device exposed model for base netconf.
             // If no, use pre built base netconf operations model
             final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
-            if (mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName)) {
+            if (mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc)) {
                 currentMappedRpcs = baseSchema.getMappedRpcs();
             } else {
                 currentMappedRpcs = mappedRpcs;
             }
 
-            final RpcDefinition rpcDefinition = currentMappedRpcs.get(rpcQName);
+            final RpcDefinition rpcDefinition = currentMappedRpcs.get(rpc);
             Preconditions.checkArgument(rpcDefinition != null,
-                    "Unable to parse response of %s, the rpc is unknown", rpcQName);
+                    "Unable to parse response of %s, the rpc is unknown", rpc);
 
             // In case no input for rpc is defined, we can simply construct the payload here
             normalizedNode = parseResult(message, rpcDefinition);
@@ -435,7 +433,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public DOMActionResult toActionResult(final SchemaPath action, final NetconfMessage message) {
+    public DOMActionResult toActionResult(final Absolute action, final NetconfMessage message) {
         final ActionDefinition actionDefinition = actions.get(action);
         Preconditions.checkArgument(actionDefinition != null, "Action does not exist: %s", action);
         final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
@@ -478,23 +476,23 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     @Beta
     public static class NetconfDeviceNotification implements DOMNotification, DOMEvent {
         private final ContainerNode content;
-        private final SchemaPath schemaPath;
+        private final Absolute schemaPath;
         private final Instant eventTime;
 
         NetconfDeviceNotification(final ContainerNode content, final Instant eventTime) {
             this.content = content;
             this.eventTime = eventTime;
-            this.schemaPath = toPath(content.getNodeType());
+            this.schemaPath = Absolute.of(content.getNodeType());
         }
 
-        NetconfDeviceNotification(final ContainerNode content, final SchemaPath schemaPath, final Instant eventTime) {
+        NetconfDeviceNotification(final ContainerNode content, final Absolute schemaPath, final Instant eventTime) {
             this.content = content;
             this.eventTime = eventTime;
             this.schemaPath = schemaPath;
         }
 
         @Override
-        public SchemaPath getType() {
+        public Absolute getType() {
             return schemaPath;
         }
 
@@ -513,7 +511,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     public static class NetconfDeviceTreeNotification extends NetconfDeviceNotification {
         private final DOMDataTreeIdentifier domDataTreeIdentifier;
 
-        NetconfDeviceTreeNotification(final ContainerNode content, final SchemaPath schemaPath, final Instant eventTime,
+        NetconfDeviceTreeNotification(final ContainerNode content, final Absolute schemaPath, final Instant eventTime,
                 final DOMDataTreeIdentifier domDataTreeIdentifier) {
             super(content, schemaPath, eventTime);
             this.domDataTreeIdentifier = domDataTreeIdentifier;

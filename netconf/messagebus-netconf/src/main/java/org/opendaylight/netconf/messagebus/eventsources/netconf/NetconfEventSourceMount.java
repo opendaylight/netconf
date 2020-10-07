@@ -10,6 +10,7 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -28,6 +29,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInputBuilder;
@@ -41,8 +43,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
  * Facade of mounted netconf device.
@@ -50,26 +53,25 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 class NetconfEventSourceMount {
     private static final YangInstanceIdentifier STREAMS_PATH = YangInstanceIdentifier.builder().node(Netconf.QNAME)
             .node(Streams.QNAME).build();
-    private static final SchemaPath CREATE_SUBSCRIPTION = SchemaPath
-            .create(true, QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
+    private static final QName CREATE_SUBSCRIPTION = QName.create(CreateSubscriptionInput.QNAME, "create-subscription");
 
-    private final DOMMountPoint mountPoint;
     private final DOMRpcService rpcService;
     private final DOMNotificationService notificationService;
     private final DOMDataBroker dataBroker;
     private final Node node;
     private final String nodeId;
     private final BindingNormalizedNodeSerializer serializer;
+    private final DOMSchemaService schemaService;
 
     NetconfEventSourceMount(final BindingNormalizedNodeSerializer serializer, final Node node,
             final DOMMountPoint mountPoint) {
         this.serializer = requireNonNull(serializer);
-        this.mountPoint = mountPoint;
         this.node = node;
         this.nodeId = node.getNodeId().getValue();
         this.rpcService = getService(mountPoint, DOMRpcService.class);
         this.notificationService = getService(mountPoint, DOMNotificationService.class);
         this.dataBroker = getService(mountPoint, DOMDataBroker.class);
+        this.schemaService = getService(mountPoint, DOMSchemaService.class);
     }
 
     private static <T extends DOMService> T getService(final DOMMountPoint mountPoint, final Class<T> service) {
@@ -138,8 +140,8 @@ class NetconfEventSourceMount {
         return Collections.emptyList();
     }
 
-    SchemaContext getSchemaContext() {
-        return mountPoint.getSchemaContext();
+    EffectiveModelContext getSchemaContext() {
+        return schemaService.getGlobalContext();
     }
 
     /**
@@ -152,7 +154,8 @@ class NetconfEventSourceMount {
      */
     ListenerRegistration<DOMNotificationListener> registerNotificationListener(final DOMNotificationListener listener,
                                                                                final SchemaPath notificationPath) {
-        return notificationService.registerNotificationListener(listener, notificationPath);
+        return notificationService.registerNotificationListener(listener,
+            Absolute.of(ImmutableList.copyOf(notificationPath.getPathFromRoot())));
     }
 
 }
