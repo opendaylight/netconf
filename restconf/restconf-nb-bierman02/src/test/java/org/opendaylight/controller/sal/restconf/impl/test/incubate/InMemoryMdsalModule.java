@@ -25,7 +25,7 @@ import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.DOMNotificationSubscriptionListenerRegistry;
 import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStore;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextProvider;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
 
 /**
  * Guice Module which binds the mdsal (not controller) {@link DataBroker} & Co.
@@ -85,10 +85,10 @@ public class InMemoryMdsalModule extends AbstractModule {
     }
 
     @Provides
-    @Singleton SchemaContextProvider getSchemaContextProvider() {
+    @Singleton EffectiveModelContextProvider getSchemaContextProvider() {
         DOMSchemaService schemaService = dataBrokerTest.getDataBrokerTestCustomizer().getSchemaService();
-        if (schemaService instanceof SchemaContextProvider) {
-            return (SchemaContextProvider) schemaService;
+        if (schemaService instanceof EffectiveModelContextProvider) {
+            return (EffectiveModelContextProvider) schemaService;
         }
         throw new IllegalStateException(
                 "The schema service isn't a SchemaContextProvider, it's a " + schemaService.getClass());

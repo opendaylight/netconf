@@ -52,8 +52,7 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
         final NormalizedNodeContext nnContext = TestRestconfUtils
                 .loadNormalizedContextFromXmlFile(pathToInputFile, uri, controllerContext);
         final OutputStream output = new ByteArrayOutputStream();
-        this.xmlBodyWriter.writeTo(nnContext, null, null, null, this.mediaType, null,
-                output);
+        this.xmlBodyWriter.writeTo(nnContext, null, null, null, this.mediaType, null, output);
         assertTrue(output.toString().contains("lf-test"));
     }
 }

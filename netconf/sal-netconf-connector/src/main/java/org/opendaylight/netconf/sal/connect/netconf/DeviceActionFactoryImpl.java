@@ -26,7 +26,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
 
         return new DOMActionService() {
             @Override
-            public ListenableFuture<? extends DOMActionResult> invokeAction(final SchemaPath schemaPath,
+            public ListenableFuture<? extends DOMActionResult> invokeAction(final Absolute schemaPath,
                     final DOMDataTreeIdentifier dataTreeIdentifier, final ContainerNode input) {
                 requireNonNull(schemaPath);
                 requireNonNull(dataTreeIdentifier);
