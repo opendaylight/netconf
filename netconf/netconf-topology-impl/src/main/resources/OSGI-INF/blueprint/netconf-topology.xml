@@ -45,6 +45,10 @@
       </cm:default-properties>
     </cm:property-placeholder>
 
+    <bean id="netconfMountPointManager" class="org.opendaylight.netconf.sal.connect.netconf.NetconfMountPointManager"/>
+    <service ref="netconfMountPointManager" interface="org.opendaylight.netconf.sal.connect.api.MountPointManagerService"
+             odl:type="default"/>
+
     <bean id="netconfTopology" class="org.opendaylight.netconf.topology.impl.NetconfTopologyImpl"
           init-method="init"
           destroy-method="close">
@@ -64,6 +68,7 @@
         <argument ref="rpcProviderService" />
         <argument ref="baseSchemas"/>
         <argument ref="deviceActionFactory"/>
+        <argument ref="netconfMountPointManager"/>
     </bean>
 
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
