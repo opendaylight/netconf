@@ -28,10 +28,10 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ReadOnlyTxTest {
@@ -43,7 +43,7 @@ public class ReadOnlyTxTest {
     @Before
     public void setUp() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(mockedNode))).when(rpc)
-                .invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
+                .invokeRpc(any(QName.class), any(ContainerNode.class));
     }
 
     @Test
@@ -54,11 +54,10 @@ public class ReadOnlyTxTest {
                 new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
 
         readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
-        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME),
+                any(ContainerNode.class));
         readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
-        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(ContainerNode.class));
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME), any(ContainerNode.class));
     }
 
     @Test
@@ -69,11 +68,10 @@ public class ReadOnlyTxTest {
                 new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
 
         readOnlyTx.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
-        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME),
+                any(ContainerNode.class));
         readOnlyTx.exists(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
-        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(ContainerNode.class));
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME), any(ContainerNode.class));
     }
 
     @Test

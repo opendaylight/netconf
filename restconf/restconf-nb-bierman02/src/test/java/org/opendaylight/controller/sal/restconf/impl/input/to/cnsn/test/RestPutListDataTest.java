@@ -52,7 +52,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class RestPutListDataTest {
     private static EffectiveModelContext schemaContextTestModule;
@@ -74,8 +73,8 @@ public class RestPutListDataTest {
         brokerFacade = mock(BrokerFacade.class);
         restconfImpl = RestconfImpl.newInstance(brokerFacade, controllerContext);
         final PutResult result = mock(PutResult.class);
-        when(brokerFacade.commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
-                any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))
+        when(brokerFacade.commitConfigurationDataPut(any(EffectiveModelContext.class),
+                any(YangInstanceIdentifier.class), any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))
                         .thenReturn(result);
         when(result.getFutureOfPutData()).thenReturn(mock(FluentFuture.class));
         when(result.getStatus()).thenReturn(Status.OK);

@@ -10,7 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import static com.google.common.base.Preconditions.checkState;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps.getSourceNode;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -34,9 +34,9 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,7 +200,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                 if (!lastJobSucceeded) {
                     onFailure(new IllegalStateException("Previous keepalive timed out"));
                 } else {
-                    Futures.addCallback(currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD), this,
+                    Futures.addCallback(currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD), this,
                         MoreExecutors.directExecutor());
                 }
             } catch (final NullPointerException e) {
@@ -367,8 +367,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         }
 
         @Override
-        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final SchemaPath type,
-                final NormalizedNode<?, ?> input) {
+        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
             final ListenableFuture<? extends DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
             final ResponseWaiting responseWaiting = new ResponseWaiting(responseWaitingScheduler, rpcResultFuture);
             responseWaiting.start();

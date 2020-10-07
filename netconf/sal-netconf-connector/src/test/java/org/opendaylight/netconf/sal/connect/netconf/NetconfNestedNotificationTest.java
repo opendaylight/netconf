@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -55,8 +55,8 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
         assertEquals("interface-enabled", root.getNodeType().getLocalName());
         assertEquals(NetconfNotification.RFC3339_DATE_PARSER.apply("2008-07-08T00:01:00Z").toInstant(),
                 ((DOMEvent) domNotification).getEventInstant());
-        assertEquals(domNotification.getType(), SchemaPath.create(true, INTERFACES_QNAME, INTERFACE_QNAME,
-                INTERFACE_ENABLED_NOTIFICATION_QNAME));
+        assertEquals(Absolute.of(INTERFACES_QNAME, INTERFACE_QNAME, INTERFACE_ENABLED_NOTIFICATION_QNAME),
+                domNotification.getType());
     }
 
     private EffectiveModelContext getNotificationSchemaContext(final Collection<String> yangResources) {

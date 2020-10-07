@@ -28,6 +28,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -77,8 +78,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
  * Unit tests for BrokerFacade.
@@ -106,7 +108,6 @@ public class BrokerFacadeTest {
     private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
     private final FluentFuture<Optional<NormalizedNode<?, ?>>> dummyNodeInFuture = wrapDummyNode(this.dummyNode);
     private final QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
-    private final SchemaPath type = SchemaPath.create(true, this.qname);
     private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(this.qname).build();
     private ControllerContext controllerContext;
 
@@ -185,9 +186,9 @@ public class BrokerFacadeTest {
     @Test
     public void testInvokeRpc() throws Exception {
         final DOMRpcResult expResult = mock(DOMRpcResult.class);
-        doReturn(immediateFluentFuture(expResult)).when(this.mockRpcService).invokeRpc(this.type, this.dummyNode);
+        doReturn(immediateFluentFuture(expResult)).when(this.mockRpcService).invokeRpc(this.qname, this.dummyNode);
 
-        final ListenableFuture<? extends DOMRpcResult> actualFuture = this.brokerFacade.invokeRpc(this.type,
+        final ListenableFuture<? extends DOMRpcResult> actualFuture = this.brokerFacade.invokeRpc(this.qname,
             this.dummyNode);
         assertNotNull("Future is null", actualFuture);
         final DOMRpcResult actualResult = actualFuture.get();
@@ -201,7 +202,7 @@ public class BrokerFacadeTest {
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(this.rwTransaction)
         .read(LogicalDatastoreType.CONFIGURATION, this.instanceID);
 
-        final PutResult result = this.brokerFacade.commitConfigurationDataPut(mock(SchemaContext.class),
+        final PutResult result = this.brokerFacade.commitConfigurationDataPut(mock(EffectiveModelContext.class),
                 this.instanceID, this.dummyNode, null, null);
 
         assertSame("commitConfigurationDataPut", CommitInfo.emptyFluentFuture(), result.getFutureOfPutData());
@@ -220,7 +221,8 @@ public class BrokerFacadeTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
 
         final FluentFuture<? extends CommitInfo> actualFuture = this.brokerFacade
-                .commitConfigurationDataPost(mock(SchemaContext.class), this.instanceID, this.dummyNode, null, null);
+                .commitConfigurationDataPost(mock(EffectiveModelContext.class), this.instanceID, this.dummyNode, null,
+                        null);
 
         assertSame("commitConfigurationDataPost", CommitInfo.emptyFluentFuture(), actualFuture);
 
@@ -237,8 +239,8 @@ public class BrokerFacadeTest {
                 .thenReturn(immediateTrueFluentFuture());
         try {
             // Schema context is only necessary for ensuring parent structure
-            this.brokerFacade.commitConfigurationDataPost((SchemaContext) null, this.instanceID, this.dummyNode, null,
-                    null);
+            this.brokerFacade.commitConfigurationDataPost((EffectiveModelContext) null, this.instanceID, this.dummyNode,
+                    null, null);
         } catch (final RestconfDocumentedException e) {
             assertEquals("getErrorTag", RestconfError.ErrorTag.DATA_EXISTS, e.getErrors().get(0).getErrorTag());
             throw e;
@@ -337,7 +339,8 @@ public class BrokerFacadeTest {
 
         // mock registration
         final ListenerRegistration<NotificationListenerAdapter> registration = mock(ListenerRegistration.class);
-        when(this.domNotification.registerNotificationListener(listener, listener.getSchemaPath()))
+        when(this.domNotification.registerNotificationListener(listener,
+            Absolute.of(ImmutableList.copyOf(listener.getSchemaPath().getPathFromRoot()))))
                 .thenReturn(registration);
 
         // test to register listener for the first time
@@ -349,7 +352,8 @@ public class BrokerFacadeTest {
         assertEquals("Registration was not successful", true, listener.isListening());
 
         // registrations should be invoked only once
-        verify(this.domNotification, times(1)).registerNotificationListener(listener, listener.getSchemaPath());
+        verify(this.domNotification, times(1)).registerNotificationListener(listener,
+            Absolute.of(ImmutableList.copyOf(listener.getSchemaPath().getPathFromRoot())));
 
         final DOMTransactionChain transactionChain = mock(DOMTransactionChain.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);

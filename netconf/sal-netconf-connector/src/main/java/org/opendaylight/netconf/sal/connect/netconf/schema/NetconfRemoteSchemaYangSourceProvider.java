@@ -35,7 +35,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
@@ -105,8 +104,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         final ContainerNode getSchemaRequest = createGetSchemaRequest(moduleName, revision);
         LOG.trace("{}: Loading YANG schema source for {}:{}", id, moduleName, revision);
         return Futures.transform(
-            rpc.invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME), getSchemaRequest),
-            input -> {
+            rpc.invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, getSchemaRequest), input -> {
                 // Transform composite node to string schema representation and then to ASTSchemaSource.
                 if (input.getErrors().isEmpty()) {
                     final Optional<String> schemaString = getSchemaFromRpc(id, input.getResult());

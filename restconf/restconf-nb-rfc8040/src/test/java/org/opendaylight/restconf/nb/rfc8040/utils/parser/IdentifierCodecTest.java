@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -28,7 +28,7 @@ public class IdentifierCodecTest {
             "list-test:top/list1=%2C%27" + '"' + "%3A" + '"' + "%20%2F,,foo/list2=a,b/result";
     private static final String URI_WITH_INT_VAL_LEAF_LIST = "list-test:top/Y=4";
 
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
 
     @Before
     public void init() throws FileNotFoundException {

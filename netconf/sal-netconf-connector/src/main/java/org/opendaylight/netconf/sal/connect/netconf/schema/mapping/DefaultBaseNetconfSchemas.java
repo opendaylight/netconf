@@ -12,8 +12,9 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory;
 
 @Beta
@@ -23,7 +24,7 @@ public final class DefaultBaseNetconfSchemas implements BaseNetconfSchemas {
     private final @NonNull BaseSchema withNotifications;
 
     @Inject
-    public DefaultBaseNetconfSchemas(final YangParserFactory parserFactory) {
+    public DefaultBaseNetconfSchemas(final YangParserFactory parserFactory) throws YangParserException {
         withoutNotifications = new BaseSchema(withoutNotifications(parserFactory));
         withNotifications = new BaseSchema(withNotifications(parserFactory));
     }
@@ -38,7 +39,8 @@ public final class DefaultBaseNetconfSchemas implements BaseNetconfSchemas {
         return withNotifications;
     }
 
-    private static EffectiveModelContext withoutNotifications(final YangParserFactory parserFactory) {
+    private static EffectiveModelContext withoutNotifications(final YangParserFactory parserFactory)
+            throws YangParserException {
         return BindingRuntimeHelpers.createEffectiveModel(parserFactory, Arrays.asList(
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
                 .$YangModuleInfoImpl.getInstance(),
@@ -46,7 +48,8 @@ public final class DefaultBaseNetconfSchemas implements BaseNetconfSchemas {
                 .$YangModuleInfoImpl.getInstance()));
     }
 
-    private static EffectiveModelContext withNotifications(final YangParserFactory parserFactory) {
+    private static EffectiveModelContext withNotifications(final YangParserFactory parserFactory)
+            throws YangParserException {
         return BindingRuntimeHelpers.createEffectiveModel(parserFactory, Arrays.asList(
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210
                 .$YangModuleInfoImpl.getInstance(),

@@ -26,9 +26,9 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.createEditConfigStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toFilterStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.io.IOException;
@@ -49,7 +49,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -86,7 +86,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableCo
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -108,35 +108,33 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     private static final QName SERVER_QNAME =
             QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
     private static final QName RESET_QNAME = QName.create(SERVER_QNAME, "reset");
-    private static final SchemaPath RESET_SERVER_PATH = SchemaPath.create(true, SERVER_QNAME, RESET_QNAME);
+    private static final Absolute RESET_SERVER_PATH = Absolute.of(SERVER_QNAME, RESET_QNAME);
     private static final QName APPLICATIONS_QNAME = QName.create(URN_EXAMPLE_SERVER_FARM_2,
             REVISION_EXAMPLE_SERVER_FARM_2, "applications");
     private static final QName APPLICATION_QNAME = QName.create(APPLICATIONS_QNAME, "application");
     private static final QName KILL_QNAME = QName.create(APPLICATION_QNAME, "kill");
-    private static final SchemaPath KILL_SERVER_APP_PATH =
-            SchemaPath.create(true, SERVER_QNAME, APPLICATIONS_QNAME, APPLICATION_QNAME, KILL_QNAME);
+    private static final Absolute KILL_SERVER_APP_PATH =
+            Absolute.of(SERVER_QNAME, APPLICATIONS_QNAME, APPLICATION_QNAME, KILL_QNAME);
 
     private static final QName DEVICE_QNAME =
             QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "device");
     private static final QName START_QNAME = QName.create(DEVICE_QNAME, "start");
-    private static final SchemaPath START_DEVICE_PATH = SchemaPath.create(true, DEVICE_QNAME, START_QNAME);
+    private static final Absolute START_DEVICE_PATH = Absolute.of(DEVICE_QNAME, START_QNAME);
     private static final QName INTERFACE_QNAME = QName.create(DEVICE_QNAME, "interface");
     private static final QName ENABLE_QNAME = QName.create(INTERFACE_QNAME, "enable");
-    private static final SchemaPath ENABLE_INTERFACE_PATH =
-            SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, ENABLE_QNAME);
+    private static final Absolute ENABLE_INTERFACE_PATH = Absolute.of(DEVICE_QNAME, INTERFACE_QNAME, ENABLE_QNAME);
 
     private static final QName DISABLE_QNAME = QName.create(URN_EXAMPLE_AUGMENTED_ACTION, "disable");
-    private static final SchemaPath DISABLE_INTERFACE_PATH =
-            SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, DISABLE_QNAME);
+    private static final Absolute DISABLE_INTERFACE_PATH = Absolute.of(DEVICE_QNAME, INTERFACE_QNAME, DISABLE_QNAME);
 
     private static final QName CHECK_WITH_OUTPUT_QNAME =
             QName.create(URN_EXAMPLE_RPCS_ACTIONS_OUTPUTS, "check-with-output");
-    private static final SchemaPath CHECK_WITH_OUTPUT_INTERFACE_PATH =
-            SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, CHECK_WITH_OUTPUT_QNAME);
+    private static final Absolute CHECK_WITH_OUTPUT_INTERFACE_PATH =
+            Absolute.of(DEVICE_QNAME, INTERFACE_QNAME, CHECK_WITH_OUTPUT_QNAME);
     private static final QName CHECK_WITHOUT_OUTPUT_QNAME =
             QName.create(URN_EXAMPLE_RPCS_ACTIONS_OUTPUTS, "check-without-output");
-    private static final SchemaPath CHECK_WITHOUT_OUTPUT_INTERFACE_PATH =
-            SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, CHECK_WITHOUT_OUTPUT_QNAME);
+    private static final Absolute CHECK_WITHOUT_OUTPUT_INTERFACE_PATH =
+            Absolute.of(DEVICE_QNAME, INTERFACE_QNAME, CHECK_WITHOUT_OUTPUT_QNAME);
     private static final QName RPC_WITH_OUTPUT_QNAME =
             QName.create(URN_EXAMPLE_RPCS_ACTIONS_OUTPUTS, "rpc-with-output");
     private static final QName RPC_WITHOUT_OUTPUT_QNAME =
@@ -146,20 +144,19 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
             QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-out");
     private static final QName BOX_IN_QNAME = QName.create(BOX_OUT_QNAME, "box-in");
     private static final QName OPEN_QNAME = QName.create(BOX_IN_QNAME, "open");
-    private static final SchemaPath OPEN_BOXES_PATH =
-            SchemaPath.create(true, BOX_OUT_QNAME, BOX_IN_QNAME, OPEN_QNAME);
+    private static final Absolute OPEN_BOXES_PATH = Absolute.of(BOX_OUT_QNAME, BOX_IN_QNAME, OPEN_QNAME);
 
     private static final QName FOO_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "foo");
     private static final QName BAR_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "bar");
     private static final QName XYZZY_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "xyzzy");
-    private static final SchemaPath XYZZY_FOO_PATH = SchemaPath.create(true, FOO_QNAME, XYZZY_QNAME);
-    private static final SchemaPath XYZZY_BAR_PATH = SchemaPath.create(true, BAR_QNAME, XYZZY_QNAME);
+    private static final Absolute XYZZY_FOO_PATH = Absolute.of(FOO_QNAME, XYZZY_QNAME);
+    private static final Absolute XYZZY_BAR_PATH = Absolute.of(BAR_QNAME, XYZZY_QNAME);
 
     private static final QName CONFLICT_CHOICE_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "conflict-choice");
     private static final QName CHOICE_CONT_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "choice-cont");
     private static final QName CHOICE_ACTION_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "choice-action");
-    private static final SchemaPath CHOICE_ACTION_PATH =
-            SchemaPath.create(true, CONFLICT_CHOICE_QNAME, CHOICE_CONT_QNAME, CHOICE_CONT_QNAME, CHOICE_ACTION_QNAME);
+    private static final Absolute CHOICE_ACTION_PATH =
+            Absolute.of(CONFLICT_CHOICE_QNAME, CHOICE_CONT_QNAME, CHOICE_CONT_QNAME, CHOICE_ACTION_QNAME);
 
     private static EffectiveModelContext PARTIAL_SCHEMA;
     private static EffectiveModelContext SCHEMA;
@@ -199,7 +196,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testLockRequestBaseSchemaNotPresent() throws Exception {
         final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
-        final NetconfMessage netconfMessage = transformer.toRpcRequest(toPath(NETCONF_LOCK_QNAME),
+        final NetconfMessage netconfMessage = transformer.toRpcRequest(NETCONF_LOCK_QNAME,
                 NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_QNAME));
 
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<lock"));
@@ -210,10 +207,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
         final NetconfMessageTransformer transformer = new NetconfMessageTransformer(new EmptyMountPointContext(SCHEMA),
             true, BASE_SCHEMAS.getBaseSchemaWithNotifications());
-        NetconfMessage netconfMessage = transformer.toRpcRequest(
-                toPath(CREATE_SUBSCRIPTION_RPC_QNAME),
-                CREATE_SUBSCRIPTION_RPC_CONTENT
-        );
+        NetconfMessage netconfMessage = transformer.toRpcRequest(CREATE_SUBSCRIPTION_RPC_QNAME,
+                CREATE_SUBSCRIPTION_RPC_CONTENT);
         String documentString = XmlUtil.toString(netconfMessage.getDocument());
         assertThat(documentString, CoreMatchers.containsString("<create-subscription"));
         assertThat(documentString, CoreMatchers.containsString("<rpc"));
@@ -224,7 +219,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
-        transformer.toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), toPath(NETCONF_LOCK_QNAME));
+        transformer.toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), NETCONF_LOCK_QNAME);
     }
 
     @Test
@@ -232,8 +227,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         DOMRpcResult domRpcResult = actionNetconfMessageTransformer
-                .toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)),
-                        toPath(RPC_WITH_OUTPUT_QNAME));
+                .toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), RPC_WITH_OUTPUT_QNAME);
         assertNotNull(domRpcResult);
     }
 
@@ -242,15 +236,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         DOMRpcResult domRpcResult = actionNetconfMessageTransformer
-                .toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)),
-                        toPath(RPC_WITHOUT_OUTPUT_QNAME));
+                .toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), RPC_WITHOUT_OUTPUT_QNAME);
         assertNotNull(domRpcResult);
     }
 
     @Test
     public void testDiscardChangesRequest() throws Exception {
         final NetconfMessage netconfMessage =
-                netconfMessageTransformer.toRpcRequest(toPath(NETCONF_DISCARD_CHANGES_QNAME), null);
+                netconfMessageTransformer.toRpcRequest(NETCONF_DISCARD_CHANGES_QNAME, null);
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<discard"));
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<rpc"));
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("message-id"));
@@ -258,7 +251,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testGetSchemaRequest() throws Exception {
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(GET_SCHEMA_QNAME),
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(GET_SCHEMA_QNAME,
                 NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest("module", Optional.of("2012-12-12")));
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get-schema xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
@@ -283,7 +276,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                         + "</data>\n"
                         + "</rpc-reply>"
         ));
-        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(response, toPath(GET_SCHEMA_QNAME));
+        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(response, GET_SCHEMA_QNAME);
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
         final DOMSource schemaContent = ((DOMSourceAnyxmlNode) ((ContainerNode) compositeNodeRpcResult.getResult())
@@ -310,8 +303,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</rpc-reply>"));
 
         final NetconfMessageTransformer transformer = getTransformer(SCHEMA);
-        final DOMRpcResult compositeNodeRpcResult =
-                transformer.toRpcResult(response, toPath(NETCONF_GET_CONFIG_QNAME));
+        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(response, NETCONF_GET_CONFIG_QNAME);
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
 
@@ -352,7 +344,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_CONFIG_QNAME),
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -380,7 +372,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_CONFIG_QNAME),
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -424,8 +416,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         final ContainerNode wrap =
                 NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_QNAME, editConfigStructure, target);
-        final NetconfMessage netconfMessage =
-                netconfMessageTransformer.toRpcRequest(toPath(NETCONF_EDIT_CONFIG_QNAME), wrap);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_EDIT_CONFIG_QNAME, wrap);
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<edit-config>\n"
@@ -462,7 +453,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability),
                     new NodeWithValue<>(capability, "a:b:c")), SCHEMA);
 
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_QNAME),
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, filter));
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
@@ -488,14 +479,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>"
         ));
         final DOMRpcResult compositeNodeRpcResult =
-                netconfMessageTransformer.toRpcResult(response, toPath(NETCONF_COMMIT_QNAME));
+                netconfMessageTransformer.toRpcResult(response, NETCONF_COMMIT_QNAME);
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNull(compositeNodeRpcResult.getResult());
     }
 
     @Test
     public void getActionsTest() {
-        Set<SchemaPath> schemaPaths = new HashSet<>();
+        Set<Absolute> schemaPaths = new HashSet<>();
         schemaPaths.add(RESET_SERVER_PATH);
         schemaPaths.add(START_DEVICE_PATH);
         schemaPaths.add(ENABLE_INTERFACE_PATH);
@@ -511,7 +502,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         List<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertEquals(schemaPaths.size(), actions.size());
         for (ActionDefinition actionDefinition : actions) {
-            SchemaPath path = actionDefinition.getPath();
+            Absolute path = Absolute.of(ImmutableList.copyOf(actionDefinition.getPath().getPathFromRoot()));
             assertTrue(schemaPaths.remove(path));
         }
     }

@@ -42,7 +42,7 @@ public class StreamNotificationTopicRegistrationTest {
 
     private static final String STREAM_NAME = "stream-1";
     private static final String PREFIX = ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH
-            .getLastComponent().getNamespace().toString();
+            .lastNodeIdentifier().getNamespace().toString();
 
     @Mock
     private NetconfEventSource source;
@@ -60,8 +60,8 @@ public class StreamNotificationTopicRegistrationTest {
     public void setUp() throws Exception {
         Node node = new NodeBuilder().setNodeId(NodeId.getDefaultInstance("node-id")).build();
         when(mount.getNode()).thenReturn(node);
-        when(mount.registerNotificationListener(source, ConnectionNotificationTopicRegistration
-                .EVENT_SOURCE_STATUS_PATH))
+        when(mount.registerNotificationListener(source,
+                ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH.asSchemaPath()))
                 .thenReturn(listenerRegistration);
         doReturn(immediateNullFluentFuture()).when(mount).invokeCreateSubscription(any(), any());
         doReturn(immediateNullFluentFuture()).when(mount).invokeCreateSubscription(any());
@@ -113,14 +113,14 @@ public class StreamNotificationTopicRegistrationTest {
         final TopicId topic1 = registerTopic("topic1");
         final TopicId topic2 = registerTopic("topic2");
         final TopicId topic3 = registerTopic("topic3");
-        final Set<TopicId> notificationTopicIds =
-                registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
+        final Set<TopicId> notificationTopicIds = registration.getTopicsForNotification(
+            ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH.asSchemaPath());
         assertNotNull(notificationTopicIds);
         assertThat(notificationTopicIds, hasItems(topic1, topic2, topic3));
 
         registration.unRegisterNotificationTopic(topic3);
-        final Set<TopicId> afterUnregister =
-                registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
+        final Set<TopicId> afterUnregister = registration.getTopicsForNotification(
+            ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH.asSchemaPath());
         assertNotNull(afterUnregister);
         assertThat(afterUnregister, hasItems(topic1, topic2));
         assertFalse(afterUnregister.contains(topic3));
@@ -128,7 +128,8 @@ public class StreamNotificationTopicRegistrationTest {
 
     private TopicId registerTopic(final String value) {
         final TopicId topic = TopicId.getDefaultInstance(value);
-        registration.registerNotificationTopic(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH, topic);
+        registration.registerNotificationTopic(
+            ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH.asSchemaPath(), topic);
         return topic;
     }
 

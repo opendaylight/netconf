@@ -28,6 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -37,11 +38,10 @@ import org.w3c.dom.Element;
  * Topic registration on event-source-status-notification.
  */
 class ConnectionNotificationTopicRegistration extends NotificationTopicRegistration {
-
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionNotificationTopicRegistration.class);
 
-    public static final SchemaPath EVENT_SOURCE_STATUS_PATH = SchemaPath
-            .create(true, QName.create(EventSourceStatusNotification.QNAME, "event-source-status"));
+    public static final Absolute EVENT_SOURCE_STATUS_PATH =
+            Absolute.of(QName.create(EventSourceStatusNotification.QNAME, "event-source-status"));
     private static final NodeIdentifier EVENT_SOURCE_STATUS_ARG = NodeIdentifier.create(
             EventSourceStatusNotification.QNAME);
 
@@ -50,7 +50,7 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
     ConnectionNotificationTopicRegistration(final String sourceName,
                                             final DOMNotificationListener domNotificationListener) {
         super(NotificationSourceType.ConnectionStatusChange, sourceName,
-                EVENT_SOURCE_STATUS_PATH.getLastComponent().getNamespace().toString());
+                EVENT_SOURCE_STATUS_PATH.lastNodeIdentifier().getNamespace().toString());
         this.domNotificationListener = requireNonNull(domNotificationListener);
         LOG.info("Connection notification source has been initialized.");
         setActive(true);
@@ -127,7 +127,7 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
         DOMNotification dn = new DOMNotification() {
 
             @Override
-            public SchemaPath getType() {
+            public Absolute getType() {
                 return EVENT_SOURCE_STATUS_PATH;
             }
 

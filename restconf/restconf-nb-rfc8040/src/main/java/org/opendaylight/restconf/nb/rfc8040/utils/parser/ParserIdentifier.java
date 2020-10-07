@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -93,7 +95,7 @@ public final class ParserIdentifier {
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
                     ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
 
-        final EffectiveModelContext mountSchemaContext = mountPoint.getEffectiveModelContext();
+        final EffectiveModelContext mountSchemaContext = coerceModelContext(mountPoint);
         final String pathId = pathsIt.next().replaceFirst("/", "");
         return createIIdContext(mountSchemaContext, pathId, mountPoint);
     }
@@ -115,7 +117,8 @@ public final class ParserIdentifier {
                 schemaContext);
     }
 
-    private static SchemaNode getPathSchema(final SchemaContext schemaContext, final YangInstanceIdentifier urlPath) {
+    private static SchemaNode getPathSchema(final EffectiveModelContext schemaContext,
+            final YangInstanceIdentifier urlPath) {
         // First things first: an empty path means data invocation on SchemaContext
         if (urlPath.isEmpty()) {
             return schemaContext;
@@ -168,7 +171,7 @@ public final class ParserIdentifier {
      * @return                      Yang instance identifier serialized to String
      */
     public static String stringFromYangInstanceIdentifier(final YangInstanceIdentifier instanceIdentifier,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         return IdentifierCodec.serialize(instanceIdentifier, schemaContext);
     }
 
@@ -261,9 +264,9 @@ public final class ParserIdentifier {
                 Optional.of(domMountPointService));
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
-            final Module module = point.getMountPoint().getSchemaContext().findModule(moduleName, revision)
-                    .orElse(null);
-            return new SchemaExportContext(point.getMountPoint().getSchemaContext(), module, sourceProvider);
+            final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
+            final Module module = context.findModule(moduleName, revision).orElse(null);
+            return new SchemaExportContext(context, module, sourceProvider);
         }
     }
 
@@ -306,5 +309,17 @@ public final class ParserIdentifier {
             "Supplied name has not expected identifier format.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
 
         return name;
+    }
+
+    private static EffectiveModelContext coerceModelContext(final DOMMountPoint mountPoint) {
+        final EffectiveModelContext context = modelContext(mountPoint);
+        checkState(context != null, "Mount point %s does not have a model context", mountPoint);
+        return context;
+    }
+
+    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
+        return mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
     }
 }

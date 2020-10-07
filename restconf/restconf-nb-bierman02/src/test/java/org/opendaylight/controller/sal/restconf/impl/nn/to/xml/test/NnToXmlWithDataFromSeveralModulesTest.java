@@ -94,12 +94,8 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
     private static NormalizedNodeContext prepareNormalizedNodeContext() {
         final String rev = "2014-01-17";
 
-        final DataSchemaNode schemaContNode = schemaContext;
-
-        assertTrue(schemaContNode instanceof ContainerSchemaNode);
-
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataContSchemaContNode = Builders
-                .containerBuilder((ContainerSchemaNode) schemaContNode);
+                .containerBuilder(schemaContext);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> modul1 = buildContBuilderMod1(
                 "module:one", rev, "cont_m1", "contB_m1", "lf1_m1",
@@ -112,8 +108,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
         dataContSchemaContNode.withChild(modul2.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null,
-                        schemaContNode, null, schemaContext),
+                new InstanceIdentifierContext<>(null, schemaContext, null, schemaContext),
                 dataContSchemaContNode.build());
 
         return testNormalizedNodeContext;

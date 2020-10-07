@@ -29,13 +29,14 @@ import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.EffectiveAugmentationSchema;
 
 abstract class DataNormalizationOperation<T extends PathArgument> implements Identifiable<T> {
@@ -50,7 +51,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         this.identifier = identifier;
     }
 
-    static DataNormalizationOperation<?> from(final SchemaContext ctx) {
+    static DataNormalizationOperation<?> from(final EffectiveModelContext ctx) {
         return new ContainerNormalization(ctx);
     }
 
@@ -185,7 +186,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
     }
 
     private static final class ContainerNormalization extends DataContainerNormalizationOperation<NodeIdentifier> {
-        ContainerNormalization(final ContainerSchemaNode schema) {
+        ContainerNormalization(final ContainerLike schema) {
             super(new NodeIdentifier(schema.getQName()), schema);
         }
     }

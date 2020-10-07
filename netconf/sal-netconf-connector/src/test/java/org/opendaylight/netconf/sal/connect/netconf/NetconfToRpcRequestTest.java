@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import java.util.Collection;
 import org.junit.Before;
@@ -70,7 +69,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME, "NETCONF"))
                 .build();
 
-        final NetconfMessage message = messageTransformer.toRpcRequest(toPath(SUBSCRIBE_RPC_NAME), root);
+        final NetconfMessage message = messageTransformer.toRpcRequest(SUBSCRIBE_RPC_NAME, root);
         assertNotNull(message);
 
         final Document xmlDoc = message.getDocument();
@@ -96,7 +95,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
                         + "</rpc-reply>\n"
         ));
 
-        messageTransformer.toRpcResult(response, toPath(EDIT_CONFIG_QNAME));
+        messageTransformer.toRpcResult(response, EDIT_CONFIG_QNAME);
     }
 
 }

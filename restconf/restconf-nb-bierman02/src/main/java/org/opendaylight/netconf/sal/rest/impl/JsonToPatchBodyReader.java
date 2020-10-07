@@ -251,8 +251,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                     } else {
                         edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()).concat(target)));
                         edit.setTargetSchemaNode(SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
-                                codec.getDataContextTree().getChild(edit.getTarget()).getDataSchemaNode().getPath()
-                                        .getParent()));
+                                codec.getDataContextTree().findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
+                                        .getPath().getParent()));
                     }
 
                     break;

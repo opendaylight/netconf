@@ -126,7 +126,7 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
         activateNotificationSource();
         if (!isActive()) {
             LOG.warn("Stream {} is not active, listener for notification {} is not registered.", getStreamName(),
-                    notificationPath.toString());
+                    notificationPath);
             return false;
         }
 

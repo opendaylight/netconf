@@ -403,9 +403,10 @@ public final class PutDataTransactionUtil {
         return strategy.commit();
     }
 
-    public static DataSchemaNode checkListAndOrderedType(final SchemaContext ctx, final YangInstanceIdentifier path) {
+    public static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,
+            final YangInstanceIdentifier path) {
         final YangInstanceIdentifier parent = path.getParent();
-        final DataSchemaContextNode<?> node = DataSchemaContextTree.from(ctx).getChild(parent);
+        final DataSchemaContextNode<?> node = DataSchemaContextTree.from(ctx).findChild(parent).orElseThrow();
         final DataSchemaNode dataSchemaNode = node.getDataSchemaNode();
 
         if (dataSchemaNode instanceof ListSchemaNode) {

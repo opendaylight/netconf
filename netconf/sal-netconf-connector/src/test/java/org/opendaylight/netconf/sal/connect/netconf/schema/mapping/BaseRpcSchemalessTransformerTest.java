@@ -31,7 +31,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -103,7 +102,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
                 .withChild(target)
                 .build();
         final NetconfMessage msg = transformer.toRpcRequest(
-                SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), editConfig);
+                NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME, editConfig);
         final Diff diff = XMLUnit.compareXML(EXP_RPC, XmlUtil.toString(msg.getDocument()));
         Assert.assertTrue(diff.toString(), diff.similar());
     }
@@ -117,8 +116,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         final Element element = (Element) doc.importNode(dataElement, true);
         doc.getDocumentElement().appendChild(element);
         final NetconfMessage msg = new NetconfMessage(doc);
-        final DOMRpcResult result = transformer.toRpcResult(msg,
-                SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME));
+        final DOMRpcResult result = transformer.toRpcResult(msg, NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
         Assert.assertNotNull(result.getResult());
         final ContainerNode rpcReply = (ContainerNode) result.getResult();
         Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getNodeType());

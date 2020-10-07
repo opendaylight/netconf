@@ -17,6 +17,7 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
+import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -76,7 +78,7 @@ import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -231,10 +233,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
         final NormalizedNode<?, ?> mapToStreams =
             RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
+                listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
         writeDataToDS(schemaContext,
-            listener.getSchemaPath().getLastComponent().getLocalName(), strategy, exist, mapToStreams);
+            listener.getSchemaPath().lastNodeIdentifier().getLocalName(), strategy, exist, mapToStreams);
     }
 
     private static boolean checkExist(final EffectiveModelContext schemaContext, final RestconfStrategy strategy) {
@@ -273,8 +275,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final EffectiveModelContext ref = mountPoint == null
-                ? this.schemaContextHandler.get()
-                : mountPoint.getEffectiveModelContext();
+                ? this.schemaContextHandler.get() : modelContext(mountPoint);
 
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         return PutDataTransactionUtil.putData(payload, ref, strategy, checkedParms.insert, checkedParms.point);
@@ -390,15 +391,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final EffectiveModelContext ref = mountPoint == null
-                ? this.schemaContextHandler.get()
-                : mountPoint.getEffectiveModelContext();
+                ? this.schemaContextHandler.get() : modelContext(mountPoint);
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
 
         return PlainPatchDataTransactionUtil.patchData(payload, strategy, ref);
     }
 
     private EffectiveModelContext getSchemaContext(final DOMMountPoint mountPoint) {
-        return mountPoint == null ? schemaContextHandler.get() : mountPoint.getEffectiveModelContext();
+        return mountPoint == null ? schemaContextHandler.get() : modelContext(mountPoint);
     }
 
     // FIXME: why is this synchronized?
@@ -423,7 +423,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response invokeAction(final NormalizedNodeContext payload) {
         final InstanceIdentifierContext<?> context = payload.getInstanceIdentifierContext();
         final DOMMountPoint mountPoint = context.getMountPoint();
-        final SchemaPath schemaPath = context.getSchemaNode().getPath();
+        final Absolute schemaPath = Absolute.of(ImmutableList.copyOf(context.getSchemaNode().getPath()
+            .getPathFromRoot()));
         final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
         final NormalizedNode<?, ?> data = payload.getData();
 
@@ -437,7 +438,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (mountPoint != null) {
             response = RestconfInvokeOperationsUtil.invokeActionViaMountPoint(mountPoint, (ContainerNode) data,
                 schemaPath, yangIIdContext);
-            schemaContextRef = mountPoint.getEffectiveModelContext();
+            schemaContextRef = modelContext(mountPoint);
         } else {
             response = RestconfInvokeOperationsUtil.invokeAction((ContainerNode) data, schemaPath,
                 this.actionServiceHandler, yangIIdContext);
@@ -461,5 +462,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         return Response.status(200).entity(new NormalizedNodeContext(new InstanceIdentifierContext<>(yangIIdContext,
                 resultNodeSchema, mountPoint, schemaContextRef), resultData)).build();
+    }
+
+    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
+        return mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
     }
 }
