@@ -51,7 +51,7 @@ public class ApiDocServiceImplTest {
         final DOMSchemaService schemaService = this.helper.createMockSchemaService(context);
 
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getSchemaContext()).thenReturn(context);
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));

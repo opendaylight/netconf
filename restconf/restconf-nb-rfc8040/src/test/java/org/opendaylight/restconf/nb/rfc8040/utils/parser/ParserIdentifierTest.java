@@ -28,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -129,12 +130,11 @@ public class ParserIdentifierTest {
                 .build();
 
         mountPoint = mountPointService.createMountPoint(mountPointId)
-                .addInitialSchemaContext(SCHEMA_CONTEXT_ON_MOUNT_POINT)
+                .addService(DOMSchemaService.class, FixedDOMSchemaService.of(SCHEMA_CONTEXT_ON_MOUNT_POINT))
                 .register()
                 .getInstance();
 
         // register mount point with null schema context
-        when(this.mockMountPoint.getEffectiveModelContext()).thenReturn(null);
         when(this.mockMountPointService.getMountPoint(YangInstanceIdentifier.empty()))
                 .thenReturn(Optional.of(this.mockMountPoint));
     }
@@ -562,13 +562,9 @@ public class ParserIdentifierTest {
             sourceProvider));
     }
 
-    /**
-     * Negative test of of getting <code>SchemaExportContext</code> when <code>SchemaContext</code> behind mount
-     * point is <code>null</code>. Test is expected to fail with <code>NullPointerException</code>.
-     */
     @Test
     public void toSchemaExportContextFromIdentifierNullSchemaContextBehindMountPointNegativeTest() {
-        assertThrows(NullPointerException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
+        assertThrows(IllegalStateException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT, "/" + RestconfConstants.MOUNT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
                 this.mockMountPointService, sourceProvider));
     }

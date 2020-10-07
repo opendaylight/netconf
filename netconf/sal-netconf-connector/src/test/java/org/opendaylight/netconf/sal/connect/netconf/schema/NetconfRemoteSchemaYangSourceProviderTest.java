@@ -36,7 +36,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableAnyXmlNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -56,7 +55,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
 
         final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Collections.emptySet());
         final FluentFuture<DOMRpcResult> response = FluentFutures.immediateFluentFuture(value);
-        doReturn(response).when(service).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
+        doReturn(response).when(service).invokeRpc(any(QName.class), any(ContainerNode.class));
 
         provider = new NetconfRemoteSchemaYangSourceProvider(
                 new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)), service);
@@ -67,8 +66,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         final SourceIdentifier identifier = RevisionSourceIdentifier.create("test", Revision.of("2016-02-08"));
         final YangTextSchemaSource source = provider.getSource(identifier).get();
         Assert.assertEquals(identifier, source.getIdentifier());
-        verify(service).invokeRpc(
-                SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME),
+        verify(service).invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME,
                 NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest(identifier.getName(),
                     identifier.getRevision().map(Revision::toString))
         );
@@ -89,5 +87,4 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
                 ImmutableAnyXmlNodeBuilder.create().withNodeIdentifier(childId).withValue(v).build();
         return ImmutableContainerNodeBuilder.create().withNodeIdentifier(id).withChild(child).build();
     }
-
 }

@@ -93,13 +93,14 @@ public class PlainPatchDataTransactionUtilTest {
                 .node(qnPlayer)
                 .node(qnGap)
                 .build();
-        this.schemaNodeForGap = DataSchemaContextTree.from(this.schema).getChild(this.iidGap).getDataSchemaNode();
+        this.schemaNodeForGap = DataSchemaContextTree.from(this.schema).findChild(this.iidGap).orElseThrow()
+                .getDataSchemaNode();
 
         this.iidJukebox = YangInstanceIdentifier.builder()
                 .node(qnJukebox)
                 .build();
         this.schemaNodeForJukebox = DataSchemaContextTree.from(this.schema)
-                .getChild(this.iidJukebox).getDataSchemaNode();
+                .findChild(this.iidJukebox).orElseThrow().getDataSchemaNode();
 
         this.leafGap = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(qnGap))

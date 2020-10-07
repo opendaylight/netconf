@@ -23,7 +23,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -48,9 +47,9 @@ public class SchemalessMessageTransformerTest {
             + "<ok/>\n"
             + "</rpc-reply>\n";
 
-    private SchemalessMessageTransformer transformer;
     private static final QName TEST_RPC = QName.create("test-ns", "2016-10-13", "test-rpc");
-    private static final SchemaPath SCHEMA_PATH = SchemaPath.create(true, TEST_RPC);
+
+    private SchemalessMessageTransformer transformer;
 
     @Before
     public void setUp() throws Exception {
@@ -62,7 +61,7 @@ public class SchemalessMessageTransformerTest {
         final Document payload = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/notification-payload.xml"));
         final NetconfMessage netconfMessage = new NetconfMessage(payload);
         final DOMNotification domNotification = transformer.toNotification(netconfMessage);
-        Assert.assertEquals(domNotification.getType().getLastComponent(),
+        Assert.assertEquals(domNotification.getType().lastNodeIdentifier(),
                 SchemalessMessageTransformer.SCHEMALESS_NOTIFICATION_PAYLOAD.getNodeType());
         final QName qName =
                 QName.create("org:opendaylight:notification:test:ns:yang:user-notification", "user-visited-page");
@@ -80,7 +79,7 @@ public class SchemalessMessageTransformerTest {
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_RPC))
                 .withValue(new DOMSource(src))
                 .build();
-        final NetconfMessage netconfMessage = transformer.toRpcRequest(SCHEMA_PATH, input);
+        final NetconfMessage netconfMessage = transformer.toRpcRequest(TEST_RPC, input);
         final Diff diff = XMLUnit.compareXML(XmlUtil.readXmlToDocument(EXP_REQUEST), netconfMessage.getDocument());
         Assert.assertTrue(diff.toString(), diff.similar());
     }
@@ -89,7 +88,7 @@ public class SchemalessMessageTransformerTest {
     public void toRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(EXP_REPLY);
         final NetconfMessage netconfMessage = new NetconfMessage(doc);
-        final DOMRpcResult result = transformer.toRpcResult(netconfMessage, SCHEMA_PATH);
+        final DOMRpcResult result = transformer.toRpcResult(netconfMessage, TEST_RPC);
         final DOMSource value = (DOMSource) result.getResult().getValue();
         Assert.assertNotNull(result.getResult());
         final Document domSourceDoc = (Document) value.getNode();
@@ -101,7 +100,7 @@ public class SchemalessMessageTransformerTest {
     public void toEmptyRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(OK_REPLY);
         final DOMRpcResult result = transformer.toRpcResult(
-                new NetconfMessage(doc), SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME));
+                new NetconfMessage(doc), NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME);
         Assert.assertNull(result.getResult());
     }
 

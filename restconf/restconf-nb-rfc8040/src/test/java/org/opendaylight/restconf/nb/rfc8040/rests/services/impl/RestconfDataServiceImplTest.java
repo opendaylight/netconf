@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
@@ -51,6 +50,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -192,7 +192,8 @@ public class RestconfDataServiceImplTest {
 
         this.contextRef =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
-        this.schemaNode = DataSchemaContextTree.from(this.contextRef).getChild(this.iidBase).getDataSchemaNode();
+        this.schemaNode = DataSchemaContextTree.from(this.contextRef).findChild(this.iidBase).orElseThrow(
+            ).getDataSchemaNode();
 
         doReturn(CommitInfo.emptyFluentFuture()).when(this.write).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
@@ -215,8 +216,8 @@ public class RestconfDataServiceImplTest {
                 this.actionServiceHandler, configuration);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
-        doCallRealMethod().when(this.mountPoint).getSchemaContext();
-        doReturn(this.contextRef).when(this.mountPoint).getEffectiveModelContext();
+        doReturn(Optional.of(FixedDOMSchemaService.of(this.contextRef))).when(this.mountPoint)
+                .getService(DOMSchemaService.class);
         doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint).getService(DOMDataBroker.class);
         doReturn(this.mountTransactionChain).when(this.mountDataBroker)
                 .createTransactionChain(any(DOMTransactionChainListener.class));

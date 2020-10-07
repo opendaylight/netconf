@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -42,7 +42,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
@@ -162,7 +162,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final DOMRpcResult moduleListNodeResult;
         try {
             moduleListNodeResult =
-                    deviceRpc.invokeRpc(NETCONF_GET_PATH, GET_MODULES_STATE_MODULE_LIST_RPC).get();
+                    deviceRpc.invokeRpc(NETCONF_GET_QNAME, GET_MODULES_STATE_MODULE_LIST_RPC).get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(deviceId + ": Interrupted while waiting for response to "

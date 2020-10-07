@@ -41,8 +41,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
@@ -111,7 +111,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             final SchemaPath path, final InstanceIdentifierContext<?> pathContext, final NormalizedNode<?, ?> data,
             final Integer depth, final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
-        final SchemaContext schemaCtx = pathContext.getSchemaContext();
+        final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();
 
         if (pathContext.getSchemaNode() instanceof RpcDefinition) {
             /*
@@ -153,7 +153,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-            final SchemaContext schemaContext, final SchemaPath schemaPath, final Integer depth,
+            final EffectiveModelContext schemaContext, final SchemaPath schemaPath, final Integer depth,
             final List<Set<QName>> fields) {
         final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter
                 .create(xmlWriter, schemaContext, schemaPath);
