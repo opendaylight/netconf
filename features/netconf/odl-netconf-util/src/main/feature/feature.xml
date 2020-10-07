@@ -11,6 +11,6 @@
         <configfile finalname="etc/netconf.cfg">
             mvn:org.opendaylight.netconf/netconf-util/${project.version}/cfg/config
         </configfile>
-        <feature version="[5,6)">odl-yangtools-codec</feature>
+        <feature version="[6,7)">odl-yangtools-codec</feature>
     </feature>
 </features>

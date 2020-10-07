@@ -25,7 +25,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -71,7 +70,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     }
 
     @Override
-    public NetconfMessage toRpcRequest(final SchemaPath rpc, final NormalizedNode<?, ?> input) {
+    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode<?, ?> input) {
         final DOMSource payload = (DOMSource) input.getValue();
         wrapPayload((Document) payload.getNode());
         return new NetconfMessage((Document) ((DOMSourceAnyxmlNode) input).getValue().getNode());
@@ -84,7 +83,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
      * @return anyxml
      */
     @Override
-    public DOMRpcResult toRpcResult(final NetconfMessage rpcReply, final SchemaPath rpc) {
+    public DOMRpcResult toRpcResult(final NetconfMessage rpcReply, final QName rpc) {
         final Document document = rpcReply.getDocument();
         final DOMSourceAnyxmlNode result;
         if (BaseRpcSchemalessTransformer.isOkPresent(document)) {

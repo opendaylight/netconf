@@ -9,7 +9,7 @@ package org.opendaylight.netconf.api.capability;
 
 import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 
 /**
  * Yang model representing capability.
@@ -21,7 +21,7 @@ public final class YangModuleCapability extends BasicCapability {
     private final String moduleName;
     private final String moduleNamespace;
 
-    public YangModuleCapability(final Module module, final String moduleContent) {
+    public YangModuleCapability(final ModuleLike module, final String moduleContent) {
         super(toCapabilityURI(module));
         this.content = moduleContent;
         this.moduleName = module.getName();
@@ -34,7 +34,7 @@ public final class YangModuleCapability extends BasicCapability {
         return Optional.of(content);
     }
 
-    private static String toCapabilityURI(final Module module) {
+    private static String toCapabilityURI(final ModuleLike module) {
         final StringBuilder sb = new StringBuilder();
         sb.append(module.getNamespace()).append("?module=").append(module.getName());
 
