@@ -18,7 +18,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_LOCK_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
@@ -33,7 +32,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -49,9 +48,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
@@ -75,44 +74,43 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     @Test
     public void lock() {
         netconService.lock();
-        verify(rpcService).invokeRpc(eq(toPath(NETCONF_LOCK_QNAME)), any(ContainerNode.class));
+        verify(rpcService).invokeRpc(eq(NETCONF_LOCK_QNAME), any(ContainerNode.class));
     }
 
     @Test
     public void unlock() {
         netconService.unlock();
-        verify(rpcService).invokeRpc(eq(toPath(NETCONF_UNLOCK_QNAME)), any(ContainerNode.class));
+        verify(rpcService).invokeRpc(eq(NETCONF_UNLOCK_QNAME), any(ContainerNode.class));
     }
 
     @Test
     public void discardChanges() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(rpcService)
-                .invokeRpc(any(SchemaPath.class), isNull());
+                .invokeRpc(any(QName.class), isNull());
         netconService.discardChanges();
-        verify(rpcService).invokeRpc(eq(toPath(NETCONF_DISCARD_CHANGES_QNAME)), isNull());
+        verify(rpcService).invokeRpc(eq(NETCONF_DISCARD_CHANGES_QNAME), isNull());
     }
 
     @Test
     public void get() {
         netconService.get(null);
-        verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any(ContainerNode.class));
+        verify(rpcService).invokeRpc(eq(NETCONF_GET_QNAME), any(ContainerNode.class));
     }
 
     @Test
     public void getConfig() {
         netconService.getConfig(null);
-        verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
+        verify(rpcService).invokeRpc(eq(NETCONF_GET_CONFIG_QNAME), any(ContainerNode.class));
     }
 
     @Test
     public void merge() {
         netconService.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
                 Optional.empty());
-        verify(rpcService).invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)),
-                captor.capture());
+        verify(rpcService).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.capture());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
-                toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.getValue());
+                NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME, captor.getValue());
         Assert.assertTrue(netconfMessage.toString().contains("operation=\"merge\""));
     }
 
@@ -120,11 +118,10 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     public void replace() {
         netconService.replace(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
                 Optional.empty());
-        verify(rpcService).invokeRpc(
-                eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), captor.capture());
+        verify(rpcService).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.capture());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
-                toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.getValue());
+                NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME, captor.getValue());
         Assert.assertTrue(netconfMessage.toString().contains("operation=\"replace\""));
     }
 
@@ -132,33 +129,30 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     public void create() {
         netconService.create(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
                 Optional.empty());
-        verify(rpcService).invokeRpc(
-                eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), captor.capture());
+        verify(rpcService).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.capture());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
-                toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.getValue());
+                NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME, captor.getValue());
         Assert.assertTrue(netconfMessage.toString().contains("operation=\"create\""));
     }
 
     @Test
     public void delete() {
         netconService.delete(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId().getParent());
-        verify(rpcService).invokeRpc(
-                eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), captor.capture());
+        verify(rpcService).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.capture());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
-                toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.getValue());
+                NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME, captor.getValue());
         Assert.assertTrue(netconfMessage.toString().contains("operation=\"delete\""));
     }
 
     @Test
     public void remove() {
         netconService.remove(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId().getParent());
-        verify(rpcService).invokeRpc(
-                eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), captor.capture());
+        verify(rpcService).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.capture());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
-                toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.getValue());
+                NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME, captor.getValue());
         Assert.assertTrue(netconfMessage.toString().contains("operation=\"remove\""));
     }
 
@@ -166,7 +160,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     public void commit() {
         List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
         netconService.commit(resultsFutures);
-        verify(rpcService).invokeRpc(eq(toPath(NETCONF_COMMIT_QNAME)), any(ContainerNode.class));
+        verify(rpcService).invokeRpc(eq(NETCONF_COMMIT_QNAME), any(ContainerNode.class));
     }
 
     private NetconfDataTreeServiceImpl getNetconService() {
