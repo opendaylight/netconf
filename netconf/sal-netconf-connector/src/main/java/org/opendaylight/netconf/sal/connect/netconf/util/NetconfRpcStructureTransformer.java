@@ -60,13 +60,13 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
                                                          final YangInstanceIdentifier dataPath,
                                                          final Optional<ModifyAction> operation) {
         // FIXME: propagate MountPointContext
-        return NetconfMessageTransformUtil.createEditConfigAnyxml(mountContext.getSchemaContext(), dataPath, operation,
-            data);
+        return NetconfMessageTransformUtil.createEditConfigAnyxml(mountContext.getEffectiveModelContext(), dataPath,
+            operation, data);
     }
 
     @Override
     public DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier path) {
         // FIXME: propagate MountPointContext
-        return NetconfMessageTransformUtil.toFilterStructure(path, mountContext.getSchemaContext());
+        return NetconfMessageTransformUtil.toFilterStructure(path, mountContext.getEffectiveModelContext());
     }
 }

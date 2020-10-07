@@ -63,9 +63,10 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyRe
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -167,7 +168,8 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             }
         } else if (message instanceof InvokeRpcMessage) { // master
             final InvokeRpcMessage invokeRpcMessage = (InvokeRpcMessage) message;
-            invokeSlaveRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage(), sender());
+            invokeSlaveRpc(invokeRpcMessage.getSchemaPath().lastNodeIdentifier(),
+                invokeRpcMessage.getNormalizedNodeMessage(), sender());
         } else if (message instanceof InvokeActionMessage) { // master
             final InvokeActionMessage invokeActionMessage = (InvokeActionMessage) message;
             LOG.info("InvokeActionMessage Details : {}", invokeActionMessage.toString());
@@ -234,19 +236,19 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         }, MoreExecutors.directExecutor());
     }
 
-    private void invokeSlaveRpc(final SchemaPath schemaPath, final NormalizedNodeMessage normalizedNodeMessage,
+    private void invokeSlaveRpc(final QName qname, final NormalizedNodeMessage normalizedNodeMessage,
                                 final ActorRef recipient) {
 
-        LOG.debug("{}: invokeSlaveRpc for {}, input: {} on rpc service {}", id, schemaPath, normalizedNodeMessage,
+        LOG.debug("{}: invokeSlaveRpc for {}, input: {} on rpc service {}", id, qname, normalizedNodeMessage,
                 deviceRpc);
 
-        final ListenableFuture<? extends DOMRpcResult> rpcResult = deviceRpc.invokeRpc(schemaPath,
+        final ListenableFuture<? extends DOMRpcResult> rpcResult = deviceRpc.invokeRpc(qname,
                 normalizedNodeMessage != null ? normalizedNodeMessage.getNode() : null);
 
         Futures.addCallback(rpcResult, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult domRpcResult) {
-                LOG.debug("{}: invokeSlaveRpc for {}, domRpcResult: {}", id, schemaPath, domRpcResult);
+                LOG.debug("{}: invokeSlaveRpc for {}, domRpcResult: {}", id, qname, domRpcResult);
 
                 if (domRpcResult == null) {
                     recipient.tell(new EmptyResultResponse(), getSender());
@@ -270,12 +272,12 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     /**
      * Invoking Action on Slave Node in Odl Cluster Environment.
      *
-     * @param schemaPath {@link SchemaPath}
+     * @param schemaPath {@link Absolute}
      * @param containerNodeMessage {@link ContainerNodeMessage}
      * @param domDataTreeIdentifier {@link DOMDataTreeIdentifier}
      * @param recipient {@link ActorRef}
      */
-    private void invokeSlaveAction(final SchemaPath schemaPath, final ContainerNodeMessage containerNodeMessage,
+    private void invokeSlaveAction(final Absolute schemaPath, final ContainerNodeMessage containerNodeMessage,
         final DOMDataTreeIdentifier domDataTreeIdentifier, final ActorRef recipient) {
         LOG.info("{}: invokeSlaveAction for {}, input: {}, identifier: {} on action service {}", id, schemaPath,
             containerNodeMessage, domDataTreeIdentifier, deviceAction);

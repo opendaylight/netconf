@@ -9,12 +9,13 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import java.io.FileNotFoundException;
+import java.util.Optional;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -22,6 +23,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -135,7 +138,7 @@ public class URITest {
 
     @Test
     public void testMountPointWithExternModul() throws FileNotFoundException, ReactorException {
-        initMountService(true);
+        initSchemaService();
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class/student/name");
         assertEquals(
@@ -148,7 +151,7 @@ public class URITest {
 
     @Test
     public void testMountPointWithoutExternModul() throws FileNotFoundException, ReactorException {
-        initMountService(true);
+        initSchemaService();
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/");
         assertTrue(Iterables.isEmpty(instanceIdentifier.getInstanceIdentifier().getPathArguments()));
@@ -156,17 +159,13 @@ public class URITest {
 
     @Test
     public void testMountPointWithoutMountPointSchema() throws FileNotFoundException, ReactorException {
-        initMountService(false);
         this.exception.expect(RestconfDocumentedException.class);
 
         controllerContext.toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class");
     }
 
-    public void initMountService(final boolean withSchema) throws FileNotFoundException, ReactorException {
-        if (withSchema) {
-            when(mountInstance.getSchemaContext()).thenReturn(mountSchemaContext);
-        } else {
-            when(mountInstance.getSchemaContext()).thenReturn(null);
-        }
+    public void initSchemaService() {
+        doReturn(Optional.of(FixedDOMSchemaService.of(mountSchemaContext))).when(mountInstance)
+            .getService(DOMSchemaService.class);
     }
 }

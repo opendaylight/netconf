@@ -14,17 +14,19 @@ import static org.mockito.Mockito.mock;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class Bug8072Test {
@@ -40,10 +42,11 @@ public class Bug8072Test {
     private final ControllerContext controllerContext;
 
     public Bug8072Test() throws FileNotFoundException {
-        final SchemaContext mountPointContext = TestUtils.loadSchemaContext("/full-versions/test-module");
+        final EffectiveModelContext mountPointContext = TestUtils.loadSchemaContext("/full-versions/test-module");
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
-        doReturn(mountPointContext).when(mountInstance).getEffectiveModelContext();
+        doReturn(Optional.of(FixedDOMSchemaService.of(() -> mountPointContext))).when(mountInstance)
+            .getService(DOMSchemaService.class);
     }
 
     @BeforeClass

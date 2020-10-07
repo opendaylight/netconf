@@ -56,6 +56,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -73,9 +74,11 @@ import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedN
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -225,7 +228,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
-                                                             final SchemaContext ctx) {
+                                                             final EffectiveModelContext ctx) {
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
                 Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
         element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
@@ -343,7 +346,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static DOMSourceAnyxmlNode createEditConfigAnyxml(
-            final SchemaContext ctx, final YangInstanceIdentifier dataPath,
+            final EffectiveModelContext ctx, final YangInstanceIdentifier dataPath,
             final Optional<ModifyAction> operation,
             final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
@@ -398,7 +401,7 @@ public final class NetconfMessageTransformUtil {
         }
     }
 
-    public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx,
+    public static DataContainerChild<?, ?> createEditConfigStructure(final EffectiveModelContext ctx,
             final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
             final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         return Builders.choiceBuilder().withNodeIdentifier(EDIT_CONTENT_NODEID)
@@ -456,8 +459,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static DOMResult prepareDomResultForActionRequest(final DataSchemaContextTree dataSchemaContextTree,
-            final DOMDataTreeIdentifier domDataTreeIdentifier, final SchemaPath actionSchemaPath,
-            final MessageCounter counter, final QName action) {
+            final DOMDataTreeIdentifier domDataTreeIdentifier, final MessageCounter counter, final QName action) {
         final Document document = XmlUtil.newDocument();
         final Element rpcNS =
                 document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
@@ -511,15 +513,19 @@ public final class NetconfMessageTransformUtil {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static void writeNormalizedRpc(final ContainerNode normalized, final DOMResult result,
-                                          final SchemaPath schemaPath,
-                                          final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
+    public static void writeNormalizedOperationInput(final ContainerNode normalized, final DOMResult result,
+            final Absolute operationPath, final EffectiveModelContext baseNetconfCtx)
+                throws IOException, XMLStreamException {
+        final QName inputQName = YangConstants.operationInputQName(operationPath.lastNodeIdentifier().getModule());
+        // FIXME: eliminate this conversion
+        final SchemaPath inputPath = operationPath.asSchemaPath().createChild(inputQName);
+
         final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
         try {
             try (NormalizedNodeStreamWriter normalizedNodeStreamWriter =
-                    XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, schemaPath)) {
+                    XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, inputPath)) {
                 try (SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
-                        new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, schemaPath)) {
+                        new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, inputPath)) {
                     final Collection<DataContainerChild<?, ?>> value = normalized.getValue();
                     normalizedNodeWriter.write(value);
                     normalizedNodeWriter.flush();

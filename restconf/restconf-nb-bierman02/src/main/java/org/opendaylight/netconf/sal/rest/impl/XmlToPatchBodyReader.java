@@ -158,11 +158,12 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                                 module.getQNameModule().getRevision().map(Revision::toString).orElse(null))));
 
                 targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                        codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath().getParent());
+                        codec.getDataContextTree().findChild(targetII).orElseThrow().getDataSchemaNode().getPath()
+                            .getParent());
 
                 // move schema node
                 schemaNode = (DataSchemaNode) SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                        codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath());
+                        codec.getDataContextTree().findChild(targetII).orElseThrow().getDataSchemaNode().getPath());
             }
 
             if (targetNode == null) {

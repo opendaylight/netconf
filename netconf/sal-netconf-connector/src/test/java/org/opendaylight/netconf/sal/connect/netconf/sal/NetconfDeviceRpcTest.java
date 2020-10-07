@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -50,7 +50,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Node;
 
 public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
@@ -62,7 +61,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     private RemoteDeviceCommunicator<NetconfMessage> communicator;
 
     private NetconfDeviceRpc rpc;
-    private SchemaPath path;
+    private QName type;
     private DOMRpcResult expectedReply;
 
     @BeforeClass
@@ -91,9 +90,8 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
                 .when(communicator).sendRequest(any(NetconfMessage.class), any(QName.class));
         rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicator, transformer);
 
-        path = SchemaPath
-                .create(true, QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config"));
-        expectedReply = transformer.toRpcResult(reply, path);
+        type = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config");
+        expectedReply = transformer.toRpcResult(reply, type);
     }
 
     @Test
@@ -106,14 +104,14 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
         when(communicatorMock.sendRequest(any(), any())).thenReturn(Futures.immediateFuture(result));
         when(failingTransformer.toRpcResult(any(), any())).thenThrow(new RuntimeException("FAIL"));
         final NetconfDeviceRpc failingRpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicatorMock, failingTransformer);
-        assertThrows(ExecutionException.class, () -> failingRpc.invokeRpc(path, mock(ContainerNode.class)).get());
-        assertThrows(ExecutionException.class, () -> failingRpc.invokeRpc(path, null).get());
+        assertThrows(ExecutionException.class, () -> failingRpc.invokeRpc(type, mock(ContainerNode.class)).get());
+        assertThrows(ExecutionException.class, () -> failingRpc.invokeRpc(type, null).get());
     }
 
     @Test
     public void testInvokeRpc() throws Exception {
         ContainerNode input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
-        final DOMRpcResult result = rpc.invokeRpc(path, input).get();
+        final DOMRpcResult result = rpc.invokeRpc(type, input).get();
         assertEquals(expectedReply.getResult().getIdentifier(), result.getResult().getIdentifier());
         assertEquals(resolveNode(expectedReply), resolveNode(result));
     }
@@ -137,7 +135,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
         final Collection<? extends RpcDefinition> operations = SCHEMA_CONTEXT.getOperations();
         assertEquals(argValue.size(), operations.size());
         for (RpcDefinition operation : operations) {
-            final DOMRpcIdentifier domRpcIdentifier = DOMRpcIdentifier.create(operation.getPath());
+            final DOMRpcIdentifier domRpcIdentifier = DOMRpcIdentifier.create(operation.getQName());
             assertTrue(argValue.contains(domRpcIdentifier));
 
         }

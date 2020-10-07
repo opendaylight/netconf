@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.test.tool;
 
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collections;
@@ -22,7 +20,6 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaServiceExtension;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
 import org.opendaylight.mdsal.dom.spi.store.DOMStore;
 import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
@@ -230,12 +227,6 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
         private DOMSchemaService createSchemaService() {
             return new DOMSchemaService() {
-
-                @Override
-                public EffectiveModelContext getSessionContext() {
-                    return schemaContext;
-                }
-
                 @Override
                 public EffectiveModelContext getGlobalContext() {
                     return schemaContext;
@@ -246,17 +237,11 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                         final EffectiveModelContextListener listener) {
                     listener.onModelContextUpdated(getGlobalContext());
                     return new AbstractListenerRegistration<>(listener) {
-
                         @Override
                         protected void removeRegistration() {
                             // No-op
                         }
                     };
-                }
-
-                @Override
-                public ClassToInstanceMap<DOMSchemaServiceExtension> getExtensions() {
-                    return ImmutableClassToInstanceMap.of();
                 }
             };
         }

@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Codec for identifier to serialize {@link YangInstanceIdentifier} to
@@ -22,11 +22,11 @@ public final class IdentifierCodec {
         throw new UnsupportedOperationException("Util class.");
     }
 
-    public static String serialize(final YangInstanceIdentifier data, final SchemaContext schemaContext) {
+    public static String serialize(final YangInstanceIdentifier data, final EffectiveModelContext schemaContext) {
         return YangInstanceIdentifierSerializer.create(schemaContext, data);
     }
 
-    public static YangInstanceIdentifier deserialize(final String data, final SchemaContext schemaContext) {
+    public static YangInstanceIdentifier deserialize(final String data, final EffectiveModelContext schemaContext) {
         if (data == null) {
             return YangInstanceIdentifier.builder().build();
         }

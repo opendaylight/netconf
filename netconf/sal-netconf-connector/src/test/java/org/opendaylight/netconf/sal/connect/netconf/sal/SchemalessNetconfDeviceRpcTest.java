@@ -33,7 +33,6 @@ import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +61,6 @@ public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     @Test
     public void testInvokeRpc() throws Exception {
         final QName qName = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config");
-        SchemaPath type = SchemaPath.create(true, qName);
         DOMSource src = new DOMSource(XmlUtil.readXmlToDocument("<get-config xmlns=\"dd\">\n"
                 + "    <source>\n"
                 + "      <running/>\n"
@@ -79,7 +77,7 @@ public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
                 .withValue(src)
                 .build();
 
-        deviceRpc.invokeRpc(type, input);
+        deviceRpc.invokeRpc(qName, input);
         ArgumentCaptor<NetconfMessage> msgCaptor = ArgumentCaptor.forClass(NetconfMessage.class);
         ArgumentCaptor<QName> qnameCaptor = ArgumentCaptor.forClass(QName.class);
         verify(listener).sendRequest(msgCaptor.capture(), qnameCaptor.capture());

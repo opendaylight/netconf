@@ -12,27 +12,27 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.COMMIT_RPC_CONTENT;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.EDIT_CONTENT_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COMMIT_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DEFAULT_OPERATION_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_ERROR_OPTION_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_LOCK_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_LOCK_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_LOCK_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_SOURCE_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_TARGET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_UNLOCK_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_UNLOCK_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_VALIDATE_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_VALIDATE_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.ROLLBACK_ON_ERROR_OPTION;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toFilterStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
@@ -92,21 +92,21 @@ public final class NetconfBaseOps {
         requireNonNull(callback);
         requireNonNull(datastore);
 
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_QNAME,
                 getLockContent(datastore));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
     public ListenableFuture<? extends DOMRpcResult> lockCandidate(final FutureCallback<DOMRpcResult> callback) {
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_QNAME,
             getLockContent(NETCONF_CANDIDATE_QNAME));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
     public ListenableFuture<? extends DOMRpcResult> lockRunning(final FutureCallback<DOMRpcResult> callback) {
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_QNAME,
             getLockContent(NETCONF_RUNNING_QNAME));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
@@ -117,21 +117,21 @@ public final class NetconfBaseOps {
         requireNonNull(callback);
         requireNonNull(datastore);
 
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_QNAME,
                 getUnLockContent(datastore));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
     public ListenableFuture<? extends DOMRpcResult> unlockRunning(final FutureCallback<DOMRpcResult> callback) {
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_QNAME,
             getUnLockContent(NETCONF_RUNNING_QNAME));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
     public ListenableFuture<? extends DOMRpcResult> unlockCandidate(final FutureCallback<DOMRpcResult> callback) {
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_QNAME,
             getUnLockContent(NETCONF_CANDIDATE_QNAME));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
@@ -140,7 +140,7 @@ public final class NetconfBaseOps {
     public ListenableFuture<? extends DOMRpcResult> discardChanges(final FutureCallback<DOMRpcResult> callback) {
         requireNonNull(callback);
 
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_DISCARD_CHANGES_PATH, null);
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_DISCARD_CHANGES_QNAME, null);
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
@@ -148,7 +148,7 @@ public final class NetconfBaseOps {
     public ListenableFuture<? extends DOMRpcResult> commit(final FutureCallback<DOMRpcResult> callback) {
         requireNonNull(callback);
 
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_COMMIT_PATH, COMMIT_RPC_CONTENT);
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_COMMIT_QNAME, COMMIT_RPC_CONTENT);
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
@@ -157,7 +157,7 @@ public final class NetconfBaseOps {
             final QName datastore) {
         requireNonNull(callback);
 
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_VALIDATE_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_VALIDATE_QNAME,
             getValidateContent(requireNonNull(datastore)));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
@@ -175,7 +175,7 @@ public final class NetconfBaseOps {
                                                                final QName source, final QName target) {
         requireNonNull(callback);
 
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_COPY_CONFIG_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_COPY_CONFIG_QNAME,
             getCopyConfigContent(requireNonNull(source), requireNonNull(target)));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
@@ -195,10 +195,10 @@ public final class NetconfBaseOps {
         final ListenableFuture<? extends DOMRpcResult> future;
         if (isFilterPresent(filterPath)) {
             final DataContainerChild<?, ?> node = transformer.toFilterStructure(filterPath.get());
-            future = rpc.invokeRpc(NETCONF_GET_CONFIG_PATH,
+            future = rpc.invokeRpc(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore), node));
         } else {
-            future = rpc.invokeRpc(NETCONF_GET_CONFIG_PATH,
+            future = rpc.invokeRpc(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore)));
         }
 
@@ -241,10 +241,10 @@ public final class NetconfBaseOps {
                                                         final Optional<YangInstanceIdentifier> filterPath) {
         requireNonNull(callback);
 
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_QNAME,
                 isFilterPresent(filterPath)
                     ? NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
-                        toFilterStructure(filterPath.get(), mountContext.getSchemaContext()))
+                        toFilterStructure(filterPath.get(), mountContext.getEffectiveModelContext()))
                     : NetconfMessageTransformUtil.GET_RPC_CONTENT);
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
@@ -284,7 +284,7 @@ public final class NetconfBaseOps {
             final boolean rollback) {
         requireNonNull(callback);
 
-        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_EDIT_CONFIG_PATH,
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_EDIT_CONFIG_QNAME,
                 getEditConfigContent(requireNonNull(datastore), requireNonNull(editStructure), modifyAction, rollback));
 
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());

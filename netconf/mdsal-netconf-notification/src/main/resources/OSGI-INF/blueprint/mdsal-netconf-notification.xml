@@ -17,7 +17,7 @@
                interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
                odl:type="mapper-aggregator-registry"/>
     <reference id="bindingGenerator"
-               interface="org.opendaylight.binding.runtime.api.BindingRuntimeGenerator"/>
+               interface="org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator"/>
     <reference id="codecFactory"
                interface="org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory"/>
     <reference id="parserFactory"

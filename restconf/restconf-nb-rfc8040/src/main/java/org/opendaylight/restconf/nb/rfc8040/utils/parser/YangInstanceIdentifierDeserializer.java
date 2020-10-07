@@ -31,9 +31,10 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -63,13 +64,13 @@ public final class YangInstanceIdentifierDeserializer {
     // percent encoded radix for parsing integers
     private static final int PERCENT_ENCODED_RADIX = 16;
 
-    private final SchemaContext schemaContext;
+    private final EffectiveModelContext schemaContext;
     private final String data;
 
     private DataSchemaContextNode<?> current;
     private int offset;
 
-    private YangInstanceIdentifierDeserializer(final SchemaContext schemaContext, final String data) {
+    private YangInstanceIdentifierDeserializer(final EffectiveModelContext schemaContext, final String data) {
         this.schemaContext = requireNonNull(schemaContext);
         this.data = requireNonNull(data);
         current = DataSchemaContextTree.from(schemaContext).getRoot();
@@ -82,7 +83,7 @@ public final class YangInstanceIdentifierDeserializer {
      * @param data path to data, in URL string form
      * @return {@link Iterable} of {@link PathArgument}
      */
-    public static Iterable<PathArgument> create(final SchemaContext schemaContext, final String data) {
+    public static Iterable<PathArgument> create(final EffectiveModelContext schemaContext, final String data) {
         return new YangInstanceIdentifierDeserializer(schemaContext, data).parse();
     }
 
@@ -333,8 +334,8 @@ public final class YangInstanceIdentifierDeserializer {
 
     private QName getQNameOfDataSchemaNode(final String nodeName) {
         final DataSchemaNode dataSchemaNode = current.getDataSchemaNode();
-        if (dataSchemaNode instanceof ContainerSchemaNode) {
-            return getQNameOfDataSchemaNode((ContainerSchemaNode) dataSchemaNode, nodeName);
+        if (dataSchemaNode instanceof ContainerLike) {
+            return getQNameOfDataSchemaNode((ContainerLike) dataSchemaNode, nodeName);
         } else if (dataSchemaNode instanceof ListSchemaNode) {
             return getQNameOfDataSchemaNode((ListSchemaNode) dataSchemaNode, nodeName);
         }

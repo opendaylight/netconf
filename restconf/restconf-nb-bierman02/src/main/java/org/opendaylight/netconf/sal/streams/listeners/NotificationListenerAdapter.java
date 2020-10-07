@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWrit
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +87,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
             return;
         }
 
-        final SchemaContext schemaContext = controllerContext.getGlobalSchema();
+        final EffectiveModelContext schemaContext = controllerContext.getGlobalSchema();
         final String xml = prepareXml(schemaContext, notification);
         if (checkFilter(xml)) {
             prepareAndPostData(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
@@ -130,7 +130,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      * @return json as {@link String}
      */
     @VisibleForTesting
-    String prepareJson(final SchemaContext schemaContext, final DOMNotification notification) {
+    String prepareJson(final EffectiveModelContext schemaContext, final DOMNotification notification) {
         final JsonParser jsonParser = new JsonParser();
         final JsonObject json = new JsonObject();
         json.add("ietf-restconf:notification", jsonParser.parse(writeBodyToString(schemaContext, notification)));
@@ -138,11 +138,12 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         return json.toString();
     }
 
-    private static String writeBodyToString(final SchemaContext schemaContext, final DOMNotification notification) {
+    private static String writeBodyToString(final EffectiveModelContext schemaContext,
+            final DOMNotification notification) {
         final Writer writer = new StringWriter();
         final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
             JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(schemaContext),
-            notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
+            notification.getType().asSchemaPath(), null, JsonWriterFactory.createJsonWriter(writer));
         final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
         try {
             nodeWriter.write(notification.getBody());
@@ -153,7 +154,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         return writer.toString();
     }
 
-    private String prepareXml(final SchemaContext schemaContext, final DOMNotification notification) {
+    private String prepareXml(final EffectiveModelContext schemaContext, final DOMNotification notification) {
         final Document doc = createDocument();
         final Element notificationElement = basePartDoc(doc);
 
@@ -166,7 +167,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     private void addValuesToNotificationEventElement(final Document doc, final Element element,
-            final SchemaContext schemaContext, final DOMNotification notification) {
+            final EffectiveModelContext schemaContext, final DOMNotification notification) {
         try {
 
             final DOMResult domResult = writeNormalizedNode(notification.getBody(), schemaContext, this.path);

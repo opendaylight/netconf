@@ -11,16 +11,17 @@ import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 public interface MessageTransformer<M> {
 
     DOMNotification toNotification(M message);
 
-    M toRpcRequest(SchemaPath rpc, NormalizedNode<?, ?> node);
+    M toRpcRequest(QName rpc, NormalizedNode<?, ?> node);
 
-    DOMRpcResult toRpcResult(M message, SchemaPath rpc);
+    DOMRpcResult toRpcResult(M message, QName rpc);
 
     /**
      * Parse action into message for request.
@@ -30,7 +31,7 @@ public interface MessageTransformer<M> {
      * @param payload - input of action
      * @return message
      */
-    default M toActionRequest(final SchemaPath action, final DOMDataTreeIdentifier domDataTreeIdentifier,
+    default M toActionRequest(final Absolute action, final DOMDataTreeIdentifier domDataTreeIdentifier,
             final NormalizedNode<?, ?> payload) {
         throw new UnsupportedOperationException();
     }
@@ -42,7 +43,7 @@ public interface MessageTransformer<M> {
      * @param message - message to parsing
      * @return {@link DOMActionResult}
      */
-    default DOMActionResult toActionResult(final SchemaPath action, final M message) {
+    default DOMActionResult toActionResult(final Absolute action, final M message) {
         throw new UnsupportedOperationException();
     }
 }

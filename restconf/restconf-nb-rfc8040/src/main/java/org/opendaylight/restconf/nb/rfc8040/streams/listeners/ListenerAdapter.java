@@ -35,6 +35,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -132,7 +133,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @return Data in printable form.
      */
     private String prepareXml(final Collection<DataTreeCandidate> dataTreeCandidates) {
-        final SchemaContext schemaContext = schemaHandler.get();
+        final EffectiveModelContext schemaContext = schemaHandler.get();
         final DataSchemaContextTree dataContextTree = DataSchemaContextTree.from(schemaContext);
         final Document doc = createDocument();
         final Element notificationElement = basePartDoc(doc);
@@ -151,7 +152,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     private void addValuesToDataChangedNotificationEventElement(final Document doc,
             final Element dataChangedNotificationEventElement, final Collection<DataTreeCandidate> dataTreeCandidates,
-            final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
+            final EffectiveModelContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
 
         for (DataTreeCandidate dataTreeCandidate : dataTreeCandidates) {
             DataTreeCandidateNode candidateNode = dataTreeCandidate.getRootNode();
@@ -172,7 +173,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
     private void addNodeToDataChangeNotificationEventElement(final Document doc,
             final Element dataChangedNotificationEventElement, final DataTreeCandidateNode candidateNode,
-            final YangInstanceIdentifier parentYiid, final SchemaContext schemaContext,
+            final YangInstanceIdentifier parentYiid, final EffectiveModelContext schemaContext,
             final DataSchemaContextTree dataSchemaContextTree) {
 
         Optional<NormalizedNode<?, ?>> optionalNormalizedNode = Optional.empty();
@@ -288,7 +289,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     private Node createCreatedChangedDataChangeEventElement(final Document doc, final YangInstanceIdentifier eventPath,
-            final NormalizedNode<?, ?> normalized, final Operation operation, final SchemaContext schemaContext,
+            final NormalizedNode<?, ?> normalized, final Operation operation, final EffectiveModelContext schemaContext,
             final DataSchemaContextTree dataSchemaContextTree) {
         final Element dataChangeEventElement = doc.createElement(DATA_CHANGE_EVENT);
         final Element pathElement = doc.createElement(PATH);
@@ -300,7 +301,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         dataChangeEventElement.appendChild(operationElement);
 
         try {
-            SchemaPath nodePath;
+            final SchemaPath nodePath;
             final Optional<DataSchemaContextNode<?>> childrenSchemaNode = dataSchemaContextTree.findChild(eventPath);
             checkState(childrenSchemaNode.isPresent());
             if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {

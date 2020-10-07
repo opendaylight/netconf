@@ -30,6 +30,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
@@ -42,7 +43,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class NetconfEventSourceMountTest extends AbstractCodecTest {
     public static final String STREAM_1 = "stream-1";
@@ -55,6 +55,8 @@ public class NetconfEventSourceMountTest extends AbstractCodecTest {
     @Mock
     DOMRpcService rpcService;
     @Mock
+    DOMSchemaService schemaService;
+    @Mock
     private DOMDataTreeReadTransaction tx;
     private NetconfEventSourceMount mount;
 
@@ -65,6 +67,7 @@ public class NetconfEventSourceMountTest extends AbstractCodecTest {
         doReturn(Optional.of(rpcService)).when(domMountPoint).getService(DOMRpcService.class);
         doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPoint)
                 .getService(DOMNotificationService.class);
+        doReturn(Optional.of(schemaService)).when(domMountPoint).getService(DOMSchemaService.class);
         doReturn(tx).when(dataBroker).newReadOnlyTransaction();
         final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME)
                 .build();
@@ -80,8 +83,7 @@ public class NetconfEventSourceMountTest extends AbstractCodecTest {
                 .setName(new StreamNameType(STREAM_1))
                 .build();
         mount.invokeCreateSubscription(stream, Optional.empty());
-        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
-                "create-subscription"));
+        final QName type = QName.create(CreateSubscriptionInput.QNAME, "create-subscription");
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
         Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
@@ -95,8 +97,7 @@ public class NetconfEventSourceMountTest extends AbstractCodecTest {
                 .build();
         final Instant date = Instant.now();
         mount.invokeCreateSubscription(stream, Optional.of(date));
-        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
-                "create-subscription"));
+        final QName type = QName.create(CreateSubscriptionInput.QNAME, "create-subscription");
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
         Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
@@ -114,8 +115,7 @@ public class NetconfEventSourceMountTest extends AbstractCodecTest {
                 .setReplaySupport(true)
                 .build();
         mount.invokeCreateSubscription(stream, Optional.empty());
-        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
-                "create-subscription"));
+        final QName type = QName.create(CreateSubscriptionInput.QNAME, "create-subscription");
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
         Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
