@@ -165,10 +165,10 @@ public class RestconfImplTest {
         final DOMRpcService rpcService = mock(DOMRpcService.class);
         doReturn(Optional.of(rpcService)).when(mount).getService(DOMRpcService.class);
         doReturn(immediateFluentFuture(mock(DOMRpcResult.class))).when(rpcService)
-                .invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+                .invokeRpc(any(QName.class), any(NormalizedNode.class));
         this.restconfImpl.invokeRpc("randomId", ctx, uriInfo);
         this.restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
-        verify(rpcService, times(2)).invokeRpc(any(SchemaPath.class), any());
+        verify(rpcService, times(2)).invokeRpc(any(QName.class), any());
     }
 
     /**

@@ -161,7 +161,7 @@ public class NetconfDevice
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
         final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
-        final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener,
+        final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getEffectiveModelContext(), listener,
             new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
         final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(
             new DeviceSourcesResolver(id, baseSchema, initRpc, remoteSessionCapabilities, stateSchemasResolver));
@@ -216,7 +216,7 @@ public class NetconfDevice
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
         final ListenableFuture<DOMRpcResult> rpcResultListenableFuture = deviceRpc.invokeRpc(
-                NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_PATH,
+                NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME,
                 NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
 
         Futures.addCallback(rpcResultListenableFuture, new FutureCallback<DOMRpcResult>() {
@@ -261,7 +261,7 @@ public class NetconfDevice
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
             this.salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
                     this.deviceActionFactory == null ? null : this.deviceActionFactory.createDeviceAction(
-                            this.messageTransformer, listener, result.getSchemaContext()));
+                            this.messageTransformer, listener, result.getEffectiveModelContext()));
             this.notificationHandler.onRemoteSchemaUp(this.messageTransformer);
 
             LOG.info("{}: Netconf connector initialized successfully", id);
@@ -322,7 +322,7 @@ public class NetconfDevice
         final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(schemaContext, listener,
             new NetconfMessageTransformer(emptyContext, false, baseSchema));
 
-        return Futures.transform(deviceRpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_GET_PATH,
+        return Futures.transform(deviceRpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_GET_QNAME,
             Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID)
                 .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, schemaContext))
                 .build()), rpcResult -> processSchemaMounts(rpcResult, emptyContext), MoreExecutors.directExecutor());
@@ -374,7 +374,7 @@ public class NetconfDevice
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
             final RemoteDeviceCommunicator<NetconfMessage> listener) {
-        return new NetconfDeviceRpc(result.getSchemaContext(), listener,
+        return new NetconfDeviceRpc(result.getEffectiveModelContext(), listener,
             new NetconfMessageTransformer(result, true, baseSchemas.getBaseSchema()));
     }
 

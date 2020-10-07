@@ -52,18 +52,18 @@ import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
@@ -90,7 +90,7 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_VOID_INVOKER = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
             return immediateFluentFuture(new DefaultDOMRpcResult(null, Collections.emptyList()));
         }
 
@@ -102,7 +102,7 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_FAILED_INVOCATION = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
             return immediateFailedFluentFuture(new DOMRpcException("rpc invocation not implemented yet") {
                 private static final long serialVersionUID = 1L;
             });
@@ -116,14 +116,14 @@ public class RuntimeRpcTest {
 
     private final DOMRpcService rpcServiceSuccessfulInvocation = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
             final Collection<DataContainerChild<? extends PathArgument, ?>> children =
                     ((ContainerNode) input).getValue();
-            final Module module = SCHEMA_CONTEXT.findModules(type.getLastComponent().getNamespace()).stream()
+            final Module module = SCHEMA_CONTEXT.findModules(type.getNamespace()).stream()
                 .findFirst().orElse(null);
-            final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(
-                module, module.getNamespace(), type.getLastComponent().getLocalName());
-            final ContainerSchemaNode outputSchemaNode = rpcDefinition.getOutput();
+            final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(),
+                type.getLocalName());
+            final OutputSchemaNode outputSchemaNode = rpcDefinition.getOutput();
             final ContainerNode node = ImmutableContainerNodeBuilder.create()
                     .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(outputSchemaNode.getQName()))
                     .withValue(children).build();

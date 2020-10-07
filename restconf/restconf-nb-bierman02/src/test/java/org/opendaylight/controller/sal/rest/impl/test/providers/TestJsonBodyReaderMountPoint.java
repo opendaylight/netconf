@@ -133,13 +133,10 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
         checkExpectValueNormalizeNodeContext(dataSchemaNode, nnContext, null);
     }
 
-    protected void checkExpectValueNormalizeNodeContext(
-            final DataSchemaNode dataSchemaNode,
+    protected void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
             final NormalizedNodeContext nnContext, final QName qualifiedName) {
-        YangInstanceIdentifier dataNodeIdent = YangInstanceIdentifier
-                .of(dataSchemaNode.getQName());
-        final DOMMountPoint mountPoint = nnContext
-                .getInstanceIdentifierContext().getMountPoint();
+        YangInstanceIdentifier dataNodeIdent = YangInstanceIdentifier.of(dataSchemaNode.getQName());
+        final DOMMountPoint mountPoint = nnContext.getInstanceIdentifierContext().getMountPoint();
         final DataSchemaNode mountDataSchemaNode = mountPoint.getSchemaContext().getDataChildByName(
                         dataSchemaNode.getQName());
         assertNotNull(mountDataSchemaNode);

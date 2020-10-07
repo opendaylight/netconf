@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +43,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -170,7 +173,8 @@ public class RestGetOperationTest extends JerseyTest {
     public void getDataWithUrlMountPoint() throws Exception {
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
                 isNull())).thenReturn(prepareCnDataForMountPointTest(false));
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
+        when(mountInstance.getService(DOMSchemaService.class))
+                .thenReturn(Optional.of(FixedDOMSchemaService.of(() -> schemaContextTestModule)));
 
         String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/test-module:cont/cont1";
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
@@ -192,8 +196,8 @@ public class RestGetOperationTest extends JerseyTest {
         final YangInstanceIdentifier awaitedInstanceIdentifier = prepareInstanceIdentifierForList();
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), eq(awaitedInstanceIdentifier),
                 isNull())).thenReturn(prepareCnDataForSlashesBehindMountPointTest());
-
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
+        when(mountInstance.getService(DOMSchemaService.class))
+                .thenReturn(Optional.of(FixedDOMSchemaService.of(() -> schemaContextTestModule)));
 
         final String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/"
                 + "test-module:cont/lst1/GigabitEthernet0%2F0%2F0%2F0";
@@ -221,8 +225,8 @@ public class RestGetOperationTest extends JerseyTest {
     public void getDataMountPointIntoHighestElement() throws Exception {
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
                 isNull())).thenReturn(prepareCnDataForMountPointTest(true));
-
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
+        when(mountInstance.getService(DOMSchemaService.class))
+                .thenReturn(Optional.of(FixedDOMSchemaService.of(() -> schemaContextTestModule)));
 
         final String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/test-module:cont";
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
@@ -369,7 +373,8 @@ public class RestGetOperationTest extends JerseyTest {
     public void getOperationsBehindMountPointTest() throws Exception {
         setControllerContext(schemaContextModules);
 
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContextBehindMountPoint);
+        when(mountInstance.getService(DOMSchemaService.class))
+            .thenReturn(Optional.of(FixedDOMSchemaService.of(() -> schemaContextBehindMountPoint)));
 
         final String uri = "/operations/ietf-interfaces:interfaces/interface/0/yang-ext:mount/";
 

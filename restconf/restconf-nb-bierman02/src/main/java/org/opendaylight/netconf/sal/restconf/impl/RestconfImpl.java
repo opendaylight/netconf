@@ -401,7 +401,7 @@ public final class RestconfImpl implements RestconfService {
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
             schemaContext = mountPoint.getEffectiveModelContext();
-            response = mountRpcServices.get().invokeRpc(schema.getPath(), input);
+            response = mountRpcServices.get().invokeRpc(schema.getQName(), input);
         } else {
             final URI namespace = schema.getQName().getNamespace();
             if (namespace.toString().equals(SAL_REMOTE_NAMESPACE)) {
@@ -415,7 +415,7 @@ public final class RestconfImpl implements RestconfService {
                     throw new RestconfDocumentedException(msg, ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
             } else {
-                response = this.broker.invokeRpc(schema.getPath(), input);
+                response = this.broker.invokeRpc(schema.getQName(), input);
             }
             schemaContext = this.controllerContext.getGlobalSchema();
         }
@@ -493,9 +493,9 @@ public final class RestconfImpl implements RestconfService {
             if (!mountRpcServices.isPresent()) {
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
-            response = mountRpcServices.get().invokeRpc(rpc.getPath(), input);
+            response = mountRpcServices.get().invokeRpc(rpc.getQName(), input);
         } else {
-            response = this.broker.invokeRpc(rpc.getPath(), input);
+            response = this.broker.invokeRpc(rpc.getQName(), input);
         }
 
         final NormalizedNode<?, ?> result = checkRpcResponse(response).getResult();
