@@ -22,7 +22,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 public class NetconfDeviceNotificationServiceTest {
 
@@ -42,8 +42,8 @@ public class NetconfDeviceNotificationServiceTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        final SchemaPath path1 = SchemaPath.create(true, QName.create(new URI("namespace1"), "path1"));
-        final SchemaPath path2 = SchemaPath.create(true, QName.create(new URI("namespace2"), "path2"));
+        final Absolute path1 = Absolute.of(QName.create(new URI("namespace1"), "path1"));
+        final Absolute path2 = Absolute.of(QName.create(new URI("namespace2"), "path2"));
         service = new NetconfDeviceNotificationService();
         service.registerNotificationListener(listener1, path1);
         registration = service.registerNotificationListener(listener2, path2);

@@ -13,12 +13,12 @@ import com.google.common.collect.ImmutableList;
 import java.util.Iterator;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 class DataNormalizer {
     private final DataNormalizationOperation<?> operation;
 
-    DataNormalizer(final SchemaContext ctx) {
+    DataNormalizer(final EffectiveModelContext ctx) {
         operation = DataNormalizationOperation.from(ctx);
     }
 

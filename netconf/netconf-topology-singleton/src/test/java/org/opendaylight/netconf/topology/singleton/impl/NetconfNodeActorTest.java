@@ -83,6 +83,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -113,7 +114,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
@@ -315,11 +316,11 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1), masterRef), testKit.getRef());
 
         verify(mockMountPointBuilder, timeout(5000)).register();
-        verify(mockMountPointBuilder, after(500)).addInitialSchemaContext(mockSchemaContext);
-        verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), any());
+        verify(mockMountPointBuilder, after(500)).addService(eq(DOMDataBroker.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMActionService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMNotificationService.class), any());
+        verify(mockMountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mockSchemaSourceReg1).close();
         verify(mockRegistry, times(2)).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
         verify(mockSchemaRepository, times(2)).createEffectiveModelContextFactory();
@@ -493,7 +494,6 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         assertTrue(slaveDomRPCService instanceof ProxyDOMRpcService);
 
         final QName testQName = QName.create("", "TestQname");
-        final SchemaPath schemaPath = SchemaPath.create(true, testQName);
         final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(testQName))
                 .withChild(ImmutableNodes.leafNode(testQName, "foo")).build();
@@ -503,7 +503,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         doReturn(FluentFutures.immediateNullFluentFuture()).when(mockDOMRpcService).invokeRpc(any(), any());
 
-        DOMRpcResult result = slaveDomRPCService.invokeRpc(schemaPath, outputNode).get(2, TimeUnit.SECONDS);
+        DOMRpcResult result = slaveDomRPCService.invokeRpc(testQName, outputNode).get(2, TimeUnit.SECONDS);
 
         assertEquals(null, result);
 
@@ -512,7 +512,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(outputNode)))
                 .when(mockDOMRpcService).invokeRpc(any(), any());
 
-        result = slaveDomRPCService.invokeRpc(schemaPath, outputNode).get(2, TimeUnit.SECONDS);
+        result = slaveDomRPCService.invokeRpc(testQName, outputNode).get(2, TimeUnit.SECONDS);
 
         assertEquals(outputNode, result.getResult());
         assertTrue(result.getErrors().isEmpty());
@@ -522,7 +522,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(rpcError)))
                 .when(mockDOMRpcService).invokeRpc(any(), any());
 
-        result = slaveDomRPCService.invokeRpc(schemaPath, outputNode).get(2, TimeUnit.SECONDS);
+        result = slaveDomRPCService.invokeRpc(testQName, outputNode).get(2, TimeUnit.SECONDS);
 
         assertNull(result.getResult());
         assertEquals(rpcError, result.getErrors().iterator().next());
@@ -533,7 +533,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 .when(mockDOMRpcService).invokeRpc(any(), any());
 
         final DOMRpcResult resultOutputError =
-                slaveDomRPCService.invokeRpc(schemaPath, outputNode).get(2, TimeUnit.SECONDS);
+                slaveDomRPCService.invokeRpc(testQName, outputNode).get(2, TimeUnit.SECONDS);
 
         assertEquals(outputNode, resultOutputError.getResult());
         assertEquals(rpcError, resultOutputError.getErrors().iterator().next());
@@ -541,7 +541,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         // RPC failure.
         doReturn(FluentFutures.immediateFailedFluentFuture(new ClusteringRpcException("mock")))
             .when(mockDOMRpcService).invokeRpc(any(), any());
-        final ListenableFuture<? extends DOMRpcResult> future = slaveDomRPCService.invokeRpc(schemaPath, outputNode);
+        final ListenableFuture<? extends DOMRpcResult> future = slaveDomRPCService.invokeRpc(testQName, outputNode);
 
         final ExecutionException e = assertThrows(ExecutionException.class, () -> future.get(2, TimeUnit.SECONDS));
         final Throwable cause = e.getCause();
@@ -563,7 +563,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         assertTrue(slaveDomActionService instanceof ProxyDOMActionService);
 
         final QName testQName = QName.create("test", "2019-08-16", "TestActionQname");
-        final SchemaPath schemaPath = SchemaPath.create(true, testQName);
+        final Absolute schemaPath = Absolute.of(testQName);
 
         final YangInstanceIdentifier yangIIdPath = YangInstanceIdentifier
             .create(new YangInstanceIdentifier.NodeIdentifier(testQName));
@@ -687,7 +687,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 masterRef), testKit.getRef());
 
         verify(mockMountPointBuilder, timeout(5000)).register();
-        verify(mockMountPointBuilder).addInitialSchemaContext(mockSchemaContext);
+        verify(mockMountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), any());
         verify(mockMountPointBuilder).addService(eq(NetconfDataTreeService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), any());
@@ -708,7 +708,6 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         doNothing().when(mockMountPointReg).close();
 
-        doReturn(mockMountPointBuilder).when(mockMountPointBuilder).addInitialSchemaContext(any());
         doReturn(mockMountPointBuilder).when(mockMountPointBuilder).addService(any(), any());
         doReturn(mockMountPointReg).when(mockMountPointBuilder).register();
     }

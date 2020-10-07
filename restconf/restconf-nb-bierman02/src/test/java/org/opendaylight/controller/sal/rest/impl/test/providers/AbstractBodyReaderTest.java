@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -112,6 +114,12 @@ public abstract class AbstractBodyReaderTest {
     protected static void checkPatchContextMountPoint(final PatchContext patchContext) {
         checkPatchContext(patchContext);
         assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
-        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint().getSchemaContext());
     }
+
+    protected static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
+        return mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
+    }
+
 }

@@ -8,6 +8,6 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-message-bus-${project.version}">
     <feature name="odl-message-bus" version="${project.version}">
-        <feature version="[2,3)">odl-controller-exp-messagebus</feature>
+        <feature version="[3,4)">odl-controller-exp-messagebus</feature>
     </feature>
 </features>

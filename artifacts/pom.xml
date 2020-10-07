@@ -14,7 +14,7 @@
     <parent>
       <groupId>org.opendaylight.odlparent</groupId>
       <artifactId>odlparent-lite</artifactId>
-      <version>7.0.6</version>
+      <version>8.0.0</version>
       <relativePath/>
     </parent>
 
@@ -162,6 +162,13 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>ietf-netconf-with-defaults</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-test-models</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>

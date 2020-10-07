@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.topology.singleton.messages.ContainerNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
  * Message container which holds node data in {@link SchemaPathMessage}, {@link ContainerNodeMessage} and
@@ -46,7 +46,7 @@ public class InvokeActionMessage implements Serializable {
         this.domDataTreeIdentifier = requireNonNull(domDataTreeIdentifier);
     }
 
-    public SchemaPath getSchemaPath() {
+    public Absolute getSchemaPath() {
         return schemaPathMessage.getSchemaPath();
     }
 

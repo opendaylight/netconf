@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -44,7 +43,7 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -153,12 +152,11 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         }
 
         final RpcDefinition rpcDefinition = rpcDefinitionOptional.get();
-        final SchemaPath schemaPath = SchemaPath.create(Collections.singletonList(rpcDefinition.getQName()), true);
         final ContainerNode inputNode = rpcToNNode(operationElement, rpcDefinition.getInput());
 
         final DOMRpcResult result;
         try {
-            result = rpcService.invokeRpc(schemaPath, inputNode).get();
+            result = rpcService.invokeRpc(rpcDefinition.getQName(), inputNode).get();
         } catch (final InterruptedException | ExecutionException e) {
             throw DocumentedException.wrap(e);
         }
@@ -255,7 +253,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
      * @return parsed rpc into normalized node, or null if input schema is null
      */
     private @Nullable ContainerNode rpcToNNode(final XmlElement element,
-            final @Nullable ContainerSchemaNode input) throws DocumentedException {
+            final @Nullable InputSchemaNode input) throws DocumentedException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext.getCurrentContext(), input);

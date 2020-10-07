@@ -76,6 +76,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableIt
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.model.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -150,10 +151,12 @@ public class NetconfTopologyImplTest {
         final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
 
-        PathArgument pa = IdentifiableItem.of(Node.class, new NodeKey(NODE_ID));
+        NodeKey key = new NodeKey(NODE_ID);
+        PathArgument pa = IdentifiableItem.of(Node.class, key);
         when(newNode.getIdentifier()).thenReturn(pa);
 
         final NodeBuilder nn = new NodeBuilder()
+                .withKey(key)
                 .addAugmentation(new NetconfNodeBuilder()
                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                     .setPort(new PortNumber(Uint16.valueOf(9999)))
@@ -271,8 +274,15 @@ public class NetconfTopologyImplTest {
     }
 
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
-        private static final BaseNetconfSchemas BASE_SCHEMAS =
-                new DefaultBaseNetconfSchemas(new YangParserFactoryImpl());
+        private static final BaseNetconfSchemas BASE_SCHEMAS;
+
+        static {
+            try {
+                BASE_SCHEMAS = new DefaultBaseNetconfSchemas(new YangParserFactoryImpl());
+            } catch (YangParserException e) {
+                throw new ExceptionInInitializerError(e);
+            }
+        }
 
         public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                           final EventExecutor eventExecutor,

@@ -23,6 +23,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
@@ -126,7 +128,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
             final DOMMountPointService.DOMMountPointBuilder mountBuilder =
                     mountService.createMountPoint(id.getTopologyPath());
-            mountBuilder.addInitialSchemaContext(initialCtx);
+            mountBuilder.addService(DOMSchemaService.class, FixedDOMSchemaService.of(() -> initialCtx));
 
             if (broker != null) {
                 mountBuilder.addService(DOMDataBroker.class, broker);

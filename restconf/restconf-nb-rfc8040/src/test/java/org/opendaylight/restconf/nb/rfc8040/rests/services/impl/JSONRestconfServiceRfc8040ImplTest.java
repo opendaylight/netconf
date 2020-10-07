@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -59,6 +58,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
@@ -85,8 +85,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * Unit tests for JSONRestconfServiceDraft18.
@@ -466,10 +464,9 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     @Test
     public void testInvokeRpcWithInput() throws IOException, OperationFailedException {
-        final SchemaPath path = SchemaPath.create(true, MAKE_TOAST_QNAME);
-
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), any(NormalizedNode.class));
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(MAKE_TOAST_QNAME),
+            any(NormalizedNode.class));
 
         final String uriPath = "toaster:make-toast";
         final String input = loadData("/full-versions/make-toast-rpc-input.json");
@@ -479,7 +476,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         assertEquals("Output present", false, output.isPresent());
 
         final ArgumentCaptor<NormalizedNode<?, ?>> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
-        verify(mockRpcService).invokeRpc(eq(path), capturedNode.capture());
+        verify(mockRpcService).invokeRpc(eq(MAKE_TOAST_QNAME), capturedNode.capture());
 
         assertTrue("Expected ContainerNode. Actual " + capturedNode.getValue().getClass(),
                 capturedNode.getValue() instanceof ContainerNode);
@@ -490,10 +487,8 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     @Test
     public void testInvokeRpcWithNoInput() throws OperationFailedException {
-        final SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
-
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), any());
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(CANCEL_TOAST_QNAME), any());
 
         final String uriPath = "toaster:cancel-toast";
 
@@ -501,18 +496,16 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         assertEquals("Output present", false, output.isPresent());
 
-        verify(mockRpcService).invokeRpc(eq(path), any());
+        verify(mockRpcService).invokeRpc(eq(CANCEL_TOAST_QNAME), any());
     }
 
     @Test
     public void testInvokeRpcWithOutput() throws OperationFailedException {
-        final SchemaPath path = SchemaPath.create(true, TEST_OUTPUT_QNAME);
-
         final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_OUTPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
-        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), any());
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(TEST_OUTPUT_QNAME), any());
 
         final String uriPath = "toaster:testOutput";
 
@@ -523,12 +516,12 @@ public class JSONRestconfServiceRfc8040ImplTest {
         assertThat("Output element is missing namespace", output.get(), containsString("\"toaster:output\""));
         assertThat("Missing \"textOut\"", output.get(), containsString("\"textOut\":\"foo\""));
 
-        verify(mockRpcService).invokeRpc(eq(path), any());
+        verify(mockRpcService).invokeRpc(eq(TEST_OUTPUT_QNAME), any());
     }
 
     public void testInvokeRpcFailure() {
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException("testExeption");
-        doReturn(immediateFailedFluentFuture(exception)).when(mockRpcService).invokeRpc(any(SchemaPath.class),
+        doReturn(immediateFailedFluentFuture(exception)).when(mockRpcService).invokeRpc(any(QName.class),
                 any(NormalizedNode.class));
 
         assertThrows(OperationFailedException.class,
@@ -568,10 +561,10 @@ public class JSONRestconfServiceRfc8040ImplTest {
     }
 
     DOMMountPoint setupTestMountPoint() throws FileNotFoundException {
-        final SchemaContext schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
+        final EffectiveModelContext schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
         final DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
-        doReturn(schemaContextTestModule).when(mockMountPoint).getEffectiveModelContext();
-        doCallRealMethod().when(mockMountPoint).getSchemaContext();
+        doReturn(Optional.of(FixedDOMSchemaService.of(schemaContextTestModule))).when(mockMountPoint)
+            .getService(DOMSchemaService.class);
 
         doReturn(Optional.of(mockDOMDataBroker)).when(mockMountPoint).getService(DOMDataBroker.class);
 

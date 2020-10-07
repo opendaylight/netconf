@@ -36,6 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
@@ -47,15 +48,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public class NetconfEventSourceManagerTest extends AbstractCodecTest {
 
-    NetconfEventSourceManager netconfEventSourceManager;
-    ListenerRegistration<?> listenerRegistrationMock;
-    DOMMountPointService domMountPointServiceMock;
-    MountPointService mountPointServiceMock;
-    EventSourceRegistry eventSourceTopologyMock;
-    DataTreeModification<Node> dataTreeModificationMock;
-    RpcProviderService rpcProviderRegistryMock;
-    EventSourceRegistry eventSourceRegistry;
-
+    private NetconfEventSourceManager netconfEventSourceManager;
+    private ListenerRegistration<?> listenerRegistrationMock;
+    private DOMMountPointService domMountPointServiceMock;
+    private MountPointService mountPointServiceMock;
+    private EventSourceRegistry eventSourceTopologyMock;
+    private DataTreeModification<Node> dataTreeModificationMock;
+    private RpcProviderService rpcProviderRegistryMock;
+    private EventSourceRegistry eventSourceRegistry;
 
     @SuppressWarnings("unchecked")
     @Before
@@ -81,6 +81,7 @@ public class NetconfEventSourceManagerTest extends AbstractCodecTest {
         doReturn(Optional.of(mock(DOMRpcService.class))).when(domMountPointMock).getService(DOMRpcService.class);
         doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPointMock)
                 .getService(DOMNotificationService.class);
+        doReturn(Optional.of(mock(DOMSchemaService.class))).when(domMountPointMock).getService(DOMSchemaService.class);
 
         DOMDataTreeReadTransaction rtx = mock(DOMDataTreeReadTransaction.class);
         doReturn(rtx).when(mpDataBroker).newReadOnlyTransaction();

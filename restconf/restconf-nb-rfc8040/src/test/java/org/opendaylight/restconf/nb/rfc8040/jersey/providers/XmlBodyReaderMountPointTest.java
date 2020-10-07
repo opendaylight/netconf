@@ -144,34 +144,26 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
     }
 
-    private void checkExpectValueNormalizeNodeContext(
-            final DataSchemaNode dataSchemaNode,
+    private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
             final NormalizedNodeContext nnContext) {
         checkExpectValueNormalizeNodeContext(dataSchemaNode, nnContext, null);
     }
 
-    private void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
+    private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
             final NormalizedNodeContext nnContext, final QName qualifiedName) {
-        YangInstanceIdentifier dataNodeIdent = YangInstanceIdentifier
-                .of(dataSchemaNode.getQName());
-        final DOMMountPoint mountPoint = nnContext
-                .getInstanceIdentifierContext().getMountPoint();
-        final DataSchemaNode mountDataSchemaNode = mountPoint
-                .getSchemaContext().getDataChildByName(
-                        dataSchemaNode.getQName());
+        YangInstanceIdentifier dataNodeIdent = YangInstanceIdentifier.of(dataSchemaNode.getQName());
+        final DOMMountPoint mountPoint = nnContext.getInstanceIdentifierContext().getMountPoint();
+        final DataSchemaNode mountDataSchemaNode = modelContext(mountPoint)
+                .getDataChildByName(dataSchemaNode.getQName());
         assertNotNull(mountDataSchemaNode);
         if (qualifiedName != null && dataSchemaNode instanceof DataNodeContainer) {
-            final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode)
-                    .getDataChildByName(qualifiedName);
-            dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent)
-                    .node(child.getQName()).build();
-            assertTrue(nnContext.getInstanceIdentifierContext().getSchemaNode()
-                    .equals(child));
+            final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode).getDataChildByName(qualifiedName);
+            dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent).node(child.getQName()).build();
+            assertTrue(nnContext.getInstanceIdentifierContext().getSchemaNode().equals(child));
         } else {
             assertTrue(mountDataSchemaNode.equals(dataSchemaNode));
         }
-        assertNotNull(NormalizedNodes.findNode(nnContext.getData(),
-                dataNodeIdent));
+        assertNotNull(NormalizedNodes.findNode(nnContext.getData(), dataNodeIdent));
     }
 
     /**

@@ -26,9 +26,10 @@ import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
+import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 
 public final class OperationBuilder {
     public static final String BODY = "body";
@@ -203,8 +204,8 @@ public final class OperationBuilder {
         final String operName = operDef.getQName().getLocalName();
         final String inputName = operName + INPUT_SUFFIX;
 
-        final ContainerSchemaNode input = operDef.getInput();
-        final ContainerSchemaNode output = operDef.getOutput();
+        final InputSchemaNode input = operDef.getInput();
+        final OutputSchemaNode output = operDef.getOutput();
         if (!input.getChildNodes().isEmpty()) {
             final String discriminator = definitionNames.getDiscriminator(input);
             final String clearDefName = parentName + "_" + operName + INPUT_SUFFIX;
@@ -330,13 +331,13 @@ public final class OperationBuilder {
 
     private static String buildSummaryValue(final String httpMethod, final String moduleName,
                                             final Optional<String> deviceName, final String nodeName) {
-        return httpMethod + SUMMARY_SEPARATOR + (deviceName.map(s -> s + SUMMARY_SEPARATOR).orElse(""))
+        return httpMethod + SUMMARY_SEPARATOR + deviceName.map(s -> s + SUMMARY_SEPARATOR).orElse("")
                 + moduleName + SUMMARY_SEPARATOR + nodeName;
     }
 
     public static ArrayNode buildTagsValue(final Optional<String> deviceName, final String moduleName) {
         final ArrayNode tagsValue = JsonNodeFactory.instance.arrayNode();
-        tagsValue.add((deviceName.map(s -> "mounted " + s).orElse("controller")) + " " + moduleName);
+        tagsValue.add(deviceName.map(s -> "mounted " + s).orElse("controller") + " " + moduleName);
         return tagsValue;
     }
 

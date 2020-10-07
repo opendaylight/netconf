@@ -16,6 +16,11 @@
     <description>NETCONF topology APIs</description>
     <packaging>bundle</packaging>
 
+    <properties>
+        <!-- FIXME: Remove this -->
+        <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>

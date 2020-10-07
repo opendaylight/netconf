@@ -31,7 +31,9 @@ import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.Submodule;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -107,7 +109,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
             if (cap.isPresent()) {
                 capabilities.add(cap.get());
             }
-            for (final Module submodule : module.getSubmodules()) {
+            for (final Submodule submodule : module.getSubmodules()) {
                 cap = moduleToCapability(submodule, rootSchemaSourceProviderDependency);
                 if (cap.isPresent()) {
                     capabilities.add(cap.get());
@@ -118,9 +120,8 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         return capabilities;
     }
 
-    private static Optional<YangModuleCapability> moduleToCapability(
-            final Module module, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
-
+    private static Optional<YangModuleCapability> moduleToCapability(final ModuleLike module,
+            final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
         final SourceIdentifier moduleSourceIdentifier = RevisionSourceIdentifier.create(module.getName(),
                 module.getRevision());
 

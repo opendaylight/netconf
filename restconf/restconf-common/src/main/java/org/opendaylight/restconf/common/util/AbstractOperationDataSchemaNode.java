@@ -9,8 +9,8 @@ package org.opendaylight.restconf.common.util;
 
 import java.util.Optional;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.RevisionAwareXPath;
 import org.opendaylight.yangtools.yang.model.api.Status;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathExpression.QualifiedBound;
 
 abstract class AbstractOperationDataSchemaNode implements DataSchemaNode {
     @Override
@@ -24,11 +24,13 @@ abstract class AbstractOperationDataSchemaNode implements DataSchemaNode {
     }
 
     @Override
+    @Deprecated
     public final boolean isAugmenting() {
         return false;
     }
 
     @Override
+    @Deprecated
     public final boolean isAddedByUses() {
         return false;
     }
@@ -44,7 +46,7 @@ abstract class AbstractOperationDataSchemaNode implements DataSchemaNode {
     }
 
     @Override
-    public final Optional<RevisionAwareXPath> getWhenCondition() {
+    public final Optional<? extends QualifiedBound> getWhenCondition() {
         return Optional.empty();
     }
 }

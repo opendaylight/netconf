@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -36,7 +37,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableCo
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +128,7 @@ final class CreateStreamUtil {
      * @return Parsed stream name.
      */
     private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path,
-            final SchemaContext schemaContext, final ContainerNode data) {
+            final EffectiveModelContext schemaContext, final ContainerNode data) {
         LogicalDatastoreType datastoreType = parseEnum(
                 data, LogicalDatastoreType.class, RestconfStreamsConstants.DATASTORE_PARAM_NAME);
         datastoreType = datastoreType == null ? LogicalDatastoreType.CONFIGURATION : datastoreType;
@@ -218,7 +219,8 @@ final class CreateStreamUtil {
         final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
                 .getNotificationListenerFor(streamName);
         return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
-                notificationDefinition.getPath(), streamName, outputType));
+                Absolute.of(ImmutableList.copyOf(notificationDefinition.getPath().getPathFromRoot())), streamName,
+                outputType));
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,

@@ -22,11 +22,12 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
 import org.opendaylight.yangtools.yang.model.api.MustDefinition;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.RevisionAwareXPath;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.Status;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathExpression.QualifiedBound;
 
 /**
  * Simple proxy for container like schema nodes, where user provides a collection of children schema nodes.
@@ -93,11 +94,13 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
+    @Deprecated
     public boolean isAugmenting() {
         throw new UnsupportedOperationException();
     }
 
     @Override
+    @Deprecated
     public boolean isAddedByUses() {
         throw new UnsupportedOperationException();
     }
@@ -113,6 +116,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
+    @Deprecated
     public SchemaPath getPath() {
         throw new UnsupportedOperationException();
     }
@@ -143,12 +147,17 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public Optional<RevisionAwareXPath> getWhenCondition() {
+    public Optional<? extends QualifiedBound> getWhenCondition() {
         return Optional.empty();
     }
 
     @Override
     public Collection<? extends MustDefinition> getMustConstraints() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public ContainerEffectiveStatement asEffectiveStatement() {
+        throw new UnsupportedOperationException();
     }
 }

@@ -95,24 +95,25 @@ public class PutDataTransactionUtilTest {
         final NodeIdentifierWithPredicates nodeWithKey2 =
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band 2");
 
+        final DataSchemaContextTree tree = DataSchemaContextTree.from(this.schema);
         this.iid = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerQname)
                 .node(leafQname)
                 .build();
-        this.schemaNode = DataSchemaContextTree.from(this.schema).getChild(this.iid).getDataSchemaNode();
+        this.schemaNode = tree.findChild(this.iid).orElseThrow().getDataSchemaNode();
 
         this.iid2 = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .build();
-        this.schemaNode2 = DataSchemaContextTree.from(this.schema).getChild(this.iid2).getDataSchemaNode();
+        this.schemaNode2 = tree.findChild(this.iid2).orElseThrow().getDataSchemaNode();
 
         this.iid3 = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(listQname)
                 .node(nodeWithKey)
                 .build();
-        this.schemaNode3 = DataSchemaContextTree.from(this.schema).getChild(this.iid3).getDataSchemaNode();
+        this.schemaNode3 = tree.findChild(this.iid3).orElseThrow().getDataSchemaNode();
 
         this.buildLeaf = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(leafQname))
