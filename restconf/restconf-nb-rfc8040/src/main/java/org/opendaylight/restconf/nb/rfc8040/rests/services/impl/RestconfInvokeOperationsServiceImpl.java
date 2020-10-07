@@ -8,12 +8,14 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.net.URI;
+import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -24,11 +26,11 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * Implementation of {@link RestconfInvokeOperationsService}.
@@ -61,7 +63,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
         final EffectiveModelContext refSchemaCtx = this.schemaContextHandler.get();
-        final SchemaPath schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
+        final QName schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
 
@@ -82,7 +84,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             schemaContextRef = this.schemaContextHandler.get();
         } else {
             response = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(mountPoint, payload.getData(), schemaPath);
-            schemaContextRef = mountPoint.getEffectiveModelContext();
+            schemaContextRef = modelContext(mountPoint);
         }
 
         final DOMRpcResult result = RestconfInvokeOperationsUtil.checkResponse(response);
@@ -100,5 +102,11 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint,
                     schemaContextRef), resultData);
         }
+    }
+
+    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
+        return mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
     }
 }

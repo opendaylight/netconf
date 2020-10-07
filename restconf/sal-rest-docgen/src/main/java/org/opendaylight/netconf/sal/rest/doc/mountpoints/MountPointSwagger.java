@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -44,6 +43,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
@@ -123,19 +123,16 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         return instanceId;
     }
 
-    private SchemaContext getSchemaContext(final YangInstanceIdentifier id) {
+    private EffectiveModelContext getSchemaContext(final YangInstanceIdentifier id) {
         if (id == null) {
             return null;
         }
 
         checkState(mountService != null);
-        final Optional<DOMMountPoint> mountPoint = this.mountService.getMountPoint(id);
-        if (mountPoint.isEmpty()) {
-            return null;
-        }
-
-        final SchemaContext context = mountPoint.get().getSchemaContext();
-        return context;
+        return this.mountService.getMountPoint(id)
+            .flatMap(mountPoint -> mountPoint.getService(DOMSchemaService.class))
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
     }
 
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,

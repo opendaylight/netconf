@@ -16,7 +16,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceNotificationService.class);
 
-    private final Multimap<SchemaPath, DOMNotificationListener> listeners = HashMultimap.create();
+    private final Multimap<Absolute, DOMNotificationListener> listeners = HashMultimap.create();
 
     // Notification publish is very simple and hijacks the thread of the caller
     // TODO shouldnt we reuse the implementation for notification router from sal-broker-impl ?
@@ -42,15 +42,15 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
 
     @Override
     public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
-            final T listener, final Collection<SchemaPath> types) {
-        for (final SchemaPath type : types) {
+            final T listener, final Collection<Absolute> types) {
+        for (final Absolute type : types) {
             listeners.put(type, listener);
         }
 
-        return new AbstractListenerRegistration<T>(listener) {
+        return new AbstractListenerRegistration<>(listener) {
             @Override
             protected void removeRegistration() {
-                for (final SchemaPath type : types) {
+                for (final Absolute type : types) {
                     listeners.remove(type, listener);
                 }
             }
@@ -59,7 +59,7 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
 
     @Override
     public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
-            final T listener, final SchemaPath... types) {
+            final T listener, final Absolute... types) {
         return registerNotificationListener(listener, Lists.newArrayList(types));
     }
 }

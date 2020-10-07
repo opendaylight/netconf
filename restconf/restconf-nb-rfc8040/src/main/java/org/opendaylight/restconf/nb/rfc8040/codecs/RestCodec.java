@@ -18,8 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.Predicate;
@@ -41,6 +44,7 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -62,7 +66,7 @@ public final class RestCodec {
 
     // FIXME: IllegalArgumentCodec is not quite accurate
     public static IllegalArgumentCodec<Object, Object> from(final TypeDefinition<?> typeDefinition,
-            final DOMMountPoint mountPoint, final SchemaContext schemaContext) {
+            final DOMMountPoint mountPoint, final EffectiveModelContext schemaContext) {
         return new ObjectCodec(typeDefinition, mountPoint, schemaContext);
     }
 
@@ -77,10 +81,10 @@ public final class RestCodec {
 
         private final TypeDefinition<?> type;
 
-        private final SchemaContext schemaContext;
+        private final EffectiveModelContext schemaContext;
 
         private ObjectCodec(final TypeDefinition<?> typeDefinition, final DOMMountPoint mountPoint,
-                final SchemaContext schemaContext) {
+                final EffectiveModelContext schemaContext) {
             this.schemaContext = schemaContext;
             this.type = RestUtil.resolveBaseTypeFrom(typeDefinition);
             if (this.type instanceof IdentityrefTypeDefinition) {
@@ -348,7 +352,7 @@ public final class RestCodec {
         final URI validNamespace = resolveValidNamespace(namespace, mountPoint, schemaContext);
         Module module = null;
         if (mountPoint != null) {
-            module = mountPoint.getSchemaContext().findModules(validNamespace).iterator().next();
+            module = modelContext(mountPoint).findModules(validNamespace).iterator().next();
         } else {
             module = schemaContext.findModules(validNamespace).iterator().next();
         }
@@ -363,7 +367,7 @@ public final class RestCodec {
             final SchemaContext schemaContext) {
         URI validNamespace;
         if (mountPoint != null) {
-            validNamespace = findFirstModuleByName(mountPoint.getSchemaContext(), namespace);
+            validNamespace = findFirstModuleByName(modelContext(mountPoint), namespace);
         } else {
             validNamespace = findFirstModuleByName(schemaContext, namespace);
         }
@@ -419,7 +423,7 @@ public final class RestCodec {
         final Iterable<ChoiceSchemaNode> choiceNodes =
                 Iterables.filter(container.getChildNodes(), ChoiceSchemaNode.class);
         final Iterable<Collection<? extends CaseSchemaNode>> map = Iterables.transform(choiceNodes,
-            choice -> choice.getCases());
+            @Nullable ChoiceSchemaNode::getCases);
         for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
@@ -429,5 +433,11 @@ public final class RestCodec {
         return node instanceof LeafSchemaNode || node instanceof LeafListSchemaNode
                 || node instanceof ContainerSchemaNode || node instanceof ListSchemaNode
                 || node instanceof AnyxmlSchemaNode;
+    }
+
+    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
+        return mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
     }
 }
