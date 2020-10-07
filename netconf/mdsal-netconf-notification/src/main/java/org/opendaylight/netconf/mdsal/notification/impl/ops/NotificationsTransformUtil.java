@@ -15,11 +15,11 @@ import java.util.Optional;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
-import org.opendaylight.binding.runtime.api.BindingRuntimeContext;
-import org.opendaylight.binding.runtime.api.BindingRuntimeGenerator;
-import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
+import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
+import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.NetconfUtil;
@@ -29,21 +29,22 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory;
 import org.w3c.dom.Document;
 
 @Singleton
 public final class NotificationsTransformUtil {
-    private final SchemaContext schemaContext;
+    private final EffectiveModelContext schemaContext;
     private final BindingNormalizedNodeSerializer serializer;
 
     public NotificationsTransformUtil(final YangParserFactory parserFactory, final BindingRuntimeGenerator generator,
-            final BindingDOMCodecFactory codecFactory) {
+            final BindingDOMCodecFactory codecFactory) throws YangParserException {
         final BindingRuntimeContext ctx = BindingRuntimeHelpers.createRuntimeContext(parserFactory, generator,
             Netconf.class, NetconfConfigChange.class, YangLibraryChange.class, YangLibraryUpdate.class);
-        schemaContext = ctx.getSchemaContext();
+        schemaContext = ctx.getEffectiveModelContext();
         verify(schemaContext.getOperations().stream()
                 .filter(input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION))
                 .findFirst()

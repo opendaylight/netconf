@@ -112,6 +112,5 @@ public abstract class AbstractBodyReaderTest {
     protected static void checkPatchContextMountPoint(final PatchContext patchContext) {
         checkPatchContext(patchContext);
         assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
-        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint().getSchemaContext());
     }
 }

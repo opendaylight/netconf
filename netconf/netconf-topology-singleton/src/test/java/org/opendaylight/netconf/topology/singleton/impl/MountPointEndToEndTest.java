@@ -57,7 +57,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -72,6 +71,7 @@ import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
@@ -153,7 +153,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -214,8 +213,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
     private EffectiveModelContext deviceSchemaContext;
     private YangModuleInfo topModuleInfo;
-    private SchemaPath putTopRpcSchemaPath;
-    private SchemaPath getTopRpcSchemaPath;
+    private QName putTopRpcSchemaPath;
+    private QName getTopRpcSchemaPath;
     private BindingNormalizedNodeSerializer bindingToNormalized;
     private YangInstanceIdentifier yangNodeInstanceId;
     private final TopDOMRpcImplementation topRpcImplementation = new TopDOMRpcImplementation();
@@ -237,8 +236,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         deviceRpcService.onModelContextUpdated(deviceSchemaContext);
 
-        putTopRpcSchemaPath = findRpcDefinition("put-top").getPath();
-        getTopRpcSchemaPath = findRpcDefinition("get-top").getPath();
+        putTopRpcSchemaPath = findRpcDefinition("put-top").getQName();
+        getTopRpcSchemaPath = findRpcDefinition("get-top").getQName();
 
         deviceRpcService.getRpcProviderService().registerRpcImplementation(topRpcImplementation,
                 DOMRpcIdentifier.create(putTopRpcSchemaPath), DOMRpcIdentifier.create(getTopRpcSchemaPath));
@@ -532,12 +531,12 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         testRpc(domRpcService, getTopRpcSchemaPath, getTopInput, result);
     }
 
-    private void testRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
+    private void testRpc(final DOMRpcService domRpcService, final QName qname,
             final NormalizedNode<?, ?> input, final DOMRpcResult result) throws InterruptedException,
             ExecutionException, TimeoutException {
         final FluentFuture<DOMRpcResult> future = result == null ? FluentFutures.immediateNullFluentFuture()
                 : FluentFutures.immediateFluentFuture(result);
-        final DOMRpcResult actual = invokeRpc(domRpcService, schemaPath, input, future);
+        final DOMRpcResult actual = invokeRpc(domRpcService, qname, input, future);
         if (result == null) {
             assertNull(actual);
             return;
@@ -561,10 +560,10 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         }
     }
 
-    private void testFailedRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
+    private void testFailedRpc(final DOMRpcService domRpcService, final QName qname,
             final NormalizedNode<?, ?> input) throws InterruptedException, TimeoutException {
         try {
-            invokeRpc(domRpcService, schemaPath, input, FluentFutures.immediateFailedFluentFuture(
+            invokeRpc(domRpcService, qname, input, FluentFutures.immediateFailedFluentFuture(
                     new ClusteringRpcException("mock")));
             fail("Expected exception");
         } catch (ExecutionException e) {
@@ -573,13 +572,13 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         }
     }
 
-    private DOMRpcResult invokeRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
+    private DOMRpcResult invokeRpc(final DOMRpcService domRpcService, final QName qname,
             final NormalizedNode<?, ?> input, final FluentFuture<DOMRpcResult> returnFuture)
                     throws InterruptedException, ExecutionException, TimeoutException {
         topRpcImplementation.init(returnFuture);
-        final ListenableFuture<? extends DOMRpcResult> resultFuture = domRpcService.invokeRpc(schemaPath, input);
+        final ListenableFuture<? extends DOMRpcResult> resultFuture = domRpcService.invokeRpc(qname, input);
 
-        topRpcImplementation.verify(DOMRpcIdentifier.create(schemaPath), input);
+        topRpcImplementation.verify(DOMRpcIdentifier.create(qname), input);
 
         return resultFuture.get(5, TimeUnit.SECONDS);
     }

@@ -70,7 +70,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
@@ -585,8 +584,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     public MessageTransformer<NetconfMessage> getMessageTransformer() throws Exception {
         final MessageTransformer<NetconfMessage> messageTransformer = mockClass(MessageTransformer.class);
-        doReturn(NOTIFICATION).when(messageTransformer).toRpcRequest(any(SchemaPath.class), any(NormalizedNode.class));
-        doReturn(RPC_RESULT).when(messageTransformer).toRpcResult(any(NetconfMessage.class), any(SchemaPath.class));
+        doReturn(NOTIFICATION).when(messageTransformer).toRpcRequest(any(QName.class), any(NormalizedNode.class));
+        doReturn(RPC_RESULT).when(messageTransformer).toRpcResult(any(NetconfMessage.class), any(QName.class));
         doReturn(COMPOSITE_NODE).when(messageTransformer).toNotification(any(NetconfMessage.class));
         return messageTransformer;
     }

@@ -47,7 +47,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 //TODO UNSTABLE TESTS - FIX ME
@@ -168,12 +167,13 @@ public class RestPutOperationTest extends JerseyTest {
         final String uri = "/config/ietf-interfaces:interfaces/interface/eth0";
 
         doThrow(OptimisticLockFailedException.class).when(brokerFacade).commitConfigurationDataPut(
-                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
+                any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null,
+                null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
 
         doThrow(OptimisticLockFailedException.class).doReturn(mock(PutResult.class)).when(brokerFacade)
-                .commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
+                .commitConfigurationDataPut(any(EffectiveModelContext.class), any(YangInstanceIdentifier.class),
                         any(NormalizedNode.class), null, null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
@@ -186,7 +186,8 @@ public class RestPutOperationTest extends JerseyTest {
 
         doThrow(TransactionCommitFailedException.class)
                 .when(brokerFacade).commitConfigurationDataPut(
-                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
+                    any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
+                    null, null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
     }
@@ -199,10 +200,12 @@ public class RestPutOperationTest extends JerseyTest {
         final PutResult putResMock = mock(PutResult.class);
         if (noErrors) {
             doReturn(putResMock).when(brokerFacade).commitConfigurationDataPut(
-                    any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
+                    any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
+                    null, null);
         } else {
             doThrow(RestconfDocumentedException.class).when(brokerFacade).commitConfigurationDataPut(
-                    any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
+                    any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
+                    null, null);
         }
     }
 
