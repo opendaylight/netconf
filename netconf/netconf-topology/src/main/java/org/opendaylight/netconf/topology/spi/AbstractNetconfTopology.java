@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -46,7 +45,6 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
-import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
@@ -100,7 +98,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     private static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
     private static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
     private static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
-
 
     private final NetconfClientDispatcher clientDispatcher;
     private final EventExecutor eventExecutor;
@@ -165,15 +162,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     @Override
     public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
         LOG.debug("Disconnecting RemoteDevice{{}}", nodeId.getValue());
-        if (!activeConnectors.containsKey(nodeId)) {
+
+        final NetconfConnectorDTO connectorDTO = activeConnectors.remove(nodeId);
+        if (connectorDTO == null) {
             return Futures.immediateFailedFuture(
-                    new IllegalStateException("Unable to disconnect device that is not connected"));
+                new IllegalStateException("Unable to disconnect device that is not connected"));
         }
 
-        // retrieve connection, and disconnect it
-        final NetconfConnectorDTO connectorDTO = activeConnectors.remove(nodeId);
-        connectorDTO.getCommunicator().close();
-        connectorDTO.getFacade().close();
+        connectorDTO.close();
         return Futures.immediateFuture(null);
     }
 
@@ -238,10 +234,28 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
+        final List<SchemaSourceRegistration<?>> yanglibRegistrations;
         if (node.isSchemaless()) {
             device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
+            yanglibRegistrations = List.of();
         } else {
-            device = createNetconfDevice(remoteDeviceId, salFacade, nodeId, node, nodeOptional);
+            final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
+                ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
+
+            final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node, nodeId.getValue());
+            device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(reconnectOnChangedSchema)
+                .setSchemaResourcesDTO(resources)
+                .setGlobalProcessingExecutor(this.processingExecutor)
+                .setId(remoteDeviceId)
+                .setSalFacade(salFacade)
+                .setNode(node)
+                .setEventExecutor(eventExecutor)
+                .setNodeOptional(nodeOptional)
+                .setDeviceActionFactory(deviceActionFactory)
+                .setBaseSchemas(baseSchemas)
+                .build();
+            yanglibRegistrations = registerDeviceSchemaSources(remoteDeviceId, nodeId, node, resources);
         }
 
         final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
@@ -260,44 +274,17 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
         }
-        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade);
+
+        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
     }
 
-    private NetconfDevice createNetconfDevice(final RemoteDeviceId remoteDeviceId,
-            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade, final NodeId nodeId, final NetconfNode node,
-            final NetconfNodeAugmentedOptional nodeOptional) {
-        final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
-                ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
-
-        final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node, nodeId.getValue());
-
-        final NetconfDevice device = new NetconfDeviceBuilder()
-                .setReconnectOnSchemasChange(reconnectOnChangedSchema)
-                .setSchemaResourcesDTO(resources)
-                .setGlobalProcessingExecutor(this.processingExecutor)
-                .setId(remoteDeviceId)
-                .setSalFacade(salFacade)
-                .setNode(node)
-                .setEventExecutor(eventExecutor)
-                .setNodeOptional(nodeOptional)
-                .setDeviceActionFactory(deviceActionFactory)
-                .setBaseSchemas(baseSchemas)
-                .build();
-
+    private List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
+            final NodeId nodeId, final NetconfNode node, final SchemaResourcesDTO resources) {
         final YangLibrary yangLibrary = node.getYangLibrary();
         if (yangLibrary != null) {
             final Uri uri = yangLibrary.getYangLibraryUrl();
             if (uri != null) {
-                // FIXME: NETCONF-675: these registrations need to be torn down with the device. This does not look
-                //                     quite right, though, as we can end up adding a lot of registrations on a
-                //                     per-device basis.
-                //                     This leak is also detected by SpotBugs as soon as this initialization is switched
-                //                     to proper "new ArrayList<>" and hence we really need to attach these somewhere
-                //                     else.
-                //                     It seems we should be subclassing NetconfConnectorDTO for this purpose as a
-                //                     first step and then perhaps do some refcounting or similar based on the
-                //                     schemaRegistry instance.
-                final List<SchemaSourceRegistration<?>> registeredYangLibSources = Lists.newArrayList();
+                final List<SchemaSourceRegistration<?>> registrations = new ArrayList<>();
                 final String yangLibURL = uri.getValue();
                 final SchemaSourceRegistry schemaRegistry = resources.getSchemaRegistry();
 
@@ -312,15 +299,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 }
 
                 for (final Map.Entry<SourceIdentifier, URL> entry : schemas.getAvailableModels().entrySet()) {
-                    registeredYangLibSources.add(schemaRegistry.registerSchemaSource(
-                        new YangLibrarySchemaYangSourceProvider(remoteDeviceId, schemas.getAvailableModels()),
+                    registrations.add(schemaRegistry.registerSchemaSource(new YangLibrarySchemaYangSourceProvider(
+                        remoteDeviceId, schemas.getAvailableModels()),
                         PotentialSchemaSource.create(entry.getKey(), YangTextSchemaSource.class,
                             PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
+                return registrations;
             }
         }
 
-        return device;
+        return List.of();
     }
 
     /**
@@ -459,14 +447,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected static class NetconfConnectorDTO implements AutoCloseable {
-
+        private final List<SchemaSourceRegistration<?>> yanglibRegistrations;
         private final NetconfDeviceCommunicator communicator;
         private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
 
         public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator,
-                                   final RemoteDeviceHandler<NetconfSessionPreferences> facade) {
+                final RemoteDeviceHandler<NetconfSessionPreferences> facade,
+                final List<SchemaSourceRegistration<?>> yanglibRegistrations) {
             this.communicator = communicator;
             this.facade = facade;
+            this.yanglibRegistrations = yanglibRegistrations;
         }
 
         public NetconfDeviceCommunicator getCommunicator() {
@@ -485,6 +475,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         public void close() {
             communicator.close();
             facade.close();
+            yanglibRegistrations.forEach(SchemaSourceRegistration::close);
         }
     }
 }
