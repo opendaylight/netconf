@@ -24,14 +24,15 @@
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
 
+    <properties>
+        <!-- FIXME: Remove this -->
+        <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
+    </properties>
+
     <dependencies>
         <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor_2.13</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-cluster_2.13</artifactId>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>repackaged-akka</artifactId>
         </dependency>
 
         <dependency>

@@ -26,10 +26,10 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMes
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
@@ -52,7 +52,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     }
 
     @Override
-    public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
         final MessageTransformer<NetconfMessage> transformer;
         if (input instanceof DOMSourceAnyxmlNode) {
             transformer = schemalessTransformer;
@@ -66,10 +66,10 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     }
 
     private ListenableFuture<DOMRpcResult> handleRpc(
-            final @NonNull SchemaPath type, final @NonNull NormalizedNode<?, ?> input,
+            final @NonNull QName type, final @NonNull NormalizedNode<?, ?> input,
             final MessageTransformer<NetconfMessage> transformer) {
         final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = listener.sendRequest(
-            transformer.toRpcRequest(type, input), type.getLastComponent());
+            transformer.toRpcRequest(type, input), type);
 
         final SettableFuture<DOMRpcResult> ret = SettableFuture.create();
         Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
@@ -89,8 +89,8 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
         return ret;
     }
 
-    private static boolean isBaseRpc(final SchemaPath type) {
-        return NetconfMessageTransformUtil.NETCONF_URI.equals(type.getLastComponent().getNamespace());
+    private static boolean isBaseRpc(final QName type) {
+        return NetconfMessageTransformUtil.NETCONF_URI.equals(type.getNamespace());
     }
 
     @Override

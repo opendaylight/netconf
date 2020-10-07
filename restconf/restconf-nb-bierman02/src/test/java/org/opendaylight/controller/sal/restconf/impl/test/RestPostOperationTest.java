@@ -47,7 +47,6 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class RestPostOperationTest extends JerseyTest {
 
@@ -120,7 +119,7 @@ public class RestPostOperationTest extends JerseyTest {
     @Ignore //jenkins has problem with JerseyTest
     // - we expecting problems with singletons ControllerContext as schemaContext holder
     public void createConfigurationDataTest() throws UnsupportedEncodingException, ParseException {
-        when(brokerFacade.commitConfigurationDataPost((SchemaContext) null, any(YangInstanceIdentifier.class),
+        when(brokerFacade.commitConfigurationDataPost((EffectiveModelContext) null, any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), null, null))
                 .thenReturn(mock(FluentFuture.class));
 
@@ -142,8 +141,8 @@ public class RestPostOperationTest extends JerseyTest {
         // FIXME : NEVER test a nr. of call some service in complex test suite
 //        verify(brokerFacade, times(2))
         verify(brokerFacade, times(1))
-                .commitConfigurationDataPost((SchemaContext) null, instanceIdCaptor.capture(), compNodeCaptor.capture(),
-                        null, null);
+                .commitConfigurationDataPost((EffectiveModelContext) null, instanceIdCaptor.capture(),
+                        compNodeCaptor.capture(), null, null);
 //        identifier = "[(urn:ietf:params:xml:ns:yang:test-interface?revision=2014-07-01)interfaces," +
 //                "(urn:ietf:params:xml:ns:yang:test-interface?revision=2014-07-01)block]";
         assertEquals(identifier, ImmutableList.copyOf(instanceIdCaptor.getValue().getPathArguments()).toString());
@@ -152,7 +151,7 @@ public class RestPostOperationTest extends JerseyTest {
     @Test
     public void createConfigurationDataNullTest() throws UnsupportedEncodingException {
         doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade).commitConfigurationDataPost(
-            any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), isNull(),
+            any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), isNull(),
             isNull());
 
         //FIXME : find who is set schemaContext

@@ -27,6 +27,7 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
 
 final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNode implements ContainerSchemaNode {
     // There is no need to intern this nor add a revision, as we are providing the corresponding context anyway
@@ -45,6 +46,7 @@ final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNod
     }
 
     @Override
+    @Deprecated
     public SchemaPath getPath() {
         return PATH;
     }
@@ -98,5 +100,10 @@ final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNod
     @Override
     public boolean isPresenceContainer() {
         return false;
+    }
+
+    @Override
+    public ContainerEffectiveStatement asEffectiveStatement() {
+        throw new UnsupportedOperationException();
     }
 }
