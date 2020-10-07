@@ -24,12 +24,13 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public final class RestconfInvokeOperationsUtil {
      * @return {@link DOMRpcResult}
      */
     public static DOMRpcResult invokeRpcViaMountPoint(final DOMMountPoint mountPoint, final NormalizedNode<?, ?> data,
-            final SchemaPath schemaPath) {
+            final QName schemaPath) {
         final Optional<DOMRpcService> mountPointService = mountPoint.getService(DOMRpcService.class);
         if (mountPointService.isPresent()) {
             return prepareResult(mountPointService.get().invokeRpc(schemaPath, nonnullInput(schemaPath, data)));
@@ -70,25 +71,25 @@ public final class RestconfInvokeOperationsUtil {
      *
      * @param data
      *             input data
-     * @param schemaPath
-     *             schema path of data
+     * @param rpc
+     *             RPC type
      * @param rpcServiceHandler
      *             rpc service handler to invoke rpc
      * @return {@link DOMRpcResult}
      */
-    public static DOMRpcResult invokeRpc(final NormalizedNode<?, ?> data, final SchemaPath schemaPath,
+    public static DOMRpcResult invokeRpc(final NormalizedNode<?, ?> data, final QName rpc,
             final RpcServiceHandler rpcServiceHandler) {
         final DOMRpcService rpcService = rpcServiceHandler.get();
         if (rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
 
-        return prepareResult(rpcService.invokeRpc(schemaPath, nonnullInput(schemaPath, data)));
+        return prepareResult(rpcService.invokeRpc(rpc, nonnullInput(rpc, data)));
     }
 
-    private static @NonNull NormalizedNode<?, ?> nonnullInput(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    private static @NonNull NormalizedNode<?, ?> nonnullInput(final QName type, final NormalizedNode<?, ?> input) {
         return input != null ? input
-                : ImmutableNodes.containerNode(YangConstants.operationInputQName(type.getLastComponent().getModule()));
+                : ImmutableNodes.containerNode(YangConstants.operationInputQName(type.getModule()));
     }
 
     /**
@@ -133,7 +134,7 @@ public final class RestconfInvokeOperationsUtil {
      * @return {@link DOMActionResult}
      */
     public static DOMActionResult invokeActionViaMountPoint(final DOMMountPoint mountPoint, final ContainerNode data,
-            final SchemaPath schemaPath, final YangInstanceIdentifier yangIId) {
+            final Absolute schemaPath, final YangInstanceIdentifier yangIId) {
         final Optional<DOMActionService> mountPointService = mountPoint.getService(DOMActionService.class);
         if (!mountPointService.isPresent()) {
             throw new RestconfDocumentedException("DomAction service is missing.");
@@ -152,7 +153,7 @@ public final class RestconfInvokeOperationsUtil {
      *             action service handler to invoke action
      * @return {@link DOMActionResult}
      */
-    public static DOMActionResult invokeAction(final ContainerNode data, final SchemaPath schemaPath,
+    public static DOMActionResult invokeAction(final ContainerNode data, final Absolute schemaPath,
             final ActionServiceHandler actionServiceHandler, final YangInstanceIdentifier yangIId) {
         return prepareActionResult(
             actionServiceHandler.get().invokeAction(schemaPath, prepareDataTreeId(yangIId), data));

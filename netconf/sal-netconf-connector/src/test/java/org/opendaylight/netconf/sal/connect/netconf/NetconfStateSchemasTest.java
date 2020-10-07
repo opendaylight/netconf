@@ -16,7 +16,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
@@ -124,7 +123,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
                 .withChild(data)
                 .build();
         doReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcReply))).when(rpc)
-            .invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any());
+            .invokeRpc(eq(NETCONF_GET_QNAME), any());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertEquals(numberOfLegalSchemas, availableYangSchemasQNames.size());
@@ -143,7 +142,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testCreateFail() throws Exception {
-        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(
+        when(rpc.invokeRpc(eq(NETCONF_GET_QNAME), any())).thenReturn(
                 immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("not available")));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
@@ -154,7 +153,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     public void testCreateRpcError() throws Exception {
         final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, "fail", "fail");
         doReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcError))).when(rpc)
-            .invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any());
+            .invokeRpc(eq(NETCONF_GET_QNAME), any());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
@@ -169,7 +168,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
             try {
                 when(interruptedFuture.get()).thenThrow(new InterruptedException("interrupted"));
                 doReturn(FluentFuture.from(interruptedFuture)).when(rpc)
-                    .invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any());
+                    .invokeRpc(eq(NETCONF_GET_QNAME), any());
                 NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
             } catch (final InterruptedException | ExecutionException e) {
                 LOG.info("Operation failed.", e);
@@ -195,6 +194,5 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
         Assert.assertEquals(schema2, schema1);
         Assert.assertNotEquals(schema1, schema3);
         Assert.assertNotEquals(schema2, schema3);
-
     }
 }

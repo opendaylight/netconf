@@ -59,7 +59,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -210,15 +209,14 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
     @Override
     public void onNotification(final DOMNotification notification) {
-        SchemaPath notificationPath = notification.getType();
         Instant notificationEventTime = null;
         if (notification instanceof DOMEvent) {
             notificationEventTime = ((DOMEvent) notification).getEventInstant();
         }
-        final String namespace = notification.getType().getLastComponent().getNamespace().toString();
+        final String namespace = notification.getType().lastNodeIdentifier().getNamespace().toString();
         for (NotificationTopicRegistration notifReg : notificationTopicRegistrations.get(namespace)) {
             notifReg.setLastEventTime(notificationEventTime);
-            for (TopicId topicId : notifReg.getTopicsForNotification(notificationPath)) {
+            for (TopicId topicId : notifReg.getTopicsForNotification(notification.getType().asSchemaPath())) {
                 publishNotification(notification, topicId);
                 LOG.debug("Notification {} has been published for TopicId {}", notification.getType(),
                         topicId.getValue());
@@ -247,10 +245,9 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
         final DOMResult result = new DOMResult(element);
 
-        final SchemaContext context = mount.getSchemaContext();
-        final SchemaPath schemaPath = body.getType();
         try {
-            NetconfUtil.writeNormalizedNode(body.getBody(), result, schemaPath, context);
+            NetconfUtil.writeNormalizedNode(body.getBody(), result, body.getType().asSchemaPath(),
+                mount.getSchemaContext());
             return Builders.anyXmlBuilder().withNodeIdentifier(PAYLOAD_ARG).withValue(new DOMSource(element)).build();
         } catch (IOException | XMLStreamException e) {
             LOG.error("Unable to encapsulate notification.", e);
@@ -289,7 +286,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
         final List<SchemaPath> availNotifList = new ArrayList<>();
         // add Event Source Connection status notification
-        availNotifList.add(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
+        availNotifList.add(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH.asSchemaPath());
 
         // add all known notifications from netconf device
         for (final NotificationDefinition nd : mount.getSchemaContext().getNotifications()) {

@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -271,7 +272,7 @@ public class DefinitionGenerator {
                 definitionNames, schemaContext, oaversion);
     }
 
-    private void processOperationInputOutput(final ContainerSchemaNode container, final String operationName,
+    private void processOperationInputOutput(final ContainerLike container, final String operationName,
                                              final String parentName, final boolean isInput,
                                              final ObjectNode definitions, final DefinitionNames definitionNames,
                                              final SchemaContext schemaContext, final OAversion oaversion)
@@ -876,7 +877,7 @@ public class DefinitionGenerator {
     private boolean isHexadecimalOrOctal(RangeRestrictedTypeDefinition typeDef) {
         final Optional<?> optDefaultValue = typeDef.getDefaultValue();
         if (optDefaultValue.isPresent()) {
-            final String defaultValue = ((String)optDefaultValue.get());
+            final String defaultValue = (String)optDefaultValue.get();
             return defaultValue.startsWith("0") || defaultValue.startsWith("-0");
         }
         return false;

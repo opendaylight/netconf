@@ -61,6 +61,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -68,7 +69,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
@@ -129,7 +129,7 @@ public class InvokeRpcMethodTest {
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "rpc-test");
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(),"input");
-        ContainerSchemaNode rpcInputSchemaNode = null;
+        ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
@@ -162,10 +162,9 @@ public class InvokeRpcMethodTest {
     @Test
     public void testInvokeRpcWithNoPayloadRpc_FailNoErrors() {
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
-        final SchemaPath type = SchemaPath.create(true, qname);
 
         doReturn(immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("testExeption")))
-        .when(brokerFacade).invokeRpc(eq(type), any());
+        .when(brokerFacade).invokeRpc(eq(qname), any());
 
         try {
             this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
@@ -207,8 +206,7 @@ public class InvokeRpcMethodTest {
                         "app-tag", null, null));
 
         final DOMRpcResult result = new DefaultDOMRpcResult(rpcErrors);
-        final SchemaPath path = SchemaPath.create(true,
-                QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast"));
+        final QName path = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(path), any());
 
         try {
@@ -228,9 +226,8 @@ public class InvokeRpcMethodTest {
         final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
-        final SchemaPath path = SchemaPath.create(true, qname);
 
-        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), any());
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(qname), any());
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
         assertNotNull(output);
@@ -246,8 +243,7 @@ public class InvokeRpcMethodTest {
         final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
-        final SchemaPath path = SchemaPath.create(true, qname);
-        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), any());
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(qname), any());
 
         WebApplicationException exceptionToBeThrown = null;
         try {
@@ -275,8 +271,7 @@ public class InvokeRpcMethodTest {
     @Ignore
     public void testInvokeRpcMethodWithInput() {
         final DOMRpcResult expResult = mock(DOMRpcResult.class);
-        final SchemaPath path = SchemaPath.create(true,
-                QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)make-toast"));
+        final QName path = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)make-toast");
 
         final Module rpcModule = schemaContext.findModules("toaster").iterator().next();
         assertNotNull(rpcModule);
@@ -284,7 +279,7 @@ public class InvokeRpcMethodTest {
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(),"input");
 
         RpcDefinition rpcDef = null;
-        ContainerSchemaNode rpcInputSchemaNode = null;
+        ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
@@ -331,7 +326,7 @@ public class InvokeRpcMethodTest {
         final QName rpcOutputQName = QName.create(rpcModule.getQNameModule(),"output");
 
         RpcDefinition rpcDef = null;
-        ContainerSchemaNode rpcOutputSchemaNode = null;
+        ContainerLike rpcOutputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcOutputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcOutputQName);
@@ -354,7 +349,7 @@ public class InvokeRpcMethodTest {
 
         final DOMRpcResult result = new DefaultDOMRpcResult(container);
 
-        doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(rpcDef.getPath()), any());
+        doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(rpcDef.getQName()), any());
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:testOutput", null, uriInfo);
         assertNotNull(output);

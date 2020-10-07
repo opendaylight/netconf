@@ -8,27 +8,32 @@
 
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+import java.util.List;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 public class SchemaPathMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @SuppressFBWarnings("SE_BAD_FIELD")
-    private final SchemaPath schemaPath;
+    private final Absolute schemaPath;
 
-    public SchemaPathMessage(final SchemaPath schemaPath) {
+    public SchemaPathMessage(final QName qname) {
+        this(Absolute.of(qname));
+    }
+
+    public SchemaPathMessage(final Absolute schemaPath) {
         this.schemaPath = schemaPath;
     }
 
-    public SchemaPath getSchemaPath() {
+    public Absolute getSchemaPath() {
         return schemaPath;
     }
 
@@ -57,14 +62,14 @@ public class SchemaPathMessage implements Serializable {
 
         @Override
         public void writeExternal(final ObjectOutput out) throws IOException {
-            final Iterable<QName> path = schemaPathMessage.getSchemaPath().getPathFromRoot();
-            out.writeInt(Iterables.size(path));
+            final List<QName> path = schemaPathMessage.getSchemaPath().getNodeIdentifiers();
+            out.writeInt(path.size());
             for (final QName qualifiedName : path) {
                 // FIXME: switch to QName.writeTo() or a sal-clustering-commons stream
                 out.writeObject(qualifiedName);
             }
 
-            out.writeBoolean(schemaPathMessage.getSchemaPath().isAbsolute());
+            out.writeBoolean(true);
         }
 
         @Override
@@ -76,7 +81,10 @@ public class SchemaPathMessage implements Serializable {
                 paths[i] = (QName) in.readObject();
             }
             final boolean absolute = in.readBoolean();
-            schemaPathMessage = new SchemaPathMessage(SchemaPath.create(absolute, paths));
+            if (!absolute) {
+                throw new InvalidObjectException("Non-absolute path");
+            }
+            schemaPathMessage = new SchemaPathMessage(Absolute.of(paths));
         }
 
         private Object readResolve() {

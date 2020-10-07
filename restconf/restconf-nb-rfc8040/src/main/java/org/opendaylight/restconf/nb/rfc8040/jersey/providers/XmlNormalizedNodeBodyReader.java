@@ -48,7 +48,7 @@ import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -134,7 +134,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode
+        if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
             final XmlParserStream xmlParser = XmlParserStream.create(writer, pathContext.getSchemaContext(),
                     schemaNode);
