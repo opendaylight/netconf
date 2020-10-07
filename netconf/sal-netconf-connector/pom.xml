@@ -150,6 +150,10 @@
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-test-util</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-test-models</artifactId>
+    </dependency>
   </dependencies>
 
   <scm>

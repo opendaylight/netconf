@@ -24,7 +24,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,7 +164,7 @@ public final class ListenersBroker {
      * @param outputType Specific type of output for notifications - XML or JSON.
      * @return Created or existing notification listener adapter.
      */
-    public NotificationListenerAdapter registerNotificationListener(final SchemaPath schemaPath,
+    public NotificationListenerAdapter registerNotificationListener(final Absolute schemaPath,
             final String streamName, final NotificationOutputType outputType) {
         requireNonNull(schemaPath);
         requireNonNull(streamName);

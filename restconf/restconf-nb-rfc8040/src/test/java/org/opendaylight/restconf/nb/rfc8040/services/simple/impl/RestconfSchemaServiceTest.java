@@ -23,8 +23,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
@@ -93,7 +95,7 @@ public class RestconfSchemaServiceTest {
         // create and register mount points
         mountPointService
                 .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:1", "2016-01-01", "cont")))
-                .addInitialSchemaContext(SCHEMA_CONTEXT_BEHIND_MOUNT_POINT)
+                .addService(DOMSchemaService.class, FixedDOMSchemaService.of(SCHEMA_CONTEXT_BEHIND_MOUNT_POINT))
                 .register();
         mountPointService
                 .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont")))

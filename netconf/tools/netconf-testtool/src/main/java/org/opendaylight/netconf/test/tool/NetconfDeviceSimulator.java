@@ -60,6 +60,8 @@ import org.opendaylight.netconf.test.tool.schemacache.SchemaSourceCache;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.ModuleLike;
+import org.opendaylight.yangtools.yang.model.api.Submodule;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -336,7 +338,7 @@ public class NetconfDeviceSimulator implements Closeable {
         final Set<Capability> capabilities = new HashSet<>();
 
         for (final Module module : schemaContext.getModules()) {
-            for (final Module subModule : module.getSubmodules()) {
+            for (final Submodule subModule : module.getSubmodules()) {
                 addModuleCapability(consumer, capabilities, subModule);
             }
             addModuleCapability(consumer, capabilities, module);
@@ -345,7 +347,7 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private static void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
-                                     final Module module) {
+                                            final ModuleLike module) {
         final SourceIdentifier moduleSourceIdentifier = RevisionSourceIdentifier.create(module.getName(),
             module.getRevision());
         try {

@@ -28,10 +28,10 @@ import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessage
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -53,7 +53,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
     }
 
     @Override
-    public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
         LOG.trace("{}: Rpc operation invoked with schema type: {} and node: {}.", id, type, input);
 
         final NormalizedNodeMessage normalizedNodeMessage = input != null
@@ -63,7 +63,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
 
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
 
-        scalaFuture.onComplete(new OnComplete<Object>() {
+        scalaFuture.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
