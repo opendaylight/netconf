@@ -58,23 +58,23 @@ public class SchemalessNetconfDevice
         final SchemalessNetconfDeviceRpc schemalessNetconfDeviceRpc = new SchemalessNetconfDeviceRpc(id,
                 netconfDeviceCommunicator, rpcTransformer, messageTransformer);
 
-        salFacade.onDeviceConnected(baseSchemas.getBaseSchema().getMountPointContext(),
+        salFacade.onDeviceConnected(id.getName(), baseSchemas.getBaseSchema().getMountPointContext(),
                 remoteSessionCapabilities, schemalessNetconfDeviceRpc);
 
     }
 
     @Override
     public void onRemoteSessionDown() {
-        salFacade.onDeviceDisconnected();
+        salFacade.onDeviceDisconnected(id.getName());
     }
 
     @Override
     public void onRemoteSessionFailed(final Throwable throwable) {
-        salFacade.onDeviceFailed(throwable);
+        salFacade.onDeviceFailed(id.getName(), throwable);
     }
 
     @Override
     public void onNotification(final NetconfMessage notification) {
-        salFacade.onNotification(messageTransformer.toNotification(notification));
+        salFacade.onNotification(id.getName(), messageTransformer.toNotification(notification));
     }
 }

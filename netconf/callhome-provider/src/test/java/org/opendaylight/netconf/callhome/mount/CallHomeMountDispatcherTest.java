@@ -36,6 +36,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfMountPointManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -56,6 +57,7 @@ public class CallHomeMountDispatcherTest {
     private CallHomeProtocolSessionContext mockProtoSess;
     private AAAEncryptionService mockEncryptionService;
     private BaseNetconfSchemas mockBaseSchemas;
+    private NetconfMountPointManager netconfMountPointManager;
 
     @Before
     public void setup() {
@@ -71,10 +73,11 @@ public class CallHomeMountDispatcherTest {
         mockProtoSess = mock(CallHomeProtocolSessionContext.class);
         mockEncryptionService = mock(AAAEncryptionService.class);
         mockBaseSchemas = mock(BaseNetconfSchemas.class);
+        netconfMountPointManager = mock(NetconfMountPointManager.class);
 
         instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
                 mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount,
-                mockEncryptionService) {
+                mockEncryptionService, netconfMountPointManager) {
             @Override
             public CallHomeMountSessionManager getSessionManager() {
                 return mockSessMgr;
