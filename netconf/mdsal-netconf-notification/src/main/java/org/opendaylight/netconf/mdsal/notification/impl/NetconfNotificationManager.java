@@ -332,6 +332,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         }
 
         @Override
+        @Deprecated
         public void onYangLibraryChange(final YangLibraryChange yangLibraryChange) {
             baseRegistration.onNotification(BASE_STREAM_NAME,
                 transformUtil.transform(yangLibraryChange, YANG_LIBRARY_CHANGE_PATH));
