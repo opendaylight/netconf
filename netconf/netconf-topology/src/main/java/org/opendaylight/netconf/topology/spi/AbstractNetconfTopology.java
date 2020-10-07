@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -41,10 +42,12 @@ import org.opendaylight.netconf.nettyutil.TimedReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
+import org.opendaylight.netconf.sal.connect.api.MountPointManagerService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
@@ -57,6 +60,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfSalFacadeType;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
@@ -106,6 +110,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     private final SchemaResourceManager schemaManager;
     private final BaseNetconfSchemas baseSchemas;
 
+    protected final MountPointManagerService netconfMountPointManager;
     protected final ScheduledThreadPool keepaliveExecutor;
     protected final ListeningExecutorService processingExecutor;
     protected final DataBroker dataBroker;
@@ -123,7 +128,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                       final DataBroker dataBroker, final DOMMountPointService mountPointService,
                                       final AAAEncryptionService encryptionService,
                                       final DeviceActionFactory deviceActionFactory,
-                                      final BaseNetconfSchemas baseSchemas) {
+                                      final BaseNetconfSchemas baseSchemas,
+                                      final MountPointManagerService netconfMountPointManager) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
@@ -135,6 +141,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.mountPointService = mountPointService;
         this.encryptionService = encryptionService;
         this.baseSchemas = requireNonNull(baseSchemas);
+        this.netconfMountPointManager = netconfMountPointManager;
 
         this.keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
     }
@@ -214,23 +221,32 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
         //setup default values since default value is not supported in mdsal
-        final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
-                ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis().toJava();
-        final long keepaliveDelay = node.getKeepaliveDelay() == null
-                ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay().toJava();
+        final long
+                defaultRequestTimeoutMillis =
+                node.getDefaultRequestTimeoutMillis()
+                        == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis().toJava();
+        final long
+                keepaliveDelay =
+                node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay().toJava();
 
         final IpAddress ipAddress = node.getHost().getIpAddress();
-        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
-                ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
-                node.getPort().getValue().toJava());
+        final InetSocketAddress
+                address =
+                new InetSocketAddress(ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address()
+                        .getValue() : ipAddress.getIpv6Address().getValue(), node.getPort().getValue().toJava());
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
-        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = createSalFacade(remoteDeviceId);
+        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = null;
 
         if (keepaliveDelay > 0) {
             LOG.warn("Adding keepalive facade, for device {}", nodeId);
-            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, this.keepaliveExecutor.getExecutor(),
-                    keepaliveDelay, defaultRequestTimeoutMillis);
+            salFacade =
+                    netconfMountPointManager.getInstance(remoteDeviceId, mountPointService, dataBroker, topologyId,
+                            NetconfSalFacadeType.KEEPALIVESALFACADE, this.keepaliveExecutor.getExecutor(),
+                            keepaliveDelay, defaultRequestTimeoutMillis);
+
+        } else {
+            salFacade = createSalFacade(remoteDeviceId);
         }
 
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
@@ -239,43 +255,45 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
             yanglibRegistrations = List.of();
         } else {
-            final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
-                ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
+             final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
+                    ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
             final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node, nodeId.getValue());
             device = new NetconfDeviceBuilder()
-                .setReconnectOnSchemasChange(reconnectOnChangedSchema)
-                .setSchemaResourcesDTO(resources)
-                .setGlobalProcessingExecutor(this.processingExecutor)
-                .setId(remoteDeviceId)
-                .setSalFacade(salFacade)
-                .setNode(node)
-                .setEventExecutor(eventExecutor)
-                .setNodeOptional(nodeOptional)
-                .setDeviceActionFactory(deviceActionFactory)
-                .setBaseSchemas(baseSchemas)
-                .build();
+                    .setReconnectOnSchemasChange(reconnectOnChangedSchema)
+                    .setSchemaResourcesDTO(resources)
+                    .setGlobalProcessingExecutor(this.processingExecutor)
+                    .setId(remoteDeviceId)
+                    .setSalFacade(salFacade)
+                    .setNode(node)
+                    .setEventExecutor(eventExecutor)
+                    .setNodeOptional(nodeOptional)
+                    .setDeviceActionFactory(deviceActionFactory)
+                    .setBaseSchemas(baseSchemas)
+                    .setMountPointManagerService(netconfMountPointManager)
+                    .build();
             yanglibRegistrations = registerDeviceSchemaSources(remoteDeviceId, nodeId, node, resources);
         }
 
         final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
         final int rpcMessageLimit = node.getConcurrentRpcLimit() == null ? DEFAULT_CONCURRENT_RPC_LIMIT
-            : node.getConcurrentRpcLimit().toJava();
+                : node.getConcurrentRpcLimit().toJava();
 
         if (rpcMessageLimit < 1) {
             LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", remoteDeviceId);
         }
 
         NetconfDeviceCommunicator netconfDeviceCommunicator =
-             userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
-                     userCapabilities.get(), rpcMessageLimit)
-            : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
+                userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
+                        userCapabilities.get(), rpcMessageLimit)
+                        : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
 
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
         }
 
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
+
     }
 
     private List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
@@ -300,9 +318,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
                 for (final Map.Entry<SourceIdentifier, URL> entry : schemas.getAvailableModels().entrySet()) {
                     registrations.add(schemaRegistry.registerSchemaSource(new YangLibrarySchemaYangSourceProvider(
-                        remoteDeviceId, schemas.getAvailableModels()),
-                        PotentialSchemaSource.create(entry.getKey(), YangTextSchemaSource.class,
-                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                                    remoteDeviceId, schemas.getAvailableModels()),
+                            PotentialSchemaSource.create(entry.getKey(), YangTextSchemaSource.class,
+                                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
                 return List.copyOf(registrations);
             }
