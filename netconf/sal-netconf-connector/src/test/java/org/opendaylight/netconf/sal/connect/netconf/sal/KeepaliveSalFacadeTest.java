@@ -104,7 +104,7 @@ public class KeepaliveSalFacadeTest {
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
         verify(underlyingSalFacade).onDeviceConnected(
-                isNull(), isNull(), any(DOMRpcService.class), isNull());
+                isNull(MountPointContext.class), isNull(), any(DOMRpcService.class), isNull());
 
         verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(QName.class), any(ContainerNode.class));
     }
@@ -117,7 +117,8 @@ public class KeepaliveSalFacadeTest {
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
-        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
+        verify(underlyingSalFacade).onDeviceConnected(isNull(MountPointContext.class), isNull(),
+                any(DOMRpcService.class), isNull());
 
         // Should disconnect the session
         verify(listener, timeout(15000).times(1)).disconnect();
@@ -134,7 +135,8 @@ public class KeepaliveSalFacadeTest {
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
-        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
+        verify(underlyingSalFacade).onDeviceConnected(isNull(MountPointContext.class), isNull(),
+                any(DOMRpcService.class), isNull());
 
 
         // Shouldn't disconnect the session
@@ -148,7 +150,8 @@ public class KeepaliveSalFacadeTest {
             invocationOnMock -> {
                 proxyRpc = (DOMRpcService) invocationOnMock.getArguments()[2];
                 return null;
-            }).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
+            }).when(underlyingSalFacade).onDeviceConnected(isNull(MountPointContext.class), isNull(),
+                any(DOMRpcService.class), isNull());
 
         doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(QName.class), any(ContainerNode.class));
