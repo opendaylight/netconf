@@ -40,6 +40,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
+import org.opendaylight.netconf.sal.connect.api.MountPointManagerService;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
@@ -114,6 +115,7 @@ public class NetconfDevice
     private final NetconfNode node;
     private final EventExecutor eventExecutor;
     private final NetconfNodeAugmentedOptional nodeOptional;
+    private final MountPointManagerService mountPointManagerService ;
 
     @GuardedBy("this")
     private boolean connected = false;
@@ -125,14 +127,14 @@ public class NetconfDevice
             final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
         this(schemaResourcesDTO, baseSchemas, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null,
-            null, null, null);
+            null, null, null, null);
     }
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
             final DeviceActionFactory deviceActionFactory, final NetconfNode node, final EventExecutor eventExecutor,
-            final NetconfNodeAugmentedOptional nodeOptional) {
+            final NetconfNodeAugmentedOptional nodeOptional, MountPointManagerService mountPointManagerService) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
@@ -147,6 +149,8 @@ public class NetconfDevice
         this.stateSchemasResolver = schemaResourcesDTO.getStateSchemasResolver();
         this.processingExecutor = requireNonNull(globalProcessingExecutor);
         this.notificationHandler = new NotificationHandler(salFacade, id);
+        this.mountPointManagerService = mountPointManagerService;
+
     }
 
     @Override
@@ -181,8 +185,15 @@ public class NetconfDevice
         Futures.addCallback(futureContext, new FutureCallback<MountPointContext>() {
             @Override
             public void onSuccess(final MountPointContext result) {
-                handleSalInitializationSuccess(result, remoteSessionCapabilities,
-                    getDeviceSpecificRpc(result, listener), listener);
+                mountPointManagerService.updateNetconfMountPointHandler(id.getName(), result, remoteSessionCapabilities,
+                        resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
+                MountPointContext
+                        cachedMountPointContext =
+                        mountPointManagerService.getMountPointContextByNodeId(id.getName());
+                MessageTransformer<NetconfMessage> cachedMessageTransformer =
+                        mountPointManagerService.getNetconfMessageTransformer(cachedMountPointContext);
+                handleSalInitializationSuccess(cachedMountPointContext, remoteSessionCapabilities,
+                        getDeviceSpecificRpc(cachedMountPointContext, listener, cachedMessageTransformer), listener) ;
             }
 
             @Override
@@ -197,7 +208,7 @@ public class NetconfDevice
                             LOG.warn("{} : No more sources for schema context.", id);
                             LOG.info("{} : Try to remount device.", id);
                             onRemoteSessionDown();
-                            salFacade.onDeviceReconnected(remoteSessionCapabilities, node);
+                            salFacade.onDeviceReconnected(id.getName(), remoteSessionCapabilities, node);
                         }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime().toJava(),
                             TimeUnit.MILLISECONDS);
                         return;
@@ -205,7 +216,7 @@ public class NetconfDevice
                 }
 
                 handleSalInitializationFailure(cause, listener);
-                salFacade.onDeviceFailed(cause);
+                salFacade.onDeviceFailed(id.getName(), cause);
             }
         }, MoreExecutors.directExecutor());
     }
@@ -249,21 +260,19 @@ public class NetconfDevice
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private synchronized void handleSalInitializationSuccess(final MountPointContext result,
-                                        final NetconfSessionPreferences remoteSessionCapabilities,
-                                        final DOMRpcService deviceRpc,
-                                        final RemoteDeviceCommunicator<NetconfMessage> listener) {
+            final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc,
+            final RemoteDeviceCommunicator<NetconfMessage> listener) {
         //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         //since salFacade.onDeviceDisconnected was already called.
         if (connected) {
-            this.messageTransformer = new NetconfMessageTransformer(result, true,
-                resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
-
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
-            this.salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
+            NetconfMessageTransformer
+                    cachedMessageTransformer =
+                    mountPointManagerService.getNetconfMessageTransformer(result);
+            this.salFacade.onDeviceConnected(id.getName(), remoteSessionCapabilities, deviceRpc,
                     this.deviceActionFactory == null ? null : this.deviceActionFactory.createDeviceAction(
-                            this.messageTransformer, listener, result.getEffectiveModelContext()));
-            this.notificationHandler.onRemoteSchemaUp(this.messageTransformer);
-
+                            cachedMessageTransformer, listener, result.getEffectiveModelContext()));
+            this.notificationHandler.onRemoteSchemaUp(cachedMessageTransformer);
             LOG.info("{}: Netconf connector initialized successfully", id);
         } else {
             LOG.warn("{}: Device communicator was closed before schema setup finished.", id);
@@ -351,7 +360,7 @@ public class NetconfDevice
         setConnected(false);
         notificationHandler.onRemoteSchemaDown();
 
-        salFacade.onDeviceDisconnected();
+        salFacade.onDeviceDisconnected(id.getName());
         sourceRegistrations.forEach(SchemaSourceRegistration::close);
         sourceRegistrations.clear();
         resetMessageTransformer();
@@ -373,9 +382,9 @@ public class NetconfDevice
     }
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
-            final RemoteDeviceCommunicator<NetconfMessage> listener) {
-        return new NetconfDeviceRpc(result.getEffectiveModelContext(), listener,
-            new NetconfMessageTransformer(result, true, baseSchemas.getBaseSchema()));
+            final RemoteDeviceCommunicator<NetconfMessage> listener,
+            MessageTransformer<NetconfMessage> cachedMessageTransformer) {
+        return new NetconfDeviceRpc(result.getEffectiveModelContext(), listener, cachedMessageTransformer);
     }
 
     /**
