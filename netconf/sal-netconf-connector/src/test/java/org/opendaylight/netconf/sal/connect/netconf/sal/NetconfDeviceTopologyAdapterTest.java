@@ -31,6 +31,8 @@ import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
+import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -46,11 +48,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfDeviceTopologyAdapterTest {
-    private static EffectiveModelContext SCHEMA_CONTEXT;
+    private static BindingRuntimeContext RUNTIME_CONTEXT;
 
     private final RemoteDeviceId id = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
 
@@ -73,15 +73,13 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @BeforeClass
     public static void beforeClass() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResources(NetconfDeviceTopologyAdapterTest.class,
-            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
-            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang",
-            "/schemas/network-topology-augment-test@2016-08-08.yang", "/schemas/netconf-node-optional.yang");
+        // FIXME: we also need network-topology-augment-test@2016-08-08.yang's model
+        RUNTIME_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(NetworkTopology.class, NetconfNode.class);
     }
 
     @AfterClass
     public static void afterClass() {
-        SCHEMA_CONTEXT = null;
+        RUNTIME_CONTEXT = null;
     }
 
     @Before
@@ -98,7 +96,7 @@ public class NetconfDeviceTopologyAdapterTest {
         ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
         domDataBroker = customizer.getDOMDataBroker();
         dataBroker = customizer.createDataBroker();
-        customizer.updateSchema(SCHEMA_CONTEXT);
+        customizer.updateSchema(RUNTIME_CONTEXT);
 
         transactionChain = dataBroker.createTransactionChain(new TransactionChainListener() {
             @Override

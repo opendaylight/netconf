@@ -47,17 +47,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 public class NetconfEventSourceTest {
-
-
-    private static final SchemaPath NOTIFICATION_1_PATH = SchemaPath.create(true, QName.create("ns1", "1970-01-15",
-            "not1"));
-    private static final SchemaPath NOTIFICATION_2_PATH = SchemaPath.create(true, QName.create("ns2", "1980-02-18",
-            "not2"));
+    private static final Absolute NOTIFICATION_1_PATH = Absolute.of(QName.create("ns1", "1970-01-15", "not1"));
+    private static final Absolute NOTIFICATION_2_PATH = Absolute.of(QName.create("ns2", "1980-02-18", "not2"));
 
     NetconfEventSource netconfEventSource;
 
@@ -82,9 +79,9 @@ public class NetconfEventSourceTest {
         doReturn(body.build()).when(matchnigNotification).getBody();
         //init schema context mock
         Set<NotificationDefinition> notifications = new HashSet<>();
-        notifications.add(getNotificationDefinitionMock(NOTIFICATION_1_PATH.getLastComponent()));
-        notifications.add(getNotificationDefinitionMock(NOTIFICATION_2_PATH.getLastComponent()));
-        SchemaContext schemaContext = mock(SchemaContext.class);
+        notifications.add(getNotificationDefinitionMock(NOTIFICATION_1_PATH.lastNodeIdentifier()));
+        notifications.add(getNotificationDefinitionMock(NOTIFICATION_2_PATH.lastNodeIdentifier()));
+        EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
         doReturn(notifications).when(schemaContext).getNotifications();
         //init mount point mock
         List<Stream> streams = new ArrayList<>();
@@ -101,7 +98,7 @@ public class NetconfEventSourceTest {
         doReturn(nodeId1.getNodeId().getValue()).when(mount).getNodeId();
 
         Map<String, String> streamMap = new HashMap<>();
-        streamMap.put(NOTIFICATION_1_PATH.getLastComponent().getNamespace().toString(), "stream-1");
+        streamMap.put(NOTIFICATION_1_PATH.lastNodeIdentifier().getNamespace().toString(), "stream-1");
         netconfEventSource = new NetconfEventSource(
                 streamMap,
                 mount,
