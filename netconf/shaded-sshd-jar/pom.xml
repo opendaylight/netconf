@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent</artifactId>
-        <version>7.0.6</version>
+        <version>8.0.0</version>
         <relativePath/>
     </parent>
 
@@ -42,6 +42,7 @@
         <dependency>
             <groupId>net.i2p.crypto</groupId>
             <artifactId>eddsa</artifactId>
+            <version>0.3.0</version>
         </dependency>
     </dependencies>
 
