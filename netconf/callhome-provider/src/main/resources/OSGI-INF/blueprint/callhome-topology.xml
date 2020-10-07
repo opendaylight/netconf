@@ -31,6 +31,8 @@
                interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
     <reference id="baseSchemas"
                interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
+    <reference id="netconfMountPointManager"
+               interface="org.opendaylight.netconf.sal.connect.api.MountPointManagerService"/>
 
     <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"
           init-method="init"
@@ -51,5 +53,8 @@
         <argument ref="domMountPointService"/>
         <argument ref="encryptionService"/>
         <argument ref="deviceActionFactory"/>
-    </bean>
+        <argument ref="netconfMountPointManager"/>
+         <!--<constructor-arg ref="length"/>
+        <ref> <ref ccomponent-id ="netconfMountPointManager" />-->
+     </bean>
 </blueprint>
