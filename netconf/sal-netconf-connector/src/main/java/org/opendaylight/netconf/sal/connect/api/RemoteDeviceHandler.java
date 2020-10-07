@@ -13,7 +13,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
-public interface RemoteDeviceHandler<PREF> extends AutoCloseable {
+public interface RemoteDeviceHandler<PREF> extends RemoteDeviceManagerHandler, AutoCloseable {
 
     /**
      * When device connected, init new mount point with specific schema context and DOM services.

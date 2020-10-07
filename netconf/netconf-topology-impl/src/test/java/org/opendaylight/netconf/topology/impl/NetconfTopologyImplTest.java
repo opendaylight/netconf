@@ -47,6 +47,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfMountPointManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.DefaultBaseNetconfSchemas;
@@ -108,6 +109,9 @@ public class NetconfTopologyImplTest {
     @Mock
     private AAAEncryptionService encryptionService;
 
+    @Mock
+    NetconfMountPointManager netconfMountPointManager;
+
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -117,7 +121,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
             mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
-            encryptionService);
+            encryptionService, netconfMountPointManager);
 
         spyTopology = spy(topology);
     }
@@ -280,10 +284,11 @@ public class NetconfTopologyImplTest {
                                           final ThreadPool processingExecutor,
                                           final SchemaResourceManager schemaRepositoryProvider,
                                           final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                                          final AAAEncryptionService encryptionService) {
+                                          final AAAEncryptionService encryptionService,
+                                          final NetconfMountPointManager netconfMountPointManager) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
                     processingExecutor, schemaRepositoryProvider, dataBroker,
-                  mountPointService, encryptionService, BASE_SCHEMAS);
+                  mountPointService, encryptionService, BASE_SCHEMAS, netconfMountPointManager);
         }
 
         @Override

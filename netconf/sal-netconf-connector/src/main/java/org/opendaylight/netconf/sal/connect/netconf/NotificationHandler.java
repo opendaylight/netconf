@@ -87,7 +87,7 @@ final class NotificationHandler {
         LOG.debug("{}: Forwarding notification {}", id, parsedNotification);
 
         if (filter == null || filter.filterNotification(parsedNotification).isPresent()) {
-            salFacade.onNotification(parsedNotification);
+            salFacade.onNotification(id.getName(), parsedNotification);
         }
     }
 

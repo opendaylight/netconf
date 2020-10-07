@@ -17,14 +17,14 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev19
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class LockChangeListener implements DataTreeChangeListener<DatastoreLock> {
+public final class LockChangeListener implements DataTreeChangeListener<DatastoreLock> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LockChangeListener.class);
 
     private final NetconfDeviceDataBroker netconfDeviceDataBroker;
     private final NetconfDataTreeServiceImpl netconfDataTreeService;
 
-    LockChangeListener(final DOMDataBroker netconfDeviceDataBrokder,
+    public LockChangeListener(final DOMDataBroker netconfDeviceDataBrokder,
                        final NetconfDataTreeService netconfDataTreeService) {
         this.netconfDeviceDataBroker = (NetconfDeviceDataBroker)netconfDeviceDataBrokder;
         this.netconfDataTreeService = (NetconfDataTreeServiceImpl) netconfDataTreeService;
