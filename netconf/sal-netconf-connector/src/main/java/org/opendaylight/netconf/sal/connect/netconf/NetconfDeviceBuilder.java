@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
+import org.opendaylight.netconf.sal.connect.api.MountPointManager;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
@@ -31,6 +32,7 @@ public class NetconfDeviceBuilder {
     private EventExecutor eventExecutor;
     private NetconfNodeAugmentedOptional nodeOptional;
     private BaseNetconfSchemas baseSchemas;
+    private MountPointManager mountPointManager;
 
     public NetconfDeviceBuilder() {
     }
@@ -85,11 +87,16 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
+    public NetconfDeviceBuilder setMountPointManager(MountPointManager mountPointManager) {
+        this.mountPointManager = mountPointManager;
+        return this;
+    }
+
     public NetconfDevice build() {
         validation();
         return new NetconfDevice(this.schemaResourcesDTO, this.baseSchemas, this.id, this.salFacade,
             this.globalProcessingExecutor, this.reconnectOnSchemasChange, this.deviceActionFactory, this.node,
-            this.eventExecutor, this.nodeOptional);
+            this.eventExecutor, this.nodeOptional,this.mountPointManager);
     }
 
     private void validation() {
