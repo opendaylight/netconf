@@ -48,9 +48,11 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Submodule;
 
 /**
  * Util class for mapping nodes.
@@ -114,7 +116,7 @@ public final class RestconfMappingNodeUtil {
      *             schema context
      */
     private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> mapBuilder,
-            final DataSchemaNode moduleSch, final boolean isSubmodule, final Module module,
+            final DataSchemaNode moduleSch, final boolean isSubmodule, final ModuleLike module,
             final Module ietfYangLibraryModule, final SchemaContext context) {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
                 Builders.mapEntryBuilder((ListSchemaNode) moduleSch);
@@ -162,14 +164,14 @@ public final class RestconfMappingNodeUtil {
      * @param context
      *             schema context
      */
-    private static void addSubmodules(final Module module,
+    private static void addSubmodules(final ModuleLike module,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Module ietfYangLibraryModule, final SchemaContext context) {
         final DataSchemaNode listSubm = findSchemaInListOfModulesSchema(
                 IetfYangLibrary.SPECIFIC_MODULE_SUBMODULE_LIST_QNAME, ietfYangLibraryModule);
         final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> mapBuilder =
                 Builders.orderedMapBuilder((ListSchemaNode) listSubm);
-        for (final Module submodule : module.getSubmodules()) {
+        for (final Submodule submodule : module.getSubmodules()) {
             fillMapByModules(mapBuilder, listSubm, true, submodule, ietfYangLibraryModule, context);
         }
         mapEntryBuilder.withChild(mapBuilder.build());
@@ -187,7 +189,7 @@ public final class RestconfMappingNodeUtil {
      * @param context
      *             schema context
      */
-    private static void addDeviationList(final Module module,
+    private static void addDeviationList(final ModuleLike module,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Module ietfYangLibraryModule, final SchemaContext context) {
         final DataSchemaNode deviationsSchema = findSchemaInListOfModulesSchema(
@@ -243,7 +245,7 @@ public final class RestconfMappingNodeUtil {
      * @param ietfYangLibraryModule
      *             ietf-yang-library module
      */
-    private static void addCommonLeafs(final Module module,
+    private static void addCommonLeafs(final ModuleLike module,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Module ietfYangLibraryModule) {
         addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, mapEntryBuilder,

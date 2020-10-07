@@ -15,6 +15,7 @@ import org.opendaylight.yangtools.yang.model.api.MustDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.LeafEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
 
 final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode implements LeafSchemaNode {
@@ -35,6 +36,7 @@ final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode imp
     }
 
     @Override
+    @Deprecated
     public SchemaPath getPath() {
         return OperationsContainerSchemaNode.PATH.createChild(getQName());
     }
@@ -48,5 +50,10 @@ final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode imp
     @Override
     public Collection<MustDefinition> getMustConstraints() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public LeafEffectiveStatement asEffectiveStatement() {
+        throw new UnsupportedOperationException();
     }
 }

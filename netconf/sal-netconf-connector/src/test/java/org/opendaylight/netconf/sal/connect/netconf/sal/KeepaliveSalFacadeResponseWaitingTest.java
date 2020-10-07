@@ -13,7 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps.getSourceNode;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 
 import com.google.common.util.concurrent.SettableFuture;
@@ -95,7 +95,7 @@ public class KeepaliveSalFacadeResponseWaitingTest {
 
         //This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
         final SettableFuture<DOMRpcResult> keepaliveSettableFuture = SettableFuture.create();
-        doReturn(keepaliveSettableFuture).when(deviceRpc).invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD);
+        doReturn(keepaliveSettableFuture).when(deviceRpc).invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
         final DOMRpcResult keepaliveResult = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
         keepaliveSettableFuture.set(keepaliveResult);
@@ -111,7 +111,7 @@ public class KeepaliveSalFacadeResponseWaitingTest {
         verify(deviceRpc, after(2000).times(1)).invokeRpc(null, null);
 
         //verify the keepalive RPC invoke. Should be never happen.
-        verify(deviceRpc, after(2000).never()).invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD);
+        verify(deviceRpc, after(2000).never()).invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
     }
 
     private final class LocalNetconfSalFacade implements RemoteDeviceHandler<NetconfSessionPreferences> {

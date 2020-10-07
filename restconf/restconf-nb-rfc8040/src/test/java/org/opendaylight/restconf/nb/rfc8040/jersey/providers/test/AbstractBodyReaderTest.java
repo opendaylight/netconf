@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,6 +22,8 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -49,8 +50,8 @@ public abstract class AbstractBodyReaderTest {
         final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(schemaContext).when(mountPoint).getEffectiveModelContext();
-        doCallRealMethod().when(mountPoint).getSchemaContext();
+        doReturn(Optional.of(FixedDOMSchemaService.of(schemaContext))).when(mountPoint)
+            .getService(DOMSchemaService.class);
 
         mountPointServiceHandler = new DOMMountPointServiceHandler(mountPointService);
     }
@@ -114,6 +115,12 @@ public abstract class AbstractBodyReaderTest {
     protected static void checkPatchContextMountPoint(final PatchContext patchContext) {
         checkPatchContext(patchContext);
         assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
-        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint().getSchemaContext());
     }
+
+    protected static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
+        return mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
+    }
+
 }

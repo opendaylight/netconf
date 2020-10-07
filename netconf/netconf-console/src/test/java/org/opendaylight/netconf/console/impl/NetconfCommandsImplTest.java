@@ -32,6 +32,8 @@ import org.junit.Test;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
+import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 import org.opendaylight.netconf.console.utils.NetconfConsoleUtils;
@@ -56,8 +58,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.common.Uint16;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfCommandsImplTest {
 
@@ -68,28 +68,26 @@ public class NetconfCommandsImplTest {
             NetconfNodeConnectionStatus.ConnectionStatus.Connected;
     private static final String CAP_PREFIX = "prefix";
 
-    private static EffectiveModelContext SCHEMA_CONTEXT;
+    private static BindingRuntimeContext RUNTIME_CONTEXT;
 
     private DataBroker dataBroker;
     private NetconfCommandsImpl netconfCommands;
 
     @BeforeClass
     public static void beforeClass() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResources(NetconfCommandsImplTest.class,
-            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
-            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang", "/schemas/netconf-node-optional.yang");
+        RUNTIME_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(TopologyNetconf.class);
     }
 
     @AfterClass
     public static void afterClass() {
-        SCHEMA_CONTEXT = null;
+        RUNTIME_CONTEXT = null;
     }
 
     @Before
     public void setUp() throws Exception {
         ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
         dataBroker = customizer.createDataBroker();
-        customizer.updateSchema(SCHEMA_CONTEXT);
+        customizer.updateSchema(RUNTIME_CONTEXT);
 
         netconfCommands = new NetconfCommandsImpl(dataBroker);
     }

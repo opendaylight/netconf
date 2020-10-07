@@ -381,7 +381,6 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         doNothing().when(mockMountPointReg).close();
 
-        doReturn(mockMountPointBuilder).when(mockMountPointBuilder).addInitialSchemaContext(any());
         doReturn(mockMountPointBuilder).when(mockMountPointBuilder).addService(any(), any());
         doReturn(mockMountPointReg).when(mockMountPointBuilder).register();
 

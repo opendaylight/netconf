@@ -44,9 +44,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -117,7 +118,7 @@ public class URIParametersParsing {
         final QName rpcInputQName =
                 QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "input");
         final RpcDefinition rpcDef = Mockito.mock(RpcDefinition.class);
-        ContainerSchemaNode rpcInputSchemaNode = null;
+        ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcSalRemoteModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
@@ -168,7 +169,7 @@ public class URIParametersParsing {
 
         container.withChild(augmentationBuilder.build());
 
-        when(rpcDef.getInput()).thenReturn(rpcInputSchemaNode);
+        when(rpcDef.getInput()).thenReturn((InputSchemaNode) rpcInputSchemaNode);
         when(rpcDef.getPath()).thenReturn(SchemaPath.create(true, rpcQName));
         when(rpcDef.getQName()).thenReturn(rpcQName);
 

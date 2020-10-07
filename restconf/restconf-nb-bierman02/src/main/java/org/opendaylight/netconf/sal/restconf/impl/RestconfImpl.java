@@ -60,6 +60,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
@@ -199,6 +200,7 @@ public final class RestconfImpl implements RestconfService {
     }
 
     @Override
+    @Deprecated
     public NormalizedNodeContext getModules(final UriInfo uriInfo) {
         final MapNode allModuleMap = makeModuleMapNode(controllerContext.getAllModules());
 
@@ -221,6 +223,7 @@ public final class RestconfImpl implements RestconfService {
      * Valid only for mount point.
      */
     @Override
+    @Deprecated
     public NormalizedNodeContext getModules(final String identifier, final UriInfo uriInfo) {
         Preconditions.checkNotNull(identifier);
         if (!identifier.contains(ControllerContext.MOUNT)) {
@@ -251,6 +254,7 @@ public final class RestconfImpl implements RestconfService {
     }
 
     @Override
+    @Deprecated
     public NormalizedNodeContext getModule(final String identifier, final UriInfo uriInfo) {
         Preconditions.checkNotNull(identifier);
         final Entry<String, Revision> nameRev = getModuleNameAndRevision(identifier);
@@ -263,7 +267,7 @@ public final class RestconfImpl implements RestconfService {
             mountPoint = mountPointIdentifier.getMountPoint();
             module = this.controllerContext.findModuleByNameAndRevision(mountPoint, nameRev.getKey(),
                 nameRev.getValue());
-            schemaContext = mountPoint.getEffectiveModelContext();
+            schemaContext = modelContext(mountPoint);
         } else {
             module = this.controllerContext.findModuleByNameAndRevision(nameRev.getKey(), nameRev.getValue());
             schemaContext = this.controllerContext.getGlobalSchema();
@@ -289,6 +293,7 @@ public final class RestconfImpl implements RestconfService {
     }
 
     @Override
+    @Deprecated
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
         final EffectiveModelContext schemaContext = this.controllerContext.getGlobalSchema();
         final Set<String> availableStreams = Notificator.getStreamNames();
@@ -318,11 +323,13 @@ public final class RestconfImpl implements RestconfService {
     }
 
     @Override
+    @Deprecated
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
         return OperationsResourceUtils.contextForModelContext(controllerContext.getGlobalSchema(), null);
     }
 
     @Override
+    @Deprecated
     public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
         if (!identifier.contains(ControllerContext.MOUNT)) {
             final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
@@ -334,7 +341,7 @@ public final class RestconfImpl implements RestconfService {
         final InstanceIdentifierContext<?> mountPointIdentifier =
                 this.controllerContext.toMountPointIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
-        return OperationsResourceUtils.contextForModelContext(mountPoint.getSchemaContext(), mountPoint);
+        return OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
     }
 
     private Module getRestconfModule() {
@@ -400,8 +407,8 @@ public final class RestconfImpl implements RestconfService {
                 LOG.debug("Error: Rpc service is missing.");
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
-            schemaContext = mountPoint.getEffectiveModelContext();
-            response = mountRpcServices.get().invokeRpc(schema.getPath(), input);
+            schemaContext = modelContext(mountPoint);
+            response = mountRpcServices.get().invokeRpc(schema.getQName(), input);
         } else {
             final URI namespace = schema.getQName().getNamespace();
             if (namespace.toString().equals(SAL_REMOTE_NAMESPACE)) {
@@ -415,7 +422,7 @@ public final class RestconfImpl implements RestconfService {
                     throw new RestconfDocumentedException(msg, ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
             } else {
-                response = this.broker.invokeRpc(schema.getPath(), input);
+                response = this.broker.invokeRpc(schema.getQName(), input);
             }
             schemaContext = this.controllerContext.getGlobalSchema();
         }
@@ -450,7 +457,7 @@ public final class RestconfImpl implements RestconfService {
             // mounted RPC call - look up mount instance.
             final InstanceIdentifierContext<?> mountPointId = this.controllerContext.toMountPointIdentifier(identifier);
             mountPoint = mountPointId.getMountPoint();
-            schemaContext = mountPoint.getEffectiveModelContext();
+            schemaContext = modelContext(mountPoint);
             final int startOfRemoteRpcName =
                     identifier.lastIndexOf(ControllerContext.MOUNT) + ControllerContext.MOUNT.length() + 1;
             final String remoteRpcName = identifier.substring(startOfRemoteRpcName);
@@ -472,7 +479,7 @@ public final class RestconfImpl implements RestconfService {
         if (mountPoint == null) {
             rpc = this.controllerContext.getRpcDefinition(identifierDecoded);
         } else {
-            rpc = findRpc(mountPoint.getSchemaContext(), identifierDecoded);
+            rpc = findRpc(modelContext(mountPoint), identifierDecoded);
         }
 
         if (rpc == null) {
@@ -493,9 +500,9 @@ public final class RestconfImpl implements RestconfService {
             if (!mountRpcServices.isPresent()) {
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
-            response = mountRpcServices.get().invokeRpc(rpc.getPath(), input);
+            response = mountRpcServices.get().invokeRpc(rpc.getQName(), input);
         } else {
-            response = this.broker.invokeRpc(rpc.getPath(), input);
+            response = this.broker.invokeRpc(rpc.getQName(), input);
         }
 
         final NormalizedNode<?, ?> result = checkRpcResponse(response).getResult();
@@ -1538,5 +1545,11 @@ public final class RestconfImpl implements RestconfService {
         }
 
         return Futures.immediateFuture(new DefaultDOMRpcResult(output));
+    }
+
+    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
+        return mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
     }
 }

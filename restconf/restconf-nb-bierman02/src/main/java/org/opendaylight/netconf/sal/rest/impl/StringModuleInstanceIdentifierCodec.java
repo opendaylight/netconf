@@ -13,6 +13,7 @@ import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -28,13 +29,13 @@ public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStr
     private final SchemaContext context;
     private final String defaultPrefix;
 
-    public StringModuleInstanceIdentifierCodec(final SchemaContext context) {
+    public StringModuleInstanceIdentifierCodec(final EffectiveModelContext context) {
         this.context = requireNonNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = "";
     }
 
-    StringModuleInstanceIdentifierCodec(final SchemaContext context, final @NonNull String defaultPrefix) {
+    StringModuleInstanceIdentifierCodec(final EffectiveModelContext context, final @NonNull String defaultPrefix) {
         this.context = requireNonNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = defaultPrefix;

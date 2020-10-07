@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,13 +19,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
@@ -78,7 +80,7 @@ public class MountInstanceTest {
     public void testOnTopologyDeviceConnected() {
         mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
             notificationService, null);
-        verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
+        verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
         verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
@@ -88,7 +90,7 @@ public class MountInstanceTest {
     public void testOnTopologyDeviceConnectedWithNetconfService() {
         mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, null, netconfService, rpcService,
                 notificationService, null);
-        verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
+        verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
         verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
@@ -121,7 +123,7 @@ public class MountInstanceTest {
     public void testPublishNotification() {
         mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, null, rpcService,
             notificationService, null);
-        verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
+        verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
         mountInstance.publish(notification);
         verify(notificationService).publishNotification(notification);

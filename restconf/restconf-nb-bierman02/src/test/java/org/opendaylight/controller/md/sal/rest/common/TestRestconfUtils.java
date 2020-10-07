@@ -8,7 +8,7 @@
 package org.opendaylight.controller.md.sal.rest.common;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -30,6 +30,7 @@ import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWrit
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -40,7 +41,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -70,8 +71,8 @@ public final class TestRestconfUtils {
         final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
 
         if (mountInstance != null) {
-            doReturn(schemaContext).when(mountInstance).getEffectiveModelContext();
-            doCallRealMethod().when(mountInstance).getSchemaContext();
+            doReturn(Optional.of(FixedDOMSchemaService.of(() -> schemaContext))).when(mountInstance)
+                .getService(eq(DOMSchemaService.class));
             doReturn(Optional.ofNullable(mountInstance)).when(mockMountService).getMountPoint(
                 any(YangInstanceIdentifier.class));
         }
@@ -156,7 +157,7 @@ public final class TestRestconfUtils {
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final XmlParserStream xmlParser = XmlParserStream.create(writer, iiContext.getSchemaContext(), schemaNode);
 
-        if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
+        if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode) {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             return resultHolder.getResult();
         }
