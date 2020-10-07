@@ -15,24 +15,27 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
+import org.opendaylight.netconf.sal.connect.api.MountPointManager;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfSalFacadeType;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
 public class CallHomeTopology extends BaseCallHomeTopology {
+
 
     public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas) {
+            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas,
+            final MountPointManager netconfMountPointManager) {
         this(topologyId, clientDispatcher, eventExecutor,
                 keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService, baseSchemas, null);
+                dataBroker, mountPointService, encryptionService, baseSchemas, null, netconfMountPointManager);
     }
 
     public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
@@ -41,14 +44,17 @@ public class CallHomeTopology extends BaseCallHomeTopology {
                             final SchemaResourceManager schemaRepositoryProvider,
                             final DataBroker dataBroker, final DOMMountPointService mountPointService,
                             final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas,
-                            final DeviceActionFactory deviceActionFactory) {
+                            final DeviceActionFactory deviceActionFactory,
+                            final MountPointManager mountPointManager) {
         super(topologyId, clientDispatcher, eventExecutor,
                 keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService, deviceActionFactory, baseSchemas);
+                dataBroker, mountPointService, encryptionService, deviceActionFactory,
+                baseSchemas, mountPointManager);
     }
 
     @Override
     protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id) {
-        return new NetconfDeviceSalFacade(id, mountPointService, dataBroker, topologyId);
+        return netconfMountPointManager.getInstance(id, mountPointService, dataBroker, topologyId,
+                NetconfSalFacadeType.NETCONFDEVICESALFACADE, null, null, null);
     }
 }
