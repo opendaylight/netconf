@@ -133,7 +133,7 @@ public final class NetconfUtil {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized, final DOMResult result,
-                                           final SchemaPath schemaPath, final SchemaContext context)
+                                           final SchemaPath schemaPath, final EffectiveModelContext context)
             throws IOException, XMLStreamException {
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
         try (
@@ -159,7 +159,7 @@ public final class NetconfUtil {
     public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized,
                                            final @Nullable NormalizedMetadata metadata,
                                            final DOMResult result, final SchemaPath schemaPath,
-                                           final SchemaContext context) throws IOException, XMLStreamException {
+                                           final EffectiveModelContext context) throws IOException, XMLStreamException {
         if (metadata == null) {
             writeNormalizedNode(normalized, result, schemaPath, context);
             return;
@@ -187,7 +187,7 @@ public final class NetconfUtil {
     }
 
     public static void writeFilter(final YangInstanceIdentifier query, final DOMResult result,
-            final SchemaPath schemaPath, final SchemaContext context) throws IOException, XMLStreamException {
+            final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
         if (query.isEmpty()) {
             // No query at all
             return;
@@ -215,7 +215,7 @@ public final class NetconfUtil {
 
         // FIXME: we probably need to propagate MountPointContext here and not just the child nodes
         final ContainerSchemaNode dataRead = new NodeContainerProxy(NETCONF_DATA_QNAME,
-            mountContext.getSchemaContext().getChildNodes());
+            mountContext.getEffectiveModelContext().getChildNodes());
         try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead)) {
             xmlParserStream.traverse(value);
         }

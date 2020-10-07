@@ -34,7 +34,7 @@ import org.opendaylight.netconf.topology.singleton.messages.action.InvokeActionM
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -70,8 +70,8 @@ public class ProxyDOMActionService implements DOMActionService {
     }
 
     @Override
-    public FluentFuture<DOMActionResult> invokeAction(final SchemaPath type,
-        final DOMDataTreeIdentifier domDataTreeIdentifier, final ContainerNode input) {
+    public FluentFuture<DOMActionResult> invokeAction(final Absolute type,
+            final DOMDataTreeIdentifier domDataTreeIdentifier, final ContainerNode input) {
         requireNonNull(type);
         requireNonNull(input);
         requireNonNull(domDataTreeIdentifier);
@@ -84,7 +84,7 @@ public class ProxyDOMActionService implements DOMActionService {
 
         final SettableFuture<DOMActionResult> settableFuture = SettableFuture.create();
 
-        scalaFuture.onComplete(new OnComplete<Object>() {
+        scalaFuture.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
