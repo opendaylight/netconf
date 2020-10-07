@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.util.Optional;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -34,6 +35,8 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.OptimisticLockFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -47,7 +50,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 //TODO UNSTABLE TESTS - FIX ME
@@ -139,7 +141,7 @@ public class RestPutOperationTest extends JerseyTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
 
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
+        mockMountPoint();
 
         String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/test-module:cont";
         assertEquals(200, put(uri, MediaType.APPLICATION_XML, xmlData2));
@@ -156,7 +158,7 @@ public class RestPutOperationTest extends JerseyTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
 
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
+        mockMountPoint();
 
         final String uri = "/config/ietf-interfaces:interfaces/yang-ext:mount";
         assertEquals(200, put(uri, MediaType.APPLICATION_XML, xmlData3));
@@ -168,12 +170,13 @@ public class RestPutOperationTest extends JerseyTest {
         final String uri = "/config/ietf-interfaces:interfaces/interface/eth0";
 
         doThrow(OptimisticLockFailedException.class).when(brokerFacade).commitConfigurationDataPut(
-                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
+                any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null,
+                null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
 
         doThrow(OptimisticLockFailedException.class).doReturn(mock(PutResult.class)).when(brokerFacade)
-                .commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
+                .commitConfigurationDataPut(any(EffectiveModelContext.class), any(YangInstanceIdentifier.class),
                         any(NormalizedNode.class), null, null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
@@ -186,7 +189,8 @@ public class RestPutOperationTest extends JerseyTest {
 
         doThrow(TransactionCommitFailedException.class)
                 .when(brokerFacade).commitConfigurationDataPut(
-                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
+                    any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
+                    null, null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
     }
@@ -195,14 +199,21 @@ public class RestPutOperationTest extends JerseyTest {
         return target(uri).request(mediaType).put(Entity.entity(data, mediaType)).getStatus();
     }
 
+    private void mockMountPoint() {
+        when(mountInstance.getService(DOMSchemaService.class))
+            .thenReturn(Optional.of(FixedDOMSchemaService.of(schemaContextTestModule)));
+    }
+
     private void mockCommitConfigurationDataPutMethod(final boolean noErrors) {
         final PutResult putResMock = mock(PutResult.class);
         if (noErrors) {
             doReturn(putResMock).when(brokerFacade).commitConfigurationDataPut(
-                    any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
+                    any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
+                    null, null);
         } else {
             doThrow(RestconfDocumentedException.class).when(brokerFacade).commitConfigurationDataPut(
-                    any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
+                    any(EffectiveModelContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
+                    null, null);
         }
     }
 

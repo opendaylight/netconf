@@ -7,13 +7,13 @@
  */
 package org.opendaylight.restconf.common.util;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.opendaylight.yangtools.concepts.SemVer;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.UnqualifiedQName;
 import org.opendaylight.yangtools.yang.common.YangVersion;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Deviation;
@@ -25,6 +25,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.Submodule;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 import org.opendaylight.yangtools.yang.model.api.YangStmtMapping;
@@ -62,8 +63,8 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final String argument() {
-        return getName();
+    public final UnqualifiedQName argument() {
+        return UnqualifiedQName.of(getName());
     }
 
     @Override
@@ -72,7 +73,7 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final Set<ModuleImport> getImports() {
+    public final Collection<? extends ModuleImport> getImports() {
         // Yeah, not accurate, but this should not be needed
         return Collections.emptySet();
     }
@@ -83,17 +84,17 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final Set<TypeDefinition<?>> getTypeDefinitions() {
+    public final Collection<? extends TypeDefinition<?>> getTypeDefinitions() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Set<GroupingDefinition> getGroupings() {
+    public final Collection<? extends GroupingDefinition> getGroupings() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Set<UsesNode> getUses() {
+    public final Collection<? extends UsesNode> getUses() {
         return Collections.emptySet();
     }
 
@@ -108,7 +109,7 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final Set<NotificationDefinition> getNotifications() {
+    public final Collection<? extends NotificationDefinition> getNotifications() {
         return Collections.emptySet();
     }
 
@@ -128,37 +129,42 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final Set<Module> getSubmodules() {
+    public final Collection<? extends Submodule> getSubmodules() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Set<FeatureDefinition> getFeatures() {
+    public final Collection<? extends FeatureDefinition> getFeatures() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Set<AugmentationSchemaNode> getAugmentations() {
+    public final Collection<? extends AugmentationSchemaNode> getAugmentations() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Set<RpcDefinition> getRpcs() {
+    public final Collection<? extends RpcDefinition> getRpcs() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Set<Deviation> getDeviations() {
+    public final Collection<? extends Deviation> getDeviations() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Set<IdentitySchemaNode> getIdentities() {
+    public final Collection<? extends IdentitySchemaNode> getIdentities() {
         return Collections.emptySet();
     }
 
     @Override
-    public final List<ExtensionDefinition> getExtensionSchemaNodes() {
+    public final Collection<? extends ExtensionDefinition> getExtensionSchemaNodes() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public final ModuleEffectiveStatement asEffectiveStatement() {
+        throw new UnsupportedOperationException();
     }
 }

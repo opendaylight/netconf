@@ -27,10 +27,10 @@ import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
@@ -50,9 +50,9 @@ public final class NetconfDeviceRpc implements DOMRpcService {
 
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
         final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
-            transformer.toRpcRequest(type, input), type.getLastComponent());
+            transformer.toRpcRequest(type, input), type);
 
         final SettableFuture<DOMRpcResult> ret = SettableFuture.create();
         Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
@@ -79,7 +79,7 @@ public final class NetconfDeviceRpc implements DOMRpcService {
     @Override
     public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
         listener.onRpcAvailable(Collections2.transform(schemaContext.getOperations(),
-            input -> DOMRpcIdentifier.create(input.getPath())));
+            input -> DOMRpcIdentifier.create(input.getQName())));
 
         // NOOP, no rpcs appear and disappear in this implementation
         return NoOpListenerRegistration.of(listener);

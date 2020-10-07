@@ -59,10 +59,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNo
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Util class for read data from data store via transaction.
@@ -141,9 +141,8 @@ public final class ReadDataTransactionUtil {
         if (!depth.get(0).equals(RestconfDataServiceConstant.ReadData.UNBOUNDED)) {
             final Integer value = Ints.tryParse(depth.get(0));
 
-            if (value == null
-                    || !(value >= RestconfDataServiceConstant.ReadData.MIN_DEPTH
-                        && value <= RestconfDataServiceConstant.ReadData.MAX_DEPTH)) {
+            if (value == null || value < RestconfDataServiceConstant.ReadData.MIN_DEPTH
+                    || value > RestconfDataServiceConstant.ReadData.MAX_DEPTH) {
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid depth parameter: " + depth, null,
@@ -182,7 +181,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
-            final @NonNull RestconfStrategy strategy, final SchemaContext schemaContext) {
+            final @NonNull RestconfStrategy strategy, final EffectiveModelContext schemaContext) {
         return readData(valueOfContent, strategy, null, schemaContext);
     }
 
@@ -198,7 +197,7 @@ public final class ReadDataTransactionUtil {
      */
     public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
                                                           final @NonNull RestconfStrategy strategy,
-                                                          final String withDefa, final SchemaContext ctx) {
+                                                          final String withDefa, final EffectiveModelContext ctx) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
                 if (withDefa == null) {
@@ -222,7 +221,7 @@ public final class ReadDataTransactionUtil {
     }
 
     private static NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
-            final YangInstanceIdentifier path, final String withDefa, final SchemaContext ctx) {
+            final YangInstanceIdentifier path, final String withDefa, final EffectiveModelContext ctx) {
         boolean trim;
         switch (withDefa) {
             case "trim":
@@ -236,7 +235,7 @@ public final class ReadDataTransactionUtil {
         }
 
         final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
-        final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+        final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
         if (result instanceof ContainerNode) {
             final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder =
                     Builders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
@@ -257,7 +256,7 @@ public final class ReadDataTransactionUtil {
             final YangInstanceIdentifier actualPath, final boolean trim, final List<QName> keys) {
         for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
-            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+            final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
             if (child instanceof ContainerNode) {
                 final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> childBuilder =
                         Builders.containerBuilder((ContainerSchemaNode) childSchema);
@@ -299,7 +298,8 @@ public final class ReadDataTransactionUtil {
             final List<QName> keys) {
         for (final MapEntryNode mapEntryNode : result.getValue()) {
             final YangInstanceIdentifier actualNode = path.node(mapEntryNode.getIdentifier());
-            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(actualNode).getDataSchemaNode();
+            final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(actualNode).orElseThrow()
+                    .getDataSchemaNode();
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
                     Builders.mapEntryBuilder((ListSchemaNode) childSchema);
             buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, baseSchemaCtxTree, actualNode, trim, keys);
@@ -312,7 +312,7 @@ public final class ReadDataTransactionUtil {
             final YangInstanceIdentifier actualPath, final boolean trim) {
         for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
-            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+            final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
             if (child instanceof ContainerNode) {
                 final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builderChild =
                         Builders.containerBuilder((ContainerSchemaNode) childSchema);
@@ -381,7 +381,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode<?, ?> readAllData(final @NonNull RestconfStrategy strategy,
-            final String withDefa, final SchemaContext ctx) {
+            final String withDefa, final EffectiveModelContext ctx) {
         // PREPARE STATE DATA NODE
         final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(
                 strategy, LogicalDatastoreType.OPERATIONAL, false);
