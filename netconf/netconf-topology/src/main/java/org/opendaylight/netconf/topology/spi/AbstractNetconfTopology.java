@@ -23,9 +23,11 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -100,6 +102,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     private static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
     private static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
     private static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
+    private static final Set<Uri> DEVICE_YANG_LIB_URI = new HashSet<>();
 
 
     private final NetconfClientDispatcher clientDispatcher;
@@ -238,10 +241,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
+        List<SchemaSourceRegistration<?>> deviceSchemaSourceRegistration = null;
         if (node.isSchemaless()) {
             device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
         } else {
             device = createNetconfDevice(remoteDeviceId, salFacade, nodeId, node, nodeOptional);
+            deviceSchemaSourceRegistration = createDeviceSchemaSourceRegistration(remoteDeviceId, nodeId, node);
         }
 
         final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
@@ -259,6 +264,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
+        }
+
+        if (device instanceof NetconfDevice && deviceSchemaSourceRegistration != null
+                && node.getYangLibrary() != null) {
+            return new NetconfConnectorWithSchemaSourceRegistrationDTO(netconfDeviceCommunicator, salFacade,
+                    node.getYangLibrary().getYangLibraryUrl(), deviceSchemaSourceRegistration);
         }
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade);
     }
@@ -284,19 +295,17 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setBaseSchemas(baseSchemas)
                 .build();
 
+        return device;
+    }
+
+    private List<SchemaSourceRegistration<?>> createDeviceSchemaSourceRegistration(final RemoteDeviceId remoteDeviceId,
+                                                                                   final NodeId nodeId,
+                                                                                   final NetconfNode node) {
         final YangLibrary yangLibrary = node.getYangLibrary();
         if (yangLibrary != null) {
             final Uri uri = yangLibrary.getYangLibraryUrl();
-            if (uri != null) {
-                // FIXME: NETCONF-675: these registrations need to be torn down with the device. This does not look
-                //                     quite right, though, as we can end up adding a lot of registrations on a
-                //                     per-device basis.
-                //                     This leak is also detected by SpotBugs as soon as this initialization is switched
-                //                     to proper "new ArrayList<>" and hence we really need to attach these somewhere
-                //                     else.
-                //                     It seems we should be subclassing NetconfConnectorDTO for this purpose as a
-                //                     first step and then perhaps do some refcounting or similar based on the
-                //                     schemaRegistry instance.
+            if (!DEVICE_YANG_LIB_URI.contains(uri)) {
+                final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node, nodeId.getValue());
                 final List<SchemaSourceRegistration<?>> registeredYangLibSources = Lists.newArrayList();
                 final String yangLibURL = uri.getValue();
                 final SchemaSourceRegistry schemaRegistry = resources.getSchemaRegistry();
@@ -313,14 +322,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
                 for (final Map.Entry<SourceIdentifier, URL> entry : schemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources.add(schemaRegistry.registerSchemaSource(
-                        new YangLibrarySchemaYangSourceProvider(remoteDeviceId, schemas.getAvailableModels()),
-                        PotentialSchemaSource.create(entry.getKey(), YangTextSchemaSource.class,
-                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                            new YangLibrarySchemaYangSourceProvider(remoteDeviceId, schemas.getAvailableModels()),
+                            PotentialSchemaSource.create(entry.getKey(), YangTextSchemaSource.class,
+                                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
+                return registeredYangLibSources;
             }
         }
-
-        return device;
+        return null;
     }
 
     /**
@@ -485,6 +494,36 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         public void close() {
             communicator.close();
             facade.close();
+        }
+    }
+
+    protected static class NetconfConnectorWithSchemaSourceRegistrationDTO extends NetconfConnectorDTO {
+
+        private final Uri uri;
+        private final List<SchemaSourceRegistration<?>> deviceSchemaSourceRegistration;
+
+        public NetconfConnectorWithSchemaSourceRegistrationDTO(final NetconfDeviceCommunicator communicator,
+                                   final RemoteDeviceHandler<NetconfSessionPreferences> facade,
+                                   final Uri uri, List<SchemaSourceRegistration<?>> deviceSchemaSourceRegistration) {
+            super(communicator, facade);
+            this.uri = requireNonNull(uri);
+            this.deviceSchemaSourceRegistration = requireNonNull(deviceSchemaSourceRegistration);
+        }
+
+        public Uri getUri() {
+            return uri;
+        }
+
+        public List<SchemaSourceRegistration<?>> getDeviceSchemaSourceRegistration() {
+            return deviceSchemaSourceRegistration;
+        }
+
+        @Override
+        public void close() {
+            DEVICE_YANG_LIB_URI.remove(uri);
+            for (SchemaSourceRegistration<?> schemaSourceRegistration : deviceSchemaSourceRegistration) {
+                schemaSourceRegistration.close();
+            }
         }
     }
 }
