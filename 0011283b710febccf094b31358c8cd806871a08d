@@ -33,6 +33,24 @@
       "revId": "0011283b710febccf094b31358c8cd806871a08d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db06aa8d_b78d120e",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2020-10-08T16:33:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c2520de_d051d494",
+      "revId": "0011283b710febccf094b31358c8cd806871a08d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
