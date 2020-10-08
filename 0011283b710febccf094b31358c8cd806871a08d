@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2de53967_c6d9ff41",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-08T14:29:08Z",
+      "side": 1,
+      "message": "sign-off needs to always be last",
+      "revId": "0011283b710febccf094b31358c8cd806871a08d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c2520de_d051d494",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-08T14:29:08Z",
+      "side": 1,
+      "message": "I would move this line after all null checks",
+      "revId": "0011283b710febccf094b31358c8cd806871a08d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
