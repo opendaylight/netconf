@@ -28,10 +28,12 @@ import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import java.util.HashSet;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -39,6 +41,7 @@ import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -47,6 +50,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.DefaultBaseNetconfSchemas;
@@ -55,11 +59,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.schema.storage.YangLibraryBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -143,6 +150,20 @@ public class NetconfTopologyImplTest {
         verify(wtx).merge(LogicalDatastoreType.OPERATIONAL,
                 networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
     }
+
+    @Test
+    public void testDeviceCommunicator() {
+        TransactionChain transactionChain = mock(TransactionChain.class);
+        WriteTransaction writeTransaction = mock(WriteTransaction.class);
+        Mockito.when(transactionChain.newWriteOnlyTransaction()).thenReturn(writeTransaction);
+        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
+        Mockito.when(dataBroker.createTransactionChain(any())).thenReturn(transactionChain);
+        SchemaResourcesDTO schemaResourcesDTO = mock(SchemaResourcesDTO.class);
+        doReturn(schemaResourcesDTO).when(mockedResourceManager).getSchemaResources(any(), any());
+
+        topology.testNetconfConnectorDTO();
+    }
+
 
     @Test
     public void testOnDataTreeChange() {
@@ -294,6 +315,56 @@ public class NetconfTopologyImplTest {
         @Override
         public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
             return Futures.immediateFuture(null);
+        }
+
+        private void testNetconfConnectorDTO() {
+            Uri yangLibUri = new Uri("test/uri");
+            YangLibraryBuilder yangLibraryBuilder = new YangLibraryBuilder()
+                    .setYangLibraryUrl(yangLibUri);
+
+            IpAddress ipAddress = new IpAddress(new Ipv4Address("127.0.0.1"));
+            final NodeBuilder nn = new NodeBuilder()
+                    .addAugmentation(new NetconfNodeBuilder()
+                            .setHost(new Host(ipAddress))
+                            .setPort(new PortNumber(Uint16.valueOf(9999)))
+                            .setReconnectOnChangedSchema(true)
+                            .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                            .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+                            .setKeepaliveDelay(Uint32.valueOf(1000))
+                            .setTcpOnly(true)
+                            .setSchemaless(false)
+                            .setYangLibrary(yangLibraryBuilder.build())
+                            .setCredentials(new LoginPasswordBuilder()
+                                    .setUsername("testuser")
+                                    .setPassword("testpassword")
+                                    .build())
+                            .build());
+
+            PathArgument pa = IdentifiableItem.of(Node.class, new NodeKey(NODE_ID));
+            Node node = nn.build();
+
+            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
+            final NetconfNodeAugmentedOptional nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
+            Assert.assertEquals(0, getDeviceYangLibUri().size());
+            NetconfConnectorDTO deviceCommunicator = createDeviceCommunicator(NetconfTopologyImpl.getNodeId(pa),
+                    netconfNode, nodeOptional);
+
+            Assert.assertNotNull(deviceCommunicator);
+            Assert.assertTrue(deviceCommunicator instanceof NetconfConnectorWithSchemaSourceRegistrationDTO);
+            NetconfConnectorWithSchemaSourceRegistrationDTO communicator =
+                    (NetconfConnectorWithSchemaSourceRegistrationDTO) deviceCommunicator;
+            Assert.assertEquals(yangLibUri, communicator.getUri());
+            Assert.assertEquals(1, getDeviceYangLibUri().size());
+
+            NetconfConnectorDTO duplicateCommunicator = createDeviceCommunicator(NetconfTopologyImpl.getNodeId(pa),
+                    netconfNode, nodeOptional);
+            Assert.assertNotNull(duplicateCommunicator);
+            Assert.assertFalse(duplicateCommunicator instanceof NetconfConnectorWithSchemaSourceRegistrationDTO);
+            Assert.assertEquals(1, getDeviceYangLibUri().size());
+
+            deviceCommunicator.close();
+            duplicateCommunicator.close();
+            Assert.assertEquals(0, getDeviceYangLibUri().size());
         }
     }
 
