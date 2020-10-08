@@ -15,7 +15,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -120,8 +119,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         this.contextTree = DataSchemaContextTree.from(schemaContext);
 
         this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        this.actions = Maps.uniqueIndex(getActions(schemaContext),
-            action -> Absolute.of(ImmutableList.copyOf(action.getPath().getPathFromRoot())));
+        this.actions = Maps.uniqueIndex(getActions(schemaContext), action -> action.getPath().asAbsolute());
 
         // RFC6020 normal notifications
         this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
@@ -206,7 +204,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         if (nestedNotificationInfo != null) {
             return new NetconfDeviceTreeNotification(content,
                 // FIXME: improve this to cache the path
-                Absolute.of(ImmutableList.copyOf(mostRecentNotification.getPath().getPathFromRoot())),
+                mostRecentNotification.getPath().asAbsolute(),
                 stripped.getKey(), nestedNotificationInfo.domDataTreeIdentifier);
         }
 

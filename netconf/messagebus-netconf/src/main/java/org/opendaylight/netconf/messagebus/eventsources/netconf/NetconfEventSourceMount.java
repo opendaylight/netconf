@@ -10,7 +10,6 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -45,7 +44,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
  * Facade of mounted netconf device.
@@ -154,8 +152,7 @@ class NetconfEventSourceMount {
      */
     ListenerRegistration<DOMNotificationListener> registerNotificationListener(final DOMNotificationListener listener,
                                                                                final SchemaPath notificationPath) {
-        return notificationService.registerNotificationListener(listener,
-            Absolute.of(ImmutableList.copyOf(notificationPath.getPathFromRoot())));
+        return notificationService.registerNotificationListener(listener, notificationPath.asAbsolute());
     }
 
 }
