@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcec92d7_1f3da1aa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-08T13:41:17Z",
+      "side": 1,
+      "message": "sign-off needs to always be last",
+      "revId": "56905bfb979907dcef9f582938245a24762665fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4763106f_748c5d3e",
+        "filename": "netconf/netconf-topology-impl/src/test/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-08T13:41:17Z",
+      "side": 1,
+      "message": "I think you can remove this method override as it just call super()",
+      "revId": "56905bfb979907dcef9f582938245a24762665fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9f30465_b15ffd29",
+        "filename": "netconf/netconf-topology-impl/src/test/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-08T13:41:17Z",
+      "side": 1,
+      "message": "Must be private",
+      "revId": "56905bfb979907dcef9f582938245a24762665fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
