@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1106765a_1be2cbd9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-08T14:22:29Z",
+      "side": 1,
+      "message": "sign-off needs to always be last",
+      "revId": "f2ed8a8787687f785963be26c341744f4ff063b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
