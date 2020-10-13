@@ -370,7 +370,7 @@ public class PutDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
         PutDataTransactionUtil.putData(payload, this.schema,
-                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+                new NetconfRestconfStrategy(iidContext.getInstanceIdentifier(), netconfService), null, null);
         verify(this.netconfService).getConfig(this.iid2);
         verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION, this.iid2,
                 payload.getData(), Optional.empty());

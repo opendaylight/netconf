@@ -293,18 +293,17 @@ public final class PostDataTransactionUtil {
      * Get location from {@link YangInstanceIdentifier} and {@link UriInfo}.
      *
      * @param uriInfo                uri info
-     * @param yangInstanceIdentifier reference to {@link InstanceIdentifierContext}
+     * @param dataPath               root location
      * @param schemaContext          reference to {@link SchemaContext}
      * @return {@link URI}
      */
-    private static URI resolveLocation(final UriInfo uriInfo, final InstanceIdentifierContext<?> yangInstanceIdentifier,
+    private static URI resolveLocation(final UriInfo uriInfo, final YangInstanceIdentifier dataPath,
                                        final EffectiveModelContext schemaContext, final NormalizedNode<?, ?> data) {
         if (uriInfo == null) {
             return null;
         }
 
-        YangInstanceIdentifier path = yangInstanceIdentifier.getInstanceIdentifier();
-
+        YangInstanceIdentifier path = dataPath;
         if (data instanceof MapNode) {
             final Collection<MapEntryNode> children = ((MapNode) data).getValue();
             if (!children.isEmpty()) {

@@ -34,18 +34,17 @@ import org.slf4j.LoggerFactory;
 /**
  * Strategy that allow to communicate with netconf devices using pure netconf operations.
  */
-public class NetconfRestconfStrategy implements RestconfStrategy {
+public class NetconfRestconfStrategy extends AbstractRestconfStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfRestconfStrategy.class);
 
     private final NetconfDataTreeService netconfService;
-    private final InstanceIdentifierContext<?> instanceIdentifier;
 
     private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures;
 
-    public NetconfRestconfStrategy(final NetconfDataTreeService netconfService,
-                                   final InstanceIdentifierContext<?> instanceIdentifier) {
+    public NetconfRestconfStrategy(final YangInstanceIdentifier instanceIdentifier,
+                                   final NetconfDataTreeService netconfService) {
+        super(instanceIdentifier);
         this.netconfService = requireNonNull(netconfService);
-        this.instanceIdentifier = requireNonNull(instanceIdentifier);
     }
 
     @Override
@@ -118,11 +117,6 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
         return null;
     }
 
-    @Override
-    public InstanceIdentifierContext<?> getInstanceIdentifier() {
-        return instanceIdentifier;
-    }
-
     /**
      * As we are not using any transactions here, always return null.
      */
@@ -133,7 +127,7 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
 
     @Override
     public RestconfStrategy buildStrategy(final InstanceIdentifierContext<?> instanceIdentifierContext) {
-        return new NetconfRestconfStrategy(this.netconfService, instanceIdentifierContext);
+        return new NetconfRestconfStrategy(instanceIdentifierContext.getInstanceIdentifier(), netconfService);
     }
 
     private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {

@@ -108,9 +108,9 @@ public interface RestconfStrategy {
     /**
      * Get instance identifier of data.
      *
-     * @return {@link InstanceIdentifierContext}
+     * @return A {@link YangInstanceIdentifier}
      */
-    InstanceIdentifierContext<?> getInstanceIdentifier();
+    @NonNull YangInstanceIdentifier getInstanceIdentifier();
 
     /**
      * Get transaction chain handler for creating new transaction chain.

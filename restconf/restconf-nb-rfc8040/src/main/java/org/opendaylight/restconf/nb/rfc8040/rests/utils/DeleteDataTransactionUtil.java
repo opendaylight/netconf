@@ -32,7 +32,7 @@ public final class DeleteDataTransactionUtil {
      */
     public static Response deleteData(final RestconfStrategy strategy) {
         strategy.prepareReadWriteExecution();
-        final YangInstanceIdentifier path = strategy.getInstanceIdentifier().getInstanceIdentifier();
+        final YangInstanceIdentifier path = strategy.getInstanceIdentifier();
         TransactionUtil.checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
                 RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
         strategy.delete(LogicalDatastoreType.CONFIGURATION, path);

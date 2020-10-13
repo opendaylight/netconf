@@ -206,7 +206,7 @@ public final class ReadDataTransactionUtil {
                 } else {
                     return prepareDataByParamWithDef(
                             readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true),
-                            strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
+                            strategy.getInstanceIdentifier(), withDefa, ctx);
                 }
             case RestconfDataServiceConstant.ReadData.NONCONFIG:
                 return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, true);
@@ -359,7 +359,7 @@ public final class ReadDataTransactionUtil {
             final boolean closeTransactionChain) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(
-                store, strategy.getInstanceIdentifier().getInstanceIdentifier());
+                store, strategy.getInstanceIdentifier());
         if (closeTransactionChain) {
             //Method close transactionChain if any
             FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
@@ -395,7 +395,7 @@ public final class ReadDataTransactionUtil {
         } else {
             configDataNode = prepareDataByParamWithDef(
                     readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true),
-                    strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
+                    strategy.getInstanceIdentifier(), withDefa, ctx);
         }
 
         // if no data exists
