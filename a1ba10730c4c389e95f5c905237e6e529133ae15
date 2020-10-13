@@ -2,6 +2,75 @@
   "comments": [
     {
       "key": {
+        "uuid": "aa131915_c4b382f1",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContext.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:32:55Z",
+      "side": 1,
+      "message": "unrelated reformat, in the wrong direction",
+      "range": {
+        "startLine": 43,
+        "startChar": 32,
+        "endLine": 44,
+        "endChar": 93
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "675cff8e_da69fc8f",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfChunkException.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:32:55Z",
+      "side": 1,
+      "message": "why do we retain these bytes...",
+      "range": {
+        "startLine": 21,
+        "startChar": 18,
+        "endLine": 21,
+        "endChar": 39
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "34623abe_24f127f4",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfChunkException.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:32:55Z",
+      "side": 1,
+      "message": "when  we have already encoded them here?",
+      "range": {
+        "startLine": 37,
+        "startChar": 40,
+        "endLine": 37,
+        "endChar": 90
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "de7927e2_8bd2f8d8",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfChunkAggregator.java",
         "patchSetId": 3
