@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30043032_dccb3aa9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:40:46Z",
+      "side": 1,
+      "message": "reformat to follow commit message guidelines and explain what is being done and why",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 131
+      },
+      "revId": "2e8daabea02ddac0e2538f3af92b0d5a19c5ad6d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "37220a6e_8c2044e1",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/impl/NetconfNotificationManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:40:46Z",
+      "side": 1,
+      "message": "how about this put?",
+      "range": {
+        "startLine": 129,
+        "startChar": 34,
+        "endLine": 129,
+        "endChar": 50
+      },
+      "revId": "2e8daabea02ddac0e2538f3af92b0d5a19c5ad6d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
