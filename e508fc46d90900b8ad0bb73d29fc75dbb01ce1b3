@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc9c6528_484a396b",
+        "filename": "netconf/netconf-topology-impl/src/test/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T15:41:45Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 27
+      },
+      "revId": "e508fc46d90900b8ad0bb73d29fc75dbb01ce1b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
