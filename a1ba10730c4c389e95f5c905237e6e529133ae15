@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "de7927e2_8bd2f8d8",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfChunkAggregator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:29:58Z",
+      "side": 1,
+      "message": "While other states are obvious from the RFC, this state is not and hence needs to be properly documented.",
+      "range": {
+        "startLine": 53,
+        "startChar": 8,
+        "endLine": 53,
+        "endChar": 28
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e3473f0_a510a6df",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfChunkAggregator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:29:58Z",
+      "side": 1,
+      "message": "this needs an explanation and has wrong name, it actually is \u0027propagationEnabled\"",
+      "range": {
+        "startLine": 59,
+        "startChar": 4,
+        "endLine": 59,
+        "endChar": 46
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "984a4657_7a0a7a71",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:29:58Z",
+      "side": 1,
+      "message": "- do not split the string, as yoiu are missing a space\n- refactor as \"Request/Reply message-id mismatch, ...\"",
+      "range": {
+        "startLine": 295,
+        "startChar": 25,
+        "endLine": 296,
+        "endChar": 74
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ca4d55a2_7a017cac",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:29:58Z",
+      "side": 1,
+      "message": "why is this on a separate line?",
+      "range": {
+        "startLine": 312,
+        "startChar": 20,
+        "endLine": 312,
+        "endChar": 24
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c202cd3_ea8acbf9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-13T11:29:58Z",
+      "side": 1,
+      "message": "new public method, document it",
+      "range": {
+        "startLine": 254,
+        "startChar": 4,
+        "endLine": 254,
+        "endChar": 39
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
