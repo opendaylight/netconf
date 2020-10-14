@@ -185,7 +185,7 @@ public final class PutDataTransactionUtil {
         switch (insert) {
             case "first":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = readList(path, schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = readList(strategy, path);
                     final OrderedMapNode readList = (OrderedMapNode) readData;
                     if (readList == null || readList.getValue().isEmpty()) {
                         return makePut(path, schemaContext, strategy, data, exists);
@@ -197,7 +197,7 @@ public final class PutDataTransactionUtil {
                         return strategy.commit();
                     }
                 } else {
-                    final NormalizedNode<?, ?> readData = readList(path, schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = readList(strategy, path);
 
                     final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
@@ -215,7 +215,7 @@ public final class PutDataTransactionUtil {
                 return makePut(path, schemaContext, strategy, data, exists);
             case "before":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = readList(path, schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = readList(strategy, path);
                     final OrderedMapNode readList = (OrderedMapNode) readData;
                     if (readList == null || readList.getValue().isEmpty()) {
                         return makePut(path, schemaContext, strategy, data, exists);
@@ -225,7 +225,7 @@ public final class PutDataTransactionUtil {
                         return strategy.commit();
                     }
                 } else {
-                    final NormalizedNode<?, ?> readData = readList(path, schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = readList(strategy, path);
 
                     final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
@@ -238,7 +238,7 @@ public final class PutDataTransactionUtil {
                 }
             case "after":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = readList(path, schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = readList(strategy, path);
                     final OrderedMapNode readList = (OrderedMapNode) readData;
                     if (readList == null || readList.getValue().isEmpty()) {
                         return makePut(path, schemaContext, strategy, data, exists);
@@ -248,7 +248,7 @@ public final class PutDataTransactionUtil {
                         return strategy.commit();
                     }
                 } else {
-                    final NormalizedNode<?, ?> readData = readList(path, schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = readList(strategy, path);
 
                     final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
@@ -266,12 +266,10 @@ public final class PutDataTransactionUtil {
         }
     }
 
-    public static NormalizedNode<?, ?> readList(final YangInstanceIdentifier path,
-                                                final EffectiveModelContext schemaContext,
-                                                final RestconfStrategy strategy,
-                                                final DataSchemaNode schemaNode) {
-        return ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, path, strategy, null,
-            schemaContext);
+    // FIXME: this method is only called from a context where we are modifying data. This should be part of strategy,
+    //        requiring an already-open transaction. It also must return a future, so it can be properly composed.
+    static NormalizedNode<?, ?> readList(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
+        return ReadDataTransactionUtil.readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true);
     }
 
     private static void insertWithPointLeafListPut(final RestconfStrategy strategy,

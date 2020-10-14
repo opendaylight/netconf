@@ -384,8 +384,7 @@ public final class ReadDataTransactionUtil {
      *                              in {@link RestconfStrategy} if any
      * @return {@link NormalizedNode}
      */
-    private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
-            final @NonNull RestconfStrategy strategy,
+    static @Nullable NormalizedNode<?, ?> readDataViaTransaction(final @NonNull RestconfStrategy strategy,
             final LogicalDatastoreType store, final YangInstanceIdentifier path,
             final boolean closeTransactionChain) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
