@@ -21,6 +21,8 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -35,12 +37,16 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Util class to post data to DS.
  *
  */
 public final class PostDataTransactionUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(PostDataTransactionUtil.class);
+
     private PostDataTransactionUtil() {
         // Hidden on purpose
     }
@@ -214,13 +220,11 @@ public final class PostDataTransactionUtil {
         strategy.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (lastInsertedPosition == lastItemPosition) {
-                TransactionUtil.checkItemDoesNotExists(strategy, datastore, path,
-                        RestconfDataServiceConstant.PostData.POST_TX_TYPE);
+                checkItemDoesNotExists(strategy, datastore, path, RestconfDataServiceConstant.PostData.POST_TX_TYPE);
                 strategy.create(datastore, path, payload);
             }
             final YangInstanceIdentifier childPath = path.getParent().getParent().node(nodeChild.getIdentifier());
-            TransactionUtil.checkItemDoesNotExists(strategy, datastore, childPath,
-                    RestconfDataServiceConstant.PostData.POST_TX_TYPE);
+            checkItemDoesNotExists(strategy, datastore, childPath, RestconfDataServiceConstant.PostData.POST_TX_TYPE);
             strategy.create(datastore, childPath, nodeChild);
             lastInsertedPosition++;
         }
@@ -250,13 +254,11 @@ public final class PostDataTransactionUtil {
         strategy.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (lastInsertedPosition == lastItemPosition) {
-                TransactionUtil.checkItemDoesNotExists(strategy, datastore, path,
-                        RestconfDataServiceConstant.PostData.POST_TX_TYPE);
+                checkItemDoesNotExists(strategy, datastore, path, RestconfDataServiceConstant.PostData.POST_TX_TYPE);
                 strategy.create(datastore, path, payload);
             }
             final YangInstanceIdentifier childPath = path.getParent().getParent().node(mapEntryNode.getIdentifier());
-            TransactionUtil.checkItemDoesNotExists(strategy, datastore, childPath,
-                    RestconfDataServiceConstant.PostData.POST_TX_TYPE);
+            checkItemDoesNotExists(strategy, datastore, childPath, RestconfDataServiceConstant.PostData.POST_TX_TYPE);
             strategy.create(datastore, childPath, mapEntryNode);
             lastInsertedPosition++;
         }
@@ -268,7 +270,7 @@ public final class PostDataTransactionUtil {
             boolean merge = false;
             for (final MapEntryNode child : ((MapNode) data).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-                TransactionUtil.checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, childPath,
+                checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, childPath,
                         RestconfDataServiceConstant.PostData.POST_TX_TYPE);
                 if (!merge) {
                     merge = true;
@@ -280,7 +282,7 @@ public final class PostDataTransactionUtil {
                 strategy.create(LogicalDatastoreType.CONFIGURATION, childPath, child);
             }
         } else {
-            TransactionUtil.checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
+            checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
                     RestconfDataServiceConstant.PostData.POST_TX_TYPE);
 
             TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
@@ -319,9 +321,37 @@ public final class PostDataTransactionUtil {
     private static void simplePost(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
                                    final NormalizedNode<?, ?> payload,
                                    final SchemaContext schemaContext, final RestconfStrategy strategy) {
-        TransactionUtil.checkItemDoesNotExists(strategy, datastore, path,
-                RestconfDataServiceConstant.PostData.POST_TX_TYPE);
+        checkItemDoesNotExists(strategy, datastore, path, RestconfDataServiceConstant.PostData.POST_TX_TYPE);
         TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
         strategy.create(datastore, path, payload);
     }
+
+
+    /**
+     * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
+     * data already exists.
+     *
+     * @param strategy      Object that perform the actual DS operations
+     * @param store         Datastore
+     * @param path          Path to be checked
+     * @param operationType Type of operation (READ, POST, PUT, DELETE...)
+     */
+    private static void checkItemDoesNotExists(final RestconfStrategy strategy,
+                                               final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                                               final String operationType) {
+        final FluentFuture<Boolean> future = strategy.exists(store, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, operationType, response);
+
+        if (response.result) {
+            // close transaction
+            strategy.cancel();
+            // throw error
+            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
+            throw new RestconfDocumentedException(
+                    "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
+        }
+    }
+
 }
