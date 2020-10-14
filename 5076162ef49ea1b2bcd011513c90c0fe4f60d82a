@@ -22,6 +22,52 @@
       "revId": "5076162ef49ea1b2bcd011513c90c0fe4f60d82a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "992bb35d_fe1798dd",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-14T15:13:40Z",
+      "side": 1,
+      "message": "please do not mass-change whitespace + change implenentation -- it just makes it harder to rebase",
+      "range": {
+        "startLine": 79,
+        "startChar": 18,
+        "endLine": 79,
+        "endChar": 20
+      },
+      "revId": "5076162ef49ea1b2bcd011513c90c0fe4f60d82a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b9b3b154_28c33638",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-14T15:13:40Z",
+      "side": 1,
+      "message": "this is an implementation detail -- one implementation is ignoring it",
+      "range": {
+        "startLine": 99,
+        "startChar": 14,
+        "endLine": 99,
+        "endChar": 56
+      },
+      "revId": "5076162ef49ea1b2bcd011513c90c0fe4f60d82a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
