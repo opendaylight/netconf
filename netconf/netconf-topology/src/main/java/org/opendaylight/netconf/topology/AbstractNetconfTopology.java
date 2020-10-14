@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -266,15 +265,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     @Override
     public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
         LOG.debug("Disconnecting RemoteDevice{{}}", nodeId.getValue());
-        if (!activeConnectors.containsKey(nodeId)) {
+        final NetconfConnectorDTO connectorDTO = activeConnectors.remove(nodeId);
+        if (connectorDTO == null) {
             return Futures.immediateFailedFuture(
                     new IllegalStateException("Unable to disconnect device that is not connected"));
         }
 
         // retrieve connection, and disconnect it
-        final NetconfConnectorDTO connectorDTO = activeConnectors.remove(nodeId);
-        connectorDTO.getCommunicator().close();
-        connectorDTO.getFacade().close();
+        connectorDTO.close();
         return Futures.immediateFuture(null);
     }
 
@@ -342,7 +340,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         // pre register yang library sources as fallback schemas to schema registry
-        final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
+        final List<SchemaSourceRegistration<?>> registeredYangLibSources = new ArrayList<>();
         if (node.getYangLibrary() != null) {
             final String yangLibURL = node.getYangLibrary().getYangLibraryUrl().getValue();
             final String yangLibUsername = node.getYangLibrary().getUsername();
@@ -402,7 +400,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
         }
-        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade);
+        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, registeredYangLibSources);
     }
 
     protected NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final NodeId nodeId, final NetconfNode node) {
@@ -619,11 +617,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         private final NetconfDeviceCommunicator communicator;
         private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
+        private final List<SchemaSourceRegistration<?>> registeredSources;
 
         public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator,
-                                   final RemoteDeviceHandler<NetconfSessionPreferences> facade) {
+                                   final RemoteDeviceHandler<NetconfSessionPreferences> facade,
+                                   final List<SchemaSourceRegistration<?>> registeredSources) {
             this.communicator = communicator;
             this.facade = facade;
+            this.registeredSources = registeredSources;
         }
 
         public NetconfDeviceCommunicator getCommunicator() {
@@ -642,6 +643,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         public void close() {
             communicator.close();
             facade.close();
+            registeredSources.forEach(SchemaSourceRegistration::close);
         }
     }
 }
