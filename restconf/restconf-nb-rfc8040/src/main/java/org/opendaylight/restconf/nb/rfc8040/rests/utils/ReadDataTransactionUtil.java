@@ -213,7 +213,7 @@ public final class ReadDataTransactionUtil {
             case RestconfDataServiceConstant.ReadData.ALL:
                 return readAllData(strategy, path, withDefa, ctx);
             default:
-                strategy.cancel();
+                strategy.close();
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
@@ -398,7 +398,7 @@ public final class ReadDataTransactionUtil {
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(store, path);
         if (closeTransactionChain) {
             //Method close transactionChain if any
-            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory, strategy.getTransactionChain());
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory, strategy, path);
         } else {
             FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory);
         }
