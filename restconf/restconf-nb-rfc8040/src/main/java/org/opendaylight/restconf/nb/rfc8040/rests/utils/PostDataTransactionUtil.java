@@ -61,11 +61,10 @@ public final class PostDataTransactionUtil {
                                     final RestconfStrategy strategy,
                                     final EffectiveModelContext schemaContext, final String insert,
                                     final String point) {
-        final FluentFuture<? extends CommitInfo> future = submitData(
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
+        final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
+        final FluentFuture<? extends CommitInfo> future = submitData(path, payload.getData(),
                 strategy, schemaContext, insert, point);
-        final URI location = resolveLocation(uriInfo, strategy.getInstanceIdentifier(),
-                schemaContext, payload.getData());
+        final URI location = resolveLocation(uriInfo, path, schemaContext, payload.getData());
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain if any
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory,
@@ -292,19 +291,18 @@ public final class PostDataTransactionUtil {
     /**
      * Get location from {@link YangInstanceIdentifier} and {@link UriInfo}.
      *
-     * @param uriInfo                uri info
-     * @param yangInstanceIdentifier reference to {@link InstanceIdentifierContext}
-     * @param schemaContext          reference to {@link SchemaContext}
+     * @param uriInfo       uri info
+     * @param initialPath          data path
+     * @param schemaContext reference to {@link SchemaContext}
      * @return {@link URI}
      */
-    private static URI resolveLocation(final UriInfo uriInfo, final InstanceIdentifierContext<?> yangInstanceIdentifier,
+    private static URI resolveLocation(final UriInfo uriInfo, final YangInstanceIdentifier initialPath,
                                        final EffectiveModelContext schemaContext, final NormalizedNode<?, ?> data) {
         if (uriInfo == null) {
             return null;
         }
 
-        YangInstanceIdentifier path = yangInstanceIdentifier.getInstanceIdentifier();
-
+        YangInstanceIdentifier path = initialPath;
         if (data instanceof MapNode) {
             final Collection<MapEntryNode> children = ((MapNode) data).getValue();
             if (!children.isEmpty()) {

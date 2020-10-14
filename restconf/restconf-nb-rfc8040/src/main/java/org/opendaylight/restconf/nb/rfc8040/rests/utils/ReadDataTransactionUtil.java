@@ -141,9 +141,8 @@ public final class ReadDataTransactionUtil {
         if (!depth.get(0).equals(RestconfDataServiceConstant.ReadData.UNBOUNDED)) {
             final Integer value = Ints.tryParse(depth.get(0));
 
-            if (value == null
-                    || !(value >= RestconfDataServiceConstant.ReadData.MIN_DEPTH
-                        && value <= RestconfDataServiceConstant.ReadData.MAX_DEPTH)) {
+            if (value == null || value < RestconfDataServiceConstant.ReadData.MIN_DEPTH
+                    || value > RestconfDataServiceConstant.ReadData.MAX_DEPTH) {
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid depth parameter: " + depth, null,
@@ -182,8 +181,9 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
-            final @NonNull RestconfStrategy strategy, final SchemaContext schemaContext) {
-        return readData(valueOfContent, strategy, null, schemaContext);
+            final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
+            final SchemaContext schemaContext) {
+        return readData(valueOfContent, path, strategy, null, schemaContext);
     }
 
     /**
@@ -191,27 +191,29 @@ public final class ReadDataTransactionUtil {
      * inside of object {@link RestconfStrategy} provided as a parameter.
      *
      * @param valueOfContent type of data to read (config, state, all)
+     * @param path           the path to read
      * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa       vaule of with-defaults parameter
+     * @param withDefa       valee of with-defaults parameter
      * @param ctx            schema context
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
+                                                          final @NonNull YangInstanceIdentifier path,
                                                           final @NonNull RestconfStrategy strategy,
                                                           final String withDefa, final SchemaContext ctx) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
                 if (withDefa == null) {
-                    return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true);
+                    return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true);
                 } else {
                     return prepareDataByParamWithDef(
-                            readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true),
-                            strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
+                            readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true),
+                            path, withDefa, ctx);
                 }
             case RestconfDataServiceConstant.ReadData.NONCONFIG:
-                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, true);
+                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, true);
             case RestconfDataServiceConstant.ReadData.ALL:
-                return readAllData(strategy, withDefa, ctx);
+                return readAllData(strategy, path, withDefa, ctx);
             default:
                 strategy.cancel();
                 throw new RestconfDocumentedException(
@@ -355,11 +357,10 @@ public final class ReadDataTransactionUtil {
      */
     private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
             final @NonNull RestconfStrategy strategy,
-            final LogicalDatastoreType store,
+            final LogicalDatastoreType store, final YangInstanceIdentifier path,
             final boolean closeTransactionChain) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(
-                store, strategy.getInstanceIdentifier().getInstanceIdentifier());
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(store, path);
         if (closeTransactionChain) {
             //Method close transactionChain if any
             FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
@@ -381,21 +382,21 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode<?, ?> readAllData(final @NonNull RestconfStrategy strategy,
-            final String withDefa, final SchemaContext ctx) {
+            final YangInstanceIdentifier path, final String withDefa, final SchemaContext ctx) {
         // PREPARE STATE DATA NODE
         final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(
-                strategy, LogicalDatastoreType.OPERATIONAL, false);
+                strategy, LogicalDatastoreType.OPERATIONAL, path, false);
 
         // PREPARE CONFIG DATA NODE
         final NormalizedNode<?, ?> configDataNode;
         //Here will be closed transactionChain if any
         if (withDefa == null) {
             configDataNode = readDataViaTransaction(
-                    strategy, LogicalDatastoreType.CONFIGURATION, true);
+                    strategy, LogicalDatastoreType.CONFIGURATION, path, true);
         } else {
             configDataNode = prepareDataByParamWithDef(
-                    readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true),
-                    strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
+                    readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true),
+                    path, withDefa, ctx);
         }
 
         // if no data exists

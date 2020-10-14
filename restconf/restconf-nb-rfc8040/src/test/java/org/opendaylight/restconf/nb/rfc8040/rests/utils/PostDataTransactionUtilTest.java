@@ -162,14 +162,14 @@ public class PostDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
         Response response = PostDataTransactionUtil.postData(this.uriInfo, payload,
-                        new MdsalRestconfStrategy(iidContext, transactionChainHandler), this.schema, null, null);
+                        new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
         assertEquals(201, response.getStatus());
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,
-                new NetconfRestconfStrategy(netconfService, iidContext), this.schema, null, null);
+                new NetconfRestconfStrategy(netconfService), this.schema, null, null);
         assertEquals(201, response.getStatus());
         verify(this.netconfService).getConfig(this.iid2);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
@@ -193,7 +193,7 @@ public class PostDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
         Response response = PostDataTransactionUtil.postData(this.uriInfo, payload,
-                        new MdsalRestconfStrategy(iidContext, transactionChainHandler), this.schema, null, null);
+                        new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), "UTF-8"),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
@@ -201,7 +201,7 @@ public class PostDataTransactionUtilTest {
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next());
 
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,
-                new NetconfRestconfStrategy(netconfService, iidContext), this.schema, null, null);
+                new NetconfRestconfStrategy(netconfService), this.schema, null, null);
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), "UTF-8"),
                 containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
@@ -232,7 +232,7 @@ public class PostDataTransactionUtilTest {
 
         try {
             PostDataTransactionUtil.postData(this.uriInfo, payload,
-                    new MdsalRestconfStrategy(iidContext, transactionChainHandler), this.schema, null, null);
+                    new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
             fail("Expected RestconfDocumentedException");
         } catch (final RestconfDocumentedException e) {
             assertEquals(1, e.getErrors().size());
@@ -245,7 +245,7 @@ public class PostDataTransactionUtilTest {
 
         try {
             PostDataTransactionUtil.postData(this.uriInfo, payload,
-                    new NetconfRestconfStrategy(netconfService, iidContext), this.schema, null, null);
+                    new NetconfRestconfStrategy(netconfService), this.schema, null, null);
             fail("Expected RestconfDocumentedException");
         } catch (final RestconfDocumentedException e) {
             assertEquals(1, e.getErrors().size());

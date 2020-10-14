@@ -270,11 +270,8 @@ public final class PutDataTransactionUtil {
                                                 final EffectiveModelContext schemaContext,
                                                 final RestconfStrategy strategy,
                                                 final DataSchemaNode schemaNode) {
-        final InstanceIdentifierContext<?> iid = new InstanceIdentifierContext<SchemaNode>(
-                path.getParent(), schemaNode, null, schemaContext);
-        final RestconfStrategy restconfStrategy = strategy.buildStrategy(iid);
-        return ReadDataTransactionUtil.readData(
-                RestconfDataServiceConstant.ReadData.CONFIG, restconfStrategy, schemaContext);
+        return ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, path, strategy,
+            schemaContext);
     }
 
     private static void insertWithPointLeafListPut(final RestconfStrategy strategy,

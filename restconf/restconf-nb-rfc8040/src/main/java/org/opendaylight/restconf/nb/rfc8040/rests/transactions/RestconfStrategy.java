@@ -15,7 +15,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -27,7 +26,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  * @see MdsalRestconfStrategy
  */
 public interface RestconfStrategy {
-
     /**
      * Lock the entire datastore.
      */
@@ -106,24 +104,9 @@ public interface RestconfStrategy {
     @Nullable DOMTransactionChain getTransactionChain();
 
     /**
-     * Get instance identifier of data.
-     *
-     * @return {@link InstanceIdentifierContext}
-     */
-    InstanceIdentifierContext<?> getInstanceIdentifier();
-
-    /**
      * Get transaction chain handler for creating new transaction chain.
      *
      * @return {@link TransactionChainHandler} or null
      */
     @Nullable TransactionChainHandler getTransactionChainHandler();
-
-    /**
-     * Create a new and same type strategy for communication with netconf interface with
-     * a new {@link InstanceIdentifierContext}.
-     *
-     * @return {@link RestconfStrategy}
-     */
-    RestconfStrategy buildStrategy(InstanceIdentifierContext<?> instanceIdentifierContext);
 }

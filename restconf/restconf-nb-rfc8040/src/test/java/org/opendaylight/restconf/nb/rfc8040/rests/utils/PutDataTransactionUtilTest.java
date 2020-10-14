@@ -225,8 +225,8 @@ public class PutDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
-        PutDataTransactionUtil.putData(payload, this.schema,
-                new MdsalRestconfStrategy(iidContext, transactionChainHandler), null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
+                null, null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -242,8 +242,8 @@ public class PutDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid2);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
-        PutDataTransactionUtil.putData(payload, this.schema,
-                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
+                null, null);
         verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -259,8 +259,8 @@ public class PutDataTransactionUtilTest {
                 .when(this.netconfService).getConfig(this.iid2);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
-        PutDataTransactionUtil.putData(payload, this.schema,
-                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
+                null, null);
         verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -281,8 +281,8 @@ public class PutDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
-        PutDataTransactionUtil.putData(payload, this.schema,
-                new MdsalRestconfStrategy(iidContext, transactionChainHandler), null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
+                null, null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -298,8 +298,8 @@ public class PutDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
-        PutDataTransactionUtil.putData(payload, this.schema,
-                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
+                null, null);
         verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -316,7 +316,7 @@ public class PutDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
         PutDataTransactionUtil.putData(payload, this.schema,
-                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+                new NetconfRestconfStrategy(netconfService), null, null);
         verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -336,8 +336,8 @@ public class PutDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        PutDataTransactionUtil.putData(payload, this.schema,
-                new MdsalRestconfStrategy(iidContext, transactionChainHandler), null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
+                null, null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());
     }
@@ -352,8 +352,8 @@ public class PutDataTransactionUtilTest {
                 .getConfig(this.iid2);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
-        PutDataTransactionUtil.putData(payload, this.schema,
-                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
+                null, null);
         verify(this.netconfService).getConfig(this.iid2);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, this.iid2,
                 payload.getData(), Optional.empty());
@@ -370,7 +370,7 @@ public class PutDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
         PutDataTransactionUtil.putData(payload, this.schema,
-                new NetconfRestconfStrategy(netconfService, iidContext), null, null);
+                new NetconfRestconfStrategy(netconfService), null, null);
         verify(this.netconfService).getConfig(this.iid2);
         verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION, this.iid2,
                 payload.getData(), Optional.empty());
