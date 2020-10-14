@@ -328,7 +328,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
             }
 
-            if (insert != Insert.BEFORE || insert != Insert.AFTER) {
+            if (insert != Insert.BEFORE && insert != Insert.AFTER) {
                 throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.",
                     RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
