@@ -53,6 +53,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataServi
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
@@ -207,7 +208,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private void createAllYangNotificationStreams(final RestconfStrategy strategy,
             final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
-        strategy.prepareReadWriteExecution();
+        final RestconfTransaction transaction = strategy.prepareWriteExecution();
         final boolean exist = checkExist(schemaContext, strategy);
 
         for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
@@ -217,18 +218,18 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final NotificationListenerAdapter notifiStreamJSON =
                 CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
                     NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamJSON);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction, exist, notifiStreamXML);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction, exist, notifiStreamJSON);
         }
         try {
-            strategy.commit().get();
+            transaction.commit().get();
         } catch (final InterruptedException | ExecutionException e) {
             throw new RestconfDocumentedException("Problem while putting data to DS.", e);
         }
     }
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo, final RestconfStrategy strategy, final boolean exist,
+            final UriInfo uriInfo, final RestconfTransaction transaction, final boolean exist,
             final NotificationListenerAdapter listener) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
         final NormalizedNode<?, ?> mapToStreams =
@@ -236,7 +237,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
         writeDataToDS(schemaContext,
-            listener.getSchemaPath().lastNodeIdentifier().getLocalName(), strategy, exist, mapToStreams);
+            listener.getSchemaPath().lastNodeIdentifier().getLocalName(), transaction, exist, mapToStreams);
     }
 
     private static boolean checkExist(final EffectiveModelContext schemaContext, final RestconfStrategy strategy) {
@@ -249,7 +250,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
-                                      final RestconfStrategy strategy, final boolean exist,
+                                      final RestconfTransaction transaction, final boolean exist,
                                       final NormalizedNode<?, ?> mapToStreams) {
         final String pathId;
         if (exist) {
@@ -257,7 +258,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         } else {
             pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
         }
-        strategy.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
+        transaction.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
             mapToStreams);
     }
 

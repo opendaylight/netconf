@@ -16,12 +16,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -65,14 +65,13 @@ final class FutureCallbackTx {
      *             type of operation (READ, POST, PUT, DELETE)
      * @param dataFactory
      *             factory setting result
-     * @param transactionChain
-     *             transaction chain
+     * @param strategy Strategy for various RESTCONF operations
      * @throws RestconfDocumentedException
      *             if the Future throws an exception
      */
     // FIXME: this is a *synchronous operation* and has to die
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
-            final FutureDataFactory<? super T> dataFactory, @Nullable final DOMTransactionChain transactionChain)
+            final FutureDataFactory<? super T> dataFactory, @Nullable final RestconfStrategy strategy)
             throws RestconfDocumentedException {
 
         try {
@@ -116,8 +115,8 @@ final class FutureCallbackTx {
                 throw new RestconfDocumentedException("Transaction failed", e);
             }
         } finally {
-            if (transactionChain != null) {
-                transactionChain.close();
+            if (strategy != null) {
+                strategy.close();
             }
         }
     }

@@ -221,14 +221,14 @@ public class PutDataTransactionUtilTest {
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
                 null, null);
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -277,14 +277,14 @@ public class PutDataTransactionUtilTest {
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
         PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
                 null, null);
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -333,13 +333,13 @@ public class PutDataTransactionUtilTest {
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
                 null, null);
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());
     }
 

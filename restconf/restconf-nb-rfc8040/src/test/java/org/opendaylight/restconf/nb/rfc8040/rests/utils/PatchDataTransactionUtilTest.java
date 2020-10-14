@@ -33,6 +33,7 @@ import org.mockito.Mockito;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -67,6 +68,8 @@ public class PatchDataTransactionUtilTest {
     private DOMTransactionChain transactionChain;
     @Mock
     private DOMDataTreeReadWriteTransaction rwTransaction;
+    @Mock
+    private DOMDataTreeReadTransaction readTransaction;
     @Mock
     private DOMDataBroker mockDataBroker;
     @Mock
@@ -170,6 +173,7 @@ public class PatchDataTransactionUtilTest {
 
         /* Mocks */
         doReturn(this.rwTransaction).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.readTransaction).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
     }
@@ -199,11 +203,11 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void testPatchDataCreateAndDelete() {
-        doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
+        doReturn(immediateFalseFluentFuture()).when(this.readTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.instanceIdContainer);
         Mockito.when(this.netconfService.getConfig(this.instanceIdContainer))
                 .thenReturn(immediateFluentFuture(Optional.empty()));
-        doReturn(immediateTrueFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
+        doReturn(immediateTrueFluentFuture()).when(this.readTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.targetNodeForCreateAndDelete);
         Mockito.when(this.netconfService.getConfig(this.targetNodeForCreateAndDelete))
                 .thenReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))));
@@ -226,7 +230,7 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void deleteNonexistentDataTest() {
-        doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
+        doReturn(immediateFalseFluentFuture()).when(this.readTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.targetNodeForCreateAndDelete);
         Mockito.when(this.netconfService.getConfig(this.targetNodeForCreateAndDelete))
                 .thenReturn(immediateFluentFuture(Optional.empty()));
@@ -245,8 +249,8 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void testPatchMergePutContainer() {
-        doReturn(immediateFalseFluentFuture()).doReturn(immediateTrueFluentFuture())
-                .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
+        doReturn(immediateFalseFluentFuture()).doReturn(immediateTrueFluentFuture()).when(this.readTransaction)
+            .exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityMerge =
                 new PatchEntity("edit1", MERGE, this.instanceIdContainer, this.buildBaseContainerForTests);

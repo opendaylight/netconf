@@ -182,7 +182,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(mockReadWriteTx).commit();
         doReturn(immediateFluentFuture(Optional.empty())).when(mockReadWriteTx).read(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
-        doReturn(immediateFalseFluentFuture()).when(mockReadWriteTx).exists(
+        doReturn(immediateFalseFluentFuture()).when(mockReadOnlyTx).exists(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         doReturn(mockReadOnlyTx).when(mockTxChain).newReadOnlyTransaction();
@@ -421,7 +421,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     @Test
     public void testDelete() throws OperationFailedException {
-        doReturn(immediateTrueFluentFuture()).when(mockReadWriteTx).exists(
+        doReturn(immediateTrueFluentFuture()).when(mockReadOnlyTx).exists(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
