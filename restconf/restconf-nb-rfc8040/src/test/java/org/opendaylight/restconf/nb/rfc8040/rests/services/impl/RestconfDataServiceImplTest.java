@@ -559,11 +559,11 @@ public class RestconfDataServiceImplTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(
                 this.iidBase, this.schemaNode, this.mountPoint, this.contextRef);
 
-        RestconfStrategy restconfStrategy = this.dataService.getRestconfStrategy(iidContext, this.mountPoint);
+        RestconfStrategy restconfStrategy = this.dataService.getRestconfStrategy(this.mountPoint);
         assertTrue(restconfStrategy instanceof MdsalRestconfStrategy);
 
         doReturn(Optional.of(this.netconfService)).when(this.mountPoint).getService(NetconfDataTreeService.class);
-        restconfStrategy = this.dataService.getRestconfStrategy(iidContext, this.mountPoint);
+        restconfStrategy = this.dataService.getRestconfStrategy(this.mountPoint);
         assertTrue(restconfStrategy instanceof NetconfRestconfStrategy);
     }
 }

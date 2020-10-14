@@ -18,7 +18,6 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -30,14 +29,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  * @see DOMDataTreeReadWriteTransaction
  */
 public class MdsalRestconfStrategy implements RestconfStrategy {
-    private final InstanceIdentifierContext<?> instanceIdentifier;
     private final DOMTransactionChain transactionChain;
-    private DOMDataTreeReadWriteTransaction rwTx;
     private final TransactionChainHandler transactionChainHandler;
 
-    public MdsalRestconfStrategy(final InstanceIdentifierContext<?> instanceIdentifier,
-                                 final TransactionChainHandler transactionChainHandler) {
-        this.instanceIdentifier = requireNonNull(instanceIdentifier);
+    private DOMDataTreeReadWriteTransaction rwTx;
+
+    public MdsalRestconfStrategy(final TransactionChainHandler transactionChainHandler) {
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         transactionChain = transactionChainHandler.get();
     }
@@ -64,27 +61,27 @@ public class MdsalRestconfStrategy implements RestconfStrategy {
     }
 
     @Override
-    public FluentFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path) {
+    public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         return rwTx.exists(store, path);
     }
 
     @Override
-    public void delete(LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         rwTx.delete(store, path);
     }
 
     @Override
-    public void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data) {
+    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
         rwTx.merge(store, path, data);
     }
 
     @Override
-    public void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data) {
+    public void create(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
         rwTx.put(store, path, data);
     }
 
     @Override
-    public void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data) {
+    public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
         create(store, path, data);
     }
 
@@ -99,17 +96,7 @@ public class MdsalRestconfStrategy implements RestconfStrategy {
     }
 
     @Override
-    public InstanceIdentifierContext<?> getInstanceIdentifier() {
-        return instanceIdentifier;
-    }
-
-    @Override
     public TransactionChainHandler getTransactionChainHandler() {
         return transactionChainHandler;
-    }
-
-    @Override
-    public RestconfStrategy buildStrategy(final InstanceIdentifierContext<?> instanceIdentifierContext) {
-        return new MdsalRestconfStrategy(instanceIdentifierContext, this.transactionChainHandler);
     }
 }

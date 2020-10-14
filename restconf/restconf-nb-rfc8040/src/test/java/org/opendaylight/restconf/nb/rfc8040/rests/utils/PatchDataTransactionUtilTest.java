@@ -193,8 +193,8 @@ public class PatchDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.instanceIdMerge, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
 
-        patch(patchContext, new MdsalRestconfStrategy(iidContext, transactionChainHandler), false);
-        patch(patchContext, new NetconfRestconfStrategy(netconfService, iidContext), false);
+        patch(patchContext, new MdsalRestconfStrategy(transactionChainHandler), false);
+        patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
     }
 
     @Test
@@ -220,8 +220,8 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
-        patch(patchContext, new MdsalRestconfStrategy(iidContext, transactionChainHandler), true);
-        patch(patchContext, new NetconfRestconfStrategy(netconfService, iidContext), true);
+        patch(patchContext, new MdsalRestconfStrategy(transactionChainHandler), true);
+        patch(patchContext, new NetconfRestconfStrategy(netconfService), true);
     }
 
     @Test
@@ -239,8 +239,8 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
-        delete(patchContext, new MdsalRestconfStrategy(iidContext, transactionChainHandler));
-        delete(patchContext, new NetconfRestconfStrategy(netconfService, iidContext));
+        delete(patchContext, new MdsalRestconfStrategy(transactionChainHandler));
+        delete(patchContext, new NetconfRestconfStrategy(netconfService));
     }
 
     @Test
@@ -257,8 +257,8 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
-        patch(patchContext, new MdsalRestconfStrategy(iidContext, transactionChainHandler), false);
-        patch(patchContext, new NetconfRestconfStrategy(netconfService, iidContext), false);
+        patch(patchContext, new MdsalRestconfStrategy(transactionChainHandler), false);
+        patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
     }
 
     private void patch(final PatchContext patchContext, final RestconfStrategy strategy,
@@ -275,7 +275,7 @@ public class PatchDataTransactionUtilTest {
         assertTrue(patchStatusContext.isOk());
     }
 
-    private void delete(PatchContext patchContext, RestconfStrategy strategy) {
+    private void delete(final PatchContext patchContext, final RestconfStrategy strategy) {
         final PatchStatusContext patchStatusContext =
                 PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
 
