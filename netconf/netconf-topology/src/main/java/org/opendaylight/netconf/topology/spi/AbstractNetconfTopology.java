@@ -304,7 +304,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                         PotentialSchemaSource.create(entry.getKey(), YangTextSchemaSource.class,
                             PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
-                return registrations;
+                return List.copyOf(registrations);
             }
         }
 
