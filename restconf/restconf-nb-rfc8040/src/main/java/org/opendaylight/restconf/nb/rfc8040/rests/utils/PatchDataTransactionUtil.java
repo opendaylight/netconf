@@ -179,7 +179,17 @@ public final class PatchDataTransactionUtil {
                                                     final YangInstanceIdentifier path,
                                                     final RestconfStrategy strategy) {
         LOG.trace("Delete {} within Restconf Patch: {}", dataStore.name(), path);
-        checkItemExistsWithinTransaction(strategy, dataStore, path);
+        final FluentFuture<Boolean> future = strategy.exists(dataStore, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
+
+        if (!response.result) {
+            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
+            throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                    path);
+        }
+
         strategy.delete(dataStore, path);
     }
 
@@ -277,29 +287,6 @@ public final class PatchDataTransactionUtil {
             } else {
                 strategy.replace(dataStore, path, payload);
             }
-        }
-    }
-
-    /**
-     * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
-     * data does NOT already exists.
-     *
-     * @param strategy      Object that perform the actual DS operations
-     * @param store         Datastore
-     * @param path          Path to be checked
-     */
-    public static void checkItemExistsWithinTransaction(final RestconfStrategy strategy,
-                                                        final LogicalDatastoreType store,
-                                                        final YangInstanceIdentifier path) {
-        final FluentFuture<Boolean> future = strategy.exists(store, path);
-        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
-        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
-
-        if (!response.result) {
-            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
-            throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                    path);
         }
     }
 
