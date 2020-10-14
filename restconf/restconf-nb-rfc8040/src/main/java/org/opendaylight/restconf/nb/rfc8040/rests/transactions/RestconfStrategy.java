@@ -14,7 +14,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -28,6 +31,27 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
 public abstract class RestconfStrategy {
+    RestconfStrategy() {
+        // Hidden on purpose
+    }
+
+    /**
+     * Look up the appropriate strategy for a particular mount point.
+     *
+     * @param mountPoint Target mount point
+     * @return A strategy, or null if the mount point does not expose a supported interface
+     * @throws NullPointerException if {@code mountPoint} is null
+     */
+    public static Optional<RestconfStrategy> forMountPoint(final DOMMountPoint mountPoint) {
+        final Optional<RestconfStrategy> netconf = mountPoint.getService(NetconfDataTreeService.class)
+            .map(NetconfRestconfStrategy::new);
+        if (netconf.isPresent()) {
+            return netconf;
+        }
+
+        return mountPoint.getService(DOMDataBroker.class).map(MdsalRestconfStrategy::new);
+    }
+
     /**
      * Lock the entire datastore.
      */
