@@ -76,8 +76,8 @@ public class DeleteDataTransactionUtilTest {
         Mockito.when(this.netconfService.getConfig(YangInstanceIdentifier.empty()))
                 .thenReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))));
         // test
-        delete(new MdsalRestconfStrategy(this.context, transactionChainHandler));
-        delete(new NetconfRestconfStrategy(netconfService, this.context));
+        delete(new MdsalRestconfStrategy(transactionChainHandler));
+        delete(new NetconfRestconfStrategy(netconfService));
     }
 
     /**
@@ -91,19 +91,19 @@ public class DeleteDataTransactionUtilTest {
         Mockito.when(this.netconfService.getConfig(YangInstanceIdentifier.empty()))
                 .thenReturn(immediateFluentFuture(Optional.empty()));
         // test and assert error
-        deleteFail(new MdsalRestconfStrategy(this.context, transactionChainHandler));
-        deleteFail(new NetconfRestconfStrategy(netconfService, this.context));
+        deleteFail(new MdsalRestconfStrategy(transactionChainHandler));
+        deleteFail(new NetconfRestconfStrategy(netconfService));
     }
 
     private void delete(final RestconfStrategy strategy) {
-        final Response response = DeleteDataTransactionUtil.deleteData(strategy);
+        final Response response = DeleteDataTransactionUtil.deleteData(strategy, context.getInstanceIdentifier());
         // assert success
         assertEquals("Not expected response received", Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     private void deleteFail(final RestconfStrategy strategy) {
         try {
-            DeleteDataTransactionUtil.deleteData(strategy);
+            DeleteDataTransactionUtil.deleteData(strategy, context.getInstanceIdentifier());
             fail("Delete operation should fail due to missing data");
         } catch (final RestconfDocumentedException e) {
             assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());

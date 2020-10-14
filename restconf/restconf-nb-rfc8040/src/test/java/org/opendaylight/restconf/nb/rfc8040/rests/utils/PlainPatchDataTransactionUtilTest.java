@@ -174,14 +174,12 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
-        PlainPatchDataTransactionUtil.patchData(payload,
-                new MdsalRestconfStrategy(iidContext, transactionChainHandler),
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
                 this.schema);
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
-        PlainPatchDataTransactionUtil.patchData(payload,
-                new NetconfRestconfStrategy(netconfService, iidContext),
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
                 this.schema);
         verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -203,12 +201,12 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(iidContext, transactionChainHandler),
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
                 this.schema);
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService, iidContext),
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
                 this.schema);
         verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -230,12 +228,11 @@ public class PlainPatchDataTransactionUtilTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
-        PlainPatchDataTransactionUtil.patchData(payload,
-                new MdsalRestconfStrategy(iidContext, transactionChainHandler),
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
                 this.schema);
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService, iidContext),
+        PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
                 this.schema);
         verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData(),
                 Optional.empty());

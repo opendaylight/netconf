@@ -24,7 +24,6 @@ import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -38,14 +37,11 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfRestconfStrategy.class);
 
     private final NetconfDataTreeService netconfService;
-    private final InstanceIdentifierContext<?> instanceIdentifier;
 
     private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures;
 
-    public NetconfRestconfStrategy(final NetconfDataTreeService netconfService,
-                                   final InstanceIdentifierContext<?> instanceIdentifier) {
+    public NetconfRestconfStrategy(final NetconfDataTreeService netconfService) {
         this.netconfService = requireNonNull(netconfService);
-        this.instanceIdentifier = requireNonNull(instanceIdentifier);
     }
 
     @Override
@@ -118,22 +114,12 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
         return null;
     }
 
-    @Override
-    public InstanceIdentifierContext<?> getInstanceIdentifier() {
-        return instanceIdentifier;
-    }
-
     /**
      * As we are not using any transactions here, always return null.
      */
     @Override
     public TransactionChainHandler getTransactionChainHandler() {
         return null;
-    }
-
-    @Override
-    public RestconfStrategy buildStrategy(final InstanceIdentifierContext<?> instanceIdentifierContext) {
-        return new NetconfRestconfStrategy(this.netconfService, instanceIdentifierContext);
     }
 
     private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {

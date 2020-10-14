@@ -30,9 +30,8 @@ public final class DeleteDataTransactionUtil {
      * @param strategy object that perform the actual DS operations
      * @return {@link Response}
      */
-    public static Response deleteData(final RestconfStrategy strategy) {
+    public static Response deleteData(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
         strategy.prepareReadWriteExecution();
-        final YangInstanceIdentifier path = strategy.getInstanceIdentifier().getInstanceIdentifier();
         TransactionUtil.checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
                 RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
         strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
