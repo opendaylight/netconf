@@ -12,13 +12,19 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Util class for delete specific data in config DS.
  */
 public final class DeleteDataTransactionUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(DeleteDataTransactionUtil.class);
 
     private DeleteDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
@@ -32,7 +38,7 @@ public final class DeleteDataTransactionUtil {
      */
     public static Response deleteData(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
         strategy.prepareReadWriteExecution();
-        TransactionUtil.checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
+        checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
                 RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
         strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
         final FluentFuture<? extends CommitInfo> future = strategy.commit();
@@ -41,5 +47,33 @@ public final class DeleteDataTransactionUtil {
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response,
                 strategy.getTransactionChain());
         return response.build();
+    }
+
+
+    /**
+     * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
+     * data does NOT already exists.
+     *
+     * @param strategy      Object that perform the actual DS operations
+     * @param store         Datastore
+     * @param path          Path to be checked
+     * @param operationType Type of operation (READ, POST, PUT, DELETE...)
+     */
+    private static void checkItemExists(final RestconfStrategy strategy,
+                                        final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                                        final String operationType) {
+        final FluentFuture<Boolean> future = strategy.exists(store, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, operationType, response);
+
+        if (!response.result) {
+            // close transaction
+            strategy.cancel();
+            // throw error
+            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
+            throw new RestconfDocumentedException(
+                    "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
+        }
     }
 }
