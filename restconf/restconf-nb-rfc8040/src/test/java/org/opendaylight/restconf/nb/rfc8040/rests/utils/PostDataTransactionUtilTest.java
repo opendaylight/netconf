@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -174,7 +173,7 @@ public class PostDataTransactionUtilTest {
     }
 
     @Test
-    public void testPostListData() throws UnsupportedEncodingException {
+    public void testPostListData() {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iidList, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildList);
@@ -184,7 +183,8 @@ public class PostDataTransactionUtilTest {
         final NodeIdentifierWithPredicates identifier = entryNode.getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doReturn(read).when(this.transactionChain).newReadOnlyTransaction();
+        doReturn(immediateFalseFluentFuture()).when(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
@@ -194,7 +194,7 @@ public class PostDataTransactionUtilTest {
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
 
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,

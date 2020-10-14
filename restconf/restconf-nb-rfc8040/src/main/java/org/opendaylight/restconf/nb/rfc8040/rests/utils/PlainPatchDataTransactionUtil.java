@@ -17,6 +17,7 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -46,25 +47,24 @@ public final class PlainPatchDataTransactionUtil {
                                      final RestconfStrategy strategy,
                                      final EffectiveModelContext schemaContext) {
 
-        strategy.prepareReadWriteExecution();
+        final RestconfTransaction transaction = strategy.prepareWriteExecution();
         YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
         NormalizedNode<?, ?> data = payload.getData();
 
         try {
             LOG.trace("Merge CONFIGURATION within Restconf Patch: {} with payload {}", path, data);
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-            strategy.merge(LogicalDatastoreType.CONFIGURATION, path, data);
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+            transaction.merge(LogicalDatastoreType.CONFIGURATION, path, data);
         } catch (final RestconfDocumentedException e) {
-            strategy.cancel();
+            transaction.cancel();
             throw new IllegalArgumentException(e);
         }
 
-        final FluentFuture<? extends CommitInfo> future = strategy.commit();
+        final FluentFuture<? extends CommitInfo> future = transaction.commit();
         final ResponseFactory response = new ResponseFactory(Status.OK);
 
-        FutureCallbackTx.addCallback(future, PatchDataTransactionUtil.PATCH_TX_TYPE, response,
-                strategy.getTransactionChain()); // closes transactionChain if any, may throw
-
+        // closes transactionChain if any, may throw
+        FutureCallbackTx.addCallback(future, PatchDataTransactionUtil.PATCH_TX_TYPE, response, strategy, path);
         return response.build();
     }
 }
