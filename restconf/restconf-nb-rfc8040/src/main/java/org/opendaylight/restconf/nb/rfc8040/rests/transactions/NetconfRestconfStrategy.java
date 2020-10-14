@@ -15,23 +15,12 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import java.util.List;
 import java.util.Optional;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,21 +34,13 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     private final NetconfDataTreeService netconfService;
 
-    private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures;
-
     public NetconfRestconfStrategy(final NetconfDataTreeService netconfService) {
         this.netconfService = requireNonNull(netconfService);
     }
 
     @Override
-    public void prepareReadWriteExecution() {
-        resultsFutures = netconfService.lock();
-    }
-
-    @Override
-    public void cancel() {
-        netconfService.discardChanges();
-        netconfService.unlock();
+    public RestconfTransaction prepareWriteExecution() {
+        return new NetconfRestconfTransaction(netconfService);
     }
 
     @Override
@@ -83,77 +64,6 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         return remapException(read(store, path))
                 .transform(optionalNode -> optionalNode != null && optionalNode.isPresent(),
                         MoreExecutors.directExecutor());
-    }
-
-    @Override
-    public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        resultsFutures.add(netconfService.delete(store, path));
-    }
-
-    @Override
-    public void remove(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        resultsFutures.add(netconfService.remove(store, path));
-    }
-
-    @Override
-    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                      final NormalizedNode<?, ?> data) {
-        resultsFutures.add(netconfService.merge(store, path, data, Optional.empty()));
-    }
-
-    @Override
-    public void create(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                       final NormalizedNode<?, ?> data, final SchemaContext schemaContext) {
-        if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubTree.getIdentifier()),
-                emptySubTree);
-
-            for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
-                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-                resultsFutures.add(netconfService.create(store, childPath, child, Optional.empty()));
-            }
-        } else {
-            resultsFutures.add(netconfService.create(store, path, data, Optional.empty()));
-        }
-    }
-
-    @Override
-    public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                        final NormalizedNode<?, ?> data, final SchemaContext schemaContext) {
-        if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubTree.getIdentifier()),
-                emptySubTree);
-
-            for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
-                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-                resultsFutures.add(netconfService.replace(store, childPath, child, Optional.empty()));
-            }
-        } else {
-            resultsFutures.add(netconfService.replace(store, path, data, Optional.empty()));
-        }
-    }
-
-    @Override
-    public FluentFuture<? extends @NonNull CommitInfo> commit() {
-        return FluentFuture.from(netconfService.commit(resultsFutures));
-    }
-
-    /**
-     * As we are not using any transactions here, always return null.
-     */
-    @Override
-    public DOMTransactionChain getTransactionChain() {
-        return null;
-    }
-
-    /**
-     * As we are not using any transactions here, always return null.
-     */
-    @Override
-    public TransactionChainHandler getTransactionChainHandler() {
-        return null;
     }
 
     private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {

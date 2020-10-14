@@ -16,13 +16,13 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -66,38 +66,18 @@ final class FutureCallbackTx {
      *             type of operation (READ, POST, PUT, DELETE)
      * @param dataFactory
      *             factory setting result
-     * @param transactionChain
-     *             transaction chain
+     * @param strategy Strategy for various RESTCONF operations
+     * @param path unique identifier of a particular node instance in the data tree
      * @throws RestconfDocumentedException
      *             if the Future throws an exception
      */
     // FIXME: this is a *synchronous operation* and has to die
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
                                 final FutureDataFactory<? super T> dataFactory,
-                                @Nullable final DOMTransactionChain transactionChain)
+                                @Nullable final RestconfStrategy strategy,
+                                final YangInstanceIdentifier path)
         throws RestconfDocumentedException {
-        addCallback(listenableFuture, txType, dataFactory, transactionChain, null);
-    }
 
-    /**
-     * Add callback to the future object and close transaction chain.
-     *
-     * @param listenableFuture
-     *             future object
-     * @param txType
-     *             type of operation (READ, POST, PUT, DELETE)
-     * @param dataFactory
-     *             factory setting result
-     * @param transactionChain
-     *             transaction chain
-     * @param path
-     *             unique identifier of a particular node instance in the data tree.
-     * @throws RestconfDocumentedException
-     *             if the Future throws an exception
-     */
-    static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
-            final FutureDataFactory<? super T> dataFactory, @Nullable final DOMTransactionChain transactionChain,
-                                YangInstanceIdentifier path) throws RestconfDocumentedException {
         try {
             final T result = listenableFuture.get();
             dataFactory.setResult(result);
@@ -153,8 +133,8 @@ final class FutureCallbackTx {
                 throw new RestconfDocumentedException("Transaction failed", e);
             }
         } finally {
-            if (transactionChain != null) {
-                transactionChain.close();
+            if (strategy != null) {
+                strategy.close();
             }
         }
     }

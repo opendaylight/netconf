@@ -16,6 +16,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,18 +39,18 @@ public final class DeleteDataTransactionUtil {
      * @return {@link Response}
      */
     public static Response deleteData(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
-        strategy.prepareReadWriteExecution();
+        final RestconfTransaction transaction = strategy.prepareWriteExecution();
         try {
-            strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
+            transaction.delete(LogicalDatastoreType.CONFIGURATION, path);
         } catch (RestconfDocumentedException e) {
             // close transaction if any and pass exception further
-            strategy.cancel();
+            transaction.cancel();
             throw e;
         }
-        final FluentFuture<? extends CommitInfo> future = strategy.commit();
+        final FluentFuture<? extends CommitInfo> future = transaction.commit();
         final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, strategy.getTransactionChain(), path);
+        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, strategy, path);
         return response.build();
     }
 
@@ -57,17 +58,15 @@ public final class DeleteDataTransactionUtil {
      * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
      * data does NOT already exists.
      *
-     * @param strategy      Object that perform the actual DS operations
-     * @param store         Datastore
-     * @param path          Path to be checked
-     * @param operationType Type of operation (READ, POST, PUT, DELETE...)
+     * @param isExistsFuture if checked data exists
+     * @param path           Path to be checked
+     * @param operationType  Type of operation (READ, POST, PUT, DELETE...)
      */
-    public static void checkItemExists(final RestconfStrategy strategy,
-                                       final LogicalDatastoreType store, final YangInstanceIdentifier path,
+    public static void checkItemExists(final FluentFuture<Boolean> isExistsFuture,
+                                       final YangInstanceIdentifier path,
                                        final String operationType) {
-        final FluentFuture<Boolean> future = strategy.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-        FutureCallbackTx.addCallback(future, operationType, response);
+        FutureCallbackTx.addCallback(isExistsFuture, operationType, response);
 
         if (!response.result) {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
