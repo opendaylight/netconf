@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
@@ -19,7 +20,9 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
@@ -571,5 +574,51 @@ public class ReadDataTransactionUtilTest {
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
         assertNull(writerParameters.getWithDefault());
         assertFalse(writerParameters.isTagged());
+    }
+
+    /**
+     * Test when parameter is present at most once.
+     */
+    @Test
+    public void checkParameterCountTest() {
+        ReadDataTransactionUtil.checkParameterCount(List.of("all"), RestconfDataServiceConstant.ReadData.CONTENT);
+    }
+
+    /**
+     * Test when parameter is present more than once.
+     */
+    @Test
+    public void checkParameterCountNegativeTest() {
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ReadDataTransactionUtil.checkParameterCount(List.of("config", "nonconfig", "all"),
+                    RestconfDataServiceConstant.ReadData.CONTENT));
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Error status code is not correct", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
+    }
+
+
+    /**
+     * Test when all parameters are allowed.
+     */
+    @Test
+    public void checkParametersTypesTest() {
+        ReadDataTransactionUtil.checkParametersTypes(RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                Set.of("content"),
+                RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH);
+    }
+
+    /**
+     * Test when not allowed parameter type is used.
+     */
+    @Test
+    public void checkParametersTypesNegativeTest() {
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ReadDataTransactionUtil.checkParametersTypes(RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                    Set.of("not-allowed-parameter"),
+                    RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH));
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Error status code is not correct", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 }

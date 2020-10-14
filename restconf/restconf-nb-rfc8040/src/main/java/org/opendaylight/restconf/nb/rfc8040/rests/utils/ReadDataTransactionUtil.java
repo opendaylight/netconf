@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
@@ -14,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
@@ -26,6 +29,8 @@ import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -95,8 +100,7 @@ public final class ReadDataTransactionUtil {
         }
 
         // check only allowed parameters
-        ParametersUtil.checkParametersTypes(
-                RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+        checkParametersTypes(RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
                 uriInfo.getQueryParameters().keySet(),
                 RestconfDataServiceConstant.ReadData.CONTENT,
                 RestconfDataServiceConstant.ReadData.DEPTH,
@@ -118,10 +122,10 @@ public final class ReadDataTransactionUtil {
                 Collections.emptyList());
 
         // parameter can be in URI at most once
-        ParametersUtil.checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
-        ParametersUtil.checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
-        ParametersUtil.checkParameterCount(fields, RestconfDataServiceConstant.ReadData.FIELDS);
-        ParametersUtil.checkParameterCount(fields, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
+        checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
+        checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
+        checkParameterCount(fields, RestconfDataServiceConstant.ReadData.FIELDS);
+        checkParameterCount(fields, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
 
         // check and set content
         final String contentValue = content.get(0);
@@ -220,6 +224,45 @@ public final class ReadDataTransactionUtil {
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
                                 "The content parameter value must be either config, nonconfig or all (default)"));
+        }
+    }
+
+
+    /**
+     * Check if URI does not contain value for the same parameter more than once.
+     *
+     * @param parameterValues URI parameter values
+     * @param parameterName URI parameter name
+     */
+    @VisibleForTesting
+    static void checkParameterCount(final @NonNull List<String> parameterValues, final @NonNull String parameterName) {
+        if (parameterValues.size() > 1) {
+            throw new RestconfDocumentedException(
+                    "Parameter " + parameterName + " can appear at most once in request URI",
+                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
+    }
+
+    /**
+     * Check if URI does not contain not allowed parameters for specified operation.
+     *
+     * @param operationType type of operation (READ, POST, PUT, DELETE...)
+     * @param usedParameters parameters used in URI request
+     * @param allowedParameters allowed parameters for operation
+     */
+    @VisibleForTesting
+    static void checkParametersTypes(final @NonNull String operationType,
+                                     final @NonNull Set<String> usedParameters,
+                                     final @NonNull String... allowedParameters) {
+        // FIXME: there should be a speedier way to do this
+        final Set<String> notAllowedParameters = Sets.newHashSet(usedParameters);
+        notAllowedParameters.removeAll(Sets.newHashSet(allowedParameters));
+
+        if (!notAllowedParameters.isEmpty()) {
+            throw new RestconfDocumentedException(
+                    "Not allowed parameters for " + operationType + " operation: " + notAllowedParameters,
+                    RestconfError.ErrorType.PROTOCOL,
+                    RestconfError.ErrorTag.INVALID_VALUE);
         }
     }
 
