@@ -139,6 +139,7 @@ public class PostDataTransactionUtilTest {
 
         doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/16/")).when(this.uriInfo).getBaseUriBuilder();
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
@@ -150,13 +151,13 @@ public class PostDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+        doReturn(immediateFalseFluentFuture()).when(this.read).exists(LogicalDatastoreType.CONFIGURATION,
             this.iid2);
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid2);
         final NodeIdentifier identifier =
                 ((ContainerNode) ((Collection<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
-                payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
+            payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
@@ -164,7 +165,7 @@ public class PostDataTransactionUtilTest {
         Response response = PostDataTransactionUtil.postData(this.uriInfo, payload,
                         new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
         assertEquals(201, response.getStatus());
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
@@ -187,7 +188,7 @@ public class PostDataTransactionUtilTest {
         final NodeIdentifierWithPredicates identifier = entryNode.getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doReturn(immediateFalseFluentFuture()).when(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
@@ -198,17 +199,17 @@ public class PostDataTransactionUtilTest {
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
 
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,
-                new NetconfRestconfStrategy(netconfService), this.schema, null, null);
+            new NetconfRestconfStrategy(netconfService), this.schema, null, null);
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
-                containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
+            containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
         verify(this.netconfService).getConfig(node);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, node, entryNode,
-                Optional.empty());
+            Optional.empty());
     }
 
     @Test
@@ -217,13 +218,13 @@ public class PostDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+        doReturn(immediateFalseFluentFuture()).when(this.read).exists(LogicalDatastoreType.CONFIGURATION,
             this.iid2);
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid2);
         final NodeIdentifier identifier =
                 ((ContainerNode) ((Collection<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
-                payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
+            payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
         final DOMException domException = new DOMException((short) 414, "Post request failed");
         doReturn(immediateFailedFluentFuture(domException)).when(this.readWrite).commit();
@@ -238,7 +239,7 @@ public class PostDataTransactionUtilTest {
             assertTrue(e.getErrors().get(0).getErrorInfo().contains(domException.getMessage()));
         }
 
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 

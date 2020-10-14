@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -31,30 +29,18 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  */
 public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMTransactionChain transactionChain;
-    private final TransactionChainHandler transactionChainHandler;
-
-    private DOMDataTreeReadWriteTransaction rwTx;
 
     public MdsalRestconfStrategy(final DOMDataBroker dataBroker) {
         this(new TransactionChainHandler(dataBroker));
     }
 
     public MdsalRestconfStrategy(final TransactionChainHandler transactionChainHandler) {
-        this.transactionChainHandler = requireNonNull(transactionChainHandler);
-        transactionChain = transactionChainHandler.get();
+        transactionChain = requireNonNull(transactionChainHandler).get();
     }
 
     @Override
-    public void prepareReadWriteExecution() {
-        rwTx = transactionChain.newReadWriteTransaction();
-    }
-
-    @Override
-    public void cancel() {
-        if (rwTx != null) {
-            rwTx.cancel();
-        }
-        transactionChain.close();
+    public RestconfTransaction prepareWriteExecution() {
+        return new MdsalRestconfTransaction(transactionChain);
     }
 
     @Override
@@ -67,44 +53,13 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     @Override
     public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        return rwTx.exists(store, path);
+        try (DOMDataTreeReadTransaction tx = transactionChain.newReadOnlyTransaction()) {
+            return tx.exists(store, path);
+        }
     }
 
     @Override
-    public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        rwTx.delete(store, path);
-    }
-
-    @Override
-    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data) {
-        rwTx.merge(store, path, data);
-    }
-
-    @Override
-    public void create(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data) {
-        rwTx.put(store, path, data);
-    }
-
-    @Override
-    public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data) {
-        create(store, path, data);
-    }
-
-    @Override
-    public FluentFuture<? extends @NonNull CommitInfo> commit() {
-        return rwTx.commit();
-    }
-
-    @Override
-    public DOMTransactionChain getTransactionChain() {
-        return transactionChain;
-    }
-
-    @Override
-    public TransactionChainHandler getTransactionChainHandler() {
-        return transactionChainHandler;
+    public void close() {
+        transactionChain.close();
     }
 }
