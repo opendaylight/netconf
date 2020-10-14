@@ -20,7 +20,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Util class for common methods of transactions.
- *
  */
 public final class TransactionUtil {
     private TransactionUtil() {
@@ -34,6 +33,8 @@ public final class TransactionUtil {
      * @param schemaContext {@link SchemaContext}
      * @param strategy      object that perform the actual DS operations
      */
+    // FIXME: this method should only be invoked in MdsalRestconfStrategy, and even then only if we are crossing
+    //        an implicit list.
     public static void ensureParentsByMerge(final YangInstanceIdentifier path, final SchemaContext schemaContext,
                                             final RestconfStrategy strategy) {
         final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
