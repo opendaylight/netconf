@@ -58,6 +58,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
@@ -84,11 +85,12 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public class RestconfDataServiceImpl implements RestconfDataService {
+    // FIXME: we should be able to interpret 'point' and refactor this class into a behavior
     private static final class QueryParams implements Immutable {
         final @Nullable String point;
-        final @Nullable String insert;
+        final @Nullable Insert insert;
 
-        QueryParams(final @Nullable String insert, final @Nullable String point) {
+        QueryParams(final @Nullable Insert insert, final @Nullable String point) {
             this.insert = insert;
             this.point = point;
         }
@@ -281,28 +283,33 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private static QueryParams checkQueryParameters(final UriInfo uriInfo) {
         boolean insertUsed = false;
         boolean pointUsed = false;
-        String insert = null;
+        Insert insert = null;
         String point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
                 case INSERT:
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().get(0);
-                    } else {
+                    if (insertUsed) {
                         throw new RestconfDocumentedException("Insert parameter can be used only once.",
-                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                    }
+
+                    insertUsed = true;
+                    final String str = entry.getValue().get(0);
+                    insert = Insert.valueOf(str);
+                    if (insert == null) {
+                        throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
+                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
                     }
                     break;
                 case POINT:
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().get(0);
-                    } else {
+                    if (pointUsed) {
                         throw new RestconfDocumentedException("Point parameter can be used only once.",
-                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
                     }
+
+                    pointUsed = true;
+                    point = entry.getValue().get(0);
                     break;
                 default:
                     throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey(),
@@ -314,15 +321,18 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return new QueryParams(insert, point);
     }
 
-    private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed, final String insert) {
-        if (pointUsed && !insertUsed) {
-            throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.",
+    private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed, final Insert insert) {
+        if (pointUsed) {
+            if (!insertUsed) {
+                throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.",
                     RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-        }
-        if (pointUsed && (insert.equals("first") || insert.equals("last"))) {
-            throw new RestconfDocumentedException(
+            }
+
+            if (insert != Insert.BEFORE || insert != Insert.AFTER) {
+                throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.",
                     RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+            }
         }
     }
 
