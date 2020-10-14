@@ -397,14 +397,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     // FIXME: why is this synchronized?
     public synchronized RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
+        final TransactionChainHandler transactionChain;
         if (mountPoint != null) {
             final Optional<NetconfDataTreeService> service = mountPoint.getService(NetconfDataTreeService.class);
             if (service.isPresent()) {
                 return new NetconfRestconfStrategy(service.get());
             }
+            transactionChain = transactionChainOfMountPoint(mountPoint);
+        } else {
+            transactionChain = transactionChainHandler;
         }
-        final TransactionChainHandler transactionChain = mountPoint == null
-                ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
         return new MdsalRestconfStrategy(transactionChain);
     }
 
