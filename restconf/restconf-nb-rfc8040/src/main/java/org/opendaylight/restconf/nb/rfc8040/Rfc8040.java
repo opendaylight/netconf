@@ -8,6 +8,10 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import java.net.URI;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.Deviation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.Submodule;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -107,25 +111,12 @@ public final class Rfc8040 {
             throw new UnsupportedOperationException("Util class");
         }
 
-        public static final String NAME = "ietf-yang-library";
-        public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-yang-library";
-        public static final URI URI_MODULE = URI.create(NAMESPACE);
-        public static final Revision REVISION =  Revision.of("2016-06-21");
+        public static final QNameModule MODULE_QNAME = $YangModuleInfoImpl.getInstance().getName().getModule();
+        public static final Revision REVISION = MODULE_QNAME.getRevision().orElseThrow();
 
-        public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, REVISION).intern();
+        public static final QName MODULE_SET_ID_LEAF_QNAME = QName.create(MODULE_QNAME, "module-set-id").intern();
 
-        public static final String MODULE_SET_ID_LEAF = "module-set-id";
-        public static final QName MODULE_SET_ID_LEAF_QNAME = QName.create(MODULE_QNAME, MODULE_SET_ID_LEAF).intern();
-
-        public static final String GROUPING_MODULE_LIST = "module-list";
-        public static final QName GROUPING_MODULE_LIST_QNAME = QName.create(MODULE_QNAME, GROUPING_MODULE_LIST)
-                .intern();
-
-        public static final String MODULES_STATE_CONT = "modules-state";
-        public static final QName MODUELS_STATE_CONT_QNAME = QName.create(MODULE_QNAME, MODULES_STATE_CONT).intern();
-
-        public static final String MODULE_LIST = "module";
-        public static final QName MODULE_QNAME_LIST = QName.create(MODULE_QNAME, MODULE_LIST).intern();
+        public static final QName MODULE_QNAME_LIST = Module.QNAME;
 
         public static final String SPECIFIC_MODULE_NAME_LEAF = "name";
         public static final QName SPECIFIC_MODULE_NAME_LEAF_QNAME =
@@ -136,29 +127,19 @@ public final class Rfc8040 {
                 QName.create(MODULE_QNAME, SPECIFIC_MODULE_REVISION_LEAF).intern();
 
         public static final String BASE_URI_OF_SCHEMA = "/modules/";
-        public static final String SPECIFIC_MODULE_SCHEMA_LEAF = "schema";
-        public static final QName SPECIFIC_MODULE_SCHEMA_LEAF_QNAME =
-                QName.create(MODULE_QNAME, SPECIFIC_MODULE_SCHEMA_LEAF).intern();
-
-        public static final String SPECIFIC_MODULE_NAMESPACE_LEAF = "namespace";
+        public static final QName SPECIFIC_MODULE_SCHEMA_LEAF_QNAME = QName.create(MODULE_QNAME, "schema").intern();
         public static final QName SPECIFIC_MODULE_NAMESPACE_LEAF_QNAME =
-                QName.create(MODULE_QNAME, SPECIFIC_MODULE_NAMESPACE_LEAF).intern();
+                QName.create(MODULE_QNAME, "namespace").intern();
 
-        public static final String SPECIFIC_MODULE_FEATURE_LEAF_LIST = "feature";
         public static final QName SPECIFIC_MODULE_FEATURE_LEAF_LIST_QNAME =
-                QName.create(MODULE_QNAME, SPECIFIC_MODULE_FEATURE_LEAF_LIST).intern();
+                QName.create(MODULE_QNAME, "feature").intern();
 
-        public static final String SPECIFIC_MODULE_DEVIATION_LIST = "deviation";
-        public static final QName SPECIFIC_MODULE_DEVIATION_LIST_QNAME =
-                QName.create(MODULE_QNAME, SPECIFIC_MODULE_DEVIATION_LIST).intern();
+        public static final QName SPECIFIC_MODULE_DEVIATION_LIST_QNAME = Deviation.QNAME;
 
-        public static final String SPECIFIC_MODULE_CONFORMANCE_LEAF = "conformance-type";
         public static final QName SPECIFIC_MODULE_CONFORMANCE_LEAF_QNAME =
-                QName.create(MODULE_QNAME, SPECIFIC_MODULE_CONFORMANCE_LEAF).intern();
+                QName.create(MODULE_QNAME, "conformance-type").intern();
 
-        public static final String SPECIFIC_MODULE_SUBMODULE_LIST = "submodule";
-        public static final QName SPECIFIC_MODULE_SUBMODULE_LIST_QNAME =
-                QName.create(MODULE_QNAME, SPECIFIC_MODULE_SUBMODULE_LIST).intern();
+        public static final QName SPECIFIC_MODULE_SUBMODULE_LIST_QNAME = Submodule.QNAME;
     }
 
     /**
