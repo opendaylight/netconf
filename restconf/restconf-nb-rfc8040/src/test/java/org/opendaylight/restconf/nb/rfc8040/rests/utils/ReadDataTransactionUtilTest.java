@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -40,6 +41,7 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -47,6 +49,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -512,14 +515,30 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        final String preparedDefaultValue = "sample-default";
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                Collections.singletonList(preparedDefaultValue));
+        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, Collections.singletonList("explicit"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
-        assertEquals(preparedDefaultValue, writerParameters.getWithDefault());
+        assertSame(WithDefaults.EXPLICIT.value(), writerParameters.getWithDefault());
         assertFalse(writerParameters.isTagged());
+    }
+
+    /**
+     * Testing parsing of with-defaults parameter which value which is not supported.
+     */
+    @Test
+    public void parseUriParametersWithDefaultInvalidTest() {
+        // preparation of input data
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, Collections.singletonList("invalid"));
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+        final List<RestconfError> errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorTag.INVALID_VALUE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -532,7 +551,7 @@ public class ReadDataTransactionUtilTest {
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                Collections.singletonList(ReadData.REPORT_ALL_TAGGED_DEFAULT_VALUE));
+                Collections.singletonList(ReadData.WithDefaults.REPORT_ALL_TAGGED.value()));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -550,7 +569,7 @@ public class ReadDataTransactionUtilTest {
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                Collections.singletonList(ReadData.REPORT_ALL_DEFAULT_VALUE));
+                Collections.singletonList(ReadData.WithDefaults.REPORT_ALL.value()));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
