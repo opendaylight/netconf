@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public final class TransactionUtil {
-
     private static final Logger LOG = LoggerFactory.getLogger(TransactionUtil.class);
 
     private TransactionUtil() {
@@ -68,33 +67,6 @@ public final class TransactionUtil {
         final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
         strategy.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
-    }
-
-    /**
-     * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
-     * data does NOT already exists.
-     *
-     * @param strategy      Object that perform the actual DS operations
-     * @param store         Datastore
-     * @param path          Path to be checked
-     * @param operationType Type of operation (READ, POST, PUT, DELETE...)
-     */
-    public static void checkItemExists(final RestconfStrategy strategy,
-                                       final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                                       final String operationType) {
-        final FluentFuture<Boolean> future = strategy.exists(store, path);
-        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
-        FutureCallbackTx.addCallback(future, operationType, response);
-
-        if (!response.result) {
-            // close transaction
-            strategy.cancel();
-            // throw error
-            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
-            throw new RestconfDocumentedException(
-                    "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
-        }
     }
 
     /**
