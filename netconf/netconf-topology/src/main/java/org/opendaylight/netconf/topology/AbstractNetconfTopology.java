@@ -400,7 +400,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
         }
-        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, registeredYangLibSources);
+        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, List.copyOf(registeredYangLibSources));
     }
 
     protected NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final NodeId nodeId, final NetconfNode node) {
