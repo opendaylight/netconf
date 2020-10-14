@@ -270,7 +270,7 @@ public final class PutDataTransactionUtil {
                                                 final EffectiveModelContext schemaContext,
                                                 final RestconfStrategy strategy,
                                                 final DataSchemaNode schemaNode) {
-        return ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, path, strategy,
+        return ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, path, strategy, null,
             schemaContext);
     }
 
