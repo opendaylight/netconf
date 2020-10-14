@@ -25,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -47,6 +48,8 @@ public class DeleteDataTransactionUtilTest {
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
+    private DOMDataTreeReadTransaction read;
+    @Mock
     private DOMDataBroker mockDataBroker;
     @Mock
     private NetconfDataTreeService netconfService;
@@ -57,6 +60,7 @@ public class DeleteDataTransactionUtilTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
         Mockito.when(this.transactionChain.newReadWriteTransaction()).thenReturn(this.readWrite);
+        Mockito.when(this.transactionChain.newReadOnlyTransaction()).thenReturn(this.read);
         Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
         Mockito.when(this.context.getInstanceIdentifier()).thenReturn(YangInstanceIdentifier.empty());
@@ -71,7 +75,7 @@ public class DeleteDataTransactionUtilTest {
     @Test
     public void deleteData() {
         // assert that data to delete exists
-        Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
+        Mockito.when(this.transactionChain.newReadOnlyTransaction().exists(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.empty())).thenReturn(immediateTrueFluentFuture());
         Mockito.when(this.netconfService.getConfig(YangInstanceIdentifier.empty()))
                 .thenReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))));
@@ -86,7 +90,7 @@ public class DeleteDataTransactionUtilTest {
     @Test
     public void deleteDataNegativeTest() {
         // assert that data to delete does NOT exist
-        Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
+        Mockito.when(this.transactionChain.newReadOnlyTransaction().exists(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.empty())).thenReturn(immediateFalseFluentFuture());
         Mockito.when(this.netconfService.getConfig(YangInstanceIdentifier.empty()))
                 .thenReturn(immediateFluentFuture(Optional.empty()));

@@ -370,7 +370,7 @@ public class RestconfDataServiceImplTest {
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(immediateTrueFluentFuture()).when(this.readWrite)
+        doReturn(immediateTrueFluentFuture()).when(this.read)
                 .exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
@@ -388,7 +388,7 @@ public class RestconfDataServiceImplTest {
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, mountPoint, this.contextRef);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(immediateTrueFluentFuture()).when(this.readWrite)
+        doReturn(immediateTrueFluentFuture()).when(this.read)
                 .exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
@@ -432,7 +432,7 @@ public class RestconfDataServiceImplTest {
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/15/")).when(this.uriInfo).getBaseUriBuilder();
 
@@ -444,7 +444,7 @@ public class RestconfDataServiceImplTest {
     public void testDeleteData() {
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(immediateTrueFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         final Response response = this.dataService.deleteData("example-jukebox:jukebox");
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -457,7 +457,7 @@ public class RestconfDataServiceImplTest {
     public void testDeleteDataMountPoint() {
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(immediateTrueFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         final Response response =
                 this.dataService.deleteData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox");
         assertNotNull(response);
@@ -483,9 +483,9 @@ public class RestconfDataServiceImplTest {
         doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(immediateTrueFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
         final PatchStatusContext status = this.dataService.patchData(patch, this.uriInfo);
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
@@ -511,8 +511,8 @@ public class RestconfDataServiceImplTest {
         doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
-        doReturn(immediateTrueFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(immediateTrueFluentFuture()).when(this.read).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
 
         final PatchStatusContext status = this.dataService.patchData(patch, this.uriInfo);
         assertTrue(status.isOk());
@@ -539,9 +539,9 @@ public class RestconfDataServiceImplTest {
         doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(true).when(this.readWrite).cancel();
         final PatchStatusContext status = this.dataService.patchData(patch, this.uriInfo);
 
