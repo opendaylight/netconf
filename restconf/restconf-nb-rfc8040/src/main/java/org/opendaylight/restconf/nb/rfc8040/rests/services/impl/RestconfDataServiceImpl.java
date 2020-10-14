@@ -29,13 +29,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -53,7 +50,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
@@ -397,34 +393,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     // FIXME: why is this synchronized?
     public synchronized RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
-        final TransactionChainHandler transactionChain;
-        if (mountPoint != null) {
-            final Optional<NetconfDataTreeService> service = mountPoint.getService(NetconfDataTreeService.class);
-            if (service.isPresent()) {
-                return new NetconfRestconfStrategy(service.get());
-            }
-            transactionChain = transactionChainOfMountPoint(mountPoint);
-        } else {
-            transactionChain = transactionChainHandler;
-        }
-        return new MdsalRestconfStrategy(transactionChain);
-    }
-
-    /**
-     * Prepare transaction chain to access data of mount point.
-     *
-     * @param mountPoint mount point reference
-     * @return {@link TransactionChainHandler}
-     */
-    private static TransactionChainHandler transactionChainOfMountPoint(final @NonNull DOMMountPoint mountPoint) {
-        final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
-        if (domDataBrokerService.isPresent()) {
-            return new TransactionChainHandler(domDataBrokerService.get());
+        if (mountPoint == null) {
+            return new MdsalRestconfStrategy(transactionChainHandler);
         }
 
-        final String errMsg = "DOM data broker service isn't available for mount point " + mountPoint.getIdentifier();
-        LOG.warn(errMsg);
-        throw new RestconfDocumentedException(errMsg);
+        return RestconfStrategy.forMountPoint(mountPoint).orElseThrow(() -> {
+            LOG.warn("Mount point {} does not expose a suitable access interface", mountPoint.getIdentifier());
+            return new RestconfDocumentedException("Could not find a supported access interface in mount point "
+                + mountPoint.getIdentifier());
+        });
     }
 
     /**
