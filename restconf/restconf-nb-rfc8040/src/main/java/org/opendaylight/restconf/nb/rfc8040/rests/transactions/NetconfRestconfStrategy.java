@@ -15,13 +15,9 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import java.util.List;
 import java.util.Optional;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -40,21 +36,13 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     private final NetconfDataTreeService netconfService;
 
-    private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures;
-
     public NetconfRestconfStrategy(final NetconfDataTreeService netconfService) {
         this.netconfService = requireNonNull(netconfService);
     }
 
     @Override
-    public void prepareReadWriteExecution() {
-        resultsFutures = netconfService.lock();
-    }
-
-    @Override
-    public void cancel() {
-        netconfService.discardChanges();
-        netconfService.unlock();
+    public RestconfTransaction prepareReadWriteExecution() {
+        return new NetconfRestconfTransaction(netconfService);
     }
 
     @Override
@@ -76,37 +64,10 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     @Override
     public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         return remapException(read(store, path))
-                .transform(optionalNode -> optionalNode != null && optionalNode.isPresent(),
-                        MoreExecutors.directExecutor());
+            .transform(optionalNode -> optionalNode != null && optionalNode.isPresent(),
+                MoreExecutors.directExecutor());
     }
 
-    @Override
-    public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        resultsFutures.add(netconfService.delete(store, path));
-    }
-
-    @Override
-    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                      final NormalizedNode<?, ?> data) {
-        resultsFutures.add(netconfService.merge(store, path, data, Optional.empty()));
-    }
-
-    @Override
-    public void create(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                       final NormalizedNode<?, ?> data) {
-        resultsFutures.add(netconfService.create(store, path, data, Optional.empty()));
-    }
-
-    @Override
-    public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                        final NormalizedNode<?, ?> data) {
-        resultsFutures.add(netconfService.replace(store, path, data, Optional.empty()));
-    }
-
-    @Override
-    public FluentFuture<? extends @NonNull CommitInfo> commit() {
-        return FluentFuture.from(netconfService.commit(resultsFutures));
-    }
 
     /**
      * As we are not using any transactions here, always return null.
