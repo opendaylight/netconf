@@ -11,6 +11,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -162,14 +164,23 @@ public final class ReadDataTransactionUtil {
 
         // check and set withDefaults parameter
         if (!withDefaults.isEmpty()) {
-            switch (withDefaults.get(0)) {
-                case RestconfDataServiceConstant.ReadData.REPORT_ALL_TAGGED_DEFAULT_VALUE:
+            final String str = withDefaults.get(0);
+            final WithDefaults val = WithDefaults.forValue(str);
+            if (val == null) {
+                throw new RestconfDocumentedException(new RestconfError(RestconfError.ErrorType.PROTOCOL,
+                    RestconfError.ErrorTag.INVALID_VALUE, "Invalid with-defaults parameter: " + str, null,
+                    "The with-defaults parameter must be a string in "
+                        + Arrays.stream(WithDefaults.values()).map(WithDefaults::value).collect(Collectors.toList())));
+            }
+
+            switch (val) {
+                case REPORT_ALL:
+                    break;
+                case REPORT_ALL_TAGGED:
                     builder.setTagged(true);
                     break;
-                case RestconfDataServiceConstant.ReadData.REPORT_ALL_DEFAULT_VALUE:
-                    break;
                 default:
-                    builder.setWithDefault(withDefaults.get(0));
+                    builder.setWithDefault(val.value());
             }
         }
         return builder.build();

@@ -49,8 +49,46 @@ public final class RestconfDataServiceConstant {
         public static final int MAX_DEPTH = 65535;
 
         public static final String WITH_DEFAULTS = "with-defaults";
-        public static final String REPORT_ALL_DEFAULT_VALUE = "report-all";
-        public static final String REPORT_ALL_TAGGED_DEFAULT_VALUE = "report-all-tagged";
+
+        /**
+         * With-default values, as per
+         * <a href="https://tools.ietf.org/html/rfc8040#section-4.8.9">RFC8040 section 4.8.9</a>.
+         */
+        enum WithDefaults {
+            /**
+             * All data nodes are reported.
+             */
+            REPORT_ALL("report-all"),
+            /**
+             * Data nodes set to the YANG default are not reported.
+             */
+            TRIM("trim"),
+            /**
+             * Data nodes set to the YANG default by the client are reported.
+             */
+            EXPLICIT("explicit"),
+            /**
+             * All data nodes are reported, and defaults are tagged.
+             */
+            REPORT_ALL_TAGGED("report-all-tagged");
+
+            private static final Map<String, WithDefaults> VALUES =
+                Maps.uniqueIndex(Arrays.asList(values()), WithDefaults::value);
+
+            private @NonNull String value;
+
+            WithDefaults(final @NonNull String value) {
+                this.value = value;
+            }
+
+            public @NonNull String value() {
+                return value;
+            }
+
+            static @Nullable WithDefaults forValue(final String value) {
+                return VALUES.get(requireNonNull(value));
+            }
+        }
 
         private ReadData() {
             throw new UnsupportedOperationException("Util class.");
