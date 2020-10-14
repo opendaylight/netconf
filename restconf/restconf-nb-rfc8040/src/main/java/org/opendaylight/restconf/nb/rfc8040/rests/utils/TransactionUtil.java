@@ -7,30 +7,22 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.util.concurrent.FluentFuture;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Util class for common methods of transactions.
  *
  */
 public final class TransactionUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(TransactionUtil.class);
-
     private TransactionUtil() {
         throw new UnsupportedOperationException("Util class");
     }
@@ -67,32 +59,5 @@ public final class TransactionUtil {
         final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
         strategy.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
-    }
-
-    /**
-     * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
-     * data already exists.
-     *
-     * @param strategy      Object that perform the actual DS operations
-     * @param store         Datastore
-     * @param path          Path to be checked
-     * @param operationType Type of operation (READ, POST, PUT, DELETE...)
-     */
-    public static void checkItemDoesNotExists(final RestconfStrategy strategy,
-                                              final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                                              final String operationType) {
-        final FluentFuture<Boolean> future = strategy.exists(store, path);
-        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
-        FutureCallbackTx.addCallback(future, operationType, response);
-
-        if (response.result) {
-            // close transaction
-            strategy.cancel();
-            // throw error
-            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-            throw new RestconfDocumentedException(
-                    "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
-        }
     }
 }
