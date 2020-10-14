@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -31,12 +31,12 @@ public final class TransactionUtil {
      *
      * @param path          path of data
      * @param schemaContext {@link SchemaContext}
-     * @param strategy      object that perform the actual DS operations
+     * @param transaction   A handle to a set of DS operations
      */
     // FIXME: this method should only be invoked in MdsalRestconfStrategy, and even then only if we are crossing
     //        an implicit list.
     public static void ensureParentsByMerge(final YangInstanceIdentifier path, final SchemaContext schemaContext,
-                                            final RestconfStrategy strategy) {
+                                            final RestconfTransaction transaction) {
         final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
         YangInstanceIdentifier rootNormalizedPath = null;
 
@@ -59,6 +59,6 @@ public final class TransactionUtil {
 
         final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
-        strategy.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
+        transaction.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
     }
 }

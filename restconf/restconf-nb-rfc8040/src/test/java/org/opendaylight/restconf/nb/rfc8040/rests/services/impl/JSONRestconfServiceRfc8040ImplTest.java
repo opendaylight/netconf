@@ -49,6 +49,7 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -134,6 +135,9 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private DOMDataTreeReadTransaction mockReadOnlyTx;
 
     @Mock
+    private DOMDataTreeWriteTransaction mockWriteTx;
+
+    @Mock
     private DOMMountPointService mockMountPointService;
 
     @Mock
@@ -167,16 +171,13 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         doReturn(immediateFluentFuture(Optional.empty())).when(mockReadOnlyTx).read(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
-
         doNothing().when(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class));
         doReturn(CommitInfo.emptyFluentFuture()).when(mockReadWriteTx).commit();
-        doReturn(immediateFalseFluentFuture()).when(mockReadWriteTx).exists(
+        doReturn(immediateFalseFluentFuture()).when(mockReadOnlyTx).exists(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
-
         doReturn(mockReadOnlyTx).when(mockTxChain).newReadOnlyTransaction();
         doReturn(mockReadWriteTx).when(mockTxChain).newReadWriteTransaction();
-
         doReturn(mockTxChain).when(mockDOMDataBroker).createTransactionChain(any());
 
         final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockDOMDataBroker);
@@ -409,7 +410,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     @Test
     public void testDelete() throws OperationFailedException {
-        doReturn(immediateTrueFluentFuture()).when(mockReadWriteTx).exists(
+        doReturn(immediateTrueFluentFuture()).when(mockReadOnlyTx).exists(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
@@ -556,7 +557,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         doReturn(Optional.of(mockDOMDataBroker)).when(mockMountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.empty()).when(mockMountPoint).getService(NetconfDataTreeService.class);
-
         doReturn(Optional.of(mockMountPoint)).when(mockMountPointService).getMountPoint(notNull());
 
         return mockMountPoint;
