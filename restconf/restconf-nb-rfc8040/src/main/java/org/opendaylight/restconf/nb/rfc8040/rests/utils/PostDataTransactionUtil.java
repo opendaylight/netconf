@@ -294,7 +294,7 @@ public final class PostDataTransactionUtil {
      * Get location from {@link YangInstanceIdentifier} and {@link UriInfo}.
      *
      * @param uriInfo       uri info
-     * @param initialPath          data path
+     * @param initialPath   data path
      * @param schemaContext reference to {@link SchemaContext}
      * @return {@link URI}
      */
