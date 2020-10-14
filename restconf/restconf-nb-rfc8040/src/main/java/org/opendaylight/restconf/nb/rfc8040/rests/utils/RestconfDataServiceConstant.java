@@ -7,6 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.Map;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -43,6 +50,31 @@ public final class RestconfDataServiceConstant {
 
         public static final String READ_TYPE_TX = "READ";
         public static final String WITH_DEFAULTS = "with-defaults";
+
+        enum WithDefaults {
+            REPORT_ALL("report-all"),
+            TRIM("trim"),
+            EXPLICIT("explicit"),
+            REPORT_ALL_TAGGED("report-all-tagged");
+
+            private static final Map<String, WithDefaults> VALUES =
+                Maps.uniqueIndex(Arrays.asList(values()), WithDefaults::value);
+
+            private @NonNull String value;
+
+            WithDefaults(final @NonNull String value) {
+                this.value = value;
+            }
+
+            public @NonNull String value() {
+                return value;
+            }
+
+            static @Nullable WithDefaults forString(final String str) {
+                return VALUES.get(requireNonNull(str));
+            }
+        }
+
         public static final String REPORT_ALL_DEFAULT_VALUE = "report-all";
         public static final String REPORT_ALL_TAGGED_DEFAULT_VALUE = "report-all-tagged";
 
