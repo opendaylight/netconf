@@ -23,12 +23,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
- * Strategy that allow to communicate with netconf devices in terms of md-sal transactions.
+ * Implementation of RESTCONF operations using {@link DOMTransactionChain} and related concepts.
  *
  * @see DOMTransactionChain
  * @see DOMDataTreeReadWriteTransaction
  */
-public class MdsalRestconfStrategy implements RestconfStrategy {
+public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMTransactionChain transactionChain;
     private final TransactionChainHandler transactionChainHandler;
 

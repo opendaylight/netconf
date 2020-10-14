@@ -31,9 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Strategy that allow to communicate with netconf devices using pure netconf operations.
+ * Implementation of RESTCONF operations on top of a raw NETCONF backend.
+ *
+ * @see NetconfDataTreeService
  */
-public class NetconfRestconfStrategy implements RestconfStrategy {
+public final class NetconfRestconfStrategy extends RestconfStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfRestconfStrategy.class);
 
     private final NetconfDataTreeService netconfService;

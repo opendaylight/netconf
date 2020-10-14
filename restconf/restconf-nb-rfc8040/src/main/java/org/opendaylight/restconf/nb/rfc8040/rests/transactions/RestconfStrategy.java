@@ -20,21 +20,30 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 /**
- * This interface allows interact with netconf operations in different ways.
+ * Baseline execution strategy for various RESTCONF operations.
  *
  * @see NetconfRestconfStrategy
  * @see MdsalRestconfStrategy
  */
-public interface RestconfStrategy {
+// FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
+//        operations. This should be handled through proper allocation indirection.
+public abstract class RestconfStrategy {
     /**
      * Lock the entire datastore.
      */
-    void prepareReadWriteExecution();
+    public abstract void prepareReadWriteExecution();
+
+    /**
+     * Confirm previous operations.
+     *
+     * @return a FluentFuture containing the result of the commit information
+     */
+    public abstract FluentFuture<? extends @NonNull CommitInfo> commit();
 
     /**
      * Rollback changes and unlock the datastore.
      */
-    void cancel();
+    public abstract void cancel();
 
     /**
      * Read data from the datastore.
@@ -43,7 +52,8 @@ public interface RestconfStrategy {
      * @param path the data object path
      * @return a ListenableFuture containing the result of the read
      */
-    ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store, YangInstanceIdentifier path);
+    public abstract ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+        YangInstanceIdentifier path);
 
     /**
      * Check if data already exists in the datastore.
@@ -52,7 +62,7 @@ public interface RestconfStrategy {
      * @param path the data object path
      * @return a FluentFuture containing the result of the check
      */
-    FluentFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
+    public abstract FluentFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
      * Delete data from the datastore.
@@ -60,7 +70,7 @@ public interface RestconfStrategy {
      * @param store the logical data store which should be modified
      * @param path the data object path
      */
-    void delete(LogicalDatastoreType store, YangInstanceIdentifier path);
+    public abstract void delete(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
      * Merges a piece of data with the existing data at a specified path.
@@ -69,7 +79,7 @@ public interface RestconfStrategy {
      * @param path the data object path
      * @param data the data object to be merged to the specified path
      */
-    void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
+    public abstract void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
 
     /**
      * Stores a piece of data at the specified path.
@@ -78,7 +88,7 @@ public interface RestconfStrategy {
      * @param path the data object path
      * @param data the data object to be merged to the specified path
      */
-    void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
+    public abstract void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
 
     /**
      * Replace a piece of data at the specified path.
@@ -87,26 +97,21 @@ public interface RestconfStrategy {
      * @param path the data object path
      * @param data the data object to be merged to the specified path
      */
-    void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
-
-    /**
-     * Confirm previous operations.
-     *
-     * @return a FluentFuture containing the result of the commit information
-     */
-    FluentFuture<? extends @NonNull CommitInfo> commit();
+    public abstract void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
 
     /**
      * Get transaction chain for creating specific transaction for specific operation.
      *
      * @return transaction chain or null
      */
-    @Nullable DOMTransactionChain getTransactionChain();
+    // FIXME: these look like an implementation detail
+    public abstract @Nullable DOMTransactionChain getTransactionChain();
 
     /**
      * Get transaction chain handler for creating new transaction chain.
      *
      * @return {@link TransactionChainHandler} or null
      */
-    @Nullable TransactionChainHandler getTransactionChainHandler();
+    // FIXME: these look like an implementation detail
+    public abstract @Nullable TransactionChainHandler getTransactionChainHandler();
 }
