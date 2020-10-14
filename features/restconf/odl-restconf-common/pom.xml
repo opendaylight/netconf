@@ -78,7 +78,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>odl-mdsal-model-rfc7895</artifactId>
+            <artifactId>odl-mdsal-model-rfc8525</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
