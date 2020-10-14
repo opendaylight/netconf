@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -33,6 +34,10 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final TransactionChainHandler transactionChainHandler;
 
     private DOMDataTreeReadWriteTransaction rwTx;
+
+    public MdsalRestconfStrategy(final DOMDataBroker dataBroker) {
+        this(new TransactionChainHandler(dataBroker));
+    }
 
     public MdsalRestconfStrategy(final TransactionChainHandler transactionChainHandler) {
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
