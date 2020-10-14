@@ -48,8 +48,9 @@ import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -88,7 +89,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static final Logger LOG = LoggerFactory.getLogger(LibraryModulesSchemas.class);
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
     private static final EffectiveModelContext LIBRARY_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(
-        ModulesState.class);
+        YangLibrary.class);
 
     private static final NodeIdentifier MODULES_STATE_NID = NodeIdentifier.create(ModulesState.QNAME);
     private static final NodeIdentifier MODULE_NID = NodeIdentifier.create(Module.QNAME);
