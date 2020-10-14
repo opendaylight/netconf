@@ -177,27 +177,13 @@ public final class ReadDataTransactionUtil {
     }
 
     /**
-     * Read specific type of data from data store via transaction.
-     *
-     * @param valueOfContent type of data to read (config, state, all)
-     * @param strategy       {@link RestconfStrategy} - wrapper for variables
-     * @param schemaContext  schema context
-     * @return {@link NormalizedNode}
-     */
-    public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
-            final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
-            final SchemaContext schemaContext) {
-        return readData(valueOfContent, path, strategy, null, schemaContext);
-    }
-
-    /**
      * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} if any
      * inside of object {@link RestconfStrategy} provided as a parameter.
      *
      * @param valueOfContent type of data to read (config, state, all)
      * @param path           the path to read
      * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa       valee of with-defaults parameter
+     * @param withDefa       value of with-defaults parameter
      * @param ctx            schema context
      * @return {@link NormalizedNode}
      */
