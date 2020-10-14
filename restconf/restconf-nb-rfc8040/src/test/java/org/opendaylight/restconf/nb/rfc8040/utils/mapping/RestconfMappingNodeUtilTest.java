@@ -61,6 +61,7 @@ public class RestconfMappingNodeUtilTest {
 
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
+        // FIXME: assemble these from dependencies
         schemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing"));
         schemaContextMonitoring = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));

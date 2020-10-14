@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
@@ -425,7 +424,7 @@ public final class RestCodec {
         final Iterable<ChoiceSchemaNode> choiceNodes =
                 Iterables.filter(container.getChildNodes(), ChoiceSchemaNode.class);
         final Iterable<Collection<? extends CaseSchemaNode>> map = Iterables.transform(choiceNodes,
-            @Nullable ChoiceSchemaNode::getCases);
+            ChoiceSchemaNode::getCases);
         for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
