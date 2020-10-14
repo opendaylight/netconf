@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
@@ -65,7 +66,7 @@ public final class PostDataTransactionUtil {
      */
     public static Response postData(final UriInfo uriInfo, final NormalizedNodeContext payload,
                                     final RestconfStrategy strategy,
-                                    final EffectiveModelContext schemaContext, final String insert,
+                                    final EffectiveModelContext schemaContext, final Insert insert,
                                     final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
         final FluentFuture<? extends CommitInfo> future = submitData(path, payload.getData(),
@@ -93,7 +94,7 @@ public final class PostDataTransactionUtil {
                                                                  final NormalizedNode<?, ?> data,
                                                                  final RestconfStrategy strategy,
                                                                  final EffectiveModelContext schemaContext,
-                                                                 final String insert, final String point) {
+                                                                 final Insert insert, final String point) {
         strategy.prepareReadWriteExecution();
         if (insert == null) {
             makePost(path, data, schemaContext, strategy);
@@ -102,7 +103,7 @@ public final class PostDataTransactionUtil {
 
         final DataSchemaNode schemaNode = PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
         switch (insert) {
-            case "first":
+            case FIRST:
                 if (schemaNode instanceof ListSchemaNode) {
                     final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
                     final OrderedMapNode readList = (OrderedMapNode) readData;
@@ -129,10 +130,10 @@ public final class PostDataTransactionUtil {
                     makePost(path, readData, schemaContext, strategy);
                     return strategy.commit();
                 }
-            case "last":
+            case LAST:
                 makePost(path, data, schemaContext, strategy);
                 return strategy.commit();
-            case "before":
+            case BEFORE:
                 if (schemaNode instanceof ListSchemaNode) {
                     final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
                     final OrderedMapNode readList = (OrderedMapNode) readData;
@@ -157,7 +158,7 @@ public final class PostDataTransactionUtil {
                             path, data, schemaContext, point, readLeafList, true, strategy);
                     return strategy.commit();
                 }
-            case "after":
+            case AFTER:
                 if (schemaNode instanceof ListSchemaNode) {
                     final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
                     final OrderedMapNode readList = (OrderedMapNode) readData;

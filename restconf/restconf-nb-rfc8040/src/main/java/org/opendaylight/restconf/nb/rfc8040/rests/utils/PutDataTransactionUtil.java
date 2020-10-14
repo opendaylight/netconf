@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -143,7 +144,7 @@ public final class PutDataTransactionUtil {
      * @return {@link Response}
      */
     public static Response putData(final NormalizedNodeContext payload, final EffectiveModelContext schemaContext,
-                                   final RestconfStrategy strategy, final String insert, final String point) {
+                                   final RestconfStrategy strategy, final Insert insert, final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
 
         strategy.prepareReadWriteExecution();
@@ -176,14 +177,14 @@ public final class PutDataTransactionUtil {
             final YangInstanceIdentifier path,
             final EffectiveModelContext schemaContext,
             final RestconfStrategy strategy,
-            final NormalizedNode<?, ?> data, final String insert, final String point, final boolean exists) {
+            final NormalizedNode<?, ?> data, final Insert insert, final String point, final boolean exists) {
         if (insert == null) {
             return makePut(path, schemaContext, strategy, data, exists);
         }
 
         final DataSchemaNode schemaNode = checkListAndOrderedType(schemaContext, path);
         switch (insert) {
-            case "first":
+            case FIRST:
                 if (schemaNode instanceof ListSchemaNode) {
                     final NormalizedNode<?, ?> readData = readList(strategy, path);
                     final OrderedMapNode readList = (OrderedMapNode) readData;
@@ -211,9 +212,9 @@ public final class PutDataTransactionUtil {
                         return strategy.commit();
                     }
                 }
-            case "last":
+            case LAST:
                 return makePut(path, schemaContext, strategy, data, exists);
-            case "before":
+            case BEFORE:
                 if (schemaNode instanceof ListSchemaNode) {
                     final NormalizedNode<?, ?> readData = readList(strategy, path);
                     final OrderedMapNode readList = (OrderedMapNode) readData;
@@ -236,7 +237,7 @@ public final class PutDataTransactionUtil {
                         return strategy.commit();
                     }
                 }
-            case "after":
+            case AFTER:
                 if (schemaNode instanceof ListSchemaNode) {
                     final NormalizedNode<?, ?> readData = readList(strategy, path);
                     final OrderedMapNode readList = (OrderedMapNode) readData;
