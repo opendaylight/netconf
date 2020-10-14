@@ -532,7 +532,7 @@ public class ReadDataTransactionUtilTest {
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                Collections.singletonList(ReadData.REPORT_ALL_TAGGED_DEFAULT_VALUE));
+                Collections.singletonList(ReadData.WithDefaults.REPORT_ALL_TAGGED.value()));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -550,7 +550,7 @@ public class ReadDataTransactionUtilTest {
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                Collections.singletonList(ReadData.REPORT_ALL_DEFAULT_VALUE));
+                Collections.singletonList(ReadData.WithDefaults.REPORT_ALL.value()));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
