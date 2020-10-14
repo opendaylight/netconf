@@ -9,9 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -49,8 +50,50 @@ public final class RestconfDataServiceConstant {
         public static final int MAX_DEPTH = 65535;
 
         public static final String WITH_DEFAULTS = "with-defaults";
-        public static final String REPORT_ALL_DEFAULT_VALUE = "report-all";
-        public static final String REPORT_ALL_TAGGED_DEFAULT_VALUE = "report-all-tagged";
+
+        /**
+         * With-default values, as per
+         * <a href="https://tools.ietf.org/html/rfc8040#section-4.8.9">RFC8040 section 4.8.9</a>.
+         */
+        enum WithDefaults {
+            /**
+             * All data nodes are reported.
+             */
+            REPORT_ALL("report-all"),
+            /**
+             * Data nodes set to the YANG default are not reported.
+             */
+            TRIM("trim"),
+            /**
+             * Data nodes set to the YANG default by the client are reported.
+             */
+            EXPLICIT("explicit"),
+            /**
+             * All data nodes are reported, and defaults are tagged.
+             */
+            REPORT_ALL_TAGGED("report-all-tagged");
+
+            private static final ImmutableMap<String, WithDefaults> VALUES =
+                Maps.uniqueIndex(Arrays.asList(values()), WithDefaults::value);
+
+            private @NonNull String value;
+
+            WithDefaults(final @NonNull String value) {
+                this.value = value;
+            }
+
+            public @NonNull String value() {
+                return value;
+            }
+
+            static @Nullable WithDefaults forValue(final String value) {
+                return VALUES.get(requireNonNull(value));
+            }
+
+            static @Nullable Set<String> possibleValues() {
+                return VALUES.keySet();
+            }
+        }
 
         private ReadData() {
             throw new UnsupportedOperationException("Util class.");
@@ -85,7 +128,8 @@ public final class RestconfDataServiceConstant {
              */
             AFTER("after");
 
-            private static final Map<String, Insert> VALUES = Maps.uniqueIndex(Arrays.asList(values()), Insert::value);
+            private static final ImmutableMap<String, Insert> VALUES =
+                Maps.uniqueIndex(Arrays.asList(values()), Insert::value);
 
             private @NonNull String value;
 
