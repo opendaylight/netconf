@@ -104,8 +104,7 @@ public final class PostDataTransactionUtil {
         switch (insert) {
             case "first":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
                     final OrderedMapNode readList = (OrderedMapNode) readData;
                     if (readList == null || readList.getValue().isEmpty()) {
                         makePost(path, data, schemaContext, strategy);
@@ -117,8 +116,7 @@ public final class PostDataTransactionUtil {
                     makePost(path, readData, schemaContext, strategy);
                     return strategy.commit();
                 } else {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
 
                     final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
@@ -136,8 +134,7 @@ public final class PostDataTransactionUtil {
                 return strategy.commit();
             case "before":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
                     final OrderedMapNode readList = (OrderedMapNode) readData;
                     if (readList == null || readList.getValue().isEmpty()) {
                         makePost(path, data, schemaContext, strategy);
@@ -148,8 +145,7 @@ public final class PostDataTransactionUtil {
                             data, schemaContext, point, readList, true, strategy);
                     return strategy.commit();
                 } else {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
 
                     final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
@@ -163,8 +159,7 @@ public final class PostDataTransactionUtil {
                 }
             case "after":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, strategy, schemaNode);
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
                     final OrderedMapNode readList = (OrderedMapNode) readData;
                     if (readList == null || readList.getValue().isEmpty()) {
                         makePost(path, data, schemaContext, strategy);
@@ -175,9 +170,7 @@ public final class PostDataTransactionUtil {
                             data, schemaContext, point, readList, false, strategy);
                     return strategy.commit();
                 } else {
-                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, strategy, schemaNode);
-
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(strategy, path.getParent());
                     final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                         makePost(path, data, schemaContext, strategy);
