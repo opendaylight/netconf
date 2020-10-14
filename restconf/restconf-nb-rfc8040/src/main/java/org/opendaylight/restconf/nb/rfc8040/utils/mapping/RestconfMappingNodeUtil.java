@@ -20,6 +20,8 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModuleList;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module.ConformanceType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -79,7 +81,7 @@ public final class RestconfMappingNodeUtil {
             mapModulesByIetfYangLibraryYang(final Collection<? extends Module> modules,
                     final Module ietfYangLibraryModule, final SchemaContext context, final String moduleSetId) {
         final DataSchemaNode modulesStateSch =
-                ietfYangLibraryModule.getDataChildByName(IetfYangLibrary.MODUELS_STATE_CONT_QNAME);
+                ietfYangLibraryModule.getDataChildByName(ModulesState.QNAME);
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> modulesStateBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) modulesStateSch);
 
@@ -283,7 +285,7 @@ public final class RestconfMappingNodeUtil {
     private static DataSchemaNode findSchemaInListOfModulesSchema(final QName specificQName,
             final Module ietfYangLibraryModule) {
         for (final GroupingDefinition groupingDefinition : ietfYangLibraryModule.getGroupings()) {
-            if (groupingDefinition.getQName().equals(IetfYangLibrary.GROUPING_MODULE_LIST_QNAME)) {
+            if (groupingDefinition.getQName().equals(ModuleList.QNAME)) {
                 final DataSchemaNode dataChildByName =
                         groupingDefinition.getDataChildByName(IetfYangLibrary.MODULE_QNAME_LIST);
                 return ((ListSchemaNode) dataChildByName).getDataChildByName(specificQName);
@@ -324,7 +326,7 @@ public final class RestconfMappingNodeUtil {
     private static DataSchemaNode findNodeInInternGroupings(final QName qnameOfSchema,
             final Module ietfYangLibraryModule) {
         for (final GroupingDefinition groupingDefinition : ietfYangLibraryModule.getGroupings()) {
-            if (groupingDefinition.getQName().equals(IetfYangLibrary.GROUPING_MODULE_LIST_QNAME)) {
+            if (groupingDefinition.getQName().equals(ModuleList.QNAME)) {
                 for (final GroupingDefinition internalGrouping : groupingDefinition.getGroupings()) {
                     if (internalGrouping.getDataChildByName(qnameOfSchema) != null) {
                         return internalGrouping.getDataChildByName(qnameOfSchema);
