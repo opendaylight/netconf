@@ -25,6 +25,7 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -53,7 +54,7 @@ public final class PatchDataTransactionUtil {
                                                final EffectiveModelContext schemaContext) {
         final List<PatchStatusEntity> editCollection = new ArrayList<>();
         boolean noError = true;
-        strategy.prepareReadWriteExecution();
+        final RestconfTransaction transaction = strategy.prepareWriteExecution();
 
         for (final PatchEntity patchEntity : context.getData()) {
             if (noError) {
@@ -61,7 +62,7 @@ public final class PatchDataTransactionUtil {
                     case CREATE:
                         try {
                             createDataWithinTransaction(patchEntity.getTargetNode(), patchEntity.getNode(),
-                                schemaContext, strategy);
+                                schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -71,7 +72,7 @@ public final class PatchDataTransactionUtil {
                         break;
                     case DELETE:
                         try {
-                            deleteDataWithinTransaction(patchEntity.getTargetNode(), strategy);
+                            deleteDataWithinTransaction(patchEntity.getTargetNode(), transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -82,7 +83,7 @@ public final class PatchDataTransactionUtil {
                     case MERGE:
                         try {
                             mergeDataWithinTransaction(patchEntity.getTargetNode(), patchEntity.getNode(),
-                                schemaContext, strategy);
+                                schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -93,7 +94,7 @@ public final class PatchDataTransactionUtil {
                     case REPLACE:
                         try {
                             replaceDataWithinTransaction(patchEntity.getTargetNode(), patchEntity.getNode(),
-                                schemaContext, strategy);
+                                schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -103,7 +104,7 @@ public final class PatchDataTransactionUtil {
                         break;
                     case REMOVE:
                         try {
-                            removeDataWithinTransaction(patchEntity.getTargetNode(), strategy);
+                            removeDataWithinTransaction(patchEntity.getTargetNode(), transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
@@ -126,11 +127,11 @@ public final class PatchDataTransactionUtil {
         // if no errors then submit transaction, otherwise cancel
         if (noError) {
             final ResponseFactory response = new ResponseFactory(Status.OK);
-            final FluentFuture<? extends CommitInfo> future = strategy.commit();
+            final FluentFuture<? extends CommitInfo> future = transaction.commit();
 
             try {
                 //This method will close transactionChain if any
-                FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response, strategy.getTransactionChain());
+                FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response, strategy);
             } catch (final RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
@@ -139,7 +140,7 @@ public final class PatchDataTransactionUtil {
 
             return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, null);
         } else {
-            strategy.cancel();
+            transaction.cancel();
             return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
         }
     }
@@ -149,27 +150,27 @@ public final class PatchDataTransactionUtil {
      *
      * @param path          Path for data to be created
      * @param payload       Data to be created
-     * @param strategy      Object that perform the actual DS operations
+     * @param transaction   A handle to a set of DS operations
      */
     private static void createDataWithinTransaction(final YangInstanceIdentifier path,
                                                     final NormalizedNode<?, ?> payload,
                                                     final EffectiveModelContext schemaContext,
-                                                    final RestconfStrategy strategy) {
+                                                    final RestconfTransaction transaction) {
         LOG.trace("POST {} within Restconf Patch: {} with payload {}", LogicalDatastoreType.CONFIGURATION.name(),
             path, payload);
-        createData(payload, path, strategy, schemaContext, true);
+        transaction.create(LogicalDatastoreType.CONFIGURATION, path, payload, schemaContext);
     }
 
     /**
      * Remove data within one transaction.
      *
      * @param path     Path for data to be deleted
-     * @param strategy Object that perform the actual DS operations
+     * @param transaction   A handle to a set of DS operations
      */
     private static void deleteDataWithinTransaction(final YangInstanceIdentifier path,
-                                                    final RestconfStrategy strategy) {
+                                                    final RestconfTransaction transaction) {
         LOG.trace("Delete {} within Restconf Patch: {}", LogicalDatastoreType.CONFIGURATION.name(), path);
-        strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
+        transaction.delete(LogicalDatastoreType.CONFIGURATION, path);
     }
 
     /**
@@ -177,28 +178,28 @@ public final class PatchDataTransactionUtil {
      *
      * @param path     Path for data to be merged
      * @param payload  Data to be merged
-     * @param strategy Object that perform the actual DS operations
+     * @param transaction   A handle to a set of DS operations
      */
     private static void mergeDataWithinTransaction(final YangInstanceIdentifier path,
                                                    final NormalizedNode<?, ?> payload,
                                                    final EffectiveModelContext schemaContext,
-                                                   final RestconfStrategy strategy) {
+                                                   final RestconfTransaction transaction) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", LogicalDatastoreType.CONFIGURATION.name(),
             path, payload);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, strategy);
-        strategy.merge(LogicalDatastoreType.CONFIGURATION, path, payload);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+        transaction.merge(LogicalDatastoreType.CONFIGURATION, path, payload);
     }
 
     /**
      * Do NOT check if data exists and remove it within one transaction.
      *
      * @param path     Path for data to be deleted
-     * @param strategy Object that perform the actual DS operations
+     * @param transaction   A handle to a set of DS operations
      */
     private static void removeDataWithinTransaction(final YangInstanceIdentifier path,
-                                                    final RestconfStrategy strategy) {
+                                                    final RestconfTransaction transaction) {
         LOG.trace("Remove {} within Restconf Patch: {}", LogicalDatastoreType.CONFIGURATION.name(), path);
-        strategy.remove(LogicalDatastoreType.CONFIGURATION, path);
+        transaction.remove(LogicalDatastoreType.CONFIGURATION, path);
     }
 
     /**
@@ -206,35 +207,14 @@ public final class PatchDataTransactionUtil {
      *
      * @param path          Path for data to be created
      * @param payload       Data to be created
-     * @param strategy      Object that perform the actual DS operations
+     * @param transaction   A handle to a set of DS operations
      */
     private static void replaceDataWithinTransaction(final YangInstanceIdentifier path,
                                                      final NormalizedNode<?, ?> payload,
                                                      final EffectiveModelContext schemaContext,
-                                                     final RestconfStrategy strategy) {
+                                                     final RestconfTransaction transaction) {
         LOG.trace("PUT {} within Restconf Patch: {} with payload {}",
             LogicalDatastoreType.CONFIGURATION.name(), path, payload);
-        createData(payload, path, strategy, schemaContext, false);
-    }
-
-    /**
-     * Create data within one transaction. If {@code errorIfExists} is set to {@code true} then data will be checked
-     * for existence before created, otherwise they will be overwritten.
-     *
-     * @param data          Data to be created
-     * @param path          Path for data to be created
-     * @param strategy      Object that perform the actual DS operations
-     * @param errorIfExists Enable checking for existence of data (throws error if already exists)
-     */
-    private static void createData(final NormalizedNode<?, ?> data,
-                                   final YangInstanceIdentifier path,
-                                   final RestconfStrategy strategy,
-                                   final EffectiveModelContext schemaContext,
-                                   final boolean errorIfExists) {
-        if (errorIfExists) {
-            strategy.create(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-        } else {
-            strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-        }
+        transaction.replace(LogicalDatastoreType.CONFIGURATION, path, payload, schemaContext);
     }
 }

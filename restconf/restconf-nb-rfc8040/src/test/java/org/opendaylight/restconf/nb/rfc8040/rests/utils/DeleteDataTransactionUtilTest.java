@@ -26,6 +26,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -50,6 +51,8 @@ public class DeleteDataTransactionUtilTest {
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
+    private DOMDataTreeReadTransaction read;
+    @Mock
     private DOMDataBroker mockDataBroker;
     @Mock
     private NetconfDataTreeService netconfService;
@@ -73,8 +76,8 @@ public class DeleteDataTransactionUtilTest {
     @Test
     public void deleteData() {
         // assert that data to delete exists
-        Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
-                YangInstanceIdentifier.empty())).thenReturn(immediateTrueFluentFuture());
+        Mockito.when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
+            .thenReturn(immediateTrueFluentFuture());
         // test
         delete(new MdsalRestconfStrategy(transactionChainHandler));
         delete(new NetconfRestconfStrategy(netconfService));
@@ -86,10 +89,10 @@ public class DeleteDataTransactionUtilTest {
     @Test
     public void deleteDataNegativeTest() {
         // assert that data to delete does NOT exist
-        Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
-                YangInstanceIdentifier.empty())).thenReturn(immediateFalseFluentFuture());
+        Mockito.when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
+            .thenReturn(immediateFalseFluentFuture());
         final NetconfDocumentedException exception = new NetconfDocumentedException("id",
-            DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.from("data-missing"),
+            DocumentedException.ErrorType.PROTOCOL, DocumentedException.ErrorTag.from("data-missing"),
             DocumentedException.ErrorSeverity.ERROR);
         final SettableFuture<? extends CommitInfo> ret = SettableFuture.create();
         ret.setException(new TransactionCommitFailedException(

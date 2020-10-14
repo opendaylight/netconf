@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -145,17 +146,17 @@ public final class PutDataTransactionUtil {
                                    final RestconfStrategy strategy, final Insert insert, final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
 
-        strategy.prepareReadWriteExecution();
         final FluentFuture<Boolean> existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
-        final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
-                payload.getData(), insert, point);
-        final ResponseFactory response = new ResponseFactory();
-        //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, response, strategy.getTransactionChain());
+        final FutureDataFactory<Boolean> existsResponse = new FutureDataFactory<>();
+        FutureCallbackTx.addCallback(existsFuture, PUT_TX_TYPE, existsResponse);
 
-        final FutureDataFactory<Boolean> isExists = new FutureDataFactory<>();
-        FutureCallbackTx.addCallback(existsFuture, PUT_TX_TYPE, isExists);
-        return response.status(isExists.result ? Status.NO_CONTENT : Status.CREATED).build();
+        final ResponseFactory responseFactory =
+            new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
+        final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
+            payload.getData(), insert, point);
+        //This method will close transactionChain if any
+        FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, strategy);
+        return responseFactory.build();
     }
 
     /**
@@ -174,8 +175,9 @@ public final class PutDataTransactionUtil {
                                                                  final RestconfStrategy strategy,
                                                                  final NormalizedNode<?, ?> data,
                                                                  final Insert insert, final String point) {
+        final RestconfTransaction transaction = strategy.prepareWriteExecution();
         if (insert == null) {
-            return makePut(path, schemaContext, strategy, data);
+            return makePut(path, schemaContext, transaction, data);
         }
 
         checkListAndOrderedType(schemaContext, path);
@@ -184,30 +186,30 @@ public final class PutDataTransactionUtil {
             case FIRST:
                 readData = readList(strategy, path.getParent());
                 if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
-                    return makePut(path, schemaContext, strategy, data);
+                    return makePut(path, schemaContext, transaction, data);
                 }
-                strategy.remove(LogicalDatastoreType.CONFIGURATION, path.getParent());
-                strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-                strategy.replace(LogicalDatastoreType.CONFIGURATION, path.getParent(), readData, schemaContext);
-                return strategy.commit();
+                transaction.remove(LogicalDatastoreType.CONFIGURATION, path.getParent());
+                transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                transaction.replace(LogicalDatastoreType.CONFIGURATION, path.getParent(), readData, schemaContext);
+                return transaction.commit();
             case LAST:
-                return makePut(path, schemaContext, strategy, data);
+                return makePut(path, schemaContext, transaction, data);
             case BEFORE:
                 readData = readList(strategy, path.getParent());
                 if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
-                    return makePut(path, schemaContext, strategy, data);
+                    return makePut(path, schemaContext, transaction, data);
                 }
-                insertWithPointPut(strategy, path, data, schemaContext, point,
+                insertWithPointPut(transaction, path, data, schemaContext, point,
                     (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, true);
-                return strategy.commit();
+                return transaction.commit();
             case AFTER:
                 readData = readList(strategy, path.getParent());
                 if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
-                    return makePut(path, schemaContext, strategy, data);
+                    return makePut(path, schemaContext, transaction, data);
                 }
-                insertWithPointPut(strategy, path, data, schemaContext, point,
+                insertWithPointPut(transaction, path, data, schemaContext, point,
                     (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, false);
-                return strategy.commit();
+                return transaction.commit();
             default:
                 throw new RestconfDocumentedException(
                         "Used bad value of insert parameter. Possible values are first, last, before or after, "
@@ -222,13 +224,13 @@ public final class PutDataTransactionUtil {
             path,false);
     }
 
-    private static void insertWithPointPut(final RestconfStrategy strategy,
+    private static void insertWithPointPut(final RestconfTransaction transaction,
                                            final YangInstanceIdentifier path,
                                            final NormalizedNode<?, ?> data,
                                            final EffectiveModelContext schemaContext, final String point,
                                            final NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>> readList,
                                            final boolean before) {
-        strategy.remove(LogicalDatastoreType.CONFIGURATION, path.getParent());
+        transaction.remove(LogicalDatastoreType.CONFIGURATION, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
             ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
@@ -243,24 +245,25 @@ public final class PutDataTransactionUtil {
         }
         int lastInsertedPosition = 0;
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
-        strategy.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubtree.getIdentifier()),
+        transaction.merge(LogicalDatastoreType.CONFIGURATION,
+            YangInstanceIdentifier.create(emptySubtree.getIdentifier()),
             emptySubtree);
         for (final NormalizedNode<?, ?> nodeChild : readList.getValue()) {
             if (lastInsertedPosition == lastItemPosition) {
-                strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
             }
             final YangInstanceIdentifier childPath = path.getParent().node(nodeChild.getIdentifier());
-            strategy.replace(LogicalDatastoreType.CONFIGURATION, childPath, nodeChild, schemaContext);
+            transaction.replace(LogicalDatastoreType.CONFIGURATION, childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
     }
 
     private static FluentFuture<? extends CommitInfo> makePut(final YangInstanceIdentifier path,
                                                               final SchemaContext schemaContext,
-                                                              final RestconfStrategy strategy,
+                                                              final RestconfTransaction transaction,
                                                               final NormalizedNode<?, ?> data) {
-        strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-        return strategy.commit();
+        transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+        return transaction.commit();
     }
 
     public static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,

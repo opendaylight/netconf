@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -72,7 +73,7 @@ public final class PostDataTransactionUtil {
         final URI location = resolveLocation(uriInfo, path, schemaContext, payload.getData());
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, POST_TX_TYPE, dataFactory, strategy.getTransactionChain(), path);
+        FutureCallbackTx.addCallback(future, POST_TX_TYPE, dataFactory, strategy);
         return dataFactory.build();
     }
 
@@ -92,10 +93,10 @@ public final class PostDataTransactionUtil {
                                                                  final RestconfStrategy strategy,
                                                                  final EffectiveModelContext schemaContext,
                                                                  final Insert insert, final String point) {
-        strategy.prepareReadWriteExecution();
+        final RestconfTransaction transaction = strategy.prepareWriteExecution();
         if (insert == null) {
-            makePost(path, data, schemaContext, strategy);
-            return strategy.commit();
+            makePost(path, data, schemaContext, transaction);
+            return transaction.commit();
         }
 
         PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
@@ -104,38 +105,38 @@ public final class PostDataTransactionUtil {
             case FIRST:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
                 if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
-                    strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-                    return strategy.commit();
+                    transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                    return transaction.commit();
                 }
-                checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path);
-                strategy.remove(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
-                strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-                strategy.replace(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent(), readData,
+                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                transaction.remove(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
+                transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                transaction.replace(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent(), readData,
                     schemaContext);
-                return strategy.commit();
+                return transaction.commit();
             case LAST:
-                makePost(path, data, schemaContext, strategy);
-                return strategy.commit();
+                makePost(path, data, schemaContext, transaction);
+                return transaction.commit();
             case BEFORE:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
                 if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
-                    strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-                    return strategy.commit();
+                    transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                    return transaction.commit();
                 }
-                checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path);
+                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
                 insertWithPointPost(path, data, schemaContext, point,
-                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, true, strategy);
-                return strategy.commit();
+                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, true, transaction);
+                return transaction.commit();
             case AFTER:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
                 if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
-                    strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-                    return strategy.commit();
+                    transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                    return transaction.commit();
                 }
-                checkItemDoesNotExists(strategy, LogicalDatastoreType.CONFIGURATION, path);
+                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
                 insertWithPointPost(path, data, schemaContext, point,
-                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, false, strategy);
-                return strategy.commit();
+                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, false, transaction);
+                return transaction.commit();
             default:
                 throw new RestconfDocumentedException(
                     "Used bad value of insert parameter. Possible values are first, last, before or after, but was: "
@@ -147,9 +148,9 @@ public final class PostDataTransactionUtil {
                                             final NormalizedNode<?, ?> data,
                                             final EffectiveModelContext schemaContext, final String point,
                                             final NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>> readList,
-                                            final boolean before, final RestconfStrategy strategy) {
+                                            final boolean before, final RestconfTransaction transaction) {
         final YangInstanceIdentifier parent = path.getParent().getParent();
-        strategy.remove(LogicalDatastoreType.CONFIGURATION, parent);
+        transaction.remove(LogicalDatastoreType.CONFIGURATION, parent);
         final InstanceIdentifierContext<?> instanceIdentifier =
             ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
@@ -164,25 +165,25 @@ public final class PostDataTransactionUtil {
         }
         int lastInsertedPosition = 0;
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
-        strategy.merge(LogicalDatastoreType.CONFIGURATION,
+        transaction.merge(LogicalDatastoreType.CONFIGURATION,
             YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final NormalizedNode<?, ?> nodeChild : readList.getValue()) {
             if (lastInsertedPosition == lastItemPosition) {
-                strategy.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
             }
             final YangInstanceIdentifier childPath = parent.node(nodeChild.getIdentifier());
-            strategy.replace(LogicalDatastoreType.CONFIGURATION, childPath, nodeChild, schemaContext);
+            transaction.replace(LogicalDatastoreType.CONFIGURATION, childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
     }
 
     private static void makePost(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
-                                 final SchemaContext schemaContext, final RestconfStrategy strategy) {
+                                 final SchemaContext schemaContext, final RestconfTransaction transaction) {
         try {
-            strategy.create(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+            transaction.create(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
         } catch (RestconfDocumentedException e) {
             // close transaction if any and pass exception further
-            strategy.cancel();
+            transaction.cancel();
             throw e;
         }
     }
@@ -219,16 +220,13 @@ public final class PostDataTransactionUtil {
      * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
      * data already exists.
      *
-     * @param strategy      Object that perform the actual DS operations
-     * @param store         Datastore
-     * @param path          Path to be checked
+     * @param isExistsFuture if checked data exists
+     * @param path           Path to be checked
      */
-    public static void checkItemDoesNotExists(final RestconfStrategy strategy,
-                                               final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        final FluentFuture<Boolean> future = strategy.exists(store, path);
+    public static void checkItemDoesNotExists(final FluentFuture<Boolean> isExistsFuture,
+                                              final YangInstanceIdentifier path) {
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-
-        FutureCallbackTx.addCallback(future, POST_TX_TYPE, response);
+        FutureCallbackTx.addCallback(isExistsFuture, POST_TX_TYPE, response);
 
         if (response.result) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);

@@ -222,7 +222,7 @@ public class PatchDataTransactionUtilTest {
         doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.targetNodeForCreateAndDelete);
         final NetconfDocumentedException exception = new NetconfDocumentedException("id",
-            DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.from("data-missing"),
+            DocumentedException.ErrorType.PROTOCOL, DocumentedException.ErrorTag.from("data-missing"),
             DocumentedException.ErrorSeverity.ERROR);
         final SettableFuture<? extends CommitInfo> ret = SettableFuture.create();
         ret.setException(new TransactionCommitFailedException(

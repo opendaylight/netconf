@@ -367,7 +367,7 @@ public class RestconfDataServiceImplTest {
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(immediateTrueFluentFuture()).when(this.readWrite)
+        doReturn(immediateTrueFluentFuture()).when(this.read)
                 .exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
@@ -385,7 +385,7 @@ public class RestconfDataServiceImplTest {
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, mountPoint, this.contextRef);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(immediateTrueFluentFuture()).when(this.readWrite)
+        doReturn(immediateTrueFluentFuture()).when(this.read)
                 .exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
@@ -427,7 +427,7 @@ public class RestconfDataServiceImplTest {
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/15/")).when(this.uriInfo).getBaseUriBuilder();
 
@@ -460,7 +460,7 @@ public class RestconfDataServiceImplTest {
     }
 
     @Test
-    public void testPatchData() throws Exception {
+    public void testPatchData() {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef);
         final List<PatchEntity> entity = new ArrayList<>();
@@ -510,7 +510,7 @@ public class RestconfDataServiceImplTest {
     }
 
     @Test
-    public void testPatchDataDeleteNotExist() throws Exception {
+    public void testPatchDataDeleteNotExist() {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef);
         final List<PatchEntity> entity = new ArrayList<>();
