@@ -2,7 +2,7 @@ module callhome-status{
     namespace "urn:opendaylight:callhome:device-status";
     prefix "callhome-status";
 
-    import odl-netconf-callhome-server { prefix callhome; revision-date "2016-11-09"; }
+    import odl-netconf-callhome-server { prefix callhome; revision-date "2020-10-15"; }
 
     revision 2017-01-12 {
         description "Initial revision";
