@@ -48,7 +48,6 @@ public final class RestconfDataServiceConstant {
         public static final int MIN_DEPTH = 1;
         public static final int MAX_DEPTH = 65535;
 
-        public static final String READ_TYPE_TX = "READ";
         public static final String WITH_DEFAULTS = "with-defaults";
 
         /**

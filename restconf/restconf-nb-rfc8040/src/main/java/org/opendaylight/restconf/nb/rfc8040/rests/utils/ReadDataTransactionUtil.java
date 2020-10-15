@@ -78,9 +78,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * <li>state
  * <li>all (config + state)
  * </ul>
- *
  */
 public final class ReadDataTransactionUtil {
+    private static final String READ_TYPE_TX = "READ";
 
     private ReadDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
@@ -102,8 +102,7 @@ public final class ReadDataTransactionUtil {
         }
 
         // check only allowed parameters
-        checkParametersTypes(RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                uriInfo.getQueryParameters().keySet(),
+        checkParametersTypes(uriInfo.getQueryParameters().keySet(),
                 RestconfDataServiceConstant.ReadData.CONTENT,
                 RestconfDataServiceConstant.ReadData.DEPTH,
                 RestconfDataServiceConstant.ReadData.FIELDS, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
@@ -243,13 +242,11 @@ public final class ReadDataTransactionUtil {
     /**
      * Check if URI does not contain not allowed parameters for specified operation.
      *
-     * @param operationType type of operation (READ, POST, PUT, DELETE...)
      * @param usedParameters parameters used in URI request
      * @param allowedParameters allowed parameters for operation
      */
     @VisibleForTesting
-    static void checkParametersTypes(final @NonNull String operationType,
-                                     final @NonNull Set<String> usedParameters,
+    static void checkParametersTypes(final @NonNull Set<String> usedParameters,
                                      final @NonNull String... allowedParameters) {
         // FIXME: there should be a speedier way to do this
         final Set<String> notAllowedParameters = Sets.newHashSet(usedParameters);
@@ -257,7 +254,7 @@ public final class ReadDataTransactionUtil {
 
         if (!notAllowedParameters.isEmpty()) {
             throw new RestconfDocumentedException(
-                    "Not allowed parameters for " + operationType + " operation: " + notAllowedParameters,
+                    "Not allowed parameters for " + READ_TYPE_TX + " operation: " + notAllowedParameters,
                     RestconfError.ErrorType.PROTOCOL,
                     RestconfError.ErrorTag.INVALID_VALUE);
         }
@@ -402,11 +399,9 @@ public final class ReadDataTransactionUtil {
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(store, path);
         if (closeTransactionChain) {
             //Method close transactionChain if any
-            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                    dataFactory, strategy.getTransactionChain());
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory, strategy.getTransactionChain());
         } else {
-            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                    dataFactory);
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory);
         }
         return dataFactory.build();
     }
