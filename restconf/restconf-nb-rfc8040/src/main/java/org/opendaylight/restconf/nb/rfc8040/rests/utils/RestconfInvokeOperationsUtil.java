@@ -117,7 +117,7 @@ public final class RestconfInvokeOperationsUtil {
 
     private static DOMRpcResult prepareResult(final ListenableFuture<? extends DOMRpcResult> rpc) {
         final RpcResultFactory dataFactory = new RpcResultFactory();
-        FutureCallbackTx.addCallback(rpc, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
+        FutureCallbackTx.addCallback(rpc, PostDataTransactionUtil.POST_TX_TYPE, dataFactory);
         return dataFactory.build();
     }
 
@@ -191,7 +191,7 @@ public final class RestconfInvokeOperationsUtil {
      */
     private static DOMActionResult prepareActionResult(final ListenableFuture<? extends DOMActionResult> actionResult) {
         final ActionResultFactory dataFactory = new ActionResultFactory();
-        FutureCallbackTx.addCallback(actionResult, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
+        FutureCallbackTx.addCallback(actionResult, PostDataTransactionUtil.POST_TX_TYPE, dataFactory);
         return dataFactory.build();
     }
 
