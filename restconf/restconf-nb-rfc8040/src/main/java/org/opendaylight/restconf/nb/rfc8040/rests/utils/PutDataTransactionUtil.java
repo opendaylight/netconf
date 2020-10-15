@@ -51,6 +51,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
  *
  */
 public final class PutDataTransactionUtil {
+    private static final String PUT_TX_TYPE = "PUT";
 
     private PutDataTransactionUtil() {
     }
@@ -150,15 +151,14 @@ public final class PutDataTransactionUtil {
         strategy.prepareReadWriteExecution();
         final FluentFuture<Boolean> existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
         final FutureDataFactory<Boolean> existsResponse = new FutureDataFactory<>();
-        FutureCallbackTx.addCallback(existsFuture, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, existsResponse);
+        FutureCallbackTx.addCallback(existsFuture, PUT_TX_TYPE, existsResponse);
 
         final ResponseFactory responseFactory =
                 new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
         final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
                 payload.getData(), insert, point, existsResponse.result);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory,
-                strategy.getTransactionChain());
+        FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, strategy.getTransactionChain());
         return responseFactory.build();
     }
 

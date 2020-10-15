@@ -147,18 +147,6 @@ public final class RestconfDataServiceConstant {
     }
 
     /**
-     * Constants for data to put.
-     *
-     */
-    public static final class PutData {
-        public static final String PUT_TX_TYPE = "PUT";
-
-        private PutData() {
-            throw new UnsupportedOperationException("Util class.");
-        }
-    }
-
-    /**
      * Constants for data to post.
      *
      */
