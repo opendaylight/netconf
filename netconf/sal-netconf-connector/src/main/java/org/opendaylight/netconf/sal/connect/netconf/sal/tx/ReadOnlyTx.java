@@ -25,12 +25,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class ReadOnlyTx implements DOMDataTreeReadTransaction {
+public class ReadOnlyTx implements DOMDataTreeReadTransaction {
 
     private static final Logger LOG  = LoggerFactory.getLogger(ReadOnlyTx.class);
 
-    private final NetconfBaseOps netconfOps;
-    private final RemoteDeviceId id;
+    protected final NetconfBaseOps netconfOps;
+    protected final RemoteDeviceId id;
 
     public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id) {
         this.netconfOps = netconfOps;
@@ -49,7 +49,7 @@ public final class ReadOnlyTx implements DOMDataTreeReadTransaction {
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
     }
 
-    private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
+    protected static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
         final SettableFuture<T> ret = SettableFuture.create();
         Futures.addCallback(input, new FutureCallback<T>() {
 

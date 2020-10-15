@@ -112,9 +112,23 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     }
 
     @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
+                                                                final List<YangInstanceIdentifier> fields) {
+        return netconfOps.getData(new NetconfRpcFutureCallback("Data read", id),
+                Optional.ofNullable(path), fields);
+    }
+
+    @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
         return netconfOps.getConfigRunningData(
                 new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path));
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
+                                                                      final List<YangInstanceIdentifier> fields) {
+        return netconfOps.getConfigRunningData(
+                new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path), fields);
     }
 
     @Override
