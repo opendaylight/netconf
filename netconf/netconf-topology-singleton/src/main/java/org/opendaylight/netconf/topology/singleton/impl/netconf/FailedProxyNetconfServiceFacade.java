@@ -63,8 +63,22 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
     }
 
     @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
+                                                                final List<YangInstanceIdentifier> fields) {
+        LOG.debug("{}: Get {} {} with fields {} - failure", id, OPERATIONAL, path, fields, failure);
+        return FluentFutures.immediateFailedFluentFuture(new ReadFailedException("get", failure));
+    }
+
+    @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path) {
         LOG.debug("{}: GetConfig {} {} - failure", id, CONFIGURATION, path, failure);
+        return FluentFutures.immediateFailedFluentFuture(new ReadFailedException("getConfig", failure));
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
+                                                                      final List<YangInstanceIdentifier> fields) {
+        LOG.debug("{}: GetConfig {} {} with fields {} - failure", id, CONFIGURATION, path, fields, failure);
         return FluentFutures.immediateFailedFluentFuture(new ReadFailedException("getConfig", failure));
     }
 
