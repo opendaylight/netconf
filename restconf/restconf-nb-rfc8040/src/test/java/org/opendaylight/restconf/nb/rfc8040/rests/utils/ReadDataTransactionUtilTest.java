@@ -340,7 +340,7 @@ public class ReadDataTransactionUtilTest {
 
     @Test(expected = RestconfDocumentedException.class)
     public void readDataFailTest() {
-        final String valueOfContent = RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
+        final String valueOfContent = "nonsense";
         NormalizedNode<?, ?> normalizedNode = readData(valueOfContent, null, mdsalStrategy);
         assertNull(normalizedNode);
 
@@ -585,8 +585,7 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void checkParametersTypesTest() {
-        ReadDataTransactionUtil.checkParametersTypes(RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                Set.of("content"),
+        ReadDataTransactionUtil.checkParametersTypes(Set.of("content"),
                 RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH);
     }
 
@@ -596,8 +595,7 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void checkParametersTypesNegativeTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.checkParametersTypes(RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                    Set.of("not-allowed-parameter"),
+            () -> ReadDataTransactionUtil.checkParametersTypes(Set.of("not-allowed-parameter"),
                     RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH));
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
