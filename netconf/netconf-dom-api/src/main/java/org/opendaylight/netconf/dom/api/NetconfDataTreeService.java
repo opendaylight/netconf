@@ -56,12 +56,30 @@ public interface NetconfDataTreeService extends DOMService {
     ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path);
 
     /**
+     * The &lt;get&gt; operation with specific fields that are read from device.
+     *
+     * @param path   path to data
+     * @param fields list of fields (paths relative to parent path)
+     * @return result of &lt;get&gt; operation
+     */
+    ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path,
+                                                         List<YangInstanceIdentifier> fields);
+
+    /**
      * The &lt;get-config&gt; operation.
      * Retrieve all or part of a specified configuration datastore.
      *
      * @return result of &lt;get-config&gt; operation
      */
     ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path);
+
+    /**
+     * The &lt;get-config&gt; operation with specified fields that are read from device.
+     *
+     * @return result of &lt;get-config&gt; operation
+     */
+    ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path,
+                                                               List<YangInstanceIdentifier> fields);
 
     /**
      * The &lt;edit-config&gt; operation with "merge" attribute.
