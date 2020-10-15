@@ -19,13 +19,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-public class ReadWriteTx implements DOMDataTreeReadWriteTransaction {
+public class ReadWriteTx<T extends DOMDataTreeReadTransaction> implements DOMDataTreeReadWriteTransaction {
 
-    private final DOMDataTreeReadTransaction delegateReadTx;
+    protected final T delegateReadTx;
     private final DOMDataTreeWriteTransaction delegateWriteTx;
 
-    public ReadWriteTx(final DOMDataTreeReadTransaction delegateReadTx,
-            final DOMDataTreeWriteTransaction delegateWriteTx) {
+    public ReadWriteTx(final T delegateReadTx, final DOMDataTreeWriteTransaction delegateWriteTx) {
         this.delegateReadTx = delegateReadTx;
         this.delegateWriteTx = delegateWriteTx;
     }
