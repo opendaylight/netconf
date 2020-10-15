@@ -37,7 +37,9 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.CreateEditCo
 import org.opendaylight.netconf.topology.singleton.messages.netconf.DeleteEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.DiscardChangesRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.GetConfigRequest;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.GetConfigWithFieldsRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.GetRequest;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.GetWithFieldsRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.LockRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.MergeEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditConfigRequest;
@@ -94,9 +96,26 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
+                                                                final List<YangInstanceIdentifier> fields) {
+        LOG.debug("{}: Get {} {} with fields {} via actor {}", id, OPERATIONAL, path, fields, masterActor);
+        final Future<Object> future = Patterns.ask(masterActor, new GetWithFieldsRequest(path, fields), askTimeout);
+        return read(future, OPERATIONAL, path);
+    }
+
+    @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path) {
         LOG.debug("{}: GetConfig {} {} via actor {}", id, CONFIGURATION, path, masterActor);
         final Future<Object> future = Patterns.ask(masterActor, new GetConfigRequest(path), askTimeout);
+        return read(future, CONFIGURATION, path);
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
+                                                                      final List<YangInstanceIdentifier> fields) {
+        LOG.debug("{}: GetConfig {} {} with fields {} via actor {}", id, CONFIGURATION, path, fields, masterActor);
+        final Future<Object> future = Patterns.ask(masterActor,
+                new GetConfigWithFieldsRequest(path, fields), askTimeout);
         return read(future, CONFIGURATION, path);
     }
 

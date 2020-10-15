@@ -28,7 +28,9 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.CreateEditCo
 import org.opendaylight.netconf.topology.singleton.messages.netconf.DeleteEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.DiscardChangesRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.GetConfigRequest;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.GetConfigWithFieldsRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.GetRequest;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.GetWithFieldsRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.LockRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.MergeEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditConfigRequest;
@@ -64,10 +66,24 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
 
     @Override
     public void onReceive(final Object message) {
-        if (message instanceof GetRequest) {
+        if (message instanceof GetWithFieldsRequest) {
+            final GetWithFieldsRequest getRequest = (GetWithFieldsRequest) message;
+            final YangInstanceIdentifier path = getRequest.getPath();
+            final ListenableFuture<Optional<NormalizedNode<?, ?>>> future = netconfService.get(
+                    getRequest.getPath(), getRequest.getFields());
+            context().stop(self());
+            sendResult(future, path, sender(), self());
+        } else if (message instanceof GetRequest) {
             final GetRequest getRequest = (GetRequest) message;
             final YangInstanceIdentifier path = getRequest.getPath();
             final ListenableFuture<Optional<NormalizedNode<?, ?>>> future = netconfService.get(path);
+            context().stop(self());
+            sendResult(future, path, sender(), self());
+        } else if (message instanceof GetConfigWithFieldsRequest) {
+            final GetConfigWithFieldsRequest getConfigRequest = (GetConfigWithFieldsRequest) message;
+            final YangInstanceIdentifier path = getConfigRequest.getPath();
+            final ListenableFuture<Optional<NormalizedNode<?, ?>>> future = netconfService.getConfig(
+                    path, getConfigRequest.getFields());
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof GetConfigRequest) {
