@@ -98,10 +98,28 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
+                                                                final List<YangInstanceIdentifier> fields) {
+        LOG.debug("{}: Get {} {} with fields: {}", id, OPERATIONAL, path, fields);
+        final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.get(path, fields)));
+        return returnFuture;
+    }
+
+    @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path) {
         LOG.debug("{}: Get config {} {}", id, CONFIGURATION, path);
         final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.getConfig(path)));
+        return returnFuture;
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
+                                                                      final List<YangInstanceIdentifier> fields) {
+        LOG.debug("{}: Get config {} {} with fields: {}", id, CONFIGURATION, path, fields);
+        final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.getConfig(path, fields)));
         return returnFuture;
     }
 
