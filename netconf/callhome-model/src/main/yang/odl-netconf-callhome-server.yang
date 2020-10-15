@@ -12,6 +12,13 @@ module odl-netconf-callhome-server {
   description
    "This module defines the northbound interface for OpenDaylight NETCONF Callhome.";
 
+  revision 2020-10-15 {
+    description
+     "This revision adds connectivity details for one of the supported transport protocols";
+    reference
+     "RFC 8071: NETCONF Call Home and RESTCONF Call Home";
+  }
+
   revision "2016-11-09" {
     description "Initial version";
   }
