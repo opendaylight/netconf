@@ -25,7 +25,6 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PatchData;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -37,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 public final class PatchDataTransactionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(PatchDataTransactionUtil.class);
+    // FIXME: why is this used from other contexts?
+    static final String PATCH_TX_TYPE = "Patch";
 
     private PatchDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
@@ -134,7 +135,7 @@ public final class PatchDataTransactionUtil {
 
             try {
                 //This method will close transactionChain if any
-                FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response, strategy.getTransactionChain());
+                FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response, strategy.getTransactionChain());
             } catch (final RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
@@ -182,7 +183,7 @@ public final class PatchDataTransactionUtil {
         final FluentFuture<Boolean> future = strategy.exists(dataStore, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
 
-        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
+        FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response);
 
         if (!response.result) {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
@@ -304,7 +305,7 @@ public final class PatchDataTransactionUtil {
         final FluentFuture<Boolean> future = strategy.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
 
-        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
+        FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response);
 
         if (response.result) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
