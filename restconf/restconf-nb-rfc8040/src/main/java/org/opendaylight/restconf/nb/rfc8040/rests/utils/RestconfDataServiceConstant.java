@@ -147,18 +147,6 @@ public final class RestconfDataServiceConstant {
     }
 
     /**
-     * Constants for data to post.
-     *
-     */
-    public static final class PostData {
-        public static final String POST_TX_TYPE = "POST";
-
-        private PostData() {
-            throw new UnsupportedOperationException("Util class.");
-        }
-    }
-
-    /**
      * Constants for data to yang patch.
      *
      */
