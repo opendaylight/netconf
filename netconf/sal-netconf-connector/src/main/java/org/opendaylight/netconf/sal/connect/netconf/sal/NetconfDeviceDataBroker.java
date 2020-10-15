@@ -18,7 +18,14 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
+import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
+import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
+import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
+import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsTransactionChain;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.FieldsAwareReadOnlyTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.FieldsAwareReadWriteTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.FieldsAwareTxChain;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.TxChain;
@@ -30,6 +37,8 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
+
+    private final NetconfDOMDataBrokerFieldsExtension fieldsExtension = new NetconfDOMDataBrokerFieldsExtensionImpl();
 
     private final RemoteDeviceId id;
     private final NetconfBaseOps netconfOps;
@@ -60,7 +69,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     @Override
     public DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
-        return new ReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
+        return new ReadWriteTx<>(newReadOnlyTransaction(), newWriteOnlyTransaction());
     }
 
     @Override
@@ -83,11 +92,27 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     @Override
     public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
-        return ImmutableClassToInstanceMap.of();
+        return ImmutableClassToInstanceMap.of(NetconfDOMDataBrokerFieldsExtension.class, fieldsExtension);
     }
 
     void setLockAllowed(final boolean isLockAllowedOrig) {
         this.isLockAllowed = isLockAllowedOrig;
     }
 
+    private final class NetconfDOMDataBrokerFieldsExtensionImpl implements NetconfDOMDataBrokerFieldsExtension {
+        @Override
+        public NetconfDOMFieldsReadTransaction newReadOnlyTransaction() {
+            return new FieldsAwareReadOnlyTx(netconfOps, id);
+        }
+
+        @Override
+        public NetconfDOMFieldsReadWriteTransaction newReadWriteTransaction() {
+            return new FieldsAwareReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
+        }
+
+        @Override
+        public NetconfDOMFieldsTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
+            return new FieldsAwareTxChain(NetconfDeviceDataBroker.this, listener, this);
+        }
+    }
 }

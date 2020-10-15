@@ -19,57 +19,55 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-public class ReadWriteTx implements DOMDataTreeReadWriteTransaction {
-
-    private final DOMDataTreeReadTransaction delegateReadTx;
+public class ReadWriteTx<T extends DOMDataTreeReadTransaction> implements DOMDataTreeReadWriteTransaction {
     private final DOMDataTreeWriteTransaction delegateWriteTx;
+    final T delegateReadTx;
 
-    public ReadWriteTx(final DOMDataTreeReadTransaction delegateReadTx,
-            final DOMDataTreeWriteTransaction delegateWriteTx) {
+    public ReadWriteTx(final T delegateReadTx, final DOMDataTreeWriteTransaction delegateWriteTx) {
         this.delegateReadTx = delegateReadTx;
         this.delegateWriteTx = delegateWriteTx;
     }
 
     @Override
-    public boolean cancel() {
+    public final boolean cancel() {
         return delegateWriteTx.cancel();
     }
 
     @Override
-    public void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                    final NormalizedNode<?, ?> data) {
+    public final void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                          final NormalizedNode<?, ?> data) {
         delegateWriteTx.put(store, path, data);
     }
 
     @Override
-    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                      final NormalizedNode<?, ?> data) {
+    public final void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                            final NormalizedNode<?, ?> data) {
         delegateWriteTx.merge(store, path, data);
     }
 
     @Override
-    public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    public final void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         delegateWriteTx.delete(store, path);
     }
 
     @Override
-    public FluentFuture<? extends @NonNull CommitInfo> commit() {
+    public final FluentFuture<? extends @NonNull CommitInfo> commit() {
         return delegateWriteTx.commit();
     }
 
     @Override
-    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+    public final FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         return delegateReadTx.read(store, path);
     }
 
     @Override
-    public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    public final FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         return delegateReadTx.exists(store, path);
     }
 
     @Override
-    public Object getIdentifier() {
+    public final Object getIdentifier() {
         return this;
     }
 }
