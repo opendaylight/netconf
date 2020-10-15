@@ -41,6 +41,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
@@ -212,9 +213,22 @@ public final class NetconfBaseOps {
         return extractData(filterPath, getConfigRunning(callback, filterPath));
     }
 
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
+            final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath,
+            final List<YangInstanceIdentifier> fields) {
+        // FIXME: implement this method
+        throw new UnsupportedOperationException();
+    }
+
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
                                                                     final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, get(callback, filterPath));
+    }
+
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
+            final Optional<YangInstanceIdentifier> path, final List<YangInstanceIdentifier> fields) {
+        // FIXME: implement this method
+        throw new UnsupportedOperationException();
     }
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
@@ -364,5 +378,4 @@ public final class NetconfBaseOps {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_UNLOCK_NODEID)
                 .withChild(getTargetNode(datastore)).build();
     }
-
 }
