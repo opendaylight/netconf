@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DeleteDataTransactionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(DeleteDataTransactionUtil.class);
+    private static final String DELETE_TX_TYPE = "DELETE";
 
     private DeleteDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
@@ -38,17 +39,14 @@ public final class DeleteDataTransactionUtil {
      */
     public static Response deleteData(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
         strategy.prepareReadWriteExecution();
-        checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path,
-                RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
+        checkItemExists(strategy, LogicalDatastoreType.CONFIGURATION, path, DELETE_TX_TYPE);
         strategy.delete(LogicalDatastoreType.CONFIGURATION, path);
         final FluentFuture<? extends CommitInfo> future = strategy.commit();
         final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response,
-                strategy.getTransactionChain());
+        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, strategy.getTransactionChain());
         return response.build();
     }
-
 
     /**
      * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
