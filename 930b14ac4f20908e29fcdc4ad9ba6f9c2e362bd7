@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "855a00d6_3e33fb01",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 1030,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-15T11:15:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18643ea9_637d42a2",
+      "revId": "930b14ac4f20908e29fcdc4ad9ba6f9c2e362bd7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c9717704_1c849e3a",
         "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
         "patchSetId": 6
@@ -33,6 +51,24 @@
       "revId": "930b14ac4f20908e29fcdc4ad9ba6f9c2e362bd7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d42bec4_23702fac",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-15T11:15:06Z",
+      "side": 1,
+      "message": "RFC practice says we need to do this. Will be done as separate patch",
+      "parentUuid": "c9717704_1c849e3a",
+      "revId": "930b14ac4f20908e29fcdc4ad9ba6f9c2e362bd7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
