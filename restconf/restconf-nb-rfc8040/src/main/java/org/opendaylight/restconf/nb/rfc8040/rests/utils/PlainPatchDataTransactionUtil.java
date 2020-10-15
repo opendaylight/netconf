@@ -62,7 +62,7 @@ public final class PlainPatchDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> future = strategy.commit();
         final ResponseFactory response = new ResponseFactory(Status.OK);
 
-        FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PatchData.PATCH_TX_TYPE, response,
+        FutureCallbackTx.addCallback(future, PatchDataTransactionUtil.PATCH_TX_TYPE, response,
                 strategy.getTransactionChain()); // closes transactionChain if any, may throw
 
         return response.build();
