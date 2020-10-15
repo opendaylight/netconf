@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -18,6 +19,10 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
+import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
+import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
+import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
+import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsTransactionChain;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
@@ -25,11 +30,16 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.TxChain;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.fields.FieldsAwareReadOnlyTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.fields.FieldsAwareReadWriteTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.fields.FieldsAwareTxChain;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
+
+    private final NetconfDOMDataBrokerFieldsExtension fieldsExtension = new NetconfDOMDataBrokerFieldsExtensionImpl();
 
     private final RemoteDeviceId id;
     private final NetconfBaseOps netconfOps;
@@ -60,7 +70,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     @Override
     public DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
-        return new ReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
+        return new ReadWriteTx<>(newReadOnlyTransaction(), newWriteOnlyTransaction());
     }
 
     @Override
@@ -83,11 +93,30 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     @Override
     public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
-        return ImmutableClassToInstanceMap.of();
+        return ImmutableClassToInstanceMap.of(NetconfDOMDataBrokerFieldsExtension.class, fieldsExtension);
     }
 
     void setLockAllowed(final boolean isLockAllowedOrig) {
         this.isLockAllowed = isLockAllowedOrig;
     }
 
+    private final class NetconfDOMDataBrokerFieldsExtensionImpl implements NetconfDOMDataBrokerFieldsExtension {
+        @Override
+        @NonNull
+        public NetconfDOMFieldsReadTransaction newReadOnlyTransaction() {
+            return new FieldsAwareReadOnlyTx(netconfOps, id);
+        }
+
+        @Override
+        @NonNull
+        public NetconfDOMFieldsReadWriteTransaction newReadWriteTransaction() {
+            return new FieldsAwareReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
+        }
+
+        @Override
+        @NonNull
+        public NetconfDOMFieldsTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
+            return new FieldsAwareTxChain(NetconfDeviceDataBroker.this, listener, this);
+        }
+    }
 }
