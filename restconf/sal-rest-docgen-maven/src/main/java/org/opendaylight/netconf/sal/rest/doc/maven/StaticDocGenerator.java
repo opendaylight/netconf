@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
-import org.apache.maven.project.MavenProject;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGeneratorDraft02;
@@ -32,7 +31,6 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang2sources.spi.BasicCodeGenerator;
-import org.opendaylight.yangtools.yang2sources.spi.MavenProjectAware;
 import org.opendaylight.yangtools.yang2sources.spi.ModuleResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * This class gathers all yang defined {@link Module}s and generates Swagger compliant documentation.
  */
 public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
-        implements BasicCodeGenerator, MavenProjectAware {
+        implements BasicCodeGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(StaticDocGenerator.class);
 
     private static final String DEFAULT_OUTPUT_BASE_DIR_PATH = "target" + File.separator + "generated-resources"
@@ -138,13 +136,11 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
 
     @Override
     public void setAdditionalConfig(final Map<String, String> additionalConfig) {
+        // No-op, although it should not be
     }
 
     @Override
     public void setResourceBaseDir(final File resourceBaseDir) {
-    }
-
-    @Override
-    public void setMavenProject(final MavenProject mavenProject) {
+        // No-op, although it should not be
     }
 }
