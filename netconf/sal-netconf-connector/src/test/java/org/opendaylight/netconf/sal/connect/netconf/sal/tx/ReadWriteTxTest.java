@@ -30,12 +30,12 @@ public class ReadWriteTxTest {
     private DOMDataTreeReadTransaction delegateReadTx;
     @Mock
     private DOMDataTreeWriteTransaction delegateWriteTx;
-    private ReadWriteTx tx;
+    private ReadWriteTx<?> tx;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        tx = new ReadWriteTx(delegateReadTx, delegateWriteTx);
+        tx = new ReadWriteTx<>(delegateReadTx, delegateWriteTx);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ReadWriteTxTest {
 
     @Test
     public void getIdentifier() throws Exception {
-        final ReadWriteTx tx2 = new ReadWriteTx(null, null);
+        final ReadWriteTx<?> tx2 = new ReadWriteTx<>(null, null);
         assertNotEquals(tx.getIdentifier(), tx2.getIdentifier());
     }
 }

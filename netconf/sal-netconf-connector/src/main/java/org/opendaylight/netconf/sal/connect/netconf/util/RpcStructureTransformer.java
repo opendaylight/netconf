@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
+import java.util.List;
 import java.util.Optional;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -22,6 +23,7 @@ interface RpcStructureTransformer {
     /**
      * Transforms data and path to the config element structure. It means creating of parent xml structure
      * specified by path and appending data to the structure. Operation is set as attribute on data element.
+     *
      * @param data data
      * @param dataPath path, where data will be written
      * @param operation operation
@@ -32,14 +34,25 @@ interface RpcStructureTransformer {
 
     /**
      * Transforms path to filter structure.
+     *
      * @param path path
      * @return filter structure
      */
     DataContainerChild<?,?> toFilterStructure(YangInstanceIdentifier path);
 
     /**
+     * Transforms list of fields filters to filter structure.
+     * Field paths are relative to parent query path.
+     *
+     * @param fieldsFilters list of: parent path and selection fields
+     * @return filter structure
+     */
+    DataContainerChild<?,?> toFilterStructure(List<FieldsFilter> fieldsFilters);
+
+    /**
      * Selects data specified by path from data node. Data must be product of get-config rpc with filter created by
-     * {@link #toFilterStructure(YangInstanceIdentifier)} with same path.
+     * {@link #toFilterStructure(YangInstanceIdentifier)} or {@link #toFilterStructure(List)} )} with same path.
+     *
      * @param data data
      * @param path path to select
      * @return selected data
