@@ -23,7 +23,7 @@ public final class TxTestUtils {
 
     }
 
-    static YangInstanceIdentifier getContainerId() {
+    public static YangInstanceIdentifier getContainerId() {
         return YangInstanceIdentifier.builder()
                 .node(Q_NAME_1)
                 .build();
@@ -36,7 +36,7 @@ public final class TxTestUtils {
                 .build();
     }
 
-    static ContainerNode getContainerNode() {
+    public static ContainerNode getContainerNode() {
         return Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Q_NAME_1))
                 .build();

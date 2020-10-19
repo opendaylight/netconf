@@ -13,6 +13,7 @@ import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedN
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
@@ -91,7 +93,27 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
     abstract StreamingContext<?> getChild(PathArgument child);
 
+    /**
+     * Writing node structure that is described by series of {@link PathArgument}
+     * into {@link NormalizedNodeStreamWriter}.
+     *
+     * @param writer output {@link NormalizedNode} writer
+     * @param first  the first {@link PathArgument}
+     * @param others iterator that points to next path arguments
+     * @throws IOException failed to write a stream of path arguments into {@link NormalizedNodeStreamWriter}
+     */
     abstract void streamToWriter(NormalizedNodeStreamWriter writer, PathArgument first, Iterator<PathArgument> others)
+            throws IOException;
+
+    /**
+     * Writing node structure that is described by provided {@link TreeNode} into {@link NormalizedNodeStreamWriter}.
+     *
+     * @param writer output {@link NormalizedNode} writer
+     * @param first  the first {@link PathArgument}
+     * @param tree   subtree of path arguments that starts with the first path argument
+     * @throws IOException failed to write a stream of path arguments into {@link NormalizedNodeStreamWriter}
+     */
+    abstract void streamToWriter(NormalizedNodeStreamWriter writer, PathArgument first, TreeNode<PathArgument> tree)
             throws IOException;
 
     abstract boolean isMixin();
@@ -135,13 +157,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         @Override
         final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
                 final Iterator<PathArgument> others) throws IOException {
-            if (!isMixin()) {
-                final QName type = getIdentifier().getNodeType();
-                if (type != null) {
-                    final QName firstType = first.getNodeType();
-                    checkArgument(type.equals(firstType), "Node QName must be %s was %s", type, firstType);
-                }
-            }
+            verifyActualPathArgument(first);
 
             emitElementStart(writer, first);
             if (others.hasNext()) {
@@ -150,6 +166,28 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
                 childOp.streamToWriter(writer, childPath, others);
             }
             writer.endNode();
+        }
+
+        @Override
+        void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                            final TreeNode<PathArgument> subtree) throws IOException {
+            verifyActualPathArgument(first);
+
+            emitElementStart(writer, first);
+            for (final TreeNode<PathArgument> node : subtree.values()) {
+                final PathArgument childPath = node.getElement();
+                final StreamingContext<?> childOp = getChildOperation(childPath);
+                childOp.streamToWriter(writer, childPath, node);
+            }
+            writer.endNode();
+        }
+
+        private void verifyActualPathArgument(final PathArgument first) {
+            if (!isMixin()) {
+                final QName type = getIdentifier().getNodeType();
+                final QName firstType = first.getNodeType();
+                checkArgument(type.equals(firstType), "Node QName must be %s was %s", type, firstType);
+            }
         }
 
         abstract void emitElementStart(NormalizedNodeStreamWriter writer, PathArgument arg) throws IOException;
@@ -230,6 +268,12 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         @Override
         final boolean isMixin() {
             return false;
+        }
+
+        @Override
+        void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                            final TreeNode<PathArgument> tree) throws IOException {
+            streamToWriter(writer, first, Collections.emptyIterator());
         }
     }
 
