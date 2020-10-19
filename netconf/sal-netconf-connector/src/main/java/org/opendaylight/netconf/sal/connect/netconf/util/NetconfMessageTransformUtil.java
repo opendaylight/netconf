@@ -226,29 +226,66 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull DataContainerChild<?, ?> EMPTY_FILTER;
 
     static {
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
-                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(),
-                NETCONF_TYPE_QNAME.getLocalName(), SUBTREE);
-
-        EMPTY_FILTER = Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID)
-                .withValue(new DOMSource(element)).build();
+        final Element element = getNetconfFilterElement();
+        EMPTY_FILTER = buildFilterStructure(element);
     }
 
+    /**
+     * Creation of the subtree filter structure using {@link YangInstanceIdentifier} path.
+     *
+     * @param identifier parent path / query
+     * @param ctx        mountpoint schema context
+     * @return created DOM structure with subtree filter
+     */
     public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
                                                              final EffectiveModelContext ctx) {
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
-                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
-                SUBTREE);
-
+        final Element element = getNetconfFilterElement();
         try {
             NetconfUtil.writeFilter(identifier, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
+        return buildFilterStructure(element);
+    }
 
-        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
+    /**
+     * Creation of the subtree filter structure using list of parent {@link YangInstanceIdentifier}
+     * and specific selection fields. Field paths are relative to parent query path.
+     *
+     * @param fieldsFilters list of: parent path and selection fields
+     * @param ctx           mountpoint schema context
+     * @return created DOM structure with subtree filter
+     */
+    public static DataContainerChild<?, ?> toFilterStructure(final List<FieldsFilter> fieldsFilters,
+                                                             final EffectiveModelContext ctx) {
+        Preconditions.checkState(!fieldsFilters.isEmpty(), "An empty list of subtree filters is not allowed");
+        final Element element = getNetconfFilterElement();
+
+        for (final FieldsFilter filter : fieldsFilters) {
+            try {
+                NetconfUtil.writeFilter(filter.getPath(), new DOMResult(element),
+                        SchemaPath.ROOT, ctx, filter.getFields());
+            } catch (IOException | XMLStreamException e) {
+                throw new IllegalStateException(String.format(
+                        "Unable to serialize filter element for path %s with fields: %s",
+                        filter.getPath(), filter.getFields()), e);
+            }
+        }
+        return buildFilterStructure(element);
+    }
+
+    private static Element getNetconfFilterElement() {
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
+                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
+        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                SUBTREE);
+        return element;
+    }
+
+    private static DataContainerChild<?, ?> buildFilterStructure(final Element element) {
+        return Builders.anyXmlBuilder()
+                .withNodeIdentifier(NETCONF_FILTER_NODEID)
+                .withValue(new DOMSource(element))
                 .build();
     }
 

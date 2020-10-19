@@ -1,0 +1,15 @@
+<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <get>
+        <filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+            <c xmlns="test:namespace">
+                <a/>
+                <d>
+                    <x/>
+                </d>
+            </c>
+            <e xmlns="test:namespace">
+                <z/>
+            </e>
+        </filter>
+    </get>
+</rpc>
