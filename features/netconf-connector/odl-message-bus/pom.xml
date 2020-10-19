@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-controller-exp-messagebus</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
