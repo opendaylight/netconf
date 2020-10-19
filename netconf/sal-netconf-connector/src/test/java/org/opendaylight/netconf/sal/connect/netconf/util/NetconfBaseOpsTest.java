@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -16,12 +19,14 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,8 +46,11 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -54,7 +62,24 @@ import org.xml.sax.SAXException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfBaseOpsTest extends AbstractTestModelTest {
-    private static final QName CONTAINER_Q_NAME = QName.create("test:namespace", "2013-07-22", "c");
+    private static final QNameModule TEST_MODULE = QNameModule.create(
+            URI.create("test:namespace"), Revision.of("2013-07-22"));
+
+    private static final QName CONTAINER_C_QNAME = QName.create(TEST_MODULE, "c");
+    private static final NodeIdentifier CONTAINER_C_NID = NodeIdentifier.create(CONTAINER_C_QNAME);
+    private static final QName LEAF_A_QNAME = QName.create(TEST_MODULE, "a");
+    private static final NodeIdentifier LEAF_A_NID = NodeIdentifier.create(LEAF_A_QNAME);
+    private static final QName LEAF_B_QNAME = QName.create(TEST_MODULE, "b");
+    private static final NodeIdentifier LEAF_B_NID = NodeIdentifier.create(LEAF_B_QNAME);
+    private static final QName CONTAINER_D_QNAME = QName.create(TEST_MODULE, "d");
+    private static final NodeIdentifier CONTAINER_D_NID = NodeIdentifier.create(CONTAINER_D_QNAME);
+    private static final QName LEAF_X_QNAME = QName.create(TEST_MODULE, "x");
+    private static final NodeIdentifier LEAF_X_NID = NodeIdentifier.create(LEAF_X_QNAME);
+
+    private static final QName CONTAINER_E_QNAME = QName.create(TEST_MODULE, "e");
+    private static final NodeIdentifier CONTAINER_E_NID = NodeIdentifier.create(CONTAINER_E_QNAME);
+    private static final QName LEAF_Z_QNAME = QName.create(TEST_MODULE, "z");
+    private static final NodeIdentifier LEAF_Z_NID = NodeIdentifier.create(LEAF_Z_QNAME);
 
     static {
         XMLUnit.setIgnoreWhitespace(true);
@@ -178,16 +203,16 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     public void testGetConfigRunningData() throws Exception {
         final Optional<NormalizedNode<?, ?>> dataOpt =
                 baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
-        Assert.assertTrue(dataOpt.isPresent());
-        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+        assertTrue(dataOpt.isPresent());
+        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
     @Test
     public void testGetData() throws Exception {
         final Optional<NormalizedNode<?, ?>> dataOpt =
                 baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
-        Assert.assertTrue(dataOpt.isPresent());
-        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+        assertTrue(dataOpt.isPresent());
+        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
     @Test
@@ -205,7 +230,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     @Test
     public void testGetConfigCandidateWithFilter() throws Exception {
         final YangInstanceIdentifier id = YangInstanceIdentifier.builder()
-                .node(CONTAINER_Q_NAME)
+                .node(CONTAINER_C_QNAME)
                 .build();
         baseOps.getConfigCandidate(callback, Optional.of(id));
         verifyMessageSent("getConfig_candidate-filter", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
@@ -219,14 +244,13 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testEditConfigCandidate() throws Exception {
-        final QName leafQName = QName.create(CONTAINER_Q_NAME, "a");
         final LeafNode<Object> leaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQName))
+                .withNodeIdentifier(LEAF_A_NID)
                 .withValue("leaf-value")
                 .build();
         final YangInstanceIdentifier leafId = YangInstanceIdentifier.builder()
-                .node(CONTAINER_Q_NAME)
-                .node(leafQName)
+                .node(CONTAINER_C_QNAME)
+                .node(LEAF_A_NID)
                 .build();
         final DataContainerChild<?, ?> structure = baseOps.createEditConfigStrcture(Optional.of(leaf),
                 Optional.of(ModifyAction.REPLACE), leafId);
@@ -236,20 +260,88 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testEditConfigRunning() throws Exception {
-        final QName containerQName = QName.create("test:namespace", "2013-07-22", "c");
-        final QName leafQName = QName.create(containerQName, "a");
         final LeafNode<Object> leaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQName))
+                .withNodeIdentifier(LEAF_A_NID)
                 .withValue("leaf-value")
                 .build();
         final YangInstanceIdentifier leafId = YangInstanceIdentifier.builder()
-                .node(containerQName)
-                .node(leafQName)
+                .node(CONTAINER_C_NID)
+                .node(LEAF_A_NID)
                 .build();
         final DataContainerChild<?, ?> structure = baseOps.createEditConfigStrcture(Optional.of(leaf),
                 Optional.of(ModifyAction.REPLACE), leafId);
         baseOps.editConfigRunning(callback, structure, ModifyAction.MERGE, true);
         verifyMessageSent("edit-config-test-module-running", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
+    }
+
+    @Test
+    public void testGetWithFields() throws ExecutionException, InterruptedException {
+        final YangInstanceIdentifier path = YangInstanceIdentifier.create(CONTAINER_C_NID);
+        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.create(LEAF_A_NID);
+        final YangInstanceIdentifier leafBField = YangInstanceIdentifier.create(LEAF_B_NID);
+
+        baseOps.getData(callback, Optional.of(path), List.of(leafAField, leafBField)).get();
+        verify(listener).sendRequest(msg("/netconfMessages/get-fields-request.xml"),
+                eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME));
+    }
+
+    @Test
+    public void testGetConfigWithFields() throws ExecutionException, InterruptedException {
+        final YangInstanceIdentifier path = YangInstanceIdentifier.create(CONTAINER_C_NID);
+        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.create(LEAF_A_NID);
+        final YangInstanceIdentifier leafBField = YangInstanceIdentifier.create(LEAF_B_NID);
+
+        baseOps.getConfigRunningData(callback, Optional.of(path), List.of(leafAField, leafBField)).get();
+        verify(listener).sendRequest(msg("/netconfMessages/get-config-fields-request.xml"),
+                eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME));
+    }
+
+    @Test
+    public void testGetDataWithoutFields() {
+        assertThrows(ExecutionException.class, () -> baseOps.getData(callback,
+                Optional.of(YangInstanceIdentifier.empty()), Collections.emptyList()).get());
+    }
+
+    @Test
+    public void getConfigRunningDataWithoutFields() {
+        assertThrows(ExecutionException.class, () -> baseOps.getConfigRunningData(callback,
+                Optional.of(YangInstanceIdentifier.empty()), Collections.emptyList()).get());
+    }
+
+    @Test
+    public void testGetWithFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.create(CONTAINER_C_NID, LEAF_A_NID);
+        final YangInstanceIdentifier leafXField = YangInstanceIdentifier.create(
+                CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
+        final YangInstanceIdentifier leafZField = YangInstanceIdentifier.create(CONTAINER_E_NID, LEAF_Z_NID);
+
+        baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty()),
+                List.of(leafAField, leafXField, leafZField)).get();
+        verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-subtrees.xml"),
+                eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME));
+    }
+
+    @Test
+    public void testGetConfigWithFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+        final YangInstanceIdentifier leafAField = YangInstanceIdentifier.create(CONTAINER_C_NID, LEAF_A_NID);
+        final YangInstanceIdentifier leafXField = YangInstanceIdentifier.create(
+                CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
+        final YangInstanceIdentifier leafZField = YangInstanceIdentifier.create(CONTAINER_E_NID, LEAF_Z_NID);
+
+        baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.empty()),
+                List.of(leafAField, leafXField, leafZField)).get();
+        verify(listener).sendRequest(msg("/netconfMessages/get-config-with-multiple-subtrees.xml"),
+                eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME));
+    }
+
+    @Test
+    public void testGetWithRootFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+        final YangInstanceIdentifier contCField = YangInstanceIdentifier.create(CONTAINER_C_NID);
+        final YangInstanceIdentifier contDField = YangInstanceIdentifier.create(CONTAINER_E_NID);
+
+        baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty()), List.of(contCField, contDField)).get();
+        verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-root-subtrees.xml"),
+                eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME));
     }
 
     private void verifyMessageSent(final String fileName, final QName name) {
