@@ -62,8 +62,14 @@ import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Datastores;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Statistics;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.Datastore;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.datastore.Locks;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -812,6 +818,190 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertTrue(actionResult.getOutput().isEmpty());
     }
 
+    @Test
+    public void getTwoNonOverlappingFieldsTest() throws IOException, SAXException {
+        // preparation of the fields
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
+        final YangInstanceIdentifier netconfStartTimeField = YangInstanceIdentifier.create(toId(Statistics.QNAME),
+                toId(QName.create(Statistics.QNAME, "netconf-start-time")));
+        final YangInstanceIdentifier datastoresField = YangInstanceIdentifier.create(toId(Datastores.QNAME));
+
+        // building filter structure and NETCONF message
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                parentYiid, List.of(netconfStartTimeField, datastoresField), SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+
+        // testing
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "    <get>\n"
+                + "        <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "            <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "                <statistics>\n"
+                + "                    <netconf-start-time/>\n"
+                + "                </statistics>\n"
+                + "                <datastores/>\n"
+                + "            </netconf-state>\n"
+                + "        </filter>\n"
+                + "    </get>\n"
+                + "</rpc>\n");
+    }
+
+    @Test
+    public void getOverlappingFieldsTest() throws IOException, SAXException {
+        // preparation of the fields
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
+        final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.create(toId(Capabilities.QNAME));
+        final YangInstanceIdentifier capabilityField = YangInstanceIdentifier.create(toId(Capabilities.QNAME),
+                toId(QName.create(Capabilities.QNAME, "capability").intern()));
+        final YangInstanceIdentifier datastoreField = YangInstanceIdentifier.create(toId(Datastores.QNAME));
+        final YangInstanceIdentifier locksFields = YangInstanceIdentifier.create(toId(Datastores.QNAME),
+                toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME));
+
+        // building filter structure and NETCONF message
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                parentYiid, List.of(capabilitiesField, capabilityField, datastoreField, locksFields), SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+
+        // testing
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "    <get>\n"
+                + "        <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "            <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "                <capabilities/>\n"
+                + "                <datastores/>\n"
+                + "            </netconf-state>\n"
+                + "        </filter>\n"
+                + "    </get>\n"
+                + "</rpc>");
+    }
+
+    @Test
+    public void getOverlappingFieldsWithEmptyFieldTest() throws IOException, SAXException {
+        // preparation of the fields
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
+        final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.create(toId(Capabilities.QNAME));
+
+        // building filter structure and NETCONF message
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                parentYiid, List.of(capabilitiesField, YangInstanceIdentifier.empty()), SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+
+        // testing
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "    <get>\n"
+                + "        <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "            <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\"/>\n"
+                + "        </filter>\n"
+                + "    </get>\n"
+                + "</rpc>");
+    }
+
+    @Test
+    public void getSpecificFieldsUnderListTest() throws IOException, SAXException {
+        // preparation of the fields
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME),
+                toId(Schemas.QNAME), toId(Schema.QNAME), NodeIdentifierWithPredicates.of(Schema.QNAME));
+        final YangInstanceIdentifier versionField = YangInstanceIdentifier.create(
+                toId(QName.create(Schema.QNAME, "version").intern()));
+        final YangInstanceIdentifier identifierField = YangInstanceIdentifier.create(
+                toId(QName.create(Schema.QNAME, "identifier").intern()));
+
+        // building filter structure and NETCONF message
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                parentYiid, List.of(versionField, identifierField), SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+
+        // testing
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "    <get>\n"
+                + "        <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "            <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "                <schemas>\n"
+                + "                    <schema>\n"
+                + "                        <version/>\n"
+                + "                        <identifier/>\n"
+                + "                    </schema>\n"
+                + "                </schemas>\n"
+                + "            </netconf-state>\n"
+                + "        </filter>\n"
+                + "    </get>\n"
+                + "</rpc>");
+    }
+
+    @Test
+    public void getWholeListTest() throws IOException, SAXException {
+        // preparation of the fields
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
+        final YangInstanceIdentifier datastoreListField = YangInstanceIdentifier.create(toId(Datastores.QNAME),
+                toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME));
+        final YangInstanceIdentifier sessionListField = YangInstanceIdentifier.create(toId(Sessions.QNAME),
+                toId(Session.QNAME), NodeIdentifierWithPredicates.of(Session.QNAME));
+
+        // building filter structure and NETCONF message
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                parentYiid, List.of(datastoreListField, sessionListField), SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+
+        // testing
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "    <get>\n"
+                + "        <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "            <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "                <datastores>\n"
+                + "                    <datastore/>\n"
+                + "                </datastores>\n"
+                + "                <sessions>\n"
+                + "                    <session/>\n"
+                + "                </sessions>\n"
+                + "            </netconf-state>\n"
+                + "        </filter>\n"
+                + "    </get>\n"
+                + "</rpc>");
+    }
+
+    @Test
+    public void getSpecificListEntriesWithSpecificFieldsTest() throws IOException, SAXException {
+        // preparation of the fields
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME),
+                toId(Sessions.QNAME));
+        final QName sessionId = QName.create(Session.QNAME, "session-id").intern();
+        final YangInstanceIdentifier session1Field = YangInstanceIdentifier.create(toId(Session.QNAME),
+                NodeIdentifierWithPredicates.of(Session.QNAME, sessionId, 1));
+        final YangInstanceIdentifier session2TransportField = YangInstanceIdentifier.create(toId(Session.QNAME),
+                NodeIdentifierWithPredicates.of(Session.QNAME, sessionId, 2),
+                toId(QName.create(Session.QNAME, "transport").intern()));
+
+        // building filter structure and NETCONF message
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                parentYiid, List.of(session1Field, session2TransportField), SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+
+        // testing
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "    <get>\n"
+                + "        <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "            <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "                <sessions>\n"
+                + "                    <session>\n"
+                + "                        <session-id>1</session-id>\n"
+                + "                    </session>\n"
+                + "                    <session>\n"
+                + "                        <session-id>2</session-id>\n"
+                + "                        <transport/>\n"
+                + "                    </session>\n"
+                + "                </sessions>\n"
+                + "            </netconf-state>\n"
+                + "        </filter>\n"
+                + "    </get>\n"
+                + "</rpc>");
+    }
+
     private static void checkAction(final QName actionQname, final Node action , final String inputLocalName,
             final String inputNodeName, final String inputValue) {
         checkNode(action, actionQname.getLocalName(), actionQname.getLocalName(),
@@ -833,8 +1023,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         Node messageId = baseRpc.getAttributes().getNamedItem("message-id");
         assertNotNull(messageId);
         assertTrue(messageId.getNodeValue().contains("m-"));
-
         Node childAction = baseRpc.getFirstChild();
+
         checkNode(childAction, "action", "action", NetconfMessageTransformUtil.NETCONF_ACTION_NAMESPACE.toString());
         return childAction;
     }

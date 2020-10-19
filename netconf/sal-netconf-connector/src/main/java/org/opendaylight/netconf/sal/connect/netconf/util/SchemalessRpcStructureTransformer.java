@@ -137,6 +137,14 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
                 .build();
     }
 
+    @Override
+    public DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier path,
+                                                      final List<YangInstanceIdentifier> fields) {
+        // todo: implementation of this feature
+        throw new UnsupportedOperationException(
+                "Creation of filter structure using fields for schemaless mountpoint is not supported");
+    }
+
     private static void checkDataValidForPath(final YangInstanceIdentifier dataPath, final Element dataNode) {
         //if datapath is empty, consider dataNode to be a root node
         if (dataPath.isEmpty()) {
