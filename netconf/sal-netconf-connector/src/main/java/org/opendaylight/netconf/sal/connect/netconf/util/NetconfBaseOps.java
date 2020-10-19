@@ -37,13 +37,17 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toFilterStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
+import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.ModifyAction;
@@ -56,6 +60,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -207,27 +212,103 @@ public final class NetconfBaseOps {
         return future;
     }
 
+    private ListenableFuture<? extends DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback,
+            final QName datastore, final Optional<YangInstanceIdentifier> filterPath,
+            final List<YangInstanceIdentifier> fields) {
+        requireNonNull(callback);
+        requireNonNull(datastore);
+
+        final NormalizedNode<?, ?> rpcInput;
+        if (isFilterPresent(filterPath)) {
+            final DataContainerChild<?, ?> node = transformer.toFilterStructure(filterPath.get(), fields);
+            rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore), node);
+        } else {
+            final List<DataContainerChild<? extends PathArgument, ?>> rpcNodes = getRpcNodesFromRootFields(fields);
+            rpcNodes.add(getSourceNode(datastore));
+            rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, rpcNodes);
+        }
+        final ListenableFuture<? extends DOMRpcResult> response = rpc.invokeRpc(NETCONF_GET_CONFIG_PATH, rpcInput);
+        Futures.addCallback(response, callback, MoreExecutors.directExecutor());
+        return response;
+    }
+
+    /**
+     * Calling GET-CONFIG RPC with subtree filter that is specified by {@link YangInstanceIdentifier}.
+     *
+     * @param callback   RPC response callback
+     * @param filterPath path to requested data
+     * @return asynchronous completion token with read {@link NormalizedNode} wrapped in {@link Optional} instance
+     */
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
             final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, getConfigRunning(callback, filterPath));
     }
 
+    /**
+     * Calling GET-CONFIG RPC with subtree filter tha tis specified by parent {@link YangInstanceIdentifier} and list
+     * of specific fields that caller would like to read. Field paths are relative to parent path.
+     *
+     * @param callback   RPC response callback
+     * @param filterPath parent path to requested data
+     * @param fields     paths to specific fields that are selected under parent path
+     * @return asynchronous completion token with read {@link NormalizedNode} wrapped in {@link Optional} instance
+     */
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
             final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath,
             final List<YangInstanceIdentifier> fields) {
-        // todo: implementation
-        return Futures.immediateFailedFuture(new IllegalStateException());
+        if (fields.isEmpty()) {
+            return Futures.immediateFailedFuture(new IllegalArgumentException(
+                    "Failed to build NETCONF GET-CONFIG RPC: provided list of fields is empty; filter path: "
+                            + filterPath));
+        }
+        final ListenableFuture<? extends DOMRpcResult> response;
+        if (containsEmptyPath(fields)) {
+            response = getConfigRunning(callback, filterPath);
+        } else {
+            response = getConfigRunning(callback, filterPath, fields);
+        }
+        return extractData(filterPath, response);
     }
 
+    /**
+     * Calling GET RPC with subtree filter that is specified by {@link YangInstanceIdentifier}.
+     *
+     * @param callback   RPC response callback
+     * @param filterPath path to requested data
+     * @return asynchronous completion token with read {@link NormalizedNode} wrapped in {@link Optional} instance
+     */
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
                                                                     final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, get(callback, filterPath));
     }
 
+    /**
+     * Calling GET RPC with subtree filter tha tis specified by parent {@link YangInstanceIdentifier} and list
+     * of specific fields that caller would like to read. Field paths are relative to parent path.
+     *
+     * @param callback   RPC response callback
+     * @param filterPath parent path to requested data
+     * @param fields     paths to specific fields that are selected under parent path
+     * @return asynchronous completion token with read {@link NormalizedNode} wrapped in {@link Optional} instance
+     */
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
-            final Optional<YangInstanceIdentifier> path, List<YangInstanceIdentifier> fields) {
-        // todo: implementation
-        return Futures.immediateFailedFuture(new IllegalStateException());
+            final Optional<YangInstanceIdentifier> filterPath, final List<YangInstanceIdentifier> fields) {
+        if (fields.isEmpty()) {
+            return Futures.immediateFailedFuture(new IllegalArgumentException(
+                    "Failed to build NETCONF GET RPC: provided list of fields is empty; filter path: " + filterPath));
+        }
+        final ListenableFuture<? extends DOMRpcResult> response;
+        if (containsEmptyPath(fields)) {
+            response = get(callback, filterPath);
+        } else {
+            response = get(callback, filterPath, fields);
+        }
+        return extractData(filterPath, response);
+    }
+
+    private static boolean containsEmptyPath(final List<YangInstanceIdentifier> fields) {
+        return fields.stream()
+                .anyMatch(YangInstanceIdentifier::isEmpty);
     }
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
@@ -246,6 +327,11 @@ public final class NetconfBaseOps {
         return getConfig(callback, NETCONF_RUNNING_QNAME, filterPath);
     }
 
+    private ListenableFuture<? extends DOMRpcResult> getConfigRunning(final FutureCallback<DOMRpcResult> callback,
+            final Optional<YangInstanceIdentifier> filterPath, final List<YangInstanceIdentifier> fields) {
+        return getConfig(callback, NETCONF_RUNNING_QNAME, filterPath, fields);
+    }
+
     public ListenableFuture<? extends DOMRpcResult> getConfigCandidate(final FutureCallback<DOMRpcResult> callback,
             final Optional<YangInstanceIdentifier> filterPath) {
         return getConfig(callback, NETCONF_CANDIDATE_QNAME, filterPath);
@@ -262,6 +348,47 @@ public final class NetconfBaseOps {
                     : NetconfMessageTransformUtil.GET_RPC_CONTENT);
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
+    }
+
+    private ListenableFuture<? extends DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
+            final Optional<YangInstanceIdentifier> filterPath, final List<YangInstanceIdentifier> fields) {
+        requireNonNull(callback);
+
+        final NormalizedNode<?, ?> rpcInput;
+        if (isFilterPresent(filterPath)) {
+            rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, transformer.toFilterStructure(
+                    filterPath.get(), fields));
+        } else {
+            final List<DataContainerChild<? extends PathArgument, ?>> rpcNodes = getRpcNodesFromRootFields(fields);
+            rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, rpcNodes);
+        }
+        final ListenableFuture<? extends DOMRpcResult> response = rpc.invokeRpc(NETCONF_GET_PATH, rpcInput);
+        Futures.addCallback(response, callback, MoreExecutors.directExecutor());
+        return response;
+    }
+
+    private List<DataContainerChild<? extends PathArgument, ?>> getRpcNodesFromRootFields(
+            final List<YangInstanceIdentifier> fields) {
+        final Map<YangInstanceIdentifier, List<YangInstanceIdentifier>> getConfigEntries = fields.stream()
+                .map(fieldPath -> {
+                    final YangInstanceIdentifier rootPath = YangInstanceIdentifier.create(
+                            Iterables.limit(fieldPath.getPathArguments(), 1));
+                    final YangInstanceIdentifier updatedFieldPath = YangInstanceIdentifier.create(
+                            Iterables.skip(fieldPath.getPathArguments(), 1));
+                    return new SimpleEntry<>(rootPath, updatedFieldPath);
+                })
+                .collect(Collectors.groupingBy(SimpleEntry::getKey,
+                        Collectors.mapping(SimpleEntry::getValue, Collectors.toList())));
+        return getConfigEntries.keySet().stream()
+                .map(rootPath -> {
+                    final List<YangInstanceIdentifier> fieldEntries = getConfigEntries.get(rootPath);
+                    if (containsEmptyPath(fieldEntries)) {
+                        return transformer.toFilterStructure(rootPath);
+                    } else {
+                        return transformer.toFilterStructure(rootPath, fieldEntries);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private static boolean isFilterPresent(final Optional<YangInstanceIdentifier> filterPath) {

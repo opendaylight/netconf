@@ -215,29 +215,61 @@ public final class NetconfMessageTransformUtil {
     public static final DataContainerChild<?, ?> EMPTY_FILTER;
 
     static {
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
-                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(),
-                NETCONF_TYPE_QNAME.getLocalName(), SUBTREE);
-
-        EMPTY_FILTER = Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID)
-                .withValue(new DOMSource(element)).build();
+        final Element element = getNetconfFilterElement();
+        EMPTY_FILTER = buildFilterStructure(element);
     }
 
+    /**
+     * Creation of the subtree filter structure using {@link YangInstanceIdentifier} path.
+     *
+     * @param identifier parent path / query
+     * @param ctx        mountpoint schema context
+     * @return created DOM structure with subtree filter
+     */
     public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
                                                              final SchemaContext ctx) {
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
-                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
-                SUBTREE);
-
+        final Element element = getNetconfFilterElement();
         try {
             NetconfUtil.writeFilter(identifier, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
+        return buildFilterStructure(element);
+    }
 
-        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
+    /**
+     * Creation of the subtree filter structure using parent {@link YangInstanceIdentifier} and specific selection
+     * fields. Field paths are relative to parent query path.
+     *
+     * @param identifier parent path / query
+     * @param fields     list of specific fields for which the filter should be created
+     * @param ctx        mountpoint schema context
+     * @return created DOM structure with subtree filter
+     */
+    public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
+            final List<YangInstanceIdentifier> fields, final SchemaContext ctx) {
+        final Element element = getNetconfFilterElement();
+        try {
+            NetconfUtil.writeFilter(identifier, new DOMResult(element), SchemaPath.ROOT, ctx, fields);
+        } catch (IOException | XMLStreamException e) {
+            throw new IllegalStateException(String.format(
+                    "Unable to serialize filter element for path %s with fields: %s", identifier, fields), e);
+        }
+        return buildFilterStructure(element);
+    }
+
+    private static Element getNetconfFilterElement() {
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
+                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
+        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                SUBTREE);
+        return element;
+    }
+
+    private static DataContainerChild<?, ?> buildFilterStructure(final Element element) {
+        return Builders.anyXmlBuilder()
+                .withNodeIdentifier(NETCONF_FILTER_NODEID)
+                .withValue(new DOMSource(element))
                 .build();
     }
 
@@ -338,8 +370,26 @@ public final class NetconfMessageTransformUtil {
         return wrap(toId(name), node);
     }
 
+    /**
+     * Wrap and array of {@link DataContainerChild} into container with specified {@link NodeIdentifier}.
+     *
+     * @param name wrapping container identifier
+     * @param node array of children nodes
+     * @return wrapping {@link ContainerNode}
+     */
     public static ContainerNode wrap(final NodeIdentifier name, final DataContainerChild<?, ?>... node) {
         return Builders.containerBuilder().withNodeIdentifier(name).withValue(ImmutableList.copyOf(node)).build();
+    }
+
+    /**
+     * Wrap {@link List} of {@link DataContainerChild} into container with specified {@link NodeIdentifier}.
+     *
+     * @param name  wrapping container identifier
+     * @param nodes list of children nodes
+     * @return wrapping {@link ContainerNode}
+     */
+    public static ContainerNode wrap(final NodeIdentifier name, final List<DataContainerChild<?, ?>> nodes) {
+        return Builders.containerBuilder().withNodeIdentifier(name).withValue(nodes).build();
     }
 
     public static DOMSourceAnyxmlNode createEditConfigAnyxml(
