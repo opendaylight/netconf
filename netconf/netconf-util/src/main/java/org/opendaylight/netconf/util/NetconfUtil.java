@@ -13,6 +13,8 @@ import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -186,6 +188,16 @@ public final class NetconfUtil {
         }
     }
 
+    /**
+     * Writing subtree filter specified by {@link YangInstanceIdentifier} into {@link DOMResult}.
+     *
+     * @param query      path to the root node
+     * @param result     DOM result holder
+     * @param schemaPath schema path of the parent node
+     * @param context    mountpoint schema context
+     * @throws IOException        failed to write filter into {@link NormalizedNodeStreamWriter}
+     * @throws XMLStreamException failed to serialize filter into XML document
+     */
     public static void writeFilter(final YangInstanceIdentifier query, final DOMResult result,
             final SchemaPath schemaPath, final SchemaContext context) throws IOException, XMLStreamException {
         if (query.isEmpty()) {
@@ -205,6 +217,72 @@ public final class NetconfUtil {
         } finally {
             xmlWriter.close();
         }
+    }
+
+    /**
+     * Writing subtree filter specified by parent {@link YangInstanceIdentifier} and specific fields
+     * into {@link DOMResult}. Field paths are relative to parent query path.
+     *
+     * @param query      path to the root node
+     * @param result     DOM result holder
+     * @param schemaPath schema path of the parent node
+     * @param context    mountpoint schema context
+     * @param fields     list of specific fields for which the filter should be created
+     * @throws IOException        failed to write filter into {@link NormalizedNodeStreamWriter}
+     * @throws XMLStreamException failed to serialize filter into XML document
+     */
+    public static void writeFilter(final YangInstanceIdentifier query, final DOMResult result,
+                                   final SchemaPath schemaPath, final SchemaContext context,
+                                   final List<YangInstanceIdentifier> fields) throws IOException, XMLStreamException {
+        if (query.isEmpty() || fields.isEmpty()) {
+            // No query at all
+            return;
+        }
+        final List<YangInstanceIdentifier> aggregatedFields = aggregateFields(fields);
+        final TreeNode<PathArgument> rootNode = constructPathArgumentTree(query, aggregatedFields);
+
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        try {
+            try (NormalizedNodeStreamWriter writer = XMLStreamNormalizedNodeStreamWriter.create(
+                    xmlWriter, context, schemaPath)) {
+                final PathArgument first = rootNode.getElement();
+                StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType())
+                        .streamToWriter(writer, first, rootNode);
+            }
+        } finally {
+            xmlWriter.close();
+        }
+    }
+
+    private static List<YangInstanceIdentifier> aggregateFields(final List<YangInstanceIdentifier> fields) {
+        return fields.stream()
+                .filter(field -> fields.stream()
+                        .filter(fieldYiid -> !field.equals(fieldYiid))
+                        .noneMatch(fieldYiid -> fieldYiid.contains(field)))
+                .collect(Collectors.toList());
+    }
+
+    private static TreeNode<PathArgument> constructPathArgumentTree(final YangInstanceIdentifier query,
+                                                                    final List<YangInstanceIdentifier> fields) {
+        final Iterator<PathArgument> queryIterator = query.getPathArguments().iterator();
+        final PathArgument firstPathArg = queryIterator.next();
+        final TreeNode<PathArgument> rootTreeNode = new TreeNode<>(firstPathArg);
+
+        TreeNode<PathArgument> queryTreeNode = rootTreeNode;
+        while (queryIterator.hasNext()) {
+            final PathArgument nextPathArg = queryIterator.next();
+            final TreeNode<PathArgument> nextTreeNode = new TreeNode<>(nextPathArg);
+            queryTreeNode.addChildNode(nextTreeNode);
+            queryTreeNode = nextTreeNode;
+        }
+
+        for (final YangInstanceIdentifier field : fields) {
+            TreeNode<PathArgument> actualFieldTreeNode = queryTreeNode;
+            for (final PathArgument fieldPathArg : field.getPathArguments()) {
+                actualFieldTreeNode = actualFieldTreeNode.computeIfAbsent(fieldPathArg, TreeNode::new);
+            }
+        }
+        return rootTreeNode;
     }
 
     public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final MountPointContext mountContext,
