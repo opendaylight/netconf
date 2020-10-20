@@ -297,7 +297,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
                     insertUsed = true;
                     final String str = entry.getValue().get(0);
-                    insert = Insert.valueOf(str);
+                    insert = Insert.forValue(str);
                     if (insert == null) {
                         throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
                             RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
