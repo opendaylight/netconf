@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "95d8305e_a8b72d7c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/MdsalRestconfStrategy.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-10-20T12:29:02Z",
+      "side": 1,
+      "message": "Do we need to have this blocking check here? I think we might be able to get rid of this one as well, with a callback that would submit/abort based on the future from BatchedExistenceCheck",
+      "range": {
+        "startLine": 173,
+        "startChar": 12,
+        "endLine": 173,
+        "endChar": 41
+      },
+      "revId": "5c76f3146cddfce170ac65cd4eb234003235d27b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
