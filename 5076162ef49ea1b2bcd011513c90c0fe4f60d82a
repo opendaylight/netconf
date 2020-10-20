@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "92262eb2_6b5d724e",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDataTreeServiceImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-20T13:10:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52a41b5a_ce4aa88f",
+      "range": {
+        "startLine": 338,
+        "startChar": 8,
+        "endLine": 338,
+        "endChar": 56
+      },
+      "revId": "5076162ef49ea1b2bcd011513c90c0fe4f60d82a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "992bb35d_fe1798dd",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
         "patchSetId": 11
@@ -45,6 +69,30 @@
       "revId": "5076162ef49ea1b2bcd011513c90c0fe4f60d82a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d6c0378_885344f2",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-10-20T13:10:26Z",
+      "side": 1,
+      "message": "Reverted these changes",
+      "parentUuid": "992bb35d_fe1798dd",
+      "range": {
+        "startLine": 79,
+        "startChar": 18,
+        "endLine": 79,
+        "endChar": 20
+      },
+      "revId": "5076162ef49ea1b2bcd011513c90c0fe4f60d82a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
