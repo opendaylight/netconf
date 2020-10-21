@@ -46,6 +46,30 @@
       "revId": "86557fe1550b0f5d7cf3a28a550f1018e1545ca6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a510168_f70c0e53",
+        "filename": "netconf/netconf-api/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-21T11:55:22Z",
+      "side": 1,
+      "message": "Step back and review your patch, it is rather obvious ;)",
+      "parentUuid": "14e5b319_6ffc54e5",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 16
+      },
+      "revId": "86557fe1550b0f5d7cf3a28a550f1018e1545ca6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
