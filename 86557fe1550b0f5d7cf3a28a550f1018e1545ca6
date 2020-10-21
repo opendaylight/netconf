@@ -22,6 +22,30 @@
       "revId": "86557fe1550b0f5d7cf3a28a550f1018e1545ca6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14e5b319_6ffc54e5",
+        "filename": "netconf/netconf-api/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-10-21T09:55:34Z",
+      "side": 1,
+      "message": "thanks for review :) I didn\u0027t think that I would find reviewer so quickly\n\ncan you please point me to the correct module where it should be placed? do you think that extension approach to DOMDataBroker is not good at all?",
+      "parentUuid": "763ae0b8_d4f72063",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 16
+      },
+      "revId": "86557fe1550b0f5d7cf3a28a550f1018e1545ca6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
