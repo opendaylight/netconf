@@ -11,11 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 

@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.api;
 
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.nativ.netconf.communicator.RemoteDeviceCommunicator;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public interface DeviceActionFactory {

@@ -23,13 +23,12 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
@@ -41,14 +40,14 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
     @Test
     public void testSessionOnMethods() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
-        final NetconfDeviceCommunicator listener = mockCloseableClass(NetconfDeviceCommunicator.class);
+        final NativeNetconfDeviceCommunicator listener = mockCloseableClass(NativeNetconfDeviceCommunicator.class);
         final SchemalessMessageTransformer messageTransformer = mock(SchemalessMessageTransformer.class);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test-D",
                 InetSocketAddress.createUnresolved("localhost", 22));
         final Throwable throwable = new Throwable();
 
         final SchemalessNetconfDevice device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, facade,
-            messageTransformer);
+                messageTransformer);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
@@ -56,8 +55,8 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
         final NetconfMessage netconfMessage = mock(NetconfMessage.class);
 
         device.onRemoteSessionUp(sessionCaps, listener);
-        verify(facade).onDeviceConnected(
-                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+        verify(facade).onDeviceConnected(any(MountPointContext.class), any(NetconfSessionPreferences.class),
+                any(DOMRpcService.class));
 
         device.onNotification(netconfMessage);
         verify(facade).onNotification(isNull());
@@ -71,17 +70,17 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
     @SuppressWarnings("unchecked")
     private static RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler =
-                mockCloseableClass(RemoteDeviceHandler.class);
-        doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
+        final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler = mockCloseableClass(
+                RemoteDeviceHandler.class);
+        doNothing().when(remoteDeviceHandler).onDeviceConnected(any(MountPointContext.class),
+                any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
         return remoteDeviceHandler;
     }
 
-    private static <T extends AutoCloseable> T mockCloseableClass(
-            final Class<T> remoteDeviceHandlerClass) throws Exception {
+    private static <T extends AutoCloseable> T mockCloseableClass(final Class<T> remoteDeviceHandlerClass)
+            throws Exception {
         final T mock = mockClass(remoteDeviceHandlerClass);
         doNothing().when(mock).close();
         return mock;
@@ -94,18 +93,16 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
     }
 
     private static NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
-                                                            final Collection<String> additionalCapabilities) {
-        final ArrayList<String> capabilities = Lists.newArrayList(
-                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
+            final Collection<String> additionalCapabilities) {
+        final ArrayList<String> capabilities = Lists.newArrayList(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
 
         if (addMonitor) {
-            capabilities.add(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
+            capabilities.add(NetconfSessionPreferences.IETF_NETCONF_MONITORING.getNamespace().toString());
         }
 
         capabilities.addAll(additionalCapabilities);
 
-        return NetconfSessionPreferences.fromStrings(
-                capabilities);
+        return NetconfSessionPreferences.fromStrings(capabilities);
     }
 }

@@ -9,22 +9,23 @@
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 
 public class NetconfConnectorDTO implements AutoCloseable {
 
-    private final NetconfDeviceCommunicator communicator;
+    private final NativeNetconfDeviceCommunicator communicator;
     private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
 
-    public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator,
+    public NetconfConnectorDTO(
+            final NativeNetconfDeviceCommunicator communicator,
                                final RemoteDeviceHandler<NetconfSessionPreferences> facade) {
         this.communicator = communicator;
         this.facade = facade;
     }
 
-    public NetconfDeviceCommunicator getCommunicator() {
+    public NativeNetconfDeviceCommunicator getCommunicator() {
         return communicator;
     }
 

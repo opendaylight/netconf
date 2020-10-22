@@ -8,9 +8,9 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
