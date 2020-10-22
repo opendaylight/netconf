@@ -8,30 +8,25 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import io.netty.util.concurrent.EventExecutor;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorInitializerFactory;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 
 abstract class BaseCallHomeTopology extends AbstractNetconfTopology {
-    BaseCallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                         final EventExecutor eventExecutor,
-                         final ScheduledThreadPool keepaliveExecutor,
-                         final ThreadPool processingExecutor,
-                         final SchemaResourceManager schemaRepositoryProvider,
-                         final DataBroker dataBroker,
-                         final DOMMountPointService mountPointService,
-                         final AAAEncryptionService encryptionService,
-                         final DeviceActionFactory deviceActionFactory,
-                         final BaseNetconfSchemas baseSchemas) {
-        super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
-              processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService,
-              encryptionService, deviceActionFactory, baseSchemas);
+    BaseCallHomeTopology(final String topologyId, final NetconfClientDispatcher dispatcher,
+            final NetconfDeviceCommunicatorInitializerFactory communicator, final EventExecutor eventExecutor,
+            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+            final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
+            final DOMMountPointService mountPointService, final DeviceActionFactory deviceActionFactory,
+            final BaseNetconfSchemas baseSchemas) {
+        super(topologyId, dispatcher, communicator, eventExecutor, keepaliveExecutor, processingExecutor,
+                schemaRepositoryProvider, dataBroker, mountPointService, deviceActionFactory, baseSchemas);
     }
 }

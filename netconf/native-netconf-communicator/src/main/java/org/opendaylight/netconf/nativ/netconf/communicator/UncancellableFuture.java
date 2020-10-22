@@ -5,14 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.listener;
+package org.opendaylight.netconf.nativ.netconf.communicator;
 
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.util.concurrent.AbstractFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-final class UncancellableFuture<V> extends AbstractFuture<V> {
+public final class UncancellableFuture<V> extends AbstractFuture<V> {
     private volatile boolean uncancellable = false;
 
     UncancellableFuture(final boolean uncancellable) {
