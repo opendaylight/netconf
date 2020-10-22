@@ -1,0 +1,3109 @@
+module core-model-1-4 {
+  yang-version 1.1;
+  namespace "urn:onf:yang:core-model-1-4";
+  prefix core-model;
+
+  organization
+    "Open Networking Foundation (ONF)";
+  contact
+    "WG Web : https://wiki.opennetworking.org/pages/viewpage.action?pageId=262963204
+     WG List: <mailto:information-modeling@opennetworking.org>
+     Editor : Nigel Davis
+     Email  : <mailto:ndavis@ciena.com>";
+  description
+    "This module contains a collection of YANG definitions for management and control of network fuctions.
+
+     Copyright 2019 Open Networking Foundation (ONF). All rights reserved.
+
+     Licensed under the Apache License, Version 2.0 (the 'License');
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an 'AS IS' BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.";
+
+  revision 2019-11-27 {
+    description
+      "Package equipment-specification has been deleted, 
+       because of wrong key statements and overall grouping never applied.
+       ";
+  }
+  revision 2019-11-22 {
+    description
+      "Module name and name space changed to core-model-1-4
+       ";
+    reference
+      "ONF-TR-512, RFC 6020 and RFC 6087";
+  }
+  revision 2019-07-09 {
+    description
+      "Corrected version derived from ONF-TR-512 v1.4
+       - Type of LayerProtocol/layerProtocolName simplfied to LayerProtocolNameType
+       - Type of Profile/profileName changed to ProfileNameType (same concept as for layerProtocolName
+       - FcSwitch added.
+       - remove references to UML model.";
+    reference
+      "ONF-TR-512, RFC 6020 and RFC 6087";
+  }
+  revision 2019-07-05 {
+    description
+      "Corrected version derived from ONF-TR-512 v1.4
+       - renaming of attribute lp to layer-protocol
+       - presence statement in root container according to RFC8407 4.10. Top-Level Data Definitions
+       - Feature names introduced";
+    reference
+      "ONF-TR-512, RFC 6020 and RFC 6087";
+  }
+  revision 2019-05-25 {
+    description
+      "Initial version derived from ONF-TR-512 v1.4
+       Please view https://github.com/OpenNetworkingFoundation/5G-xHaul/tree/experimental/models/tools for changes.
+       Additional information: Additional manual changes";
+    reference
+      "ONF-TR-512, RFC 6020 and RFC 6087";
+  }
+  revision 2019-05-05 {
+    description
+      "Initial version
+       Please view https://github.com/OpenNetworkingFoundation/5G-xHaul/tree/experimental/models/tools for changes.
+       Additional information: Initial version";
+    reference
+      "ONF-TR-512, RFC 6020 and RFC 6087";
+  }
+
+  /****************************************
+   * typedef statements
+   **************************************/ 
+
+  typedef port-role {
+    type string;
+    description
+      "The role of a port in the context of the function of the forwarding entity that it bounds.";
+  }
+
+  typedef port-direction {
+    type identityref {
+      base PORT_DIRECTION;
+    }
+    description
+      "The orientation of flow at the Port of a Forwarding entity.";
+  }
+
+  typedef forwarding-direction {
+    type identityref {
+      base FORWARDING_DIRECTION;
+    }
+    description
+      "The directionality of a Forwarding entity.";
+  }
+
+  typedef termination-direction {
+    type identityref {
+      base TERMINATION_DIRECTION;
+    }
+    description
+      "The directionality of a termination entity.";
+  }
+
+  typedef termination-state {
+    type identityref {
+      base TERMINATION_STATE;
+    }
+    description
+      "Provides support for the range of behaviors and specific states that an LP can take with respect to termination of the signal.
+       Indicates to what degree the LayerTermination is terminated.";
+  }
+
+  typedef layer-protocol-name-type {
+    type identityref {
+      base LAYER_PROTOCOL_NAME_TYPE;
+    }
+    description
+      "A controlled list of LayerProtocol names.";
+  }
+
+  typedef bit-string {
+    type string;
+    description
+      "This primitive type defines a bit oriented string.
+       The size of the BitString will be defined in the valueRange property of the attribute; according to ASN.1 (X.680).
+       The semantic of each bit position will be defined in the Documentation field of the attribute.";
+  }
+
+  typedef printable-string {
+    type string;
+    description
+      "A string that only includes printable characters.";
+  }
+
+  typedef universal-id {
+    type string;
+    description
+      "The universal ID value where the mechanism for generation is defined by some authority not directly referenced in the structure.
+       An example structure is [IETF RFC4122].";
+  }
+
+  typedef dt-address {
+    type string;
+    description
+      "A description of location via a hierarchy of narrowing contexts.";
+  }
+
+  typedef operational-state {
+    type identityref {
+      base OPERATIONAL_STATE;
+    }
+    description
+      "The operational state is used to indicate whether or not the resource is installed and working. ";
+  }
+
+  typedef administrative-state {
+    type identityref {
+      base ADMINISTRATIVE_STATE;
+    }
+    description
+      "The administrative state is used to show whether use of a resource is allowed or prohibited.
+       The administrative state can be observed and directly controlled by certain operational roles.
+       Typically, only a user (in the provider context) with administrative privileges is allowed to write the administrative state, any other users are restricted to read only.";
+  }
+
+  typedef administrative-control {
+    type identityref {
+      base ADMINISTRATIVE_CONTROL;
+    }
+    description
+      "Reflects the current control action when the entity is not in the desired state.";
+  }
+
+  typedef lifecycle-state {
+    type identityref {
+      base LIFECYCLE_STATE;
+    }
+    description
+      "This state is used to track the planned deployment, allocation to clients and withdrawal of resources.";
+  }
+
+  typedef forwarding-rule {
+    type identityref {
+      base FORWARDING_RULE;
+    }
+    description
+      "Rule that restricts the creation/deletion of an FC between points grouped by FD or related by the Link between FDs.";
+  }
+
+  typedef rule-type {
+    type identityref {
+      base RULE_TYPE;
+    }
+    description
+      "Indicates the focus of the rule.";
+  }
+
+  typedef port-role-rule-option {
+    type identityref {
+      base PORT_ROLE_RULE_OPTION;
+    }
+    description
+      "Indicates how to interpret the PortRole list.";
+  }
+
+  typedef signal-property-value-rule {
+    type identityref {
+      base SIGNAL_PROPERTY_VALUE_RULE;
+    }
+    description
+      "none";
+  }
+
+  typedef metaclass-class-name {
+    type string;
+    description
+      "none";
+  }
+
+  typedef profile-name-type {
+    type identityref {
+      base PROFILE_NAME_TYPE;
+    }
+    description
+      "A controlled list of Profile names.";
+  }
+
+  /*********************************************
+   * grouping statements for complex data types
+   *******************************************/ 
+
+  identity PORT_DIRECTION {
+    description
+      "none";
+  }
+
+  identity PORT_DIRECTION_BIDIRECTIONAL {
+    base PORT_DIRECTION;
+    description
+      "The Port has both an INPUT flow and an OUTPUT flow defined.";
+  }
+
+  identity PORT_DIRECTION_INPUT {
+    base PORT_DIRECTION;
+    description
+      "The Port only has definition for a flow into the Forwarding entity (i.e. an ingress flow).";
+  }
+
+  identity PORT_DIRECTION_OUTPUT {
+    base PORT_DIRECTION;
+    description
+      "The Port only has definition for a flow out of the Forwarding entity (i.e. an egress flow).";
+  }
+
+  identity PORT_DIRECTION_UNIDENTIFIED_OR_UNKNOWN {
+    base PORT_DIRECTION;
+    description
+      "Not a normal state. The system is unable to determine the correct value.";
+  }
+
+  identity PORT_DIRECTION_OMNIDIRECTIONAL {
+    base PORT_DIRECTION;
+    description
+      "none";
+  }
+
+  identity FORWARDING_DIRECTION {
+    description
+      "none";
+  }
+
+  identity FORWARDING_DIRECTION_BIDIRECTIONAL {
+    base FORWARDING_DIRECTION;
+    description
+      "The Forwarding entity supports both BIDIRECTIONAL flows at all Ports (i.e. all Ports have both an INPUT flow and an OUTPUT flow defined).";
+  }
+
+  identity FORWARDING_DIRECTION_UNIDIRECTIONAL {
+    base FORWARDING_DIRECTION;
+    description
+      "The Forwarding entity has Ports that are either INPUT or OUTPUT. It has no BIDIRECTIONAL Ports.";
+  }
+
+  identity FORWARDING_DIRECTION_UNDEFINED_OR_UNKNOWN {
+    base FORWARDING_DIRECTION;
+    description
+      "Not a normal state. The system is unable to determine the correct value.";
+  }
+
+  identity FORWARDING_DIRECTION_OMNIDIRECTIONAL {
+    base FORWARDING_DIRECTION;
+    description
+      "none";
+  }
+
+  identity TERMINATION_DIRECTION {
+    description
+      "none";
+  }
+
+  identity TERMINATION_DIRECTION_BIDIRECTIONAL {
+    base TERMINATION_DIRECTION;
+    description
+      "A Termination with both SINK and SOURCE flows.";
+  }
+
+  identity TERMINATION_DIRECTION_SINK {
+    base TERMINATION_DIRECTION;
+    description
+      "The flow is up the layer stack from the server side to the client side.
+       Considering an example of a Termination function within the termination entity, a SINK flow:
+       - will arrive at the base of the termination function (the server side) where it is essentially at an INPUT to the termination component
+       - then will be decoded and deconstructed
+       - then relevant parts of the flow will be sent out of the termination function (the client side) where it is essentially at an OUTPUT from the termination component
+       A SINK termination is one that only supports a SINK flow.
+       A SINK termination can be bound to an OUTPUT Port of a Forwarding entity";
+  }
+
+  identity TERMINATION_DIRECTION_SOURCE {
+    base TERMINATION_DIRECTION;
+    description
+      "The flow is down the layer stack from the server side to the client side.
+       Considering an example of a Termination function within the termination entity, a SOURCE flow:
+       - will arrive at the top of the termination function (the client side) where it is essentially at an INPUT to the termination component
+       - then will be assembled with various overheads etc. and will be coded
+       - then coded form of the assembly of flow will be sent out of the termination function (the server side) where it is essentially at an OUTPUT from the termination component
+       A SOURCE termination is one that only supports a SOURCE flow.
+       A SOURCE termination can be bound to an INPUT Port of a Forwarding entity";
+  }
+
+  identity TERMINATION_DIRECTION_UNDEFINED_OR_UNKNOWN {
+    base TERMINATION_DIRECTION;
+    description
+      "Not a normal state. The system is unable to determine the correct value.";
+  }
+
+  identity TERMINATION_STATE {
+    description
+      "none";
+  }
+
+  identity TERMINATION_STATE_LP_CAN_NEVER_TERMINATE {
+    base TERMINATION_STATE;
+    description
+      "A non-flexible case that can never be terminated.";
+  }
+
+  identity TERMINATION_STATE_LP_NOT_TERMINATED {
+    base TERMINATION_STATE;
+    description
+      "A flexible termination that can terminate but is currently not terminated.";
+  }
+
+  identity TERMINATION_STATE_TERMINATED_SERVER_TO_CLIENT_FLOW {
+    base TERMINATION_STATE;
+    description
+      "A flexible termination that is currently terminated for server to client flow only.";
+  }
+
+  identity TERMINATION_STATE_TERMINATED_CLIENT_TO_SERVER_FLOW {
+    base TERMINATION_STATE;
+    description
+      "A flexible termination that is currently terminated for client to server flow only.";
+  }
+
+  identity TERMINATION_STATE_TERMINATED_BIDIRECTIONAL {
+    base TERMINATION_STATE;
+    description
+      "A flexible termination that is currently terminated in both directions of flow.";
+  }
+
+  identity TERMINATION_STATE_LP_PERMENANTLY_TERMINATED {
+    base TERMINATION_STATE;
+    description
+      "A non-flexible termination that is always terminated (in both directions of flow for a bidirectional case and in the one direction of flow for both unidirectional cases).";
+  }
+
+  identity TERMINATION_STATE_TERMINATION_STATE_UNKNOWN {
+    base TERMINATION_STATE;
+    description
+      "There TerminationState cannot be determined.";
+  }
+
+  identity PROTECTION_REASON {
+    description
+      "none";
+  }
+
+  identity PROTECTION_REASON_WAIT_TO_REVERT {
+    base PROTECTION_REASON;
+    description
+      "The resource is selected as control is waiting to restore to a preferred resource.";
+  }
+
+  identity PROTECTION_REASON_SIGNAL_DEGRADE {
+    base PROTECTION_REASON;
+    description
+      "The resource is selected as the best preferred resource is in signal degrade.";
+  }
+
+  identity PROTECTION_REASON_SIGNAL_FAIL {
+    base PROTECTION_REASON;
+    description
+      "The resource is selected as the best preferred resource is in signal fail.";
+  }
+
+  identity ROUTE_SELECTION_CONTROL {
+    description
+      "none";
+  }
+
+  identity ROUTE_SELECTION_CONTROL_LOCK_OUT {
+    base ROUTE_SELECTION_CONTROL;
+    description
+      "The resource is configured to temporarily not be available for use in the protection scheme(s) it is part of.
+       This overrides all other protection control states including forced.
+       If the item is locked out, then it cannot be used under any circumstances.
+       Note: Only relevant when part of a protection scheme.
+       Note: if a protection process that has a relationship to the item (i.e. is one of the options the protection process may choose) is deactivated by being isFrozen = true) then the lockout request will be rejected. ";
+  }
+
+  identity ROUTE_SELECTION_REASON {
+    description
+      "none";
+  }
+
+  identity ROUTE_SELECTION_REASON_NONE {
+    base ROUTE_SELECTION_REASON;
+    description
+      "No reason";
+  }
+
+  identity SWITCH_CONTROL {
+    description
+      "none";
+  }
+
+  identity SWITCH_CONTROL_NORMAL {
+    base SWITCH_CONTROL;
+    description
+      "No administrative control applied to the switch.";
+  }
+
+  identity SWITCH_CONTROL_MANUAL {
+    base SWITCH_CONTROL;
+    description
+      "Resource temporarily chosen by control configuration where the resource is not the preferred resource.
+       Preferred resource has highest priority.
+       Temporarily overrides reversion.
+       If this resource fails, it will switch to best available resource.
+       If resource selected is shared and another FC requires the resource, then the selection control will change to Normal and switch to best available based upon normal rules.
+       Cannot manually switch a Forced switch, cannot remove a forced switch, cannot switch to a locked out item and will be rejected if the protection process is deactivated by being Freeze = true).
+       A manual switch/route that is selecting an FcPort, LTP, FC, Link or Route that is subsequently set to LOCK_OUT will have the manual removed (changed to NORMAL) and will switch away from the FcPort with LOCK_OUT to best available based upon normal rules.
+       A manual switch that is selecting an FcPort that is subsequently selected by a Forced switch will be restored to normal operation and the manual will be removed.
+       A manual switch/route that is selecting an FcPort, LTP, FC, Link or Route that is subsequently manual selected by another switch/route will have the manual removed and will switch away from the FcPort.
+       Can be returned to NORMAL by configuration action.";
+  }
+
+  identity SWITCH_CONTROL_FORCED {
+    base SWITCH_CONTROL;
+    description
+      "Resource temporarily chosen by control configuration where the resource is not the preferred resource.
+       Preferred resource has highest priority.
+       Temporarily overrides reversion.
+       If this resource fails it will NOT switch.
+       If resource selected is shared and another FC requires the resource through a FORCE on that FC and the FC is of a higher FcPriority then the selection control on this FC will change to NORMAL and switch to best available based upon normal rules.
+       If the resource selected is then set to LOCK_OUT then the selection control will change to NORMAL and switch to best available based upon normal rules.
+       Can be returned to NORMAL by configuration action.";
+  }
+
+  identity SWITCH_STATE_REASON {
+    description
+      "none";
+  }
+
+  identity SWITCH_STATE_REASON_NONE {
+    base SWITCH_STATE_REASON;
+    description
+      "No reason";
+  }
+
+  identity REVERSION_MODE {
+    description
+      "none";
+  }
+
+  identity REVERSION_MODE_REVERTIVE {
+    base REVERSION_MODE;
+    description
+      "An FC switched to a lower priority (non-preferred) resource will revert to a higher priority (preferred) resource when that recovers (potentially after some hold-off time).";
+  }
+
+  identity REVERSION_MODE_NON-REVERTIVE {
+    base REVERSION_MODE;
+    description
+      "An FC switched to a lower priority (non-preferred) resource will not revert to a higher priority (preferred) resource when that recovers.";
+  }
+
+  identity RESILIENCE_CONTROL {
+    description
+      "none";
+  }
+
+  identity RESILIENCE_CONTROL_QUIESCENT {
+    base RESILIENCE_CONTROL;
+    description
+      "none";
+  }
+
+  identity RESILIENCE_CONTROL_RESTORING {
+    base RESILIENCE_CONTROL;
+    description
+      "none";
+  }
+
+  identity RESILIENCE_CONTROL_RECOVERY_FAILED {
+    base RESILIENCE_CONTROL;
+    description
+      "none";
+  }
+
+  identity RESILIENCE_CONTROL_UNKNOWN {
+    base RESILIENCE_CONTROL;
+    description
+      "none";
+  }
+
+  identity RUN_MODE {
+    description
+      "none";
+  }
+
+  identity RUN_MODE_FREE_RUN {
+    base RUN_MODE;
+    description
+      "The clock is not synchronized to another clock.";
+  }
+
+  identity RUN_MODE_LOCKED {
+    base RUN_MODE;
+    description
+      "The clock is synchronized to another clock.";
+  }
+
+  identity RUN_MODE_HOLD_OVER {
+    base RUN_MODE;
+    description
+      "The clock was previously synchronized to another clock but that timing input has been lost.
+       The clock is set to the last known synchronization.";
+  }
+
+  identity LAYER_PROTOCOL_NAME_TYPE {
+    description
+      "none";
+  }
+
+  identity LAYER_PROTOCOL_NAME_TYPE_PHOTONIC_MEDIA {
+    base LAYER_PROTOCOL_NAME_TYPE;
+    description
+      "The characteristic information is that of a channel able to carry photons and of the photon source/sink.";
+  }
+
+  identity LAYER_PROTOCOL_NAME_TYPE_OTU_AND_ODU {
+    base LAYER_PROTOCOL_NAME_TYPE;
+    description
+      "The characteristic information is that of a channel able to carry ODU/OTU protocol (OTN) and of the ODU/OTU source/sink.";
+  }
+
+  identity LAYER_PROTOCOL_NAME_TYPE_ETHERNET {
+    base LAYER_PROTOCOL_NAME_TYPE;
+    description
+      "The characteristic information is that of a channel able to carry Ethernet protocol and of the Ethernet protocol source/sink.";
+  }
+
+  identity OPERATIONAL_STATE {
+    description
+      "none";
+  }
+
+  identity OPERATIONAL_STATE_DISABLED {
+    base OPERATIONAL_STATE;
+    description
+      "The resource is unable to meet the SLA of the user of the resource.
+       If no (explicit) SLA is defined the resource is disabled if it is totally inoperable and unable to provide service to the user.";
+  }
+
+  identity OPERATIONAL_STATE_ENABLED {
+    base OPERATIONAL_STATE;
+    description
+      "The resource is partially or fully operable and available for use.";
+  }
+
+  identity ADMINISTRATIVE_STATE {
+    description
+      "none";
+  }
+
+  identity ADMINISTRATIVE_STATE_LOCKED {
+    base ADMINISTRATIVE_STATE;
+    description
+      "Users are administratively prohibited from making use of the resource.";
+  }
+
+  identity ADMINISTRATIVE_STATE_UNLOCKED {
+    base ADMINISTRATIVE_STATE;
+    description
+      "Users are allowed to use the resource.";
+  }
+
+  identity ADMINISTRATIVE_STATE_SHUTTING_DOWN {
+    base ADMINISTRATIVE_STATE;
+    description
+      "The entity is administratively restricted to existing instances of use only. There may be specific actions to remove existing uses. No new instances of use can be enabled.
+       The resource automatically transitions to “locked” when the last user quits.
+       The administrative state is not visible in the client context.
+       The lifecycle state “pending removal” should be used to indicate to the client that the provider intends to remove the resource.";
+  }
+
+  identity ADMINISTRATIVE_CONTROL {
+    description
+      "none";
+  }
+
+  identity ADMINISTRATIVE_CONTROL_UNLOCK {
+    base ADMINISTRATIVE_CONTROL;
+    description
+      "The intention is for the entity to become unlocked.
+       The entity may already be UNLOCKED.";
+  }
+
+  identity ADMINISTRATIVE_CONTROL_LOCK_PASSIVE {
+    base ADMINISTRATIVE_CONTROL;
+    description
+      "The intention is for the entity to become locked but no effort is expected to move to the Locked state (the state will be achieved once all users stop using the resource).
+       The entity may be LOCKED.";
+  }
+
+  identity ADMINISTRATIVE_CONTROL_LOCK_ACTIVE {
+    base ADMINISTRATIVE_CONTROL;
+    description
+      "The intention is for the entity to become locked and it is expected that effort will be made to move to the Locked state (users will be actively removed).
+       The entity may already be LOCKED.";
+  }
+
+  identity ADMINISTRATIVE_CONTROL_LOCK_IMMEDIATE {
+    base ADMINISTRATIVE_CONTROL;
+    description
+      "The intention is for the entity to become locked and it is expected to move to the Locked state immediately (users will be force removed).
+       The entity may already be LOCKED.";
+  }
+
+  identity ADMINISTRATIVE_CONTROL_QUIESCENT {
+    base ADMINISTRATIVE_CONTROL;
+    description
+      "The administrative state is at a stable value (LOCKED/UNLOCKED) and no action is being taken.";
+  }
+
+  identity LIFECYCLE_STATE {
+    description
+      "none";
+  }
+
+  identity LIFECYCLE_STATE_PLANNED {
+    base LIFECYCLE_STATE;
+    description
+      "The resource is planned but is not present in the network.
+       Should include a 'time' when the resources are expected to be installed.";
+  }
+
+  identity LIFECYCLE_STATE_POTENTIAL_AVAILABLE {
+    base LIFECYCLE_STATE;
+    description
+      "The supporting resources are present in the network but are shared with other clients; or require further configuration before they can be used; or both.
+       (1) When a potential resource is configured and allocated to a client it is moved to the INSTALLED state for that client.
+       (2) If the potential resource has been consumed (e.g. allocated to another client) it is moved to the POTENTIAL BUSY state for all other clients.";
+  }
+
+  identity LIFECYCLE_STATE_POTENTIAL_BUSY {
+    base LIFECYCLE_STATE;
+    description
+      "The supporting resources are present in the network but have been allocated to other clients.";
+  }
+
+  identity LIFECYCLE_STATE_INSTALLED {
+    base LIFECYCLE_STATE;
+    description
+      "The resource is present in the network and is capable of providing the service.";
+  }
+
+  identity LIFECYCLE_STATE_PENDING_REMOVAL {
+    base LIFECYCLE_STATE;
+    description
+      "The resource has been marked for removal. Should include a “time” when the resources are expected to be removed.";
+  }
+
+  identity FORWARDING_RULE {
+    description
+      "none";
+  }
+
+  identity FORWARDING_RULE_CANNOT_FORWARD_ACROSS_FD_LINK {
+    base FORWARDING_RULE;
+    description
+      "LTPs referenced by the FD (or indirectly by the Link between FDs) cannot have FCs created between them.
+       This rule overrides all others.";
+  }
+
+  identity FORWARDING_RULE_MUST_FORWARD_ACROSS_FD_LINK {
+    base FORWARDING_RULE;
+    description
+      "LTPs referenced by the FD (or indirectly by the Link between FDs) MUST have FCs created between them.
+       This rule overrides all others except the CANNOT_FORWARD rule.";
+  }
+
+  identity FORWARDING_RULE_MAY_FORWARD_ACROSS_FD_LINK {
+    base FORWARDING_RULE;
+    description
+      "LTPs referenced by the FD (or indirectly by the Link between FDs) may have FCs created between them.
+       FCs may not be created between points that are not related by this rule either directly in an FD or indirectly via a Link linking two or more FDs.
+       For a Link points in an FD at one end of the Link can be connected to points in an FD at an other end of the Link.";
+  }
+
+  identity FORWARDING_RULE_NULL_FORWARDING_RULE {
+    base FORWARDING_RULE;
+    description
+      "none";
+  }
+
+  identity RULE_TYPE {
+    description
+      "none";
+  }
+
+  identity RULE_TYPE_FORWARDING {
+    base RULE_TYPE;
+    description
+      "The rule relates to creation of FCs.";
+  }
+
+  identity RULE_TYPE_COST {
+    base RULE_TYPE;
+    description
+      "The rule relates to forwarding cost.";
+  }
+
+  identity RULE_TYPE_RISK {
+    base RULE_TYPE;
+    description
+      "The rule relates to forwarding risk.";
+  }
+
+  identity RULE_TYPE_CAPACITY {
+    base RULE_TYPE;
+    description
+      "none";
+  }
+
+  identity PORT_ROLE_RULE_OPTION {
+    description
+      "none";
+  }
+
+  identity PORT_ROLE_RULE_OPTION_SAME_ROLE {
+    base PORT_ROLE_RULE_OPTION;
+    description
+      "The ports to which the rule applies must have role from the list in PortRole.";
+  }
+
+  identity PORT_ROLE_RULE_OPTION_DIFFERENT_ROLE {
+    base PORT_ROLE_RULE_OPTION;
+    description
+      "The ports to which the rule applies must not have a role from the list in PortRole.";
+  }
+
+  identity PORT_ROLE_RULE_OPTION_ANY_ROLE {
+    base PORT_ROLE_RULE_OPTION;
+    description
+      "The rule applies to any role of port.";
+  }
+
+  identity SIGNAL_PROPERTY_VALUE_RULE {
+    description
+      "none";
+  }
+
+  identity SIGNAL_PROPERTY_VALUE_RULE_SAME_VALUE {
+    base SIGNAL_PROPERTY_VALUE_RULE;
+    description
+      "none";
+  }
+
+  identity SIGNAL_PROPERTY_VALUE_RULE_ANY_VALUE {
+    base SIGNAL_PROPERTY_VALUE_RULE;
+    description
+      "none";
+  }
+
+  identity PROFILE_NAME_TYPE {
+    description
+      "none";
+  }
+
+  identity PROFILE_NAME_TYPE_USER_PROFILE {
+    base PROFILE_NAME_TYPE;
+    description
+      "none";
+  }
+
+  identity CONNECTOR_AND_PIN_ORIENTATION {
+    description
+      "none";
+  }
+
+  identity CONNECTOR_AND_PIN_ORIENTATION_MALE {
+    base CONNECTOR_AND_PIN_ORIENTATION;
+    description
+      "The connecting elements are dominantly protrusions.";
+  }
+
+  identity CONNECTOR_AND_PIN_ORIENTATION_FEMALE {
+    base CONNECTOR_AND_PIN_ORIENTATION;
+    description
+      "The connecting elements are dominantly indentations.";
+  }
+
+  identity CONNECTOR_AND_PIN_ORIENTATION_SYMMETRIC_NEUTRAL {
+    base CONNECTOR_AND_PIN_ORIENTATION;
+    description
+      "The pin (and housing) orientation combination is such that it is symmetric so a connector is compatible with itself.
+       The connecting element may be a surface rather than protrusions or indentations.";
+  }
+
+  identity EQUIPMENT_CATEGORY {
+    description
+      "none";
+  }
+
+  identity EQUIPMENT_CATEGORY_SUBRACK {
+    base EQUIPMENT_CATEGORY;
+    description
+      "An assembly with holders designed to accommodate CIRCUIT_PACKs.
+       The assembly is designed to be mounted in a RACK.";
+  }
+
+  identity EQUIPMENT_CATEGORY_CIRCUIT_PACK {
+    base EQUIPMENT_CATEGORY;
+    description
+      "An assembly with connectors compatible with those in a holder.
+       The assembly is designed to be mounted in a holder (SLOT) of a SUBRACK.
+       May also support holders (SLOTs) for SMALL_FORMFACTOR_PLUGGABLEs.";
+  }
+
+  identity EQUIPMENT_CATEGORY_SMALL_FORMFACTOR_PLUGGABLE {
+    base EQUIPMENT_CATEGORY;
+    description
+      "A small assembly (compared to a CIRCUIT_PACK) with connectors compatible with those in a holder.
+       The assembly is designed to be mounted in a holder (SLOT) of a CIRCUIT_PACK or STAND_ALONE_UNIT.";
+  }
+
+  identity EQUIPMENT_CATEGORY_STAND_ALONE_UNIT {
+    base EQUIPMENT_CATEGORY;
+    description
+      "An assembly with connectors for cabling and potentially with holders.
+       The assembly is designed to be mounted in a freeform environment (on a table or simple mechanical cabinet).
+       May support holders (SLOTs) for CIRCUIT_PACKs or for SMALL_FORMFACTOR_PLUGGABLEs.";
+  }
+
+  identity EQUIPMENT_CATEGORY_RACK {
+    base EQUIPMENT_CATEGORY;
+    description
+      "A mechanical assembly with cabling and predefined mounting points for particular SUBRACK types.
+       The assembly is designed to be mounted on the floor in a row with other RACKs.";
+  }
+
+  identity HOLDER_CATEGORY {
+    description
+      "none";
+  }
+
+  identity HOLDER_CATEGORY_SLOT {
+    base HOLDER_CATEGORY;
+    description
+      "A guided holder with fixed connectors.
+       The guided holder is designed to take a particular form of CIRCUIT_PACK or SMALL_FORMFACTOR_PLUGGABLE";
+  }
+
+  /****************************************
+   * package resilience
+   **************************************/ 
+
+  typedef protection-reason {
+    type identityref {
+      base PROTECTION_REASON;
+    }
+    description
+      "The cause of the current protection state.";
+  }
+
+  typedef route-selection-control {
+    type identityref {
+      base ROUTE_SELECTION_CONTROL;
+    }
+    description
+      "Possible degrees of administrative control applied to the Route selection.";
+  }
+
+  typedef route-selection-reason {
+    type identityref {
+      base ROUTE_SELECTION_REASON;
+    }
+    description
+      "The cause of the current route selection.";
+  }
+
+  typedef switch-control {
+    type identityref {
+      base SWITCH_CONTROL;
+    }
+    description
+      "none";
+  }
+
+  typedef switch-state-reason {
+    type identityref {
+      base SWITCH_STATE_REASON;
+    }
+    description
+      "Explains the reason for the current switch state.";
+  }
+
+  typedef reversion-mode {
+    type identityref {
+      base REVERSION_MODE;
+    }
+    description
+      "The reversion mode associated with protection.";
+  }
+
+  typedef protection-type {
+    type string;
+    description
+      "Identifies the type of protection of an FcSwitch.";
+  }
+
+  typedef resilience-control {
+    type identityref {
+      base RESILIENCE_CONTROL;
+    }
+    description
+      "none";
+  }
+
+  /****************************************
+   * package timing
+   **************************************/ 
+
+  typedef run-mode {
+    type identityref {
+      base RUN_MODE;
+    }
+    description
+      "none";
+  }
+
+  grouping layer-protocol-name-and-qualifier {
+    leaf layer-protocol-qualifier {
+      type string;
+      description
+        "Qualifies the use of the LayerProtocol where the same LayerProtocol may be used recursively such that each recursion has the same characteristic information in the main traffic path but where there is some distinction in some other aspect.
+         An example of use is in the case of the PHOTONIC_MEDIA LayerProtocol. All photonic media is of the same characteristic in the main traffic path, just a channel that enables the flow of photons, but may differ in overhead and with respect to level of nesting.
+         For the PHOTONIC_MEDIA, qualifiers may include OMS (Optical Multiplex Section), OTS (Optical Transmission Section) and NMCA (Network Media Channel Assembly).";
+    }
+    leaf layer-protocol-name {
+      type layer-protocol-name-type;
+      description
+        "The name of the LayerProtocol chosen from a controlled list.
+         LayerProtocol names include:
+         - PHOTONIC_MEDIA
+         - ODU
+         - ETHERNET";
+    }
+    description
+      "Provides a controlled list of layer protocol names and indicates the naming authority.
+       Note that it is expected that attributes will be added to this structure to convey the naming authority name, the name of the layer protocol using a human readable string and any particular standard reference.
+       Layer protocol names include:
+       -    Layer 1 (L1): OTU, ODU
+       -    Layer 2 (L2): Carrier Grade Ethernet (ETY, ETH), MPLS-TP (MT)
+      ";
+  }
+
+  grouping name-and-value {
+    leaf value-name {
+      type string;
+      description
+        "The name of the value. The value need not have a name.";
+    }
+    leaf value {
+      type string;
+      description
+        "The value.";
+    }
+    description
+      "A scoped name-value pair.";
+  }
+
+  grouping local-id-and-class {
+    leaf class-of-instance {
+      type string;
+      description
+        "The class to which the name refers.";
+    }
+    leaf local-id {
+      type string;
+      description
+        "The localId of the entity.";
+    }
+    description
+      "The localId and the class of entity that it identifies.";
+  }
+
+  grouping port-role-rule {
+    leaf-list port-role {
+      type port-role;
+      description
+        "The role of the port considered.";
+    }
+    leaf-list port-role-rule {
+      type port-role-rule-option;
+      description
+        "none";
+    }
+    description
+      "Constrains which ports the rule applies to.";
+  }
+
+  grouping signal-property-rule {
+    leaf signal-property-name {
+      type string;
+      description
+        "The name of the signal property to which the rule applies.";
+    }
+    leaf signal-property-value-rule {
+      type signal-property-value-rule;
+      description
+        "Indicates whether signal properties should be accounted for or not.";
+    }
+    description
+      "none";
+  }
+
+  grouping metaclass-class {
+    leaf name {
+      type metaclass-class-name;
+      description
+        "The text name of the Class";
+    }
+    description
+      "This datatype represents the '<<Metaclass>> Class' from the UML metamodel.
+       An instance of the referencing Class (e.g. LTP) will reference a Class (not an instance).
+       This referenced Class will provide definition to extend the referencing instance.
+       So, for example, an LTP instance will have the attributes defined in the LTP class and also the attributes defined in the referenced Class (an LtpSpec).
+       The referenced Class may:
+       (1) provide invariant properties (that are the same for many instances) that then are not conveyed with the referencing instance.
+       (2) provide definitions for attributes that are present in the instance that are not defined in the Class of the instance (these attribute may have been pruned and refactored from one or more external definition sources).
+       (3) apply constraints to attributes in the instance that were defined in the class of the referencing instance.
+       (4) replace attributes that were present in the class of the referencing instance by a new definition (same name).;
+      ";
+  }
+
+  grouping external-managed-universal-id {
+    leaf manager-identifier {
+      type string;
+      description
+        "none";
+    }
+    leaf external-managed-uuid {
+      type string;
+      description
+        "none";
+    }
+    description
+      "none";
+  }
+
+  /****************************************
+   * package core-network-model
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+  /****************************************
+   * package resilience
+   **************************************/ 
+
+  grouping control-parameters-pac {
+    leaf reversion-mode {
+      type reversion-mode;
+      description
+        "Indicates whether the protection scheme is revertive or non-revertive.";
+    }
+    leaf wait-to-revert-time {
+      type int64;
+      default "15";
+      description
+        "If the protection system is revertive, this attribute specifies the time, in minutes, to wait after a fault clears on a higher priority (preferred) resource before switching to the preferred resource.
+         If a further fault occurs on the preferred resource in the waitToRevertTime then the reversion attempt is cancelled.
+         The WTR timer is overridden by the needs of a higher priority signal. Depending upon which resource is requested this may simply cancel the attempt to revert of may cause immediate reversion.";
+    }
+    leaf prot-type {
+      type protection-type;
+      description
+        "Indicates the protection scheme that is used for the ProtectionGroup.";
+    }
+    leaf hold-off-time {
+      type int64;
+      description
+        "This attribute indicates the time, in milliseconds, between declaration of a switch trigger condition (e.g. signal degrade or signal fail), and the initialization of the protection switching algorithm.";
+    }
+    leaf network-scheme-specification {
+      type string;
+      description
+        "none";
+    }
+    description
+      "A list of control parameters to apply to a switch.";
+  }
+
+  grouping fc-switch {
+    leaf hold-off-time {
+      type int64;
+      description
+        "Moved to ControlParameter_Pac. This attribute indicates the time, in seconds, between declaration of unacceptable quality of signal on the currently selected FcPort, and the initialization of the protection switching algorithm. ";
+    }
+    leaf prot-type {
+      type protection-type;
+      description
+        "Indicates the protection scheme that is used for the ProtectionGroup.";
+    }
+    leaf reversion-mode {
+      type reversion-mode;
+      description
+        "Moved to ControlParameter_Pac. This attribute whether or not the protection scheme is revertive or non-revertive. ";
+    }
+    list selected-fc-port {
+      key "local-id";
+      uses fc-port;
+      description
+        "Indicates which points are selected by the switch.
+         Depending on the switch spec (via FcSpec)
+         - more than one FcPort can be selected at any one time (e.g. egress switch, ingress packet switch)
+         - zero FcPorts can be selected. For an ingress switch this indicates that the switch common (egress) is 'high impedance'
+         .";
+    }
+    leaf-list profile-proxy {
+      type string;
+      description
+        "Provides a set of predefined values for switch control in place of the direct values available via the FcSwitch or via _configurationAndSwitchControl.";
+    }
+    leaf configuration-and-switch-control {
+      type string;
+      description
+        "A ConfigurationAndSwitchController that is external to the switch (it is coordinating many switches and hence cannot be encapsulated in the FcSwitch.";
+    }
+    leaf internal-configuration-and-switch-control {
+      type string;
+      description
+        "A ConfigurationAndSwitchController encapsulated in the FcSwitch that controls the FcSwitch alone.";
+    }
+    leaf switch-control {
+      type switch-control;
+      description
+        "Degree of administrative control applied to the switch selection.";
+    }
+    leaf switch-selects-ports {
+      type port-direction;
+      description
+        "Indicates whether the switch selects from ingress to the FC or to egress of the FC, or both.";
+    }
+    leaf switch-selection-reason {
+      type switch-state-reason;
+      config false;
+      description
+        "The reason for the current switch selection.";
+    }
+    container control-parameters {
+      uses control-parameters-pac;
+      description
+        "none";
+    }
+    leaf wait-to-restore-time {
+      type int64;
+      description
+        "Moved to ControlParameter_Pac and changed to waitToRevert. If the protection system is revertive, this attribute specifies the amount of time, in seconds, to wait after the preferred FcPort returns to an acceptable state of operation (e.g. a fault has cleared) before restoring traffic to that preferred FcPort.";
+    }
+    uses local-class;
+    description
+      "The FcSwitch class models the switched forwarding of traffic (traffic flow) between FcPorts and is present where there is protection functionality in the FC.
+       If an FC exposes protection (having two or more FcPorts that provide alternative identical inputs/outputs), the FC will have one or more associated FcSwitch objects to represent the alternative flow choices visible at the edge of the FC.
+       The FC switch represents and defines a protection switch structure encapsulated in the FC and essentially 'decorates' FCs that are involved in resilience schemes that use switching in a protection mechanism.
+       Essentially FcSwitch performs one of the functions of the Protection Group in a traditional model. It associates 2 or more FcPorts each playing the role of a Protection Unit.
+       One or more protection, i.e. standby/backup, FcPorts provide protection for one or more working (i.e. regular/main/preferred) FcPorts where either protection or working can feed one or more protected FcPort.
+       The switch may be used in revertive or non-revertive (symmetric) mode. When in revertive mode it may define a waitToRestore time.
+       It may be used in one of several modes including source switched, destination switched, source and destination switched etc. (covering cases such as 1+1 and 1:1).
+       It may be locked out (prevented from switching), force switched or manual switched.
+       It will indicate switch state and change of state.
+       The switch can be switched away from all sources such that it becomes open and hence two coordinated switches can both feed the same LTP so long as at least one of the two is switched away from all sources (is 'open').
+       The ability for a Switch to be 'high impedance' allows bidirectional ForwardingConstructs to be overlaid on the same bidirectional LTP where the appropriate control is enabled to prevent signal conflict.
+       This ability allows multiple alternate routes to be present that otherwise would be in conflict.";
+  }
+
+  grouping casc-port {
+    leaf port-role {
+      type string;
+      description
+        "The role of the port of a C&SC.
+         The interpretation of the role is provided by the C&SC spec.
+         The C&SC spec will set out the role in the context of C&SC functions.
+         The role will indicate how the port relates to the associated entity, e.g. is conveying messages.";
+    }
+    container port-role-properties {
+      uses casc-port-role-properties;
+      description
+        "A link to properties associated with the port role as defined by the CascSpec.";
+    }
+    list logical-termination-point {
+      key "uuid";
+      uses logical-termination-point;
+      description
+        "The LTP that conveys the messages related to the port and/or is subject to control action and/or provides indications of state etc.
+         For direct association, there may be up to 2 LTPs (to account for directionality differences).
+         In the specification representation, there may be a number rules that provide further LTP relationships that are implicit in the instantiated model.";
+    }
+    leaf encapsulating-casc-port {
+      type leafref {
+        path "/core-model:casc-port/core-model:uuid";
+      }
+      description
+        "In a case where there is nested C&SC the ports are also nested and this references the superior port.";
+    }
+    leaf is-related-control-flow-disabled {
+      type boolean;
+      default "true";
+      description
+        "If TRUE, then any Control signal flow related to this controller (to, from or drop-and-continue) is prevented from passing through the related LTP carrying the signaling for this controller.
+         This can be considered as being realized using an FcSwitch in an FC embedded in the LP at the layer of signaling to disconnect the FcPort bidirectionally.
+         This FcSwitch should be represented in the LTP spec.
+         Note that the FcSwitch will be at the granularity of the relevant control signal and other flows may be passed uninterrupted.";
+    }
+    leaf is-controlled-fc-port-disabled {
+      type boolean;
+      description
+        "If TRUE, then the related FcPort on the FC is disabled and hence signal will not flow through that FcPort.
+         This is realized using an FcSwitch to disconnect the FcPort bidirectionally.
+         Note that as the controller may control many FCs and may switch them all together as one, in an implementation the FcSwitch could be omitted from the FC instance model.
+         Any omission should be explained by the FcSpec.
+         This is equivalent to a blocked indication on the LTP used in other representations.";
+    }
+    leaf is-protection-lock-out {
+      type boolean;
+      description
+        "The resource is configured to temporarily not be available for use in the protection scheme(s) it is part of.
+         This overrides all other protection control states including forced.
+         If the item is locked out, then it cannot be used under any circumstances.
+         This causes isRelatedControlFlowDisabled to become TRUE and isControlledFcPortDisabled to become TRUE.";
+    }
+    uses global-class;
+    description
+      "A port of a C&SC that can be used where there is significant asymmetry to be represented.
+       This can represent any combination of:
+       - the conveying of messaging to/from the C&SC
+       - the conveying of control action
+       - the providing of indications of state etc.";
+  }
+
+  grouping casc-port-role-properties {
+    leaf signalling-format {
+      type string;
+      description
+        "A reference to the definition of the signalling format used by the instance referenced by the related port.
+         This is a placeholder for a more sophisticated capability.";
+    }
+    leaf monitoring-details {
+      type string;
+      description
+        "Information on what is being monitored in the instance referenced by the related port.
+         This is a placeholder for a more sophisticated capability.";
+    }
+    leaf control-details {
+      type string;
+      description
+        "Information on what is being controlled in the instance referenced by the related port.
+         This is a placeholder for a more sophisticated capability.";
+    }
+    description
+      " Container for properties associated with the port role as defined by the CascSpec.";
+  }
+
+  /****************************************
+   * package timing
+   **************************************/ 
+
+  grouping clock {
+    leaf run-mode {
+      type run-mode;
+      config false;
+      description
+        "The run-mode of the frequency system clock, such as free-run, locked, and holdover.";
+    }
+    leaf-list encompassed-clock {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:embedded-clock/core-model:local-id";
+      }
+      description
+        "A clock may be emergent from and may effectively encompass several clocks in a resilient solution.";
+    }
+    list encapsulated-fc {
+      key "uuid";
+      uses forwarding-construct;
+      description
+        "A Clock may encapsulate an FC related to resilience where the clock provides an output that is essentially that of one of several other clocks in the resilience scheme.";
+    }
+    leaf-list sync-ltp {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      description
+        "A clock may feed one or more LTPs with timing information to propagate across the network (it may feed no LTPs).";
+    }
+    leaf-list encapsulated-casc {
+      type string;
+      description
+        "The clock may encapsulate a complex FC where there is a resilience mechanism active and that FC will need to be controlled.
+         The Casc to control the FC can be encapsulated in the Clock.";
+    }
+    leaf-list phase-aligned-clock {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:embedded-clock/core-model:local-id";
+      }
+      description
+        "One or more clocks can be actively phase aligned (this is especially relevant in a hitless resilience scheme).";
+    }
+    uses local-class;
+    description
+      "Clock function processes the input sync information (frequency and ssm or time stamp and PTP announce messages) and provides the modified sync information to the sync distribution function.
+       If none of the inputs meet the quality defined by the controller the clock may enter a hold-over or free run mode.
+       The status of the clock will be reported to the controller.";
+  }
+
+  grouping forwarding-domain {
+    leaf-list layer-protocol-name {
+      type layer-protocol-name-type;
+      min-elements 1;
+      description
+        "One or more protocol layers at which the FD represents the opportunity to enable forwarding between LTP that bound it.";
+    }
+    leaf-list lower-level-fd {
+      type leafref {
+        path "/core-model:control-construct/core-model:forwarding-domain/core-model:uuid";
+      }
+      description
+        "The FD class supports a recursive aggregation relationship (HigherLevelFdEncompassesLowerLevelFds) such that the internal construction of an FD can be exposed as multiple lower level FDs and associated Links (partitioning).
+         The aggregated FDs and Links form an interconnected topology that provides and describes the capability of the aggregating FD.
+         Note that the model actually represents an aggregation of lower level FDs into higher level FDs as views rather than FD partition, and supports multiple views.
+         Aggregation allow reallocation of capacity from lower level FDs to different higher level FDs as if the network is reorganized (as the association is aggregation not composition).";
+    }
+    list fc {
+      key "uuid";
+      uses forwarding-construct;
+      description
+        "An FD aggregates one or more FCs. An aggregated FC connects LTPs that bound the FD.";
+    }
+    leaf-list logical-termination-point {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      description
+        "An instance of FD is associated with zero or more LTP objects.
+         The LTPs that bound the FD provide capacity for forwarding.
+         For asymmetric FDs, the association to the LTP is via the FdPort.";
+    }
+    list fd-port {
+      key "local-id";
+      uses fd-port;
+      description
+        "The association of the FD to LTPs is either made directly for symmetric FDs or via FdPort for asymmetric FDs.";
+    }
+    uses global-class;
+    description
+      "The ForwardingDomain (FD) class models the topological component that represents a forwarding capability that provides the opportunity to enable forwarding (of specific transport characteristic information at one or more protocol layers) between points.
+       The FD object provides the context for and constrains the formation, adjustment and removal of FCs and hence offers the potential to enable forwarding.
+       The FCs may be formed between LTPs at the boundary of the FD or between AccessPorts at the boundary of the FD (for the most basic media layers cases - most media cases use LTPs).
+       A number of FDs (related by Links) may be grouped and abstracted to form an FD where that FD represents the effect of the underlying FDs but where the detailed structure is not apparent.
+       This grouping and abstraction is potentially recursive.
+       This aspect is essentially equivalent to ITU-T partitioning but this is an aggregation not a composition, so it allows an FD to be in multiple higher level FDs.
+       The notion of abstraction/grouping assumes that small things are brought together into larger things as opposed to ITU-T partitioning that assumes large things are broken down into smaller things.
+       An FD represents an abstraction of some combination of software behavior, electronic behavior and physical structure that provides a forwarding capability.
+       At a lower level of recursion an FD could represent a forwarding capability within a device.
+       A device may encompass two or more disjoint forwarding capabilities and may support more than one layer protocol, hence more than one FD.
+       A routing fabric may be logically partitioned to represent connectivity constraints, hence the FD representing the routing fabric may be partitioned into a number of FDs representing the constraints.
+       The FD represents a subnetwork [ITU-T G.800], FlowDomain [TMF 612] and a MultiLayerSubNetwork (MLSN) [TMF 612].
+       As in the TMF concept of MLSN the FD can support more than one layer-protocol.
+       Note that the ITU-T G.800 subnetwork is a single layer entity.";
+  }
+
+  grouping forwarding-construct {
+    leaf layer-protocol-name {
+      type layer-protocol-name-type;
+      description
+        "The layerProtocol at which the FC enables the potential for forwarding.";
+    }
+    leaf-list lower-level-fc {
+      type leafref {
+        path "/core-model:control-construct/core-model:forwarding-domain/core-model:fc/core-model:uuid";
+      }
+      description
+        "An FC object supports a recursive aggregation relationship such that the internal construction of an FC can be exposed as multiple lower level FC objects (partitioning).
+         Aggregation is used as for the FD to allow changes in hierarchy.
+         FC aggregation reflects FD aggregation.
+         For example a low level FC could represent what would have traditionally been considered as a 'Cross-Connection' in an 'NE'. The 'Cross-Connection' in an 'NE' is not necessarily the lowest level of FC partitioning.
+        ";
+    }
+    leaf fc-route {
+      type string;
+      description
+        "An FC object can have zero or more routes, each of which is defined as a list of lower level FC objects describing the flow across the network.";
+    }
+    list fc-port {
+      key "local-id";
+      uses fc-port;
+      description
+        "The FcPorts define the boundary of the FC.
+         The FC is accessed via the FcPorts.
+         Flow within the FC is defined in terms of its FcPorts.";
+    }
+    list fc-switch {
+      key "local-id";
+      uses fc-switch;
+      description
+        "If an FC exposes protection (having two FcPorts that provide alternative identical inputs/outputs), the FC will have one or more associated FcSwitch objects.
+         The arrangement of switches for a particular instance is described by a referenced FcSpec.";
+    }
+    leaf-list configuration-and-switch-control {
+      type string;
+      description
+        "Reference to a ConfigurationAndSwitchController that coordinates switches encapsulated in the FC.
+         The controller coordinates multiple switches in the same FC.";
+    }
+    leaf forwarding-direction {
+      type forwarding-direction;
+      description
+        "The directionality of the ForwardingConstruct.
+         Is applicable to simple ForwardingConstructs where all FcPorts are BIDIRECTIONAL (the ForwardingConstruct will be BIDIRECTIONAL) or UNIDIRECTIONAL (the ForwardingConstruct will be UNIDIRECTIONAL).
+         Is not present in more complex cases.
+         In the case of media the FcPorts and FC may also be omni-directional.";
+    }
+    leaf is-protection-lock-out {
+      if-feature "forwardingconstructisprotectionlockout";
+      type boolean;
+      description
+        "The resource is configured to temporarily not be available for use in the protection scheme(s) it is part of.
+         This overrides all other protection control states including forced.
+         If the item is locked out then it cannot be used under any circumstances.
+         Note: Only relevant when part of a protection scheme.";
+    }
+    leaf service-priority {
+      type int64;
+      description
+        "Relevant where 'service' FCs are competing for server resources.
+         Used to determine which signal FC is allocated resource.
+         The priority of the 'service' with respect to other 'services'.
+         Lower numeric value means higher priority.
+         Covers cases such as pre-emptible in a resilience solution. ";
+    }
+    leaf-list supported-link {
+      type string;
+      description
+        "An FC that spans between LTPs that terminate the LayerProtocol usually supports one or more links in the client layer.";
+    }
+    leaf supporting-pc {
+      type string;
+      description
+        "The functionality supporting this entity.";
+    }
+    uses global-class;
+    description
+      "The ForwardingConstruct (FC) represents enabled constrained potential for forwarding between two or more FcPorts at a particular specific layerProtocol .
+       The constraint is explained by the FcSpec. Even when an FC is in place enabling potential for flow, it is possible that no information is flowing as there is no flow matching the constraint, hence 'potential'.
+       Like the LTP, the FC supports any transport protocol including all analogue, circuit and packet forms.
+       The FC is used to effect forwarding of transport characteristic (layer protocol) information.
+       An FC can be in only one ForwardingDomain (FD).
+       The FC is a forwarding entity.
+       At a low level of the recursion, a FC represents a cross-connection within an NE. It may also represent a fragment of a cross-connection under certain circumstances.
+       The FC object can be used to represent many different structures including point-to-point (P2P), point-to-multipoint (P2MP), rooted-multipoint (RMP) and multipoint-to-multipoint (MP2MP) bridge and selector structures for linear, ring or mesh protection schemes.
+       When applied to media, the FC represents the ability for a flow/wave (potentially containing information), to be propagated between FcPorts.
+       The existence of a FC instance is independent of the presence (or absence) of a flow/wave (and any information encoded within it) where flow/wave covers the progressing of any analogue or digital (packet/frame etc.) structure.
+       A flow/wave cannot propagate in the absence of a FC instance.";
+  }
+
+  grouping fc-port {
+    leaf-list logical-termination-point {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      max-elements 2;
+      description
+        "The FcPort may be associated with more than one LTP when the FcPort is bidirectional and the LTPs are unidirectional.
+         Multiple LTP
+         - Bidirectional FcPort to two Uni-directional LTPs
+         Zero LTP
+         - BreakBeforeMake transition
+         - Planned LTP not yet in place
+         - Off-network LTP referenced through other mechanism.";
+    }
+    leaf role {
+      type port-role;
+      description
+        "Each FcPort of the FC has an assigned role (e.g., working, protection, protected, symmetric, hub, spoke, leaf, root) in the context of the FC with respect to the FC function.
+         The role is fixed by the referenced FcSpec.";
+    }
+    leaf fc-port-direction {
+      type port-direction;
+      description
+        "The orientation of the defined flow at the FcPort.";
+    }
+    leaf is-protection-lock-out {
+      if-feature "fcportisprotectionlockout";
+      type boolean;
+      description
+        "The resource is configured to temporarily not be available for use in the protection scheme(s) it is part of.
+         This overrides all other protection control states including forced.
+         If the item is locked out, then it cannot be used under any circumstances.
+         Note: Only relevant when part of a protection scheme.";
+    }
+    leaf selection-priority {
+      type int64;
+      description
+        "The preference priority of the resource in the protection scheme for a particular FC.
+         The lower the value the higher the priority.
+         A lower value of selection priority is preferred
+         If two resources have the same value they are of equal priority.
+         There is no preference between equal priorities.
+         If a resource with the lowest value selection priority fails,, then the next lowest value available (may be the same value) is picked.
+         Hence on failure of the current resource the next best available will be selected.
+         If there are several equal values, the choice is essentially arbitrary.
+         If the scheme is revertive then when a resource of higher priority than the currently selected resource recovers it will be selected.
+         This is equivalent to working/protection but allows for all static scheme types with n:m capability.
+         In simple schemes 0 = working and 1 = protecting.
+         If selection priority of an FcPort is increased in value and the FC is currently selecting this FcPort then if another FcPort of a lower selection priority value is available, the wait to restore process will come into action as if the other FcPort had just become available.
+         If selection priority of a FcPort is changed and the FC is not currently selecting this FcPort but is selecting an item that is now of a higher numeric value than the changed FcPort then the wait to restore process will come into action as if the other FcPort had just become available.";
+    }
+    leaf is-internal-port {
+      type boolean;
+      config false;
+      description
+        "The FcPort is not exposed and cannot have associated LTPs.
+         This form of FcPort is used to enable chaining of FcSwitches or FcRoutes in complex network protection scenarios.";
+    }
+    leaf-list fc-route-feeds-fc-port-egress {
+      type string;
+      description
+        "Identifies which route(s) currently actively forward to the FcPort to exit the FC to an LTP (or for an internal FcPort to propagate to the next internal switch/route).";
+    }
+    leaf-list fc-port {
+      type leafref {
+        path "/core-model:control-construct/core-model:forwarding-domain/core-model:fc/core-model:fc-port/core-model:local-id";
+      }
+      max-elements 2;
+      description
+        "An FcPort may have a direct association to another FcPort where there is a transition from one domain to another but where there has been no termination.";
+    }
+    leaf-list port-of-internal-fc {
+      type leafref {
+        path "/core-model:control-construct/core-model:forwarding-domain/core-model:fc/core-model:fc-port/core-model:local-id";
+      }
+      description
+        "none";
+    }
+    uses local-class;
+    description
+      "The association of the FC to LTPs is always made via FcPorts.
+       In the case of media the association between FCs is made via their FcPorts and the association of an FC to the physical Pin is made via the FcPort.
+       The FcPort class models the access to the FC function.
+       The traffic forwarding between the associated FcPorts of the FC depends upon the type of FC and may be associated with FcSwitch object instances.
+       In cases where there is resilience, the FcPort may convey the resilience role of the access to the FC.
+       It can represent a protected (resilient/reliable) point or a protecting (unreliable working/main or protection/spare) point.
+       The FcPort replaces the Protection Unit of a traditional protection model (e.g., ITU-T).
+       The ForwardingConstruct can be considered as a component and the FcPort as a Port on that component.";
+  }
+
+  grouping layer-protocol {
+    leaf layer-protocol-name {
+      type layer-protocol-name-type;
+      description
+        "Indicate the specific layer-protocol described by the LayerProtocol entity.";
+    }
+    leaf configured-client-capacity {
+      type string;
+      description
+        "Provides a summarized view of the client capacity that is configurable for use.
+         Note the client LTP association should provide all necessary detail hence this attribute is questionable.";
+    }
+    leaf lp-direction {
+      type termination-direction;
+      description
+        "The overall directionality of the LP.
+         - A BIDIRECTIONAL LP will have some SINK and/or SOURCE flows.
+         - A SINK LP can only contain elements with SINK flows or CONTRA_DIRECTION_SOURCE flows
+         - A SOURCE LP can only contain SOURCE flows or CONTRA_DIRECTION_SINK flows";
+    }
+    leaf termination-state {
+      type termination-state;
+      description
+        "Indicates whether the layer is terminated and if so how.";
+    }
+    leaf-list configuration-and-switch-control {
+      type string;
+      description
+        "A switch controller external to the LayerProtocol.
+         The controller will coordinate one or more switches in one or more FCs related to the LayerProtocol";
+    }
+    leaf is-protection-lock-out {
+      type boolean;
+      description
+        "The resource is configured to temporarily not be available for use in the protection scheme(s) it is part of.
+         This overrides all other protection control states including forced.
+         If the item is locked out, then it cannot be used under any circumstances.
+         Note: Only relevant when part of a protection scheme.";
+    }
+    leaf fc-blocks-signal-to-lp {
+      type string;
+      description
+        "Indicates whether the associated FC is blocking signal to/from the LTP.";
+    }
+    uses local-class;
+    description
+      "The projection of an LTP into each transport layer is represented by a LayerProtocol (LP) instance. A LayerProtocol instance can be used for controlling termination and monitoring functionality.
+       It can also be used for controlling the adaptation (i.e. aggregation, encapsulation and/or multiplexing of client signal), tandem connection monitoring, traffic conditioning and/or shaping functionality at an intermediate point along a connection.
+       Where the client – server relationship is fixed 1:1 and immutable, the layers can be encapsulated in a single LTP instance. Where there is a n:1 relationship between client and server, the layers must be split over two separate instances of LTP. ";
+  }
+
+  grouping logical-termination-point {
+    leaf-list server-ltp {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      description
+        "References contained LTPs representing servers of this LTP in an inverse multiplexing configuration (e.g. VCAT).";
+    }
+    leaf-list client-ltp {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      description
+        "References contained LTPs representing client traffic of this LTP for normal cases of multiplexing.";
+    }
+    list layer-protocol {
+      key "local-id";
+      min-elements 1;
+      uses layer-protocol;
+      description
+        "Ordered list of LayerProtocols that this LTP is comprised of where the first entry in the list is the lowest server layer (e.g. physical).";
+    }
+    leaf connected-ltp {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      description
+        "Applicable in a simple context where two LTPs are associated via a non-adjustable enabled forwarding.
+         Reduces clutter removing the need for two additional LTPs and an FC with a pair of FcPorts.";
+    }
+    leaf peer-ltp {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      description
+        "References contained LTPs representing the reversal of orientation of flow where two LTPs are associated via a non-adjustable enabled forwarding and where the referenced LTP is fully dependent on this LTP.";
+    }
+    leaf-list physical-port-reference {
+      type leafref {
+        require-instance true;
+        path "/core-model:control-construct/core-model:equipment/core-model:uuid";
+      }
+      description
+        "One or more text labels for the unmodeled physical port associated with the LTP.
+         In many cases there is no associated physical port.";
+    }
+    leaf-list ltp-in-other-view {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      description
+        "References one or more LTPs in other views that represent this LTP.
+         The referencing LTP is the provider of capability.";
+    }
+    leaf ltp-direction {
+      type termination-direction;
+      description
+        "The overall directionality of the LTP.
+         - A BIDIRECTIONAL LTP must have at least some LPs that are BIDIRECTIONAL but may also have some SINK and/or SOURCE LPs.
+         - A SINK LTP can only contain SINK LPs
+         - A SOURCE LTP can only contain SOURCE LPs";
+    }
+    leaf transfer-capacity-pac {
+      type string;
+      description
+        "The LTP has as an inherent capacity derived from underlying capability.
+         The capacity of a particular LTP may be dependent upon other uses of resource in the device and hence it may vary over time.
+         The capacity of a Link is dependent upon the capacity of the LTPs at its ends.
+         An LTP may be an abstraction and virtualization of a subset of the underlying capability offered in a view or may be directly reflecting the underlying realization.";
+    }
+    leaf-list fd-rule-group {
+      type leafref {
+        path "/core-model:control-construct/core-model:forwarding-domain/core-model:uuid";
+      }
+      description
+        "An LTP can reference FD rules that the FD that aggregates it also references so that the rules can then apply to the LTP.";
+    }
+    list embedded-clock {
+      key "local-id";
+      uses clock;
+      description
+        "none";
+    }
+    leaf supporting-pc {
+      type string;
+      description
+        "The functionality supporting this entity.";
+    }
+    uses global-class;
+    description
+      "The LogicalTerminationPoint (LTP) class encapsulates the termination and adaptation functions of one or more transport layers represented by instances of LayerProtocol.
+       The encapsulated transport layers have a simple fixed 1:1 client-server relationship defined by association end ordering.
+       The structure of LTP supports all transport protocols including analogue, circuit and packet forms.";
+  }
+
+  grouping fd-port {
+    leaf-list logical-termination-point {
+      type leafref {
+        path "/core-model:control-construct/core-model:logical-termination-point/core-model:uuid";
+      }
+      max-elements 2;
+      description
+        "An instance of FD is associated with zero or more LTP objects.
+         The LTPs that bound the FD provide capacity for forwarding.
+         For asymmetric FDs, the association to the LTP is via the FdPort.";
+    }
+    leaf role {
+      type port-role;
+      description
+        "Each FdPort of the FD has a role (e.g., symmetric, hub, spoke, leaf, root) in the context of the FD with respect to the FD capability. ";
+    }
+    leaf fd-port-direction {
+      type port-direction;
+      description
+        "The orientation of the defined flow at the FdPort.";
+    }
+    leaf-list fc-port {
+      type leafref {
+        path "/core-model:control-construct/core-model:forwarding-domain/core-model:fc/core-model:fc-port/core-model:local-id";
+      }
+      description
+        "Where an FD is asymmetric and hence has FdPorts and where that FD and supports FCs, appropriate FdPorts of that FD support the corresponding FcPorts.";
+    }
+    leaf-list fd-port {
+      type leafref {
+        path "/core-model:control-construct/core-model:forwarding-domain/core-model:fd-port/core-model:local-id";
+      }
+      max-elements 2;
+      description
+        "An FdPort may have a direct association to another FdPort where there is a transition from one domain to another but where there has been no termination.";
+    }
+    uses local-class;
+    description
+      "The association of the FD to LTPs may be direct for symmetric FDs and may be via FdPort for asymmetric FDs.
+       The FdPort class models the role of the access to the FD function.
+       The capability to set up FCs between the associated FdPorts of the FD depends upon the type of FD. It is asymmetry in this capability that brings the need for FdPort.
+       The FD can be considered as a component and the FdPort as a Port on that component.";
+  }
+
+  feature forwardingconstructisprotectionlockout {
+    description
+      "none";
+  }
+
+  feature fcportisprotectionlockout {
+    description
+      "none";
+  }
+
+  /****************************************
+   * package associations
+   **************************************/ 
+  /****************************************
+   * package core-foundation-model
+   **************************************/ 
+  /****************************************
+   * package super-classes-and-common-packages
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+
+  grouping name {
+    list name {
+      key "value-name";
+      uses name-and-value;
+      description
+        "List of names.";
+    }
+    description
+      "Name: A property of an entity with a value that is unique in some namespace but may change during the life of the entity. A name carries no semantics with respect to the purpose of the entity.";
+  }
+
+  grouping global-class {
+    container external-managed-id {
+      uses external-managed-universal-id;
+      description
+        "A list of external managed universal identifiers, set by an external tool. There must not be any function implemented on the ControlConstruct itself next to updating the list on request and storing it persitenly. ";
+    }
+    leaf local-id {
+      type string;
+      description
+        "An identifier that is unique in the context of some scope that is less than the global scope.
+         (This should be considered in the context of Identifier: A property of an entity/role with a value that is unique within an identifier space, where the identifier space is itself unique, and immutable. The identifier therefore represents the identity of the entity/role. An identifier carries no semantics with respect to the purpose of the entity.)";
+    }
+    leaf uuid {
+      type universal-id;
+      description
+        "UUID: An identifier that is universally unique
+         (This should be considered in the context of Identifier: A property of an entity/role with a value that is unique within an identifier space, where the identifier space is itself globally unique, and immutable. An identifier carries no semantics with respect to the purpose or state of the entity)
+         The uuid should be treated as opaque by the user.";
+    }
+    uses name;
+    uses label;
+    uses extension;
+    uses state-pac;
+    uses address;
+    description
+      "Represents a type of thing (an Entity) that has instances which can exist in their own right (independently of any others).
+       Entity: Has identity, defined boundary, properties, functionality and lifecycle in a global context.
+       (This should be considered in the context of a Class: (usage) The representation of a thing that may be an entity or an inseparable Entity Feature).";
+  }
+
+  grouping local-class {
+    leaf local-id {
+      type string;
+      description
+        "An identifier that is unique in the context of some scope that is less than the global scope.
+         (This should be considered in the context of Identifier: A property of an entity/role with a value that is unique within an identifier space, where the identifier space is itself unique, and immutable. The identifier therefore represents the identity of the entity/role. An identifier carries no semantics with respect to the purpose of the entity.)";
+    }
+    uses name;
+    uses label;
+    uses extension;
+    uses state-pac;
+    uses address;
+    description
+      "A LocalClass represents a Feature of an Entity. It is inseparable from a GlobalClass but is a distinct feature of that GlobalClass such that the instances of LocalClass are able to have associations to other instances.
+       Feature of an Entity: An inseparable, externally distinguishable part of an entity.
+       The mandatory LocalId of the LocalClass instance is unique in the context of the GlobalClass from which it is inseparable.
+       (This should be considered in the context of a Class: (usage) The representation of a thing that may be an entity or an inseparable feature of an entity.)
+      ";
+  }
+
+  grouping label {
+    list label {
+      key "value-name";
+      uses name-and-value;
+      description
+        "List of labels.";
+    }
+    description
+      "A property of an entity with a value that is not expected to be unique and is allowed to change. A label carries no semantics with respect to the purpose of the entity and has no effect on the entity behavior or state.";
+  }
+
+  grouping extension {
+    list extension {
+      key "value-name";
+      uses name-and-value;
+      description
+        "List of simple name-value extensions.";
+    }
+    description
+      "Extension provides an opportunity to define properties not declared in the class that extend the class enabling a realization with simple ad-hoc extension of standard classes to be conformant.";
+  }
+
+  grouping universal-id-authority {
+    leaf uuid {
+      type universal-id;
+      description
+        "The UUID for the UUID authority.";
+    }
+
+    description
+      "Represents the authority that controls the allocation of UUIDs.";
+  }
+
+  grouping name-and-value-authority {
+    leaf uuid {
+      type universal-id;
+      description
+        "The UUID for the NameAndValueAuthority.";
+    }
+    description
+      "Represents the authority that controls the legal values for the names and values of a name/value attribute.";
+  }
+
+  grouping conditional-package {
+    uses extension;
+    uses label;
+    description
+      "The base class for conditional packages.";
+  }
+
+  grouping address {
+    leaf-list address {
+      type dt-address;
+      description
+        "One or more descriptions of the location.";
+    }
+    description
+      "Provides an opportunity to state the location of the entity via one or more hierarchies of narrowing contexts.";
+  }
+
+  /****************************************
+   * package assocations
+   **************************************/ 
+  /****************************************
+   * package state-model
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+
+  grouping state-pac {
+    leaf operational-state {
+      type operational-state;
+      config false;
+      description
+        "The operational state is used to indicate whether or not the resource is installed and working.";
+    }
+    leaf administrative-control {
+      type administrative-control;
+      description
+        "The administrativeControl state provides control of the availability of specific resources without modification to the provisioning of those resources.
+         The value is the current control target. The actual administrativeState may or may not be at target.";
+    }
+    leaf administrative-state {
+      type administrative-state;
+      config false;
+      description
+        "Shows whether or not the client has permission to use or has a prohibition against using the resource.
+         The administrative state expresses usage permissions for specific resources without modification to the provisioning of those resources.";
+    }
+    leaf lifecycle-state {
+      type lifecycle-state;
+      description
+        "Used to track the planned deployment, allocation to clients and withdrawal of resources.";
+    }
+    description
+      "Provides general state attributes.";
+  }
+
+  /****************************************
+   * package state-machines
+   **************************************/ 
+  /****************************************
+   * package core-physical-model
+   **************************************/ 
+  /****************************************
+   * package rule-models
+   **************************************/ 
+  /****************************************
+   * package fru-non-fru-rules
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+
+  grouping field-replaceable {
+    list equipment-non-fru {
+      key "uuid";
+      uses non-field-replaceable;
+      description
+        "none";
+    }
+    list holder {
+      key "local-id";
+      uses holder;
+      description
+        "none";
+    }
+    container holder-address {
+      uses holder;
+      description
+        "none";
+    }
+    uses equipment;
+    description
+      "A rule class (an abstract specialization of Equipment) that represents an equipment that can be replaced in the field.
+       May plug in to a holder in another equipment (if not stand-alone).
+       Realization could use an FRU Boolean on Equipment.";
+  }
+
+  grouping non-field-replaceable {
+    uses equipment;
+    description
+      "A rule class (an abstract specialization of Equipment) that represents an equipment that cannot be replaced in the field.
+       Is simply a subordinate part of an FRU (or another NFRU – where there must be an FRU at the top of the hierarchy).
+       Does not have any exposed holders (any associated holders are assumed to belong to the containing FRU).
+       Does not have any connectors (any associated connectors are assumed to belong to the containing FRU).
+      ";
+  }
+
+  /****************************************
+   * package connector-rules
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+
+  grouping connector-on-equipment-for-holder {
+    leaf connector-in-holder {
+      type string;
+      description
+        "The equipment connector is plugged into the referenced holder connector.";
+    }
+    uses connector;
+    description
+      "A rule class (an abstract specialization of Connector) that represents a connector on an equipment that is intended to mate with a connector in a holder.";
+  }
+
+  /****************************************
+   * package equipment-detail
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+  /****************************************
+   * package dynamic-details
+   **************************************/ 
+
+  grouping function-enablers {
+    leaf power-state {
+      type string;
+      description
+        "The state of the power being supplied to the equipment.
+         Note that this attribute summarizes the power state.
+         Full details on the actual power system would be provided from a number of PC instances representing the relevant parts of the Power function (e.g. different voltage supplies).";
+    }
+    description
+      "Represents the dynamic aspects of the properties that relate to the motive force that directly enable functionality to emerge from the equipment.";
+  }
+
+  grouping mechanical-functions {
+    leaf rotation-speed {
+      type string;
+      description
+        "none";
+    }
+    description
+      "Represents the dynamic aspects of the mechanical functions of the equipment.";
+  }
+
+  grouping physical-properties {
+    leaf temperature {
+      type string;
+      description
+        "none";
+    }
+    description
+      "Represents the dynamic aspects of the physical environmental properties of the equipment.";
+  }
+
+  grouping location {
+    leaf equipment-location {
+      type dt-address;
+      description
+        "none";
+    }
+    leaf geographical-location {
+      type dt-address;
+      description
+        "none";
+    }
+    description
+      "Represents where the equipment is.";
+  }
+
+  /****************************************
+   * package invariant-details
+   **************************************/ 
+
+  grouping equipment-structure {
+    leaf category {
+      type equipment-category;
+      description
+        "This attribute provides the identifier for a category of equipments regarded as having particular shared characteristics.";
+    }
+    description
+      "Represents the form of the equipment.";
+  }
+
+  grouping equipment-instance {
+    leaf serial-number {
+      type string;
+      description
+        "This attribute represents the serial number of this instance.";
+    }
+    leaf asset-instance-identifier {
+      type string;
+      description
+        "This attribute represents the asset identifier of this instance from the manufacturer's perspective.";
+    }
+    description
+      "Represents the per instance invariant properties of the equipment.";
+  }
+
+  grouping equipment-type {
+    leaf description {
+      type string;
+      description
+        "Text describing the type of Equipment.";
+    }
+    leaf model-identifier {
+      type string;
+      description
+        "This attribute identifies the model of the equipment.";
+    }
+    leaf part-type-identifier {
+      type string;
+      description
+        "This attribute identifies the part type of the equipment.";
+    }
+    leaf type-name {
+      type string;
+      description
+        "This attribute identifies the type of the equipment.";
+    }
+    leaf version {
+      type string;
+      description
+        "This attribute identifies the version of the equipment.";
+    }
+    description
+      "Represents the invariant properties of the equipment that define and characterize the type.";
+  }
+
+  grouping holder-structure {
+    leaf holder-category {
+      type holder-category;
+      description
+        "none";
+    }
+    leaf is-captive {
+      type boolean;
+      description
+        "none";
+    }
+    leaf is-guided {
+      type boolean;
+      description
+        "This attribute indicates whether the holder has guides that constrain the position of the equipment in the holder or not.";
+    }
+    leaf is-quantised-space {
+      type boolean;
+      description
+        "none";
+    }
+    description
+      "Represents the form of the holder.";
+  }
+
+  grouping manufactured-thing {
+    container manufacturer-properties {
+      uses manufacturer-properties;
+      description
+        "none";
+    }
+    container equipment-type {
+      uses equipment-type;
+      description
+        "none";
+    }
+    container equipment-instance {
+      uses equipment-instance;
+      description
+        "none";
+    }
+    container operator-augmented-equipment-type {
+      uses operator-augmented-equipment-type;
+      description
+        "none";
+    }
+    container operator-augmented-equipment-instance {
+      uses operator-augmented-equipment-instance;
+      description
+        "none";
+    }
+    description
+      "Collects all invariant aspects of a manufactured thing.";
+  }
+
+  grouping manufacturer-properties {
+    leaf manufacturer-identifier {
+      type string;
+      description
+        "none";
+    }
+    leaf manufacturer-name {
+      type string;
+      description
+        "none";
+    }
+    description
+      "Represents the properties of the manufacturer.";
+  }
+
+  grouping mechanical-features {
+    description
+      "Represents the invariant characteristics of dynamic mechanical features of a physical thing.";
+  }
+
+  grouping operator-augmented-equipment-type {
+    leaf asset-type-identifier {
+      type string;
+      description
+        "none";
+    }
+    description
+      "Represents the invariant properties of the equipment asset allocated by the operator that define and characterize the type.";
+  }
+
+  grouping physical-characteristics {
+    leaf weight-characeristics {
+      type string;
+      description
+        "none";
+    }
+    leaf fire-characteristics {
+      type string;
+      description
+        "none";
+    }
+    leaf materials {
+      type string;
+      description
+        "none";
+    }
+    description
+      "Represents the invariant physical characteristics (including composition and physical robustness) of the type.";
+  }
+
+  grouping environmental-rating {
+    container thermal-rating {
+      uses thermal-rating;
+      description
+        "This attribute represents the thermal characteristics (preferred maximum/minimum, absolute maximum/minimum etc) that the entity can tolerate.";
+    }
+    container power-rating {
+      uses power-rating;
+      description
+        "This attribute represents the power chracteristics (peak and mean per power source) of the entity.
+         For an Equipment this is the power consumption.
+         For a Holder this is the power that can be conveyed.";
+    }
+    leaf humidity-rating {
+      type string;
+      description
+        "This attribute represents the humidity characteristics (preferred maximum/minimum, absolute maximum/minimum etc.) that the entity can tolerate.";
+    }
+    description
+      "Represents the invariant physical operational boundaries for the equipment/holder type.";
+  }
+
+  grouping position {
+    leaf relative-position {
+      type string;
+      description
+        "none";
+    }
+    description
+      "Represents the invariant relative position of the holder (with respect to some frame of reference in an equipment) or connector on an equipment or pin in a connector.";
+  }
+
+  grouping spatial-properties-of-type {
+    leaf height {
+      type string;
+      description
+        "none";
+    }
+    leaf width {
+      type string;
+      description
+        "none";
+    }
+    leaf length {
+      type string;
+      description
+        "none";
+    }
+    description
+      "Represents the basic invariant spatial properties of a physical thing.";
+  }
+
+  grouping swappability {
+    leaf is-hot-swappable {
+      type boolean;
+      default "true";
+      description
+        "none";
+    }
+    description
+      "Represents the degree of field replacement that is possible for the equipment type.";
+  }
+
+  grouping operator-augmented-equipment-instance {
+    leaf asset-instance-identifier {
+      type string;
+      description
+        "This attribute represents the asset identifier of this instance from the operator's perspective.";
+    }
+    description
+      "Represents the invariant properties of the equipment asset allocated by the operator that define and characterize the type.";
+  }
+
+  /****************************************
+   * package pattern-classes
+   **************************************/ 
+
+  grouping cable-details {
+    container spatial-properties-of-type {
+      uses spatial-properties-of-type;
+      description
+        "none";
+    }
+    container physical-characteristics {
+      uses physical-characteristics;
+      description
+        "none";
+    }
+    container manufactured-thing {
+      uses manufactured-thing;
+      description
+        "none";
+    }
+    description
+      "none";
+  }
+
+  grouping connector-details {
+    container position {
+      uses position;
+      description
+        "none";
+    }
+    container mechanical-features {
+      uses mechanical-features;
+      description
+        "none";
+    }
+    container manufactured-thing {
+      uses manufactured-thing;
+      description
+        "none";
+    }
+    description
+      "none";
+  }
+
+  grouping equipment-detail {
+    container location {
+      uses location;
+      description
+        "none";
+    }
+    container structure {
+      uses equipment-structure;
+      description
+        "none";
+    }
+    container swappability {
+      uses swappability;
+      description
+        "none";
+    }
+    container physical-properties {
+      uses physical-properties;
+      description
+        "none";
+    }
+    container function-enablers {
+      uses function-enablers;
+      description
+        "none";
+    }
+    container mechanical-functions {
+      uses mechanical-functions;
+      description
+        "none";
+    }
+    container physical-characteristics {
+      uses physical-characteristics;
+      description
+        "none";
+    }
+    container mechanical-features {
+      uses mechanical-features;
+      description
+        "none";
+    }
+    container spatial-properties-of-type {
+      uses spatial-properties-of-type;
+      description
+        "none";
+    }
+    container environmental-rating {
+      uses environmental-rating;
+      description
+        "none";
+    }
+    container manufactured-thing {
+      uses manufactured-thing;
+      description
+        "none";
+    }
+    uses local-class;
+    description
+      "none";
+  }
+
+  grouping holder-details {
+    container spatial-properties-of-type {
+      uses spatial-properties-of-type;
+      description
+        "none";
+    }
+    container environmental-rating {
+      uses environmental-rating;
+      description
+        "none";
+    }
+    container position {
+      uses position;
+      description
+        "none";
+    }
+    container holder-structure {
+      uses holder-structure;
+      description
+        "none";
+    }
+    uses local-class;
+    description
+      "none";
+  }
+
+  /****************************************
+   * package data-types
+   **************************************/ 
+
+  grouping thermal-rating {
+    leaf thermal-rating-name {
+      type string;
+      description
+        "Name of the rating property, e.g. Absolute.";
+    }
+    leaf maximum-temperature {
+      type decimal64 {
+        fraction-digits 3;
+      }
+      description
+        "The maximum temperature in Celsius.";
+    }
+    leaf minimum-temperature {
+      type decimal64 {
+        fraction-digits 3;
+      }
+      description
+        "The minimum temperature in Celsius.";
+    }
+    description
+      "A thermal rating value range.";
+  }
+
+  grouping power-rating {
+    leaf power-rating-name {
+      type string;
+      description
+        "Name of the rating property, e.g. Absolute.";
+    }
+    leaf power-rating-value {
+      type string;
+      description
+        "none";
+    }
+    description
+      "none";
+  }
+
+  /****************************************
+   * package equipment-pattern-structure
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+
+  grouping connector {
+    leaf connector {
+      type string;
+      description
+        "The Connector that is attached to this Connector so as to join the Equipment/Cable with this Connector to another Equipment/Cable.
+         This may provide physical support and/or allow signal flow.";
+    }
+    leaf orientation {
+      type connector-and-pin-orientation;
+      description
+        "The physical orientation of the connector, such as whether it is a male, or female, or neutral structure.";
+    }
+    leaf pin-layout {
+      type string;
+      description
+        "none";
+    }
+    leaf connector-type {
+      type string;
+      description
+        "The type of the connector.";
+    }
+    leaf role {
+      type string;
+      description
+        "The purpose of the Connector in the physical space and the functional space.";
+    }
+    uses local-class;
+    description
+      "Represents a connector that may be fully exposed (e.g. to plug in a cable or on the end of a cable) or partially exposed (e.g. backplane to plug in another piece of equipment such as a module).
+       A physical port on the Equipment. A place where signals produced by the functionality of the Equipment may be accessed.";
+  }
+
+  grouping equipment {
+    list connector {
+      key "local-id";
+      uses connector;
+      description
+        "A Connector on the Equipment.";
+    }
+    list contained-holder {
+      key "local-id";
+      uses holder;
+      description
+        "References the Holder in an Equipment that is available to take other Equipments.
+         For example:
+         - Slot in a sub-rack
+         - Slot in a Field Replaceable Unit that can take a small form-factor pluggable.";
+    }
+    leaf is-field-replaceable {
+      type boolean;
+      default "true";
+      config false;
+      description
+        "Indicates whether or not the equipment can be removed and replaced 'in the field' (i.e. in a deployment) by normal operations personnel.";
+    }
+    leaf-list function-block {
+      type string;
+      description
+        "none";
+    }
+    list expected-equipment {
+      key "local-id";
+      uses expected-equipment;
+      description
+        "none";
+    }
+    container actual-equipment {
+      uses actual-equipment;
+      description
+        "none";
+    }
+    leaf equipment-functional-boundary {
+      type string;
+      description
+        "none";
+    }
+    uses global-class;
+    description
+      "Represents any relevant physical thing.
+       Can be either field replaceable or not field replaceable.
+       Note: The model is currently constrained to inside plant.";
+  }
+
+  grouping holder {
+    leaf occupying-fru {
+      type leafref {
+        path "/core-model:control-construct/core-model:equipment/core-model:uuid";
+      }
+      description
+        "The FRU that is occupying the holder.
+         A holder may be unoccupied.
+         An FRU may occupy more hat one holder (using or blocking are intentionally not distinguished here).";
+    }
+    leaf holder-location {
+      type dt-address;
+      description
+        "The relative position of the holder in the context of its containing equipment along with the position of that containing Equipment (and further recursion).";
+    }
+    container expected-holder {
+      uses expected-holder;
+      description
+        "none";
+    }
+    container actual-holder {
+      uses actual-holder;
+      description
+        "none";
+    }
+    uses local-class;
+    description
+      "Represents a space in an equipment in which another equipment can be fitted in the field.";
+  }
+
+  /****************************************
+   * package data-types
+   **************************************/ 
+
+  typedef connector-and-pin-orientation {
+    type identityref {
+      base CONNECTOR_AND_PIN_ORIENTATION;
+    }
+    description
+      "Most connector schemes are asymmetric such that there are two orientations of the connector where a mating is only possible between two connectors of different orientations.
+       A multi-pin connector may have a mix of pin orientations. In this case, it is expected that the dominant orientation of pin is chosen for the connector orientation.";
+  }
+
+  typedef equipment-category {
+    type identityref {
+      base EQUIPMENT_CATEGORY;
+    }
+    description
+      "The form of equipment.";
+  }
+
+  typedef holder-category {
+    type identityref {
+      base HOLDER_CATEGORY;
+    }
+    description
+      "The form of holder.";
+  }
+
+  /****************************************
+   * package expected-and-actual
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+
+  grouping actual-holder {
+    uses holder-details;
+    description
+      "A holder in the ActualEquipment.";
+  }
+
+  grouping expected-holder {
+    uses holder-details;
+    description
+      "A definition of a holder expected in the ActualEquipment (i.e. an ActualHolder) as part of the constraints provided by the ExpectedEquipment.";
+  }
+
+  grouping actual-equipment {
+    uses equipment-detail;
+    description
+      "The equipment that is actually present in the physical network.
+       It will expose all dynamic properties and some critical static properties.";
+  }
+
+  grouping expected-equipment {
+    uses equipment-detail;
+    description
+      "A definition of the restrictions on the equipment that is expected to be present in the physical network at a particular 'place'.
+       The expected equipment will state the type and may constrain any other invariant properties.
+       It may also provide desired ranges for dynamic properties.";
+  }
+
+  /****************************************
+   * package connector-and-pin
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+
+  grouping signal-ref-pt {
+    container logical-termination-point {
+      uses logical-termination-point;
+      description
+        "none";
+    }
+    list elemental-signals {
+      min-elements 1;
+      uses elemental-signals;
+      description
+        "none";
+    }
+    description
+      "A single coherent signal as processed by a single LTP.";
+  }
+
+  grouping signal-ref-pt-group {
+    description
+      "A conceptual access for a group of signals (where that group of signals cannot be separated).
+       A physical indivisible group of signals.";
+  }
+
+  grouping elemental-signals {
+    description
+      "The elemental (sub-atomic) parts of an 'indivisible' signal where processing in the LTP is required to extract the elemental signals.";
+  }
+
+  /****************************************
+   * package general-controller-model
+   **************************************/ 
+  /****************************************
+   * package associations
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+
+  container control-construct {
+    presence "Enables SDN";
+    uses control-construct;
+    description
+      "none";
+  }
+
+  grouping control-construct {
+    leaf-list top-level-equipment {
+      type leafref {
+        path "/core-model:control-construct/core-model:equipment/core-model:uuid";
+      }
+      description
+        "none";
+    }
+    list equipment {
+      key "uuid";
+      uses equipment;
+      description
+        "none";
+    }
+    list logical-termination-point {
+      key "uuid";
+      uses logical-termination-point;
+      description
+        "none";
+    }
+    list forwarding-domain {
+      key "uuid";
+      uses forwarding-domain;
+      description
+        "none";
+    }
+    container profile-collection {
+      uses profile-collection;
+      description
+        "none";
+    }
+    uses global-class;
+    description
+      "Represents control capability/functionality.
+       ControlConstructs communicate with other ControlConstructs through ControlPorts about things within the related ConstraintDomains.
+       The ControlConstruct applies to all Control/Management cases including:
+       - the controller in the Network/Managed Element e.g. an SNMP agent).
+       - an SDN Controller.
+       - an EMS.
+       - an NMS.
+       This specific model follows a subset of the Component-System Pattern.
+       Root element for controller southbound APIs.";
+  }
+
+  grouping profile-collection {
+    list profile {
+      key "uuid";
+      uses profile;
+      description
+        "none";
+    }
+    description
+      "none";
+  }
+
+  grouping profile {
+    leaf profile-name {
+      type profile-name-type;
+      description
+        "none";
+    }
+    uses global-class;
+    description
+      "none";
+  }
+
+  grouping control-port {
+    container logical-termination-point {
+      uses logical-termination-point;
+      description
+        "The LTP through which the control messaging/signaling flows.";
+    }
+    leaf provider-role {
+      type string;
+      description
+        "Properties relevant when the ControlPort is exposing the ControlConstruct as a provider of capability.";
+    }
+    leaf user-role {
+      type string;
+      description
+        "Properties relevant when the ControlPort is exposing the ControlConstruct as a user of capability.";
+    }
+    uses global-class;
+    description
+      "The access to the ControlConstruct following the normal Component-Port pattern (i.e., the functions of a component are accessed via ports).
+       Is assumed to usually be bidirectional.";
+  }
+
+  /****************************************
+   * package interfaces
+   **************************************/ 
+
+  rpc apply-system-structure-state-defined-by-constraint {
+    description
+      "none";
+    input {
+      leaf input-constraint-structure {
+        type string;
+        description
+          "none";
+      }
+    }
+    output {
+      leaf output-constraint-structure {
+        type string;
+        description
+          "none";
+      }
+    }
+  }
+
+  rpc retrieve-system-structure-defined-by-constraint {
+    description
+      "none";
+    input {
+      leaf input-constraint-structure {
+        type string;
+        description
+          "none";
+      }
+    }
+    output {
+      leaf output-constraint-structure {
+        type string;
+        description
+          "none";
+      }
+    }
+  }
+
+  /****************************************
+   * package core-software-model
+   **************************************/ 
+  /****************************************
+   * grouping statements for object classes
+   **************************************/ 
+  /****************************************
+   * package file-system
+   **************************************/ 
+
+  grouping file {
+    leaf size {
+      type string;
+      description
+        "The size of the File, in bytes.";
+    }
+    leaf checksum {
+      type string;
+      description
+        "A checksum that can be used to validate the contents of the File (in case of corruption or malicious changes) using a hashing algorithm like MD5 or SHA1.";
+    }
+    uses file-system-entry;
+    description
+      "A File is a data structure used to store information (user data, commands, software etc.) in a computer system. Note that in this CIM class, we are only storing the metadata associated with the File, not the actual contents of the File.";
+  }
+
+  grouping file-system {
+    list file-system-entry {
+      uses file-system-entry;
+      description
+        "The root FileSystem entries, which can be Files or Directories.";
+    }
+    description
+      "A FileSystem organizes the data on a storage system so that it can be easily created, updated and accessed. It manages the Directories and also the metadata for the Files.";
+  }
+
+  grouping file-system-entry {
+    leaf is-read-only {
+      type boolean;
+      description
+        "If the File contents can be modified or not.";
+    }
+    leaf is-hidden {
+      type boolean;
+      description
+        "If the File is hidden by the FileSystem.";
+    }
+    leaf path-name {
+      type string;
+      description
+        "The full pathname of the entry, back to the root Directory.";
+    }
+    leaf local-name {
+      type string;
+      description
+        "The name of the entry in its Directory.";
+    }
+    description
+      "FileSystemEntry is an abstraction of File and Directory, useful when there is a need to reference both classes. It also allows for an easy representation of a hierarchical filesystem.";
+  }
+
+  grouping symbolic-link {
+    container file-system-entry {
+      uses file-system-entry;
+      description
+        "The FileSystemEntry that this SymbolicLink refers to.";
+    }
+    uses file;
+    description
+      "A SymbolicLink is a File that contains a path reference to a File or a Directory.";
+  }
+
+  grouping directory {
+    list file-system-entry {
+      uses file-system-entry;
+      description
+        "Directory entry, which can be a File or another Directory.";
+    }
+    uses file-system-entry;
+    description
+      "A Directory is a collection of Files and other Directories. Because a Directory can contain other Directories, this allows a hierarchical file system to be represented.";
+  }
+
+  /****************************************
+   * package running-software
+   **************************************/ 
+
+  grouping installed-software-component {
+    leaf name {
+      type string;
+      description
+        "The name of the installed component as returned by the operating system.";
+    }
+    leaf version {
+      type string;
+      description
+        "The version of the installed component as returned by the operating system.";
+    }
+    leaf serial-number {
+      type string;
+      description
+        "As part of software licensing, a serial number may be available for the installation.";
+    }
+    container installation-file {
+      uses file;
+      description
+        "If available, the File that the installation was from.";
+    }
+    leaf-list child-installed-software-component {
+      type leafref {
+        path "/core-model:installed-software-component/core-model:child-installed-software-component/core-model:serial-number";
+      }
+      description
+        "References to any child installations.";
+    }
+    list installed-file-system-entry {
+      uses file-system-entry;
+      description
+        "References to any Directories or Files created or used by the installation. Note that installations may share files. So installation 1 may create key.dll in a common area, and installation 2 would create this if it wasn’t present. Because it is already present, installation 2 just references the file. Now if installation 1 is uninstalled, key.dll is not removed as there is still a reference to it.";
+    }
+    description
+      "InstalledSoftwareComponent is part of the software inventory. It represents an application or an application suite or an application (feature) option. It is the unit of installation. Note that this is operating system dependent. For example, Microsoft DOS 3.3 didn’t have an installation manager.";
+  }
+
+  grouping running-software-process {
+    leaf process-id {
+      type string;
+      description
+        "The identifier provided by the operating system.";
+    }
+    leaf priority {
+      type string;
+      description
+        "The process priority which is used by a multi-tasking operating system to assign resource allocations for the different running software processes.";
+    }
+    leaf invoking-user {
+      type string;
+      description
+        "The username of the account that invoked the process.";
+    }
+    leaf invoking-command {
+      type string;
+      description
+        "The command string that invoked the process.";
+    }
+    leaf run-state {
+      type string;
+      description
+        "The current run state. A software process may be actively running or suspended (or some other state supported by the operating system).";
+    }
+    leaf name {
+      type string;
+      description
+        "The name of the process as assigned by the operating system.";
+    }
+    leaf description {
+      type string;
+      description
+        "The description of the process as assigned by the operating system.";
+    }
+    container executable {
+      uses file;
+      description
+        "A reference to the executable file (invoked via the invokingCommand). Note that the invoking command may not list the full file path.";
+    }
+    leaf-list child-software-process {
+      type string;
+      description
+        "References to a software process’s subprocesses and threads.";
+    }
+    list open-file {
+      uses file;
+      description
+        "References to any files opened and/or locked by the running process.";
+    }
+    description
+      "This is the unit of software execution. It could be a running application or a thread (the smallest level of software execution).";
+  }
+
+  grouping running-operating-system {
+    list running-software-process {
+      uses running-software-process;
+      description
+        "The software processes running under this operating system.";
+    }
+    list running-container-engine {
+      uses running-container-engine;
+      description
+        "The running container engines supported by the running operating system.";
+    }
+    leaf-list running-host-os-vmm {
+      type string;
+      description
+        "The host OS VMMs running under this operating system.";
+    }
+    uses running-software-process;
+    description
+      "An operating system is a running software process that enables software applications to utilize the computer’s hardware.";
+  }
+
+  grouping running-software-application {
+    uses running-software-process;
+    description
+      "This covers generic software processes that don’t have a special subclass (operating system, virtual machine and container special cases have their own specific subclasses).";
+  }
+
+  /****************************************
+   * package software-container
+   **************************************/ 
+
+  grouping running-container {
+    leaf container-boundary {
+      type string;
+      description
+        "The constraints defining the boundary of the Container.";
+    }
+    uses running-software-process;
+    description
+      "A container that has been activated by its container engine and hence can provide and consume resources.";
+  }
+
+  grouping running-container-engine {
+    list running-container {
+      uses running-container;
+      description
+        "The containers running in this container engine.";
+    }
+    uses running-software-process;
+    description
+      "A software process that abstracts running applications from the operating system. It provides some level of isolation, but not as much as a hypervisor.";
+  }
+
+  /****************************************
+   * package associations
+   **************************************/ 
+}

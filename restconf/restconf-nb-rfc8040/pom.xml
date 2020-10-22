@@ -204,6 +204,15 @@
       <artifactId>threadpool-config-impl</artifactId>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.opendaylight.netconf</groupId>
+          <artifactId>restconf-common-models</artifactId>
+          <version>1.7.2-Oxygen-SR2.4_2_5_rc15-frinxodl-SNAPSHOT</version>
+      </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>restconf-common-models</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

@@ -7,6 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
@@ -14,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
@@ -59,6 +64,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNo
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -96,7 +102,7 @@ public final class ReadDataTransactionUtil {
 
         // check only allowed parameters
         ParametersUtil.checkParametersTypes(
-                RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                READ_TYPE_TX,
                 uriInfo.getQueryParameters().keySet(),
                 RestconfDataServiceConstant.ReadData.CONTENT,
                 RestconfDataServiceConstant.ReadData.DEPTH,
@@ -155,7 +161,18 @@ public final class ReadDataTransactionUtil {
 
         // check and set fields
         if (!fields.isEmpty()) {
-            builder.setFields(ParserFieldsParameter.parseFieldsParameter(identifier, fields.get(0)));
+            if (identifier.getMountPoint() != null) {
+                List<List<PathArgument>> tmpList = ParserFieldsParameter
+                        .parseMountPointFieldsParameter(identifier, fields.get(0));
+                for (int i = 0; i < tmpList.size(); i++) {
+                    tmpList.set(i, tmpList.get(i).subList(1, tmpList.get(i).size()));
+                }
+                builder.setMountPointFields(tmpList.stream()
+                        .map(YangInstanceIdentifier::create)
+                        .collect(Collectors.toList()));
+            } else {
+                builder.setFields(ParserFieldsParameter.parseFieldsParameter(identifier, fields.get(0)));
+            }
         }
 
         // check and set withDefaults parameter
@@ -218,6 +235,83 @@ public final class ReadDataTransactionUtil {
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
                                 "The content parameter value must be either config, nonconfig or all (default)"));
+        }
+    }
+
+    /**
+     * Read data from mountpoint via transaction.
+     *
+     * @param valueOfContent type of data to read (config, state, all)
+     * @param path           the path to read
+     * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa       value of with-defaults parameter
+     * @param ctx            schema context
+     * @param fields         identifiers for nodes specified by fields query
+     * @return {@link NormalizedNode}
+     */
+    public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
+                                                          final @NonNull YangInstanceIdentifier path,
+                                                          final @NonNull RestconfStrategy strategy,
+                                                          final String withDefa, final EffectiveModelContext ctx,
+                                                          final @NonNull List<YangInstanceIdentifier> fields) {
+        switch (valueOfContent) {
+            case RestconfDataServiceConstant.ReadData.CONFIG:
+                if (withDefa == null) {
+                    return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
+                            true, fields);
+                } else {
+                    return prepareDataByParamWithDef(
+                            readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
+                                    true, fields),
+                            path, withDefa, ctx);
+                }
+            case RestconfDataServiceConstant.ReadData.NONCONFIG:
+                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, true,
+                        fields);
+            case RestconfDataServiceConstant.ReadData.ALL:
+                return readAllData(strategy, path, withDefa, ctx, fields);
+            default:
+                strategy.cancel();
+                throw new RestconfDocumentedException(
+                        new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                                "Invalid content parameter: " + valueOfContent, null,
+                                "The content parameter value must be either config, nonconfig or all (default)"));
+        }
+    }
+
+    /**
+     * Check if URI does not contain value for the same parameter more than once.
+     *
+     * @param parameterValues URI parameter values
+     * @param parameterName URI parameter name
+     */
+    @VisibleForTesting
+    static void checkParameterCount(final @NonNull List<String> parameterValues, final @NonNull String parameterName) {
+        if (parameterValues.size() > 1) {
+            throw new RestconfDocumentedException(
+                    "Parameter " + parameterName + " can appear at most once in request URI",
+                    RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE);
+        }
+    }
+
+    /**
+     * Check if URI does not contain not allowed parameters for specified operation.
+     *
+     * @param usedParameters parameters used in URI request
+     * @param allowedParameters allowed parameters for operation
+     */
+    @VisibleForTesting
+    static void checkParametersTypes(final @NonNull Set<String> usedParameters,
+                                     final @NonNull String... allowedParameters) {
+        // FIXME: there should be a speedier way to do this
+        final Set<String> notAllowedParameters = Sets.newHashSet(usedParameters);
+        notAllowedParameters.removeAll(Sets.newHashSet(allowedParameters));
+
+        if (!notAllowedParameters.isEmpty()) {
+            throw new RestconfDocumentedException(
+                    "Not allowed parameters for " + READ_TYPE_TX + " operation: " + notAllowedParameters,
+                    RestconfError.ErrorType.PROTOCOL,
+                    RestconfError.ErrorTag.INVALID_VALUE);
         }
     }
 
@@ -362,11 +456,36 @@ public final class ReadDataTransactionUtil {
                 store, strategy.getInstanceIdentifier().getInstanceIdentifier());
         if (closeTransactionChain) {
             //Method close transactionChain if any
-            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX,
                     dataFactory, strategy.getTransactionChain());
         } else {
-            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX,
                     dataFactory);
+        }
+        return dataFactory.build();
+    }
+
+    /**
+     * Reads mountpoint data specified by fields parameter.
+     *
+     * @param strategy              {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param closeTransactionChain If is set to true, after transaction it will close transactionChain
+     *                              in {@link RestconfStrategy} if any
+     * @param fields                identifiers specified by fields query
+     * @return {@link NormalizedNode}
+     */
+    static @Nullable NormalizedNode<?, ?> readDataViaTransaction(final @NonNull RestconfStrategy strategy,
+                                                                 final LogicalDatastoreType store,
+                                                                 final YangInstanceIdentifier path,
+                                                                 final boolean closeTransactionChain,
+                                                                 List<YangInstanceIdentifier> fields) {
+        final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(store, path, fields);
+        if (closeTransactionChain) {
+            //Method close transactionChain if any
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory, strategy.getTransactionChain());
+        } else {
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory);
         }
         return dataFactory.build();
     }
@@ -396,6 +515,46 @@ public final class ReadDataTransactionUtil {
             configDataNode = prepareDataByParamWithDef(
                     readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, true),
                     strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
+        }
+
+        // if no data exists
+        if (stateDataNode == null && configDataNode == null) {
+            return null;
+        }
+
+        // return config data
+        if (stateDataNode == null) {
+            return configDataNode;
+        }
+
+        // return state data
+        if (configDataNode == null) {
+            return stateDataNode;
+        }
+
+        // merge data from config and state
+        return mergeStateAndConfigData(stateDataNode, configDataNode);
+    }
+
+    private static @Nullable NormalizedNode<?, ?> readAllData(final @NonNull RestconfStrategy strategy,
+                                                              final YangInstanceIdentifier path, final String withDefa,
+                                                              final EffectiveModelContext ctx,
+                                                              List<YangInstanceIdentifier> fields) {
+        // PREPARE STATE DATA NODE
+        final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(
+                strategy, LogicalDatastoreType.OPERATIONAL, path, false, fields);
+
+        // PREPARE CONFIG DATA NODE
+        final NormalizedNode<?, ?> configDataNode;
+        //Here will be closed transactionChain if any
+        if (withDefa == null) {
+            configDataNode = readDataViaTransaction(
+                    strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields);
+        } else {
+            configDataNode = prepareDataByParamWithDef(
+                    readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true,
+                            fields),
+                    path, withDefa, ctx);
         }
 
         // if no data exists
