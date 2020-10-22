@@ -67,7 +67,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -154,9 +154,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        final NormalizedNode<?, ?> node = readData(identifier, parameters.getContent(),
-                instanceIdentifier.getInstanceIdentifier(), strategy, parameters.getWithDefault(), schemaContextRef,
-                uriInfo);
+        final NormalizedNode<?, ?> node;
+        if (!parameters.getMountPointFieldsFields().isEmpty()) {
+            node = readData(identifier, parameters.getContent(),
+                    instanceIdentifier.getInstanceIdentifier(), strategy, parameters.getWithDefault(), schemaContextRef,
+                    uriInfo, parameters.getMountPointFieldsFields());
+        } else {
+            node = readData(identifier, parameters.getContent(),
+                    instanceIdentifier.getInstanceIdentifier(), strategy, parameters.getWithDefault(), schemaContextRef,
+                    uriInfo);
+        }
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
@@ -205,6 +212,28 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return ReadDataTransactionUtil.readData(content, path, strategy, withDefa, schemaContext);
     }
 
+    /**
+     * Read specific type of data from mountpoint via transaction.
+     *
+     * @param identifier    identifier of data to read
+     * @param content       type of data to read (config, state, all)
+     * @param strategy      {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa      value of with-defaults parameter
+     * @param schemaContext schema context
+     * @param uriInfo       uri info
+     * @param fields        identifiers specified by fields query
+     * @return {@link NormalizedNode}
+     */
+    private NormalizedNode<?, ?> readData(final String identifier, final String content,
+                                          final YangInstanceIdentifier path, final RestconfStrategy strategy,
+                                          final String withDefa, final EffectiveModelContext schemaContext,
+                                          final UriInfo uriInfo, List<YangInstanceIdentifier> fields) {
+        if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
+            createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
+        }
+        return ReadDataTransactionUtil.readData(content, path, strategy, withDefa, schemaContext, fields);
+    }
+
     private void createAllYangNotificationStreams(final RestconfStrategy strategy,
             final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
         strategy.prepareReadWriteExecution();
@@ -213,10 +242,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
             final NotificationListenerAdapter notifiStreamXML =
                 CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.XML);
+                    NotificationOutputTypeGrouping.NotificationOutputType.XML);
             final NotificationListenerAdapter notifiStreamJSON =
                 CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.JSON);
+                    NotificationOutputTypeGrouping.NotificationOutputType.JSON);
             writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamXML);
             writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamJSON);
         }

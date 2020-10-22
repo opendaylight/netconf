@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -19,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.netconf.api.dom.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -62,6 +64,16 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             final YangInstanceIdentifier path) {
         try (DOMDataTreeReadTransaction tx = transactionChain.newReadOnlyTransaction()) {
             return tx.read(store, path);
+        }
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+                                                                 YangInstanceIdentifier path,
+                                                                 List<YangInstanceIdentifier> fields) {
+        try (NetconfDOMFieldsReadTransaction tx =
+                     (NetconfDOMFieldsReadTransaction) transactionChain.newReadOnlyTransaction()) {
+            return tx.read(store, path, fields);
         }
     }
 
