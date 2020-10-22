@@ -7,10 +7,7 @@
  */
 package org.opendaylight.netconf.topology.impl;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -33,7 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -43,11 +39,9 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorInitializerFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.DefaultBaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
@@ -55,7 +49,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.ProtocolBuilder;
@@ -86,9 +79,6 @@ public class NetconfTopologyImplTest {
     private static final String TOPOLOGY_ID = "testing-topology";
 
     @Mock
-    private NetconfClientDispatcher mockedClientDispatcher;
-
-    @Mock
     private EventExecutor mockedEventExecutor;
 
     @Mock
@@ -107,7 +97,10 @@ public class NetconfTopologyImplTest {
     private DOMMountPointService mountPointService;
 
     @Mock
-    private AAAEncryptionService encryptionService;
+    private NetconfDeviceCommunicatorInitializerFactory netconfDeviceCommunicatorFactory;
+
+    @Mock
+    private NetconfClientDispatcher dispatcher;
 
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
@@ -116,9 +109,9 @@ public class NetconfTopologyImplTest {
     public void setUp() {
         when(mockedProcessingExecutor.getExecutor()).thenReturn(MoreExecutors.newDirectExecutorService());
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
-            mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
-            encryptionService);
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, dispatcher, netconfDeviceCommunicatorFactory,
+                mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager,
+                dataBroker, mountPointService);
 
         spyTopology = spy(topology);
     }
@@ -151,8 +144,8 @@ public class NetconfTopologyImplTest {
         final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
 
-        NodeKey key = new NodeKey(NODE_ID);
-        PathArgument pa = IdentifiableItem.of(Node.class, key);
+        final NodeKey key = new NodeKey(NODE_ID);
+        final PathArgument pa = IdentifiableItem.of(Node.class, key);
         when(newNode.getIdentifier()).thenReturn(pa);
 
         final NodeBuilder nn = new NodeBuilder()
@@ -195,105 +188,24 @@ public class NetconfTopologyImplTest {
 
     }
 
-    @Test
-    public void testGetClientConfig() {
-        final NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-
-        final NetconfNode testingNode = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(true)
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
-        final NetconfReconnectingClientConfiguration configuration =
-                spyTopology.getClientConfig(sessionListener, testingNode);
-        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TCP, configuration.getProtocol());
-        assertNotNull(configuration.getAuthHandler());
-        assertNull(configuration.getSslHandlerFactory());
-
-
-        final NetconfNode testingNode2 = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(false)
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
-        final NetconfReconnectingClientConfiguration configuration2 =
-                spyTopology.getClientConfig(sessionListener, testingNode2);
-        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration2.getProtocol());
-        assertNotNull(configuration2.getAuthHandler());
-        assertNull(configuration2.getSslHandlerFactory());
-
-
-        final NetconfNode testingNode3 = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(false)
-                .setProtocol(new ProtocolBuilder().setName(Name.SSH).build())
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
-        final NetconfReconnectingClientConfiguration configuration3 =
-                spyTopology.getClientConfig(sessionListener, testingNode3);
-        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration3.getProtocol());
-        assertNotNull(configuration3.getAuthHandler());
-        assertNull(configuration3.getSslHandlerFactory());
-
-
-        final NetconfNode testingNode4 = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(false)
-                .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
-        final NetconfReconnectingClientConfiguration configuration4 =
-                spyTopology.getClientConfig(sessionListener, testingNode4);
-        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, configuration4.getProtocol());
-        assertNull(configuration4.getAuthHandler());
-        assertNotNull(configuration4.getSslHandlerFactory());
-    }
-
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
         private static final BaseNetconfSchemas BASE_SCHEMAS;
 
         static {
             try {
                 BASE_SCHEMAS = new DefaultBaseNetconfSchemas(new YangParserFactoryImpl());
-            } catch (YangParserException e) {
+            } catch (final YangParserException e) {
                 throw new ExceptionInInitializerError(e);
             }
         }
 
-        public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                                          final EventExecutor eventExecutor,
-                                          final ScheduledThreadPool keepaliveExecutor,
-                                          final ThreadPool processingExecutor,
-                                          final SchemaResourceManager schemaRepositoryProvider,
-                                          final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                                          final AAAEncryptionService encryptionService) {
-            super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker,
-                  mountPointService, encryptionService, BASE_SCHEMAS);
+        public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher dispatcher,
+                final NetconfDeviceCommunicatorInitializerFactory netconfDeviceCommunicatorFactory,
+                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
+                final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
+                final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+            super(topologyId, dispatcher, netconfDeviceCommunicatorFactory, eventExecutor, keepaliveExecutor,
+                    processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService, BASE_SCHEMAS);
         }
 
         @Override

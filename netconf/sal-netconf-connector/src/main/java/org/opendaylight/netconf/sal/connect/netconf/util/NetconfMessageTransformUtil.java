@@ -39,6 +39,7 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.util.NetconfUtil;
@@ -46,8 +47,6 @@ import org.opendaylight.netconf.util.NodeContainerProxy;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata.Builder;
@@ -103,23 +102,20 @@ public final class NetconfMessageTransformUtil {
 
     }
 
-    public static final QName IETF_NETCONF_MONITORING =
-            QName.create(NetconfState.QNAME, "ietf-netconf-monitoring").intern();
-    public static final QName GET_DATA_QNAME = QName.create(IETF_NETCONF_MONITORING, "data").intern();
-    public static final QName GET_SCHEMA_QNAME = QName.create(IETF_NETCONF_MONITORING, "get-schema").intern();
+    public static final QName GET_DATA_QNAME = QName.create(NetconfSessionPreferences.IETF_NETCONF_MONITORING,
+            "data").intern();
+    public static final QName GET_SCHEMA_QNAME = QName.create(NetconfSessionPreferences.IETF_NETCONF_MONITORING,
+            "get-schema").intern();
     public static final QName IETF_NETCONF_MONITORING_SCHEMA_FORMAT =
-            QName.create(IETF_NETCONF_MONITORING, "format").intern();
+            QName.create(NetconfSessionPreferences.IETF_NETCONF_MONITORING, "format").intern();
     public static final QName IETF_NETCONF_MONITORING_SCHEMA_LOCATION =
-            QName.create(IETF_NETCONF_MONITORING, "location").intern();
+            QName.create(NetconfSessionPreferences.IETF_NETCONF_MONITORING, "location").intern();
     public static final QName IETF_NETCONF_MONITORING_SCHEMA_IDENTIFIER =
-            QName.create(IETF_NETCONF_MONITORING, "identifier").intern();
+            QName.create(NetconfSessionPreferences.IETF_NETCONF_MONITORING, "identifier").intern();
     public static final QName IETF_NETCONF_MONITORING_SCHEMA_VERSION =
-            QName.create(IETF_NETCONF_MONITORING, "version").intern();
+            QName.create(NetconfSessionPreferences.IETF_NETCONF_MONITORING, "version").intern();
     public static final QName IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE =
-            QName.create(IETF_NETCONF_MONITORING, "namespace").intern();
-
-    public static final QName IETF_NETCONF_NOTIFICATIONS =
-            QName.create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications").intern();
+            QName.create(NetconfSessionPreferences.IETF_NETCONF_MONITORING, "namespace").intern();
 
     public static final URI NETCONF_URI = NETCONF_QNAME.getNamespace();
 
@@ -173,18 +169,7 @@ public final class NetconfMessageTransformUtil {
     public static final URI NETCONF_ACTION_NAMESPACE = URI.create("urn:ietf:params:xml:ns:yang:1");
     public static final String NETCONF_ACTION = "action";
 
-    public static final URI NETCONF_ROLLBACK_ON_ERROR_URI = URI
-            .create("urn:ietf:params:netconf:capability:rollback-on-error:1.0");
     public static final String ROLLBACK_ON_ERROR_OPTION = "rollback-on-error";
-
-    public static final URI NETCONF_CANDIDATE_URI = URI
-            .create("urn:ietf:params:netconf:capability:candidate:1.0");
-
-    public static final URI NETCONF_NOTIFICATONS_URI = URI
-            .create("urn:ietf:params:netconf:capability:notification:1.0");
-
-    public static final URI NETCONF_RUNNING_WRITABLE_URI = URI
-            .create("urn:ietf:params:netconf:capability:writable-running:1.0");
 
     public static final QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
@@ -382,7 +367,7 @@ public final class NetconfMessageTransformUtil {
         final Deque<Builder> builders = new ArrayDeque<>(args.size());
 
         // Step one: open builders
-        for (PathArgument arg : args) {
+        for (final PathArgument arg : args) {
             builders.push(ImmutableNormalizedMetadata.builder().withIdentifier(arg));
         }
 
@@ -497,7 +482,7 @@ public final class NetconfMessageTransformUtil {
             if (next instanceof NodeWithValue) {
                 actualElement.setNodeValue(((NodeWithValue) next).getValue().toString());
             } else if (next instanceof NodeIdentifierWithPredicates) {
-                for (Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).entrySet()) {
+                for (final Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).entrySet()) {
                     final Element entryElement = document.createElementNS(entry.getKey().getNamespace().toString(),
                             entry.getKey().getLocalName());
                     entryElement.setTextContent(entry.getValue().toString());

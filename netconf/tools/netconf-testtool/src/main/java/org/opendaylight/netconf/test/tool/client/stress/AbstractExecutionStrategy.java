@@ -10,17 +10,17 @@ package org.opendaylight.netconf.test.tool.client.stress;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
 
 abstract class AbstractExecutionStrategy implements ExecutionStrategy {
     private final Parameters params;
     private final List<NetconfMessage> preparedMessages;
-    private final NetconfDeviceCommunicator sessionListener;
+    private final NativeNetconfDeviceCommunicator sessionListener;
     private final List<Integer> editBatches;
     private final int editAmount;
 
     AbstractExecutionStrategy(final Parameters params, final List<NetconfMessage> editConfigMsgs,
-                              final NetconfDeviceCommunicator sessionListener) {
+            final NativeNetconfDeviceCommunicator sessionListener) {
         editAmount = editConfigMsgs.size();
         this.params = params;
         this.preparedMessages = editConfigMsgs;
@@ -54,7 +54,7 @@ abstract class AbstractExecutionStrategy implements ExecutionStrategy {
         return preparedMessages;
     }
 
-    protected NetconfDeviceCommunicator getSessionListener() {
+    protected NativeNetconfDeviceCommunicator getSessionListener() {
         return sessionListener;
     }
 

@@ -20,7 +20,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.netconf.ProxyNetconfService;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.NetconfDataTreeServiceRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -45,7 +45,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
      * @param askTimeout       ask timeout
      */
     public ProxyNetconfDataTreeService(final RemoteDeviceId id, final ActorRef masterNode,
-                                       final ExecutionContext executionContext, final Timeout askTimeout) {
+            final ExecutionContext executionContext, final Timeout askTimeout) {
         this.id = id;
         this.masterNode = masterNode;
         this.executionContext = executionContext;
@@ -74,38 +74,36 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path) {
         final Future<Object> masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
+        final ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext,
+                askTimeout);
         return netconfService.get(path);
     }
-
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path) {
         final Future<Object> masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
+        final ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext,
+                askTimeout);
         return netconfService.getConfig(path);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                          NormalizedNode<?, ?> data,
-                                                          Optional<ModifyAction> defaultOperation) {
+            NormalizedNode<?, ?> data, Optional<ModifyAction> defaultOperation) {
         isLocked();
         return proxyNetconfService.merge(store, path, data, defaultOperation);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                            NormalizedNode<?, ?> data,
-                                                            Optional<ModifyAction> defaultOperation) {
+            NormalizedNode<?, ?> data, Optional<ModifyAction> defaultOperation) {
         isLocked();
         return proxyNetconfService.replace(store, path, data, defaultOperation);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                           NormalizedNode<?, ?> data,
-                                                           Optional<ModifyAction> defaultOperation) {
+            NormalizedNode<?, ?> data, Optional<ModifyAction> defaultOperation) {
         isLocked();
         return proxyNetconfService.create(store, path, data, defaultOperation);
     }
@@ -124,7 +122,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<? extends CommitInfo> commit(
-        List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+            List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
         isLocked();
         return proxyNetconfService.commit(resultsFutures);
     }
@@ -135,7 +133,6 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     }
 
     private void isLocked() {
-        Preconditions.checkState(proxyNetconfService != null,
-            "%s: Device's datastore must be locked first", id);
+        Preconditions.checkState(proxyNetconfService != null, "%s: Device's datastore must be locked first", id);
     }
 }

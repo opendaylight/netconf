@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -184,7 +184,7 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
             }
 
             // Invoke transaction operations outside the sync block to avoid unnecessary blocking.
-            for (Consumer<ProxyTransactionFacade> oper : operationsBatch) {
+            for (final Consumer<ProxyTransactionFacade> oper : operationsBatch) {
                 oper.accept(newTransactionFacade);
             }
         }

@@ -29,13 +29,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.AbstractWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.NetconfTcp;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
@@ -66,7 +65,7 @@ public class NetconfDeviceDataBrokerTest {
     public void setUp() throws Exception {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(rpcService)
             .invokeRpc(any(QName.class), any(ContainerNode.class));
-        dataBroker = getDataBroker(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+        dataBroker = getDataBroker(NetconfSessionPreferences.NETCONF_CANDIDATE_URI.toString());
     }
 
     @Test
@@ -86,28 +85,28 @@ public class NetconfDeviceDataBrokerTest {
     @Test
     public void testWritableRunningCandidateWriteTransaction() throws Exception {
         testWriteTransaction(
-                WriteCandidateRunningTx.class, NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString(),
-                NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+                WriteCandidateRunningTx.class, NetconfSessionPreferences.NETCONF_RUNNING_WRITABLE_URI.toString(),
+                NetconfSessionPreferences.NETCONF_CANDIDATE_URI.toString());
     }
 
     @Test
     public void testCandidateWriteTransaction() throws Exception {
-        testWriteTransaction(WriteCandidateTx.class, NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+        testWriteTransaction(WriteCandidateTx.class, NetconfSessionPreferences.NETCONF_CANDIDATE_URI.toString());
     }
 
     @Test
     public void testRunningWriteTransaction() throws Exception {
-        testWriteTransaction(WriteRunningTx.class, NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString());
+        testWriteTransaction(WriteRunningTx.class, NetconfSessionPreferences.NETCONF_RUNNING_WRITABLE_URI.toString());
     }
 
     private void testWriteTransaction(final Class<? extends AbstractWriteTx> transaction,
             final String... capabilities) {
-        NetconfDeviceDataBroker db = getDataBroker(capabilities);
+        final NetconfDeviceDataBroker db = getDataBroker(capabilities);
         Assert.assertEquals(transaction, db.newWriteOnlyTransaction().getClass());
     }
 
     private NetconfDeviceDataBroker getDataBroker(final String... caps) {
-        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(Arrays.asList(caps));
+        final NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(Arrays.asList(caps));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         return new NetconfDeviceDataBroker(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
