@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.util;
+package org.opendaylight.netconf.nativ.netconf.communicator.protocols.ssh;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -23,20 +23,19 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.specification.TlsCase;
 
 public final class SslHandlerFactoryImpl implements SslHandlerFactory {
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final NativeNetconfKeystore keystore;
     private final @Nullable Specification specification;
 
-    public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter) {
-        this(keystoreAdapter, null);
+    public SslHandlerFactoryImpl(final NativeNetconfKeystore keystore) {
+        this(keystore, null);
     }
 
-    public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter, final Specification specification) {
-        this.keystoreAdapter = requireNonNull(keystoreAdapter);
+    public SslHandlerFactoryImpl(final NativeNetconfKeystore keystore, final Specification specification) {
+        this.keystore = requireNonNull(keystore);
         this.specification = specification;
     }
 
@@ -48,7 +47,7 @@ public final class SslHandlerFactoryImpl implements SslHandlerFactory {
     @Override
     public SslHandler createSslHandler(Set<String> allowedKeys) {
         try {
-            final KeyStore keyStore = keystoreAdapter.getJavaKeyStore(allowedKeys);
+            final KeyStore keyStore = keystore.getJavaKeyStore(allowedKeys);
 
             final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(keyStore, "".toCharArray());

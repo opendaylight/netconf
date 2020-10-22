@@ -33,7 +33,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
@@ -87,7 +87,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testCancel() {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         tx.cancel();
         masterActor.expectMsgClass(CancelRequest.class);
@@ -96,20 +96,20 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testCommit() throws InterruptedException, ExecutionException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
         commit(tx);
     }
 
     @Test
     public void testCommitAfterCancel() throws InterruptedException, ExecutionException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
         commit(tx);
         assertFalse(tx.cancel());
     }
 
     @Test
     public void testDoubleCommit() throws InterruptedException, ExecutionException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         commit(tx);
         try {
@@ -122,7 +122,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testDelete() {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         tx.delete(STORE, PATH);
         final DeleteRequest deleteRequest = masterActor.expectMsgClass(DeleteRequest.class);
@@ -132,7 +132,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testDeleteAfterCommit() throws InterruptedException, ExecutionException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         commit(tx);
         try {
@@ -145,7 +145,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testPut() {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         tx.put(STORE, PATH, node);
         final PutRequest putRequest = masterActor.expectMsgClass(PutRequest.class);
@@ -156,7 +156,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testPutAfterCommit() throws InterruptedException, ExecutionException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         commit(tx);
         try {
@@ -169,7 +169,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testMerge() {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         tx.merge(STORE, PATH, node);
         final MergeRequest mergeRequest = masterActor.expectMsgClass(MergeRequest.class);
@@ -180,7 +180,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testMergeAfterCommit() throws InterruptedException, ExecutionException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         commit(tx);
         try {
@@ -201,7 +201,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testRead() throws Exception {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> read = tx.read(STORE, PATH);
         final ReadRequest readRequest = masterActor.expectMsgClass(ReadRequest.class);
@@ -216,7 +216,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testReadEmpty() throws Exception {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> read = tx.read(STORE, PATH);
         masterActor.expectMsgClass(ReadRequest.class);
@@ -227,7 +227,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testReadFailure() throws InterruptedException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> read = tx.read(STORE, PATH);
         masterActor.expectMsgClass(ReadRequest.class);
@@ -238,7 +238,7 @@ public class ProxyReadWriteTransactionTest {
             read.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             assertEquals(mockEx, cause.getCause());
         }
@@ -246,7 +246,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testExists() throws Exception {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         final ListenableFuture<Boolean> read = tx.exists(STORE, PATH);
         final ExistsRequest existsRequest = masterActor.expectMsgClass(ExistsRequest.class);
@@ -260,7 +260,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testExistsFailure() throws InterruptedException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
         final ListenableFuture<Boolean> read = tx.exists(STORE, PATH);
         masterActor.expectMsgClass(ExistsRequest.class);
@@ -271,7 +271,7 @@ public class ProxyReadWriteTransactionTest {
             read.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             assertEquals(mockEx, cause.getCause());
         }
@@ -279,7 +279,7 @@ public class ProxyReadWriteTransactionTest {
 
     @Test
     public void testFutureOperationsWithMasterDown() throws InterruptedException, TimeoutException {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx(Timeout.apply(500, TimeUnit.MILLISECONDS));
+        final ProxyReadWriteTransaction tx = newSuccessfulProxyTx(Timeout.apply(500, TimeUnit.MILLISECONDS));
 
         ListenableFuture<?> future = tx.read(STORE, PATH);
         masterActor.expectMsgClass(ReadRequest.class);
@@ -289,7 +289,7 @@ public class ProxyReadWriteTransactionTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             verifyDocumentedException(cause.getCause());
         }
@@ -302,7 +302,7 @@ public class ProxyReadWriteTransactionTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             verifyDocumentedException(cause.getCause());
         }
@@ -315,7 +315,7 @@ public class ProxyReadWriteTransactionTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof TransactionCommitFailedException);
             verifyDocumentedException(cause.getCause());
         }
@@ -324,7 +324,7 @@ public class ProxyReadWriteTransactionTest {
     @Test
     public void testDelayedMasterActorFuture() throws InterruptedException, TimeoutException, ExecutionException {
         final Promise<Object> promise = Futures.promise();
-        ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, promise.future(),
+        final ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, promise.future(),
                 system.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
 
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> read = tx.read(STORE, PATH);
@@ -359,7 +359,7 @@ public class ProxyReadWriteTransactionTest {
     @Test
     public void testFailedMasterActorFuture() throws InterruptedException, TimeoutException {
         final AskTimeoutException mockEx = new AskTimeoutException("mock");
-        ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, Futures.failed(mockEx),
+        final ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, Futures.failed(mockEx),
                 system.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
 
         ListenableFuture<?> future = tx.read(STORE, PATH);
@@ -367,7 +367,7 @@ public class ProxyReadWriteTransactionTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             assertEquals(mockEx, cause.getCause());
         }
@@ -377,7 +377,7 @@ public class ProxyReadWriteTransactionTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             assertEquals(mockEx, cause.getCause());
         }
@@ -391,7 +391,7 @@ public class ProxyReadWriteTransactionTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof TransactionCommitFailedException);
             assertEquals(mockEx, cause.getCause());
         }

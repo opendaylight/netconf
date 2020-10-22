@@ -61,9 +61,9 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -152,11 +152,11 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         masterAddress = Cluster.get(masterSystem).selfAddress().toString();
 
-        SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository("master");
+        final SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository("master");
         masterSchemaRepository.registerSchemaSourceListener(
                 TextToIRTransformer.create(masterSchemaRepository, masterSchemaRepository));
 
-        String yangTemplate =
+        final String yangTemplate =
                   "module ID {"
                 + "  namespace \"ID\";"
                 + "  prefix ID;"
@@ -169,7 +169,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, 1)))
         .collect(Collectors.toList());
 
-        NetconfTopologySetup masterSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
+        final NetconfTopologySetup masterSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
                 .setActorSystem(masterSystem).setDataBroker(mockDataBroker).setSchemaResourceDTO(
                         new NetconfDevice.SchemaResourcesDTO(masterSchemaRepository, masterSchemaRepository,
                                 mockSchemaContextFactory, mockSchemasResolver)).setBaseSchemas(BASE_SCHEMAS).build();
@@ -178,11 +178,11 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 DEVICE_ID, responseTimeout, mockMountPointService).withDispatcher(Dispatchers.DefaultDispatcherId()),
                 NetconfTopologyUtils.createMasterActorName(DEVICE_ID.getName(), masterAddress));
 
-        SharedSchemaRepository slaveSchemaRepository = new SharedSchemaRepository("slave");
+        final SharedSchemaRepository slaveSchemaRepository = new SharedSchemaRepository("slave");
         slaveSchemaRepository.registerSchemaSourceListener(
                 TextToIRTransformer.create(slaveSchemaRepository, slaveSchemaRepository));
 
-        NetconfTopologySetup slaveSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
+        final NetconfTopologySetup slaveSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
                 .setActorSystem(slaveSystem).setDataBroker(mockDataBroker).setSchemaResourceDTO(
                         new NetconfDevice.SchemaResourcesDTO(slaveSchemaRepository, slaveSchemaRepository,
                                 mockSchemaContextFactory, mockSchemasResolver)).setBaseSchemas(BASE_SCHEMAS).build();
@@ -204,7 +204,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     public void testSlaveMountPointRegistration() throws InterruptedException, ExecutionException, TimeoutException {
         initializeMaster();
 
-        ListenerRegistration<?> mockListenerReg = mock(ListenerRegistration.class);
+        final ListenerRegistration<?> mockListenerReg = mock(ListenerRegistration.class);
         doReturn(mockListenerReg).when(mockDataBroker).registerDataTreeChangeListener(any(), any());
 
         final NodeId nodeId = new NodeId("device");
@@ -222,7 +222,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NetconfNode netconfNode = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNode).build();
 
-        DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
+        final DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
         doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).getIdentifier();
         doReturn(WRITE).when(mockDataObjModification).getModificationType();
         doReturn(node).when(mockDataObjModification).getDataAfter();
@@ -314,7 +314,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NetconfNode netconfNode = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNode).build();
 
-        DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
+        final DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
         doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).getIdentifier();
         doReturn(WRITE).when(mockDataObjModification).getModificationType();
         doReturn(node).when(mockDataObjModification).getDataAfter();
@@ -332,7 +332,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         initializeMaster();
 
-        CompletableFuture<AskForMasterMountPoint> yangTextSchemaSourceRequestFuture = new CompletableFuture<>();
+        final CompletableFuture<AskForMasterMountPoint> yangTextSchemaSourceRequestFuture = new CompletableFuture<>();
         testMasterActorRef.underlyingActor().messagesToDrop.put(YangTextSchemaSourceRequest.class,
                 yangTextSchemaSourceRequestFuture);
 
@@ -348,7 +348,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         setupMountPointMocks();
 
-        CompletableFuture<AskForMasterMountPoint> askForMasterMountPointFuture = new CompletableFuture<>();
+        final CompletableFuture<AskForMasterMountPoint> askForMasterMountPointFuture = new CompletableFuture<>();
         testMasterActorRef.underlyingActor().messagesToDrop.put(AskForMasterMountPoint.class,
                 askForMasterMountPointFuture);
 
@@ -384,7 +384,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     }
 
     private void initializeMaster() {
-        TestKit kit = new TestKit(masterSystem);
+        final TestKit kit = new TestKit(masterSystem);
         testMasterActorRef.tell(new CreateInitialMasterActorData(mockDeviceDataBroker, netconfService,
             SOURCE_IDENTIFIERS,
                 mockRpcService, mockActionService), kit.getRef());
@@ -403,7 +403,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override
         public void handleReceive(final Object message) {
-            CompletableFuture dropFuture = messagesToDrop.remove(message.getClass());
+            final CompletableFuture dropFuture = messagesToDrop.remove(message.getClass());
             if (dropFuture != null) {
                 dropFuture.complete(message);
             } else {

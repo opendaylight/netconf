@@ -21,6 +21,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
@@ -37,7 +38,6 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import io.netty.util.concurrent.SucceededFuture;
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -98,12 +98,13 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegist
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorInitializerFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -179,51 +180,51 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
     private static final String TEST_DEFAULT_SUBDIR = "test-schema";
 
+    private final DOMMountPointService masterMountPointService = new DOMMountPointServiceImpl();
+    private final DOMRpcRouter deviceRpcService = new DOMRpcRouter();
+    private final DOMMountPointService slaveMountPointService = new DOMMountPointServiceImpl();
+    private final SettableFuture<NetconfTopologyContext> slaveNetconfTopologyContextFuture = SettableFuture.create();
+    private final EventExecutor eventExecutor = GlobalEventExecutor.INSTANCE;
+    private final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
+    private final TopDOMRpcImplementation topRpcImplementation = new TopDOMRpcImplementation();
+    private final ContainerNode getTopInput = ImmutableNodes.containerNode(GetTopInput.QNAME);
+
+    private volatile SettableFuture<MasterSalFacade> masterSalFacadeFuture = SettableFuture.create();
+
     @Mock private DOMRpcProviderService mockRpcProviderRegistry;
     @Mock private RpcProviderService mockRpcProviderService;
     @Mock private DOMActionProviderService mockActionProviderRegistry;
     @Mock private NetconfClientDispatcher mockClientDispatcher;
-    @Mock private AAAEncryptionService mockEncryptionService;
     @Mock private ThreadPool mockThreadPool;
     @Mock private ScheduledThreadPool mockKeepaliveExecutor;
     @Mock private DeviceActionFactory deviceActionFactory;
-
     @Mock private ActorSystemProvider mockMasterActorSystemProvider;
     @Mock private DOMMountPointListener masterMountPointListener;
-    private final DOMMountPointService masterMountPointService = new DOMMountPointServiceImpl();
-    private final DOMRpcRouter deviceRpcService = new DOMRpcRouter();
+    @Mock private ActorSystemProvider mockSlaveActorSystemProvider;
+    @Mock private ClusterSingletonServiceProvider mockSlaveClusterSingletonServiceProvider;
+    @Mock private ClusterSingletonServiceRegistration mockSlaveClusterSingletonServiceReg;
+    @Mock private DOMMountPointListener slaveMountPointListener;
+    @Mock private NetconfDeviceCommunicatorInitializerFactory netconfDeviceCommunicatorFactory;
+    @Mock private NetconfDeviceCommunicatorFactory communicatorFactory;
+    @Mock private AAAEncryptionService mockEncryptionService;
+
     private DOMClusterSingletonServiceProviderImpl masterClusterSingletonServiceProvider;
     private DataBroker masterDataBroker;
     private DOMDataBroker deviceDOMDataBroker;
     private ActorSystem masterSystem;
     private NetconfTopologyManager masterNetconfTopologyManager;
-    private volatile SettableFuture<MasterSalFacade> masterSalFacadeFuture = SettableFuture.create();
-
-    @Mock private ActorSystemProvider mockSlaveActorSystemProvider;
-    @Mock private ClusterSingletonServiceProvider mockSlaveClusterSingletonServiceProvider;
-    @Mock private ClusterSingletonServiceRegistration mockSlaveClusterSingletonServiceReg;
-    @Mock private DOMMountPointListener slaveMountPointListener;
-    private final DOMMountPointService slaveMountPointService = new DOMMountPointServiceImpl();
     private DataBroker slaveDataBroker;
     private ActorSystem slaveSystem;
     private NetconfTopologyManager slaveNetconfTopologyManager;
-    private final SettableFuture<NetconfTopologyContext> slaveNetconfTopologyContextFuture = SettableFuture.create();
     private TransactionChain slaveTxChain;
-
-    private final EventExecutor eventExecutor = GlobalEventExecutor.INSTANCE;
-    private final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
     private EffectiveModelContext deviceSchemaContext;
     private YangModuleInfo topModuleInfo;
     private QName putTopRpcSchemaPath;
     private QName getTopRpcSchemaPath;
     private BindingNormalizedNodeSerializer bindingToNormalized;
     private YangInstanceIdentifier yangNodeInstanceId;
-    private final TopDOMRpcImplementation topRpcImplementation = new TopDOMRpcImplementation();
-    private final ContainerNode getTopInput = ImmutableNodes.containerNode(GetTopInput.QNAME);
-
     private SchemaResourceManager resourceManager;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Before
     public void setUp() throws Exception {
         deleteCacheDir();
@@ -243,14 +244,13 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         deviceRpcService.getRpcProviderService().registerRpcImplementation(topRpcImplementation,
                 DOMRpcIdentifier.create(putTopRpcSchemaPath), DOMRpcIdentifier.create(getTopRpcSchemaPath));
 
+        when(netconfDeviceCommunicatorFactory.init(mockClientDispatcher)).thenReturn(communicatorFactory);
+
         setupMaster();
 
         setupSlave();
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
-
-        doReturn(new SucceededFuture(GlobalEventExecutor.INSTANCE, null)).when(mockClientDispatcher)
-                .createReconnectingClient(any());
 
         LOG.info("****** Setup complete");
     }
@@ -267,7 +267,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private void setupMaster() throws Exception {
-        AbstractConcurrentDataBrokerTest dataBrokerTest = newDataBrokerTest();
+        final AbstractConcurrentDataBrokerTest dataBrokerTest = newDataBrokerTest();
         masterDataBroker = dataBrokerTest.getDataBroker();
         deviceDOMDataBroker = dataBrokerTest.getDomBroker();
         bindingToNormalized = dataBrokerTest.getDataBrokerTestCustomizer().getAdapterContext().currentSerializer();
@@ -293,15 +293,16 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 mockRpcProviderRegistry, mockActionProviderRegistry, masterClusterSingletonServiceProvider,
                 mockKeepaliveExecutor, mockThreadPool, mockMasterActorSystemProvider, eventExecutor,
                 mockClientDispatcher, TOPOLOGY_ID, config, masterMountPointService, mockEncryptionService,
-                mockRpcProviderService, deviceActionFactory, resourceManager) {
+                mockRpcProviderService, deviceActionFactory, resourceManager,
+                netconfDeviceCommunicatorFactory) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
                 final DeviceActionFactory deviceActionFact) {
-                NetconfTopologyContext context =
+                final NetconfTopologyContext context =
                     super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, deviceActionFact);
 
-                NetconfTopologyContext spiedContext = spy(context);
+                final NetconfTopologyContext spiedContext = spy(context);
                 doAnswer(invocation -> {
                     final MasterSalFacade spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
                     doReturn(deviceDOMDataBroker).when(spiedFacade).newDeviceDataBroker();
@@ -319,7 +320,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private void setupSlave() throws Exception {
-        AbstractConcurrentDataBrokerTest dataBrokerTest = newDataBrokerTest();
+        final AbstractConcurrentDataBrokerTest dataBrokerTest = newDataBrokerTest();
         slaveDataBroker = dataBrokerTest.getDataBroker();
 
         slaveSystem = ActorSystem.create(ACTOR_SYSTEM_NAME, ConfigFactory.load().getConfig("Slave"));
@@ -330,16 +331,16 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 .registerClusterSingletonService(any());
 
         slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker, mockRpcProviderRegistry,
-            mockActionProviderRegistry, mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
-                mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
+                mockActionProviderRegistry, mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor,
+                mockThreadPool, mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
                 slaveMountPointService, mockEncryptionService, mockRpcProviderService, deviceActionFactory,
-                resourceManager) {
+                resourceManager, netconfDeviceCommunicatorFactory) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
                 final DeviceActionFactory actionFactory) {
-                NetconfTopologyContext spiedContext = spy(super.newNetconfTopologyContext(setup, serviceGroupIdent,
-                    actorResponseWaitTime, actionFactory));
+                final NetconfTopologyContext spiedContext = spy(super.newNetconfTopologyContext(setup,
+                        serviceGroupIdent, actorResponseWaitTime, actionFactory));
 
                 slaveNetconfTopologyContextFuture.set(spiedContext);
                 return spiedContext;
@@ -383,12 +384,12 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         final ArrayList<String> capabilities = Lists.newArrayList(
-            NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+                NetconfSessionPreferences.NETCONF_CANDIDATE_URI.toString());
 
         masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
                 NetconfSessionPreferences.fromStrings(capabilities), deviceRpcService.getRpcService());
 
-        DOMMountPoint masterMountPoint = awaitMountPoint(masterMountPointService);
+        final DOMMountPoint masterMountPoint = awaitMountPoint(masterMountPointService);
 
         LOG.info("****** Testing master DOMDataBroker operations");
 
@@ -413,9 +414,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         masterDataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, NODE_INSTANCE_ID), changes -> {
                 final WriteTransaction slaveTx = slaveTxChain.newWriteOnlyTransaction();
-                for (DataTreeModification<Node> dataTreeModification : changes) {
-                    DataObjectModification<Node> rootNode = dataTreeModification.getRootNode();
-                    InstanceIdentifier<Node> path = dataTreeModification.getRootPath().getRootIdentifier();
+                for (final DataTreeModification<Node> dataTreeModification : changes) {
+                    final DataObjectModification<Node> rootNode = dataTreeModification.getRootNode();
+                    final InstanceIdentifier<Node> path = dataTreeModification.getRootPath().getRootIdentifier();
                     switch (rootNode.getModificationType()) {
                         case WRITE:
                         case SUBTREE_MODIFIED:
@@ -432,7 +433,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 slaveTx.commit();
             });
 
-        DOMMountPoint slaveMountPoint = awaitMountPoint(slaveMountPointService);
+        final DOMMountPoint slaveMountPoint = awaitMountPoint(slaveMountPointService);
 
         final NetconfTopologyContext slaveNetconfTopologyContext =
                 slaveNetconfTopologyContextFuture.get(5, TimeUnit.SECONDS);
@@ -458,9 +459,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
 
-        MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
+        final MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         final ArrayList<String> capabilities = Lists.newArrayList(
-            NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+                NetconfSessionPreferences.NETCONF_CANDIDATE_URI.toString());
 
         masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
                 NetconfSessionPreferences.fromStrings(capabilities), deviceRpcService.getRpcService());
@@ -483,7 +484,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             try (ReadTransaction readTx = masterDataBroker.newReadOnlyTransaction()) {
-                Optional<Node> node = readTx.read(LogicalDatastoreType.OPERATIONAL,
+                final Optional<Node> node = readTx.read(LogicalDatastoreType.OPERATIONAL,
                         NODE_INSTANCE_ID).get(5, TimeUnit.SECONDS);
                 assertTrue(node.isPresent());
                 final NetconfNode netconfNode = node.get().augmentation(NetconfNode.class);
@@ -517,7 +518,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private void testPutTopRpc(final DOMRpcService domRpcService, final DOMRpcResult result)
             throws InterruptedException, ExecutionException, TimeoutException {
-        ContainerNode putTopInput = bindingToNormalized.toNormalizedNodeRpcData(
+        final ContainerNode putTopInput = bindingToNormalized.toNormalizedNodeRpcData(
                 new PutTopInputBuilder().setTopLevelList(oneTopLevelList()).build());
         testRpc(domRpcService, putTopRpcSchemaPath, putTopInput, result);
     }
@@ -547,11 +548,11 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         assertEquals(result.getResult(), actual.getResult());
 
         assertEquals(result.getErrors().size(), actual.getErrors().size());
-        Iterator<? extends RpcError> iter1 = result.getErrors().iterator();
-        Iterator<? extends RpcError> iter2 = actual.getErrors().iterator();
+        final Iterator<? extends RpcError> iter1 = result.getErrors().iterator();
+        final Iterator<? extends RpcError> iter2 = actual.getErrors().iterator();
         while (iter1.hasNext() && iter2.hasNext()) {
-            RpcError err1 = iter1.next();
-            RpcError err2 = iter2.next();
+            final RpcError err1 = iter1.next();
+            final RpcError err2 = iter2.next();
             assertEquals(err1.getErrorType(), err2.getErrorType());
             assertEquals(err1.getTag(), err2.getTag());
             assertEquals(err1.getMessage(), err2.getMessage());
@@ -567,7 +568,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             invokeRpc(domRpcService, qname, input, FluentFutures.immediateFailedFluentFuture(
                     new ClusteringRpcException("mock")));
             fail("Expected exception");
-        } catch (ExecutionException e) {
+        } catch (final ExecutionException e) {
             assertTrue(e.getCause() instanceof ClusteringRpcException);
             assertEquals("mock", e.getCause().getMessage());
         }
@@ -609,7 +610,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         writeTx.delete(LogicalDatastoreType.CONFIGURATION, topPath);
         writeTx.commit().get(5, TimeUnit.SECONDS);
 
-        DOMDataTreeReadWriteTransaction readTx = dataBroker.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction readTx = dataBroker.newReadWriteTransaction();
         assertFalse(readTx.exists(LogicalDatastoreType.CONFIGURATION, topPath).get(5, TimeUnit.SECONDS));
         assertTrue(readTx.cancel());
     }
@@ -657,9 +658,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static void verifyTopologyNodesCreated(final DataBroker dataBroker) {
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
-                Optional<Topology> configTopology = readTx.read(LogicalDatastoreType.CONFIGURATION,
+                final Optional<Topology> configTopology = readTx.read(LogicalDatastoreType.CONFIGURATION,
                         NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-                Optional<Topology> operTopology = readTx.read(LogicalDatastoreType.OPERATIONAL,
+                final Optional<Topology> operTopology = readTx.read(LogicalDatastoreType.OPERATIONAL,
                         NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
                 return configTopology.isPresent() && operTopology.isPresent();
             }
@@ -667,7 +668,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private AbstractConcurrentDataBrokerTest newDataBrokerTest() throws Exception {
-        AbstractConcurrentDataBrokerTest dataBrokerTest = new AbstractConcurrentDataBrokerTest(true) {
+        final AbstractConcurrentDataBrokerTest dataBrokerTest = new AbstractConcurrentDataBrokerTest(true) {
             @Override
             protected Set<YangModuleInfo> getModuleInfos() throws Exception {
                 return ImmutableSet.of(BindingReflections.getModuleInfo(NetconfNode.class),
@@ -714,9 +715,10 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private RpcDefinition findRpcDefinition(final String rpc) {
-        Module topModule = deviceSchemaContext.findModule(TOP_MODULE_NAME, topModuleInfo.getName().getRevision()).get();
+        final Module topModule = deviceSchemaContext.findModule(TOP_MODULE_NAME, topModuleInfo.getName().getRevision())
+                .get();
         RpcDefinition rpcDefinition = null;
-        for (RpcDefinition def: topModule.getRpcs()) {
+        for (final RpcDefinition def: topModule.getRpcs()) {
             if (def.getQName().getLocalName().equals(rpc)) {
                 rpcDefinition = def;
                 break;

@@ -28,14 +28,15 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorInitializerFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -61,29 +62,35 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
     private final RpcProviderService rpcProviderService;
+    private final AAAEncryptionService encryptionService;
+
     private ListenerRegistration<NetconfTopologyImpl> datastoreListenerRegistration = null;
     private ObjectRegistration<?> rpcReg = null;
 
-    public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+    public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher dispatcher,
+            final NetconfDeviceCommunicatorInitializerFactory netconfDeviceCommunicatorFactory,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
             final BaseNetconfSchemas baseSchemas) {
-        this(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, rpcProviderService,
-                baseSchemas, null);
+        this(topologyId, dispatcher, netconfDeviceCommunicatorFactory, eventExecutor,
+                keepaliveExecutor,
+                processingExecutor,schemaRepositoryProvider, dataBroker, mountPointService, encryptionService,
+                rpcProviderService, baseSchemas, null);
     }
 
-    public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+    public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher dispatcher,
+            final NetconfDeviceCommunicatorInitializerFactory netconfDeviceCommunicatorFactory,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
             final BaseNetconfSchemas baseSchemas, final DeviceActionFactory deviceActionFactory) {
-        super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
+        super(topologyId, dispatcher, netconfDeviceCommunicatorFactory, eventExecutor, keepaliveExecutor,
+                processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService, deviceActionFactory,
                 baseSchemas);
+        this.encryptionService = encryptionService;
         this.rpcProviderService = requireNonNull(rpcProviderService);
     }
 

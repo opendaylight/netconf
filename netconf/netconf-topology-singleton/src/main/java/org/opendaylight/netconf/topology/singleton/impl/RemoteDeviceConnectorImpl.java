@@ -16,58 +16,34 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.math.BigDecimal;
-import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
-import org.opendaylight.netconf.nettyutil.TimedReconnectStrategyFactory;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.RemoteDevice;
+import org.opendaylight.netconf.nativ.netconf.communicator.UserPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
-import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
-import org.opendaylight.netconf.sal.connect.netconf.auth.DatastoreBackedPublicKeyAuth;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.OdlHelloMessageCapabilities;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.key.auth.KeyBased;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPassword;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -85,11 +61,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;
-    private final String privateKeyPath;
-    private final String privateKeyPassphrase;
-    private final AAAEncryptionService encryptionService;
-    private final NetconfKeystoreAdapter keystoreAdapter;
     private final DeviceActionFactory deviceActionFactory;
+    private final NetconfDeviceCommunicatorFactory netconfDeviceCommunicatorFactory;
 
     // FIXME: this seems to be a builder-like transition between {start,stop}RemoteDeviceConnection. More documentation
     //        is needed, as to what the lifecycle is here.
@@ -100,10 +73,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
-        this.privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
-        this.privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
-        this.encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
-        keystoreAdapter = new NetconfKeystoreAdapter(netconfTopologyDeviceSetup.getDataBroker());
+        netconfDeviceCommunicatorFactory = netconfTopologyDeviceSetup.getNetconfDeviceCommunicatorFactory();
+        new NetconfKeystoreAdapter(netconfTopologyDeviceSetup.getDataBroker(),
+                netconfDeviceCommunicatorFactory.getKeystore());
     }
 
     @Override
@@ -115,12 +87,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         requireNonNull(netconfNode.getPort());
 
         this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
-        final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
-        final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
-        final NetconfReconnectingClientConfiguration clientConfig =
-                getClientConfig(netconfClientSessionListener, netconfNode);
-        final ListenableFuture<NetconfDeviceCapabilities> future = deviceCommunicator
-                .initializeRemoteConnection(netconfTopologyDeviceSetup.getNetconfClientDispatcher(), clientConfig);
+        final NativeNetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
+        final ListenableFuture<NetconfDeviceCapabilities> future = deviceCommunicator.initializeRemoteConnection();
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
@@ -198,7 +166,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             }
         }
 
-        final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
+        final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> device;
         if (node.isSchemaless()) {
             device = new SchemalessNetconfDevice(netconfTopologyDeviceSetup.getBaseSchemas(), remoteDeviceId,
                 salFacade);
@@ -223,12 +191,16 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             LOG.info("{}: Concurrent rpc limit is smaller than 1, no limit will be enforced.", remoteDeviceId);
         }
 
-        NetconfDeviceCommunicator netconfDeviceCommunicator = userCapabilities.isPresent()
-            ? new NetconfDeviceCommunicator(remoteDeviceId, device, new UserPreferences(userCapabilities.get(),
-                node.getYangModuleCapabilities() == null ? false : node.getYangModuleCapabilities().isOverride(),
-                    node.getNonModuleCapabilities() == null ? false : node.getNonModuleCapabilities().isOverride()),
-                rpcMessageLimit)
-            : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
+        final NativeNetconfDeviceCommunicator netconfDeviceCommunicator = userCapabilities
+                .isPresent()
+                        ? netconfDeviceCommunicatorFactory.create(remoteDeviceId, device,
+                                new UserPreferences(userCapabilities.get(),
+                                        node.getYangModuleCapabilities() == null ? false
+                                                : node.getYangModuleCapabilities().isOverride(),
+                                        node.getNonModuleCapabilities() == null ? false
+                                                : node.getNonModuleCapabilities().isOverride()),
+                                node)
+                        : netconfDeviceCommunicatorFactory.create(remoteDeviceId, device, node);
 
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
@@ -257,105 +229,5 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         return Optional.of(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined));
-    }
-
-    //TODO: duplicate code
-    private static InetSocketAddress getSocketAddress(final Host host, final int port) {
-        if (host.getDomainName() != null) {
-            return new InetSocketAddress(host.getDomainName().getValue(), port);
-        } else {
-            final IpAddress ipAddress = host.getIpAddress();
-            final String ip = ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address().getValue() :
-                    ipAddress.getIpv6Address().getValue();
-            return new InetSocketAddress(ip, port);
-        }
-    }
-
-    @VisibleForTesting
-    NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
-                                                           final NetconfNode node) {
-
-        //setup default values since default value is not supported in mdsal
-        final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null
-                ? NetconfTopologyUtils.DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis().toJava();
-        final long maxConnectionAttempts = node.getMaxConnectionAttempts() == null
-                ? NetconfTopologyUtils.DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts().toJava();
-        final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
-                ? NetconfTopologyUtils.DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS
-                : node.getBetweenAttemptsTimeoutMillis().toJava();
-        final boolean isTcpOnly = node.isTcpOnly() == null
-                ? NetconfTopologyUtils.DEFAULT_IS_TCP_ONLY : node.isTcpOnly();
-        final BigDecimal sleepFactor = node.getSleepFactor() == null
-                ? NetconfTopologyUtils.DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
-
-        final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue().toJava());
-
-        final ReconnectStrategyFactory sf =
-                new TimedReconnectStrategyFactory(netconfTopologyDeviceSetup.getEventExecutor(), maxConnectionAttempts,
-                        betweenAttemptsTimeoutMillis, sleepFactor);
-
-
-        final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
-        final Protocol protocol = node.getProtocol();
-        if (isTcpOnly) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
-                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
-        } else if (protocol == null || protocol.getName() == Protocol.Name.SSH) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
-                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
-        } else if (protocol.getName() == Protocol.Name.TLS) {
-            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withSslHandlerFactory(new SslHandlerFactoryImpl(keystoreAdapter, protocol.getSpecification()))
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
-        } else {
-            throw new IllegalStateException("Unsupported protocol type: " + protocol.getName());
-        }
-
-        final List<Uri> odlHelloCapabilities = getOdlHelloCapabilities(node);
-        if (odlHelloCapabilities != null) {
-            reconnectingClientConfigurationBuilder.withOdlHelloCapabilities(odlHelloCapabilities);
-        }
-
-        return reconnectingClientConfigurationBuilder
-                .withAddress(socketAddress)
-                .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
-                .withReconnectStrategy(sf.createReconnectStrategy())
-                .withConnectStrategyFactory(sf)
-                .withSessionListener(listener)
-                .build();
-    }
-
-    private static List<Uri> getOdlHelloCapabilities(final NetconfNode node) {
-        final OdlHelloMessageCapabilities helloCapabilities = node.getOdlHelloMessageCapabilities();
-        return helloCapabilities != null ? helloCapabilities.getCapability() : null;
-    }
-
-    private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
-        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                .rev150114.netconf.node.credentials.credentials.LoginPassword) {
-            final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                    .rev150114.netconf.node.credentials.credentials.LoginPassword loginPassword
-                    = (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                    .rev150114.netconf.node.credentials.credentials.LoginPassword) credentials;
-            return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
-        }
-        if (credentials instanceof LoginPwUnencrypted) {
-            final LoginPasswordUnencrypted loginPassword =
-                    ((LoginPwUnencrypted) credentials).getLoginPasswordUnencrypted();
-            return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
-        }
-        if (credentials instanceof LoginPw) {
-            final LoginPassword loginPassword = ((LoginPw) credentials).getLoginPassword();
-            return new LoginPasswordHandler(loginPassword.getUsername(),
-                    encryptionService.decrypt(loginPassword.getPassword()));
-        }
-        if (credentials instanceof KeyAuth) {
-            final KeyBased keyPair = ((KeyAuth) credentials).getKeyBased();
-            return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(),
-                    keystoreAdapter, encryptionService);
-        }
-        throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }
 }
