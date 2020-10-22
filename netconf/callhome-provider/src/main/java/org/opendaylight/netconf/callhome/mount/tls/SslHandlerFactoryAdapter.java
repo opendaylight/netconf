@@ -22,8 +22,9 @@ import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.SslHandlerFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.protocols.ssh.NativeNetconfKeystoreImpl;
+import org.opendaylight.netconf.nativ.netconf.communicator.protocols.ssh.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
-import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
@@ -43,13 +44,13 @@ public class SslHandlerFactoryAdapter extends AbstractRegistration implements Ss
     private static final Logger LOG = LoggerFactory.getLogger(SslHandlerFactoryAdapter.class);
 
     private final DeviceListener deviceListener = new DeviceListener();
-    private final NetconfKeystoreAdapter keystoreAdapter;
     private final SslHandlerFactory sslHandlerFactory;
     private final Registration deviceListenerReg;
 
     public SslHandlerFactoryAdapter(final DataBroker dataBroker) {
-        this.keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
-        this.sslHandlerFactory = new SslHandlerFactoryImpl(keystoreAdapter);
+        final NativeNetconfKeystoreImpl keystore = new NativeNetconfKeystoreImpl();
+        new NetconfKeystoreAdapter(dataBroker, keystore);
+        this.sslHandlerFactory = new SslHandlerFactoryImpl(keystore);
         this.deviceListenerReg = dataBroker.registerDataTreeChangeListener(ALLOWED_DEVICES, deviceListener);
     }
 

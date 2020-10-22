@@ -9,7 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import com.google.common.util.concurrent.FutureCallback;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
