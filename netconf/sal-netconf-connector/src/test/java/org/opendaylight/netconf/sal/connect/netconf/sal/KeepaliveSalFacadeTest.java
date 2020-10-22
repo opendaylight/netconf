@@ -31,11 +31,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -74,7 +74,7 @@ public class KeepaliveSalFacadeTest {
         doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(),
             isNull(), any(DOMRpcService.class), isNull());
 
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorServiceSpy = Mockito.spy(executorService);
 
         doAnswer(

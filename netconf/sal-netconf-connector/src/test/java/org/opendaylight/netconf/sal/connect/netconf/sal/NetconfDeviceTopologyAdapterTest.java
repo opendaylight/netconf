@@ -37,8 +37,8 @@ import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
@@ -90,7 +90,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         doReturn(txIdent).when(writeTx).getIdentifier();
 
-        ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
+        final ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
         domDataBroker = customizer.getDOMDataBroker();
         dataBroker = customizer.createDataBroker();
         customizer.updateSchema(RUNTIME_CONTEXT);
@@ -126,7 +126,7 @@ public class NetconfDeviceTopologyAdapterTest {
         adapter.setDeviceAsFailed(null);
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            Optional<NetconfNode> netconfNode = dataBroker.newReadWriteTransaction()
+            final Optional<NetconfNode> netconfNode = dataBroker.newReadWriteTransaction()
                     .read(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class))
                     .get(5, TimeUnit.SECONDS);
             return netconfNode.isPresent() && netconfNode.get().getConnectionStatus()
@@ -138,7 +138,7 @@ public class NetconfDeviceTopologyAdapterTest {
     public void testDeviceUpdate() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
 
-        NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
+        final NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
@@ -151,24 +151,24 @@ public class NetconfDeviceTopologyAdapterTest {
     @Test
     public void testDeviceAugmentedNodePresence() throws Exception {
 
-        Integer dataTestId = 474747;
+        final Integer dataTestId = 474747;
 
-        NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, transactionChain);
+        final NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, transactionChain);
 
-        QName netconfTestLeafQname = QName.create(
+        final QName netconfTestLeafQname = QName.create(
                 "urn:TBD:params:xml:ns:yang:network-topology-augment-test", "2016-08-08", "test-id").intern();
 
-        YangInstanceIdentifier pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME)
+        final YangInstanceIdentifier pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME)
                 .node(Topology.QNAME)
                 .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), "topology-netconf")
                 .node(Node.QNAME)
                 .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
                 .node(netconfTestLeafQname).build();
 
-        NormalizedNode<?, ?> augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId)
+        final NormalizedNode<?, ?> augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId)
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(netconfTestLeafQname)).build();
 
-        DOMDataTreeWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
+        final DOMDataTreeWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
         wtx.commit().get(5, TimeUnit.SECONDS);
 
@@ -192,7 +192,7 @@ public class NetconfDeviceTopologyAdapterTest {
     public void testRemoveDeviceConfiguration() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
 
-        NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
+        final NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.close();
 
         verify(txChain, times(2)).newWriteOnlyTransaction();

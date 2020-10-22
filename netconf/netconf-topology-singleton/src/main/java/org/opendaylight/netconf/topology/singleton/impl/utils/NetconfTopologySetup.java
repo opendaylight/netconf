@@ -13,12 +13,12 @@ import akka.actor.ActorSystem;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.concurrent.ScheduledExecutorService;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorFactory;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -43,8 +43,8 @@ public class NetconfTopologySetup {
     private final Duration idleTimeout;
     private final String privateKeyPath;
     private final String privateKeyPassphrase;
-    private final AAAEncryptionService encryptionService;
     private final BaseNetconfSchemas baseSchemas;
+    private final NetconfDeviceCommunicatorFactory netconfDeviceCommunicatorFactory;
 
     NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -63,8 +63,8 @@ public class NetconfTopologySetup {
         this.idleTimeout = builder.getIdleTimeout();
         this.privateKeyPath = builder.getPrivateKeyPath();
         this.privateKeyPassphrase = builder.getPrivateKeyPassphrase();
-        this.encryptionService = builder.getEncryptionService();
         this.baseSchemas = builder.getBaseSchemas();
+        netconfDeviceCommunicatorFactory = builder.getNetconfDeviceCommunicatorFactory();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -131,8 +131,8 @@ public class NetconfTopologySetup {
         return privateKeyPassphrase;
     }
 
-    public AAAEncryptionService getEncryptionService() {
-        return encryptionService;
+    public NetconfDeviceCommunicatorFactory getNetconfDeviceCommunicatorFactory() {
+        return netconfDeviceCommunicatorFactory;
     }
 
     public BaseNetconfSchemas getBaseSchemas() {
@@ -156,8 +156,8 @@ public class NetconfTopologySetup {
         private Duration idleTimeout;
         private String privateKeyPath;
         private String privateKeyPassphrase;
-        private AAAEncryptionService encryptionService;
         private BaseNetconfSchemas baseSchemas;
+        private NetconfDeviceCommunicatorFactory netconfDeviceCommunicatorFactory;
 
         public NetconfTopologySetupBuilder() {
 
@@ -323,13 +323,14 @@ public class NetconfTopologySetup {
             return this.privateKeyPassphrase;
         }
 
-        AAAEncryptionService getEncryptionService() {
-            return this.encryptionService;
+        public NetconfTopologySetupBuilder setNetconfDeviceCommunicatorFactory(
+                NetconfDeviceCommunicatorFactory netconfDeviceCommunicatorFactory) {
+            this.netconfDeviceCommunicatorFactory = netconfDeviceCommunicatorFactory;
+            return this;
         }
 
-        public NetconfTopologySetupBuilder setEncryptionService(final AAAEncryptionService encryptionService) {
-            this.encryptionService = encryptionService;
-            return this;
+        NetconfDeviceCommunicatorFactory getNetconfDeviceCommunicatorFactory() {
+            return netconfDeviceCommunicatorFactory;
         }
 
         public static NetconfTopologySetupBuilder create() {
