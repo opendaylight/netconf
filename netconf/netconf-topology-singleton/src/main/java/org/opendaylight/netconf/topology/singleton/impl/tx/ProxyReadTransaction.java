@@ -10,7 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl.tx;
 import akka.actor.ActorRef;
 import akka.util.Timeout;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 

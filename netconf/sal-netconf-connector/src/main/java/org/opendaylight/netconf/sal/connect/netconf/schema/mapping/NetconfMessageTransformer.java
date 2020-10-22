@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 
 import com.google.common.annotations.Beta;
@@ -138,16 +138,16 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private static void findAction(final DataSchemaNode dataSchemaNode, final List<ActionDefinition> builder) {
         if (dataSchemaNode instanceof ActionNodeContainer) {
-            for (ActionDefinition actionDefinition : ((ActionNodeContainer) dataSchemaNode).getActions()) {
+            for (final ActionDefinition actionDefinition : ((ActionNodeContainer) dataSchemaNode).getActions()) {
                 builder.add(actionDefinition);
             }
         }
         if (dataSchemaNode instanceof DataNodeContainer) {
-            for (DataSchemaNode innerDataSchemaNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
+            for (final DataSchemaNode innerDataSchemaNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
                 findAction(innerDataSchemaNode, builder);
             }
         } else if (dataSchemaNode instanceof ChoiceSchemaNode) {
-            for (CaseSchemaNode caze : ((ChoiceSchemaNode) dataSchemaNode).getCases()) {
+            for (final CaseSchemaNode caze : ((ChoiceSchemaNode) dataSchemaNode).getCases()) {
                 findAction(caze, builder);
             }
         }
@@ -172,7 +172,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         NestedNotificationInfo nestedNotificationInfo = null;
         if (notificationDefinitions.isEmpty()) {
             // check if notification is nested notification
-            Optional<NestedNotificationInfo> nestedNotificationOptional = findNestedNotification(message, element);
+            final Optional<NestedNotificationInfo> nestedNotificationOptional = findNestedNotification(message,
+                    element);
             if (nestedNotificationOptional.isPresent()) {
                 nestedNotificationInfo = nestedNotificationOptional.get();
                 notificationDefinitions = Collections.singletonList(nestedNotificationInfo.notificationDefinition);
@@ -221,7 +222,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         }
         final Module module = modules.next();
         final QName topLevelNodeQName = QName.create(element.getNamespaceURI(), element.getLocalName());
-        for (DataSchemaNode childNode : module.getChildNodes()) {
+        for (final DataSchemaNode childNode : module.getChildNodes()) {
             if (topLevelNodeQName.isEqualWithoutRevision(childNode.getQName())) {
                 return Optional.of(traverseXmlNodeContainingNotification(element, childNode,
                     YangInstanceIdentifier.builder()));
@@ -233,26 +234,26 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private NestedNotificationInfo traverseXmlNodeContainingNotification(final Node xmlNode,
             final SchemaNode schemaNode, final YangInstanceIdentifier.InstanceIdentifierBuilder builder) {
         if (schemaNode instanceof ContainerSchemaNode) {
-            ContainerSchemaNode dataContainerNode = (ContainerSchemaNode) schemaNode;
+            final ContainerSchemaNode dataContainerNode = (ContainerSchemaNode) schemaNode;
             builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
 
-            Entry<Node, SchemaNode> xmlContainerChildPair = findXmlContainerChildPair(xmlNode, dataContainerNode);
+            final Entry<Node, SchemaNode> xmlContainerChildPair = findXmlContainerChildPair(xmlNode, dataContainerNode);
             return traverseXmlNodeContainingNotification(xmlContainerChildPair.getKey(),
                     xmlContainerChildPair.getValue(), builder);
         } else if (schemaNode instanceof ListSchemaNode) {
-            ListSchemaNode listSchemaNode = (ListSchemaNode) schemaNode;
+            final ListSchemaNode listSchemaNode = (ListSchemaNode) schemaNode;
             builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
 
-            Map<QName, Object> listKeys = findXmlListKeys(xmlNode, listSchemaNode);
+            final Map<QName, Object> listKeys = findXmlListKeys(xmlNode, listSchemaNode);
             builder.nodeWithKey(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()), listKeys);
 
-            Entry<Node, SchemaNode> xmlListChildPair = findXmlListChildPair(xmlNode, listSchemaNode);
+            final Entry<Node, SchemaNode> xmlListChildPair = findXmlListChildPair(xmlNode, listSchemaNode);
             return traverseXmlNodeContainingNotification(xmlListChildPair.getKey(),
                     xmlListChildPair.getValue(), builder);
         } else if (schemaNode instanceof NotificationDefinition) {
             builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
 
-            NotificationDefinition notificationDefinition = (NotificationDefinition) schemaNode;
+            final NotificationDefinition notificationDefinition = (NotificationDefinition) schemaNode;
             return new NestedNotificationInfo(notificationDefinition,
                     new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, builder.build()), xmlNode);
         }
@@ -267,10 +268,10 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                     .collect(Collectors.toMap(child -> child.getQName().withoutRevision(), Function.identity()));
 
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node currentNode = nodeList.item(i);
+            final Node currentNode = nodeList.item(i);
             if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
-                SchemaNode schemaChildNode = childrenWithoutRevision.get(currentNodeQName);
+                final QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                final SchemaNode schemaChildNode = childrenWithoutRevision.get(currentNodeQName);
                 if (schemaChildNode != null) {
                     return new AbstractMap.SimpleEntry<>(currentNode, schemaChildNode);
                 }
@@ -280,14 +281,14 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     private static Map<QName, Object> findXmlListKeys(final Node xmlNode, final ListSchemaNode listSchemaNode) {
-        Map<QName, Object> listKeys = new HashMap<>();
-        NodeList nodeList = xmlNode.getChildNodes();
-        Set<QName> keyDefinitionsWithoutRevision = listSchemaNode.getKeyDefinition().stream()
+        final Map<QName, Object> listKeys = new HashMap<>();
+        final NodeList nodeList = xmlNode.getChildNodes();
+        final Set<QName> keyDefinitionsWithoutRevision = listSchemaNode.getKeyDefinition().stream()
                 .map(QName::withoutRevision).collect(Collectors.toSet());
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node currentNode = nodeList.item(i);
+            final Node currentNode = nodeList.item(i);
             if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                final QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
                 if (keyDefinitionsWithoutRevision.contains(currentNodeQName)) {
                     listKeys.put(currentNodeQName, currentNode.getFirstChild().getNodeValue());
                 }
@@ -302,10 +303,10 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private static Entry<Node, SchemaNode> findXmlListChildPair(final Node xmlNode, final ListSchemaNode list) {
         final NodeList nodeList = xmlNode.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node currentNode = nodeList.item(i);
+            final Node currentNode = nodeList.item(i);
             if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-                QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
-                for (SchemaNode childNode : Iterables.concat(list.getChildNodes(), list.getNotifications())) {
+                final QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
+                for (final SchemaNode childNode : Iterables.concat(list.getChildNodes(), list.getNotifications())) {
                     if (!list.getKeyDefinition().contains(childNode.getQName())
                             && currentNodeQName.isEqualWithoutRevision(childNode.getQName())) {
                         return new AbstractMap.SimpleEntry<>(currentNode, childNode);
@@ -457,7 +458,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 return null;
             }
 
-            Element element = message.getDocument().getDocumentElement();
+            final Element element = message.getDocument().getDocumentElement();
             try {
                 final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);

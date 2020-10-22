@@ -23,14 +23,14 @@
                interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
     <reference id="domMountPointService"
                interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
-    <reference id="encryptionService"
-               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
     <reference id="schemaManager"
                interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
     <reference id="baseSchemas"
                interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
+    <reference id="communicator"
+               interface="org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorInitializerFactory"/>
 
     <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"
           init-method="init"
@@ -42,6 +42,7 @@
 
     <bean id="callhomeDispatcher" class="org.opendaylight.netconf.callhome.mount.CallHomeMountDispatcher">
         <argument value="topology-netconf"/>
+        <argument ref="communicator"/>
         <argument ref="eventExecutor"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
@@ -49,7 +50,6 @@
         <argument ref="baseSchemas"/>
         <argument ref="dataBroker"/>
         <argument ref="domMountPointService"/>
-        <argument ref="encryptionService"/>
         <argument ref="deviceActionFactory"/>
     </bean>
 </blueprint>

@@ -5,11 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.listener;
+package org.opendaylight.netconf.nativ.netconf.communicator;
 
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -30,13 +32,15 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSession;
-import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.protocols.ssh.NativeNetconfKeystore;
+import org.opendaylight.netconf.nativ.netconf.communicator.protocols.ssh.NativeNetconfKeystoreImpl;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NativeNetconfClientConfigUtil;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NativeNetconfMessageUtil;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -45,24 +49,24 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfDeviceCommunicator
-        implements NetconfClientSessionListener, RemoteDeviceCommunicator<NetconfMessage> {
+public class NetconfDeviceCommunicator implements NativeNetconfDeviceCommunicator {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicator.class);
+    private static final int DEFAULT_CONCURRENT_RPC_LIMIT = 0;
 
-    protected final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice;
-    private final Optional<UserPreferences> overrideNetconfCapabilities;
-    protected final RemoteDeviceId id;
     private final Lock sessionLock = new ReentrantLock();
-
+    private final Queue<Request> requests = new ArrayDeque<>();
+    private final Optional<UserPreferences> overrideNetconfCapabilities;
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
-
-    private final Queue<Request> requests = new ArrayDeque<>();
-    private NetconfClientSession currentSession;
-
     private final SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
+    private final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> remoteDevice;
+    private final RemoteDeviceId id;
+    private final NetconfClientDispatcher dispatcher;
+
+    private NetconfClientSession currentSession;
     private Future<?> initFuture;
+    private NetconfClientConfiguration clientConfig;
 
     // isSessionClosing indicates a close operation on the session is issued and
     // tearDown will surely be called later to finish the close.
@@ -73,34 +77,53 @@ public class NetconfDeviceCommunicator
             AtomicIntegerFieldUpdater.newUpdater(NetconfDeviceCommunicator.class, "closing");
     private volatile int closing;
 
-    public boolean isSessionClosing() {
-        return closing != 0;
+    public NetconfDeviceCommunicator(final RemoteDeviceId id,
+            final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> remoteDevice,
+            final UserPreferences netconfSessionPreferences, final NetconfNode node,
+            final NetconfClientDispatcher dispatcher, final NativeNetconfKeystore keystore,
+            final AAAEncryptionService encryptionService, EventExecutor eventExecutor) {
+        this(id, remoteDevice, Optional.of(netconfSessionPreferences), node, dispatcher, keystore, encryptionService,
+                eventExecutor);
     }
 
-    public NetconfDeviceCommunicator(
-            final RemoteDeviceId id,
-            final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
-            final UserPreferences netconfSessionPreferences, final int rpcMessageLimit) {
-        this(id, remoteDevice, Optional.of(netconfSessionPreferences), rpcMessageLimit);
+    public NetconfDeviceCommunicator(final RemoteDeviceId id,
+            final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> remoteDevice,
+            final NetconfNode node, final NetconfClientDispatcher dispatcher, final NativeNetconfKeystoreImpl keystore,
+            final AAAEncryptionService encryptionService, final EventExecutor eventExecutor) {
+        this(id, remoteDevice, Optional.empty(), node, dispatcher, keystore, encryptionService, eventExecutor);
     }
 
-    public NetconfDeviceCommunicator(
-            final RemoteDeviceId id,
-            final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
-            final int rpcMessageLimit) {
-        this(id, remoteDevice, Optional.empty(), rpcMessageLimit);
+    public NetconfDeviceCommunicator(final RemoteDeviceId id,
+            final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> remoteDevice,
+            final NetconfNode node, final NetconfClientDispatcher dispatcher) {
+        this(id, remoteDevice, node, dispatcher, null, null, null);
     }
 
-    private NetconfDeviceCommunicator(
-            final RemoteDeviceId id,
-            final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
-            final Optional<UserPreferences> overrideNetconfCapabilities, final int rpcMessageLimit) {
-        this.concurentRpcMsgs = rpcMessageLimit;
+    private NetconfDeviceCommunicator(final RemoteDeviceId id,
+            final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> remoteDevice,
+            final Optional<UserPreferences> overrideNetconfCapabilities,
+            final NetconfNode node, final NetconfClientDispatcher dispatcher, final NativeNetconfKeystore keystore,
+            final AAAEncryptionService encryptionService, EventExecutor eventExecutor) {
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
+        this.dispatcher = dispatcher;
+
         this.firstConnectionFuture = SettableFuture.create();
-        this.semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
+
+        this.concurentRpcMsgs = node.getConcurrentRpcLimit() == null
+                ? DEFAULT_CONCURRENT_RPC_LIMIT
+                : node.getConcurrentRpcLimit().toJava();
+
+        if (concurentRpcMsgs < 1) {
+            LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", id);
+        }
+
+        this.semaphore = concurentRpcMsgs > 0 ? new Semaphore(concurentRpcMsgs) : null;
+        if (eventExecutor != null || keystore != null || encryptionService != null) {
+            clientConfig = NativeNetconfClientConfigUtil.getClientConfig(this, node, eventExecutor, keystore,
+                    encryptionService);
+        }
     }
 
     @Override
@@ -110,14 +133,12 @@ public class NetconfDeviceCommunicator
             LOG.debug("{}: Session established", id);
             currentSession = session;
 
-            NetconfSessionPreferences netconfSessionPreferences =
-                                             NetconfSessionPreferences.fromNetconfSession(session);
-            LOG.trace("{}: Session advertised capabilities: {}", id,
-                    netconfSessionPreferences);
+            NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromNetconfSession(session);
+            LOG.trace("{}: Session advertised capabilities: {}", id, netconfSessionPreferences);
 
             if (overrideNetconfCapabilities.isPresent()) {
-                final NetconfSessionPreferences sessionPreferences = overrideNetconfCapabilities
-                        .get().getSessionPreferences();
+                final NetconfSessionPreferences sessionPreferences = overrideNetconfCapabilities.get()
+                        .getSessionPreferences();
                 netconfSessionPreferences = overrideNetconfCapabilities.get().moduleBasedCapsOverrided()
                         ? netconfSessionPreferences.replaceModuleCaps(sessionPreferences)
                         : netconfSessionPreferences.addModuleCaps(sessionPreferences);
@@ -141,19 +162,17 @@ public class NetconfDeviceCommunicator
     /**
      * Initialize remote connection.
      *
-     * @param dispatcher {@code NetconfCLientDispatcher}
-     * @param config     {@code NetconfClientConfiguration}
-     * @return future that returns succes on first succesfull connection and failure when the underlying
-     *     reconnecting strategy runs out of reconnection attempts
+     * @return future that returns success on first successful connection and failure when the underlying reconnecting
+     *         strategy runs out of reconnection attempts
      */
-    public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(
-            final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
-        if (config instanceof NetconfReconnectingClientConfiguration) {
-            initFuture = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
-        } else {
-            initFuture = dispatcher.createClient(config);
-        }
+    @Override
+    public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection() {
 
+        if (clientConfig instanceof NetconfReconnectingClientConfiguration) {
+            initFuture = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) clientConfig);
+        } else {
+            initFuture = dispatcher.createClient(clientConfig);
+        }
 
         initFuture.addListener(future -> {
             if (!future.isSuccess() && !future.isCancelled()) {
@@ -167,11 +186,100 @@ public class NetconfDeviceCommunicator
         return firstConnectionFuture;
     }
 
+    @Override
     public void disconnect() {
         // If session is already in closing, no need to close it again
         if (currentSession != null && startClosing() && currentSession.isUp()) {
             currentSession.close();
         }
+    }
+
+    @Override
+    public void onSessionDown(final NetconfClientSession session, final Exception exception) {
+        // If session is already in closing, no need to call tearDown again.
+        if (startClosing()) {
+            LOG.warn("{}: Session went down", id, exception);
+            tearDown(null);
+        }
+    }
+
+    @Override
+    public void onSessionTerminated(final NetconfClientSession session, final NetconfTerminationReason reason) {
+        // onSessionTerminated is called directly by disconnect, no need to compare and
+        // set isSessionClosing.
+        LOG.warn("{}: Session terminated {}", id, reason);
+        tearDown(reason.getErrorMessage());
+    }
+
+    @Override
+    public void onMessage(final NetconfClientSession session, final NetconfMessage message) {
+        /*
+         * Dispatch between notifications and messages. Messages need to be processed with lock held, notifications do
+         * not.
+         */
+        if (isNotification(message)) {
+            processNotification(message);
+        } else {
+            processMessage(message);
+        }
+    }
+
+    @Override
+    public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
+        sessionLock.lock();
+        try {
+            if (semaphore != null && !semaphore.tryAcquire()) {
+                LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
+                        + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.getName());
+                return FluentFutures.immediateFailedFluentFuture(
+                        new NetconfDocumentedException("Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
+                                + ") waiting for emptying the queue of Netconf device with id: " + id.getName()));
+            }
+
+            return sendRequestWithLock(message, rpc);
+        } finally {
+            sessionLock.unlock();
+        }
+    }
+
+    @Override
+    public void onRemoteSessionUp(NetconfSessionPreferences remoteSessionCapabilities,
+            NativeNetconfDeviceCommunicator listener) {
+        remoteDevice.onRemoteSessionUp(remoteSessionCapabilities, listener);
+    }
+
+    @Override
+    public void onRemoteSessionDown() {
+        remoteDevice.onRemoteSessionDown();
+    }
+
+    @Override
+    public void onRemoteSessionFailed(Throwable throwable) {
+        remoteDevice.onRemoteSessionFailed(throwable);
+    }
+
+    @Override
+    public void onNotification(NetconfMessage notification) {
+        remoteDevice.onNotification(notification);
+    }
+
+    @Override
+    public void close() {
+        // Cancel reconnect if in progress
+        if (initFuture != null) {
+            initFuture.cancel(false);
+        }
+        // Disconnect from device
+        // tear down not necessary, called indirectly by the close in disconnect()
+        disconnect();
+    }
+
+    public void setConfig(NetconfClientConfiguration config) {
+        clientConfig = config;
+    }
+
+    public boolean isSessionClosing() {
+        return closing != 0;
     }
 
     private void tearDown(final String reason) {
@@ -185,8 +293,7 @@ public class NetconfDeviceCommunicator
             if (currentSession != null) {
                 currentSession = null;
                 /*
-                 * Walk all requests, check if they have been executing
-                 * or cancelled and remove them from the queue.
+                 * Walk all requests, check if they have been executing or cancelled and remove them from the queue.
                  */
                 final Iterator<Request> it = requests.iterator();
                 while (it.hasNext()) {
@@ -206,7 +313,8 @@ public class NetconfDeviceCommunicator
             sessionLock.unlock();
         }
 
-        // Notify pending request futures outside of the sessionLock to avoid unnecessarily
+        // Notify pending request futures outside of the sessionLock to avoid
+        // unnecessarily
         // blocking the caller.
         for (final UncancellableFuture<RpcResult<NetconfMessage>> future : futuresToCancel) {
             if (Strings.isNullOrEmpty(reason)) {
@@ -224,50 +332,12 @@ public class NetconfDeviceCommunicator
                 String.format("The netconf session to %1$s is disconnected", id.getName()));
     }
 
-    private static RpcResult<NetconfMessage> createErrorRpcResult(final RpcError.ErrorType errorType,
+    private RpcResult<NetconfMessage> createErrorRpcResult(
+            final RpcError.ErrorType errorType,
             final String message) {
         return RpcResultBuilder.<NetconfMessage>failed()
-            .withError(errorType, NetconfDocumentedException.ErrorTag.OPERATION_FAILED.getTagValue(), message).build();
-    }
-
-    @Override
-    public void onSessionDown(final NetconfClientSession session, final Exception exception) {
-        // If session is already in closing, no need to call tearDown again.
-        if (startClosing()) {
-            LOG.warn("{}: Session went down", id, exception);
-            tearDown(null);
-        }
-    }
-
-    @Override
-    public void onSessionTerminated(final NetconfClientSession session, final NetconfTerminationReason reason) {
-        // onSessionTerminated is called directly by disconnect, no need to compare and set isSessionClosing.
-        LOG.warn("{}: Session terminated {}", id, reason);
-        tearDown(reason.getErrorMessage());
-    }
-
-    @Override
-    public void close() {
-        // Cancel reconnect if in progress
-        if (initFuture != null) {
-            initFuture.cancel(false);
-        }
-        // Disconnect from device
-        // tear down not necessary, called indirectly by the close in disconnect()
-        disconnect();
-    }
-
-    @Override
-    public void onMessage(final NetconfClientSession session, final NetconfMessage message) {
-        /*
-         * Dispatch between notifications and messages. Messages need to be processed
-         * with lock held, notifications do not.
-         */
-        if (isNotification(message)) {
-            processNotification(message);
-        } else {
-            processMessage(message);
-        }
+                .withError(errorType, NetconfDocumentedException.ErrorTag.OPERATION_FAILED.getTagValue(), message)
+                .build();
     }
 
     private void processMessage(final NetconfMessage message) {
@@ -285,8 +355,7 @@ public class NetconfDeviceCommunicator
                 }
             } else {
                 request = null;
-                LOG.warn("{}: Ignoring unsolicited message {}", id,
-                        msgToS(message));
+                LOG.warn("{}: Ignoring unsolicited message {}", id, msgToS(message));
             }
         } finally {
             sessionLock.unlock();
@@ -295,7 +364,7 @@ public class NetconfDeviceCommunicator
         if (request != null) {
 
             if (FailedNetconfMessage.class.isInstance(message)) {
-                request.future.set(NetconfMessageTransformUtil.toRpcResult((FailedNetconfMessage) message));
+                request.future.set(NativeNetconfMessageUtil.toRpcResult((FailedNetconfMessage) message));
                 return;
             }
 
@@ -306,7 +375,7 @@ public class NetconfDeviceCommunicator
             }
 
             try {
-                NetconfMessageTransformUtil.checkValidReply(request.request, message);
+                NativeNetconfMessageUtil.checkValidReply(request.request, message);
             } catch (final NetconfDocumentedException e) {
                 LOG.warn(
                         "{}: Invalid request-reply match,"
@@ -314,23 +383,22 @@ public class NetconfDeviceCommunicator
                         id, msgToS(request.request), msgToS(message), e);
 
                 request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                        .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
+                        .withRpcError(NativeNetconfMessageUtil.toRpcError(e)).build());
 
-                //recursively processing message to eventually find matching request
+                // recursively processing message to eventually find matching request
                 processMessage(message);
 
                 return;
             }
 
             try {
-                NetconfMessageTransformUtil.checkSuccessReply(message);
+                NativeNetconfMessageUtil.checkSuccessReply(message);
             } catch (final NetconfDocumentedException e) {
-                LOG.warn(
-                        "{}: Error reply from remote device, request: {}, response: {}",
-                        id, msgToS(request.request), msgToS(message), e);
+                LOG.warn("{}: Error reply from remote device, request: {}, response: {}", id, msgToS(request.request),
+                        msgToS(message), e);
 
                 request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                        .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
+                        .withRpcError(NativeNetconfMessageUtil.toRpcError(e)).build());
                 return;
             }
 
@@ -338,37 +406,18 @@ public class NetconfDeviceCommunicator
         }
     }
 
-    private static String msgToS(final NetconfMessage msg) {
+    private String msgToS(final NetconfMessage msg) {
         return XmlUtil.toString(msg.getDocument());
     }
 
-    @Override
-    public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
-        sessionLock.lock();
-        try {
-            if (semaphore != null && !semaphore.tryAcquire()) {
-                LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
-                    + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.getName());
-                return FluentFutures.immediateFailedFluentFuture(new NetconfDocumentedException(
-                        "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
-                        + ") waiting for emptying the queue of Netconf device with id: " + id.getName()));
-            }
-
-            return sendRequestWithLock(message, rpc);
-        } finally {
-            sessionLock.unlock();
-        }
-    }
-
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
-                                                                            final QName rpc) {
+            final QName rpc) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));
         }
 
         if (currentSession == null) {
-            LOG.warn("{}: Session is disconnected, failing RPC request {}",
-                    id, message);
+            LOG.warn("{}: Session is disconnected, failing RPC request {}", id, message);
             return FluentFutures.immediateFluentFuture(createSessionDownRpcResult());
         }
 
@@ -378,13 +427,12 @@ public class NetconfDeviceCommunicator
         currentSession.sendMessage(req.request).addListener(future -> {
             if (!future.isSuccess()) {
                 // We expect that a session down will occur at this point
-                LOG.debug("{}: Failed to send request {}", id,
-                        XmlUtil.toString(req.request.getDocument()),
+                LOG.debug("{}: Failed to send request {}", id, XmlUtil.toString(req.request.getDocument()),
                         future.cause());
 
                 if (future.cause() != null) {
-                    req.future.set(createErrorRpcResult(RpcError.ErrorType.TRANSPORT,
-                            future.cause().getLocalizedMessage()));
+                    req.future.set(
+                            createErrorRpcResult(RpcError.ErrorType.TRANSPORT, future.cause().getLocalizedMessage()));
                 } else {
                     req.future.set(createSessionDownRpcResult()); // assume session is down
                 }
@@ -405,27 +453,26 @@ public class NetconfDeviceCommunicator
         remoteDevice.onNotification(notification);
     }
 
-    private static boolean isNotification(final NetconfMessage message) {
+    private boolean isNotification(final NetconfMessage message) {
         if (message.getDocument() == null) {
             // We have no message, which mean we have a FailedNetconfMessage
             return false;
         }
         final XmlElement xmle = XmlElement.fromDomDocument(message.getDocument());
-        return XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(xmle.getName()) ;
+        return XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(xmle.getName());
+    }
+
+    private boolean startClosing() {
+        return CLOSING_UPDATER.compareAndSet(this, 0, 1);
     }
 
     private static final class Request {
         final UncancellableFuture<RpcResult<NetconfMessage>> future;
         final NetconfMessage request;
 
-        private Request(final UncancellableFuture<RpcResult<NetconfMessage>> future,
-                        final NetconfMessage request) {
+        private Request(final UncancellableFuture<RpcResult<NetconfMessage>> future, final NetconfMessage request) {
             this.future = future;
             this.request = request;
         }
-    }
-
-    private boolean startClosing() {
-        return CLOSING_UPDATER.compareAndSet(this, 0, 1);
     }
 }

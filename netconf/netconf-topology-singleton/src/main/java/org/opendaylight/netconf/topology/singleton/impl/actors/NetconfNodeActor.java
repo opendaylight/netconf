@@ -37,7 +37,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMActionService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyYangTextSourceProvider;
@@ -135,7 +135,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
             sender().tell(new MasterActorDataInitialized(), self());
         } else if (message instanceof AskForMasterMountPoint) { // master
-            AskForMasterMountPoint askForMasterMountPoint = (AskForMasterMountPoint) message;
+            final AskForMasterMountPoint askForMasterMountPoint = (AskForMasterMountPoint) message;
             // only master contains reference to deviceDataBroker
             if (deviceDataBroker != null) {
                 LOG.debug("{}: Sending RegisterMountPoint reply to {}", id, askForMasterMountPoint.getSlaveActorRef());
@@ -176,7 +176,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             invokeSlaveAction(invokeActionMessage.getSchemaPath(), invokeActionMessage.getContainerNodeMessage(),
                 invokeActionMessage.getDOMDataTreeIdentifier(), sender());
         } else if (message instanceof RegisterMountPoint) { //slaves
-            RegisterMountPoint registerMountPoint = (RegisterMountPoint) message;
+            final RegisterMountPoint registerMountPoint = (RegisterMountPoint) message;
             sourceIdentifiers = registerMountPoint.getSourceIndentifiers();
             registerSlaveMountPoint(registerMountPoint.getMasterActorRef());
             sender().tell(new Success(null), self());
@@ -189,7 +189,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             setup = ((RefreshSlaveActor) message).getSetup();
             schemaRepository = ((RefreshSlaveActor) message).getSchemaRepository();
         } else if (message instanceof NetconfDataTreeServiceRequest) {
-            ActorRef netconfActor = context()
+            final ActorRef netconfActor = context()
                 .actorOf(NetconfDataTreeServiceActor.props(netconfService, writeTxIdleTimeout));
             sender().tell(new Success(netconfActor), self());
         }
@@ -223,7 +223,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 try {
                     LOG.debug("{}: getSchemaSource for {} succeeded", id, sourceIdentifier);
                     sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     sender.tell(new Failure(e), getSelf());
                 }
             }
@@ -296,7 +296,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 }
 
                 //Check DomActionResult containing Ok onSuccess pass empty nodeMessageReply
-                ContainerNodeMessage nodeMessageReply = domActionResult.getOutput().map(ContainerNodeMessage::new)
+                final ContainerNodeMessage nodeMessageReply = domActionResult.getOutput().map(ContainerNodeMessage::new)
                         .orElse(null);
                 recipient.tell(new InvokeActionMessageReply(nodeMessageReply, domActionResult.getErrors()), getSelf());
             }
