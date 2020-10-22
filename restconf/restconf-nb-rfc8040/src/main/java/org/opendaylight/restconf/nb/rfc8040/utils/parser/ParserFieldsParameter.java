@@ -20,8 +20,11 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public final class ParserFieldsParameter {
@@ -47,13 +50,35 @@ public final class ParserFieldsParameter {
             throw new RestconfDocumentedException(
                     "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
-
         parseInput(input, startQNameModule, startNode, parsed, context);
         return parsed;
     }
 
     /**
-     * Parse input value of fields parameter and create list of sets. Each set represents one level of child nodes.
+     * Parse fields parameter and return list of child node paths saved in lists.
+     * @param identifier identifier context created from request URI
+     * @param input input value of fields parameter
+     * @return {@link List}
+     */
+    public static @NonNull List<List<PathArgument>> parseMountPointFieldsParameter(
+            final @NonNull InstanceIdentifierContext<?> identifier, final @NonNull String input) {
+        List<List<PathArgument>> parsed2 = new ArrayList<>();
+        parsed2.add(new ArrayList<>());
+        final SchemaContext context = identifier.getSchemaContext();
+        final QNameModule startQNameModule = identifier.getSchemaNode().getQName().getModule();
+        final DataSchemaContextNode<?> startNode = DataSchemaContextNode.fromDataSchemaNode(
+                (DataSchemaNode) identifier.getSchemaNode());
+
+        if (startNode == null) {
+            throw new RestconfDocumentedException(
+                    "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
+        return parseInputForMountPoint(input, startQNameModule,
+                startNode, parsed2, context);
+    }
+
+    /**
+     * Parse input value of fields parameter and create list of lists. Each sub-list represents one path child node.
      * @param input input value of fields parameter
      * @param startQNameModule starting qname module
      * @param startNode starting node
@@ -87,7 +112,7 @@ public final class ParserFieldsParameter {
                 case '/':
                     // add parsed identifier to results for current level
                     currentNode = addChildToResult(currentNode, input.substring(startPosition, currentPosition),
-                        currentQNameModule, currentLevel);
+                            currentQNameModule, currentLevel);
                     // go one level down
                     currentLevel = prepareQNameLevel(parsed, currentLevel);
 
@@ -239,7 +264,8 @@ public final class ParserFieldsParameter {
      * @return {@link DataSchemaContextNode}
      */
     private static @Nullable DataSchemaContextNode<?> resolveMixinNode(final @Nullable DataSchemaContextNode<?> node,
-            final @NonNull Set<QName> level, final @NonNull QName qualifiedName) {
+                                                                       final @NonNull Set<QName> level,
+                                                                       final @NonNull QName qualifiedName) {
         DataSchemaContextNode<?> currentNode = node;
         while (currentNode != null && currentNode.isMixin()) {
             level.add(qualifiedName);
@@ -283,5 +309,178 @@ public final class ParserFieldsParameter {
         }
 
         return ++position;
+    }
+
+    /**
+     * Add parsed child of current node to the currently parsed path.
+     * @param path node path
+     * @param childQName child to be found, checked and added
+     * @param currentNode current node
+     * @return {@link DataSchemaContextNode}
+     */
+    private static @NonNull DataSchemaContextNode<?> resolvePath(final @NonNull List<PathArgument> path,
+                                                                 final @NonNull QName childQName,
+                                                                 final @NonNull DataSchemaContextNode<?> currentNode) {
+        // resolve parent node
+        final DataSchemaContextNode<?> parentNode = resolveMountPointMixinNode(
+                currentNode, path, currentNode.getIdentifier().getNodeType());
+        if (parentNode == null) {
+            throw new RestconfDocumentedException(
+                    "Not-mixin node missing in " + currentNode.getIdentifier().getNodeType().getLocalName(),
+                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
+
+        // resolve child node
+        final DataSchemaContextNode<?> childNode = resolveMountPointMixinNode(
+                parentNode.getChild(childQName), path, childQName);
+        if (childNode == null) {
+            throw new RestconfDocumentedException(
+                    "Child " + childQName.getLocalName() + " node missing in "
+                            + currentNode.getIdentifier().getNodeType().getLocalName(),
+                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
+
+        // add final childNode node to level nodes
+        if (!path.contains(childNode.getIdentifier())) {
+            path.add(childNode.getIdentifier());
+        }
+        return childNode;
+    }
+
+    /**
+     * Resolve mixin node by searching for inner nodes until not mixin node or null is found.
+     * All node identifiers expect of not mixin node are added to currently checked node path.
+     * @param node initial mixin or not-mixin node
+     * @param path current nodes level
+     * @param qualifiedName qname of initial node
+     * @return {@link DataSchemaContextNode}
+     */
+    private static @Nullable DataSchemaContextNode<?> resolveMountPointMixinNode(
+            final @Nullable DataSchemaContextNode<?> node, final @NonNull List<PathArgument> path,
+            final @NonNull QName qualifiedName) {
+        DataSchemaContextNode<?> currentNode = node;
+        while (currentNode != null && currentNode.isMixin()) {
+            if (!path.contains(YangInstanceIdentifier.of(qualifiedName).getLastPathArgument())) {
+                path.add(YangInstanceIdentifier.of(qualifiedName).getLastPathArgument());
+            }
+            currentNode = currentNode.getChild(qualifiedName);
+        }
+
+        return currentNode;
+    }
+
+
+    private static List<List<PathArgument>> parseInputForMountPoint(final @NonNull String input,
+                                                                    final @NonNull QNameModule startQNameModule,
+                                                                    DataSchemaContextNode<?> startNode,
+                                                                    @NonNull List<List<PathArgument>> parsed,
+                                                                    final @NonNull SchemaContext context) {
+        int currentPosition = 0;
+        int startPosition = 0;
+        final int startSize = parsed.size();
+        QNameModule currentQNameModule = startQNameModule;
+        DataSchemaContextNode<?> currentNode = startNode;
+        Character lastSeparator = Character.MIN_VALUE;
+        while (currentPosition < input.length()) {
+            final char currentChar = input.charAt(currentPosition);
+            if (ParserConstants.YANG_IDENTIFIER_PART.matches(currentChar)) {
+                currentPosition++;
+                continue;
+            } switch (currentChar) {
+                case '/':
+                    if (lastSeparator == ';') {
+                        parsed.add(new ArrayList<>());
+                    }
+                    lastSeparator = currentChar;
+                    QName childQNameSlash = QName.create(currentQNameModule, input.substring(startPosition,
+                            currentPosition));
+                    currentNode = resolvePath(parsed.get(parsed.size() - 1), childQNameSlash, currentNode);
+                    currentPosition++;
+                    break;
+                case ';':
+                    if (lastSeparator == ';') {
+                        parsed.add(new ArrayList<>());
+                    }
+                    lastSeparator = currentChar;
+                    QName childQNameSemicolon = QName.create(currentQNameModule, input.substring(startPosition,
+                            currentPosition));
+                    resolvePath(parsed.get(parsed.size() - 1), childQNameSemicolon, currentNode);
+                    currentPosition++;
+                    break;
+                case ':':
+                    currentQNameModule = context.findModules(input.substring(startPosition, currentPosition))
+                            .iterator().next().getQNameModule();
+                    currentPosition++;
+                    break;
+                case '(':
+
+                    if (lastSeparator == ';') {
+                        parsed.add(new ArrayList<>());
+                    }
+                    lastSeparator = currentChar;
+                    // call with child node as new start node for one level down
+                    QName childQNameParenthesis = QName.create(currentQNameModule, input.substring(startPosition,
+                            currentPosition));
+                    currentNode = resolvePath(parsed.get(parsed.size() - 1), childQNameParenthesis, currentNode);
+                    final int closingParenthesis = currentPosition
+                            + findClosingParenthesis(input.substring(currentPosition + 1));
+                    parsed = parseInputForMountPoint(
+                            input.substring(currentPosition + 1, closingParenthesis),
+                            currentQNameModule, currentNode, parsed, context);
+
+                    currentPosition = closingParenthesis + 1;
+                    // closing parenthesis must be at the end of input or separator and one more character is expected
+                    if (currentPosition != input.length()) {
+                        if (currentPosition + 1 < input.length()) {
+                            if (input.charAt(currentPosition) == ';') {
+                                currentPosition++;
+                            } else {
+                                throw new RestconfDocumentedException(
+                                        "Missing semicolon character in child nodes",
+                                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+                            }
+                        } else {
+                            throw new RestconfDocumentedException(
+                                    "Unexpected character '"
+                                            + input.charAt(currentPosition)
+                                            + "' found in fields parameter value",
+                                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+                        }
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException(
+                            "Unexpected character '" + currentChar + "' found in fields parameter value",
+                            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            }
+            startPosition = currentPosition;
+        }
+        // parse input to end
+        if (startPosition < input.length()) {
+            if (lastSeparator == '/') {
+                QName childQName = QName.create(currentQNameModule, input.substring(startPosition, currentPosition));
+                resolvePath(parsed.get(parsed.size() - 1), childQName, currentNode);
+            } else if (lastSeparator == ';') {
+                parsed.add(new ArrayList<>());
+                QName childQName = QName.create(currentQNameModule, input.substring(startPosition, currentPosition));
+                resolvePath(parsed.get(parsed.size() - 1), childQName, currentNode);
+            } else if (lastSeparator == Character.MIN_VALUE) {
+                QName childQName = QName.create(currentQNameModule, input.substring(startPosition, currentPosition));
+                resolvePath(parsed.get(parsed.size() - 1), childQName, currentNode);
+            }
+        }
+        if (startNode == null) {
+            return parsed;
+        }
+        for (List<PathArgument> path: parsed.subList(startSize - 1, parsed.size())) {
+            if (!path.contains(startNode.getIdentifier())) {
+                path.add(0, startNode.getIdentifier());
+                if (startNode.getDataSchemaNode() instanceof ListSchemaNode) {
+                    path.add(0, YangInstanceIdentifier.of(startNode
+                            .getDataSchemaNode().getQName()).getLastPathArgument());
+                }
+            }
+        }
+        return parsed;
     }
 }
