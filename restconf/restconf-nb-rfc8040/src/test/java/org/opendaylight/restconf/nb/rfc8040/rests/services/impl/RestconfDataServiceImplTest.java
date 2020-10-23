@@ -136,7 +136,7 @@ public class RestconfDataServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
         Mockito.when(value.entrySet()).thenReturn(new HashSet<>());

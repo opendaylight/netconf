@@ -234,7 +234,7 @@ public final class JSONRestconfServiceRfc8040Impl implements JSONRestconfService
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writer.writeTo(patchStatusContext, PatchStatusContext.class, null, EMPTY_ANNOTATIONS,
                 MediaType.APPLICATION_JSON_TYPE, null, outputStream);
-        return outputStream.toString(StandardCharsets.UTF_8.name());
+        return outputStream.toString(StandardCharsets.UTF_8);
     }
 
     private static String toJson(final NormalizedNodeContext readData) throws IOException {
@@ -242,7 +242,7 @@ public final class JSONRestconfServiceRfc8040Impl implements JSONRestconfService
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writer.writeTo(readData, NormalizedNodeContext.class, null, EMPTY_ANNOTATIONS,
                 MediaType.APPLICATION_JSON_TYPE, null, outputStream);
-        return outputStream.toString(StandardCharsets.UTF_8.name());
+        return outputStream.toString(StandardCharsets.UTF_8);
     }
 
     private static boolean isDataMissing(final Exception exception) {

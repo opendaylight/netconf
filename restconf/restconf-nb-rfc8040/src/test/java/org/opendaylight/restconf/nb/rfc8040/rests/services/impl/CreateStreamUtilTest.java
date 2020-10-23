@@ -44,7 +44,7 @@ public class CreateStreamUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         this.refSchemaCtx =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
     }
@@ -94,7 +94,7 @@ public class CreateStreamUtilTest {
                 Builders.containerBuilder(rpcInputSchemaNode);
 
         final QName lfQName = QName.create(rpcModule.getQNameModule(), inputOutputName);
-        final DataSchemaNode lfSchemaNode = rpcInputSchemaNode.getDataChildByName(lfQName);
+        final DataSchemaNode lfSchemaNode = rpcInputSchemaNode.findDataChildByName(lfQName).orElseThrow();
 
         assertTrue(lfSchemaNode instanceof LeafSchemaNode);
 

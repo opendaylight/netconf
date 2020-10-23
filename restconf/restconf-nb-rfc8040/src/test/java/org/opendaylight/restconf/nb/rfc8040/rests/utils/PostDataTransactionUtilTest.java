@@ -21,6 +21,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
@@ -195,7 +196,7 @@ public class PostDataTransactionUtilTest {
         Response response = PostDataTransactionUtil.postData(this.uriInfo, payload,
                         new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
         assertEquals(201, response.getStatus());
-        assertThat(URLDecoder.decode(response.getLocation().toString(), "UTF-8"),
+        assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next());
@@ -203,7 +204,7 @@ public class PostDataTransactionUtilTest {
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,
                 new NetconfRestconfStrategy(netconfService), this.schema, null, null);
         assertEquals(201, response.getStatus());
-        assertThat(URLDecoder.decode(response.getLocation().toString(), "UTF-8"),
+        assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
                 containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
         verify(this.netconfService).getConfig(node);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next(),
