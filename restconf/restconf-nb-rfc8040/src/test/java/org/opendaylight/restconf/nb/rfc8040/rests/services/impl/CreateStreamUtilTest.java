@@ -94,7 +94,7 @@ public class CreateStreamUtilTest {
                 Builders.containerBuilder(rpcInputSchemaNode);
 
         final QName lfQName = QName.create(rpcModule.getQNameModule(), inputOutputName);
-        final DataSchemaNode lfSchemaNode = rpcInputSchemaNode.getDataChildByName(lfQName);
+        final DataSchemaNode lfSchemaNode = rpcInputSchemaNode.findDataChildByName(lfQName).orElseThrow();
 
         assertTrue(lfSchemaNode instanceof LeafSchemaNode);
 

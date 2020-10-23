@@ -189,7 +189,7 @@ public final class TestUtils {
     }
 
     public static String loadTextFile(final String filePath) throws IOException {
-        final FileReader fileReader = new FileReader(filePath);
+        final FileReader fileReader = new FileReader(filePath, StandardCharsets.UTF_8);
         final BufferedReader bufReader = new BufferedReader(fileReader);
 
         String line = null;

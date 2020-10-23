@@ -14,7 +14,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -217,11 +216,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         } catch (IOException e) {
             throw new IllegalStateException("Cannot write error response body", e);
         }
-        try {
-            return outputStream.toString(StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Output stream cannot be converted to string representation", e);
-        }
+        return outputStream.toString(StandardCharsets.UTF_8);
     }
 
     /**
