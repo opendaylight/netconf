@@ -41,8 +41,41 @@ import org.xml.sax.SAXException;
 
 @RunWith(Parameterized.class)
 public class SchemalessRpcStructureTransformerTest {
-
     private static final String NAMESPACE = "http://example.com/schema/1.2/config";
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters() {
+        return Arrays.asList(new Object[][] {
+            { YangInstanceIdentifier.builder()
+                .node(createNodeId("top"))
+                .node(createNodeId("users"))
+                .build(), "container.xml", null
+            },
+            { YangInstanceIdentifier.builder()
+                .node(createNodeId("top"))
+                .node(createNodeId("users"))
+                .node(createListNodeId("user", "key", "k1"))
+                .build(), "keyed-list.xml", null
+            },
+            { YangInstanceIdentifier.builder()
+                .node(createNodeId("top"))
+                .node(createNodeId("users"))
+                .node(createListNodeId("user",
+                    ImmutableMap.of(QName.create(NAMESPACE, "key1"), "k1", QName.create(NAMESPACE, "key2"), "k2")))
+                .build(), "keyed-list-compound-key.xml", null
+            },
+            { YangInstanceIdentifier.builder()
+                .node(createNodeId("top"))
+                .node(createNodeId("users"))
+                .node(createListNodeId("user", "key", "k2"))
+                .build(), "keyed-list-bad-key.xml", IllegalStateException.class
+            }});
+    }
+
+    @BeforeClass
+    public static void suiteSetup() {
+        XMLUnit.setIgnoreWhitespace(true);
+    }
 
     private final Class<? extends Exception> expectedException;
 
@@ -69,38 +102,6 @@ public class SchemalessRpcStructureTransformerTest {
                 Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI())));
         this.getConfigData = new String(Files.readAllBytes(
                 Paths.get(getClass().getResource("/schemaless/get-config/" + testDataset).toURI())));
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters() {
-        Object[][] params = {
-                {YangInstanceIdentifier.builder()
-                        .node(createNodeId("top"))
-                        .node(createNodeId("users"))
-                        .build(), "container.xml", null},
-                {YangInstanceIdentifier.builder()
-                        .node(createNodeId("top"))
-                        .node(createNodeId("users"))
-                        .node(createListNodeId("user", "key", "k1"))
-                        .build(), "keyed-list.xml", null},
-                {YangInstanceIdentifier.builder()
-                        .node(createNodeId("top"))
-                        .node(createNodeId("users"))
-                        .node(createListNodeId("user", ImmutableMap.of(QName.create(NAMESPACE, "key1"), "k1",
-                                QName.create(NAMESPACE, "key2"), "k2")))
-                        .build(), "keyed-list-compound-key.xml", null},
-                {YangInstanceIdentifier.builder()
-                        .node(createNodeId("top"))
-                        .node(createNodeId("users"))
-                        .node(createListNodeId("user", "key", "k2"))
-                        .build(), "keyed-list-bad-key.xml", IllegalStateException.class}
-        };
-        return Arrays.asList(params);
-    }
-
-    @BeforeClass
-    public static void suiteSetup() {
-        XMLUnit.setIgnoreWhitespace(true);
     }
 
     @Test

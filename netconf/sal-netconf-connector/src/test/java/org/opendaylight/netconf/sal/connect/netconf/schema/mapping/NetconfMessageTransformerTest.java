@@ -952,8 +952,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 QName.create(Locks.QNAME, "locked-by-session").intern());
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.from(
-                parentYiid, List.of(lockedTimeField, lockedBySessionField))), SCHEMA);
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(List.of(FieldsFilter.of(parentYiid,
+                List.of(lockedTimeField, lockedBySessionField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
