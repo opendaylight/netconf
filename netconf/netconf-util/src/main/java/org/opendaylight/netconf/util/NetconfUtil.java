@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -33,6 +34,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -49,6 +51,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public final class NetconfUtil {
@@ -254,6 +257,64 @@ public final class NetconfUtil {
         }
     }
 
+    /**
+     * Writing subtree filter specified by parent {@link YangInstanceIdentifier} and specific fields
+     * into {@link Element}. Field paths are relative to parent query path. Filter is created without following
+     * {@link EffectiveModelContext}.
+     *
+     * @param query         path to the root node
+     * @param fields        list of specific fields for which the filter should be created
+     * @param filterElement XML filter element to which the created filter will be written
+     */
+    public static void writeSchemalessFilter(final YangInstanceIdentifier query,
+                                             final List<YangInstanceIdentifier> fields, final Element filterElement) {
+        final List<YangInstanceIdentifier> aggregatedFields = NetconfUtil.aggregateFields(fields);
+        final TreeNode<PathArgument> pathArgumentTree = NetconfUtil.constructPathArgumentTree(query, aggregatedFields);
+        pathArgumentTreeToXmlStructure(pathArgumentTree, filterElement);
+    }
+
+    private static void pathArgumentTreeToXmlStructure(final TreeNode<PathArgument> pathArgumentTree,
+                                                       final Element data) {
+        final PathArgument pathArg = pathArgumentTree.getElement();
+        final QName nodeType = pathArg.getNodeType();
+        if (data.getElementsByTagNameNS(nodeType.getNamespace().toString(), nodeType.getLocalName()).getLength() != 0) {
+            // element has already been written as list key
+            return;
+        }
+
+        final Element childElement = data.getOwnerDocument().createElementNS(
+                nodeType.getNamespace().toString(), nodeType.getLocalName());
+        data.appendChild(childElement);
+        if (pathArg instanceof NodeIdentifierWithPredicates) {
+            appendListKeyNodes(childElement, (NodeIdentifierWithPredicates) pathArg);
+        }
+        for (final TreeNode<PathArgument> childrenNode : pathArgumentTree.values()) {
+            pathArgumentTreeToXmlStructure(childrenNode, childElement);
+        }
+    }
+
+    /**
+     * Appending list key elements to parent element.
+     *
+     * @param parentElement parent XML element to which children elements are appended
+     * @param listEntryId   list entry identifier
+     */
+    public static void appendListKeyNodes(final Element parentElement, final NodeIdentifierWithPredicates listEntryId) {
+        for (Entry<QName, Object> key : listEntryId.entrySet()) {
+            final Element keyElement = parentElement.getOwnerDocument().createElementNS(
+                    key.getKey().getNamespace().toString(), key.getKey().getLocalName());
+            keyElement.setTextContent(key.getValue().toString());
+            parentElement.appendChild(keyElement);
+        }
+    }
+
+    /**
+     * Aggregation of the fields paths based on parenthesis. Only parent/enclosing {@link YangInstanceIdentifier}
+     * are kept. For example, paths '/x/y/z', '/x/y', and '/x' are aggregated into single field path: '/x'
+     *
+     * @param fields paths of fields
+     * @return filtered {@link List} of paths
+     */
     private static List<YangInstanceIdentifier> aggregateFields(final List<YangInstanceIdentifier> fields) {
         return fields.stream()
                 .filter(field -> fields.stream()
@@ -262,6 +323,15 @@ public final class NetconfUtil {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Construction of the tree based on the parent {@link YangInstanceIdentifier} and provided list of fields.
+     * The goal of this procedure is the elimination of the redundancy that is introduced by potentially overlapping
+     * parts of the fields paths.
+     *
+     * @param query  path to parent element
+     * @param fields subpaths relative to parent path that identify specific fields
+     * @return created {@link TreeNode} structure
+     */
     private static TreeNode<PathArgument> constructPathArgumentTree(final YangInstanceIdentifier query,
                                                                     final List<YangInstanceIdentifier> fields) {
         final Iterator<PathArgument> queryIterator = query.getPathArguments().iterator();
