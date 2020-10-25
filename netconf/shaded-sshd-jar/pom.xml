@@ -55,7 +55,58 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <!--
+                    This is a mighty hack to workaround the fatal sshd-2.5.{0,1} regression
+                    in that it is not closing sessions. Since we are repackaging, we just
+                    introduce a fixed-up class into the mix.
+
+                    The class was compiled on Linux using OpenJDK 1.8.0_265-b01, with only
+                    the single fix, commit e512f68e2067723ce85c0f8e6a8642f2773aae9c, applied.
+
+                    We include the source for reference.
+
+                    Sorry, this is the best we can do before sshd-2.6.0 is released (and that
+                    also has risks).
+                -->
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>fix-ssh1028-bin</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/sshd1028</directory>
+                                    <includes>Nio2Session.class</includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/classes/org/opendaylight/netconf/shaded/sshd/common/io/nio2</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>fix-ssh1028-src</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/sshd1028</directory>
+                                    <includes>Nio2Session.java</includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
@@ -80,6 +131,7 @@
                                     <excludes>
                                         <exclude>META-INF/MANIFEST.MF</exclude>
                                         <exclude>META-INF/services/**</exclude>
+                                        <exclude>org/apache/sshd/common/io/nio2/Nio2Session.class</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
