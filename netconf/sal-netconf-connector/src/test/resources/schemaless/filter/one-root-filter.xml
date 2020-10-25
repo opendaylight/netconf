@@ -1,0 +1,13 @@
+<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <c-1 xmlns="test-namespace">
+        <leaf-1/>
+        <list-1>
+            <key-1>key1</key-1>
+            <key-2>key2</key-2>
+            <c-2>
+                <leaf-3/>
+            </c-2>
+        </list-1>
+    </c-1>
+</filter>
