@@ -19,7 +19,7 @@ import java.util.function.Function;
  *
  * @param <T> type of the node element
  */
-final class TreeNode<T> {
+public final class TreeNode<T> {
     private final T element;
     private final Map<T, TreeNode<T>> childrenNodes = new LinkedHashMap<>();
 
@@ -28,7 +28,7 @@ final class TreeNode<T> {
      *
      * @param element node element
      */
-    TreeNode(final T element) {
+    public TreeNode(final T element) {
         this.element = element;
     }
 
@@ -37,7 +37,7 @@ final class TreeNode<T> {
      *
      * @param treeNode existing tree node
      */
-    TreeNode(final TreeNode<T> treeNode) {
+    public TreeNode(final TreeNode<T> treeNode) {
         this.element = treeNode.element;
         this.childrenNodes.putAll(treeNode.childrenNodes);
     }
@@ -47,7 +47,7 @@ final class TreeNode<T> {
      *
      * @return element
      */
-    T getElement() {
+    public T getElement() {
         return element;
     }
 
@@ -56,7 +56,7 @@ final class TreeNode<T> {
      *
      * @return {@link List} of children nodes
      */
-    List<TreeNode<T>> getChildrenNodes() {
+    public List<TreeNode<T>> getChildrenNodes() {
         return ImmutableList.copyOf(childrenNodes.values());
     }
 
@@ -65,7 +65,7 @@ final class TreeNode<T> {
      *
      * @return {@code true}, if there are some children nodes.
      */
-    boolean hasChildrenNodes() {
+    public boolean hasChildrenNodes() {
         return !childrenNodes.isEmpty();
     }
 
@@ -74,7 +74,7 @@ final class TreeNode<T> {
      *
      * @param child tree node
      */
-    void addChildNode(final TreeNode<T> child) {
+    public void addChildNode(final TreeNode<T> child) {
         childrenNodes.put(child.getElement(), child);
     }
 
@@ -85,7 +85,7 @@ final class TreeNode<T> {
      * @param treeNodeFunction function used for creation of new child tree node
      * @return existing or created child tree node
      */
-    TreeNode<T> computeIfAbsent(final T childElement, final Function<T, TreeNode<T>> treeNodeFunction) {
+    public TreeNode<T> computeIfAbsent(final T childElement, final Function<T, TreeNode<T>> treeNodeFunction) {
         return childrenNodes.computeIfAbsent(childElement, treeNodeFunction);
     }
 }
