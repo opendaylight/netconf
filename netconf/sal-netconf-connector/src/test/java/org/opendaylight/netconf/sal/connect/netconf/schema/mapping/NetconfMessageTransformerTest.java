@@ -71,6 +71,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Statistics;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.Datastore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.datastore.Locks;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.datastore.locks.lock.type.partial.lock.PartialLock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
@@ -919,7 +920,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final YangInstanceIdentifier versionField = YangInstanceIdentifier.create(
                 toId(QName.create(Schema.QNAME, "version").intern()));
         final YangInstanceIdentifier identifierField = YangInstanceIdentifier.create(
-                toId(QName.create(Schema.QNAME, "identifier").intern()));
+                toId(QName.create(Schema.QNAME, "namespace").intern()));
 
         // building filter structure and NETCONF message
         final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.of(
@@ -935,9 +936,55 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "<schemas>\n"
                 + "<schema>\n"
                 + "<version/>\n"
+                + "<namespace/>\n"
+                // explicitly fetched list keys - identifier and format
                 + "<identifier/>\n"
+                + "<format/>\n"
                 + "</schema>\n"
                 + "</schemas>\n"
+                + "</netconf-state>\n"
+                + "</filter>\n"
+                + "</get>\n"
+                + "</rpc>");
+    }
+
+    @Test
+    public void getSpecificFieldsUnderMultipleLists() throws IOException, SAXException {
+        // preparation of the fields
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(
+                toId(NetconfState.QNAME), toId(Datastores.QNAME));
+        final YangInstanceIdentifier partialLockYiid = YangInstanceIdentifier.create(toId(Datastore.QNAME),
+                NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME),
+                toId(QName.create(Locks.QNAME, "lock-type").intern()), toId(PartialLock.QNAME),
+                NodeIdentifierWithPredicates.of(PartialLock.QNAME));
+        final YangInstanceIdentifier lockedTimeField = partialLockYiid.node(
+                QName.create(Locks.QNAME, "locked-time").intern());
+        final YangInstanceIdentifier lockedBySessionField = partialLockYiid.node(
+                QName.create(Locks.QNAME, "locked-by-session").intern());
+
+        // building filter structure and NETCONF message
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.of(
+                parentYiid, List.of(lockedTimeField, lockedBySessionField))), SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_PATH,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+
+        // testing
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<get>\n"
+                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "<datastores>\n"
+                + "<datastore>\n"
+                + "<locks>\n"
+                + "<partial-lock>\n"
+                + "<locked-time/>\n"
+                + "<locked-by-session/>\n"
+                + "<lock-id/>\n"
+                + "</partial-lock>\n"
+                + "</locks>\n"
+                + "<name/>\n"
+                + "</datastore>\n"
+                + "</datastores>\n"
                 + "</netconf-state>\n"
                 + "</filter>\n"
                 + "</get>\n"
