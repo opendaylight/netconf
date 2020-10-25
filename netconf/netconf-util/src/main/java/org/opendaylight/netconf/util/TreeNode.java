@@ -33,6 +33,16 @@ final class TreeNode<T> {
     }
 
     /**
+     * Creation of tree using existing {@link TreeNode}. List of children nods is copied to a new node.
+     *
+     * @param treeNode existing tree node
+     */
+    TreeNode(final TreeNode<T> treeNode) {
+        this.element = treeNode.element;
+        this.childrenNodes.putAll(treeNode.childrenNodes);
+    }
+
+    /**
      * Get node element.
      *
      * @return element
@@ -48,6 +58,15 @@ final class TreeNode<T> {
      */
     List<TreeNode<T>> getChildrenNodes() {
         return ImmutableList.copyOf(childrenNodes.values());
+    }
+
+    /**
+     * Check if this tree node has some children nodes.
+     *
+     * @return {@code true}, if there are some children nodes.
+     */
+    boolean hasChildrenNodes() {
+        return !childrenNodes.isEmpty();
     }
 
     /**
