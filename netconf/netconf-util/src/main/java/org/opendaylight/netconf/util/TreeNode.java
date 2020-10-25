@@ -29,6 +29,16 @@ final class TreeNode<T> extends LinkedHashMap<T, TreeNode<T>> {
     }
 
     /**
+     * Creation of tree using existing tree node. List of children nodes is copied to a new node.
+     *
+     * @param treeNode existing tree node
+     */
+    TreeNode(final TreeNode<T> treeNode) {
+        super(treeNode);
+        this.element = treeNode.element;
+    }
+
+    /**
      * Get node element.
      *
      * @return element
