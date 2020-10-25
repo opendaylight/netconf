@@ -254,7 +254,14 @@ public final class NetconfUtil {
         }
     }
 
-    private static List<YangInstanceIdentifier> aggregateFields(final List<YangInstanceIdentifier> fields) {
+    /**
+     * Aggregation of the fields paths based on parenthesis. Only parent/enclosing {@link YangInstanceIdentifier}
+     * are kept. For example, paths '/x/y/z', '/x/y', and '/x' are aggregated into single field path: '/x'
+     *
+     * @param fields paths of fields
+     * @return filtered {@link List} of paths
+     */
+    public static List<YangInstanceIdentifier> aggregateFields(final List<YangInstanceIdentifier> fields) {
         return fields.stream()
                 .filter(field -> fields.stream()
                         .filter(fieldYiid -> !field.equals(fieldYiid))
@@ -262,8 +269,17 @@ public final class NetconfUtil {
                 .collect(Collectors.toList());
     }
 
-    private static TreeNode<PathArgument> constructPathArgumentTree(final YangInstanceIdentifier query,
-                                                                    final List<YangInstanceIdentifier> fields) {
+    /**
+     * Construction of the tree based on the parent {@link YangInstanceIdentifier} and provided list of fields.
+     * The goal of this procedure is the elimination of the redundancy that is introduced by potentially overlapping
+     * parts of the fields paths.
+     *
+     * @param query  path to parent element
+     * @param fields subpaths relative to parent path that identify specific fields
+     * @return created {@link TreeNode} structure
+     */
+    public static TreeNode<PathArgument> constructPathArgumentTree(final YangInstanceIdentifier query,
+                                                                   final List<YangInstanceIdentifier> fields) {
         final Iterator<PathArgument> queryIterator = query.getPathArguments().iterator();
         final PathArgument firstPathArg = queryIterator.next();
         final TreeNode<PathArgument> rootTreeNode = new TreeNode<>(firstPathArg);
