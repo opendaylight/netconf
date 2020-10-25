@@ -14,6 +14,8 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
 import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.util.NetconfUtil.appendListKeyNodes;
+import static org.opendaylight.netconf.util.NetconfUtil.writeSchemalessFilter;
 
 import com.google.common.base.Preconditions;
 import java.util.Collections;
@@ -28,6 +30,8 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -45,14 +49,13 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     /**
      * Selects elements in anyxml data node, which matches path arguments QNames. Since class in not context aware,
      * method searches for all elements as they are named in path.
-     * @param data data, must be of type {@link AnyXmlNode}
+     * @param data data, must be of type {@link DOMSourceAnyxmlNode}
      * @param path path to select
      * @return selected data
      */
     @Override
     public Optional<NormalizedNode<?, ?>> selectFromDataStructure(
-            final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data,
-            final YangInstanceIdentifier path) {
+            final DataContainerChild<? extends PathArgument, ?> data, final YangInstanceIdentifier path) {
         Preconditions.checkArgument(data instanceof DOMSourceAnyxmlNode);
         final List<XmlElement> xmlElements = selectMatchingNodes(
             getSourceElement(((DOMSourceAnyxmlNode)data).getValue()), path);
@@ -80,8 +83,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
      */
     @Override
     public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode<?, ?>> data,
-                                                final YangInstanceIdentifier dataPath,
-                                                final Optional<ModifyAction> operation) {
+            final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation) {
         Preconditions.checkArgument(data.isPresent());
         Preconditions.checkArgument(data.get() instanceof DOMSourceAnyxmlNode);
 
@@ -99,15 +101,12 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
             parentXmlStructure = dataNode;
             configElement.appendChild(parentXmlStructure);
         } else {
-            final List<YangInstanceIdentifier.PathArgument> pathArguments = dataPath.getPathArguments();
+            final List<PathArgument> pathArguments = dataPath.getPathArguments();
             //last will be appended later
-            final List<YangInstanceIdentifier.PathArgument> pathWithoutLast =
-                    pathArguments.subList(0, pathArguments.size() - 1);
+            final List<PathArgument> pathWithoutLast = pathArguments.subList(0, pathArguments.size() - 1);
             parentXmlStructure = instanceIdToXmlStructure(pathWithoutLast, configElement);
         }
-        if (operation.isPresent()) {
-            setOperationAttribute(operation, document, dataNode);
-        }
+        operation.ifPresent(modifyAction -> setOperationAttribute(modifyAction, document, dataNode));
         //append data
         parentXmlStructure.appendChild(document.importNode(dataNode, true));
         return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_CONFIG_NODEID)
@@ -124,24 +123,36 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     @Override
     public DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier path) {
         final Document document = XmlUtil.newDocument();
+        final Element filterElement = prepareFilterElement(document);
+        instanceIdToXmlStructure(path.getPathArguments(), filterElement);
+        return buildFilterXmlNode(document);
+    }
+
+    @Override
+    public DataContainerChild<?, ?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
+        final Document document = XmlUtil.newDocument();
+        final Element filterElement = prepareFilterElement(document);
+        for (final FieldsFilter filter : fieldsFilters) {
+            writeSchemalessFilter(filter.path(), filter.fields(), filterElement);
+        }
+        return buildFilterXmlNode(document);
+    }
+
+    private static Element prepareFilterElement(final Document document) {
         final String filterNs = NETCONF_FILTER_QNAME.getNamespace().toString();
         final Element filter = document.createElementNS(filterNs, NETCONF_FILTER_QNAME.getLocalName());
         final Attr a = document.createAttributeNS(filterNs, "type");
         a.setTextContent("subtree");
         filter.setAttributeNode(a);
         document.appendChild(filter);
-        instanceIdToXmlStructure(path.getPathArguments(), filter);
+        return filter;
+    }
+
+    private static DataContainerChild<?, ?> buildFilterXmlNode(final Document document) {
         return Builders.anyXmlBuilder()
                 .withNodeIdentifier(NETCONF_FILTER_NODEID)
                 .withValue(new DOMSource(document.getDocumentElement()))
                 .build();
-    }
-
-    @Override
-    public DataContainerChild<?, ?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
-        // todo: implementation of this feature
-        throw new UnsupportedOperationException(
-                "Creation of filter structure using fields for schemaless mountpoint is not supported");
     }
 
     private static void checkDataValidForPath(final YangInstanceIdentifier dataPath, final Element dataNode) {
@@ -150,23 +161,20 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
             return;
         }
         final XmlElement dataElement = XmlElement.fromDomElement(dataNode);
-        final YangInstanceIdentifier.PathArgument lastPathArgument = dataPath.getLastPathArgument();
+        final PathArgument lastPathArgument = dataPath.getLastPathArgument();
         final QName nodeType = lastPathArgument.getNodeType();
         if (!nodeType.getNamespace().toString().equals(dataNode.getNamespaceURI())
                 || !nodeType.getLocalName().equals(dataElement.getName())) {
             throw new IllegalStateException(
                     String.format("Can't write data '%s' to path %s", dataNode.getTagName(), dataPath));
         }
-        if (lastPathArgument instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
+        if (lastPathArgument instanceof NodeIdentifierWithPredicates) {
             checkKeyValuesValidForPath(dataElement, lastPathArgument);
         }
-
     }
 
-    private static void checkKeyValuesValidForPath(final XmlElement dataElement,
-                                            final YangInstanceIdentifier.PathArgument lastPathArgument) {
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates keyedId =
-                (YangInstanceIdentifier.NodeIdentifierWithPredicates) lastPathArgument;
+    private static void checkKeyValuesValidForPath(final XmlElement dataElement, final PathArgument lastPathArgument) {
+        final NodeIdentifierWithPredicates keyedId = (NodeIdentifierWithPredicates) lastPathArgument;
         for (Entry<QName, Object> entry : keyedId.entrySet()) {
             QName qualifiedName = entry.getKey();
             final List<XmlElement> key =
@@ -190,32 +198,24 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         }
     }
 
-    private static void setOperationAttribute(final Optional<ModifyAction> operation, final Document document,
-                                       final Element dataNode) {
+    private static void setOperationAttribute(final ModifyAction operation, final Document document,
+                                              final Element dataNode) {
         final Attr operationAttribute = document.createAttributeNS(NETCONF_OPERATION_QNAME.getNamespace().toString(),
             NETCONF_OPERATION_QNAME.getLocalName());
-        operationAttribute.setTextContent(toOperationString(operation.get()));
+        operationAttribute.setTextContent(toOperationString(operation));
         dataNode.setAttributeNode(operationAttribute);
     }
 
-    private static Element instanceIdToXmlStructure(final List<YangInstanceIdentifier.PathArgument> pathArguments,
-                                                    final Element data) {
+    private static Element instanceIdToXmlStructure(final List<PathArgument> pathArguments, final Element data) {
         final Document doc = data.getOwnerDocument();
         Element parent = data;
-        for (YangInstanceIdentifier.PathArgument pathArgument : pathArguments) {
+        for (PathArgument pathArgument : pathArguments) {
             final QName nodeType = pathArgument.getNodeType();
             final Element element = doc.createElementNS(nodeType.getNamespace().toString(), nodeType.getLocalName());
             parent.appendChild(element);
             //if path argument is list id, add also keys to resulting xml
-            if (pathArgument instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
-                YangInstanceIdentifier.NodeIdentifierWithPredicates listNode =
-                        (YangInstanceIdentifier.NodeIdentifierWithPredicates) pathArgument;
-                for (Entry<QName, Object> key : listNode.entrySet()) {
-                    final Element keyElement =
-                            doc.createElementNS(key.getKey().getNamespace().toString(), key.getKey().getLocalName());
-                    keyElement.setTextContent(key.getValue().toString());
-                    element.appendChild(keyElement);
-                }
+            if (pathArgument instanceof NodeIdentifierWithPredicates) {
+                appendListKeyNodes(element, (NodeIdentifierWithPredicates) pathArgument);
             }
             parent = element;
         }
@@ -224,7 +224,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
 
     private static List<XmlElement> selectMatchingNodes(final Element domElement, final YangInstanceIdentifier path) {
         XmlElement element = XmlElement.fromDomElement(domElement);
-        for (YangInstanceIdentifier.PathArgument pathArgument : path.getPathArguments()) {
+        for (PathArgument pathArgument : path.getPathArguments()) {
             List<XmlElement> childElements = element.getChildElements(pathArgument.getNodeType().getLocalName());
             if (childElements.size() == 1) {
                 element = childElements.get(0);
