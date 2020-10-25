@@ -13,6 +13,7 @@ import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedN
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -169,17 +170,22 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
-                            final TreeNode<PathArgument> subtree) throws IOException {
+        final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                                  final TreeNode<PathArgument> subtree) throws IOException {
             verifyActualPathArgument(first);
 
             emitElementStart(writer, first);
             for (final TreeNode<PathArgument> node : subtree.values()) {
-                final PathArgument childPath = node.getElement();
-                final StreamingContext<?> childOp = getChildOperation(childPath);
-                childOp.streamToWriter(writer, childPath, node);
+                emitChildTreeNode(writer, node);
             }
             writer.endNode();
+        }
+
+        void emitChildTreeNode(final NormalizedNodeStreamWriter writer,
+                               final TreeNode<PathArgument> node) throws IOException {
+            final PathArgument childPath = node.getElement();
+            final StreamingContext<?> childOp = getChildOperation(childPath);
+            childOp.streamToWriter(writer, childPath, node);
         }
 
         private void verifyActualPathArgument(final PathArgument first) {
@@ -193,7 +199,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         abstract void emitElementStart(NormalizedNodeStreamWriter writer, PathArgument arg) throws IOException;
 
         @SuppressWarnings("checkstyle:illegalCatch")
-        private StreamingContext<?> getChildOperation(final PathArgument childPath) {
+        StreamingContext<?> getChildOperation(final PathArgument childPath) {
             final StreamingContext<?> childOp;
             try {
                 childOp = getChild(childPath);
@@ -238,10 +244,12 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
     private abstract static class AbstractMapMixin extends AbstractComposite<NodeIdentifier> {
         private final ListEntry innerNode;
+        private final List<QName> keyLeaves;
 
         AbstractMapMixin(final ListSchemaNode list) {
             super(NodeIdentifier.create(list.getQName()));
             this.innerNode = new ListEntry(NodeIdentifierWithPredicates.of(list.getQName()), list);
+            this.keyLeaves = list.getKeyDefinition();
         }
 
         @Override
@@ -252,6 +260,40 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         @Override
         final boolean isMixin() {
             return true;
+        }
+
+        @Override
+        final void emitChildTreeNode(final NormalizedNodeStreamWriter writer,
+                                     final TreeNode<PathArgument> node) throws IOException {
+            final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) node.getElement();
+            final StreamingContext<?> childOp = getChildOperation(childPath);
+            if (childPath.size() == 0 && node.isEmpty()) {
+                // it is a query to the whole list
+                childOp.streamToWriter(writer, childPath, node);
+                return;
+            }
+
+            final List<QName> missingKeyIds = getMissingKeyIds(childPath);
+            if (missingKeyIds.isEmpty()) {
+                childOp.streamToWriter(writer, childPath, node);
+            } else {
+                final TreeNode<PathArgument> extendedTreeNode = new TreeNode<>(node);
+                for (final QName keyIdentifier : missingKeyIds) {
+                    final NodeIdentifier keyPathArg = NodeIdentifier.create(keyIdentifier);
+                    extendedTreeNode.put(keyPathArg, new TreeNode<>(keyPathArg));
+                }
+                childOp.streamToWriter(writer, childPath, extendedTreeNode);
+            }
+        }
+
+        private List<QName> getMissingKeyIds(final NodeIdentifierWithPredicates nodeIdWithKeys) {
+            final List<QName> missingKeyIds = new ArrayList<>();
+            for (final QName keyQName : keyLeaves) {
+                if (!nodeIdWithKeys.containsKey(keyQName)) {
+                    missingKeyIds.add(keyQName);
+                }
+            }
+            return missingKeyIds;
         }
     }
 
@@ -271,8 +313,8 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
-                            final TreeNode<PathArgument> tree) throws IOException {
+        final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                                  final TreeNode<PathArgument> tree) throws IOException {
             streamToWriter(writer, first, Collections.emptyIterator());
         }
     }
