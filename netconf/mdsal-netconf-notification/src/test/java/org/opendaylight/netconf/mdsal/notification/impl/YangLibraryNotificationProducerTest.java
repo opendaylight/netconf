@@ -7,6 +7,7 @@
  */
 
 package org.opendaylight.netconf.mdsal.notification.impl;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -16,8 +17,9 @@ import static org.mockito.Mockito.verify;
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -29,6 +31,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChangeBuilder;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class YangLibraryNotificationProducerTest {
 
     private YangLibraryNotificationProducer yangLibraryNotificationProducer;
@@ -42,9 +45,7 @@ public class YangLibraryNotificationProducerTest {
     private DataBroker dataBroker;
 
     @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
+    public void setUp() {
         doNothing().when(yangLibraryPublisherRegistration).onYangLibraryChange(any(YangLibraryChange.class));
         doReturn(yangLibraryPublisherRegistration).when(netconfNotificationCollector)
                 .registerYangLibraryPublisher();

@@ -32,8 +32,9 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -59,6 +60,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import scala.concurrent.duration.Duration;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDataTreeServiceActorTest {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
@@ -76,7 +78,6 @@ public class NetconfDataTreeServiceActorTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         this.actorRef = TestActorRef.create(system,
             NetconfDataTreeServiceActor.props(netconfService, Duration.apply(2, TimeUnit.SECONDS)));
         this.probe = TestProbe.apply(system);

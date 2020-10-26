@@ -18,7 +18,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.DELETE;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
@@ -48,7 +47,9 @@ import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -99,6 +100,7 @@ import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
  *
  * @author Thomas Pantelis
  */
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     private static final String ACTOR_SYSTEM_NAME = "test";
     private static final RemoteDeviceId DEVICE_ID = new RemoteDeviceId("device", new InetSocketAddress(65535));
@@ -143,8 +145,6 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setup() {
-        initMocks(this);
-
         final Timeout responseTimeout = Timeout.apply(1, TimeUnit.SECONDS);
 
         slaveSystem = ActorSystem.create(ACTOR_SYSTEM_NAME, ConfigFactory.load().getConfig("Slave"));
@@ -240,8 +240,6 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         // Notify that the NetconfNode operational state was deleted. Expect the slave mount point closed.
 
         doReturn(DELETE).when(mockDataObjModification).getModificationType();
-        doReturn(node).when(mockDataObjModification).getDataBefore();
-        doReturn(null).when(mockDataObjModification).getDataAfter();
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
                 new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
@@ -280,7 +278,8 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         // Notify that the NetconfNode operational state was changed to UnableToConnect. Expect the slave mount point
         // closed.
 
-        setupMountPointMocks();
+        reset(mockMountPointService, mockMountPointBuilder, mockMountPointReg);
+        doNothing().when(mockMountPointReg).close();
 
         final Node updatedNode = new NodeBuilder().setNodeId(nodeId)
                 .addAugmentation(new NetconfNodeBuilder(netconfNode)
@@ -361,7 +360,8 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         verify(mockMountPointReg, timeout(5000)).close();
         verify(mockMountPointBuilder, timeout(5000)).register();
 
-        setupMountPointMocks();
+        reset(mockMountPointService, mockMountPointBuilder, mockMountPointReg);
+        doNothing().when(mockMountPointReg).close();
         netconfNodeManager.close();
         verify(mockMountPointReg, timeout(5000)).close();
     }
@@ -378,12 +378,8 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
     private void setupMountPointMocks() {
         reset(mockMountPointService, mockMountPointBuilder, mockMountPointReg);
-
         doNothing().when(mockMountPointReg).close();
-
-        doReturn(mockMountPointBuilder).when(mockMountPointBuilder).addService(any(), any());
         doReturn(mockMountPointReg).when(mockMountPointBuilder).register();
-
         doReturn(mockMountPointBuilder).when(mockMountPointService).createMountPoint(any());
     }
 

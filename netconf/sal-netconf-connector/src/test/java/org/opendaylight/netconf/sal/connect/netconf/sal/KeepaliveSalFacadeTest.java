@@ -24,9 +24,10 @@ import java.util.concurrent.ScheduledFuture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -35,7 +36,6 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -43,6 +43,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class KeepaliveSalFacadeTest {
 
     private static final RemoteDeviceId REMOTE_DEVICE_ID =
@@ -69,12 +70,9 @@ public class KeepaliveSalFacadeTest {
     public void setUp() throws Exception {
         executorServiceSpy = Executors.newScheduledThreadPool(1);
 
-        MockitoAnnotations.initMocks(this);
-
         doNothing().when(listener).disconnect();
-        doReturn("mockedRpc").when(deviceRpc).toString();
-        doNothing().when(underlyingSalFacade).onDeviceConnected(
-                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(),
+            isNull(), any(DOMRpcService.class), isNull());
 
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorServiceSpy = Mockito.spy(executorService);
@@ -84,8 +82,6 @@ public class KeepaliveSalFacadeTest {
                 invocationOnMock.callRealMethod();
                 return currentKeepalive;
             }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), any());
-
-        Mockito.when(currentKeepalive.isDone()).thenReturn(true);
 
         keepaliveSalFacade =
                 new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 1L, 1L);
@@ -101,9 +97,6 @@ public class KeepaliveSalFacadeTest {
     public void testKeepaliveSuccess() throws Exception {
         final DOMRpcResult result = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
-
-        doReturn(FluentFutures.immediateFluentFuture(result))
-                .when(deviceRpc).invokeRpc(any(QName.class), isNull());
 
         doReturn(FluentFutures.immediateFluentFuture(result))
                 .when(deviceRpc).invokeRpc(any(QName.class), any(ContainerNode.class));

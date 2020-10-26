@@ -27,13 +27,13 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
-import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
@@ -50,6 +50,7 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfCapabilityMonitoringServiceTest {
 
     private static final String TEST_MODULE_CONTENT = "content";
@@ -79,8 +80,6 @@ public class NetconfCapabilityMonitoringServiceTest {
     @Mock
     private NetconfOperationServiceFactory operationServiceFactoryMock;
     @Mock
-    private NetconfManagementSession sessionMock;
-    @Mock
     private NetconfMonitoringService.CapabilitiesListener listener;
     @Mock
     private BaseNotificationPublisherRegistration notificationPublisher;
@@ -89,8 +88,6 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
         doReturn(Optional.of(TEST_MODULE_DATE)).when(moduleMock).getRevision();
@@ -112,13 +109,10 @@ public class NetconfCapabilityMonitoringServiceTest {
         doReturn(null).when(operationServiceFactoryMock)
                 .registerCapabilityListener(any(NetconfCapabilityMonitoringService.class));
 
-        doReturn(SESSION).when(sessionMock).toManagementSession();
         doNothing().when(listener).onCapabilitiesChanged(any());
         doNothing().when(listener).onSchemasChanged(any());
 
         doNothing().when(notificationPublisher).onCapabilityChanged(any());
-        doNothing().when(notificationPublisher).onSessionStarted(any());
-        doNothing().when(notificationPublisher).onSessionEnded(any());
 
         monitoringService = new NetconfCapabilityMonitoringService(operationServiceFactoryMock);
         monitoringService.onCapabilitiesChanged(capabilities, Collections.emptySet());

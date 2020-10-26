@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.MERGE;
@@ -28,8 +27,10 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -61,6 +62,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PatchDataTransactionUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
     @Mock
@@ -84,8 +86,6 @@ public class PatchDataTransactionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
-
         doReturn(transactionChain).when(mockDataBroker).createTransactionChain(any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
@@ -176,9 +176,6 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void testPatchDataReplaceMergeAndRemove() {
-        doReturn(immediateFalseFluentFuture()).doReturn(immediateTrueFluentFuture())
-                .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeMerge);
-
         final PatchEntity entityReplace =
                 new PatchEntity("edit1", REPLACE, this.targetNodeMerge, this.buildArtistList);
         final PatchEntity entityMerge = new PatchEntity("edit2", MERGE, this.targetNodeMerge, this.buildArtistList);
@@ -245,9 +242,6 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void testPatchMergePutContainer() {
-        doReturn(immediateFalseFluentFuture()).doReturn(immediateTrueFluentFuture())
-                .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
-
         final PatchEntity entityMerge =
                 new PatchEntity("edit1", MERGE, this.instanceIdContainer, this.buildBaseContainerForTests);
         final List<PatchEntity> entities = new ArrayList<>();

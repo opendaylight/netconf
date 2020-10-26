@@ -20,9 +20,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
@@ -32,6 +33,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfOperationRouterImplTest {
 
     private static final String TEST_RPC = "<rpc message-id=\"101\" "
@@ -60,8 +62,6 @@ public class NetconfOperationRouterImplTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         doReturn(HandlingPriority.HANDLE_WITH_MAX_PRIORITY).when(maxPrioMock).canHandle(any(Document.class));
         doReturn(XmlUtil.readXmlToDocument(MAX_PRIORITY_REPLY)).when(maxPrioMock).handle(any(Document.class),
                 any(NetconfOperationChainedExecution.class));

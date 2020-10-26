@@ -15,8 +15,9 @@ import static org.mockito.Mockito.when;
 import com.google.common.util.concurrent.FluentFuture;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -25,6 +26,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ReadWriteTxTest {
     @Mock
     private DOMDataTreeReadTransaction delegateReadTx;
@@ -34,7 +36,6 @@ public class ReadWriteTxTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         tx = new ReadWriteTx(delegateReadTx, delegateWriteTx);
     }
 

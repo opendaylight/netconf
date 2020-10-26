@@ -20,8 +20,9 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
@@ -32,6 +33,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.yangtools.yang.common.RpcError;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfInvokeOperationsUtilTest {
 
     private static final TestData DATA = new TestData();
@@ -44,7 +46,6 @@ public class RestconfInvokeOperationsUtilTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         serviceHandler = new RpcServiceHandler(rpcService);
     }
 
@@ -89,7 +90,6 @@ public class RestconfInvokeOperationsUtilTest {
     public void invokeRpcMissingMountPointServiceTest() {
         doReturn(Optional.empty()).when(moutPoint).getService(DOMRpcService.class);
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
-        doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
         final DOMRpcResult rpcResult =
                 RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(moutPoint, DATA.input, DATA.rpc);
     }
