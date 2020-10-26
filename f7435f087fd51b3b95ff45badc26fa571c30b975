@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a1daab56_5133bd39",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/sshd1028/NetconfNio2ServiceFactory.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-10-26T11:02:45Z",
+      "side": 1,
+      "message": "throw new ExceptionInInitializerError(e) -- this should never happen and if it does, crash loudly",
+      "range": {
+        "startLine": 33,
+        "startChar": 12,
+        "endLine": 34,
+        "endChar": 79
+      },
+      "revId": "f7435f087fd51b3b95ff45badc26fa571c30b975",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
