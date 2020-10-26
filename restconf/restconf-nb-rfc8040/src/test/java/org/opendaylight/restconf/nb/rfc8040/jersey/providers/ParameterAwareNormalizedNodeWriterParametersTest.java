@@ -16,10 +16,11 @@ import java.util.List;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
@@ -32,6 +33,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 /**
  * Unit test for {@link ParameterAwareNormalizedNodeWriter} used with all parameters.
  */
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ParameterAwareNormalizedNodeWriterParametersTest {
 
     @Mock
@@ -57,8 +59,6 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         // identifiers
         containerNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "container"));
         Mockito.when(containerNodeData.getIdentifier()).thenReturn(containerNodeIdentifier);
@@ -77,7 +77,6 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
 
         rootDataContainerIdentifier = NodeIdentifier.create(
                 QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data"));
-        Mockito.when(rootDataContainerData.getIdentifier()).thenReturn(rootDataContainerIdentifier);
         Mockito.when(rootDataContainerData.getNodeType()).thenReturn(rootDataContainerIdentifier.getNodeType());
 
         // values

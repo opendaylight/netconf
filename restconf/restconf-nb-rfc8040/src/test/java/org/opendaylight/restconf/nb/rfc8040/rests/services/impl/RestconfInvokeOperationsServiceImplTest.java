@@ -20,8 +20,9 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -40,9 +41,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfInvokeOperationsServiceImplTest {
 
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/invoke-rpc";
@@ -57,7 +58,6 @@ public class RestconfInvokeOperationsServiceImplTest {
 
     @Before
     public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
         final EffectiveModelContext contextRef =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
         final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
@@ -111,7 +111,6 @@ public class RestconfInvokeOperationsServiceImplTest {
         final InstanceIdentifierContext<?> context = mock(InstanceIdentifierContext.class);
         final RpcDefinition schemaNode = mock(RpcDefinition.class);
         final QName qname = QName.create("invoke:rpc:module", "2013-12-03", "rpcTest");
-        when(schemaNode.getPath()).thenReturn(SchemaPath.create(true, qname));
         when(schemaNode.getQName()).thenReturn(qname);
         doReturn(schemaNode).when(context).getSchemaNode();
         final NormalizedNode<?, ?> data = mock(NormalizedNode.class);

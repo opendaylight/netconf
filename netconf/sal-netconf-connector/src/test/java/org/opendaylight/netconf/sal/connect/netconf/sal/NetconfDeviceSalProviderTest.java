@@ -19,9 +19,10 @@ import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 import java.net.InetSocketAddress;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.TransactionChainListener;
@@ -30,10 +31,9 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceSalProviderTest {
 
-    @Mock
-    private DOMMountPointService mountpointService;
     @Mock
     private WriteTransaction tx;
     @Mock
@@ -49,7 +49,6 @@ public class NetconfDeviceSalProviderTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         doReturn(chain).when(dataBroker).createTransactionChain(any(TransactionChainListener.class));
         doReturn(writeTx).when(chain).newWriteOnlyTransaction();
         doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());

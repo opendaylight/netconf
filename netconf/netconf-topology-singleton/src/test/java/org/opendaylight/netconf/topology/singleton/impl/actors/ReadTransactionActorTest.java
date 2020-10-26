@@ -13,10 +13,12 @@ import akka.testkit.TestActorRef;
 import akka.testkit.javadsl.TestKit;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ReadTransactionActorTest extends ReadTransactionActorTestAdapter {
     private static ActorSystem system = ActorSystem.apply();
 
@@ -25,7 +27,6 @@ public class ReadTransactionActorTest extends ReadTransactionActorTestAdapter {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         init(mockReadTx, system, TestActorRef.create(system, ReadTransactionActor.props(mockReadTx)));
     }
 

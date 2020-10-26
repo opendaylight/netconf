@@ -32,7 +32,8 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.mockito.MockitoAnnotations;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
@@ -57,6 +58,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public abstract class AbstractNetconfOperationTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfOperationTest.class);
     protected static final String SESSION_ID_FOR_REPORTING = "netconf-test-session1";
@@ -81,9 +83,7 @@ public abstract class AbstractNetconfOperationTest {
     }
 
     @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
+    public void setUp() {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 

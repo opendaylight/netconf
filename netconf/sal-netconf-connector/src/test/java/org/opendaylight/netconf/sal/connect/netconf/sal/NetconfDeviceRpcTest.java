@@ -24,9 +24,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
@@ -52,6 +53,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.w3c.dom.Node;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
@@ -76,7 +78,6 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         NetconfMessageTransformer transformer = new NetconfMessageTransformer(
             new EmptyMountPointContext(SCHEMA_CONTEXT), true, BASE_SCHEMAS.getBaseSchema());
         final NetconfMessage reply = new NetconfMessage(XmlUtil.readXmlToDocument(

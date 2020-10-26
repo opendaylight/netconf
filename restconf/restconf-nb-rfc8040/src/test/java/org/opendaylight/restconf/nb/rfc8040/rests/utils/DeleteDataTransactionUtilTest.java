@@ -19,9 +19,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -39,6 +40,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DeleteDataTransactionUtilTest {
     @Mock
     private DOMTransactionChain transactionChain;
@@ -55,7 +57,6 @@ public class DeleteDataTransactionUtilTest {
 
     @Before
     public void init() {
-        MockitoAnnotations.initMocks(this);
         Mockito.when(this.transactionChain.newReadWriteTransaction()).thenReturn(this.readWrite);
         Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());

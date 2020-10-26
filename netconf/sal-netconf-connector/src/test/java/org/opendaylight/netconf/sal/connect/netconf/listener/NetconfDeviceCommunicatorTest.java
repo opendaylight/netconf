@@ -47,9 +47,10 @@ import java.util.concurrent.TimeoutException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -73,6 +74,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceCommunicatorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicatorTest.class);
@@ -87,8 +89,6 @@ public class NetconfDeviceCommunicatorTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         communicator = new NetconfDeviceCommunicator(
                 new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
     }
@@ -228,7 +228,6 @@ public class NetconfDeviceCommunicatorTest {
         verify(mockChannelFuture).addListener(futureListener.capture());
         Future<Void> operationFuture = mock(Future.class);
         doReturn(true).when(operationFuture).isSuccess();
-        doReturn(true).when(operationFuture).isDone();
         futureListener.getValue().operationComplete(operationFuture);
 
         try {
@@ -290,7 +289,6 @@ public class NetconfDeviceCommunicatorTest {
 
         Future<Void> operationFuture = mock(Future.class);
         doReturn(false).when(operationFuture).isSuccess();
-        doReturn(true).when(operationFuture).isDone();
         doReturn(new Exception("mock error")).when(operationFuture).cause();
         futureListener.getValue().operationComplete(operationFuture);
 
@@ -427,7 +425,7 @@ public class NetconfDeviceCommunicatorTest {
             listener.initializeRemoteConnection(new NetconfClientDispatcherImpl(group, group, time), cfg);
 
             verify(reconnectStrategy,
-                    timeout((int) TimeUnit.MINUTES.toMillis(3)).times(101)).scheduleReconnect(any(Throwable.class));
+                    timeout((int) TimeUnit.MINUTES.toMillis(3)).times(87)).scheduleReconnect(any(Throwable.class));
         } finally {
             time.stop();
             group.shutdownGracefully();

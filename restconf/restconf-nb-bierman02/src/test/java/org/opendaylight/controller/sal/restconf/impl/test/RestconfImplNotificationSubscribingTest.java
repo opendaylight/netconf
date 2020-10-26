@@ -23,11 +23,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
@@ -44,6 +44,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfImplNotificationSubscribingTest {
 
     private final String identifier = "data-change-event-subscription/datastore=OPERATIONAL/scope=ONE";
@@ -52,9 +53,6 @@ public class RestconfImplNotificationSubscribingTest {
 
     @Mock
     private BrokerFacade broker;
-
-    @Mock
-    private DOMDataBroker domDataBroker;
 
     @Mock
     private UriInfo uriInfo;
@@ -73,15 +71,11 @@ public class RestconfImplNotificationSubscribingTest {
     }
 
     @Before
-    public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
+    public void setup() {
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
         restconfImpl = RestconfImpl.newInstance(broker, controllerContext);
 
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
-        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
-        Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         Notificator.createListener(path, this.identifier, NotificationOutputType.XML, controllerContext);
     }
 
@@ -215,7 +209,6 @@ public class RestconfImplNotificationSubscribingTest {
     public void onNotifiTest() throws Exception {
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
-        Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, this.identifier, NotificationOutputType.XML,
                 controllerContext);
 
