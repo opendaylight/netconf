@@ -19,8 +19,9 @@ import javax.xml.transform.dom.DOMSource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -42,6 +43,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfRemoteSchemaYangSourceProviderTest {
 
     @Mock
@@ -51,8 +53,6 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Collections.emptySet());
         final FluentFuture<DOMRpcResult> response = FluentFutures.immediateFluentFuture(value);
         doReturn(response).when(service).invokeRpc(any(QName.class), any(ContainerNode.class));

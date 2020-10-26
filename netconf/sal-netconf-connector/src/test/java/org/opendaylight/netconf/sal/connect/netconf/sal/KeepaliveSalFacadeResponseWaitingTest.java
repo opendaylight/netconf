@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.Mockito.after;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps.getSourceNode;
@@ -23,11 +22,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -42,6 +40,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class KeepaliveSalFacadeResponseWaitingTest {
 
     private static final RemoteDeviceId REMOTE_DEVICE_ID =
@@ -58,22 +57,13 @@ public class KeepaliveSalFacadeResponseWaitingTest {
     private DOMRpcService deviceRpc;
 
     @Mock
-    private DOMMountPointService mountPointService;
-
-    @Mock
-    private DataBroker dataBroker;
-
-    @Mock
     private NetconfDeviceCommunicator listener;
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         executorService = Executors.newScheduledThreadPool(2);
 
         underlyingSalFacade = new LocalNetconfSalFacade();
-        doNothing().when(listener).disconnect();
         keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorService, 2L, 10000L);
         keepaliveSalFacade.setListener(listener);
     }
@@ -95,7 +85,6 @@ public class KeepaliveSalFacadeResponseWaitingTest {
 
         //This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
         final SettableFuture<DOMRpcResult> keepaliveSettableFuture = SettableFuture.create();
-        doReturn(keepaliveSettableFuture).when(deviceRpc).invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
         final DOMRpcResult keepaliveResult = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
         keepaliveSettableFuture.set(keepaliveResult);

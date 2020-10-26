@@ -21,9 +21,10 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -44,6 +45,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfEventSourceMountTest extends AbstractCodecTest {
     public static final String STREAM_1 = "stream-1";
     public static final String STREAM_2 = "stream-2";
@@ -61,8 +63,7 @@ public class NetconfEventSourceMountTest extends AbstractCodecTest {
     private NetconfEventSourceMount mount;
 
     @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+    public void setUp() {
         doReturn(Optional.of(dataBroker)).when(domMountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(domMountPoint).getService(DOMRpcService.class);
         doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPoint)

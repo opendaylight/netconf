@@ -16,14 +16,16 @@ import java.net.URI;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceNotificationServiceTest {
 
     @Mock
@@ -41,7 +43,6 @@ public class NetconfDeviceNotificationServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         final Absolute path1 = Absolute.of(QName.create(new URI("namespace1"), "path1"));
         final Absolute path2 = Absolute.of(QName.create(new URI("namespace2"), "path2"));
         service = new NetconfDeviceNotificationService();

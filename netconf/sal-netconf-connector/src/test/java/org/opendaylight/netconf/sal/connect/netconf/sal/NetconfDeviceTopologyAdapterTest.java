@@ -23,8 +23,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.Transaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
@@ -50,6 +51,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceTopologyAdapterTest {
     private static BindingRuntimeContext RUNTIME_CONTEXT;
 
@@ -59,12 +61,8 @@ public class NetconfDeviceTopologyAdapterTest {
     private WriteTransaction writeTx;
     @Mock
     private TransactionChain txChain;
-    @Mock
-    private NetconfNode data;
 
     private final String txIdent = "test transaction";
-
-    private final String sessionIdForReporting = "netconf-test-session1";
 
     private TransactionChain transactionChain;
 
@@ -84,12 +82,11 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
         doNothing().when(writeTx)
-                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
+                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
         doNothing().when(writeTx)
-                .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
+                .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetworkTopology.class));
 
         doReturn(txIdent).when(writeTx).getIdentifier();
 

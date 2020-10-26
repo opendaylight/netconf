@@ -15,15 +15,17 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class TxChainTest {
 
     @Mock
@@ -49,7 +51,6 @@ public class TxChainTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         when(broker.newReadOnlyTransaction()).thenReturn(readOnlyTx);
         when(broker.newWriteOnlyTransaction()).thenReturn(writeOnlyTx1)
                 .thenReturn(writeOnlyTx2).thenReturn(writeOnlyTx3);

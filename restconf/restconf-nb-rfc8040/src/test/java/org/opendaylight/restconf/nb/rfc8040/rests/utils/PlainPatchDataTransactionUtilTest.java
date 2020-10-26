@@ -8,17 +8,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -47,6 +46,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PlainPatchDataTransactionUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
     @Mock
@@ -74,7 +74,6 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         this.schema = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
         final QName qnJukebox = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
@@ -166,12 +165,6 @@ public class PlainPatchDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.jukeboxContainerWithPlayer);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
-        doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidJukebox);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
@@ -193,12 +186,6 @@ public class PlainPatchDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.leafGap);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
-        doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidGap);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
@@ -220,12 +207,6 @@ public class PlainPatchDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.jukeboxContainerWithPlaylist);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
-        doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(immediateFalseFluentFuture())
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidJukebox);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 

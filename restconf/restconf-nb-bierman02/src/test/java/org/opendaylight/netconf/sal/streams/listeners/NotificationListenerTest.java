@@ -25,7 +25,8 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -49,6 +50,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NotificationListenerTest {
     private static final QNameModule MODULE = QNameModule.create(URI.create("notifi:mod"), Revision.of("2016-11-23"));
 
@@ -62,8 +64,7 @@ public class NotificationListenerTest {
     }
 
     @Before
-    public void init() throws Exception {
-        MockitoAnnotations.initMocks(this);
+    public void init() {
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
     }
 
@@ -202,7 +203,6 @@ public class NotificationListenerTest {
     private static MapNode mockList(final QName listQName, final MapEntryNode... entries) {
         final MapNode list = mock(MapNode.class);
         when(list.getIdentifier()).thenReturn(NodeIdentifier.create(listQName));
-        when(list.getNodeType()).thenReturn(listQName);
         when(list.getValue()).thenReturn(Lists.newArrayList(entries));
         return list;
     }
@@ -211,7 +211,6 @@ public class NotificationListenerTest {
                                           final DataContainerChild<? extends PathArgument, ?> child) {
         final ContainerNode cont = mock(ContainerNode.class);
         when(cont.getIdentifier()).thenReturn(NodeIdentifier.create(contQName));
-        when(cont.getNodeType()).thenReturn(contQName);
 
         final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
         childs.add(child);

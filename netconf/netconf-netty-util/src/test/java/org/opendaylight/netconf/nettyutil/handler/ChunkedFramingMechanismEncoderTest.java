@@ -18,9 +18,11 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ChunkedFramingMechanismEncoderTest {
 
     private int chunkSize;
@@ -28,8 +30,7 @@ public class ChunkedFramingMechanismEncoderTest {
     private ChannelHandlerContext ctx;
 
     @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+    public void setUp() {
         chunkSize = 256;
     }
 

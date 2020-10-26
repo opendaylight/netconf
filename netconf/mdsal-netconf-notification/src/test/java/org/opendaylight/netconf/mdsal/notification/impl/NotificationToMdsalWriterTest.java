@@ -16,8 +16,9 @@ import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -31,6 +32,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NotificationToMdsalWriterTest {
 
     @Mock
@@ -42,8 +44,7 @@ public class NotificationToMdsalWriterTest {
     private NotificationRegistration notificationRegistration;
 
     @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+    public void setUp() {
         final NetconfNotificationCollector notificationCollector = mock(NetconfNotificationCollector.class);
 
         doReturn(notificationRegistration).when(notificationCollector).registerStreamListener(any(
