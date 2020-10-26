@@ -17,9 +17,10 @@ import java.net.InetSocketAddress;
 import javax.xml.transform.dom.DOMSource;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
@@ -36,6 +37,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemalessNetconfDeviceRpcTest.class);
@@ -47,7 +49,6 @@ public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         RpcResult<NetconfMessage> msg = null;
         ListenableFuture<RpcResult<NetconfMessage>> future = Futures.immediateFuture(msg);
         doReturn(future).when(listener).sendRequest(any(), any());

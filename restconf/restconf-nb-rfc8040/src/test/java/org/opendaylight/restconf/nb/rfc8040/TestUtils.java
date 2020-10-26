@@ -10,8 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
@@ -40,11 +38,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.mockito.Mockito;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
@@ -276,12 +271,7 @@ public final class TestUtils {
 
     public static SchemaContextHandler newSchemaContextHandler(final EffectiveModelContext schemaContext) {
         DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
-        DOMTransactionChain mockChain = mock(DOMTransactionChain.class);
-        DOMDataTreeWriteTransaction mockTx = mock(DOMDataTreeWriteTransaction.class);
-        doReturn(CommitInfo.emptyFluentFuture()).when(mockTx).commit();
-        doReturn(mockTx).when(mockChain).newWriteOnlyTransaction();
 
-        doReturn(mockChain).when(mockDataBroker).createTransactionChain(any());
         SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
                 new TransactionChainHandler(mockDataBroker), Mockito.mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(schemaContext);

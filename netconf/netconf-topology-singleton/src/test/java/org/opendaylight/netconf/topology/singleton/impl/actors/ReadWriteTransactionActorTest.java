@@ -14,11 +14,13 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import scala.concurrent.duration.Duration;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ReadWriteTransactionActorTest {
     private static ActorSystem system = ActorSystem.apply();
 
@@ -30,7 +32,6 @@ public class ReadWriteTransactionActorTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         TestActorRef<?> actorRef = TestActorRef.create(system, ReadWriteTransactionActor.props(mockReadWriteTx,
                 Duration.apply(2, TimeUnit.SECONDS)));
         readTestAdapter.init(mockReadWriteTx, system, actorRef);

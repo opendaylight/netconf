@@ -20,10 +20,12 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Promise;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfSession;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AbstractChannelInitializerTest {
 
     @Mock
@@ -35,7 +37,6 @@ public class AbstractChannelInitializerTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         doReturn(pipeline).when(channel).pipeline();
         doReturn(pipeline).when(pipeline).addLast(anyString(), any(ChannelHandler.class));
     }

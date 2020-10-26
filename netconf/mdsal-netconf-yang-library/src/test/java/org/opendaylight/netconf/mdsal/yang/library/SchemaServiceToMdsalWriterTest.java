@@ -18,8 +18,9 @@ import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -41,6 +42,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SchemaServiceToMdsalWriterTest {
 
     private static final InstanceIdentifier<ModulesState> MODULES_STATE_INSTANCE_IDENTIFIER =
@@ -57,8 +59,6 @@ public class SchemaServiceToMdsalWriterTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
         doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();

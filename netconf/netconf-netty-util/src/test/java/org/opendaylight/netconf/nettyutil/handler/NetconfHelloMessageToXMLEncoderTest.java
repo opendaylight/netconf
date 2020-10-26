@@ -14,24 +14,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfHelloMessageToXMLEncoderTest {
 
     @Mock
     private ChannelHandlerContext ctx;
-
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void testEncode() throws Exception {

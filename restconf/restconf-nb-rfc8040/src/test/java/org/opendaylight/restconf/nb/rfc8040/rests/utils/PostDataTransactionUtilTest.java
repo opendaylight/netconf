@@ -29,9 +29,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -60,6 +61,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PostDataTransactionUtilTest {
 
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
@@ -86,7 +88,6 @@ public class PostDataTransactionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         this.schema =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
@@ -138,7 +139,6 @@ public class PostDataTransactionUtilTest {
 
         doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/16/")).when(this.uriInfo).getBaseUriBuilder();
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
@@ -157,8 +157,7 @@ public class PostDataTransactionUtilTest {
                 ((ContainerNode) ((Collection<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
@@ -184,12 +183,13 @@ public class PostDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildList);
 
         final MapNode data = (MapNode) payload.getData();
-        final NodeIdentifierWithPredicates identifier = data.getValue().iterator().next().getIdentifier();
+        final MapEntryNode entryNode = data.getValue().iterator().next();
+        final NodeIdentifierWithPredicates identifier = entryNode.getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(node);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
 
@@ -199,7 +199,7 @@ public class PostDataTransactionUtilTest {
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next());
+        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
 
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,
                 new NetconfRestconfStrategy(netconfService), this.schema, null, null);
@@ -207,7 +207,7 @@ public class PostDataTransactionUtilTest {
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
                 containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
         verify(this.netconfService).getConfig(node);
-        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next(),
+        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, node, entryNode,
                 Optional.empty());
     }
 
@@ -224,9 +224,7 @@ public class PostDataTransactionUtilTest {
                 ((ContainerNode) ((Collection<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(node);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
         final DOMException domException = new DOMException((short) 414, "Post request failed");
         doReturn(immediateFailedFluentFuture(domException)).when(this.readWrite).commit();
         doReturn(immediateFailedFluentFuture(domException)).when(this.netconfService).commit(Mockito.any());

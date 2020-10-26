@@ -20,8 +20,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -40,6 +41,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfKeystoreAdapterTest {
     private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
     private static final String XML_ELEMENT_NAME = "name";
@@ -55,8 +57,6 @@ public class NetconfKeystoreAdapterTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(
                 any(DataTreeIdentifier.class), any(NetconfKeystoreAdapter.class));
     }

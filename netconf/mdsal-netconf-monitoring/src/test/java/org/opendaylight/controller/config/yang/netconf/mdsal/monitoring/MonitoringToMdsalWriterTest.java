@@ -19,9 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -37,6 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class MonitoringToMdsalWriterTest {
 
     private static final InstanceIdentifier<NetconfState> INSTANCE_IDENTIFIER =
@@ -52,9 +54,7 @@ public class MonitoringToMdsalWriterTest {
     private MonitoringToMdsalWriter writer;
 
     @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
+    public void setUp() {
         doReturn(null).when(monitoring).registerCapabilitiesListener(any());
         doReturn(null).when(monitoring).registerSessionsListener(any());
 

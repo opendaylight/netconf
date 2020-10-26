@@ -20,8 +20,9 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -45,6 +46,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfSalKeystoreServiceTest {
     private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
     private static final String XML_ELEMENT_NAME = "name";
@@ -62,7 +64,6 @@ public class NetconfSalKeystoreServiceTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(writeTx)
             .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
