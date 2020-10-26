@@ -14,7 +14,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -36,6 +37,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CreateStreamUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/streams";
 
@@ -44,7 +46,6 @@ public class CreateStreamUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         this.refSchemaCtx =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
     }

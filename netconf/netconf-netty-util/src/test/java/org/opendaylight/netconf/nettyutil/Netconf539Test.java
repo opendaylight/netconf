@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
@@ -21,8 +19,9 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -36,6 +35,7 @@ import org.opendaylight.netconf.util.messages.FramingMechanism;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class Netconf539Test {
     @Mock
     private NetconfSessionListener<TestingNetconfSession> listener;
@@ -44,11 +44,9 @@ public class Netconf539Test {
 
     private EmbeddedChannel channel;
     private AbstractNetconfSessionNegotiator negotiator;
-    private NetconfSessionPreferences prefs;
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         channel = new EmbeddedChannel();
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
             new ChannelInboundHandlerAdapter());
@@ -59,8 +57,6 @@ public class Netconf539Test {
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         final NetconfHelloMessage serverHello = NetconfHelloMessage.createClientHello(Collections
             .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
-        doReturn(promise).when(promise).setFailure(any());
-        doReturn(promise).when(promise).setSuccess(any());
         negotiator = new TestSessionNegotiator(new NetconfSessionPreferences(serverHello), promise, channel,
             new HashedWheelTimer(), listener, 100L);
     }

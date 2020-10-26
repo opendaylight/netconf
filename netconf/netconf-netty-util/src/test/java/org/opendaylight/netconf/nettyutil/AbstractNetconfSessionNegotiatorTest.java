@@ -37,9 +37,10 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -53,6 +54,7 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.util.messages.FramingMechanism;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AbstractNetconfSessionNegotiatorTest {
 
     @Mock
@@ -70,7 +72,6 @@ public class AbstractNetconfSessionNegotiatorTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         channel = new EmbeddedChannel();
         xmlToHello = new NetconfXMLToHelloMessageDecoder();
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
@@ -84,7 +85,6 @@ public class AbstractNetconfSessionNegotiatorTest {
                 .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
         prefs = new NetconfSessionPreferences(helloBase11);
         doReturn(promise).when(promise).setFailure(any());
-        doReturn(promise).when(promise).setSuccess(any());
         negotiator = new TestSessionNegotiator(prefs, promise, channel, new HashedWheelTimer(), listener, 100L);
     }
 

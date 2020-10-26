@@ -17,9 +17,10 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -50,6 +51,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PutDataTransactionUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
     @Mock
@@ -80,7 +82,6 @@ public class PutDataTransactionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         this.schema =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
@@ -218,8 +219,6 @@ public class PutDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
-        doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -274,8 +273,6 @@ public class PutDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
-        doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -330,8 +327,6 @@ public class PutDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
-        doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,

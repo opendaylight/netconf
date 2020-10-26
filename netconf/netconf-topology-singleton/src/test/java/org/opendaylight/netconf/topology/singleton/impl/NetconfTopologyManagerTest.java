@@ -19,7 +19,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.DELETE;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
@@ -38,8 +37,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -83,6 +84,7 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.valueOf(10);
     private static final String TOPOLOGY_ID = "topologyID";
@@ -102,8 +104,6 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
-
         AbstractDataBrokerTest dataBrokerTest = new AbstractDataBrokerTest() {
             @Override
             protected Set<YangModuleInfo> getModuleInfos() throws Exception {
@@ -255,11 +255,9 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(updatedNetconfNode1).build();
 
         doReturn(WRITE).when(dataObjectModification1).getModificationType();
-        doReturn(node1).when(dataObjectModification1).getDataBefore();
         doReturn(updatedNode1).when(dataObjectModification1).getDataAfter();
 
         doReturn(SUBTREE_MODIFIED).when(dataObjectModification2).getModificationType();
-        doReturn(node2).when(dataObjectModification2).getDataBefore();
         doReturn(node2).when(dataObjectModification2).getDataAfter();
 
         doNothing().when(mockContext1).refresh(any());
@@ -282,8 +280,6 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         // Notify of Node 1 deleted.
 
         doReturn(DELETE).when(dataObjectModification1).getModificationType();
-        doReturn(updatedNode1).when(dataObjectModification1).getDataBefore();
-        doReturn(null).when(dataObjectModification1).getDataAfter();
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
                 new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
@@ -305,7 +301,6 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 .when(clusterSingletonServiceProvider).registerClusterSingletonService(newMockContext1);
 
         doReturn(WRITE).when(dataObjectModification1).getModificationType();
-        doReturn(null).when(dataObjectModification1).getDataBefore();
         doReturn(node1).when(dataObjectModification1).getDataAfter();
 
         mockContextMap.put(nodeInstanceId1, setup -> {

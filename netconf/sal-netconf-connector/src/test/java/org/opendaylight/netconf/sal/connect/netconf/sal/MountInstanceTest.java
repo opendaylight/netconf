@@ -17,8 +17,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -36,6 +37,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class MountInstanceTest {
     private static final Logger LOG = LoggerFactory.getLogger(MountInstanceTest.class);
 
@@ -67,7 +69,6 @@ public class MountInstanceTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         when(service.createMountPoint(any(YangInstanceIdentifier.class))).thenReturn(mountPointBuilder);
 
         when(mountPointBuilder.register()).thenReturn(registration);

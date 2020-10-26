@@ -18,13 +18,15 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.util.NodeContainerProxy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NodeContainerProxyTest {
 
     private static final QName QNAME = QName.create("ns", "2016-10-19", "name");
@@ -42,7 +44,6 @@ public class NodeContainerProxyTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         final Map<QName, DataSchemaNode> childNodes = new HashMap<>();
         childNodes.put(NODE_1_QNAME, schemaNode1);
         childNodes.put(NODE_2_QNAME, schemaNode2);

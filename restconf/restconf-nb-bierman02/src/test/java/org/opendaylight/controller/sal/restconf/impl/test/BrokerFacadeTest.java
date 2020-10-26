@@ -36,10 +36,11 @@ import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -54,6 +55,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -87,6 +89,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
  *
  * @author Thomas Pantelis
  */
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class BrokerFacadeTest {
 
     @Mock
@@ -113,15 +116,12 @@ public class BrokerFacadeTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         controllerContext = TestRestconfUtils.newControllerContext(
                 TestUtils.loadSchemaContext("/full-versions/test-module", "/modules"));
 
         brokerFacade = BrokerFacade.newInstance(mockRpcService, domDataBroker, domNotification, controllerContext);
 
         when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.readTransaction);
-        when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.writeTransaction);
         when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
         when(this.domDataBroker.getExtensions()).thenReturn(ImmutableClassToInstanceMap.of(
             DOMDataTreeChangeService.class, Mockito.mock(DOMDataTreeChangeService.class)));
@@ -357,8 +357,6 @@ public class BrokerFacadeTest {
 
         final DOMTransactionChain transactionChain = mock(DOMTransactionChain.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
-        when(transactionChain.newWriteOnlyTransaction()).thenReturn(wTx);
         // close and remove test notification listener
         listener.close();
         Notificator.removeListenerIfNoSubscriberExists(listener);
@@ -403,6 +401,7 @@ public class BrokerFacadeTest {
         // return mount point with broker
         when(identifierContext.getMountPoint()).thenReturn(mountPoint);
         when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.of(mountDataBroker));
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.empty());
         when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
         doReturn(CommitInfo.emptyFluentFuture()).when(transaction).commit();
 
@@ -424,15 +423,13 @@ public class BrokerFacadeTest {
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeReadWriteTransaction transaction = mock(DOMDataTreeReadWriteTransaction.class);
 
-        when(patchContext.getData()).thenReturn(new ArrayList<>());
         doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
         when(identifierContext.getMountPoint()).thenReturn(mountPoint);
 
         // missing broker on mounted device
         when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.empty());
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.empty());
 
-        when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
-        doReturn(CommitInfo.emptyFluentFuture()).when(transaction).commit();
 
         final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 

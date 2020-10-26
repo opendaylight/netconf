@@ -13,11 +13,13 @@ import akka.testkit.javadsl.TestKit;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import scala.concurrent.duration.Duration;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class WriteTransactionActorTest extends WriteTransactionActorTestAdapter {
     private static ActorSystem system = ActorSystem.apply();
 
@@ -26,7 +28,6 @@ public class WriteTransactionActorTest extends WriteTransactionActorTestAdapter 
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         init(mockWriteTx, system, TestActorRef.create(system,
                 WriteTransactionActor.props(mockWriteTx, Duration.apply(2, TimeUnit.SECONDS))));
     }
