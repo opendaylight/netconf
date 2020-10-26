@@ -37,9 +37,11 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -47,7 +49,6 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -59,6 +60,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
@@ -91,6 +93,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  *
  * @author Thomas Pantelis
  */
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class JSONRestconfServiceRfc8040ImplTest {
     static final String IETF_INTERFACES_NS = "urn:ietf:params:xml:ns:yang:ietf-interfaces";
     static final String IETF_INTERFACES_VERSION = "2013-07-04";
@@ -131,9 +134,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private DOMDataTreeReadTransaction mockReadOnlyTx;
 
     @Mock
-    private DOMDataTreeWriteTransaction mockWriteTx;
-
-    @Mock
     private DOMMountPointService mockMountPointService;
 
     @Mock
@@ -153,7 +153,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     private JSONRestconfServiceRfc8040Impl service;
 
-    private final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
+    private final SchemaContextHandler schemaContextHandler = newSchemaContextHandler();
 
     @BeforeClass
     public static void init() throws IOException {
@@ -162,32 +162,20 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     @SuppressWarnings("resource")
     @Before
-    public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
+    public void setup() {
         doReturn(ImmutableClassToInstanceMap.of()).when(domSchemaService).getExtensions();
 
         doReturn(immediateFluentFuture(Optional.empty())).when(mockReadOnlyTx).read(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
-        doNothing().when(mockWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
-                any(NormalizedNode.class));
-        doNothing().when(mockWriteTx).merge(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
-                any(NormalizedNode.class));
-        doNothing().when(mockWriteTx).delete(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
-        doReturn(CommitInfo.emptyFluentFuture()).when(mockWriteTx).commit();
-
         doNothing().when(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class));
         doReturn(CommitInfo.emptyFluentFuture()).when(mockReadWriteTx).commit();
-        doReturn(immediateFluentFuture(Optional.empty())).when(mockReadWriteTx).read(
-                eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
         doReturn(immediateFalseFluentFuture()).when(mockReadWriteTx).exists(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         doReturn(mockReadOnlyTx).when(mockTxChain).newReadOnlyTransaction();
         doReturn(mockReadWriteTx).when(mockTxChain).newReadWriteTransaction();
-        doReturn(mockWriteTx).when(mockTxChain).newWriteOnlyTransaction();
 
         doReturn(mockTxChain).when(mockDOMDataBroker).createTransactionChain(any());
 
@@ -567,6 +555,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
             .getService(DOMSchemaService.class);
 
         doReturn(Optional.of(mockDOMDataBroker)).when(mockMountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.empty()).when(mockMountPoint).getService(NetconfDataTreeService.class);
 
         doReturn(Optional.of(mockMountPoint)).when(mockMountPointService).getMountPoint(notNull());
 
@@ -603,6 +592,13 @@ public class JSONRestconfServiceRfc8040ImplTest {
             assertEquals(String.format("Path arg %d node type", index + 1), expNodeType, actual.getNodeType());
             index++;
         }
+    }
 
+    private static SchemaContextHandler newSchemaContextHandler() {
+        DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
+        SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
+            new TransactionChainHandler(mockDataBroker), Mockito.mock(DOMSchemaService.class));
+        schemaContextHandler.onModelContextUpdated(schemaContext);
+        return schemaContextHandler;
     }
 }

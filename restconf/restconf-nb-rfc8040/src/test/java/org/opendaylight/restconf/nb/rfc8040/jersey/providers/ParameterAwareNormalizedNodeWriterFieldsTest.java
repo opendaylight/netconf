@@ -18,10 +18,11 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -38,6 +39,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 /**
  * Unit test for {@link ParameterAwareNormalizedNodeWriter} used with fields parameter.
  */
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ParameterAwareNormalizedNodeWriterFieldsTest {
 
     @Mock
@@ -71,8 +73,6 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         // identifiers
         containerNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "container"));
         Mockito.when(containerNodeData.getIdentifier()).thenReturn(containerNodeIdentifier);
@@ -80,14 +80,11 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
 
         mapNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "list"));
         Mockito.when(mapNodeData.getIdentifier()).thenReturn(mapNodeIdentifier);
-        Mockito.when(mapNodeData.getNodeType()).thenReturn(mapNodeIdentifier.getNodeType());
 
         final QName leafSetEntryNodeQName = QName.create("namespace", "leaf-set-entry");
         leafSetEntryNodeValue = "leaf-set-value";
         leafSetEntryNodeIdentifier = new NodeWithValue<>(leafSetEntryNodeQName, leafSetEntryNodeValue);
         Mockito.when(leafSetEntryNodeData.getIdentifier()).thenReturn(leafSetEntryNodeIdentifier);
-        Mockito.when(leafSetEntryNodeData.getNodeType()).thenReturn(leafSetEntryNodeIdentifier.getNodeType());
-        Mockito.when(leafSetEntryNodeData.getNodeType()).thenReturn(leafSetEntryNodeQName);
 
         leafSetNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "leaf-set"));
         Mockito.when(leafSetNodeData.getIdentifier()).thenReturn(leafSetNodeIdentifier);
@@ -100,7 +97,6 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
         mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
                 QName.create("namespace", "list-entry"), mapEntryNodeKey, keyLeafNodeValue);
         Mockito.when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
-        Mockito.when(mapEntryNodeData.getNodeType()).thenReturn(mapEntryNodeIdentifier.getNodeType());
         Mockito.when(mapEntryNodeData.getChild(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
 
         Mockito.when(keyLeafNodeData.getValue()).thenReturn(keyLeafNodeValue);

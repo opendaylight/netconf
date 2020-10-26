@@ -22,9 +22,10 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.messagebus.app.util.TopicDOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
@@ -52,6 +53,7 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfEventSourceTest {
     private static final Absolute NOTIFICATION_1_PATH = Absolute.of(QName.create("ns1", "1970-01-15", "not1"));
     private static final Absolute NOTIFICATION_2_PATH = Absolute.of(QName.create("ns2", "1980-02-18", "not2"));
@@ -69,7 +71,6 @@ public class NetconfEventSourceTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         //init notification mocks
         doReturn(NOTIFICATION_1_PATH).when(matchnigNotification).getType();
         doReturn(NOTIFICATION_2_PATH).when(nonMachtingNotification).getType();
@@ -89,7 +90,6 @@ public class NetconfEventSourceTest {
         streams.add(createStream("stream-2"));
         doReturn(streams).when(mount).getAvailableStreams();
         doReturn(schemaContext).when(mount).getSchemaContext();
-        doReturn(FluentFutures.immediateNullFluentFuture()).when(mount).invokeCreateSubscription(any(), any());
         doReturn(FluentFutures.immediateNullFluentFuture()).when(mount).invokeCreateSubscription(any());
         doReturn(mock(ListenerRegistration.class)).when(mount).registerNotificationListener(any(), any());
         final Node nodeId1 = NetconfTestUtils.getNetconfNode("NodeId1", "node.test.local", ConnectionStatus

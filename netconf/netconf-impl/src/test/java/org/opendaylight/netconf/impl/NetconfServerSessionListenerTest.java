@@ -22,9 +22,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
@@ -35,6 +36,7 @@ import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.w3c.dom.Document;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfServerSessionListenerTest {
 
     @Mock
@@ -56,7 +58,6 @@ public class NetconfServerSessionListenerTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         doReturn(monitoringListener).when(monitoring).getSessionListener();
         doNothing().when(monitoringListener).onSessionUp(any());
         doNothing().when(monitoringListener).onSessionDown(any());

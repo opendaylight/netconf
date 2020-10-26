@@ -11,34 +11,28 @@ package org.opendaylight.netconf.console.commands;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfCommandsImplCallsTest {
 
     @Mock
     private NetconfCommands netconfCommands;
-
-    @Before
-    public void setUp() {
-        initMocks(this);
-    }
 
     @Test
     public void testConnectDeviceCommand() throws Exception {
@@ -51,7 +45,6 @@ public class NetconfCommandsImplCallsTest {
             "pass");
 
         netconfConnectDeviceCommand.execute();
-        doNothing().when(netconfCommands).connectDevice(any(), any());
         verify(netconfCommands, times(1)).connectDevice(any(), any());
     }
 
@@ -119,7 +112,7 @@ public class NetconfCommandsImplCallsTest {
 
         final ArgumentCaptor<HashMap> hashMapArgumentCaptor = ArgumentCaptor.forClass(HashMap.class);
 
-        doReturn("").when(netconfCommands).updateDevice(anyString(), anyString(), anyString(), any());
+        doReturn("").when(netconfCommands).updateDevice(isNull(), isNull(), isNull(), any(HashMap.class));
 
         netconfUpdateDeviceCommand.execute();
 

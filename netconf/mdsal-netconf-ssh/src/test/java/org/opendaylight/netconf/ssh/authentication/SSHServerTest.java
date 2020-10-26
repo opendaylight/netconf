@@ -7,11 +7,6 @@
  */
 package org.opendaylight.netconf.ssh.authentication;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.File;
@@ -23,8 +18,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
@@ -34,11 +30,10 @@ import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.util.NetconfConfiguration;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SSHServerTest {
     private static final String USER = "netconf";
     private static final String PASSWORD = "netconf";
@@ -59,11 +54,6 @@ public class SSHServerTest {
     public void setUp() throws Exception {
         sshKeyPair = Files.createTempFile("sshKeyPair", ".pem").toFile();
         sshKeyPair.deleteOnExit();
-
-        MockitoAnnotations.initMocks(this);
-        doReturn(null).when(mockedContext).createFilter(anyString());
-        doNothing().when(mockedContext).addServiceListener(any(ServiceListener.class), anyString());
-        doReturn(new ServiceReference[0]).when(mockedContext).getServiceReferences(anyString(), anyString());
 
         LOG.info("Creating SSH server");
 

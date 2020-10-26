@@ -18,14 +18,15 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 
-
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AggregatedNetconfOperationServiceFactoryTest {
 
     private final Set<Capability> factory1Caps = new HashSet<>();
@@ -52,7 +53,6 @@ public class AggregatedNetconfOperationServiceFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         factory1Caps.add(new BasicCapability("AAA"));
         factory1Caps.add(new BasicCapability("BBB"));
 

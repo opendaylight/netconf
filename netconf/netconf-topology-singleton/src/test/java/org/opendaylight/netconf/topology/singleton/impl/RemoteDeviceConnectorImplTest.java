@@ -10,15 +10,9 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
@@ -29,13 +23,12 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ScheduledExecutorService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
-import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
@@ -67,6 +60,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 import scala.concurrent.duration.Duration;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
 
     private static final NodeId NODE_ID = new NodeId("testing-node");
@@ -98,9 +92,6 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
     private NetconfClientDispatcher clientDispatcher;
 
     @Mock
-    private DOMMountPointService mountPointService;
-
-    @Mock
     private TransactionChain txChain;
 
     @Mock
@@ -114,16 +105,9 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
-
         remoteDeviceId = new RemoteDeviceId(TOPOLOGY_ID,
                 new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
-        doReturn(txChain).when(dataBroker).createTransactionChain(any(TransactionChainListener.class));
-        doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
-        doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
-        doReturn("Some object").when(writeTx).getIdentifier();
-        doReturn(emptyFluentFuture()).when(writeTx).commit();
         builder = new NetconfTopologySetup.NetconfTopologySetupBuilder()
                 .setBaseSchemas(BASE_SCHEMAS)
                 .setDataBroker(dataBroker)

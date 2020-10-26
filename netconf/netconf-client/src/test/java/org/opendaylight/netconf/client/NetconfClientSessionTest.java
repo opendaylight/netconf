@@ -18,16 +18,17 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import java.util.Collection;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfClientSessionTest {
 
     @Mock
@@ -35,11 +36,6 @@ public class NetconfClientSessionTest {
 
     @Mock
     Channel channel;
-
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void testNetconfClientSession() throws Exception {
@@ -52,7 +48,6 @@ public class NetconfClientSessionTest {
 
         Mockito.doReturn(pipeline).when(channel).pipeline();
         Mockito.doReturn(channelHandler).when(pipeline).replace(anyString(), anyString(), any(ChannelHandler.class));
-        Mockito.doReturn("").when(channelHandler).toString();
 
         final NetconfClientSession session = new NetconfClientSession(sessionListener, channel, sessId, caps);
         final NetconfMessageToEXIEncoder exiEncoder = NetconfMessageToEXIEncoder.create(codec);

@@ -16,14 +16,15 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -36,6 +37,7 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceSalFacadeTest {
 
     private NetconfDeviceSalFacade deviceFacade;
@@ -51,7 +53,6 @@ public class NetconfDeviceSalFacadeTest {
 
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
         final InetSocketAddress address = new InetSocketAddress("127.0.0.1", 8000);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test", address);
 
