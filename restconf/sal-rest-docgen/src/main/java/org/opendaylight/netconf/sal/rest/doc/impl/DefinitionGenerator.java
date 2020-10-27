@@ -833,8 +833,14 @@ public class DefinitionGenerator {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
             String regex = pattern.getJavaPatternString();
             regex = regex.substring(1, regex.length() - 1);
-            final Generex generex = new Generex(regex);
-            setDefaultValue(property, generex.random());
+            String defaultValue = "";
+            try {
+                final Generex generex = new Generex(regex);
+                defaultValue = generex.random();
+            } catch (IllegalArgumentException ex) {
+                LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
+            }
+            setDefaultValue(property, defaultValue);
         } else {
             setDefaultValue(property, "Some " + nodeName);
         }
