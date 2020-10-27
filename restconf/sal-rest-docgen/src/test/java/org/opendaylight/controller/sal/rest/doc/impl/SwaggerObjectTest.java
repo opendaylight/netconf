@@ -54,4 +54,18 @@ public class SwaggerObjectTest {
         }
     }
 
+    @Test
+    public void testStringTypes() throws Exception {
+        Preconditions.checkArgument(this.helper.getModules() != null, "No modules found");
+        Module strTypes = this.helper.getModules().stream()
+                .filter(module -> module.getName().equals("string-types"))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("String types module not found"));
+
+        final DefinitionGenerator generator = new DefinitionGenerator();
+        final ObjectNode jsonObject = generator.convertToJsonSchema(strTypes, this.schemaContext, new DefinitionNames(),
+                ApiDocServiceImpl.OAversion.V2_0, true);
+
+        Assert.assertNotNull(jsonObject);
+    }
 }
