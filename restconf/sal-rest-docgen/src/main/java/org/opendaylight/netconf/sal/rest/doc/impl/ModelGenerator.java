@@ -611,8 +611,13 @@ public class ModelGenerator {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
             String regex = pattern.getJavaPatternString();
             regex = regex.substring(1, regex.length() - 1);
-            final Generex generex = new Generex(regex);
-            return generex.random();
+            try {
+                final Generex generex = new Generex(regex);
+                return generex.random();
+            } catch (IllegalArgumentException ex) {
+                LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
+                return "";
+            }
         } else {
             return "Some " + nodeName;
         }
