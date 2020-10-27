@@ -10,7 +10,6 @@ package org.opendaylight.netconf.mdsal.notification.impl;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
@@ -49,7 +48,7 @@ public class NetconfNotificationOperationServiceFactory implements NetconfOperat
 
     @Override
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        return NoopAutoCloseable.INSTANCE;
+        return () -> { };
     }
 
     @Override
