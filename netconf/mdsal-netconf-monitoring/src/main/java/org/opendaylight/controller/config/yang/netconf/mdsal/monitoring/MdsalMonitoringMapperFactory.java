@@ -9,7 +9,6 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
@@ -62,7 +61,7 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
 
     @Override
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        return NoopAutoCloseable.INSTANCE;
+        return () -> {};
     }
 
     /**
