@@ -51,4 +51,18 @@ public class ModelGeneratorTest {
         }
 
     }
+
+    @Test
+    public void testStringTypes() throws Exception {
+        Preconditions.checkArgument(this.helper.getModules() != null, "No modules found");
+        Module strTypes = this.helper.getModules().stream()
+                .filter(module -> module.getName().equals("string-types"))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("String types module not found"));
+
+        final ModelGenerator generator = new ModelGenerator();
+        final ObjectNode jsonObject = generator.convertToJsonSchema(strTypes, this.schemaContext);
+
+        Assert.assertNotNull(jsonObject);
+    }
 }
