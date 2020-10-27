@@ -94,6 +94,8 @@ public class ModelGenerator {
     private static final String ID_KEY = "id";
     private static final String SUB_TYPES_KEY = "subTypes";
     private static final String UNIQUE_EMPTY_IDENTIFIER = "unique_empty_identifier";
+    private static final String IS_LATIN = "\\p{InBasicLatin}";
+    private static final String IS_LATIN_REPLACE = "[\\x00-\\x7F]";
 
     private Module topLevelModule;
 
@@ -611,11 +613,20 @@ public class ModelGenerator {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
             String regex = pattern.getJavaPatternString();
             regex = regex.substring(1, regex.length() - 1);
-            final Generex generex = new Generex(regex);
-            return generex.random();
+            try {
+                final Generex generex = new Generex(replaceLatinRegexPattern(regex));
+                return generex.random();
+            } catch (IllegalArgumentException ex) {
+                LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
+                return "";
+            }
         } else {
             return "Some " + nodeName;
         }
+    }
+
+    private static String replaceLatinRegexPattern(String regex) {
+        return regex.replace(IS_LATIN, IS_LATIN_REPLACE);
     }
 
     private String processUnionType(final UnionTypeDefinition unionType, final ObjectNode property,
