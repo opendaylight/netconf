@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3332061e_9315553a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/MountPointManagerService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-10-28T13:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d4b80b9_d67166da",
+      "revId": "a6c52d2147df258912b76b07c0d9576e508115a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5bececcb_47804267",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/MountPointManagerService.java",
         "patchSetId": 1
@@ -39,6 +57,30 @@
       "revId": "a6c52d2147df258912b76b07c0d9576e508115a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "996f7610_aff6318f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/MountPointManagerService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-10-28T13:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bececcb_47804267",
+      "range": {
+        "startLine": 28,
+        "startChar": 4,
+        "endLine": 28,
+        "endChar": 23
+      },
+      "revId": "a6c52d2147df258912b76b07c0d9576e508115a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -88,6 +130,54 @@
     },
     {
       "key": {
+        "uuid": "98ed4fc9_b88b09fc",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/RemoteDeviceHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-10-28T13:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1444bb23_e01c5f72",
+      "range": {
+        "startLine": 16,
+        "startChar": 17,
+        "endLine": 16,
+        "endChar": 36
+      },
+      "revId": "a6c52d2147df258912b76b07c0d9576e508115a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ad07ea4_0f5879ce",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/RemoteDeviceHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-10-28T13:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55741286_9d3a42af",
+      "range": {
+        "startLine": 16,
+        "startChar": 51,
+        "endLine": 16,
+        "endChar": 77
+      },
+      "revId": "a6c52d2147df258912b76b07c0d9576e508115a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "72c1b10c_9a48add3",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/RemoteDeviceManagerHandler.java",
         "patchSetId": 1
@@ -111,6 +201,30 @@
     },
     {
       "key": {
+        "uuid": "b1e0051b_fc2ab8f2",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/RemoteDeviceManagerHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-10-28T13:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72c1b10c_9a48add3",
+      "range": {
+        "startLine": 18,
+        "startChar": 17,
+        "endLine": 18,
+        "endChar": 43
+      },
+      "revId": "a6c52d2147df258912b76b07c0d9576e508115a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "024d971f_7b5f715a",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
         "patchSetId": 1
@@ -125,6 +239,24 @@
       "revId": "a6c52d2147df258912b76b07c0d9576e508115a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c15952e6_d13f7bf8",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2020-10-28T13:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "024d971f_7b5f715a",
+      "revId": "a6c52d2147df258912b76b07c0d9576e508115a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
