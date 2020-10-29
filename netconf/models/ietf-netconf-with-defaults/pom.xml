@@ -12,13 +12,13 @@
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-parent</artifactId>
-        <version>1.9.1-SNAPSHOT</version>
+        <version>1.9.1</version>
         <relativePath>../../../parent</relativePath>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>ietf-netconf-with-defaults</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.9.1</version>
     <packaging>bundle</packaging>
     <name>${project.artifactId}</name>
 

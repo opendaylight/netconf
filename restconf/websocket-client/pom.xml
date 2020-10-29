@@ -14,12 +14,12 @@
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>restconf-parent</artifactId>
-        <version>1.12.1-SNAPSHOT</version>
+        <version>1.12.1</version>
         <relativePath>../restconf-parent</relativePath>
     </parent>
 
     <artifactId>websocket-client</artifactId>
-    <version>1.12.1-SNAPSHOT</version>
+    <version>1.12.1</version>
     <packaging>jar</packaging>
 
     <dependencies>

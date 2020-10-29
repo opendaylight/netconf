@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-aaa-netconf-plugin</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.9.1</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: AAA :: ODL NETCONF Plugin</name>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-shiro</artifactId>
-            <version>0.12.1-SNAPSHOT</version>
+            <version>0.12.1</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

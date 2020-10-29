@@ -20,7 +20,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-artifacts</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.9.1</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
@@ -115,7 +115,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-netconf-connector</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -323,7 +323,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-netconf-mdsal</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
@@ -462,99 +462,99 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>ietf-restconf</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>ietf-restconf-monitoring</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-common-models</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-common</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-nb-bierman02</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-nb-rfc8040</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-nb-rfc8040</artifactId>
                 <type>cfg</type>
                 <classifier>config</classifier>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-rest-connector-config</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-rest-docgen</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-rest-docgen-maven</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-restconf-broker</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>websocket-client</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
             </dependency>
 
             <!-- restconf features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>features-restconf</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-mdsal-apidocs</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-restconf</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-restconf-all</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-restconf-common</artifactId>
-                <version>1.12.1-SNAPSHOT</version>
+                <version>1.12.1</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
