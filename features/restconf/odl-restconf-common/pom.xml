@@ -42,14 +42,14 @@
             <dependency>
                 <groupId>org.opendaylight.controller</groupId>
                 <artifactId>mdsal-artifacts</artifactId>
-                <version>1.10.5-SNAPSHOT</version>
+                <version>1.10.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.aaa</groupId>
                 <artifactId>aaa-artifacts</artifactId>
-                <version>0.10.5-SNAPSHOT</version>
+                <version>0.10.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
