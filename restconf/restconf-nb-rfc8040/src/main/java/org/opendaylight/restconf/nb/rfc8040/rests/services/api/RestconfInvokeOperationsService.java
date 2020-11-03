@@ -42,10 +42,10 @@ public interface RestconfInvokeOperationsService extends UpdateHandlers {
      */
     @POST
     @Path("/operations/{identifier:.+}")
-    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier,
             NormalizedNodeContext payload, @Context UriInfo uriInfo);
 }
