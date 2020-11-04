@@ -190,6 +190,30 @@
     },
     {
       "key": {
+        "uuid": "1896307e_f35cb3cb",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/DataTreeCandidateFormatter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-04T13:07:58Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "82fe0077_9dd34002",
+      "range": {
+        "startLine": 76,
+        "startChar": 51,
+        "endLine": 76,
+        "endChar": 60
+      },
+      "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ed68d996_94ee05da",
         "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/EventFormatter.java",
         "patchSetId": 6
