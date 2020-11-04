@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "44d04999_777be395",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/DataTreeCandidateFormatter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-11-04T12:00:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "caae7f58_4e1a52a5",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 6
+      },
+      "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "436f2582_c72cfa0a",
         "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/DataTreeCandidateFormatter.java",
         "patchSetId": 6
@@ -45,6 +69,30 @@
       "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9e4a455_fae71c94",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/DataTreeCandidateFormatter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-11-04T12:00:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "436f2582_c72cfa0a",
+      "range": {
+        "startLine": 32,
+        "startChar": 4,
+        "endLine": 32,
+        "endChar": 10
+      },
+      "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "e77a79d5_c2a94cb4",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/DataTreeCandidateFormatter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-11-04T12:00:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e26bd115_7d521f3b",
+      "range": {
+        "startLine": 40,
+        "startChar": 4,
+        "endLine": 40,
+        "endChar": 8
+      },
+      "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1151c6d4_0528af78",
         "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/DataTreeCandidateFormatter.java",
         "patchSetId": 6
@@ -82,6 +154,30 @@
       "writtenOn": "2020-11-04T10:40:12Z",
       "side": 1,
       "message": "ifPresent(), will make things easier",
+      "range": {
+        "startLine": 76,
+        "startChar": 51,
+        "endLine": 76,
+        "endChar": 60
+      },
+      "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "82fe0077_9dd34002",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/DataTreeCandidateFormatter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-11-04T12:00:48Z",
+      "side": 1,
+      "message": "nodeWriter.write() can throw an IOException which we want to get back to the caller which cant be done from a lambda here.",
+      "parentUuid": "1151c6d4_0528af78",
       "range": {
         "startLine": 76,
         "startChar": 51,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "a95571a0_ea8682c2",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/EventFormatter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-11-04T12:00:48Z",
+      "side": 1,
+      "message": "Replaced everywhere",
+      "parentUuid": "ed68d996_94ee05da",
+      "range": {
+        "startLine": 2,
+        "startChar": 22,
+        "endLine": 2,
+        "endChar": 30
+      },
+      "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "58adf32f_897ef06e",
         "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/NotificationFormatter.java",
         "patchSetId": 6
@@ -137,6 +257,30 @@
       "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d8cdf1b6_d36598f1",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/NotificationFormatter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-11-04T12:00:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58adf32f_897ef06e",
+      "range": {
+        "startLine": 47,
+        "startChar": 10,
+        "endLine": 47,
+        "endChar": 61
+      },
+      "revId": "802e872c91267833e9ba0df474d03d7e58f56a8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
