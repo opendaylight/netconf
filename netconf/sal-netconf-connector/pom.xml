@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.9.2-SNAPSHOT</version>
     <relativePath>../../parent</relativePath>
   </parent>
 
@@ -19,7 +19,7 @@
   <artifactId>sal-netconf-connector</artifactId>
 
   <!-- Preserve version from mdsal -->
-  <version>1.12.1-SNAPSHOT</version>
+  <version>1.12.2-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <dependencies>
