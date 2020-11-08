@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c38f32bd_40794c71",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T15:50:14Z",
+      "side": 1,
+      "message": "add some description what was changed/added",
+      "revId": "1c273038ffb584406f6e23b2bfa02ca9fa3a63c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "260b463c_e99859d7",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/context/WriterParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T15:50:14Z",
+      "side": 1,
+      "message": "I think, it would be better to hide fields using some abstraction (two types of parsed fields)\nafterwards, we don\u0027t need to hack RestconfStrategy interface",
+      "range": {
+        "startLine": 85,
+        "startChar": 8,
+        "endLine": 93,
+        "endChar": 9
+      },
+      "revId": "1c273038ffb584406f6e23b2bfa02ca9fa3a63c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b870601a_50205056",
+        "filename": "restconf/restconf-nb-rfc8040/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T15:50:14Z",
+      "side": 1,
+      "message": "dup dependencies - fix it, for injection of version always used dependency management\nwhere is this dependency actually used?",
+      "range": {
+        "startLine": 207,
+        "startChar": 4,
+        "endLine": 215,
+        "endChar": 17
+      },
+      "revId": "1c273038ffb584406f6e23b2bfa02ca9fa3a63c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "317b7d9a_2fe4f77d",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T15:50:14Z",
+      "side": 1,
+      "message": "why we re creating YIID and the get last path arg if path arg can be created directly?",
+      "range": {
+        "startLine": 483,
+        "startChar": 32,
+        "endLine": 484,
+        "endChar": 82
+      },
+      "revId": "1c273038ffb584406f6e23b2bfa02ca9fa3a63c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a01b9a72_d9a583ec",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/core-model/core-model-1-4.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T15:50:14Z",
+      "side": 1,
+      "message": "add just subset of the yang schema that are actually used in tests",
+      "revId": "1c273038ffb584406f6e23b2bfa02ca9fa3a63c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
