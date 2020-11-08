@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "58849954_27cc1537",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/StreamingContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-08T23:20:43Z",
+      "side": 1,
+      "message": "why would we need a mutable Set here?",
+      "range": {
+        "startLine": 254,
+        "startChar": 33,
+        "endLine": 254,
+        "endChar": 48
+      },
+      "revId": "996b6980fb100a8be24e1b46491423e15ec4875d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5250c250_6f807953",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/StreamingContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-08T23:20:43Z",
+      "side": 1,
+      "message": "size() \u003d\u003d 0",
+      "range": {
+        "startLine": 272,
+        "startChar": 26,
+        "endLine": 272,
+        "endChar": 44
+      },
+      "revId": "996b6980fb100a8be24e1b46491423e15ec4875d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "553ca584_f2657390",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/StreamingContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-08T23:20:43Z",
+      "side": 1,
+      "message": "forces view instantiation, is this really necessary?",
+      "range": {
+        "startLine": 278,
+        "startChar": 80,
+        "endLine": 278,
+        "endChar": 88
+      },
+      "revId": "996b6980fb100a8be24e1b46491423e15ec4875d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
