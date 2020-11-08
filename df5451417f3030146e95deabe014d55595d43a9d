@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "71ecd983_944f52eb",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/TreeNode.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-08T23:25:10Z",
+      "side": 1,
+      "message": "so suddenly this becomes a public mutable contract? No way we are sharing mutable structures this way.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 32
+      },
+      "revId": "df5451417f3030146e95deabe014d55595d43a9d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
