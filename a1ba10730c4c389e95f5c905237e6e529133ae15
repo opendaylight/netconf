@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "8b51c81c_8a881636",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContext.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T12:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa131915_c4b382f1",
+      "range": {
+        "startLine": 43,
+        "startChar": 32,
+        "endLine": 44,
+        "endChar": 93
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "675cff8e_da69fc8f",
         "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfChunkException.java",
         "patchSetId": 3
@@ -45,6 +69,30 @@
       "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9d509cd5_6e9c81c7",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfChunkException.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T12:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "675cff8e_da69fc8f",
+      "range": {
+        "startLine": 21,
+        "startChar": 18,
+        "endLine": 21,
+        "endChar": 39
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "0fb10181_676b0652",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfChunkException.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T12:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34623abe_24f127f4",
+      "range": {
+        "startLine": 37,
+        "startChar": 40,
+        "endLine": 37,
+        "endChar": 90
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de7927e2_8bd2f8d8",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfChunkAggregator.java",
         "patchSetId": 3
@@ -91,6 +163,30 @@
       "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1f67f4e8_b7f70105",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfChunkAggregator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T12:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de7927e2_8bd2f8d8",
+      "range": {
+        "startLine": 53,
+        "startChar": 8,
+        "endLine": 53,
+        "endChar": 28
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "e92af68c_fd8e20db",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfChunkAggregator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T12:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3473f0_a510a6df",
+      "range": {
+        "startLine": 59,
+        "startChar": 4,
+        "endLine": 59,
+        "endChar": 46
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "984a4657_7a0a7a71",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
         "patchSetId": 3
@@ -137,6 +257,30 @@
       "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "26c6a89d_c1f8286e",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T12:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "984a4657_7a0a7a71",
+      "range": {
+        "startLine": 295,
+        "startChar": 25,
+        "endLine": 296,
+        "endChar": 74
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "ddac681a_dbf01164",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T12:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca4d55a2_7a017cac",
+      "range": {
+        "startLine": 312,
+        "startChar": 20,
+        "endLine": 312,
+        "endChar": 24
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c202cd3_ea8acbf9",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
         "patchSetId": 3
@@ -183,6 +351,30 @@
       "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e53279c1_8640778f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-08T12:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c202cd3_ea8acbf9",
+      "range": {
+        "startLine": 254,
+        "startChar": 4,
+        "endLine": 254,
+        "endChar": 39
+      },
+      "revId": "a1ba10730c4c389e95f5c905237e6e529133ae15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
