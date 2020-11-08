@@ -68,6 +68,29 @@
       "revId": "996b6980fb100a8be24e1b46491423e15ec4875d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e95ac1d9_da211272",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/TreeNode.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-08T23:21:59Z",
+      "side": 1,
+      "message": "right, so this is just forwarding to underlying collection... why would we just not have this is isEmpty()?!",
+      "range": {
+        "startLine": 68,
+        "startChar": 12,
+        "endLine": 68,
+        "endChar": 28
+      },
+      "revId": "996b6980fb100a8be24e1b46491423e15ec4875d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
