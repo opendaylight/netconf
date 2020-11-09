@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2e360a08_50f65ca3",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/explorer/lib/swagger.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 948,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-11-09T16:15:38Z",
+      "side": 1,
+      "message": "I don t like the idea of leafing requestContentType to null. This is a dirty workaround and might work but cleaner would be to follow the swagger 1.2 specification and create appropriate json for this JS. This is working in master because we are using swagger 2.0 and openAPI 3.0 spec and we took this into consideration.\n\nIf we want to do this let s keep requestConentType applicaition/json and change it to null only when making delete meaning inside of else statement - after line 953. This should work as well for you right?",
+      "revId": "400fee4048315016766e7eb3db5ad67cd20dcb38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
