@@ -16,6 +16,24 @@
       "revId": "400fee4048315016766e7eb3db5ad67cd20dcb38",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "422c59fa_994df3b5",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/explorer/lib/swagger.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 948,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2020-11-09T17:25:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e360a08_50f65ca3",
+      "revId": "400fee4048315016766e7eb3db5ad67cd20dcb38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
