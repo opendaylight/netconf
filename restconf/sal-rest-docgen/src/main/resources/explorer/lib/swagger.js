@@ -951,6 +951,9 @@
           requestContentType = this.opts.requestContentType;
         }
       } else {
+        if (this.type === "DELETE") {
+          requestContentType = null;
+        }
         if (((function() {
           var _i, _len, _ref, _results;
           _ref = this.operation.parameters;
