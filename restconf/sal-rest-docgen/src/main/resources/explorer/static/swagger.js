@@ -900,7 +900,7 @@
       myHeaders = {};
       body = params.body;
       parent = params["parent"];
-      requestContentType = "application/json";
+      requestContentType = null;
       if (body && (this.type === "POST" || this.type === "PUT" || this.type === "PATCH")) {
         if (this.opts.requestContentType) {
           requestContentType = this.opts.requestContentType;
