@@ -905,6 +905,8 @@
         if (this.opts.requestContentType) {
           requestContentType = this.opts.requestContentType;
         }
+      } else if (this.type === "DELETE") {
+        requestContentType = null;
       } else {
         if (((function() {
           var _i, _len, _ref, _results;
@@ -935,7 +937,7 @@
           } else {
             requestContentType = "application/x-www-form-urlencoded";
           }
-        } else if (this.type !== "DELETE") {
+        } else {
           requestContentType = null;
         }
       }
