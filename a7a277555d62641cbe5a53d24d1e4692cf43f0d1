@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6611f060_d463437a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-11-09T10:22:03Z",
+      "side": 1,
+      "message": "sign-off needs to always be last",
+      "revId": "a7a277555d62641cbe5a53d24d1e4692cf43f0d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "af580542_2700c1d4",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-11-09T10:22:03Z",
+      "side": 1,
+      "message": "Is it better to use CharMatcher instead of Matcher here?",
+      "revId": "a7a277555d62641cbe5a53d24d1e4692cf43f0d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3c465bfa_ffc6e545",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriterTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-11-09T10:22:03Z",
+      "side": 1,
+      "message": "Use @RunWith(MockitoJUnitRunner.StrictStubs.class) instead of MockitoAnnotations.initMocks(this)",
+      "revId": "a7a277555d62641cbe5a53d24d1e4692cf43f0d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
