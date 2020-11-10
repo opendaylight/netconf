@@ -384,7 +384,7 @@ public class NetconfDeviceCommunicatorTest {
      * Test whether reconnect is scheduled properly.
      */
     @Test
-    public void testNetconfDeviceReconnectInCommunicator() throws Exception {
+    public void testNetconfDeviceReconnectInCommunicator() {
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device =
                 mock(RemoteDevice.class);
 
@@ -428,7 +428,7 @@ public class NetconfDeviceCommunicatorTest {
             listener.initializeRemoteConnection(new NetconfClientDispatcherImpl(group, group, time), cfg);
 
             verify(reconnectStrategy,
-                    timeout((int) TimeUnit.MINUTES.toMillis(3)).times(101)).scheduleReconnect(any(Throwable.class));
+                    timeout(TimeUnit.MINUTES.toMillis(4)).times(101)).scheduleReconnect(any(Throwable.class));
         } finally {
             time.stop();
             group.shutdownGracefully();
