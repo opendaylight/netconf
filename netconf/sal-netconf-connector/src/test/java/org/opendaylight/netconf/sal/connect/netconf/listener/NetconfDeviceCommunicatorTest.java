@@ -384,12 +384,12 @@ public class NetconfDeviceCommunicatorTest {
      * Test whether reconnect is scheduled properly.
      */
     @Test
-    public void testNetconfDeviceReconnectInCommunicator() throws Exception {
+    public void testNetconfDeviceReconnectInCommunicator() {
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device =
                 mock(RemoteDevice.class);
 
         final TimedReconnectStrategy timedReconnectStrategy =
-                new TimedReconnectStrategy(GlobalEventExecutor.INSTANCE, 10000, 0, 1.0, null, 100L, null);
+                new TimedReconnectStrategy(GlobalEventExecutor.INSTANCE, 5000, 0, 1.0, null, 50L, null);
         final ReconnectStrategy reconnectStrategy = spy(new ReconnectStrategy() {
             @Override
             public int getConnectTimeout() throws Exception {
@@ -417,7 +417,7 @@ public class NetconfDeviceCommunicatorTest {
                     .withReconnectStrategy(reconnectStrategy)
                     .withConnectStrategyFactory(() -> reconnectStrategy)
                     .withAuthHandler(new LoginPasswordHandler("admin", "admin"))
-                    .withConnectionTimeoutMillis(10000)
+                    .withConnectionTimeoutMillis(5000)
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                     .withSessionListener(listener)
                     .build();
@@ -425,7 +425,7 @@ public class NetconfDeviceCommunicatorTest {
             listener.initializeRemoteConnection(new NetconfClientDispatcherImpl(group, group, time), cfg);
 
             verify(reconnectStrategy,
-                    timeout((int) TimeUnit.MINUTES.toMillis(3)).times(101)).scheduleReconnect(any(Throwable.class));
+                    timeout((int) TimeUnit.MINUTES.toMillis(3)).times(51)).scheduleReconnect(any(Throwable.class));
         } finally {
             time.stop();
             group.shutdownGracefully();
