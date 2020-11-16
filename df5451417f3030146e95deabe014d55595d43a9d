@@ -22,6 +22,30 @@
       "revId": "df5451417f3030146e95deabe014d55595d43a9d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3ad3ff4e_e3618f02",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/TreeNode.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2020-11-16T13:28:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71ecd983_944f52eb",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 32
+      },
+      "revId": "df5451417f3030146e95deabe014d55595d43a9d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
