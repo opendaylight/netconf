@@ -5,65 +5,89 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.util;
 
+import java.lang.annotation.Annotation;
 import java.net.InetSocketAddress;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfConfigurationImpl implements NetconfConfiguration, ManagedService {
+@Component(immediate = true, configurationPid = "netconf")
+@Designate(ocd = NetconfConfigurationImpl.Configuration.class)
+public class NetconfConfigurationImpl implements NetconfConfiguration {
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition(name = "tcp-address")
+        String tcpAddress() default "127.0.0.1";
+        @AttributeDefinition(name = "tcp-port", min = "0", max = "65535")
+        int tcpPort() default 8383;
+        @AttributeDefinition(name = "ssh-address")
+        String sshAddress() default "0.0.0.0";
+        @AttributeDefinition(name = "ssh-port", min = "0", max = "65535")
+        int sshPort() default 1830;
+        @AttributeDefinition(name = "sshpk-path")
+        String sshPrivateKeyPath() default "./configuration/RSA.pk";
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConfigurationImpl.class);
 
-    /*
-     * Props to access information within the dictionary.
-     */
-
-    private static final String SSH_ADDRESS_PROP = "ssh-address";
-    private static final String SSH_PORT_PROP = "ssh-port";
-    private static final String TCP_ADDRESS_PROP = "tcp-address";
-    private static final String TCP_PORT_PROP = "tcp-port";
-    private static final String SSH_PK_PATH_PROP = "ssh-pk-path";
-
     private NetconfConfigurationHolder netconfConfiguration;
 
-    public NetconfConfigurationImpl(final String tcpServerAddress, final String tcpServerPort,
-                                    final String sshServerAddress, final String sshServerPort,
-                                    final String privateKeyPath) throws NumberFormatException {
+    public NetconfConfigurationImpl(final String tcpServerAddress, final int tcpServerPort,
+                                    final String sshServerAddress, final int sshServerPort,
+                                    final String privateKeyPath) {
+        activate(new Configuration() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Configuration.class;
+            }
 
-        // isolate configuration to "updated(...)" instead of repeating logic here
-        final Dictionary<String, String> dictionaryConfig = new Hashtable<>();
-        dictionaryConfig.put(TCP_ADDRESS_PROP, tcpServerAddress);
-        dictionaryConfig.put(TCP_PORT_PROP, tcpServerPort);
-        dictionaryConfig.put(SSH_ADDRESS_PROP, sshServerAddress);
-        dictionaryConfig.put(SSH_PORT_PROP, sshServerPort);
-        dictionaryConfig.put(SSH_PK_PATH_PROP, privateKeyPath);
+            @Override
+            public String tcpAddress() {
+                return tcpServerAddress;
+            }
 
-        updated(dictionaryConfig);
+            @Override
+            public int tcpPort() {
+                return tcpServerPort;
+            }
+
+            @Override
+            public String sshAddress() {
+                return sshServerAddress;
+            }
+
+            @Override
+            public int sshPort() {
+                return sshServerPort;
+            }
+
+            @Override
+            public String sshPrivateKeyPath() {
+                return privateKeyPath;
+            }
+        });
     }
 
-    @Override
-    public void updated(final Dictionary<String, ?> dictionaryConfig) {
-        if (dictionaryConfig == null) {
-            LOG.debug("CSS NETCONF server configuration cannot be updated as passed dictionary is null");
-            return;
-        }
-        final InetSocketAddress sshServerAddress =
-                new InetSocketAddress((String) dictionaryConfig.get(SSH_ADDRESS_PROP),
-                        Integer.parseInt((String) dictionaryConfig.get(SSH_PORT_PROP)));
-        final InetSocketAddress tcpServerAddress =
-                new InetSocketAddress((String) dictionaryConfig.get(TCP_ADDRESS_PROP),
-                Integer.parseInt((String) dictionaryConfig.get(TCP_PORT_PROP)));
+    @Activate
+    void activate(final Configuration config) {
+        final InetSocketAddress sshServerAddress = new InetSocketAddress(config.sshAddress(), config.sshPort());
+        final InetSocketAddress tcpServerAddress = new InetSocketAddress(config.tcpAddress(), config.tcpPort());
 
-        netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress,
-                sshServerAddress,
-                (String) dictionaryConfig.get(SSH_PK_PATH_PROP));
+        netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress, sshServerAddress,
+            config.sshPrivateKeyPath());
+        LOG.debug("CSS netconf server configuration was updated");
+    }
 
-        LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig);
+    @Deactivate
+    void modified(final Configuration config) {
+        netconfConfiguration = null;
     }
 
     @Override
