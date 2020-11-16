@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "931205fc_d10ad71a",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-16T16:01:52Z",
+      "side": 1,
+      "message": "Does CharMatcher can resolve lambda exp.?",
+      "parentUuid": "af580542_2700c1d4",
+      "revId": "a7a277555d62641cbe5a53d24d1e4692cf43f0d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c465bfa_ffc6e545",
         "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriterTest.java",
         "patchSetId": 2
