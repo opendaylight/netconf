@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "f012b02f_56c546e0",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlToXRDBodyWriter.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-17T17:31:42Z",
+      "side": 1,
+      "message": "formatting. not sure about the copyright...",
+      "revId": "0d3cf3d9c8ba8693f3f8741b92a9dcf52430bd8e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "98cf2582_57c22789",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlToXRDBodyWriter.java",
         "patchSetId": 8
