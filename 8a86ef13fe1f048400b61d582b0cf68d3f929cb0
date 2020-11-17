@@ -16,6 +16,40 @@
       "revId": "8a86ef13fe1f048400b61d582b0cf68d3f929cb0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f395d450_fdbd7778",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-11-17T11:57:59Z",
+      "side": 1,
+      "message": "I think this LOG.trace information is wrong here. As in Keepalive().run() method there can be two different delay values. And not only \"keepaliveDelaySeconds\"",
+      "revId": "8a86ef13fe1f048400b61d582b0cf68d3f929cb0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71fc3ce8_18c95953",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-11-17T11:57:59Z",
+      "side": 1,
+      "message": "Add LOG.trace here",
+      "revId": "8a86ef13fe1f048400b61d582b0cf68d3f929cb0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
