@@ -18,16 +18,8 @@ final class ResponseFactory extends FutureDataFactory<CommitInfo> implements Bui
 
     private ResponseBuilder responseBuilder;
 
-    ResponseFactory() {
-    }
-
     ResponseFactory(final Status status) {
         this.responseBuilder = Response.status(status);
-    }
-
-    ResponseFactory status(final Status status) {
-        responseBuilder = Response.status(status);
-        return this;
     }
 
     ResponseFactory location(final URI location) {

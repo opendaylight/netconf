@@ -19,13 +19,11 @@ import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
-import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +31,7 @@ import org.slf4j.LoggerFactory;
  * Add callback for future objects and result set to the data factory.
  */
 final class FutureCallbackTx {
+
     private static final Logger LOG = LoggerFactory.getLogger(FutureCallbackTx.class);
 
     private FutureCallbackTx() {
@@ -54,7 +53,7 @@ final class FutureCallbackTx {
     // FIXME: this is a *synchronous operation* and has to die
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
                                 final FutureDataFactory<? super T> dataFactory) throws RestconfDocumentedException {
-        addCallback(listenableFuture, txType, dataFactory, null, null);
+        addCallback(listenableFuture,txType,dataFactory,null);
     }
 
     /**
@@ -73,31 +72,9 @@ final class FutureCallbackTx {
      */
     // FIXME: this is a *synchronous operation* and has to die
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
-                                final FutureDataFactory<? super T> dataFactory,
-                                @Nullable final DOMTransactionChain transactionChain)
-        throws RestconfDocumentedException {
-        addCallback(listenableFuture, txType, dataFactory, transactionChain, null);
-    }
+            final FutureDataFactory<? super T> dataFactory, @Nullable final DOMTransactionChain transactionChain)
+            throws RestconfDocumentedException {
 
-    /**
-     * Add callback to the future object and close transaction chain.
-     *
-     * @param listenableFuture
-     *             future object
-     * @param txType
-     *             type of operation (READ, POST, PUT, DELETE)
-     * @param dataFactory
-     *             factory setting result
-     * @param transactionChain
-     *             transaction chain
-     * @param path
-     *             unique identifier of a particular node instance in the data tree.
-     * @throws RestconfDocumentedException
-     *             if the Future throws an exception
-     */
-    static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
-            final FutureDataFactory<? super T> dataFactory, @Nullable final DOMTransactionChain transactionChain,
-                                YangInstanceIdentifier path) throws RestconfDocumentedException {
         try {
             final T result = listenableFuture.get();
             dataFactory.setResult(result);
@@ -125,20 +102,6 @@ final class FutureCallbackTx {
                 */
                 final List<Throwable> causalChain = Throwables.getCausalChain(cause);
                 for (Throwable error : causalChain) {
-                    if (error instanceof DocumentedException) {
-                        final DocumentedException.ErrorTag errorTag = ((DocumentedException) error).getErrorTag();
-                        if (errorTag.equals(DocumentedException.ErrorTag.DATA_EXISTS)) {
-                            LOG.trace("Operation via Restconf was not executed because data at {} already exists",
-                                path);
-                            throw new RestconfDocumentedException(e, new RestconfError(RestconfError.ErrorType.PROTOCOL,
-                                RestconfError.ErrorTag.DATA_EXISTS, "Data already exists", path));
-                        } else if (errorTag.equals(DocumentedException.ErrorTag.DATA_MISSING)) {
-                            LOG.trace("Operation via Restconf was not executed because data at {} does not exist",
-                                path);
-                            throw new RestconfDocumentedException(e, new RestconfError(RestconfError.ErrorType.PROTOCOL,
-                                RestconfError.ErrorTag.DATA_MISSING, "Data does not exist", path));
-                        }
-                    }
                     if (error instanceof NetconfDocumentedException) {
                         throw new RestconfDocumentedException(error.getMessage(),
                                 RestconfError.ErrorType.valueOfCaseInsensitive(

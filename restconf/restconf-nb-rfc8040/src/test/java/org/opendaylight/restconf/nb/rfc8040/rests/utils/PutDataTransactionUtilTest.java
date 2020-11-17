@@ -245,7 +245,7 @@ public class PutDataTransactionUtilTest {
         PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
         verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
+        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
@@ -299,7 +299,7 @@ public class PutDataTransactionUtilTest {
         PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
         verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
+        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
@@ -351,7 +351,7 @@ public class PutDataTransactionUtilTest {
         PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
         verify(this.netconfService).getConfig(this.iid2);
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION, this.iid2,
+        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, this.iid2,
                 payload.getData(), Optional.empty());
     }
 

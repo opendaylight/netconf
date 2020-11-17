@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -151,6 +152,7 @@ public class PostDataTransactionUtilTest {
 
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             this.iid2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid2);
         final NodeIdentifier identifier =
                 ((ContainerNode) ((Collection<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
@@ -169,6 +171,7 @@ public class PostDataTransactionUtilTest {
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,
                 new NetconfRestconfStrategy(netconfService), this.schema, null, null);
         assertEquals(201, response.getStatus());
+        verify(this.netconfService).getConfig(this.iid2);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
@@ -185,6 +188,7 @@ public class PostDataTransactionUtilTest {
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
@@ -202,6 +206,7 @@ public class PostDataTransactionUtilTest {
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
                 containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
+        verify(this.netconfService).getConfig(node);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION, node, entryNode,
                 Optional.empty());
     }
@@ -214,6 +219,7 @@ public class PostDataTransactionUtilTest {
 
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             this.iid2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid2);
         final NodeIdentifier identifier =
                 ((ContainerNode) ((Collection<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
@@ -245,6 +251,7 @@ public class PostDataTransactionUtilTest {
             assertTrue(e.getErrors().get(0).getErrorInfo().contains(domException.getMessage()));
         }
 
+        verify(this.netconfService).getConfig(this.iid2);
         verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }

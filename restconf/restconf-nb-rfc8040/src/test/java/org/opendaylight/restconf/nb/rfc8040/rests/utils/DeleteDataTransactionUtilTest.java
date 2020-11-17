@@ -9,11 +9,12 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
-import com.google.common.util.concurrent.SettableFuture;
+import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.junit.Before;
@@ -24,12 +25,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -40,6 +38,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DeleteDataTransactionUtilTest {
@@ -75,6 +74,8 @@ public class DeleteDataTransactionUtilTest {
         // assert that data to delete exists
         Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.empty())).thenReturn(immediateTrueFluentFuture());
+        Mockito.when(this.netconfService.getConfig(YangInstanceIdentifier.empty()))
+                .thenReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))));
         // test
         delete(new MdsalRestconfStrategy(transactionChainHandler));
         delete(new NetconfRestconfStrategy(netconfService));
@@ -88,15 +89,8 @@ public class DeleteDataTransactionUtilTest {
         // assert that data to delete does NOT exist
         Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.empty())).thenReturn(immediateFalseFluentFuture());
-        final NetconfDocumentedException exception = new NetconfDocumentedException("id",
-            DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.from("data-missing"),
-            DocumentedException.ErrorSeverity.ERROR);
-        final SettableFuture<? extends CommitInfo> ret = SettableFuture.create();
-        ret.setException(new TransactionCommitFailedException(
-            String.format("Commit of transaction %s failed", this), exception));
-
-        Mockito.when(this.netconfService.commit(any())).thenAnswer(invocation -> ret);
-
+        Mockito.when(this.netconfService.getConfig(YangInstanceIdentifier.empty()))
+                .thenReturn(immediateFluentFuture(Optional.empty()));
         // test and assert error
         deleteFail(new MdsalRestconfStrategy(transactionChainHandler));
         deleteFail(new NetconfRestconfStrategy(netconfService));
