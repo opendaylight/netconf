@@ -61,7 +61,7 @@ public class KeepaliveSalFacadeTest {
     private DOMRpcService proxyRpc;
 
     @Mock
-    private ScheduledFuture currentKeepalive;
+    private ScheduledFuture<?> currentKeepalive;
 
     private KeepaliveSalFacade keepaliveSalFacade;
 
@@ -79,11 +79,10 @@ public class KeepaliveSalFacadeTest {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorServiceSpy = Mockito.spy(executorService);
 
-        doAnswer(
-            invocationOnMock -> {
-                invocationOnMock.callRealMethod();
-                return currentKeepalive;
-            }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), any());
+        doAnswer(invocationOnMock -> {
+            invocationOnMock.callRealMethod();
+            return currentKeepalive;
+        }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), any());
 
         Mockito.when(currentKeepalive.isDone()).thenReturn(true);
 
@@ -151,11 +150,8 @@ public class KeepaliveSalFacadeTest {
 
     @Test
     public void testNonKeepaliveRpcFailure() throws Exception {
-        doAnswer(
-            invocationOnMock -> {
-                proxyRpc = (DOMRpcService) invocationOnMock.getArguments()[2];
-                return null;
-            }).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
+        doAnswer(invocation -> proxyRpc = invocation.getArgument(2))
+                .when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
 
         doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
