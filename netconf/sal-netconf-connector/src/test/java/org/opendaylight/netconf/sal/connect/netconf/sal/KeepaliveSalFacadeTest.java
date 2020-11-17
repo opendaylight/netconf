@@ -8,11 +8,13 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -62,7 +64,7 @@ public class KeepaliveSalFacadeTest {
     private DOMRpcService proxyRpc;
 
     @Mock
-    private ScheduledFuture currentKeepalive;
+    private ScheduledFuture<?> currentKeepalive;
 
     private KeepaliveSalFacade keepaliveSalFacade;
 
@@ -71,17 +73,15 @@ public class KeepaliveSalFacadeTest {
         executorServiceSpy = Executors.newScheduledThreadPool(1);
 
         doNothing().when(listener).disconnect();
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(),
-            isNull(), any(DOMRpcService.class), isNull());
+        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
 
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-        executorServiceSpy = Mockito.spy(executorService);
+        executorServiceSpy = spy(executorService);
 
-        doAnswer(
-            invocationOnMock -> {
-                invocationOnMock.callRealMethod();
-                return currentKeepalive;
-            }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), any());
+        doAnswer(invocationOnMock -> {
+            invocationOnMock.callRealMethod();
+            return currentKeepalive;
+        }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), anyLong(), any());
 
         keepaliveSalFacade =
                 new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 1L, 1L);
@@ -144,11 +144,8 @@ public class KeepaliveSalFacadeTest {
 
     @Test
     public void testNonKeepaliveRpcFailure() throws Exception {
-        doAnswer(
-            invocationOnMock -> {
-                proxyRpc = (DOMRpcService) invocationOnMock.getArguments()[2];
-                return null;
-            }).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
+        doAnswer(invocation -> proxyRpc = invocation.getArgument(2))
+                .when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
 
         doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(QName.class), any(ContainerNode.class));
