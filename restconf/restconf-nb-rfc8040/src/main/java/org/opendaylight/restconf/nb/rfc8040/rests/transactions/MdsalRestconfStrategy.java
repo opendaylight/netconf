@@ -67,6 +67,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     public void cancel() {
         if (rwTx != null) {
             rwTx.cancel();
+            rwTx = null;
         }
         transactionChain.close();
     }
