@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.common.formatters;
 
 import static org.opendaylight.restconf.common.formatters.NotificationFormatter.XML_OUTPUT_FACTORY;
+import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
 
 import com.google.common.annotations.Beta;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public abstract class DataTreeCandidateFormatter extends EventFormatter<Collecti
                 "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "data-changed-notification");
 
         for (DataTreeCandidate candidate : input) {
-            final Element dataChangedElement = doc.createElement("data-changed-event");
+            final Element dataChangedElement = doc.createElement(DATA_CHANGE_EVENT_ELEMENT);
             try {
                 final Element dataElement = doc.createElement("data");
                 final DOMResult domResult = new DOMResult(dataElement);
