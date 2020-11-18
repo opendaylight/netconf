@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "590b3abf_9be31f11",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T11:44:48Z",
+      "side": 1,
+      "message": "Not sure, I can find only about old Windows xp. \nAlso in my practice was similar problem with custom linux build and old java (1.7 or earlier) - result of nanoTime() was unstable.",
+      "parentUuid": "9a7991af_446e7ee4",
+      "revId": "e5e55cf22a0d5a3e6888272fd46d00868cbe64b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a3c9469d_a608311c",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
         "patchSetId": 6
