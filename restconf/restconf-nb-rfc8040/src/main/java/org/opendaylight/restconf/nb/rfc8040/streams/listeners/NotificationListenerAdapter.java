@@ -57,10 +57,9 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         this.path = requireNonNull(path);
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
-
-        LOG.info("output type: {}, {}", outputType, this.outputType);
-
         this.formatter = getFormatterFactory().getFormatter();
+
+        LOG.debug("output type: {}, {}", outputType, this.outputType);
     }
 
     private NotificationFormatterFactory getFormatterFactory() {
@@ -70,7 +69,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
             case XML:
                 return XMLNotificationFormatter.FACTORY;
             default:
-                throw new IllegalArgumentException(("Unsupported outputType" + outputType));
+                throw new IllegalArgumentException("Unsupported outputType " + outputType);
         }
     }
 
@@ -80,8 +79,8 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     @Override
-    public void setQueryParams(Instant start, Instant stop, String filter, boolean leafNodesOnly,
-                               boolean skipNotificationData) {
+    public void setQueryParams(final Instant start, final Instant stop, final String filter,
+                               final boolean leafNodesOnly, final boolean skipNotificationData) {
         super.setQueryParams(start, stop, filter, leafNodesOnly, skipNotificationData);
         try {
             this.formatter = getFormatter(filter);
