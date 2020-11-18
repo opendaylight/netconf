@@ -25,6 +25,9 @@ public class XMLNotificationFormatter extends NotificationFormatter {
     static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:xml:ns:netconf:notification:1.0";
     static final String NOTIFICATION_ELEMENT = "notification";
 
+    static final String DATA_CHANGED_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
+    static final String DATA_CHANGED_ELEMENT = "data-changed-notification";
+
     public static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory() {
         @Override
         public XMLNotificationFormatter getFormatter(final String xpathFilter) throws XPathExpressionException {
@@ -65,7 +68,6 @@ public class XMLNotificationFormatter extends NotificationFormatter {
 
             final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter);
             nnWriter.write(input.getBody());
-            nnWriter.flush();
 
             xmlStreamWriter.writeEndElement();
             xmlStreamWriter.writeEndDocument();
