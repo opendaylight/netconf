@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "fbaf91dc_4a8f7e44",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/Rfc8040.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-18T14:17:35Z",
+      "side": 1,
+      "message": "add a javadoc reference to https://tools.ietf.org/html/rfc6415",
+      "range": {
+        "startLine": 46,
+        "startChar": 8,
+        "endLine": 46,
+        "endChar": 59
+      },
+      "revId": "bd83942edbd6d761fd25a54a70779edc8beb5d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "48b23b29_1ef90d6d",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/RootFoundApplication.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-18T14:17:35Z",
+      "side": 1,
+      "message": "why not just use Set.of()?",
+      "range": {
+        "startLine": 30,
+        "startChar": 39,
+        "endLine": 30,
+        "endChar": 55
+      },
+      "revId": "bd83942edbd6d761fd25a54a70779edc8beb5d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1f683b13_3efb8ffb",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlToXRDBodyWriter.java",
         "patchSetId": 10
@@ -41,6 +87,121 @@
         "startChar": 0,
         "endLine": 19,
         "endChar": 35
+      },
+      "revId": "bd83942edbd6d761fd25a54a70779edc8beb5d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6fcd1f7e_d7321d51",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RootFoundService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-18T14:17:35Z",
+      "side": 1,
+      "message": "we are missing https://tools.ietf.org/html/rfc6415#section-6.2",
+      "range": {
+        "startLine": 22,
+        "startChar": 40,
+        "endLine": 22,
+        "endChar": 61
+      },
+      "revId": "bd83942edbd6d761fd25a54a70779edc8beb5d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "42fa0e92_d8e127cd",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/wrapper/RootFoundServiceImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-18T14:17:35Z",
+      "side": 1,
+      "message": "final and has a private constructor",
+      "range": {
+        "startLine": 19,
+        "startChar": 19,
+        "endLine": 19,
+        "endChar": 24
+      },
+      "revId": "bd83942edbd6d761fd25a54a70779edc8beb5d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a76ad550_3ccd6726",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/wrapper/RootFoundServiceImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-18T14:17:35Z",
+      "side": 1,
+      "message": "not public",
+      "range": {
+        "startLine": 20,
+        "startChar": 8,
+        "endLine": 20,
+        "endChar": 14
+      },
+      "revId": "bd83942edbd6d761fd25a54a70779edc8beb5d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4dc57fc3_f9211bdc",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/wrapper/RootFoundServiceImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-18T14:17:35Z",
+      "side": 1,
+      "message": "missing private constructor",
+      "range": {
+        "startLine": 23,
+        "startChar": 39,
+        "endLine": 23,
+        "endChar": 50
+      },
+      "revId": "bd83942edbd6d761fd25a54a70779edc8beb5d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98a915ed_bf1c30dd",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/wrapper/RootFoundServiceImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-18T14:17:35Z",
+      "side": 1,
+      "message": "just pre-build the entire response in constructor",
+      "range": {
+        "startLine": 29,
+        "startChar": 15,
+        "endLine": 32,
+        "endChar": 44
       },
       "revId": "bd83942edbd6d761fd25a54a70779edc8beb5d1f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
