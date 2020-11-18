@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.common.formatters;
 
 import static org.opendaylight.restconf.common.formatters.NotificationFormatter.XML_OUTPUT_FACTORY;
+import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGED_ELEMENT;
+import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGED_NAMESPACE;
 import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.NOTIFICATION_ELEMENT;
 import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.NOTIFICATION_NAMESPACE;
 
@@ -64,7 +66,8 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
             xmlStreamWriter.writeCharacters(toRFC3339(now));
             xmlStreamWriter.writeEndElement();
 
-            xmlStreamWriter.writeStartElement("data-changed-notification");
+            xmlStreamWriter.setDefaultNamespace(DATA_CHANGED_NAMESPACE);
+            xmlStreamWriter.writeStartElement(DATA_CHANGED_NAMESPACE, DATA_CHANGED_ELEMENT);
 
             final XmlDataTreeCandidateSerializer serializer =
                     new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);
