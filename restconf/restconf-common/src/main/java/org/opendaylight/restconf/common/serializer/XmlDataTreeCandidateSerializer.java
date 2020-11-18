@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.common.serializer;
 
+import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
+
 import java.util.Collection;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
@@ -39,7 +41,7 @@ public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
         final NormalizedNodeStreamWriter nodeStreamWriter =
                 XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path.getParent());
 
-        xmlWriter.writeStartElement("data-changed-event");
+        xmlWriter.writeStartElement(DATA_CHANGE_EVENT_ELEMENT);
         serializePath(nodePath);
 
         if (!skipData && candidate.getDataAfter().isPresent()) {
