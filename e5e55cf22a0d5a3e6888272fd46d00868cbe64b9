@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d0a31e1_1866b773",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T10:57:48Z",
+      "side": 1,
+      "message": "Is a real reason for using nano sec precision?",
+      "revId": "e5e55cf22a0d5a3e6888272fd46d00868cbe64b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc6df029_7efd93e8",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T10:57:48Z",
+      "side": 1,
+      "message": "Can nanoTime() make a problems on old OS?",
+      "revId": "e5e55cf22a0d5a3e6888272fd46d00868cbe64b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3c9469d_a608311c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T10:57:48Z",
+      "side": 1,
+      "message": "What is the reason for using deviceRpc variable?",
+      "revId": "e5e55cf22a0d5a3e6888272fd46d00868cbe64b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b0e48b4e_1e859ba5",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T10:57:48Z",
+      "side": 1,
+      "message": "Propose: add getter",
+      "revId": "e5e55cf22a0d5a3e6888272fd46d00868cbe64b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
