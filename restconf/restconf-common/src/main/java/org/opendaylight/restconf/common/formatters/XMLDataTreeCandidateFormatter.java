@@ -47,14 +47,10 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
     }
 
     @Override
-    String createText(EffectiveModelContext schemaContext, Collection<DataTreeCandidate> input, Instant now,
-                      boolean leafNodesOnly, boolean skipData)
-            throws Exception {
-        StringWriter writer = new StringWriter();
-
-        final XMLStreamWriter xmlStreamWriter;
-        try {
-            xmlStreamWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
+    String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
+                      final Instant now, final boolean leafNodesOnly, final boolean skipData) throws Exception {
+        try (StringWriter writer = new StringWriter()) {
+            final XMLStreamWriter xmlStreamWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
             xmlStreamWriter.setDefaultNamespace(NOTIFICATION_NAMESPACE);
 
             xmlStreamWriter.writeStartElement(NOTIFICATION_NAMESPACE, NOTIFICATION_ELEMENT);
@@ -79,11 +75,9 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
             // notification
             xmlStreamWriter.writeEndElement();
+            return writer.toString();
         } catch (XMLStreamException e) {
             throw new IOException("Failed to write notification content", e);
         }
-
-
-        return writer.toString();
     }
 }

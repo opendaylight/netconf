@@ -40,16 +40,14 @@ public class XMLNotificationFormatter extends NotificationFormatter {
     public XMLNotificationFormatter() {
     }
 
-    public XMLNotificationFormatter(String xpathFilter) throws XPathExpressionException {
+    public XMLNotificationFormatter(final String xpathFilter) throws XPathExpressionException {
         super(xpathFilter);
     }
 
     @Override
-    String createText(EffectiveModelContext schemaContext, DOMNotification input, Instant now,
-                      boolean leafNodesOnly, boolean skipData)
-            throws IOException {
-        final StringWriter writer = new StringWriter();
-        try {
+    String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
+                      final boolean leafNodesOnly, final boolean skipData) throws IOException {
+        try (StringWriter writer = new StringWriter()) {
             final XMLStreamWriter xmlStreamWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
             xmlStreamWriter.setDefaultNamespace(NOTIFICATION_NAMESPACE);
 
@@ -70,8 +68,6 @@ public class XMLNotificationFormatter extends NotificationFormatter {
             xmlStreamWriter.writeEndElement();
             xmlStreamWriter.writeEndDocument();
             xmlStreamWriter.flush();
-
-            nnWriter.close();
 
             return writer.toString();
         } catch (XMLStreamException e) {
