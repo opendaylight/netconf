@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "9436796c_ae72bfd0",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-18T11:57:40Z",
+      "side": 1,
+      "message": "that is completely historic, research https://en.wikipedia.org/wiki/Time_Stamp_Counter and related stuff.\nIf it is used ScheduledThreadPoolExecutor it is by definition working.",
+      "parentUuid": "590b3abf_9be31f11",
+      "revId": "e5e55cf22a0d5a3e6888272fd46d00868cbe64b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a3c9469d_a608311c",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
         "patchSetId": 6
