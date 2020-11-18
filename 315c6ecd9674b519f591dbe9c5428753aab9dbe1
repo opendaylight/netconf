@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6acea173_0eb3c197",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlToXRDBodyWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T09:01:39Z",
+      "side": 1,
+      "message": "Can be removed?",
+      "revId": "315c6ecd9674b519f591dbe9c5428753aab9dbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cfbdb394_96042d11",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlToXRDBodyWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T09:01:39Z",
+      "side": 1,
+      "message": "IOException can be removed from throws",
+      "revId": "315c6ecd9674b519f591dbe9c5428753aab9dbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c27de961_f3b5a606",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlToXRDBodyWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T09:01:39Z",
+      "side": 1,
+      "message": "Should be logged or ignored?",
+      "revId": "315c6ecd9674b519f591dbe9c5428753aab9dbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8afb93c0_66f6c67f",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RootFoundService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T09:01:39Z",
+      "side": 1,
+      "message": "need new line at the end by codestyle",
+      "revId": "315c6ecd9674b519f591dbe9c5428753aab9dbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17a517c4_90083eaa",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/wrapper/RootFoundServiceImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T09:01:39Z",
+      "side": 1,
+      "message": "Can be direct return without using resp.",
+      "revId": "315c6ecd9674b519f591dbe9c5428753aab9dbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2c4c7f59_d012a9e3",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/wrapper/RootFoundServiceImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T09:01:39Z",
+      "side": 1,
+      "message": "Consider is better use constants from RestconfConstants instead of hardcoded?",
+      "revId": "315c6ecd9674b519f591dbe9c5428753aab9dbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dbc892f5_fd02a154",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/test/Rfc8040RestConfWiringTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T09:01:39Z",
+      "side": 1,
+      "message": "Looks like some problem with patch on this test.",
+      "revId": "315c6ecd9674b519f591dbe9c5428753aab9dbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8198c36b_a68f83f7",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/test/Rfc8040RestConfWiringTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-18T09:01:39Z",
+      "side": 1,
+      "message": "Test import commented. Will be compilation error.",
+      "revId": "315c6ecd9674b519f591dbe9c5428753aab9dbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
