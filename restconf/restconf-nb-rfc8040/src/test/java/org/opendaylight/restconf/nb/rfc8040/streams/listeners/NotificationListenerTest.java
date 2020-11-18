@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -14,7 +15,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import java.net.URI;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -42,13 +42,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class JsonNotificationListenerTest {
-    private static final Logger LOG = LoggerFactory.getLogger(JsonNotificationListenerTest.class);
-
+public class NotificationListenerTest {
     private static final QNameModule MODULE = QNameModule.create(URI.create("notifi:mod"), Revision.of("2016-11-23"));
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
@@ -76,8 +72,6 @@ public class JsonNotificationListenerTest {
         when(notificationData.getBody()).thenReturn(notifiBody);
 
         final String result = prepareJson(notificationData, schemaPathNotifi);
-
-        LOG.info("json result: {}", result);
 
         assertTrue(result.contains("ietf-restconf:notification"));
         assertTrue(result.contains("event-time"));
@@ -222,10 +216,9 @@ public class JsonNotificationListenerTest {
         return child;
     }
 
-    private static String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi)
-            throws Exception {
+    private static String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi) {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "json-stream", NotificationOutputType.JSON);
-        return notifiAdapter.formatter.eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false, false).get();
+                schemaPathNotifi, "stream-name", NotificationOutputType.JSON);
+        return requireNonNull(notifiAdapter.prepareJson(SCHEMA_CONTEXT, notificationData));
     }
 }

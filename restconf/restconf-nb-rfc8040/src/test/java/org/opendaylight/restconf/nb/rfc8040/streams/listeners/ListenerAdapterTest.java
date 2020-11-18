@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.time.Instant.EPOCH;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -20,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -49,7 +47,6 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlunit.assertj.XmlAssert;
 
 public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapterTest.class);
@@ -66,21 +63,6 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             "/listener-adapter-test/notif-without-data-update.json";
     private static final String JSON_NOTIF_WITHOUT_DATA_DELETE =
             "/listener-adapter-test/notif-without-data-del.json";
-
-    private static final String XML_NOTIF_CREATE = "/listener-adapter-test/notif-create.xml";
-    private static final String XML_NOTIF_UPDATE =  "/listener-adapter-test/notif-update.xml";
-    private static final String XML_NOTIF_DEL =  "/listener-adapter-test/notif-delete.xml";
-
-    private static final String XML_NOTIF_LEAVES_CREATE = "/listener-adapter-test/notif-leaves-create.xml";
-    private static final String XML_NOTIF_LEAVES_UPDATE =  "/listener-adapter-test/notif-leaves-update.xml";
-    private static final String XML_NOTIF_LEAVES_DEL =  "/listener-adapter-test/notif-leaves-delete.xml";
-
-    private static final String XML_NOTIF_WITHOUT_DATA_CREATE =
-            "/listener-adapter-test/notif-without-data-create.xml";
-    private static final String XML_NOTIF_WITHOUT_DATA_UPDATE =
-            "/listener-adapter-test/notif-without-data-update.xml";
-    private static final String XML_NOTIF_WITHOUT_DATA_DELETE =
-            "/listener-adapter-test/notif-without-data-delete.xml";
 
     private static final YangInstanceIdentifier PATCH_CONT_YIID =
             YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(PatchCont.QNAME));
@@ -131,69 +113,35 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             notificationLatch.countDown();
         }
 
-        public void assertGot(final String json) throws JSONException {
-            if (!Uninterruptibles.awaitUninterruptibly(notificationLatch, 500, TimeUnit.SECONDS)) {
+        public void assertGot(final String json) {
+            if (!Uninterruptibles.awaitUninterruptibly(notificationLatch, 5, TimeUnit.SECONDS)) {
                 fail("Timed out waiting for notification for: " + json);
             }
 
             LOG.info("lastNotification: {}", lastNotification);
-            final String withFakeDate = withFakeDate(lastNotification);
+            String withFakeDate = withFakeDate(lastNotification);
             LOG.info("Comparing: \n{}\n{}", json, withFakeDate);
 
             JSONAssert.assertEquals(json, withFakeDate, false);
             this.lastNotification = null;
             notificationLatch = new CountDownLatch(1);
         }
-
-        public void assertXmlSimilar(String xml) {
-            awaitUntillNotification(xml);
-
-            LOG.info("lastNotification: {}", lastNotification);
-            final String withFakeDate = withFakeXmlDate(lastNotification);
-            LOG.info("Comparing: \n{}\n{}", xml, withFakeDate);
-
-            XmlAssert.assertThat(xml).and(withFakeDate).ignoreWhitespace().ignoreChildNodesOrder().areSimilar();
-            this.lastNotification = null;
-            notificationLatch = new CountDownLatch(1);
-        }
-
-        public String awaitUntillNotification(String xml) {
-            if (!Uninterruptibles.awaitUninterruptibly(notificationLatch, 500, TimeUnit.SECONDS)) {
-                fail("Timed out waiting for notification for: " + xml);
-            }
-            return lastNotification;
-        }
-
-        public void resetLatch() {
-            notificationLatch = new CountDownLatch(1);
-        }
     }
 
-    static String withFakeDate(final String in) throws JSONException {
-        final JSONObject doc = new JSONObject(in);
-        final JSONObject notification =
-                doc.getJSONObject("urn-ietf-params-xml-ns-netconf-notification-1.0:notification");
+    static String withFakeDate(final String in) {
+        JSONObject doc = new JSONObject(in);
+        JSONObject notification = doc.getJSONObject("notification");
         if (notification == null) {
             return in;
         }
-        notification.put("event-time", "someDate");
+        notification.put("eventTime", "someDate");
         return doc.toString();
     }
 
-    static String withFakeXmlDate(String in) {
-        return in.replaceAll("<eventTime>.*</eventTime>", "<eventTime>someDate</eventTime>");
-    }
-
-    private String getNotifJson(final String path) throws IOException, URISyntaxException, JSONException {
-        final URL url = getClass().getResource(path);
-        final byte[] bytes = Files.readAllBytes(Paths.get(url.toURI()));
+    private String getNotifJson(final String path) throws IOException, URISyntaxException {
+        URL url = getClass().getResource(path);
+        byte[] bytes = Files.readAllBytes(Paths.get(url.toURI()));
         return withFakeDate(new String(bytes, StandardCharsets.UTF_8));
-    }
-
-    private String getResultXml(final String path) throws IOException, URISyntaxException, JSONException {
-        final URL url = getClass().getResource(path);
-        final byte[] bytes = Files.readAllBytes(Paths.get(url.toURI()));
-        return withFakeXmlDate(new String(bytes, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -202,15 +150,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                 NotificationOutputTypeGrouping.NotificationOutputType.JSON, true, false);
         adapter.setCloseVars(transactionChainHandler, schemaContextHandler);
 
-        final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
-        final DOMDataTreeIdentifier root =
-                new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
         changeService.registerDataTreeChangeListener(root, adapter);
 
         WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        final InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
+        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
         writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
@@ -234,15 +181,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                 NotificationOutputTypeGrouping.NotificationOutputType.JSON, false, false);
         adapter.setCloseVars(transactionChainHandler, schemaContextHandler);
 
-        final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
-        final DOMDataTreeIdentifier root =
-                new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
         changeService.registerDataTreeChangeListener(root, adapter);
 
         WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        final InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
+        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
         writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
@@ -288,100 +234,5 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_WITHOUT_DATA_DELETE));
-    }
-
-    @Test
-    public void testXmlNotifications() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.XML, false, false);
-        adapter.setCloseVars(transactionChainHandler, schemaContextHandler);
-
-        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
-        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_CREATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_UPDATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_DEL));
-    }
-
-    @Test
-    public void testXmlSkipData() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.XML, false, true);
-        adapter.setCloseVars(transactionChainHandler, schemaContextHandler);
-
-        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
-        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_WITHOUT_DATA_CREATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_WITHOUT_DATA_UPDATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_WITHOUT_DATA_DELETE));
-    }
-
-    @Test
-    public void testXmlLeavesOnly() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.XML, true, false);
-        adapter.setCloseVars(transactionChainHandler, schemaContextHandler);
-
-        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
-        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
-        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
-                .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_LEAVES_CREATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
-        writeTransaction.commit();
-        adapter.assertXmlSimilar(getResultXml(XML_NOTIF_LEAVES_UPDATE));
-
-        writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.commit();
-
-        // xmlunit cannot compare deeper children it seems out of the box so just check the iid encoding
-        final String notification = adapter.awaitUntillNotification("");
-        assertTrue(notification.contains("instance-identifier-patch-module:my-leaf12"));
-        assertTrue(notification.contains("instance-identifier-patch-module:my-leaf11"));
-        assertTrue(notification.contains("instance-identifier-patch-module:name"));
     }
 }

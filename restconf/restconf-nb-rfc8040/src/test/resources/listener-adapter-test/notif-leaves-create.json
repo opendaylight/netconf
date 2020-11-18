@@ -1,23 +1,31 @@
 {
-    "urn-ietf-params-xml-ns-netconf-notification-1.0:notification":{
-        "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification":{
-            "data-change-event":[
+    "notification": {
+        "data-changed-notification": {
+            "data-change-event": [
                 {
-                    "path":"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11",
-                    "data":{
-                        "instance-identifier-patch-module:my-leaf11":"Jed"
+                    "data": {
+                        "my-leaf11": {
+                            "content": "Jed",
+                            "xmlns": "instance:identifier:patch:module"
+                        }
                     },
-                    "operation":"created"
+                    "operation": "created",
+                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11"
                 },
                 {
-                    "path":"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name",
-                    "data":{
-                        "instance-identifier-patch-module:name":"Althea"
+                    "data": {
+                        "name": {
+                            "content": "Althea",
+                            "xmlns": "instance:identifier:patch:module"
+                        }
                     },
-                    "operation":"created"
+                    "operation": "created",
+                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name"
                 }
-            ]
+            ],
+            "xmlns": "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote"
         },
-        "event-time":"2020-10-15T13:01:29.019468+02:00"
+        "eventTime": "2017-09-17T11:23:10.323+03:00",
+        "xmlns": "urn:ietf:params:xml:ns:netconf:notification:1.0"
     }
 }
