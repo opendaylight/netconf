@@ -65,6 +65,7 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
             xmlStreamWriter.writeEndElement();
 
             xmlStreamWriter.writeStartElement("data-changed-notification");
+            xmlStreamWriter.writeNamespace("xmlns", "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote");
 
             final XmlDataTreeCandidateSerializer serializer =
                     new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);

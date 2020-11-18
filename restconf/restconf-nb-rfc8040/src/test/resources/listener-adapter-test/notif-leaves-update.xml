@@ -1,6 +1,6 @@
 <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
     <eventTime>2020-10-19T13:54:31.86969+02:00</eventTime>
-    <data-changed-notification>
+    <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
         <data-changed-event>
             <path>/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name</path>
             <data>
