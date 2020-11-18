@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil.DELETE_TX_TYPE;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil.checkItemDoesNotExists;
@@ -67,6 +68,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     public void cancel() {
         if (rwTx != null) {
             rwTx.cancel();
+            rwTx = null;
         }
         transactionChain.close();
     }
@@ -155,7 +157,9 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     @Override
     public FluentFuture<? extends @NonNull CommitInfo> commit() {
-        return rwTx.commit();
+        final FluentFuture<? extends @NonNull CommitInfo> ret = verifyNotNull(rwTx).commit();
+        rwTx = null;
+        return ret;
     }
 
     @Override
