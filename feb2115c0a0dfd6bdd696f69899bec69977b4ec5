@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcc5dbe8_79f9a870",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/XMLDataTreeCandidateFormatter.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-19T14:33:43Z",
+      "side": 1,
+      "message": "try (XMLStreamWriter ...) {\n\ninstead of explicit close below",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 59,
+        "endChar": 79
+      },
+      "revId": "feb2115c0a0dfd6bdd696f69899bec69977b4ec5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
