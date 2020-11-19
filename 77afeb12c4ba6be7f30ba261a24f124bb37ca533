@@ -22,6 +22,30 @@
       "revId": "77afeb12c4ba6be7f30ba261a24f124bb37ca533",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7e1d216b_08557eb9",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/serializer/XmlDataTreeCandidateSerializer.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-11-19T14:48:42Z",
+      "side": 0,
+      "message": "Yes, you are right. Reverted it.",
+      "parentUuid": "3ad1bd4f_5698569f",
+      "range": {
+        "startLine": 49,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 29
+      },
+      "revId": "77afeb12c4ba6be7f30ba261a24f124bb37ca533",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
