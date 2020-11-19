@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ad1bd4f_5698569f",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/serializer/XmlDataTreeCandidateSerializer.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-11-19T14:32:45Z",
+      "side": 0,
+      "message": "why do we remove this flush? I think it is needed in the general case so that state is pushed through xmlWriter",
+      "range": {
+        "startLine": 49,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 29
+      },
+      "revId": "77afeb12c4ba6be7f30ba261a24f124bb37ca533",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
