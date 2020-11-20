@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "a609476b_130cf010",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/MdsalRestconfTransaction.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-11-20T15:37:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f47db71_2d6200e1",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 6
+      },
+      "revId": "dab638fbe430a3af8466a23511f3d930f4ca4e4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b500c7a1_99cb576f",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
         "patchSetId": 8
@@ -45,6 +69,30 @@
       "revId": "dab638fbe430a3af8466a23511f3d930f4ca4e4d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "427d9f33_db837baf",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8665
+      },
+      "writtenOn": "2020-11-20T15:37:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b500c7a1_99cb576f",
+      "range": {
+        "startLine": 77,
+        "startChar": 4,
+        "endLine": 78,
+        "endChar": 5
+      },
+      "revId": "dab638fbe430a3af8466a23511f3d930f4ca4e4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
