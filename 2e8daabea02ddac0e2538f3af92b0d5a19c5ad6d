@@ -45,6 +45,30 @@
       "revId": "2e8daabea02ddac0e2538f3af92b0d5a19c5ad6d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a872989_fa54b3c2",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/impl/NetconfNotificationManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-11-24T11:30:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37220a6e_8c2044e1",
+      "range": {
+        "startLine": 129,
+        "startChar": 34,
+        "endLine": 129,
+        "endChar": 50
+      },
+      "revId": "2e8daabea02ddac0e2538f3af92b0d5a19c5ad6d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
