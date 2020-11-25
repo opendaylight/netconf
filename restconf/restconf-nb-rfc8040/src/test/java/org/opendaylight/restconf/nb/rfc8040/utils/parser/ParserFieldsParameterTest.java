@@ -49,12 +49,51 @@ public class ParserFieldsParameterTest {
     @Mock
     private InstanceIdentifierContext<ContainerSchemaNode> identifierTestServices;
 
+    @Mock
+    private InstanceIdentifierContext<ContainerSchemaNode> identifierCoreModel;
+
     private static final QNameModule Q_NAME_MODULE_JUKEBOX = QNameModule.create(
             URI.create("http://example.com/ns/example-jukebox"),
             Revision.of("2015-04-04"));
     private static final QNameModule Q_NAME_MODULE_TEST_SERVICES = QNameModule.create(
             URI.create("tests:test-services"),
             Revision.of("2019-03-25"));
+    private static final QNameModule Q_NAME_MODULE_CORE_MODEL = QNameModule.create(
+            URI.create("urn:onf:yang:core-model-1-4"),
+            Revision.of("2019-11-27"));
+
+    // container core-model
+    @Mock
+    private ContainerSchemaNode containerCoreModel;
+    private static final QName CORE_MODEL_Q_NAME = QName.create(Q_NAME_MODULE_CORE_MODEL, "core-model-1-4");
+
+    // list logical-termination-point
+    @Mock
+    private ListSchemaNode listLogicalTerminationPoint;
+    private static final QName LOGICAL_TERMINATION_POINT_Q_NAME = QName.create(Q_NAME_MODULE_CORE_MODEL,
+            "logical-termination-point");
+
+    // leaf uuid
+    @Mock
+    private LeafSchemaNode leafUuid;
+    private static final QName UUID_Q_NAME = QName.create(Q_NAME_MODULE_CORE_MODEL, "uuid");
+
+    // list layer-protocol
+    @Mock
+    private ListSchemaNode listLayerProtocol;
+    private static final QName LAYER_PROTOCOL_Q_NAME = QName.create(Q_NAME_MODULE_CORE_MODEL,
+            "layer-protocol");
+
+    // leaf local-id
+    @Mock
+    private LeafSchemaNode leafLocalId;
+    private static final QName LOCAL_ID_Q_NAME = QName.create(Q_NAME_MODULE_CORE_MODEL, "local-id");
+
+    // leaf layer-protocol-name
+    @Mock
+    private LeafSchemaNode leafLayerProtocolName;
+    private static final QName LAYER_PROTOCOL_NAME_Q_NAME = QName.create(Q_NAME_MODULE_CORE_MODEL,
+            "layer-protocol-name");
 
     // container jukebox
     @Mock
@@ -132,13 +171,41 @@ public class ParserFieldsParameterTest {
 
     @Before
     public void setUp() throws Exception {
-        final EffectiveModelContext schemaContextJukebox =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
+        final EffectiveModelContext schemaContextCoreModel =
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/core-model"));
+        // initCoreModelSchemaNodes(schemaContextCoreModel);
+
+        final EffectiveModelContext schemaContextJukebox = YangParserTestUtils.parseYangFiles(TestRestconfUtils
+                .loadFiles("/jukebox"));
         initJukeboxSchemaNodes(schemaContextJukebox);
 
         final EffectiveModelContext schemaContextTestServices =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/test-services"));
         initTestServicesSchemaNodes(schemaContextTestServices);
+    }
+
+    private void initCoreModelSchemaNodes(final EffectiveModelContext schemaContext) {
+        Mockito.when(identifierCoreModel.getSchemaContext()).thenReturn(schemaContext);
+        Mockito.when(containerCoreModel.getQName()).thenReturn(CORE_MODEL_Q_NAME);
+        Mockito.when(identifierCoreModel.getSchemaNode()).thenReturn(containerCoreModel);
+
+        Mockito.when(listLogicalTerminationPoint.getQName()).thenReturn(LOGICAL_TERMINATION_POINT_Q_NAME);
+        Mockito.when(containerCoreModel.getDataChildByName(LOGICAL_TERMINATION_POINT_Q_NAME))
+                .thenReturn(listLogicalTerminationPoint);
+        Mockito.when(listLogicalTerminationPoint.getDataChildByName(UUID_Q_NAME)).thenReturn(leafUuid);
+        Mockito.when(leafUuid.getQName()).thenReturn(UUID_Q_NAME);
+
+
+        Mockito.when(listLayerProtocol.getQName()).thenReturn(LAYER_PROTOCOL_Q_NAME);
+        Mockito.when(listLogicalTerminationPoint.getDataChildByName(LAYER_PROTOCOL_Q_NAME))
+                .thenReturn(listLayerProtocol);
+
+        Mockito.when(leafLocalId.getQName()).thenReturn(LOCAL_ID_Q_NAME);
+        Mockito.when(listLayerProtocol.getDataChildByName(LOCAL_ID_Q_NAME)).thenReturn(leafLocalId);
+
+        Mockito.when(leafLayerProtocolName.getQName()).thenReturn(LAYER_PROTOCOL_NAME_Q_NAME);
+        Mockito.when(listLayerProtocol.getDataChildByName(LAYER_PROTOCOL_NAME_Q_NAME))
+                .thenReturn(leafLayerProtocolName);
     }
 
     private void initJukeboxSchemaNodes(final EffectiveModelContext schemaContext) {
@@ -167,6 +234,7 @@ public class ParserFieldsParameterTest {
         Mockito.when(identifierTestServices.getSchemaContext()).thenReturn(schemaContext);
         Mockito.when(containerTestData.getQName()).thenReturn(TEST_DATA_Q_NAME);
         Mockito.when(identifierTestServices.getSchemaNode()).thenReturn(containerTestData);
+
 
         Mockito.when(listServices.getQName()).thenReturn(SERVICES_Q_NAME);
         Mockito.when(containerTestData.getDataChildByName(SERVICES_Q_NAME)).thenReturn(listServices);
@@ -344,6 +412,88 @@ public class ParserFieldsParameterTest {
                 Sets.newHashSet(INSTANCE_NAME_Q_NAME, NEXT_SERVICE_Q_NAME)));
     }
 
+//    /**
+//     * Test parse fields parameter containing sub-children selected delimited by slash.
+//     */
+//    @Test
+//    public void parseMountPointFieldsParameterSubPathTest() {
+//        String input = "logical-termination-point/layer-protocol/local-id";
+//        final List<YangInstanceIdentifier> parsed = ParserFieldsParameter.parseMountPointFieldsParameter(
+//                identifierCoreModel, input);
+//
+//        assertNotNull(parsed);
+//        assertEquals(1, parsed.size());
+//        assertEquals(4, parsed.get(0).size());
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(CORE_MODEL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(LOGICAL_TERMINATION_POINT_Q_NAME)
+//                .getLastPathArgument()));
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(LAYER_PROTOCOL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(LOCAL_ID_Q_NAME).getLastPathArgument()));
+//
+//    }
+//
+//    /**
+//     * Testing of fields parameter parsing when two nodes are wrapped in brackets and these nodes are not
+//     * direct children of parent node - two children with one parent node.
+//     */
+//    @Test
+//    public void parseMountPointFieldsParameterTwoChildrenPathTest() {
+//        String input = "logical-termination-point(uuid;layer-protocol)";
+//        final List<List<YangInstanceIdentifier.PathArgument>> parsed = ParserFieldsParameter
+//                .parseMountPointFieldsParameter(
+//                        identifierCoreModel, input);
+//
+//        assertNotNull(parsed);
+//        assertEquals(2, parsed.size());
+//        assertEquals(3, parsed.get(0).size());
+//        assertEquals(4, parsed.get(1).size());
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(CORE_MODEL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(LOGICAL_TERMINATION_POINT_Q_NAME)
+//                .getLastPathArgument()));
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(UUID_Q_NAME).getLastPathArgument()));
+//
+//        assertTrue(parsed.get(1).contains(YangInstanceIdentifier.of(CORE_MODEL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(1).contains(YangInstanceIdentifier.of(LOGICAL_TERMINATION_POINT_Q_NAME)
+//                .getLastPathArgument()));
+//        assertTrue(parsed.get(1).contains(YangInstanceIdentifier.of(LAYER_PROTOCOL_Q_NAME).getLastPathArgument()));
+//
+//    }
+//
+//    /**
+//     * Testing of fields parameter parsing when multiple nodes are wrapped in brackets and these nodes are not
+//     * direct children of parent node - multiple children with different parent nodes.
+//     */
+//    @Test
+//    public void parseMountPointFieldsParameterComplexPathTest() {
+//        String input = "logical-termination-point(uuid;layer-protocol(local-id;layer-protocol-name))";
+//        final List<List<YangInstanceIdentifier.PathArgument>> parsed = ParserFieldsParameter
+//                .parseMountPointFieldsParameter(
+//                        identifierCoreModel, input);
+//
+//        assertNotNull(parsed);
+//        assertEquals(3, parsed.size());
+//        assertEquals(3, parsed.get(0).size());
+//        assertEquals(5, parsed.get(1).size());
+//        assertEquals(6, parsed.get(2).size());
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(CORE_MODEL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(LOGICAL_TERMINATION_POINT_Q_NAME)
+//                .getLastPathArgument()));
+//        assertTrue(parsed.get(0).contains(YangInstanceIdentifier.of(UUID_Q_NAME).getLastPathArgument()));
+//
+//        assertTrue(parsed.get(1).contains(YangInstanceIdentifier.of(CORE_MODEL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(1).contains(YangInstanceIdentifier.of(LOGICAL_TERMINATION_POINT_Q_NAME)
+//                .getLastPathArgument()));
+//        assertTrue(parsed.get(1).contains(YangInstanceIdentifier.of(LAYER_PROTOCOL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(1).contains(YangInstanceIdentifier.of(LOCAL_ID_Q_NAME).getLastPathArgument()));
+//
+//        assertTrue(parsed.get(2).contains(YangInstanceIdentifier.of(CORE_MODEL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(2).contains(YangInstanceIdentifier.of(LOGICAL_TERMINATION_POINT_Q_NAME)
+//                .getLastPathArgument()));
+//        assertTrue(parsed.get(2).contains(YangInstanceIdentifier.of(LAYER_PROTOCOL_Q_NAME).getLastPathArgument()));
+//        assertTrue(parsed.get(2).contains(YangInstanceIdentifier.of(
+//        LAYER_PROTOCOL_NAME_Q_NAME).getLastPathArgument()));
+//    }
+
     /**
      * Test parse fields parameter containing not expected character.
      */
@@ -357,8 +507,10 @@ public class ParserFieldsParameterTest {
         } catch (final RestconfDocumentedException e) {
             // Bad request
             assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0)
+                    .getErrorTag());
+            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag()
+                    .getStatusCode());
         }
     }
 
@@ -375,8 +527,10 @@ public class ParserFieldsParameterTest {
         } catch (final RestconfDocumentedException e) {
             // Bad request
             assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0)
+                    .getErrorTag());
+            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag()
+                    .getStatusCode());
         }
     }
 
@@ -393,8 +547,10 @@ public class ParserFieldsParameterTest {
         } catch (final RestconfDocumentedException e) {
             // Bad request
             assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0)
+                    .getErrorTag());
+            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag()
+                    .getStatusCode());
         }
     }
 
@@ -411,8 +567,10 @@ public class ParserFieldsParameterTest {
         } catch (final RestconfDocumentedException e) {
             // Bad request
             assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0)
+                    .getErrorTag());
+            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag()
+                    .getStatusCode());
         }
     }
 
@@ -429,10 +587,10 @@ public class ParserFieldsParameterTest {
         } catch (final RestconfDocumentedException e) {
             // Bad request
             assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0)
+                    .getErrorTag());
+            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag()
+                    .getStatusCode());
         }
     }
-
-
 }
