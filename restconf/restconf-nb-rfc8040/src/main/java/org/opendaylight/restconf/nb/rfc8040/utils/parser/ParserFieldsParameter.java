@@ -7,11 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -20,24 +25,108 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public final class ParserFieldsParameter {
-    private ParserFieldsParameter() {
+/**
+ * Utilities used for parsing of fields query parameter content.
+ *
+ * @param <T> type of identifier
+ */
+public abstract class ParserFieldsParameter<T> {
+    private static final ParserFieldsParameter<QName> QNAME_PARSER = new QNameParser();
+    private static final ParserFieldsParameter<LinkedPathElement> PATH_PARSER = new PathParser();
 
+    private ParserFieldsParameter() {
     }
 
     /**
      * Parse fields parameter and return complete list of child nodes organized into levels.
+     *
      * @param identifier identifier context created from request URI
      * @param input input value of fields parameter
-     * @return {@link List}
+     * @return {@link List} of levels; each level contains set of {@link QName}
      */
     public static @NonNull List<Set<QName>> parseFieldsParameter(final @NonNull InstanceIdentifierContext<?> identifier,
                                                                  final @NonNull String input) {
-        final List<Set<QName>> parsed = new ArrayList<>();
+        return QNAME_PARSER.parseFields(identifier, input);
+    }
+
+    /**
+     * Parse fields parameter and return list of child node paths saved in lists.
+     *
+     * @param identifier identifier context created from request URI
+     * @param input input value of fields parameter
+     * @return {@link List} of {@link YangInstanceIdentifier} that are relative to the last {@link PathArgument}
+     *     of provided {@code identifier}
+     */
+    public static @NonNull List<YangInstanceIdentifier> parseFieldsPaths(
+            final @NonNull InstanceIdentifierContext<?> identifier, final @NonNull String input) {
+        final List<Set<LinkedPathElement>> levels = PATH_PARSER.parseFields(identifier, input);
+        final List<Map<PathArgument, LinkedPathElement>> mappedLevels = mapLevelsContentByIdentifiers(levels);
+        return buildPaths(mappedLevels);
+    }
+
+    private static List<Map<PathArgument, LinkedPathElement>> mapLevelsContentByIdentifiers(
+            final List<Set<LinkedPathElement>> levels) {
+        // this step is used for saving some processing power - we can directly find LinkedPathElement using
+        // representing PathArgument
+        return levels.stream()
+                .map(linkedPathElements -> linkedPathElements.stream()
+                        .map(linkedPathElement -> new SimpleEntry<>(linkedPathElement.targetNodeIdentifier,
+                                linkedPathElement))
+                        .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)))
+                .collect(Collectors.toList());
+    }
+
+    private static List<YangInstanceIdentifier> buildPaths(
+            final List<Map<PathArgument, LinkedPathElement>> mappedLevels) {
+        final List<YangInstanceIdentifier> completePaths = new ArrayList<>();
+        // we must traverse levels from the deepest level to the top level, because each LinkedPathElement is only
+        // linked to previous element
+        for (int levelIndex = mappedLevels.size() - 1; levelIndex >= 0; levelIndex--) {
+            // we go through unprocessed LinkedPathElements that represent leaves
+            for (final LinkedPathElement pathElement : mappedLevels.get(levelIndex).values()) {
+                if (pathElement.processed) {
+                    // this element was already processed from the lower level - skip it
+                    continue;
+                }
+                pathElement.processed = true;
+
+                // adding deepest path arguments, LinkedList is used for more effective insertion at the 0 index
+                final LinkedList<PathArgument> path = new LinkedList<>(pathElement.mixinNodesToTarget);
+                path.add(pathElement.targetNodeIdentifier);
+
+                PathArgument previousIdentifier = pathElement.previousNodeIdentifier;
+                // adding path arguments from the linked LinkedPathElements recursively
+                for (int buildingLevel = levelIndex - 1; buildingLevel >= 0; buildingLevel--) {
+                    final LinkedPathElement previousElement = mappedLevels.get(buildingLevel).get(previousIdentifier);
+                    path.addFirst(previousElement.targetNodeIdentifier);
+                    path.addAll(0, previousElement.mixinNodesToTarget);
+                    previousIdentifier = previousElement.previousNodeIdentifier;
+                    previousElement.processed = true;
+                }
+                completePaths.add(YangInstanceIdentifier.create(path));
+            }
+        }
+        return completePaths;
+    }
+
+    /**
+     * Parse fields parameter and return complete list of child nodes organized into levels.
+     *
+     * @param identifier identifier context created from request URI
+     * @param input input value of fields parameter
+     * @return {@link List} of levels; each level contains {@link Set} of identifiers of type {@link T}
+     */
+    private @NonNull List<Set<T>> parseFields(final @NonNull InstanceIdentifierContext<?> identifier,
+                                              final @NonNull String input) {
+        final List<Set<T>> parsed = new ArrayList<>();
         final SchemaContext context = identifier.getSchemaContext();
         final QNameModule startQNameModule = identifier.getSchemaNode().getQName().getModule();
         final DataSchemaContextNode<?> startNode = DataSchemaContextNode.fromDataSchemaNode(
@@ -54,25 +143,26 @@ public final class ParserFieldsParameter {
 
     /**
      * Parse input value of fields parameter and create list of sets. Each set represents one level of child nodes.
+     *
      * @param input input value of fields parameter
      * @param startQNameModule starting qname module
      * @param startNode starting node
      * @param parsed list of results
      * @param context schema context
      */
-    private static void parseInput(final @NonNull String input, final @NonNull QNameModule startQNameModule,
-                                   final @NonNull DataSchemaContextNode<?> startNode,
-                                   final @NonNull List<Set<QName>> parsed, final SchemaContext context) {
+    private void parseInput(final @NonNull String input, final @NonNull QNameModule startQNameModule,
+                            final @NonNull DataSchemaContextNode<?> startNode,
+                            final @NonNull List<Set<T>> parsed, final SchemaContext context) {
         int currentPosition = 0;
         int startPosition = 0;
         DataSchemaContextNode<?> currentNode = startNode;
         QNameModule currentQNameModule = startQNameModule;
 
-        Set<QName> currentLevel = new HashSet<>();
+        Set<T> currentLevel = new HashSet<>();
         parsed.add(currentLevel);
 
         DataSchemaContextNode<?> parenthesisNode = currentNode;
-        Set<QName> parenthesisLevel = currentLevel;
+        Set<T> parenthesisLevel = currentLevel;
         QNameModule parenthesisQNameModule = currentQNameModule;
 
         while (currentPosition < input.length()) {
@@ -87,7 +177,7 @@ public final class ParserFieldsParameter {
                 case '/':
                     // add parsed identifier to results for current level
                     currentNode = addChildToResult(currentNode, input.substring(startPosition, currentPosition),
-                        currentQNameModule, currentLevel);
+                            currentQNameModule, currentLevel);
                     // go one level down
                     currentLevel = prepareQNameLevel(parsed, currentLevel);
 
@@ -165,96 +255,41 @@ public final class ParserFieldsParameter {
     }
 
     /**
-     * Preparation of the QName level that is used as storage for parsed QNames. If the current level exist at the
-     * index that doesn't equal to the last index of already parsed QNames, a new level of QNames is allocated and
-     * pushed to input parsed QNames.
+     * Preparation of the identifiers level that is used as storage for parsed identifiers. If the current level exist
+     * at the index that doesn't equal to the last index of already parsed identifiers, a new level of identifiers
+     * is allocated and pushed to input parsed identifiers.
      *
-     * @param parsedQNames Already parsed list of QNames grouped to multiple levels.
-     * @param currentLevel Current level of QNames (set).
-     * @return Existing or new level of QNames.
+     * @param parsedIdentifiers Already parsed list of identifiers grouped to multiple levels.
+     * @param currentLevel Current level of identifiers (set).
+     * @return Existing or new level of identifiers.
      */
-    private static Set<QName> prepareQNameLevel(final List<Set<QName>> parsedQNames, final Set<QName> currentLevel) {
-        final Optional<Set<QName>> existingLevel = parsedQNames.stream()
+    private Set<T> prepareQNameLevel(final List<Set<T>> parsedIdentifiers, final Set<T> currentLevel) {
+        final Optional<Set<T>> existingLevel = parsedIdentifiers.stream()
                 .filter(qNameSet -> qNameSet.equals(currentLevel))
                 .findAny();
         if (existingLevel.isPresent()) {
-            final int index = parsedQNames.indexOf(existingLevel.get());
-            if (index == parsedQNames.size() - 1) {
-                final Set<QName> nextLevel = new HashSet<>();
-                parsedQNames.add(nextLevel);
+            final int index = parsedIdentifiers.indexOf(existingLevel.get());
+            if (index == parsedIdentifiers.size() - 1) {
+                final Set<T> nextLevel = new HashSet<>();
+                parsedIdentifiers.add(nextLevel);
                 return nextLevel;
             }
 
-            return parsedQNames.get(index + 1);
+            return parsedIdentifiers.get(index + 1);
         }
 
-        final Set<QName> nextLevel = new HashSet<>();
-        parsedQNames.add(nextLevel);
+        final Set<T> nextLevel = new HashSet<>();
+        parsedIdentifiers.add(nextLevel);
         return nextLevel;
     }
 
     /**
-     * Add parsed child of current node to result for current level.
-     * @param currentNode current node
-     * @param identifier parsed identifier of child node
-     * @param currentQNameModule current namespace and revision in {@link QNameModule}
-     * @param level current nodes level
-     * @return {@link DataSchemaContextNode}
-     */
-    private static @NonNull DataSchemaContextNode<?> addChildToResult(
-            final @NonNull DataSchemaContextNode<?> currentNode, final @NonNull String identifier,
-            final @NonNull QNameModule currentQNameModule, final @NonNull Set<QName> level) {
-        final QName childQName = QName.create(currentQNameModule, identifier);
-
-        // resolve parent node
-        final DataSchemaContextNode<?> parentNode = resolveMixinNode(
-                currentNode, level, currentNode.getIdentifier().getNodeType());
-        if (parentNode == null) {
-            throw new RestconfDocumentedException(
-                    "Not-mixin node missing in " + currentNode.getIdentifier().getNodeType().getLocalName(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
-        // resolve child node
-        final DataSchemaContextNode<?> childNode = resolveMixinNode(
-                parentNode.getChild(childQName), level, childQName);
-        if (childNode == null) {
-            throw new RestconfDocumentedException(
-                    "Child " + identifier + " node missing in "
-                            + currentNode.getIdentifier().getNodeType().getLocalName(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
-        // add final childNode node to level nodes
-        level.add(childNode.getIdentifier().getNodeType());
-        return childNode;
-    }
-
-    /**
-     * Resolve mixin node by searching for inner nodes until not mixin node or null is found.
-     * All nodes expect of not mixin node are added to current level nodes.
-     * @param node initial mixin or not-mixin node
-     * @param level current nodes level
-     * @param qualifiedName qname of initial node
-     * @return {@link DataSchemaContextNode}
-     */
-    private static @Nullable DataSchemaContextNode<?> resolveMixinNode(final @Nullable DataSchemaContextNode<?> node,
-            final @NonNull Set<QName> level, final @NonNull QName qualifiedName) {
-        DataSchemaContextNode<?> currentNode = node;
-        while (currentNode != null && currentNode.isMixin()) {
-            level.add(qualifiedName);
-            currentNode = currentNode.getChild(qualifiedName);
-        }
-
-        return currentNode;
-    }
-
-    /**
      * Find position of matching parenthesis increased by one, but at most equals to input size.
+     *
      * @param input input where to find for closing parenthesis
      * @return int position of closing parenthesis increased by one
      */
-    private static int findClosingParenthesis(final @Nullable String input) {
+    private static int findClosingParenthesis(final @NonNull String input) {
         int position = 0;
         int count = 1;
 
@@ -283,5 +318,170 @@ public final class ParserFieldsParameter {
         }
 
         return ++position;
+    }
+
+    /**
+     * Add parsed child of current node to result for current level.
+     *
+     * @param currentNode current node
+     * @param identifier parsed identifier of child node
+     * @param currentQNameModule current namespace and revision in {@link QNameModule}
+     * @param level current nodes level
+     * @return {@link DataSchemaContextNode}
+     */
+    abstract @NonNull DataSchemaContextNode<?> addChildToResult(@NonNull DataSchemaContextNode<?> currentNode,
+            @NonNull String identifier, @NonNull QNameModule currentQNameModule, @NonNull Set<T> level);
+
+    /**
+     * Fields parser that stores set of {@link QName}s in each level. Because of this fact, from the output
+     * it is is only possible to assume on what depth the selected element is placed. Identifiers of intermediary
+     * mixin nodes are also flatten to the same level as identifiers of data nodes.<br>
+     * Example: field 'a(/b/c);d/e' ('e' is place under choice node 'x') is parsed into following levels:<br>
+     * <pre>
+     * level 0: ['a', 'd']
+     * level 1: ['b', 'x', 'e']
+     * level 2: ['c']
+     * </pre>
+     */
+    private static final class QNameParser extends ParserFieldsParameter<QName> {
+        @Override
+        DataSchemaContextNode<?> addChildToResult(final DataSchemaContextNode<?> currentNode, final String identifier,
+                                                  final QNameModule currentQNameModule, final Set<QName> level) {
+            final QName childQName = QName.create(currentQNameModule, identifier);
+
+            // resolve parent node
+            final DataSchemaContextNode<?> parentNode = resolveMixinNode(
+                    currentNode, level, currentNode.getIdentifier().getNodeType());
+            if (parentNode == null) {
+                throw new RestconfDocumentedException(
+                        "Not-mixin node missing in " + currentNode.getIdentifier().getNodeType().getLocalName(),
+                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            }
+
+            // resolve child node
+            final DataSchemaContextNode<?> childNode = resolveMixinNode(
+                    parentNode.getChild(childQName), level, childQName);
+            if (childNode == null) {
+                throw new RestconfDocumentedException(
+                        "Child " + identifier + " node missing in "
+                                + currentNode.getIdentifier().getNodeType().getLocalName(),
+                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            }
+
+            // add final childNode node to level nodes
+            level.add(childNode.getIdentifier().getNodeType());
+            return childNode;
+        }
+
+        /**
+         * Resolve mixin node by searching for inner nodes until not mixin node or null is found.
+         * All nodes expect of not mixin node are added to current level nodes.
+         *
+         * @param node          initial mixin or not-mixin node
+         * @param level         current nodes level
+         * @param qualifiedName qname of initial node
+         * @return {@link DataSchemaContextNode}
+         */
+        private static @Nullable DataSchemaContextNode<?> resolveMixinNode(
+                final @Nullable DataSchemaContextNode<?> node, final @NonNull Set<QName> level,
+                final @NonNull QName qualifiedName) {
+            DataSchemaContextNode<?> currentNode = node;
+            while (currentNode != null && currentNode.isMixin()) {
+                level.add(qualifiedName);
+                currentNode = currentNode.getChild(qualifiedName);
+            }
+
+            return currentNode;
+        }
+    }
+
+    /**
+     * Fields parser that stores set of {@link LinkedPathElement}s in each level. Using {@link LinkedPathElement}
+     * it is possible to create a chain of path arguments and build complete paths since this element contains
+     * identifiers of intermediary mixin nodes and also linked previous element.<br>
+     * Example: field 'a(/b/c);d/e' ('e' is place under choice node 'x') is parsed into following levels:<br>
+     * <pre>
+     * level 0: ['./a', './d']
+     * level 1: ['a/b', '/d/x/e']
+     * level 2: ['b/c']
+     * </pre>
+     */
+    private static final class PathParser extends ParserFieldsParameter<LinkedPathElement> {
+        @Override
+        DataSchemaContextNode<?> addChildToResult(final DataSchemaContextNode<?> currentNode, final String identifier,
+                final QNameModule currentQNameModule, final Set<LinkedPathElement> level) {
+            final QName childQName = QName.create(currentQNameModule, identifier);
+            final List<PathArgument> collectedMixinNodes = new ArrayList<>();
+
+            DataSchemaContextNode<?> actualContextNode = currentNode.getChild(childQName);
+            while (actualContextNode != null && actualContextNode.isMixin()) {
+                if (actualContextNode.getDataSchemaNode() instanceof ListSchemaNode) {
+                    // we need just a single node identifier from list in the path (key is not available)
+                    actualContextNode = actualContextNode.getChild(childQName);
+                    break;
+                } else if (actualContextNode.getDataSchemaNode() instanceof LeafListSchemaNode) {
+                    // NodeWithValue is unusable - stop parsing
+                    break;
+                } else {
+                    collectedMixinNodes.add(actualContextNode.getIdentifier());
+                    actualContextNode = actualContextNode.getChild(childQName);
+                }
+            }
+
+            if (actualContextNode == null) {
+                throw new RestconfDocumentedException("Child " + identifier + " node missing in "
+                        + currentNode.getIdentifier().getNodeType().getLocalName(),
+                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            }
+            final LinkedPathElement linkedPathElement = new LinkedPathElement(currentNode.getIdentifier(),
+                    collectedMixinNodes, actualContextNode.getIdentifier());
+            level.add(linkedPathElement);
+            return actualContextNode;
+        }
+    }
+
+    /**
+     * {@link PathArgument} of data element grouped with identifiers of leading mixin nodes and previous node.<br>
+     *  - identifiers of mixin nodes on the path to the target node - required for construction of full valid
+     *    DOM paths,<br>
+     *  - identifier of the previous non-mixin node - required to successfully create a chain of {@link PathArgument}s
+     */
+    private static final class LinkedPathElement {
+        private final PathArgument previousNodeIdentifier;
+        private final List<PathArgument> mixinNodesToTarget;
+        private final PathArgument targetNodeIdentifier;
+        private boolean processed = false;
+
+        /**
+         * Creation of new {@link LinkedPathElement}.
+         *
+         * @param previousNodeIdentifier identifier of the previous non-mixin node
+         * @param mixinNodesToTarget     identifiers of mixin nodes on the path to the target node
+         * @param targetNodeIdentifier   identifier of target non-mixin node
+         */
+        private LinkedPathElement(final PathArgument previousNodeIdentifier,
+                final List<PathArgument> mixinNodesToTarget, final PathArgument targetNodeIdentifier) {
+            this.previousNodeIdentifier = previousNodeIdentifier;
+            this.mixinNodesToTarget = mixinNodesToTarget;
+            this.targetNodeIdentifier = targetNodeIdentifier;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            // this is need in order to make 'prepareQNameLevel(..)' working
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            final LinkedPathElement that = (LinkedPathElement) obj;
+            return targetNodeIdentifier.equals(that.targetNodeIdentifier);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(targetNodeIdentifier);
+        }
     }
 }

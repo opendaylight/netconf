@@ -33,5 +33,9 @@ module test-services {
                 }
             }
         }
+
+        leaf-list protocols {
+            type string;
+        }
     }
 }
