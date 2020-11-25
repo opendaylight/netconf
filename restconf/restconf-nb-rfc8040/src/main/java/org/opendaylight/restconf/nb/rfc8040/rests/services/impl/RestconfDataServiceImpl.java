@@ -155,9 +155,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        final NormalizedNode<?, ?> node = readData(identifier, parameters.getContent(),
-                instanceIdentifier.getInstanceIdentifier(), strategy, parameters.getWithDefault(), schemaContextRef,
-                uriInfo);
+        final List<YangInstanceIdentifier> fieldPaths = parameters.getFieldPaths();
+        final NormalizedNode<?, ?> node;
+        if (fieldPaths != null && !fieldPaths.isEmpty()) {
+            node = ReadDataTransactionUtil.readData(parameters.getContent(), instanceIdentifier.getInstanceIdentifier(),
+                    strategy, parameters.getWithDefault(), schemaContextRef, fieldPaths);
+        } else {
+            node = readData(identifier, parameters.getContent(),
+                    instanceIdentifier.getInstanceIdentifier(), strategy, parameters.getWithDefault(), schemaContextRef,
+                    uriInfo);
+        }
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();

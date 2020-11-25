@@ -1,0 +1,143 @@
+module core-model-1-4 {
+    yang-version 1.1;
+    namespace "urn:onf:yang:core-model-1-4";
+    prefix core-model;
+
+    organization
+      "Open Networking Foundation (ONF)";
+    contact
+      "WG Web : https://wiki.opennetworking.org/pages/viewpage.action?pageId=262963204
+       WG List: <mailto:information-modeling@opennetworking.org>
+       Editor : Nigel Davis
+       Email  : <mailto:ndavis@ciena.com>";
+    description
+      "This module contains a collection of YANG definitions for management and control of network fuctions.
+
+       Copyright 2019 Open Networking Foundation (ONF). All rights reserved.
+
+       Licensed under the Apache License, Version 2.0 (the 'License');
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an 'AS IS' BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.";
+
+    revision 2019-11-27 {
+        description
+          "Package equipment-specification has been deleted,
+           because of wrong key statements and overall grouping never applied.
+          ";
+    }
+
+    /****************************************
+     * typedef statements
+     **************************************/
+    typedef layer-protocol-name-type {
+        type identityref {
+            base LAYER_PROTOCOL_NAME_TYPE;
+        }
+        description
+          "A controlled list of LayerProtocol names.";
+    }
+    typedef universal-id {
+        type string;
+        description
+          "The universal ID value where the mechanism for generation is defined by some authority not directly referenced in the structure.
+           An example structure is [IETF RFC4122].";
+    }
+
+    identity LAYER_PROTOCOL_NAME_TYPE {
+        description
+          "none";
+    }
+
+    identity LAYER_PROTOCOL_NAME_TYPE_PHOTONIC_MEDIA {
+        base LAYER_PROTOCOL_NAME_TYPE;
+        description
+          "The characteristic information is that of a channel able to carry photons and of the photon source/sink.";
+    }
+
+    identity LAYER_PROTOCOL_NAME_TYPE_OTU_AND_ODU {
+        base LAYER_PROTOCOL_NAME_TYPE;
+        description
+          "The characteristic information is that of a channel able to carry ODU/OTU protocol (OTN) and of the ODU/OTU source/sink.";
+    }
+
+    identity LAYER_PROTOCOL_NAME_TYPE_ETHERNET {
+        base LAYER_PROTOCOL_NAME_TYPE;
+        description
+          "The characteristic information is that of a channel able to carry Ethernet protocol and of the Ethernet protocol source/sink.";
+    }
+
+    list logical-termination-point {
+        key "uuid";
+        uses logical-termination-point;
+        description
+          "none";
+    }
+
+    leaf uuid {
+        type universal-id;
+        description
+          "UUID: An identifier that is universally unique
+           (This should be considered in the context of Identifier: A property of an entity/role with a value that is unique within an identifier space, where the identifier space is itself globally unique, and immutable. An identifier carries no semantics with respect to the purpose or state of the entity)
+           The uuid should be treated as opaque by the user.";
+    }
+
+    leaf layer-protocol-name {
+        type layer-protocol-name-type;
+        description
+          "The name of the LayerProtocol chosen from a controlled list.
+           LayerProtocol names include:
+           - PHOTONIC_MEDIA
+           - ODU
+           - ETHERNET";
+    }
+
+    list layer-protocol {
+        key "local-id";
+        min-elements 1;
+        uses layer-protocol;
+        description
+          "Ordered list of LayerProtocols that this LTP is comprised of where the first entry in the list is the lowest server layer (e.g. physical).";
+    }
+
+    leaf local-id {
+        type string;
+        description
+          "An identifier that is unique in the context of some scope that is less than the global scope.
+           (This should be considered in the context of Identifier: A property of an entity/role with a value that is unique within an identifier space, where the identifier space is itself unique, and immutable. The identifier therefore represents the identity of the entity/role. An identifier carries no semantics with respect to the purpose of the entity.)";
+    }
+
+    grouping logical-termination-point {
+        list layer-protocol {
+            key "local-id";
+            min-elements 1;
+            uses layer-protocol;
+            description
+              "Ordered list of LayerProtocols that this LTP is comprised of where the first entry in the list is the lowest server layer (e.g. physical).";
+        }
+        leaf uuid {
+            type universal-id;
+            description
+              "Unique identifier.";
+        }
+    }
+    grouping layer-protocol {
+        leaf layer-protocol-name {
+            type layer-protocol-name-type;
+            description
+              "Indicate the specific layer-protocol described by the LayerProtocol entity.";
+        }
+        leaf local-id {
+            type string;
+            description
+              "Unique identifier.";
+        }
+    }
+}

@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.List;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -64,6 +65,17 @@ public abstract class RestconfStrategy implements AutoCloseable {
      */
     public abstract ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
         YangInstanceIdentifier path);
+
+    /**
+     * Read data selected using fields from the datastore.
+     *
+     * @param store the logical data store which should be modified
+     * @param path the parent data object path
+     * @param fields paths to selected fields relative to parent path
+     * @return a ListenableFuture containing the result of the read
+     */
+    public abstract ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+            YangInstanceIdentifier path, List<YangInstanceIdentifier> fields);
 
     /**
      * Check if data already exists in the datastore.
