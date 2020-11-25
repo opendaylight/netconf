@@ -11,11 +11,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +33,14 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -54,6 +63,9 @@ public class ParserFieldsParameterTest {
     private static final QNameModule Q_NAME_MODULE_TEST_SERVICES = QNameModule.create(
             URI.create("tests:test-services"),
             Revision.of("2019-03-25"));
+    private static final QNameModule Q_NAME_MODULE_AUGMENTED_JUKEBOX = QNameModule.create(
+            URI.create("http://example.com/ns/augmented-jukebox"),
+            Revision.of("2016-05-05"));
 
     // container jukebox
     @Mock
@@ -73,11 +85,17 @@ public class ParserFieldsParameterTest {
     // container augmented library
     @Mock
     private ContainerSchemaNode augmentedContainerLibrary;
-    private static final QName AUGMENTED_LIBRARY_Q_NAME = QName.create(
-            QNameModule.create(
-                    URI.create("http://example.com/ns/augmented-jukebox"),
-                    Revision.of("2016-05-05")),
+    private static final QName AUGMENTED_LIBRARY_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX,
             "augmented-library");
+
+    // augmentation that contains speed leaf
+    @Mock
+    private AugmentationSchemaNode speedAugmentation;
+
+    // leaf speed
+    @Mock
+    private LeafSchemaNode leafSpeed;
+    private static final QName SPEED_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX, "speed");
 
     // list album
     @Mock
@@ -129,6 +147,11 @@ public class ParserFieldsParameterTest {
     private LeafSchemaNode leafNextService;
     private static final QName NEXT_SERVICE_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "next-service");
 
+    // leaf-list protocols
+    @Mock
+    private LeafListSchemaNode leafListProtocols;
+    private static final QName PROTOCOLS_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "protocols");
+
     @Before
     public void setUp() throws Exception {
         final EffectiveModelContext schemaContextJukebox =
@@ -160,6 +183,14 @@ public class ParserFieldsParameterTest {
 
         when(leafName.getQName()).thenReturn(NAME_Q_NAME);
         when(listAlbum.dataChildByName(NAME_Q_NAME)).thenReturn(leafName);
+
+        when(leafSpeed.getQName()).thenReturn(SPEED_Q_NAME);
+        when(leafSpeed.isAugmenting()).thenReturn(true);
+        when(containerPlayer.dataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
+        when(containerPlayer.getDataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
+        doReturn(Collections.singletonList(leafSpeed)).when(speedAugmentation).getChildNodes();
+        doReturn(Collections.singleton(speedAugmentation)).when(containerPlayer).getAvailableAugmentations();
+        when(speedAugmentation.findDataChildByName(SPEED_Q_NAME)).thenReturn(Optional.of(leafSpeed));
     }
 
     private void initTestServicesSchemaNodes(final EffectiveModelContext schemaContext) {
@@ -169,6 +200,9 @@ public class ParserFieldsParameterTest {
 
         when(listServices.getQName()).thenReturn(SERVICES_Q_NAME);
         when(containerTestData.dataChildByName(SERVICES_Q_NAME)).thenReturn(listServices);
+
+        when(leafListProtocols.getQName()).thenReturn(PROTOCOLS_Q_NAME);
+        when(containerTestData.dataChildByName(PROTOCOLS_Q_NAME)).thenReturn(leafListProtocols);
 
         when(leafTypeOfService.getQName()).thenReturn(TYPE_OF_SERVICE_Q_NAME);
         when(listServices.dataChildByName(TYPE_OF_SERVICE_Q_NAME)).thenReturn(leafTypeOfService);
@@ -433,5 +467,121 @@ public class ParserFieldsParameterTest {
         }
     }
 
+    @Test
+    public void parseTopLevelContainerToPathTest() {
+        final String input = "library";
+        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
+                identifierJukebox, input);
 
+        assertNotNull(parsedFields);
+        assertEquals(1, parsedFields.size());
+        final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
+        assertEquals(1, pathArguments.size());
+        assertEquals(LIBRARY_Q_NAME, pathArguments.get(0).getNodeType());
+    }
+
+    @Test
+    public void parseTwoTopLevelContainersToPathsTest() {
+        final String input = "library;player";
+        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
+                identifierJukebox, input);
+
+        assertNotNull(parsedFields);
+        assertEquals(2, parsedFields.size());
+
+        final Optional<YangInstanceIdentifier> libraryPath = findPath(parsedFields, LIBRARY_Q_NAME);
+        assertTrue(libraryPath.isPresent());
+        assertEquals(1, libraryPath.get().getPathArguments().size());
+
+        final Optional<YangInstanceIdentifier> playerPath = findPath(parsedFields, PLAYER_Q_NAME);
+        assertTrue(playerPath.isPresent());
+        assertEquals(1, libraryPath.get().getPathArguments().size());
+    }
+
+    @Test
+    public void parseNestedLeafToPathTest() {
+        final String input = "library/album/name";
+        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
+                identifierJukebox, input);
+
+        assertEquals(1, parsedFields.size());
+        final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
+        assertEquals(3, pathArguments.size());
+
+        assertEquals(LIBRARY_Q_NAME, pathArguments.get(0).getNodeType());
+        assertEquals(ALBUM_Q_NAME, pathArguments.get(1).getNodeType());
+        assertEquals(NAME_Q_NAME, pathArguments.get(2).getNodeType());
+    }
+
+    @Test
+    public void parseAugmentedLeafToPathTest() {
+        final String input = "player/augmented-jukebox:speed";
+        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
+                identifierJukebox, input);
+
+        assertEquals(1, parsedFields.size());
+        final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
+
+        assertEquals(3, pathArguments.size());
+        assertEquals(PLAYER_Q_NAME, pathArguments.get(0).getNodeType());
+        assertTrue(pathArguments.get(1) instanceof AugmentationIdentifier);
+        assertEquals(SPEED_Q_NAME, pathArguments.get(2).getNodeType());
+    }
+
+    @Test
+    public void parseMultipleFieldsOnDifferentLevelsToPathsTest() {
+        final String input = "services(type-of-service;instance/instance-name;instance/provider)";
+        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
+                identifierTestServices, input);
+
+        assertEquals(3, parsedFields.size());
+
+        final Optional<YangInstanceIdentifier> tosPath = findPath(parsedFields, TYPE_OF_SERVICE_Q_NAME);
+        assertTrue(tosPath.isPresent());
+        assertEquals(2, tosPath.get().getPathArguments().size());
+
+        final Optional<YangInstanceIdentifier> instanceNamePath = findPath(parsedFields, INSTANCE_NAME_Q_NAME);
+        assertTrue(instanceNamePath.isPresent());
+        assertEquals(3, instanceNamePath.get().getPathArguments().size());
+
+        final Optional<YangInstanceIdentifier> providerPath = findPath(parsedFields, PROVIDER_Q_NAME);
+        assertTrue(providerPath.isPresent());
+        assertEquals(3, providerPath.get().getPathArguments().size());
+    }
+
+    @Test
+    public void parseListFieldUnderListToPathTest() {
+        final String input = "services/instance";
+        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
+                identifierTestServices, input);
+
+        assertEquals(1, parsedFields.size());
+        final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
+        assertEquals(2, pathArguments.size());
+
+        assertEquals(SERVICES_Q_NAME, pathArguments.get(0).getNodeType());
+        assertTrue(pathArguments.get(0) instanceof NodeIdentifier);
+        assertEquals(INSTANCE_Q_NAME, pathArguments.get(1).getNodeType());
+        assertTrue(pathArguments.get(1) instanceof NodeIdentifier);
+    }
+
+    @Test
+    public void parseLeafListFieldToPathTest() {
+        final String input = "protocols";
+        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
+                identifierTestServices, input);
+
+        assertEquals(1, parsedFields.size());
+        final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
+        assertEquals(1, pathArguments.size());
+        assertTrue(pathArguments.get(0) instanceof NodeIdentifier);
+        assertEquals(PROTOCOLS_Q_NAME, pathArguments.get(0).getNodeType());
+    }
+
+    private static Optional<YangInstanceIdentifier> findPath(final List<YangInstanceIdentifier> paths,
+                                                             final QName lastPathArg) {
+        return paths.stream()
+                .filter(path -> lastPathArg.equals(path.getLastPathArgument().getNodeType()))
+                .findAny();
+    }
 }
