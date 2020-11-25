@@ -10,11 +10,13 @@ package org.opendaylight.restconf.common.context;
 import java.util.List;
 import java.util.Set;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public final class WriterParameters {
     private final String content;
     private final Integer depth;
     private final List<Set<QName>> fields;
+    private final List<YangInstanceIdentifier> fieldPaths;
     private final boolean prettyPrint;
     private final boolean tagged;
     private final String withDefault;
@@ -23,6 +25,7 @@ public final class WriterParameters {
         this.content = builder.content;
         this.depth = builder.depth;
         this.fields = builder.fields;
+        this.fieldPaths = builder.fieldPaths;
         this.prettyPrint = builder.prettyPrint;
         this.tagged = builder.tagged;
         this.withDefault = builder.withDefault;
@@ -38,6 +41,10 @@ public final class WriterParameters {
 
     public List<Set<QName>> getFields() {
         return this.fields;
+    }
+
+    public List<YangInstanceIdentifier> getFieldPaths() {
+        return this.fieldPaths;
     }
 
     public boolean isPrettyPrint() {
@@ -56,6 +63,7 @@ public final class WriterParameters {
         private String content;
         private Integer depth;
         private List<Set<QName>> fields;
+        private List<YangInstanceIdentifier> fieldPaths;
         private boolean prettyPrint;
         private boolean tagged;
         private String withDefault;
@@ -76,6 +84,11 @@ public final class WriterParameters {
 
         public WriterParametersBuilder setFields(final List<Set<QName>> fields) {
             this.fields = fields;
+            return this;
+        }
+
+        public WriterParametersBuilder setFieldPaths(final List<YangInstanceIdentifier> fieldPaths) {
+            this.fieldPaths = fieldPaths;
             return this;
         }
 

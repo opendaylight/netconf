@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.util.List;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
@@ -56,6 +57,22 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
                 throw new IllegalArgumentException(String.format(
                         "%s, Cannot read data %s for %s datastore, unknown datastore type",
                         netconfService.getDeviceId(), path, store));
+        }
+    }
+
+    @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
+        switch (store) {
+            case CONFIGURATION:
+                return netconfService.getConfig(path, fields);
+            case OPERATIONAL:
+                return netconfService.get(path, fields);
+            default:
+                LOG.info("Unknown datastore type: {}.", store);
+                throw new IllegalArgumentException(String.format(
+                        "%s, Cannot read data %s with fields %s for %s datastore, unknown datastore type",
+                        netconfService.getDeviceId(), path, fields, store));
         }
     }
 
