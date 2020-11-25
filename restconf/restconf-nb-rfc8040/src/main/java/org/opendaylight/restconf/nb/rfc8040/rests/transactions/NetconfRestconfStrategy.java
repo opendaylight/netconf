@@ -76,6 +76,22 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
     }
 
     @Override
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
+        switch (store) {
+            case CONFIGURATION:
+                return netconfService.getConfig(path, fields);
+            case OPERATIONAL:
+                return netconfService.get(path, fields);
+            default:
+                LOG.info("Unknown datastore type: {}.", store);
+                throw new IllegalArgumentException(String.format(
+                        "%s, Cannot read data %s with fields %s for %s datastore, unknown datastore type",
+                        netconfService.getDeviceId(), path, fields, store));
+        }
+    }
+
+    @Override
     public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         return remapException(read(store, path))
                 .transform(optionalNode -> optionalNode != null && optionalNode.isPresent(),
