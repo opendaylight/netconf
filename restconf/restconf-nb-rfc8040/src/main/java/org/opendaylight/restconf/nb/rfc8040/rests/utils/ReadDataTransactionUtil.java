@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsParameter;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsPaths;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
@@ -33,7 +36,6 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -158,7 +160,11 @@ public final class ReadDataTransactionUtil {
 
         // check and set fields
         if (!fields.isEmpty()) {
-            builder.setFields(ParserFieldsParameter.parseFieldsParameter(identifier, fields.get(0)));
+            if (identifier.getMountPoint() != null) {
+                builder.setFieldPaths(parseFieldsPaths(identifier, fields.get(0)));
+            } else {
+                builder.setFields(parseFieldsParameter(identifier, fields.get(0)));
+            }
         }
 
         // check and set withDefaults parameter
@@ -221,6 +227,42 @@ public final class ReadDataTransactionUtil {
         }
     }
 
+    /**
+     * Read specific type of data from data store via transaction with specified subtrees that should only be read.
+     * Close {@link DOMTransactionChain} inside of object {@link RestconfStrategy} provided as a parameter.
+     *
+     * @param valueOfContent type of data to read (config, state, all)
+     * @param path           the parent path to read
+     * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa       value of with-defaults parameter
+     * @param ctx            schema context
+     * @param fields         paths to selected subtrees which should be read, relative to to the parent path
+     * @return {@link NormalizedNode}
+     */
+    public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
+            final @NonNull YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
+            final @Nullable String withDefa, @NonNull final EffectiveModelContext ctx,
+            final @NonNull List<YangInstanceIdentifier> fields) {
+        switch (valueOfContent) {
+            case RestconfDataServiceConstant.ReadData.CONFIG:
+                if (withDefa == null) {
+                    return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields);
+                } else {
+                    return prepareDataByParamWithDef(
+                            readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields),
+                            path, withDefa, ctx);
+                }
+            case RestconfDataServiceConstant.ReadData.NONCONFIG:
+                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, true, fields);
+            case RestconfDataServiceConstant.ReadData.ALL:
+                return readAllData(strategy, path, withDefa, ctx, fields);
+            default:
+                strategy.close();
+                throw new RestconfDocumentedException(new RestconfError(RestconfError.ErrorType.PROTOCOL,
+                        RestconfError.ErrorTag.INVALID_VALUE, "Invalid content parameter: " + valueOfContent, null,
+                        "The content parameter value must be either config, nonconfig or all (default)"));
+        }
+    }
 
     /**
      * Check if URI does not contain value for the same parameter more than once.
@@ -394,13 +436,38 @@ public final class ReadDataTransactionUtil {
     static @Nullable NormalizedNode<?, ?> readDataViaTransaction(final @NonNull RestconfStrategy strategy,
             final LogicalDatastoreType store, final YangInstanceIdentifier path,
             final boolean closeTransactionChain) {
-        final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(store, path);
+        return extractReadData(strategy, path, closeTransactionChain, listenableFuture);
+    }
+
+    /**
+     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link RestconfStrategy} with
+     * specified subtrees that should only be read.
+     *
+     * @param strategy              {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param store                 datastore type
+     * @param path                  parent path to selected fields
+     * @param closeTransactionChain if it is set to {@code true}, after transaction it will close transactionChain
+     *                              in {@link RestconfStrategy} if any
+     * @param fields                paths to selected subtrees which should be read, relative to to the parent path
+     * @return {@link NormalizedNode}
+     */
+    private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(final @NonNull RestconfStrategy strategy,
+            final @NonNull LogicalDatastoreType store, final @NonNull YangInstanceIdentifier path,
+            final boolean closeTransactionChain, final @NonNull List<YangInstanceIdentifier> fields) {
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(store, path, fields);
+        return extractReadData(strategy, path, closeTransactionChain, listenableFuture);
+    }
+
+    private static NormalizedNode<?, ?> extractReadData(final RestconfStrategy strategy,
+            final YangInstanceIdentifier path, final boolean closeTransactionChain,
+            final ListenableFuture<Optional<NormalizedNode<?, ?>>> dataFuture) {
+        final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
         if (closeTransactionChain) {
             //Method close transactionChain if any
-            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory, strategy, path);
+            FutureCallbackTx.addCallback(dataFuture, READ_TYPE_TX, dataFactory, strategy, path);
         } else {
-            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory);
+            FutureCallbackTx.addCallback(dataFuture, READ_TYPE_TX, dataFactory);
         }
         return dataFactory.build();
     }
@@ -432,6 +499,43 @@ public final class ReadDataTransactionUtil {
                     path, withDefa, ctx);
         }
 
+        return mergeConfigAndSTateDataIfNeeded(stateDataNode, configDataNode);
+    }
+
+    /**
+     * Read config and state data with selected subtrees that should only be read, then map them.
+     * Close {@link DOMTransactionChain} inside of object {@link RestconfStrategy} provided as a parameter.
+     *
+     * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param path     parent path to selected fields
+     * @param withDefa with-defaults parameter
+     * @param ctx      schema context
+     * @param fields   paths to selected subtrees which should be read, relative to to the parent path
+     * @return {@link NormalizedNode}
+     */
+    private static @Nullable NormalizedNode<?, ?> readAllData(final @NonNull RestconfStrategy strategy,
+            final @NonNull YangInstanceIdentifier path, final @Nullable String withDefa,
+            final @NonNull EffectiveModelContext ctx, final @NonNull List<YangInstanceIdentifier> fields) {
+        // PREPARE STATE DATA NODE
+        final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(
+                strategy, LogicalDatastoreType.OPERATIONAL, path, false, fields);
+
+        // PREPARE CONFIG DATA NODE
+        final NormalizedNode<?, ?> configDataNode;
+        //Here will be closed transactionChain if any
+        if (withDefa == null) {
+            configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields);
+        } else {
+            configDataNode = prepareDataByParamWithDef(
+                    readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields),
+                    path, withDefa, ctx);
+        }
+
+        return mergeConfigAndSTateDataIfNeeded(stateDataNode, configDataNode);
+    }
+
+    private static NormalizedNode<?, ?> mergeConfigAndSTateDataIfNeeded(final NormalizedNode<?, ?> stateDataNode,
+                                                                        final NormalizedNode<?, ?> configDataNode) {
         // if no data exists
         if (stateDataNode == null && configDataNode == null) {
             return null;
