@@ -13,4 +13,10 @@ module augmented-jukebox {
         container augmented-library {
         }
      }
+
+     augment "/jbox:jukebox/jbox:player" {
+       leaf speed {
+         type uint8;
+       }
+     }
    }

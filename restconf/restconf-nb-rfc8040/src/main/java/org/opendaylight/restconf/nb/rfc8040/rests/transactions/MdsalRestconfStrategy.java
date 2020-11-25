@@ -10,7 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -64,7 +66,14 @@ public class MdsalRestconfStrategy implements RestconfStrategy {
     }
 
     @Override
-    public FluentFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
+        return Futures.immediateFailedFuture(new UnsupportedOperationException(
+                "Reading of selected subtrees is currently not supported in: " + MdsalRestconfStrategy.class));
+    }
+
+    @Override
+    public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         return rwTx.exists(store, path);
     }
 
