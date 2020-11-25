@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
+
+import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
@@ -59,6 +62,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNo
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -96,7 +100,7 @@ public final class ReadDataTransactionUtil {
 
         // check only allowed parameters
         ParametersUtil.checkParametersTypes(
-                RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                READ_TYPE_TX,
                 uriInfo.getQueryParameters().keySet(),
                 RestconfDataServiceConstant.ReadData.CONTENT,
                 RestconfDataServiceConstant.ReadData.DEPTH,
@@ -155,7 +159,15 @@ public final class ReadDataTransactionUtil {
 
         // check and set fields
         if (!fields.isEmpty()) {
-            builder.setFields(ParserFieldsParameter.parseFieldsParameter(identifier, fields.get(0)));
+            if (identifier.getMountPoint() != null) {
+                builder.setFieldPaths(ParserFieldsParameter.parseMountPointFieldsParameter(
+                        identifier, fields.get(0)).stream()
+                        .map(pathArguments -> Iterables.skip(pathArguments, 1))
+                        .map(YangInstanceIdentifier::create)
+                        .collect(Collectors.toList()));
+            } else {
+                builder.setFields(ParserFieldsParameter.parseFieldsParameter(identifier, fields.get(0)));
+            }
         }
 
         // check and set withDefaults parameter
@@ -218,6 +230,43 @@ public final class ReadDataTransactionUtil {
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
                                 "The content parameter value must be either config, nonconfig or all (default)"));
+        }
+    }
+
+    /**
+     * Read specific type of data from data store via transaction with specified subtrees that should only be read.
+     * Close {@link DOMTransactionChain} if any inside of object {@link RestconfStrategy} provided as a parameter.
+     *
+     * @param valueOfContent type of data to read (config, state, all)
+     * @param path           the parent path to read
+     * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa       value of with-defaults parameter
+     * @param ctx            schema context
+     * @param fields         paths to selected subtrees which should be read, relative to to the parent path
+     * @return {@link NormalizedNode}
+     */
+    public static @Nullable NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
+            final @NonNull YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
+            final String withDefa, final EffectiveModelContext ctx,
+            final @NonNull List<YangInstanceIdentifier> fields) {
+        switch (valueOfContent) {
+            case RestconfDataServiceConstant.ReadData.CONFIG:
+                if (withDefa == null) {
+                    return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields);
+                } else {
+                    return prepareDataByParamWithDef(
+                            readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields),
+                            path, withDefa, ctx);
+                }
+            case RestconfDataServiceConstant.ReadData.NONCONFIG:
+                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, true, fields);
+            case RestconfDataServiceConstant.ReadData.ALL:
+                return readAllData(strategy, path, withDefa, ctx, fields);
+            default:
+                strategy.cancel();
+                throw new RestconfDocumentedException(new RestconfError(RestconfError.ErrorType.PROTOCOL,
+                        RestconfError.ErrorTag.INVALID_VALUE, "Invalid content parameter: " + valueOfContent, null,
+                        "The content parameter value must be either config, nonconfig or all (default)"));
         }
     }
 
@@ -362,11 +411,36 @@ public final class ReadDataTransactionUtil {
                 store, strategy.getInstanceIdentifier().getInstanceIdentifier());
         if (closeTransactionChain) {
             //Method close transactionChain if any
-            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX,
                     dataFactory, strategy.getTransactionChain());
         } else {
-            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX,
                     dataFactory);
+        }
+        return dataFactory.build();
+    }
+
+    /**
+     * Reads mountpoint data specified by fields parameter.
+     *
+     * @param strategy              {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param closeTransactionChain If is set to true, after transaction it will close transactionChain
+     *                              in {@link RestconfStrategy} if any
+     * @param fields                identifiers specified by fields query
+     * @return {@link NormalizedNode}
+     */
+    static @Nullable NormalizedNode<?, ?> readDataViaTransaction(final @NonNull RestconfStrategy strategy,
+                                                                 final LogicalDatastoreType store,
+                                                                 final YangInstanceIdentifier path,
+                                                                 final boolean closeTransactionChain,
+                                                                 List<YangInstanceIdentifier> fields) {
+        final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = strategy.read(store, path, fields);
+        if (closeTransactionChain) {
+            //Method close transactionChain if any
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory, strategy.getTransactionChain());
+        } else {
+            FutureCallbackTx.addCallback(listenableFuture, READ_TYPE_TX, dataFactory);
         }
         return dataFactory.build();
     }
@@ -398,6 +472,42 @@ public final class ReadDataTransactionUtil {
                     strategy.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
         }
 
+        return mergeConfigAndSTateDataIfNeeded(stateDataNode, configDataNode);
+    }
+
+    /**
+     * Read config and state data with selected subtrees that should only be read, then map them.
+     * Close {@link DOMTransactionChain} inside of object {@link RestconfStrategy} provided as a parameter if any.
+     *
+     * @param strategy {@link RestconfStrategy} - object that perform the actual DS operations
+     * @param withDefa with-defaults parameter
+     * @param ctx      schema context
+     * @param fields   paths to selected subtrees which should be read, relative to to the parent path
+     * @return {@link NormalizedNode}
+     */
+    private static @Nullable NormalizedNode<?, ?> readAllData(final @NonNull RestconfStrategy strategy,
+            final YangInstanceIdentifier path, final String withDefa, final EffectiveModelContext ctx,
+            final List<YangInstanceIdentifier> fields) {
+        // PREPARE STATE DATA NODE
+        final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(
+                strategy, LogicalDatastoreType.OPERATIONAL, path, false, fields);
+
+        // PREPARE CONFIG DATA NODE
+        final NormalizedNode<?, ?> configDataNode;
+        //Here will be closed transactionChain if any
+        if (withDefa == null) {
+            configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields);
+        } else {
+            configDataNode = prepareDataByParamWithDef(
+                    readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields),
+                    path, withDefa, ctx);
+        }
+
+        return mergeConfigAndSTateDataIfNeeded(stateDataNode, configDataNode);
+    }
+
+    private static NormalizedNode<?, ?> mergeConfigAndSTateDataIfNeeded(final NormalizedNode<?, ?> stateDataNode,
+                                                                        final NormalizedNode<?, ?> configDataNode) {
         // if no data exists
         if (stateDataNode == null && configDataNode == null) {
             return null;
