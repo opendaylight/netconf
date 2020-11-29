@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -23,8 +24,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -41,10 +45,12 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,11 +151,32 @@ abstract class SubscribeToStreamUtil {
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
+        final Collection<? extends NotificationDefinition> notifications;
+        final NotificationServiceHandler notificationServiceHandler;
+        if (identifier.contains(RestconfConstants.MOUNT)) {
+            final String idWithNotifName = identifier.replaceFirst(RestconfStreamsConstants.NOTIFICATION_STREAM, "");
+            final String mpId = idWithNotifName.subSequence(0,
+                    idWithNotifName.indexOf(RestconfConstants.MOUNT) + RestconfConstants.MOUNT.length()).toString()
+                    .replaceFirst("/", "");
+            final DOMMountPointService domMountPointService = handlersHolder.getDomMountPointServiceHandler().get();
+            final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
+                    mpId, schemaContext, Optional.of(domMountPointService));
+            notifications = instanceIdentifier.getSchemaContext().getNotifications();
+            final Optional<DOMNotificationService> notifServiceOpt = instanceIdentifier.getMountPoint()
+                    .getService(DOMNotificationService.class);
+            if (!notifServiceOpt.isPresent()) {
+                throw new RestconfDocumentedException("Missing notification service for mount point");
+            }
+            notificationServiceHandler = new NotificationServiceHandler(notifServiceOpt.get());
+        } else {
+            notifications = schemaContext.getNotifications();
+            notificationServiceHandler = handlersHolder.getNotificationServiceHandler();
+        }
         final boolean exist = checkExist(schemaContext, writeTransaction);
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         registerToListenNotification(
-                notificationListenerAdapter.get(), handlersHolder.getNotificationServiceHandler());
+                notificationListenerAdapter.get(), notificationServiceHandler);
         notificationListenerAdapter.get().setQueryParams(
                 notificationQueryParams.getStart(),
                 notificationQueryParams.getStop().orElse(null),
@@ -157,11 +184,11 @@ abstract class SubscribeToStreamUtil {
                 false, notificationQueryParams.isSkipNotificationData());
         notificationListenerAdapter.get().setCloseVars(
                 handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
-        final NormalizedNode<?, ?> mapToStreams =
-                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                    notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier(),
-                    schemaContext.getNotifications(), notificationQueryParams.getStart(),
-                    notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext), exist);
+        final NormalizedNode<?, ?> mapToStreams = RestconfMappingNodeUtil
+                .mapYangNotificationStreamByIetfRestconfMonitoring(
+                        notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier(), notifications,
+                        notificationQueryParams.getStart(), notificationListenerAdapter.get().getOutputType(), uri,
+                        getMonitoringModule(schemaContext), exist);
         writeDataToDS(schemaContext,
                 notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
                 exist, mapToStreams);
