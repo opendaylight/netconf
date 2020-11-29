@@ -75,20 +75,21 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
             final RpcServiceHandler rpcServiceHandler, final ActionServiceHandler actionServiceHandler,
             final NotificationServiceHandler notificationServiceHandler, final DOMSchemaService domSchemaService,
             final Configuration configuration) {
-        RestconfOperationsService restconfOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler,
+        final RestconfOperationsService restconfOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler,
             domMountPointServiceHandler);
         final DOMYangTextSourceProvider yangTextSourceProvider = domSchemaService.getExtensions()
             .getInstance(DOMYangTextSourceProvider.class);
-        RestconfSchemaService restconfSchemaService = new RestconfSchemaServiceImpl(schemaCtxHandler,
+        final RestconfSchemaService restconfSchemaService = new RestconfSchemaServiceImpl(schemaCtxHandler,
             domMountPointServiceHandler, yangTextSourceProvider);
-        RestconfStreamsSubscriptionService restconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(
-            domDataBrokerHandler, notificationServiceHandler, schemaCtxHandler, transactionChainHandler,
-            configuration);
-        RestconfDataService restconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler,
-            domMountPointServiceHandler, restconfSubscrService, actionServiceHandler, configuration);
-        RestconfInvokeOperationsService restconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(
+        final RestconfStreamsSubscriptionService restconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(
+                domDataBrokerHandler, notificationServiceHandler, schemaCtxHandler, transactionChainHandler,
+                configuration, domMountPointServiceHandler);
+        final RestconfDataService restconfDataService = new RestconfDataServiceImpl(schemaCtxHandler,
+                transactionChainHandler, domMountPointServiceHandler, restconfSubscrService, actionServiceHandler,
+                configuration);
+        final RestconfInvokeOperationsService restconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(
             rpcServiceHandler, schemaCtxHandler);
-        RestconfService restconfService = new RestconfImpl(schemaCtxHandler);
+        final RestconfService restconfService = new RestconfImpl(schemaCtxHandler);
         return new ServicesWrapper(restconfDataService, restconfInvokeOpsService, restconfSubscrService,
             restconfOpsService, restconfSchemaService, restconfService);
     }

@@ -225,7 +225,7 @@ public class JsonNotificationListenerTest {
     private static String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "json-stream", NotificationOutputType.JSON);
+                schemaPathNotifi, "json-stream", NotificationOutputType.JSON, SCHEMA_CONTEXT);
         return notifiAdapter.formatter.eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false, false).get();
     }
 }

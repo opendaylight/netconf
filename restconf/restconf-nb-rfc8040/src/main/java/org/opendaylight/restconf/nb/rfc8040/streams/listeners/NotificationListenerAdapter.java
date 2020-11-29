@@ -23,6 +23,7 @@ import org.opendaylight.restconf.common.formatters.NotificationFormatterFactory;
 import org.opendaylight.restconf.common.formatters.XMLNotificationFormatter;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +44,18 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     @VisibleForTesting NotificationFormatter formatter;
 
 
+    private final EffectiveModelContext refSchemaCtx;
+
     /**
      * Set path of listener and stream name.
      *
-     * @param path       Schema path of YANG notification.
-     * @param streamName Name of the stream.
-     * @param outputType Type of output on notification (JSON or XML).
+     * @param path         Schema path of YANG notification.
+     * @param streamName   Name of the stream.
+     * @param outputType   Type of output on notification (JSON or XML).
+     * @param refSchemaCtx Schema Context of node
      */
-    NotificationListenerAdapter(final Absolute path, final String streamName, final String outputType) {
+    NotificationListenerAdapter(final Absolute path, final String streamName, final String outputType,
+            final EffectiveModelContext refSchemaCtx) {
         setLocalNameOfPath(path.lastNodeIdentifier().getLocalName());
 
         this.outputType = NotificationOutputType.forName(requireNonNull(outputType)).get();
@@ -58,6 +63,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
         this.formatter = getFormatterFactory().getFormatter();
+        this.refSchemaCtx = requireNonNull(refSchemaCtx);
 
         LOG.debug("output type: {}, {}", outputType, this.outputType);
     }
@@ -109,7 +115,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
 
         final Optional<String> maybeOutput;
         try {
-            maybeOutput = formatter.eventData(schemaHandler.get(), notification, now, getLeafNodesOnly(),
+            maybeOutput = formatter.eventData(refSchemaCtx, notification, now, getLeafNodesOnly(),
                     isSkipNotificationData());
         } catch (Exception e) {
             LOG.error("Failed to process notification {}", notification, e);

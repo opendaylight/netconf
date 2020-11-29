@@ -31,6 +31,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -66,22 +67,19 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     /**
      * Initialize holder of handlers with holders as parameters.
      *
-     * @param domDataBrokerHandler
-     *             handler of {@link DOMDataBroker}
-     * @param notificationServiceHandler
-     *             handler of {@link DOMNotificationService}
-     * @param schemaHandler
-     *             handler of {@link SchemaContext}
-     * @param transactionChainHandler
-     *             handler of {@link DOMTransactionChain}
-     * @param configuration
-     *             configuration for restconf {@link Configuration}}
+     * @param domDataBrokerHandler        handler of {@link DOMDataBroker}
+     * @param notificationServiceHandler  handler of {@link DOMNotificationService}
+     * @param schemaHandler               handler of {@link SchemaContext}
+     * @param transactionChainHandler     handler of {@link DOMTransactionChain}
+     * @param configuration               configuration for restconf {@link Configuration}}
+     * @param domMountPointServiceHandler handler of {@link DOMMountPointServiceHandler}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
             final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler,
-            final TransactionChainHandler transactionChainHandler, final Configuration configuration) {
+            final TransactionChainHandler transactionChainHandler, final Configuration configuration,
+            final DOMMountPointServiceHandler domMountPointServiceHandler) {
         this.handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationServiceHandler,
-                transactionChainHandler, schemaHandler);
+                transactionChainHandler, schemaHandler, domMountPointServiceHandler);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
     }
@@ -158,14 +156,17 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         private final NotificationServiceHandler notificationServiceHandler;
         private final TransactionChainHandler transactionChainHandler;
         private final SchemaContextHandler schemaHandler;
+        private final DOMMountPointServiceHandler domMountPointServiceHandler;
 
         private HandlersHolder(final DOMDataBrokerHandler domDataBrokerHandler,
                 final NotificationServiceHandler notificationServiceHandler,
-                final TransactionChainHandler transactionChainHandler, final SchemaContextHandler schemaHandler) {
+                final TransactionChainHandler transactionChainHandler, final SchemaContextHandler schemaHandler,
+                final DOMMountPointServiceHandler domMountPointServiceHandler) {
             this.domDataBrokerHandler = domDataBrokerHandler;
             this.notificationServiceHandler = notificationServiceHandler;
             this.transactionChainHandler = transactionChainHandler;
             this.schemaHandler = schemaHandler;
+            this.domMountPointServiceHandler = domMountPointServiceHandler;
         }
 
         /**
@@ -202,6 +203,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          */
         public SchemaContextHandler getSchemaHandler() {
             return this.schemaHandler;
+        }
+
+        /**
+         * Get {@link DOMMountPointServiceHandler}.
+         *
+         * @return the mount point service handler
+         */
+        public DOMMountPointServiceHandler getDomMountPointServiceHandler() {
+            return domMountPointServiceHandler;
         }
     }
 

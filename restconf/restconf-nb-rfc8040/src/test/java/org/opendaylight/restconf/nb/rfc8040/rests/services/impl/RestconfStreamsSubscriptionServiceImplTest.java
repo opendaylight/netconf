@@ -41,6 +41,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -48,6 +49,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -81,6 +83,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private TransactionChainHandler transactionHandler;
     private SchemaContextHandler schemaHandler;
 
+    private DOMMountPointServiceHandler domMountPointServiceHandler;
+
     @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws FileNotFoundException, URISyntaxException {
@@ -99,7 +103,10 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         transactionHandler = new TransactionChainHandler(dataBroker);
         schemaHandler = new SchemaContextHandler(transactionHandler, mock(DOMSchemaService.class));
 
-        DOMDataTreeChangeService dataTreeChangeService = mock(DOMDataTreeChangeService.class);
+        final DOMMountPointService domMountPointService = mock(DOMMountPointService.class);
+        domMountPointServiceHandler = new DOMMountPointServiceHandler(domMountPointService);
+
+        final DOMDataTreeChangeService dataTreeChangeService = mock(DOMDataTreeChangeService.class);
         doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)
                 .registerDataTreeChangeListener(any(), any());
 
@@ -165,7 +172,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 NotificationOutputType.XML);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler, configurationSse);
+                        this.schemaHandler, this.transactionHandler, configurationSse, domMountPointServiceHandler);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -185,7 +192,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 NotificationOutputType.XML);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.transactionHandler, configurationWs, domMountPointServiceHandler);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -200,7 +207,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.transactionHandler, configurationWs, domMountPointServiceHandler);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
 
@@ -209,7 +216,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.transactionHandler, configurationWs, domMountPointServiceHandler);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 this.uriInfo);
     }

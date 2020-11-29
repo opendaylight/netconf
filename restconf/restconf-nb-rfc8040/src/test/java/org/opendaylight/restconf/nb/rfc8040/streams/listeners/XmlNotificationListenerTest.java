@@ -233,7 +233,8 @@ public class XmlNotificationListenerTest {
     private static String prepareXmlResult(final DOMNotification notificationData, final Absolute schemaPathNotifi)
             throws Exception {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "xml-stream", NotificationOutputTypeGrouping.NotificationOutputType.XML);
+                schemaPathNotifi, "xml-stream", NotificationOutputTypeGrouping.NotificationOutputType.XML,
+                SCHEMA_CONTEXT);
         return notifiAdapter.formatter.eventData(SCHEMA_CONTEXT, notificationData, Instant.now(), false, false).get();
     }
 }

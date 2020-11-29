@@ -23,6 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.ResolveEnumUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -114,7 +115,7 @@ final class CreateStreamUtil {
      * @return Parsed {@link NotificationOutputType}.
      */
     private static NotificationOutputType prepareOutputType(final ContainerNode data) {
-        NotificationOutputType outputType = parseEnum(
+        final NotificationOutputType outputType = parseEnum(
                 data, NotificationOutputType.class, RestconfStreamsConstants.OUTPUT_TYPE_PARAM_NAME);
         return outputType == null ? NotificationOutputType.XML : outputType;
     }
@@ -210,21 +211,23 @@ final class CreateStreamUtil {
      * @param notificationDefinition YANG notification definition.
      * @param refSchemaCtx           Reference to {@link EffectiveModelContext}
      * @param outputType             Output type (XML or JSON).
+     * @param identifier             identifier
      * @return {@link NotificationListenerAdapter}
      */
     static NotificationListenerAdapter createYangNotifiStream(final NotificationDefinition notificationDefinition,
-            final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType) {
+            final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType, String identifier) {
         final String streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
-                requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()));
+                requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()), identifier);
+
         final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
                 .getNotificationListenerFor(streamName);
         return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
                 Absolute.of(ImmutableList.copyOf(notificationDefinition.getPath().getPathFromRoot())), streamName,
-                outputType));
+                outputType, refSchemaCtx));
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,
-            final EffectiveModelContext refSchemaCtx, final String outputType) {
+            final EffectiveModelContext refSchemaCtx, final String outputType, String identifier) {
         final QName notificationDefinitionQName = notificationDefinition.getQName();
         final Module module = refSchemaCtx.findModule(
                 notificationDefinitionQName.getModule().getNamespace(),
@@ -232,8 +235,11 @@ final class CreateStreamUtil {
         requireNonNull(module, String.format("Module for namespace %s does not exist.",
                 notificationDefinitionQName.getModule().getNamespace()));
 
-        final StringBuilder streamNameBuilder = new StringBuilder();
-        streamNameBuilder.append(RestconfStreamsConstants.NOTIFICATION_STREAM)
+        final StringBuilder streamNameBuilder = new StringBuilder(RestconfStreamsConstants.NOTIFICATION_STREAM);
+        if (identifier.contains(RestconfConstants.MOUNT)) {
+            streamNameBuilder.append(identifier.replace(RestconfStreamsConstants.STREAMS_PATH, ""));
+        }
+        streamNameBuilder
                 .append('/')
                 .append(module.getName())
                 .append(':')
@@ -241,6 +247,7 @@ final class CreateStreamUtil {
         if (outputType.equals(NotificationOutputType.JSON.getName())) {
             streamNameBuilder.append('/').append(NotificationOutputType.JSON.getName());
         }
+
         return streamNameBuilder.toString();
     }
 }

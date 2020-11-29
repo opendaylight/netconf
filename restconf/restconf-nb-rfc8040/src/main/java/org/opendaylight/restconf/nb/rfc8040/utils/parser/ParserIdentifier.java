@@ -31,6 +31,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -54,7 +55,7 @@ import org.slf4j.LoggerFactory;
 public final class ParserIdentifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
-    private static final Splitter MP_SPLITTER = Splitter.on("/" + RestconfConstants.MOUNT);
+    public static final Splitter MP_SPLITTER = Splitter.on("/" + RestconfConstants.MOUNT);
 
     private ParserIdentifier() {
         throw new UnsupportedOperationException("Util class.");
@@ -89,7 +90,10 @@ public final class ParserIdentifier {
         }
 
         final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
-        final String mountPointId = pathsIt.next();
+        String mountPointId = pathsIt.next();
+        if (mountPointId.startsWith(RestconfStreamsConstants.STREAMS_PATH)) {
+            mountPointId = mountPointId.replaceFirst(RestconfStreamsConstants.STREAMS_PATH, "").replaceFirst("/", "");
+        }
         final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
         final DOMMountPoint mountPoint = mountPointService.get().getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
