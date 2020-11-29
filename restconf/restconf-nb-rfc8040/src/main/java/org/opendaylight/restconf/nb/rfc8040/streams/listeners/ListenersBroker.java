@@ -23,6 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -156,24 +157,27 @@ public final class ListenersBroker {
     }
 
     /**
-     * Creates new {@link NotificationDefinition} listener using input stream name and schema path
-     * if such listener haven't been created yet.
+     * Creates new {@link NotificationDefinition} listener using input stream name and schema path if such listener
+     * haven't been created yet.
      *
-     * @param schemaPath Schema path of YANG notification structure.
-     * @param streamName Stream name.
-     * @param outputType Specific type of output for notifications - XML or JSON.
+     * @param schemaPath   Schema path of YANG notification structure.
+     * @param streamName   Stream name.
+     * @param outputType   Specific type of output for notifications - XML or JSON.
+     * @param refSchemaCtx Schema context of node
      * @return Created or existing notification listener adapter.
      */
     public NotificationListenerAdapter registerNotificationListener(final Absolute schemaPath,
-            final String streamName, final NotificationOutputType outputType) {
+            final String streamName, final NotificationOutputType outputType,
+            final EffectiveModelContext refSchemaCtx) {
         requireNonNull(schemaPath);
         requireNonNull(streamName);
         requireNonNull(outputType);
+        requireNonNull(refSchemaCtx);
 
         final long stamp = notificationListenersLock.writeLock();
         try {
             return notificationListeners.computeIfAbsent(streamName, stream -> new NotificationListenerAdapter(
-                    schemaPath, stream, outputType.getName()));
+                    schemaPath, stream, outputType.getName(), refSchemaCtx));
         } finally {
             notificationListenersLock.unlockWrite(stamp);
         }
