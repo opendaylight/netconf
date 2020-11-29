@@ -47,20 +47,25 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private final Absolute path;
     private final String outputType;
 
+    private final EffectiveModelContext refSchemaCtx;
+
     /**
      * Set path of listener and stream name.
      *
-     * @param path       Schema path of YANG notification.
-     * @param streamName Name of the stream.
-     * @param outputType Type of output on notification (JSON or XML).
+     * @param path         Schema path of YANG notification.
+     * @param streamName   Name of the stream.
+     * @param outputType   Type of output on notification (JSON or XML).
+     * @param refSchemaCtx Schema Context of node
      */
-    NotificationListenerAdapter(final Absolute path, final String streamName, final String outputType) {
+    NotificationListenerAdapter(final Absolute path, final String streamName, final String outputType,
+            final EffectiveModelContext refSchemaCtx) {
         setLocalNameOfPath(path.lastNodeIdentifier().getLocalName());
 
         this.outputType = requireNonNull(outputType);
         this.path = requireNonNull(path);
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
+        this.refSchemaCtx = requireNonNull(refSchemaCtx);
     }
 
     /**
@@ -80,10 +85,9 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
             return;
         }
 
-        final EffectiveModelContext schemaContext = schemaHandler.get();
-        final String xml = prepareXml(schemaContext, notification);
+        final String xml = prepareXml(refSchemaCtx, notification);
         if (checkFilter(xml)) {
-            post(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
+            post(outputType.equals("JSON") ? prepareJson(refSchemaCtx, notification) : xml);
         }
     }
 

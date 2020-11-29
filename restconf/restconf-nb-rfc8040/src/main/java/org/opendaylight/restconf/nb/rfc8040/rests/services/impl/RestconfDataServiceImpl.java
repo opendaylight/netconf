@@ -22,6 +22,7 @@ import java.net.URI;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -62,6 +63,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
@@ -148,7 +150,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response readData(final String identifier, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContextRef = this.schemaContextHandler.get();
-        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
+        InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier
+                .toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(this.mountPointServiceHandler.get()));
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
@@ -156,7 +159,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         final NormalizedNode<?, ?> node = readData(identifier, parameters.getContent(),
                 instanceIdentifier.getInstanceIdentifier(), strategy, parameters.getWithDefault(), schemaContextRef,
-                uriInfo);
+                uriInfo, instanceIdentifier, mountPoint);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
@@ -168,6 +171,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     "Request could not be completed because the relevant data model content does not exist",
                     RestconfError.ErrorType.PROTOCOL,
                     RestconfError.ErrorTag.DATA_MISSING);
+        }
+
+        if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
+            instanceIdentifier = ParserIdentifier.toInstanceIdentifier(RestconfStreamsConstants.STREAMS_PATH,
+                    schemaContextRef, Optional.of(this.mountPointServiceHandler.get()));
         }
 
         if (parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL)
@@ -185,8 +193,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     /**
-     * Read specific type of data from data store via transaction and if identifier read data from
-     * streams then put streams from actual schema context to datastore.
+     * Read specific type of data from data store via transaction and if identifier read data from streams then put
+     * streams from actual schema context to datastore.
      *
      * @param identifier    identifier of data to read
      * @param content       type of data to read (config, state, all)
@@ -194,31 +202,44 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param withDefa      value of with-defaults parameter
      * @param schemaContext schema context
      * @param uriInfo       uri info
+     * @param mountPoint    mount point
      * @return {@link NormalizedNode}
      */
     private NormalizedNode<?, ?> readData(final String identifier, final String content,
             final YangInstanceIdentifier path, final RestconfStrategy strategy, final String withDefa,
-            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
+            final EffectiveModelContext schemaContext, final UriInfo uriInfo,
+            final InstanceIdentifierContext<?> context, DOMMountPoint mountPoint) {
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
+            final RestconfStrategy strategyLocal = getRestconfStrategy(null);
+            createAllYangNotificationStreams(schemaContext, uriInfo, identifier, context, strategyLocal);
+            final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
+                    RestconfStreamsConstants.STREAMS_PATH, schemaContext,
+                    Optional.of(this.mountPointServiceHandler.get()));
+
+            return ReadDataTransactionUtil.readData(content, instanceIdentifier.getInstanceIdentifier(),
+                    strategyLocal, withDefa, schemaContext);
         }
         return ReadDataTransactionUtil.readData(content, path, strategy, withDefa, schemaContext);
     }
 
-    private void createAllYangNotificationStreams(final RestconfStrategy strategy,
-            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
+    private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo,
+            final String identifier, final InstanceIdentifierContext<?> context, final RestconfStrategy strategy) {
         strategy.prepareReadWriteExecution();
         final boolean exist = checkExist(schemaContext, strategy);
 
-        for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
+        final EffectiveModelContext notificationsSchemaCtx = context.getSchemaContext();
+        final Collection<? extends NotificationDefinition> notifications = notificationsSchemaCtx.getNotifications();
+        for (final NotificationDefinition notificationDefinition : notifications) {
             final NotificationListenerAdapter notifiStreamXML =
-                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.XML);
+                    CreateStreamUtil.createYangNotifiStream(notificationDefinition,
+                            notificationsSchemaCtx,
+                            NotificationOutputType.XML, identifier);
             final NotificationListenerAdapter notifiStreamJSON =
-                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamJSON);
+                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, notificationsSchemaCtx,
+                            NotificationOutputType.JSON, identifier);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamXML, notifications);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamJSON,
+                    notifications);
         }
         try {
             strategy.commit().get();
@@ -229,12 +250,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
             final UriInfo uriInfo, final RestconfStrategy strategy, final boolean exist,
-            final NotificationListenerAdapter listener) {
+            final NotificationListenerAdapter listener, Collection<? extends NotificationDefinition> notifications) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
         final NormalizedNode<?, ?> mapToStreams =
             RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
-                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
+                        listener.getSchemaPath().lastNodeIdentifier(), notifications,
+                        null, listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext),
+                        exist);
         writeDataToDS(schemaContext,
             listener.getSchemaPath().lastNodeIdentifier().getLocalName(), strategy, exist, mapToStreams);
     }

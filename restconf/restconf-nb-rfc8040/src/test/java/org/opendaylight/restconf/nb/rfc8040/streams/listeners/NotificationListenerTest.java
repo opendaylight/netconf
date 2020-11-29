@@ -218,7 +218,7 @@ public class NotificationListenerTest {
 
     private static String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi) {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
-                schemaPathNotifi, "stream-name", NotificationOutputType.JSON);
+                schemaPathNotifi, "stream-name", NotificationOutputType.JSON, SCHEMA_CONTEXT);
         return requireNonNull(notifiAdapter.prepareJson(SCHEMA_CONTEXT, notificationData));
     }
 }
