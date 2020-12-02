@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "a08fb3ce_ad9aab39",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2020-12-02T09:53:15Z",
+      "side": 1,
+      "message": "As I see it is not suitable because of lambda. \nNot sure CharMatcher will be faster.",
+      "parentUuid": "2401087b_fb5e3e99",
+      "revId": "a7a277555d62641cbe5a53d24d1e4692cf43f0d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3c465bfa_ffc6e545",
         "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriterTest.java",
         "patchSetId": 2
