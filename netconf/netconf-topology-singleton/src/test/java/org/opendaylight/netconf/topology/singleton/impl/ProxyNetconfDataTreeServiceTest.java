@@ -19,8 +19,8 @@ import akka.util.Timeout;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -68,12 +68,12 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testLock() {
+    public void testLock() throws ExecutionException, InterruptedException {
         lock();
     }
 
     @Test
-    public void testUnlock() {
+    public void testUnlock() throws ExecutionException, InterruptedException {
         lock();
         proxy.unlock();
         masterActor.expectMsgClass(UnlockRequest.class);
@@ -90,7 +90,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testDiscardChanges() {
+    public void testDiscardChanges() throws ExecutionException, InterruptedException {
         lock();
         proxy.discardChanges();
         masterActor.expectMsgClass(DiscardChangesRequest.class);
@@ -123,7 +123,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testMerge() {
+    public void testMerge() throws ExecutionException, InterruptedException {
         lock();
         proxy.merge(STORE, PATH, NODE, Optional.empty());
         masterActor.expectMsgClass(MergeEditConfigRequest.class);
@@ -140,7 +140,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testReplace() {
+    public void testReplace() throws ExecutionException, InterruptedException {
         lock();
         proxy.replace(STORE, PATH, NODE, Optional.empty());
         masterActor.expectMsgClass(ReplaceEditConfigRequest.class);
@@ -157,7 +157,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testCreate() {
+    public void testCreate() throws ExecutionException, InterruptedException {
         lock();
         proxy.create(STORE, PATH, NODE, Optional.empty());
         masterActor.expectMsgClass(CreateEditConfigRequest.class);
@@ -174,7 +174,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testDelete() {
+    public void testDelete() throws ExecutionException, InterruptedException {
         lock();
         proxy.delete(STORE, PATH);
         masterActor.expectMsgClass(DeleteEditConfigRequest.class);
@@ -191,7 +191,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testRemove() {
+    public void testRemove() throws ExecutionException, InterruptedException {
         lock();
         proxy.remove(STORE, PATH);
         masterActor.expectMsgClass(RemoveEditConfigRequest.class);
@@ -208,7 +208,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testCommit() {
+    public void testCommit() throws ExecutionException, InterruptedException {
         lock();
         proxy.commit(Collections.emptyList());
         masterActor.expectMsgClass(CommitRequest.class);
@@ -224,12 +224,12 @@ public class ProxyNetconfDataTreeServiceTest {
         }
     }
 
-    private void lock() {
-        final List<ListenableFuture<? extends DOMRpcResult>> lock = proxy.lock();
+    private void lock() throws ExecutionException, InterruptedException {
+        final ListenableFuture<? extends DOMRpcResult> lock = proxy.lock();
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
 
-        assertTrue(lock.isEmpty());
+        assertTrue(lock.get().getErrors().isEmpty());
         masterActor.expectMsgClass(LockRequest.class);
     }
 

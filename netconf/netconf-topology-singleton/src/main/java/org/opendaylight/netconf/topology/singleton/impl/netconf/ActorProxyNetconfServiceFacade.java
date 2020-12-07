@@ -18,7 +18,6 @@ import akka.util.Timeout;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -68,10 +67,10 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public ListenableFuture<? extends DOMRpcResult> lock() {
         LOG.debug("{}: Lock via actor {}", id, masterActor);
         masterActor.tell(new LockRequest(), ActorRef.noSender());
-        return new ArrayList<>();
+        return createResult();
     }
 
     @Override

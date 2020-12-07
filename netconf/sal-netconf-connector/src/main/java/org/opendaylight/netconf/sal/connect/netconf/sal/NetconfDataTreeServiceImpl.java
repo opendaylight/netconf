@@ -16,8 +16,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -26,6 +26,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -71,17 +72,52 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     }
 
     @Override
-    public synchronized List<ListenableFuture<? extends DOMRpcResult>> lock() {
-        final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
+    public synchronized ListenableFuture<? extends DOMRpcResult> lock() {
+        final SettableFuture<DOMRpcResult> lockRunning = SettableFuture.create();
+        final SettableFuture<DOMRpcResult> lock = SettableFuture.create();
+
         if (candidateSupported) {
-            lockCandidate(resultsFutures);
+            final SettableFuture<DOMRpcResult> lockCandidate = SettableFuture.create();
             if (runningWritable) {
-                lockRunning(resultsFutures);
+                Futures.addCallback(lockRunning, new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(final DOMRpcResult result) {
+                        if (isSuccess(result)) {
+                            lockCandidate(lockCandidate);
+                        } else {
+                            lockCandidate.set(result);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        lockCandidate.setException(throwable);
+                    }
+                }, MoreExecutors.directExecutor());
+
+                lockRunning(lockRunning);
+                lock.setFuture(lockCandidate);
+                Futures.addCallback(lockCandidate, new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(final DOMRpcResult result) {
+                        if (!isSuccess(result)) {
+                            unlockRunning();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        unlockRunning();
+                    }
+                }, MoreExecutors.directExecutor());
             }
+            lockCandidate(lockCandidate);
+            lock.setFuture(lockCandidate);
         } else {
-            lockRunning(resultsFutures);
+            lockRunning(lockRunning);
+            lock.setFuture(lockRunning);
         }
-        return resultsFutures;
+        return lock;
     }
 
     @Override
@@ -237,11 +273,12 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
         }
     }
 
-    private void lockRunning(List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+    private void lockRunning(SettableFuture<DOMRpcResult> lockFeature) {
         if (isLockAllowed) {
-            resultsFutures.add(netconfOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
+            lockFeature.setFuture(netconfOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
         } else {
             LOG.trace("Lock is not allowed: {}", id);
+            lockFeature.setFuture(Futures.immediateFuture(new DefaultDOMRpcResult()));
         }
     }
 
@@ -253,17 +290,12 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
         }
     }
 
-    private void lockCandidate(List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+    private void lockCandidate(SettableFuture<DOMRpcResult> lockFeature) {
         if (isLockAllowed) {
-            resultsFutures.add(netconfOps.lockCandidate(new NetconfRpcFutureCallback("Lock candidate", id) {
-                @Override
-                public void onFailure(Throwable throwable) {
-                    super.onFailure(throwable);
-                    discardChanges();
-                }
-            }));
+            lockFeature.setFuture(netconfOps.lockCandidate(new NetconfRpcFutureCallback("Lock running", id)));
         } else {
             LOG.trace("Lock is not allowed: {}", id);
+            lockFeature.setFuture(Futures.immediateFuture(new DefaultDOMRpcResult()));
         }
     }
 
@@ -281,23 +313,31 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     }
 
     private synchronized ListenableFuture<RpcResult<Void>> performCommit(
-            final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
-        resultsFutures.add(netconfOps.commit(new NetconfRpcFutureCallback("Commit", id)));
-
+        final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+        final SettableFuture<RpcResult<Void>> commitResult = SettableFuture.create();
         final ListenableFuture<RpcResult<Void>> result = resultsToStatus(id, resultsFutures);
         Futures.addCallback(result, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
-                unlock();
+                if (result.isSuccessful()) {
+                    if (candidateSupported) {
+                        final ListenableFuture<? extends DOMRpcResult> commit =
+                            netconfOps.commit(new NetconfRpcFutureCallback("Commit", id));
+                        commitResult.setFuture(resultsToStatus(id, Collections.singletonList(commit)));
+                    } else {
+                        commitResult.set(RpcResultBuilder.<Void>success().build());
+                    }
+                } else {
+                    commitResult.set(result);
+                }
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
-                discardChanges();
-                unlock();
+                commitResult.setException(throwable);
             }
         }, MoreExecutors.directExecutor());
-        return result;
+        return commitResult;
     }
 
     private static ListenableFuture<RpcResult<Void>> resultsToStatus(
@@ -384,5 +424,11 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
             return;
         }
         transformed.set(RpcResultBuilder.<Void>success().build());
+    }
+
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+        justification = "https://github.com/spotbugs/spotbugs/issues/811")
+    private static boolean isSuccess(final DOMRpcResult result) {
+        return result.getErrors().isEmpty();
     }
 }

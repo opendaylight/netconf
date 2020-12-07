@@ -77,7 +77,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof LockRequest) {
-            resultsFutures.addAll(netconfService.lock());
+            resultsFutures.add(netconfService.lock());
         } else if (message instanceof MergeEditConfigRequest) {
             final MergeEditConfigRequest request = (MergeEditConfigRequest) message;
             resultsFutures.add(netconfService.merge(
