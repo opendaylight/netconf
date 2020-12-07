@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -282,22 +283,50 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
 
     private synchronized ListenableFuture<RpcResult<Void>> performCommit(
             final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
-        resultsFutures.add(netconfOps.commit(new NetconfRpcFutureCallback("Commit", id)));
+        final SettableFuture<RpcResult<Void>> commitResult = SettableFuture.create();
 
         final ListenableFuture<RpcResult<Void>> result = resultsToStatus(id, resultsFutures);
         Futures.addCallback(result, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
-                unlock();
+                if (result.isSuccessful()) {
+                    if (candidateSupported) {
+                        final ListenableFuture<? extends DOMRpcResult> commit =
+                            netconfOps.commit(new FutureCallback<>() {
+                                @Override
+                                public void onSuccess(final DOMRpcResult result) {
+                                    if (!result.getErrors().isEmpty()) {
+                                        discardChanges();
+                                    }
+                                    unlock();
+                                }
+
+                                @Override
+                                public void onFailure(final Throwable throwable) {
+                                    discardChanges();
+                                    unlock();
+                                }
+                            });
+                        commitResult.setFuture(resultsToStatus(id, Collections.singletonList(commit)));
+                    } else {
+                        commitResult.set(RpcResultBuilder.<Void>success().build());
+                        unlock();
+                    }
+                } else {
+                    commitResult.set(result);
+                    discardChanges();
+                    unlock();
+                }
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
+                commitResult.setException(throwable);
                 discardChanges();
                 unlock();
             }
         }, MoreExecutors.directExecutor());
-        return result;
+        return commitResult;
     }
 
     private static ListenableFuture<RpcResult<Void>> resultsToStatus(

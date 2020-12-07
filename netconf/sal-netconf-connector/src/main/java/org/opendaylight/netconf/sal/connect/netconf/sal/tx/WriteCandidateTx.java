@@ -11,8 +11,10 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
@@ -46,7 +48,6 @@ import org.slf4j.LoggerFactory;
  * </ol>
  */
 public class WriteCandidateTx extends AbstractWriteTx {
-
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateTx.class);
 
     public WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
@@ -66,10 +67,11 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     private void lock() {
         if (!isLockAllowed) {
-            LOG.trace("Lock is not allowed.");
+            LOG.trace("Lock is not allowed: {}", id);
+            lock = Futures.immediateFuture(new DefaultDOMRpcResult());
             return;
         }
-        final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
+        final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 if (isSuccess(result)) {
@@ -78,16 +80,17 @@ public class WriteCandidateTx extends AbstractWriteTx {
                     }
                 } else {
                     LOG.warn("{}: lock candidate invoked unsuccessfully: {}", id, result.getErrors());
+                    resultsFutures.add(lock);
                 }
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
                 LOG.warn("Lock candidate operation failed", throwable);
-                discardChanges();
+                resultsFutures.add(lock);
             }
         };
-        resultsFutures.add(netOps.lockCandidate(lockCandidateCallback));
+        lock = netOps.lockCandidate(lockCandidateCallback);
     }
 
     @Override
@@ -101,29 +104,56 @@ public class WriteCandidateTx extends AbstractWriteTx {
      * and its netty threadpool that is really sensitive to blocking calls.
      */
     private void discardChanges() {
-        netOps.discardChanges(new NetconfRpcFutureCallback("Discarding candidate", id));
+        Futures.addCallback(lock, new NetconfRpcFutureCallback("Check datastore lock", id) {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    netOps.discardChanges(new NetconfRpcFutureCallback("Discarding candidate", id));
+                }
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     @Override
     public synchronized ListenableFuture<RpcResult<Void>> performCommit() {
-        resultsFutures.add(netOps.commit(new NetconfRpcFutureCallback("Commit", id)));
+        final SettableFuture<RpcResult<Void>> commitResult = SettableFuture.create();
         final ListenableFuture<RpcResult<Void>> txResult = resultsToTxStatus();
 
-        Futures.addCallback(txResult, new FutureCallback<RpcResult<Void>>() {
+        Futures.addCallback(txResult, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
-                cleanupOnSuccess();
+                if (result.isSuccessful()) {
+                    //remove the previous results as we already processed them
+                    resultsFutures.clear();
+                    resultsFutures.add(netOps.commit(new FutureCallback<>() {
+                        @Override
+                        public void onSuccess(final DOMRpcResult result) {
+                            if (isSuccess(result)) {
+                                cleanupOnSuccess();
+                            } else {
+                                cleanup();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(final Throwable throwable) {
+                            cleanup();
+                        }
+                    }));
+                    commitResult.setFuture(resultsToTxStatus());
+                } else {
+                    commitResult.set(result);
+                    cleanup();
+                }
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
-                // TODO If lock is cause of this failure cleanup will issue warning log
-                // cleanup is trying to do unlock, but this will fail
+                commitResult.setException(throwable);
                 cleanup();
             }
         }, MoreExecutors.directExecutor());
-
-        return txResult;
+        return commitResult;
     }
 
     protected void cleanupOnSuccess() {
@@ -137,14 +167,22 @@ public class WriteCandidateTx extends AbstractWriteTx {
                               final Optional<ModifyAction> defaultOperation,
                               final String operation) {
 
-        final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit candidate", id);
-
-        if (defaultOperation.isPresent()) {
-            resultsFutures.add(netOps.editConfigCandidate(
-                    editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
-        } else {
-            resultsFutures.add(netOps.editConfigCandidate(editConfigCallback, editStructure, rollbackSupport));
-        }
+        Futures.addCallback(lock, new NetconfRpcFutureCallback("Check datastore lock", id) {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    final NetconfRpcFutureCallback editConfigCallback =
+                        new NetconfRpcFutureCallback("Edit candidate", id);
+                    if (defaultOperation.isPresent()) {
+                        resultsFutures.add(netOps.editConfigCandidate(
+                            editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
+                    } else {
+                        resultsFutures.add(
+                            netOps.editConfigCandidate(editConfigCallback, editStructure, rollbackSupport));
+                    }
+                }
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     /**
@@ -152,11 +190,17 @@ public class WriteCandidateTx extends AbstractWriteTx {
      * and its netty threadpool that is really sensitive to blocking calls.
      */
     private void unlock() {
-        if (isLockAllowed) {
-            netOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
-        } else {
-            LOG.trace("Unlock is not allowed: {}", id);
-        }
+        Futures.addCallback(lock, new NetconfRpcFutureCallback("Check datastore lock", id) {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    if (isLockAllowed) {
+                        netOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
+                    } else {
+                        LOG.trace("Unlock is not allowed: {}", id);
+                    }
+                }
+            }
+        }, MoreExecutors.directExecutor());
     }
-
 }
