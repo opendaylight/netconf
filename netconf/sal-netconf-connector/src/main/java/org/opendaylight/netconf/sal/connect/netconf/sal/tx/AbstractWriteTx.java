@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
-
     private static final Logger LOG  = LoggerFactory.getLogger(AbstractWriteTx.class);
 
     protected final RemoteDeviceId id;
@@ -54,6 +53,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     // Allow commit to be called only once
     protected volatile boolean finished = false;
     protected final boolean isLockAllowed;
+    protected volatile ListenableFuture<? extends DOMRpcResult> lock =
+        Futures.immediateFailedFuture(new NetconfDocumentedException("Lock database operation must be called first!"));
 
     public AbstractWriteTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {
@@ -151,7 +152,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     @Override
     public FluentFuture<? extends CommitInfo> commit() {
         final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
-        Futures.addCallback(commitConfiguration(), new FutureCallback<RpcResult<Void>>() {
+        Futures.addCallback(commitConfiguration(), new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
                 if (!result.isSuccessful()) {
@@ -180,7 +181,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         checkNotFinished();
         finished = true;
         final ListenableFuture<RpcResult<Void>> result = performCommit();
-        Futures.addCallback(result, new FutureCallback<RpcResult<Void>>() {
+        Futures.addCallback(result, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> rpcResult) {
                 if (rpcResult.isSuccessful()) {
@@ -216,7 +217,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     protected ListenableFuture<RpcResult<Void>> resultsToTxStatus() {
         final SettableFuture<RpcResult<Void>> transformed = SettableFuture.create();
 
-        Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {
+        Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<>() {
             @Override
             public void onSuccess(final List<DOMRpcResult> domRpcResults) {
                 if (!transformed.isDone()) {
