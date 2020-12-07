@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
@@ -106,24 +107,29 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     @Override
     public synchronized ListenableFuture<RpcResult<Void>> performCommit() {
-        resultsFutures.add(netOps.commit(new NetconfRpcFutureCallback("Commit", id)));
+        final SettableFuture<RpcResult<Void>> commitResult = SettableFuture.create();
         final ListenableFuture<RpcResult<Void>> txResult = resultsToTxStatus();
 
-        Futures.addCallback(txResult, new FutureCallback<RpcResult<Void>>() {
+        Futures.addCallback(txResult, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
-                cleanupOnSuccess();
+                if (result.isSuccessful()) {
+                    //remove the previous results as we already processed them
+                    resultsFutures.clear();
+                    resultsFutures.add(netOps.commit(new NetconfRpcFutureCallback("Commit", id)));
+                    commitResult.setFuture(resultsToTxStatus());
+                } else {
+                    commitResult.set(result);
+                }
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
-                // TODO If lock is cause of this failure cleanup will issue warning log
-                // cleanup is trying to do unlock, but this will fail
-                cleanup();
+                commitResult.setException(throwable);
             }
         }, MoreExecutors.directExecutor());
 
-        return txResult;
+        return commitResult;
     }
 
     protected void cleanupOnSuccess() {

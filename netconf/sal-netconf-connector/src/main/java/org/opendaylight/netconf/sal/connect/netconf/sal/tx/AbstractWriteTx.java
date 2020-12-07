@@ -91,6 +91,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
     protected abstract void cleanup();
 
+    protected abstract void cleanupOnSuccess();
+
     @Override
     public Object getIdentifier() {
         return this;
@@ -159,9 +161,10 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                     resultFuture.setException(new TransactionCommitFailedException(
                         String.format("Commit of transaction %s failed", getIdentifier()),
                             errors.toArray(new RpcError[errors.size()])));
+                    cleanup();
                     return;
                 }
-
+                cleanupOnSuccess();
                 resultFuture.set(CommitInfo.empty());
             }
 
@@ -169,6 +172,9 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             public void onFailure(final Throwable failure) {
                 resultFuture.setException(new TransactionCommitFailedException(
                         String.format("Commit of transaction %s failed", getIdentifier()), failure));
+                // TODO If lock is cause of this failure cleanup will issue warning log
+                // cleanup is trying to do unlock, but this will fail
+                cleanup();
             }
         }, MoreExecutors.directExecutor());
 

@@ -74,11 +74,15 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     @Override
+    protected void cleanupOnSuccess() {
+        unlock();
+    }
+
+    @Override
     public synchronized ListenableFuture<RpcResult<Void>> performCommit() {
         for (final Change change : changes) {
             resultsFutures.add(change.execute(id, netOps, rollbackSupport));
         }
-        unlock();
         return resultsToTxStatus();
     }
 
