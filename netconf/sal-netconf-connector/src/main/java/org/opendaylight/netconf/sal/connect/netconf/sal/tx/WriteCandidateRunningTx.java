@@ -8,6 +8,11 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -37,8 +42,15 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
 
     @Override
     protected synchronized void init() {
-        lockRunning();
         super.init();
+        Futures.addCallback(lock, new NetconfRpcFutureCallback("Check datastore lock", id) {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    lockRunning();
+                }
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     @Override
@@ -47,9 +59,36 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
         unlockRunning();
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void lockRunning() {
         if (isLockAllowed) {
-            resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
+            final FutureCallback<DOMRpcResult> lockRunningCallback = new FutureCallback<>() {
+                @Override
+                public void onSuccess(final DOMRpcResult result) {
+                    if (isSuccess(result)) {
+                        if (LOG.isTraceEnabled()) {
+                            LOG.trace("Lock running successful");
+                        }
+                    } else {
+                        LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
+                        if (isLockAllowed) {
+                            netOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
+                        }
+                        resultsFutures.add(lock);
+                    }
+                }
+
+                @Override
+                public void onFailure(final Throwable throwable) {
+                    LOG.warn("Lock running operation failed", throwable);
+                    if (isLockAllowed) {
+                        netOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
+                    }
+                    resultsFutures.add(lock);
+                }
+            };
+            lock = netOps.lockRunning(lockRunningCallback);
         } else {
             LOG.trace("Lock is not allowed: {}", id);
         }
@@ -60,10 +99,17 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
      * and its netty threadpool that is really sensitive to blocking calls.
      */
     private void unlockRunning() {
-        if (isLockAllowed) {
-            netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
-        } else {
-            LOG.trace("Unlock is not allowed: {}", id);
-        }
+        Futures.addCallback(lock, new NetconfRpcFutureCallback("Check datastore lock", id) {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    if (isLockAllowed) {
+                        netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+                    } else {
+                        LOG.trace("Unlock is not allowed: {}", id);
+                    }
+                }
+            }
+        }, MoreExecutors.directExecutor());
     }
 }
