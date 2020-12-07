@@ -19,6 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_LOCK_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 
 import com.google.common.util.concurrent.FluentFuture;
@@ -185,14 +186,17 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testListenerFailure() throws Exception {
+    public void testListenerFailure() {
         final IllegalStateException cause = new IllegalStateException("Failed tx");
         doReturn(FluentFutures.immediateFailedFluentFuture(cause))
                 .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult()))
+            .when(rpc).invokeRpc(eq(NETCONF_LOCK_QNAME), any(ContainerNode.class));
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchema().getMountPointContext()), false);
         final TxListener listener = mock(TxListener.class);
         tx.addListener(listener);
+        tx.init();
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
         tx.commit();
         final ArgumentCaptor<Exception> excCaptor = ArgumentCaptor.forClass(Exception.class);

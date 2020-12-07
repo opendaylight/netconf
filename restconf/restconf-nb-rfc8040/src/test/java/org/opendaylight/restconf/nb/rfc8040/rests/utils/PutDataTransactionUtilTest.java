@@ -14,6 +14,9 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
+import com.google.common.util.concurrent.FluentFuture;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +31,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -166,6 +170,9 @@ public class PutDataTransactionUtilTest {
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
+        final List<FluentFuture<DefaultDOMRpcResult>> lock =
+            Arrays.asList(immediateFluentFuture(new DefaultDOMRpcResult()));
+        doReturn(lock).when(netconfService).lock();
     }
 
     @Test

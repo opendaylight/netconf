@@ -7,11 +7,16 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
@@ -41,7 +46,6 @@ import org.slf4j.LoggerFactory;
  * </ol>
  */
 public class WriteRunningTx extends AbstractWriteTx {
-
     private static final Logger LOG  = LoggerFactory.getLogger(WriteRunningTx.class);
     private final List<Change> changes = new ArrayList<>();
 
@@ -61,11 +65,30 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     private void lock() {
-        if (isLockAllowed) {
-            resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
-        } else {
+        if (!isLockAllowed) {
             LOG.trace("Lock is not allowed: {}", id);
+            lock = Futures.immediateFuture(new DefaultDOMRpcResult());
+            return;
         }
+        final FutureCallback<DOMRpcResult> lockRunningCallback = new FutureCallback<>() {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Lock running successful");
+                    }
+                } else {
+                    LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
+                }
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.warn("Lock running operation failed", throwable);
+            }
+        };
+        lock = netOps.lockRunning(lockRunningCallback);
+        resultsFutures.add(lock);
     }
 
     @Override
@@ -75,11 +98,26 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     public synchronized ListenableFuture<RpcResult<Void>> performCommit() {
-        for (final Change change : changes) {
-            resultsFutures.add(change.execute(id, netOps, rollbackSupport));
-        }
-        unlock();
-        return resultsToTxStatus();
+        final SettableFuture<RpcResult<Void>> commitResult = SettableFuture.create();
+        Futures.addCallback(lock, new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    for (final Change change : changes) {
+                        resultsFutures.add(change.execute(id, netOps, rollbackSupport));
+                    }
+                }
+                commitResult.setFuture(resultsToTxStatus());
+                cleanup();
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                commitResult.setException(throwable);
+                cleanup();
+            }
+        }, MoreExecutors.directExecutor());
+        return commitResult;
     }
 
     @Override
@@ -92,15 +130,21 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     private void unlock() {
-        if (isLockAllowed) {
-            netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
-        } else {
-            LOG.trace("Unlock is not allowed: {}", id);
-        }
+        Futures.addCallback(lock, new NetconfRpcFutureCallback("Check datastore lock", id) {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    if (isLockAllowed) {
+                        netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+                    } else {
+                        LOG.trace("Unlock is not allowed: {}", id);
+                    }
+                }
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     private static final class Change {
-
         private final DataContainerChild<?, ?> editStructure;
         private final Optional<ModifyAction> defaultOperation;
 
