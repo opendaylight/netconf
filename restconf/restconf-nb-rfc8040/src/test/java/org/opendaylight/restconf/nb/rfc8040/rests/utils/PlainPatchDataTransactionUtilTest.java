@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import java.util.Optional;
 import org.junit.Before;
@@ -25,6 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -155,6 +157,7 @@ public class PlainPatchDataTransactionUtilTest {
                 .build();
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        Mockito.doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
     }
 

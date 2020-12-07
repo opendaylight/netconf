@@ -53,7 +53,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     }
 
     @Override
-    public synchronized List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public synchronized ListenableFuture<? extends DOMRpcResult> lock() {
         final Future<Object> masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
         proxyNetconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return proxyNetconfService.lock();

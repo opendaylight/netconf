@@ -185,7 +185,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testListenerFailure() throws Exception {
+    public void testListenerFailure() {
         final IllegalStateException cause = new IllegalStateException("Failed tx");
         doReturn(FluentFutures.immediateFailedFluentFuture(cause))
                 .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));

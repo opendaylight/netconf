@@ -25,8 +25,6 @@ import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.FluentFuture;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
@@ -150,9 +148,8 @@ public class NetconfDataTreeServiceActorTest {
 
     @Test
     public void testLock() {
-        final List<FluentFuture<DefaultDOMRpcResult>> futures =
-            Arrays.asList(immediateFluentFuture(new DefaultDOMRpcResult()));
-        doReturn(futures).when(netconfService).lock();
+        final FluentFuture<DefaultDOMRpcResult> lock = immediateFluentFuture(new DefaultDOMRpcResult());
+        doReturn(lock).when(netconfService).lock();
         actorRef.tell(new LockRequest(), probe.ref());
         verify(netconfService).lock();
     }
