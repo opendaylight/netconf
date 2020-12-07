@@ -11,7 +11,6 @@ import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATI
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,10 +39,9 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
     }
 
     @Override
-    public List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public ListenableFuture<? extends DOMRpcResult> lock() {
         LOG.debug("{}: Lock - failure", id, failure);
-        return Collections.singletonList(
-            FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("lock", failure)));
+        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("lock", failure));
     }
 
     @Override

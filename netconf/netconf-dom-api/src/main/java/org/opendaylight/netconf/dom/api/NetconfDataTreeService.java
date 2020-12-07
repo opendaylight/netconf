@@ -32,7 +32,7 @@ public interface NetconfDataTreeService extends DOMService {
      *
      * @return result of &lt;lock&gt; operation
      */
-    List<ListenableFuture<? extends DOMRpcResult>> lock();
+    ListenableFuture<? extends DOMRpcResult> lock();
 
     /**
      * The &lt;unlock&gt; operation.

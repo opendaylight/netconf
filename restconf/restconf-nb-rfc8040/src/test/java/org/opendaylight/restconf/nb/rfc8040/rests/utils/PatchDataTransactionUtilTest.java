@@ -18,6 +18,7 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.MERGE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.util.concurrent.SettableFuture;
@@ -35,6 +36,7 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -172,6 +174,7 @@ public class PatchDataTransactionUtilTest {
         doReturn(this.rwTransaction).when(this.transactionChain).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
     }
 
     @Test
