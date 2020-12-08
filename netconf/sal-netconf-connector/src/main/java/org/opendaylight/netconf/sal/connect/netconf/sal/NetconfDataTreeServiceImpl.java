@@ -54,7 +54,7 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     private final boolean candidateSupported;
     private final boolean runningWritable;
 
-    private boolean isLockAllowed = true;
+    private volatile boolean isLockAllowed = true;
 
     public NetconfDataTreeServiceImpl(final RemoteDeviceId id, final MountPointContext mountContext,
                                       final DOMRpcService rpc,
@@ -186,15 +186,19 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
                     resultFuture.setException(new TransactionCommitFailedException(
                             String.format("Commit of transaction %s failed", this),
                             errors.toArray(new RpcError[errors.size()])));
-                    return;
+                    discardChanges();
+                } else {
+                    resultFuture.set(CommitInfo.empty());
                 }
-                resultFuture.set(CommitInfo.empty());
+                unlock();
             }
 
             @Override
             public void onFailure(final Throwable failure) {
                 resultFuture.setException(new TransactionCommitFailedException(
                         String.format("Commit of transaction %s failed", this), failure));
+                discardChanges();
+                unlock();
             }
         }, MoreExecutors.directExecutor());
         return resultFuture;
@@ -260,7 +264,6 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
                 @Override
                 public void onFailure(Throwable throwable) {
                     super.onFailure(throwable);
-                    discardChanges();
                 }
             }));
         } else {
@@ -285,32 +288,51 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
             final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
         final SettableFuture<RpcResult<Void>> commitResult = SettableFuture.create();
 
-        final ListenableFuture<RpcResult<Void>> result = resultsToStatus(id, resultsFutures);
-        Futures.addCallback(result, new FutureCallback<>() {
-            @Override
-            public void onSuccess(final RpcResult<Void> result) {
-                if (result.isSuccessful()) {
-                    if (candidateSupported) {
+        if (candidateSupported) {
+            final ListenableFuture<RpcResult<Void>> result = resultsToStatus(id, resultsFutures);
+            Futures.addCallback(result, new FutureCallback<>() {
+                @Override
+                public void onSuccess(final RpcResult<Void> result) {
+                    if (result.isSuccessful()) {
                         final ListenableFuture<? extends DOMRpcResult> commit =
                             netconfOps.commit(new NetconfRpcFutureCallback("Commit", id));
                         commitResult.setFuture(resultsToStatus(id, Collections.singletonList(commit)));
                     } else {
-                        commitResult.set(RpcResultBuilder.<Void>success().build());
+                        commitResult.set(result);
                     }
-                } else {
-                    commitResult.set(result);
-                    discardChanges();
                 }
-                unlock();
-            }
 
-            @Override
-            public void onFailure(final Throwable throwable) {
-                commitResult.setException(throwable);
-                discardChanges();
-                unlock();
+                @Override
+                public void onFailure(final Throwable throwable) {
+                    commitResult.setException(throwable);
+                }
+            }, MoreExecutors.directExecutor());
+        } else {
+            if (isLockAllowed) {
+                // Our first operation must be always "lock".
+                // According to rfc6241 we need to be sure there is no error with "lock" operation to go further.
+                final ListenableFuture<RpcResult<Void>> lock =
+                    resultsToStatus(id, Collections.singletonList(resultsFutures.remove(0)));
+
+                Futures.addCallback(lock, new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(final RpcResult<Void> result) {
+                        if (result.isSuccessful()) {
+                            commitResult.setFuture(resultsToStatus(id, resultsFutures));
+                        } else {
+                            commitResult.set(result);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable throwable) {
+                        commitResult.setException(throwable);
+                    }
+                }, MoreExecutors.directExecutor());
+            } else {
+                commitResult.setFuture(resultsToStatus(id, resultsFutures));
             }
-        }, MoreExecutors.directExecutor());
+        }
         return commitResult;
     }
 
