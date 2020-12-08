@@ -7,7 +7,11 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -80,10 +84,39 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     public synchronized ListenableFuture<RpcResult<Void>> performCommit() {
-        for (final Change change : changes) {
-            resultsFutures.add(change.execute(id, netOps, rollbackSupport));
+        if (isLockAllowed) {
+            final SettableFuture<RpcResult<Void>> commitResult = SettableFuture.create();
+            // Currently we only did "lock" operation.
+            // According to rfc6241 we need to be sure there is no error with "lock" operation to go further.
+            final ListenableFuture<RpcResult<Void>> lockResult = resultsToTxStatus();
+
+            Futures.addCallback(lockResult, new FutureCallback<>() {
+                @Override
+                public void onSuccess(final RpcResult<Void> result) {
+                    if (result.isSuccessful()) {
+                        //remove the previous "lock" result as we already processed it
+                        resultsFutures.clear();
+                        for (final Change change : changes) {
+                            resultsFutures.add(change.execute(id, netOps, rollbackSupport));
+                        }
+                        commitResult.setFuture(resultsToTxStatus());
+                    } else {
+                        commitResult.set(result);
+                    }
+                }
+
+                @Override
+                public void onFailure(final Throwable throwable) {
+                    commitResult.setException(throwable);
+                }
+            }, MoreExecutors.directExecutor());
+            return commitResult;
+        } else {
+            for (final Change change : changes) {
+                resultsFutures.add(change.execute(id, netOps, rollbackSupport));
+            }
+            return resultsToTxStatus();
         }
-        return resultsToTxStatus();
     }
 
     @Override
