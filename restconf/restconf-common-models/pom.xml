@@ -14,13 +14,13 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>restconf-parent</artifactId>
-    <version>1.11.3-SNAPSHOT</version>
+    <version>1.11.3</version>
     <relativePath>../restconf-parent</relativePath>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>restconf-common-models</artifactId>
-  <version>1.11.3-SNAPSHOT</version>
+  <version>1.11.3</version>
   <packaging>bundle</packaging>
   <name>${project.artifactId}</name>
 

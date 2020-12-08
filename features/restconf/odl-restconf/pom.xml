@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-restconf</artifactId>
-    <version>1.11.3-SNAPSHOT</version>
+    <version>1.11.3</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Restconf</name>
