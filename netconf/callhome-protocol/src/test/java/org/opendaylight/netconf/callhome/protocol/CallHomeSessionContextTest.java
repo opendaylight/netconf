@@ -29,12 +29,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
-import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientSessionImpl;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyAwareChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel.Streaming;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.AttributeRepository.AttributeKey;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoInputStream;
@@ -45,7 +45,7 @@ import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchange;
 import org.opendaylight.netconf.shaded.sshd.common.util.buffer.Buffer;
 
 public class CallHomeSessionContextTest {
-    private ClientSessionImpl mockSession;
+    private NetconfClientSessionImpl mockSession;
     private CallHomeAuthorization mockAuth;
     private ClientChannel mockChannel;
     private InetSocketAddress address;
@@ -59,7 +59,7 @@ public class CallHomeSessionContextTest {
 
     @Before
     public void setup() {
-        mockSession = mock(ClientSessionImpl.class);
+        mockSession = mock(NetconfClientSessionImpl.class);
         mockAuth = mock(CallHomeAuthorization.class);
         mockChannel = mock(ClientChannel.class);
         address = mock(InetSocketAddress.class);
@@ -121,9 +121,9 @@ public class CallHomeSessionContextTest {
     public void creatingAChannelSuccessfullyShouldResultInAnAttachedListener() throws IOException {
         // given
         OpenFuture mockFuture = mock(OpenFuture.class);
-        ChannelSubsystem mockChannelSubsystem = mock(ChannelSubsystem.class);
+        NettyAwareChannelSubsystem mockChannelSubsystem = mock(NettyAwareChannelSubsystem.class);
         Mockito.doReturn(mockFuture).when(mockChannelSubsystem).open();
-        Mockito.doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString());
+        Mockito.doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString(), any());
 
         Mockito.doReturn(null).when(mockFuture).addListener(any(SshFutureListener.class));
         doNothing().when(mockChannelSubsystem).setStreaming(any(Streaming.class));

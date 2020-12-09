@@ -10,6 +10,7 @@ package org.opendaylight.netconf.callhome.protocol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
@@ -23,6 +24,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientSessionImpl;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyAwareChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
@@ -71,7 +74,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     void openNetconfChannel() {
         LOG.debug("Opening NETCONF Subsystem on {}", sshSession);
         try {
-            final ClientChannel netconfChannel = sshSession.createSubsystemChannel(NETCONF);
+            final ClientChannel netconfChannel =
+                    ((NetconfClientSessionImpl) sshSession).createSubsystemChannel(NETCONF, null);
             netconfChannel.setStreaming(ClientChannel.Streaming.Async);
             netconfChannel.open().addListener(newSshFutureListener(netconfChannel));
         } catch (IOException e) {
@@ -117,6 +121,9 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         Promise<NetconfClientSession> activationPromise = newSessionPromise();
         final MinaSshNettyChannel nettyChannel = newMinaSshNettyChannel(netconfChannel);
         factory.getChannelInitializer(listener).initialize(nettyChannel, activationPromise);
+        ChannelHandlerContext ctx = nettyChannel.pipeline().firstContext();
+        ((NettyAwareChannelSubsystem)netconfChannel).setChannelHandlerContext(ctx);
+        ((NettyAwareChannelSubsystem)netconfChannel).onClose(nettyChannel::doNettyDisconnect);
         factory.getNettyGroup().register(nettyChannel).awaitUninterruptibly(500);
         return activationPromise;
     }

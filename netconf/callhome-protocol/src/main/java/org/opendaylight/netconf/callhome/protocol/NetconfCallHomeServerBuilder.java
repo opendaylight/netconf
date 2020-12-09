@@ -15,7 +15,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.Factory;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
-import org.opendaylight.netconf.shaded.sshd.client.SshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientBuilder;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yangtools.concepts.Builder;
 
 public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServer> {
@@ -23,7 +24,7 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
     private static final long DEFAULT_SESSION_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(5);
     private static final int DEFAULT_CALL_HOME_PORT = 6666;
 
-    private SshClient sshClient;
+    private NetconfSshClient sshClient;
     private EventLoopGroup nettyGroup;
     private NetconfClientSessionNegotiatorFactory negotiationFactory;
     private InetSocketAddress bindAddress;
@@ -46,11 +47,11 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
         return new NetconfCallHomeServer(sshClient(), authProvider(), factory, bindAddress(), this.recorder);
     }
 
-    public SshClient getSshClient() {
+    public NetconfSshClient getSshClient() {
         return sshClient;
     }
 
-    public void setSshClient(final SshClient sshClient) {
+    public void setSshClient(final NetconfSshClient sshClient) {
         this.sshClient = sshClient;
     }
 
@@ -102,12 +103,13 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
         return authProvider;
     }
 
-    private SshClient sshClient() {
+    private NetconfSshClient sshClient() {
         return sshClient != null ? sshClient : defaultSshClient();
     }
 
-    private static SshClient defaultSshClient() {
-        return SshClient.setUpDefaultClient();
+    private static NetconfSshClient defaultSshClient() {
+        final NetconfClientBuilder builder = new NetconfClientBuilder();
+        return builder.build();
     }
 
     private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
