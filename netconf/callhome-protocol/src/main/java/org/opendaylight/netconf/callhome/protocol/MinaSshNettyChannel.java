@@ -9,7 +9,6 @@ package org.opendaylight.netconf.callhome.protocol;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.AbstractServerChannel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,8 +19,6 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelConfig;
 import io.netty.channel.EventLoop;
 import java.net.SocketAddress;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerReader;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerReader.ReadMsgHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWriter;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
@@ -36,7 +33,6 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     private final CallHomeSessionContext context;
     private final ClientSession session;
     private final ClientChannel sshChannel;
-    private final AsyncSshHandlerReader sshReadHandler;
     private final AsyncSshHandlerWriter sshWriteAsyncHandler;
 
     private volatile boolean nettyClosed = false;
@@ -46,8 +42,6 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         this.context = requireNonNull(context);
         this.session = requireNonNull(session);
         this.sshChannel = requireNonNull(sshChannel);
-        this.sshReadHandler = new AsyncSshHandlerReader(
-            new ConnectionClosedDuringRead(), new FireReadMessage(), "netconf", sshChannel.getAsyncOut());
         this.sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());
         pipeline().addFirst(createChannelAdapter());
     }
@@ -121,7 +115,6 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         if (!nettyClosed) {
             nettyClosed = true;
             pipeline().fireChannelInactive();
-            sshReadHandler.close();
             sshWriteAsyncHandler.close();
         }
     }
@@ -150,24 +143,6 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     @Override
     protected void doWrite(final ChannelOutboundBuffer in) {
         throw new IllegalStateException("Outbound writes to SSH should be done by SSH Write handler");
-    }
-
-    private final class FireReadMessage implements ReadMsgHandler {
-        @Override
-        public void onMessageRead(final ByteBuf msg) {
-            pipeline().fireChannelRead(msg);
-        }
-    }
-
-    private final class ConnectionClosedDuringRead implements AutoCloseable {
-
-        /**
-         * Invoked when SSH session dropped during read using {@link AsyncSshHandlerReader}.
-         */
-        @Override
-        public void close() {
-            doNettyDisconnect();
-        }
     }
 
     private class SshUnsafe extends AbstractUnsafe {
