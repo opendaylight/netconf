@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.annotations.Beta;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,11 +22,15 @@ import org.slf4j.LoggerFactory;
 public class NettyAwareChannelSubsystem extends ChannelSubsystem {
     private static final Logger LOG = LoggerFactory.getLogger(NettyAwareChannelSubsystem.class);
 
-    private final ChannelHandlerContext ctx;
+    private ChannelHandlerContext ctx;
 
     public NettyAwareChannelSubsystem(final String subsystem, final ChannelHandlerContext ctx) {
         super(subsystem);
-        this.ctx = requireNonNull(ctx);
+        this.ctx = ctx;
+    }
+
+    public void setChannelHandlerContext(ChannelHandlerContext context) {
+        this.ctx = context;
     }
 
     @Override
