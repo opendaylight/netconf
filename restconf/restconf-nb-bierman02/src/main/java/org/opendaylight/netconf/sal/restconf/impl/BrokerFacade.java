@@ -456,7 +456,7 @@ public class BrokerFacade implements Closeable {
                 // if commit failed it is global error
                 LOG.error("Http Patch {} transaction commit has failed", patchContext.getPatchId());
                 status.setStatus(new PatchStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
-                        false, ImmutableList.of(
+                    false, ImmutableList.of(
                         new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, throwable.getMessage()))));
                 waiter.countDown();
             }
