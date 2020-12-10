@@ -93,7 +93,6 @@ import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
@@ -275,8 +274,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         masterSystem = ActorSystem.create(ACTOR_SYSTEM_NAME, ConfigFactory.load().getConfig("Master"));
 
-        masterClusterSingletonServiceProvider = new DOMClusterSingletonServiceProviderImpl(
-                new SimpleDOMEntityOwnershipService());
+        masterClusterSingletonServiceProvider = new DOMClusterSingletonServiceProviderImpl();
         masterClusterSingletonServiceProvider.initializeProvider();
 
         doReturn(masterSystem).when(mockMasterActorSystemProvider).getActorSystem();
