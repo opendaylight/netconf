@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>single-feature-parent</artifactId>
-        <version>8.0.0</version>
+        <version>8.0.1</version>
         <relativePath/>
     </parent>
 
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>odl-yangtools-codec</artifactId>
-            <version>6.0.0</version>
+            <version>6.0.1</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
