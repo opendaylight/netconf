@@ -115,8 +115,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
         LOG.trace("Notification listener registered for stream: {}", stream);
 
-        final GenericNotificationListenerReg genericNotificationListenerReg =
-                new GenericNotificationListenerReg(listener) {
+        final GenericNotificationListenerReg reg = new GenericNotificationListenerReg(listener) {
             @Override
             public void close() {
                 synchronized (NetconfNotificationManager.this) {
@@ -126,8 +125,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             }
         };
 
-        notificationListeners.put(BASE_STREAM_NAME, genericNotificationListenerReg);
-        return genericNotificationListenerReg;
+        notificationListeners.put(BASE_STREAM_NAME, reg);
+        return reg;
     }
 
     @Override
@@ -193,8 +192,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
         availableStreams.add(streamName);
 
-        final GenericNotificationPublisherReg genericNotificationPublisherReg =
-                new GenericNotificationPublisherReg(this, streamName) {
+        final GenericNotificationPublisherReg reg = new GenericNotificationPublisherReg(this, streamName) {
             @Override
             public void close() {
                 synchronized (NetconfNotificationManager.this) {
@@ -203,10 +201,10 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             }
         };
 
-        notificationPublishers.add(genericNotificationPublisherReg);
+        notificationPublishers.add(reg);
 
         notifyStreamAdded(stream);
-        return genericNotificationPublisherReg;
+        return reg;
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
@@ -339,7 +337,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         }
 
         @Override
-        public void onYangLibraryUpdate(YangLibraryUpdate yangLibraryUpdate) {
+        public void onYangLibraryUpdate(final YangLibraryUpdate yangLibraryUpdate) {
             baseRegistration.onNotification(BASE_STREAM_NAME,
                     transformUtil.transform(yangLibraryUpdate, YANG_LIBRARY_UPDATE_PATH));
         }

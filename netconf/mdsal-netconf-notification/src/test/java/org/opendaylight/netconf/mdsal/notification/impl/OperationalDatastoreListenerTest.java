@@ -37,10 +37,10 @@ public class OperationalDatastoreListenerTest {
         final DataTreeIdentifier<DataObject> testId =
                 DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, instanceIdentifier);
 
-        final OperationalDatastoreListener<DataObject> op =
-                new OperationalDatastoreListener<DataObject>(instanceIdentifier) {
+        final var op = new OperationalDatastoreListener<>(instanceIdentifier) {
             @Override
             public void onDataTreeChanged(final Collection<DataTreeModification<DataObject>> collection) {
+                // no-op
             }
         };
         doReturn(null).when(dataBroker).registerDataTreeChangeListener(any(), any());

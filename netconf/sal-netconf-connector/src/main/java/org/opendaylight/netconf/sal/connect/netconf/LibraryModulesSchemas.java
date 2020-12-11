@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
@@ -48,6 +47,7 @@ import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.shaded.xerces.impl.dv.util.Base64;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
@@ -144,7 +144,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             if (connection instanceof HttpURLConnection) {
                 connection.setRequestProperty("Accept", "application/xml");
                 final String userpass = username + ":" + password;
-                final String basicAuth = "Basic " + printBase64Binary(userpass.getBytes(StandardCharsets.UTF_8));
+                final String basicAuth = "Basic " + Base64.encode(userpass.getBytes(StandardCharsets.UTF_8));
 
                 connection.setRequestProperty("Authorization", basicAuth);
             }
