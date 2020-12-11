@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-parent</artifactId>
-        <version>1.8.3-SNAPSHOT</version>
+        <version>1.8.4-SNAPSHOT</version>
         <relativePath>../../parent</relativePath>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-topology-singleton</artifactId>
-    <version>1.8.3-SNAPSHOT</version>
+    <version>1.8.4-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
 
@@ -29,7 +29,7 @@
             <dependency>
                 <groupId>org.opendaylight.controller</groupId>
                 <artifactId>config-artifacts</artifactId>
-                <version>0.12.3-SNAPSHOT</version>
+                <version>0.12.4-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

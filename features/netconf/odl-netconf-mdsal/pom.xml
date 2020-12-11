@@ -19,7 +19,7 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-mdsal</artifactId>
     <!-- This matches controller -->
-    <version>1.11.3-SNAPSHOT</version>
+    <version>1.11.4-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf :: Mdsal</name>
@@ -29,7 +29,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-artifacts</artifactId>
-                <version>1.8.3-SNAPSHOT</version>
+                <version>1.8.4-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
