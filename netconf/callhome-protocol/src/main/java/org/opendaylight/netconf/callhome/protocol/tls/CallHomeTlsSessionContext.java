@@ -69,7 +69,7 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
 
     private Promise<NetconfClientSession> doActivate(final Channel ch, final NetconfClientSessionListener listener) {
         final Promise<NetconfClientSession> activationPromise = newSessionPromise();
-        if (!activated.compareAndExchange(false, true)) {
+        if (activated.compareAndExchange(false, true)) {
             return activationPromise.setFailure(new IllegalStateException("Session (channel) already activated."));
         }
 
