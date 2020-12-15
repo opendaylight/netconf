@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
@@ -30,6 +29,7 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -142,9 +142,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             if (connection instanceof HttpURLConnection) {
                 connection.setRequestProperty("Accept", "application/xml");
                 final String userpass = username + ":" + password;
-                final String basicAuth = "Basic " + printBase64Binary(userpass.getBytes(StandardCharsets.UTF_8));
-
-                connection.setRequestProperty("Authorization", basicAuth);
+                connection.setRequestProperty("Authorization",
+                    "Basic " + Base64.getEncoder().encodeToString(userpass.getBytes(StandardCharsets.UTF_8)));
             }
 
             return createFromURLConnection(connection);
