@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tomas Cere <tomas.cere@pantheon.tech>
+Submitted-by: Tomas Cere <tomas.cere@pantheon.tech>
+Submitted-at: Tue, 15 Dec 2020 16:10:53 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/94034
+Project: netconf
+Branch: refs/heads/stable/aluminium
