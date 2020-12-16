@@ -64,7 +64,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
 
     @Override
     public ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
-        final NetconfNode node = this.encryptPassword(input);
+        final NetconfNode node = encryptPassword(input);
         final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult = SettableFuture.create();
         final NodeId nodeId = new NodeId(input.getNodeId());
         writeToConfigDS(node, nodeId, futureResult);
@@ -72,14 +72,12 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     }
 
     @VisibleForTesting
-    public NetconfNode encryptPassword(final CreateDeviceInput input) {
+    NetconfNode encryptPassword(final CreateDeviceInput input) {
         final NetconfNodeBuilder builder = new NetconfNodeBuilder();
         builder.fieldsFrom(input);
 
-        final Credentials credentials = handleEncryption(input.getCredentials());
-        builder.setCredentials(credentials);
-
-        return builder.build();
+        return builder.setCredentials(handleEncryption(input.getCredentials()))
+            .build();
     }
 
     private Credentials handleEncryption(final Credentials credentials) {

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.util;
+package org.opendaylight.netconf.sal.connect.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -49,7 +48,7 @@ public class NetconfTopologyRPCProviderTest {
     @Mock
     private AAAEncryptionService encryptionService;
 
-    private NetconfTopologyRPCProvider rpcProvider ;
+    private NetconfTopologyRPCProvider rpcProvider;
 
     @Before
     public void setUp() {
@@ -58,7 +57,7 @@ public class NetconfTopologyRPCProviderTest {
     }
 
     @Test
-    public void testEncryptPassword() throws Exception {
+    public void testEncryptPassword() {
 
         final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(true));
 
@@ -70,7 +69,7 @@ public class NetconfTopologyRPCProviderTest {
     }
 
     @Test
-    public void testNoEncryption() throws Exception {
+    public void testNoEncryption() {
         final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(false));
 
         final Credentials credentials = encryptedPwNode.getCredentials();
@@ -91,12 +90,13 @@ public class NetconfTopologyRPCProviderTest {
                     new LoginPasswordUnencryptedBuilder().setUsername("test").setPassword(TEST_PWD).build()).build();
         }
 
-        builder.setCredentials(credentials);
-        builder.setHost(new Host(new IpAddress(new Ipv4Address("10.18.16.188"))));
-        builder.setPort(new PortNumber(Uint16.valueOf(830)));
-        builder.setTcpOnly(Boolean.FALSE);
-        builder.setNodeId(NODE_ID.toString());
-        return builder.build();
+        return builder
+            .setCredentials(credentials)
+            .setHost(new Host(new IpAddress(new Ipv4Address("10.18.16.188"))))
+            .setPort(new PortNumber(Uint16.valueOf(830)))
+            .setTcpOnly(Boolean.FALSE)
+            // FIXME: do we really want 'toString()' here?
+            .setNodeId(NODE_ID.toString())
+            .build();
     }
-
 }
