@@ -50,6 +50,7 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
 import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -127,12 +128,13 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
         final AAAEncryptionService encryptionService = mock(AAAEncryptionService.class);
         final DeviceActionFactory deviceActionFactory = mock(DeviceActionFactory.class);
+        final RpcProviderService rpcProviderService = mock(RpcProviderService.class);
 
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, rpcProviderRegistry,
                 actionProviderRegistry, clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
-                mountPointService, encryptionService, deviceActionFactory,
+                mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
                 new DefaultSchemaResourceManager(new YangParserFactoryImpl())) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
