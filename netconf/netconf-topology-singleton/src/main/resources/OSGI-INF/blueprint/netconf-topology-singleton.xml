@@ -14,6 +14,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
 
     <reference id="dataBroker"
                interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
+    <reference id="rpcProvider"
+               interface="org.opendaylight.mdsal.binding.api.RpcProviderService"/>
     <reference id="rpcRegistry"
                interface="org.opendaylight.mdsal.dom.api.DOMRpcProviderService"/>
     <reference id="actionRegistry"
@@ -78,21 +80,12 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <property name="privateKeyPath" value="${private-key-path}"/>
         <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
         <argument ref="encryptionService" />
+        <argument ref="rpcProvider" />
         <argument ref="deviceActionFactory"/>
         <argument ref="schemaManager"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
-
-    <bean id="netconfNodeRegisterEncryptedRPC"
-          class="org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider"
-          >
-        <argument value="topology-netconf"/>
-        <argument ref="dataBroker"/>
-        <argument ref="encryptionService"/>
-    </bean>
-
-    <odl:rpc-implementation ref="netconfNodeRegisterEncryptedRPC"/>
 
     <bean id="netconfKeystoreProvider"
           class="org.opendaylight.netconf.sal.connect.util.NetconfSalKeystoreService">

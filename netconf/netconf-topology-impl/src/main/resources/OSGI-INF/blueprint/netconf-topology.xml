@@ -25,6 +25,8 @@
                odl:type="global-event-executor"/>
     <reference id="dataBroker"
                interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
+    <reference id="rpcProviderService"
+               interface="org.opendaylight.mdsal.binding.api.RpcProviderService"/>
     <reference id="mountPointService"
                interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
     <reference id="encryptionService"
@@ -59,6 +61,7 @@
         <property name="privateKeyPath" value="${private-key-path}"/>
         <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
         <argument ref="encryptionService" />
+        <argument ref="rpcProviderService" />
         <argument ref="baseSchemas"/>
         <argument ref="deviceActionFactory"/>
     </bean>
@@ -66,15 +69,6 @@
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
     <service ref="netconfConnectorFactory" interface="org.opendaylight.netconf.topology.api.NetconfConnectorFactory"
              odl:type="default"/>
-
-    <bean id="netconfNodeRegisterEncryptedRPC"
-          class="org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider">
-        <argument value="topology-netconf"/>
-        <argument ref="dataBroker"/>
-        <argument ref="encryptionService"/>
-    </bean>
-
-    <odl:rpc-implementation ref="netconfNodeRegisterEncryptedRPC"/>
 
     <bean id="netconfKeystoreProvider"
           class="org.opendaylight.netconf.sal.connect.util.NetconfSalKeystoreService">

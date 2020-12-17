@@ -30,6 +30,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -43,12 +44,14 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
+import org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
@@ -59,6 +62,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,10 +91,12 @@ public class NetconfTopologyManager
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
     private final AAAEncryptionService encryptionService;
+    private final RpcProviderService rpcProviderService;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager resourceManager;
 
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
+    private Registration rpcReg;
     private String privateKeyPath;
     private String privateKeyPassphrase;
 
@@ -104,6 +110,7 @@ public class NetconfTopologyManager
                                   final String topologyId, final Config config,
                                   final DOMMountPointService mountPointService,
                                   final AAAEncryptionService encryptionService,
+                                  final RpcProviderService rpcProviderService,
                                   final DeviceActionFactory deviceActionFactory,
                                   final SchemaResourceManager resourceManager) {
         this.baseSchemas = requireNonNull(baseSchemas);
@@ -120,6 +127,7 @@ public class NetconfTopologyManager
         this.writeTxIdleTimeout = Duration.apply(config.getWriteTransactionIdleTimeout().toJava(), TimeUnit.SECONDS);
         this.mountPointService = mountPointService;
         this.encryptionService = requireNonNull(encryptionService);
+        this.rpcProviderService = requireNonNull(rpcProviderService);
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
     }
@@ -127,6 +135,8 @@ public class NetconfTopologyManager
     // Blueprint init method
     public void init() {
         dataChangeListenerRegistration = registerDataTreeChangeListener();
+        rpcReg = rpcProviderService.registerRpcImplementation(NetconfNodeTopologyService.class,
+            new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId));
     }
 
     @Override
@@ -223,6 +233,10 @@ public class NetconfTopologyManager
 
     @Override
     public void close() {
+        if (rpcReg != null) {
+            rpcReg.close();
+            rpcReg = null;
+        }
         if (dataChangeListenerRegistration != null) {
             dataChangeListenerRegistration.close();
             dataChangeListenerRegistration = null;
