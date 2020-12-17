@@ -39,6 +39,7 @@ import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -109,6 +110,9 @@ public class NetconfTopologyImplTest {
     @Mock
     private AAAEncryptionService encryptionService;
 
+    @Mock
+    private RpcProviderService rpcProviderService;
+
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -118,7 +122,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
             mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
-            encryptionService);
+            encryptionService, rpcProviderService);
 
         spyTopology = spy(topology);
     }
@@ -290,10 +294,11 @@ public class NetconfTopologyImplTest {
                                           final ThreadPool processingExecutor,
                                           final SchemaResourceManager schemaRepositoryProvider,
                                           final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                                          final AAAEncryptionService encryptionService) {
+                                          final AAAEncryptionService encryptionService,
+                                          final RpcProviderService rpcProviderService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker,
-                  mountPointService, encryptionService, BASE_SCHEMAS);
+                  processingExecutor, schemaRepositoryProvider, dataBroker,
+                  mountPointService, encryptionService, rpcProviderService, BASE_SCHEMAS);
         }
 
         @Override
