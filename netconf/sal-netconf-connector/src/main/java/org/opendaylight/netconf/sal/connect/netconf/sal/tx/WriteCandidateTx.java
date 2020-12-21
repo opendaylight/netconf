@@ -68,7 +68,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
     protected void lockCandidate() {
         if (!isLockAllowed) {
             LOG.trace("Lock is not allowed: {}", id);
-            lock = Futures.immediateFuture(new DefaultDOMRpcResult());
+            lock.setFuture(Futures.immediateFuture(new DefaultDOMRpcResult()));
             return;
         }
         final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<>() {
@@ -88,7 +88,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
                 LOG.warn("Lock candidate operation failed", throwable);
             }
         };
-        lock = netOps.lockCandidate(lockCandidateCallback);
+        lock.setFuture(netOps.lockCandidate(lockCandidateCallback));
         resultsFutures.add(lock);
     }
 
@@ -166,7 +166,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
                               final Optional<ModifyAction> defaultOperation,
                               final String operation) {
         final SettableFuture<DOMRpcResult> editResult = SettableFuture.create();
-        Futures.addCallback(lock, new FutureCallback<DOMRpcResult>() {
+        Futures.addCallback(lock, new FutureCallback<>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 if (isSuccess(result)) {

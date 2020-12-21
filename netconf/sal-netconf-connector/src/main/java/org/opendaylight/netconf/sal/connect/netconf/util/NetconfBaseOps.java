@@ -42,6 +42,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -178,6 +179,16 @@ public final class NetconfBaseOps {
 
         final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_COPY_CONFIG_QNAME,
             getCopyConfigContent(requireNonNull(source), requireNonNull(target)));
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
+        return future;
+    }
+
+    public ListenableFuture<? extends DOMRpcResult> copyConfigToRunning(final FutureCallback<DOMRpcResult> callback,
+                final Map<YangInstanceIdentifier, NormalizedNode<?, ?>> nodes) {
+        requireNonNull(callback);
+
+        final ListenableFuture<? extends DOMRpcResult> future = rpc.invokeRpc(NETCONF_COPY_CONFIG_QNAME,
+            getCopyConfigToRunningContent(requireNonNull(nodes)));
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
@@ -338,6 +349,18 @@ public final class NetconfBaseOps {
                 .build();
     }
 
+    public ContainerNode getSourceNode(Map<YangInstanceIdentifier, NormalizedNode<?, ?>> nodes) {
+        final DataContainerNodeBuilder<NodeIdentifier, ChoiceNode> builder = Builders.choiceBuilder()
+            .withNodeIdentifier(CONFIG_SOURCE_NODEID)
+            .withChild(NetconfMessageTransformUtil.createConfigAnyxml(
+                mountContext.getEffectiveModelContext(), Optional.empty(), nodes));
+
+        return Builders.containerBuilder()
+            .withNodeIdentifier(NETCONF_SOURCE_NODEID)
+            .withChild(builder.build())
+            .build();
+    }
+
     public static @NonNull ContainerNode getLockContent(final QName datastore) {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_LOCK_NODEID)
                 .withChild(getTargetNode(datastore)).build();
@@ -353,6 +376,13 @@ public final class NetconfBaseOps {
     public static @NonNull ContainerNode getCopyConfigContent(final QName source, final QName target) {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_COPY_CONFIG_NODEID)
                 .withChild(getTargetNode(target)).withChild(getSourceNode(source)).build();
+    }
+
+    public ContainerNode getCopyConfigToRunningContent(Map<YangInstanceIdentifier, NormalizedNode<?, ?>> nodes) {
+        return Builders.containerBuilder().withNodeIdentifier(NETCONF_COPY_CONFIG_NODEID)
+            .withChild(getTargetNode(NETCONF_RUNNING_QNAME))
+            .withChild(getSourceNode(nodes))
+            .build();
     }
 
     public static @NonNull ContainerNode getValidateContent(final QName source) {
