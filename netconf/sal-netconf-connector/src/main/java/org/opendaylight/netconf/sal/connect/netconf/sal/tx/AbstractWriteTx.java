@@ -53,7 +53,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     // Allow commit to be called only once
     protected volatile boolean finished = false;
     protected final boolean isLockAllowed;
-    protected volatile ListenableFuture<? extends DOMRpcResult> lock;
+    protected volatile SettableFuture<DOMRpcResult> lock;
 
     public AbstractWriteTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {
@@ -61,8 +61,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         this.id = id;
         this.rollbackSupport = rollbackSupport;
         this.isLockAllowed = isLockAllowed;
-        this.lock = Futures.immediateFailedFuture(new NetconfDocumentedException(
-            "Lock database operation must be called first!"));
+        this.lock = SettableFuture.create();
         init();
     }
 
