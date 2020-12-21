@@ -13,7 +13,10 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -46,8 +49,10 @@ import org.slf4j.LoggerFactory;
  * </ol>
  */
 public class WriteRunningTx extends AbstractWriteTx {
-    private static final Logger LOG  = LoggerFactory.getLogger(WriteRunningTx.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WriteRunningTx.class);
     private final List<Change> changes = new ArrayList<>();
+    //Our backup of "running" database
+    private volatile SettableFuture<Optional<NormalizedNode<?, ?>>> runningDatastore;
 
     public WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps,
                           final boolean rollbackSupport) {
@@ -67,7 +72,8 @@ public class WriteRunningTx extends AbstractWriteTx {
     private void lock() {
         if (!isLockAllowed) {
             LOG.trace("Lock is not allowed: {}", id);
-            lock = Futures.immediateFuture(new DefaultDOMRpcResult());
+            createBackUp();
+            lock.setFuture(Futures.immediateFuture(new DefaultDOMRpcResult()));
             return;
         }
         final FutureCallback<DOMRpcResult> lockRunningCallback = new FutureCallback<>() {
@@ -77,23 +83,63 @@ public class WriteRunningTx extends AbstractWriteTx {
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Lock running successful");
                     }
+                    createBackUp();
                 } else {
                     LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
                 }
+                lock.set(result);
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
                 LOG.warn("Lock running operation failed", throwable);
+                lock.setException(throwable);
             }
         };
-        lock = netOps.lockRunning(lockRunningCallback);
+        netOps.lockRunning(lockRunningCallback);
         resultsFutures.add(lock);
+    }
+
+    private void createBackUp() {
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> backupData = netOps.getConfigRunningData(
+            new NetconfRpcFutureCallback("Backup data", id),
+            Optional.of(YangInstanceIdentifier.empty()));
+        runningDatastore = SettableFuture.create();
+        runningDatastore.setFuture(backupData);
     }
 
     @Override
     protected void cleanup() {
-        unlock();
+        if (runningDatastore != null) {
+            final YangInstanceIdentifier path = YangInstanceIdentifier.empty();
+            Futures.addCallback(runningDatastore, new FutureCallback<>() {
+                @Override
+                public void onSuccess(Optional<NormalizedNode<?, ?>> result) {
+                    if (result.isPresent()) {
+                        try {
+                            final NormalizedNode<?, Collection<NormalizedNode<?, ?>>> dataStore =
+                                (NormalizedNode<?, Collection<NormalizedNode<?, ?>>>) result.get();
+                            Map<YangInstanceIdentifier, NormalizedNode<?, ?>> map = new HashMap<>();
+                            for (NormalizedNode<?, ?> node : dataStore.getValue()) {
+                                map.put(path.node(node.getIdentifier()), node);
+                            }
+                            netOps.copyConfigToRunning(new NetconfRpcFutureCallback("Copy config", id), map);
+                        } catch (ClassCastException ex) {
+                            LOG.error("Failing discard changes", ex);
+                        }
+                    }
+                    unlock();
+                }
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                    LOG.error("Failing discard changes", throwable);
+                    unlock();
+                }
+            }, MoreExecutors.directExecutor());
+        } else {
+            unlock();
+        }
     }
 
     @Override
@@ -108,7 +154,17 @@ public class WriteRunningTx extends AbstractWriteTx {
                     }
                 }
                 commitResult.setFuture(resultsToTxStatus());
-                cleanup();
+                Futures.addCallback(commitResult, new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(RpcResult<Void> result) {
+                        unlock();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        cleanup();
+                    }
+                }, MoreExecutors.directExecutor());
             }
 
             @Override
@@ -134,6 +190,10 @@ public class WriteRunningTx extends AbstractWriteTx {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 if (isSuccess(result)) {
+                    if (runningDatastore != null) {
+                        runningDatastore.cancel(true);
+                        runningDatastore = null;
+                    }
                     if (isLockAllowed) {
                         netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
                     } else {

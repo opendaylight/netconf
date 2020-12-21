@@ -45,14 +45,13 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
     @Override
     protected synchronized void init() {
         lockRunning = SettableFuture.create();
-        lock = SettableFuture.create();
         lockRunning();
         Futures.addCallback(lockRunning, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 if (isSuccess(result)) {
                     lockCandidate();
-                    Futures.addCallback(lock, new FutureCallback<DOMRpcResult>() {
+                    Futures.addCallback(lock, new FutureCallback<>() {
                         @Override
                         public void onSuccess(final DOMRpcResult result) {
                             if (!isSuccess(result)) {
@@ -66,14 +65,14 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
                         }
                     }, MoreExecutors.directExecutor());
                 } else {
-                    ((SettableFuture)lock).set(result);
+                    lock.set(result);
                     resultsFutures.add(lock);
                 }
             }
 
             @Override
             public void onFailure(Throwable throwable) {
-                ((SettableFuture)lock).setException(throwable);
+                lock.setException(throwable);
                 resultsFutures.add(lock);
             }
         }, MoreExecutors.directExecutor());

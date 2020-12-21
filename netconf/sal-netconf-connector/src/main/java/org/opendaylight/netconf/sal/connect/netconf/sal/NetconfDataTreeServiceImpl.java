@@ -18,9 +18,12 @@ import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -55,6 +58,9 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     private final boolean runningWritable;
 
     private boolean isLockAllowed = true;
+    //Our backup of "running" database
+    private volatile SettableFuture<Optional<NormalizedNode<?, ?>>> runningDatastore;
+    private volatile SettableFuture<Boolean> canUnlockRunning;
 
     public NetconfDataTreeServiceImpl(final RemoteDeviceId id, final MountPointContext mountContext,
                                       final DOMRpcService rpc,
@@ -140,7 +146,41 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     public void discardChanges() {
         if (candidateSupported) {
             netconfOps.discardChanges(new NetconfRpcFutureCallback("Discarding candidate", id));
+        } else if (runningWritable) {
+            if (runningDatastore != null) {
+                discardRunning();
+            }
         }
+    }
+
+    private void discardRunning() {
+        canUnlockRunning = SettableFuture.create();
+        final YangInstanceIdentifier path = YangInstanceIdentifier.empty();
+        Futures.addCallback(runningDatastore, new FutureCallback<>() {
+            @Override
+            public void onSuccess(Optional<NormalizedNode<?, ?>> result) {
+                if (result.isPresent()) {
+                    try {
+                        final NormalizedNode<?, Collection<NormalizedNode<?, ?>>> dataStore =
+                            (NormalizedNode<?, Collection<NormalizedNode<?, ?>>>) result.get();
+                        Map<YangInstanceIdentifier, NormalizedNode<?, ?>> map = new HashMap<>();
+                        for (NormalizedNode<?, ?> node : dataStore.getValue()) {
+                            map.put(path.node(node.getIdentifier()), node);
+                        }
+                        netconfOps.copyConfigToRunning(new NetconfRpcFutureCallback("Copy config", id), map);
+                    } catch (ClassCastException ex) {
+                        LOG.error("Failing discard changes", ex);
+                    }
+                }
+                canUnlockRunning.set(true);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                LOG.error("Failing discard changes", throwable);
+                canUnlockRunning.set(true);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     @Override
@@ -274,17 +314,57 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
     }
 
     private void lockRunning(SettableFuture<DOMRpcResult> lockFeature) {
+        if (runningDatastore == null && !candidateSupported) {
+            runningDatastore = SettableFuture.create();
+        }
         if (isLockAllowed) {
-            lockFeature.setFuture(netconfOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
+            lockFeature.setFuture(netconfOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id) {
+                @Override
+                public void onSuccess(DOMRpcResult result) {
+                    super.onSuccess(result);
+                    if (isSuccess(result) && !candidateSupported) {
+                        runningDatastore.setFuture(getConfig(YangInstanceIdentifier.empty()));
+                    }
+                }
+            }));
         } else {
             LOG.trace("Lock is not allowed: {}", id);
+            if (!candidateSupported) {
+                runningDatastore.setFuture(getConfig(YangInstanceIdentifier.empty()));
+            }
             lockFeature.setFuture(Futures.immediateFuture(new DefaultDOMRpcResult()));
         }
     }
 
     private void unlockRunning() {
         if (isLockAllowed) {
-            netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+            if (candidateSupported || canUnlockRunning == null) {
+                netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+                if (runningDatastore != null) {
+                    runningDatastore.cancel(true);
+                    runningDatastore = null;
+                }
+            } else {
+                Futures.addCallback(canUnlockRunning, new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(@Nullable Boolean result) {
+                        netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+                        runningDatastore.cancel(true);
+                        runningDatastore = null;
+                        canUnlockRunning.cancel(true);
+                        canUnlockRunning = null;
+                    }
+
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+                        runningDatastore.cancel(true);
+                        runningDatastore = null;
+                        canUnlockRunning.cancel(true);
+                        canUnlockRunning = null;
+                    }
+                }, MoreExecutors.directExecutor());
+            }
         } else {
             LOG.trace("Unlock is not allowed: {}", id);
         }
