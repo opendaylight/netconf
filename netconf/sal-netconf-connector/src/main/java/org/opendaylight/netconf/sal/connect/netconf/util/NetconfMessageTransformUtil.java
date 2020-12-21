@@ -377,6 +377,33 @@ public final class NetconfMessageTransformUtil {
                 .build();
     }
 
+    public static DOMSourceAnyxmlNode createConfigAnyxml(final EffectiveModelContext ctx,
+             final Optional<ModifyAction> operation,
+             final Map<YangInstanceIdentifier, NormalizedNode<?, ?>> nodes) {
+
+        NormalizedNode<?, ?> configContent;
+        NormalizedMetadata metadata;
+
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
+            Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
+        final DOMResult domResult = new DOMResult(element);
+
+        for(Map.Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> node: nodes.entrySet())  {
+            configContent = ImmutableNodes.fromInstanceId(ctx, node.getKey(), node.getValue());
+            metadata = operation.map(oper -> leafMetadata(node.getKey(), oper)).orElse(null);
+
+            try {
+                NetconfUtil.writeNormalizedNode(configContent, metadata, domResult, SchemaPath.ROOT, ctx);
+            } catch (IOException | XMLStreamException e) {
+                throw new IllegalStateException("Unable to serialize copy config content element for path "
+                    + node.getKey(), e);
+            }
+        }
+
+        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_CONFIG_NODEID).withValue(new DOMSource(element))
+                .build();
+    }
+
     private static NormalizedMetadata leafMetadata(final YangInstanceIdentifier path, final ModifyAction oper) {
         final List<PathArgument> args = path.getPathArguments();
         final Deque<Builder> builders = new ArrayDeque<>(args.size());
