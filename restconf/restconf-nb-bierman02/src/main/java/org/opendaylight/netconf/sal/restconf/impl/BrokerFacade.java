@@ -314,6 +314,7 @@ public class BrokerFacade implements Closeable {
             throws Exception {
         final DOMMountPoint mountPoint = patchContext.getInstanceIdentifierContext().getMountPoint();
 
+        isMounted.set(true);
         // get new transaction and schema context on server or on mounted device
         final EffectiveModelContext schemaContext;
         final DOMDataTreeReadWriteTransaction patchTransaction;
@@ -331,6 +332,7 @@ public class BrokerFacade implements Closeable {
                 // if mount point does not have broker it is not possible to continue and global error is reported
                 LOG.error("Http Patch {} has failed - device {} does not support broker service",
                         patchContext.getPatchId(), mountPoint.getIdentifier());
+                isMounted.remove();
                 return new PatchStatusContext(
                         patchContext.getPatchId(),
                         null,
@@ -435,6 +437,7 @@ public class BrokerFacade implements Closeable {
         // if errors then cancel transaction and return error status
         if (!withoutError) {
             patchTransaction.cancel();
+            isMounted.remove();
             return new PatchStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
         }
 
@@ -463,6 +466,7 @@ public class BrokerFacade implements Closeable {
         }, MoreExecutors.directExecutor());
 
         waiter.await();
+        isMounted.remove();
         return status.getStatus();
     }
 
