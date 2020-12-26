@@ -67,5 +67,12 @@
             <type>cfg</type>
             <classifier>restconf</classifier>
         </dependency>
+
+        <!-- TODO: Remove this when RESTCONF is converted to GSON -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20131018</version>
+        </dependency>
     </dependencies>
 </project>
