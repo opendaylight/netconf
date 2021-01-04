@@ -392,16 +392,19 @@ public class NetconfDeviceCommunicatorTest {
                 new TimedReconnectStrategy(GlobalEventExecutor.INSTANCE, 10000, 0, 1.0, null, 100L, null);
         final ReconnectStrategy reconnectStrategy = spy(new ReconnectStrategy() {
             @Override
+            @Deprecated
             public int getConnectTimeout() throws Exception {
                 return timedReconnectStrategy.getConnectTimeout();
             }
 
             @Override
+            @Deprecated
             public Future<Void> scheduleReconnect(final Throwable cause) {
                 return timedReconnectStrategy.scheduleReconnect(cause);
             }
 
             @Override
+            @Deprecated
             public void reconnectSuccessful() {
                 timedReconnectStrategy.reconnectSuccessful();
             }

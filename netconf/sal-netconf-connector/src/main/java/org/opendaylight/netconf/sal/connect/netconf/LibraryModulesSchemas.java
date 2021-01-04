@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -108,7 +109,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static final YangInstanceIdentifier MODULES_STATE_MODULE_LIST =
             YangInstanceIdentifier.create(MODULES_STATE_NID, MODULE_NID);
 
-    private static final ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC = Builders.containerBuilder()
+    private static final @NonNull ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC = Builders.containerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
             .withChild(NetconfMessageTransformUtil.toFilterStructure(MODULES_STATE_MODULE_LIST, LIBRARY_CONTEXT))
             .build();

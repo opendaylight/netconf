@@ -99,7 +99,7 @@ class NetconfEventSourceMount {
             final Optional<Instant> lastEventTime) {
         final CreateSubscriptionInputBuilder inputBuilder = new CreateSubscriptionInputBuilder()
                 .setStream(stream.getName());
-        if (lastEventTime.isPresent() && stream.isReplaySupport()) {
+        if (lastEventTime.isPresent() && stream.getReplaySupport()) {
             final ZonedDateTime dateTime = lastEventTime.get().atZone(ZoneId.systemDefault());
             final String formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime);
             inputBuilder.setStartTime(new DateAndTime(formattedDate));

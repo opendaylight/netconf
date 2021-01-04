@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -70,7 +71,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemas.class);
     private static final YangInstanceIdentifier STATE_SCHEMAS_IDENTIFIER =
             YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).build();
-    private static final ContainerNode GET_SCHEMAS_RPC;
+    private static final @NonNull ContainerNode GET_SCHEMAS_RPC;
 
     static {
         final Document document = XmlUtil.newDocument();

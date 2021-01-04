@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -34,6 +35,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -66,17 +68,15 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         this.rpc = requireNonNull(rpc);
     }
 
-    public static ContainerNode createGetSchemaRequest(final String moduleName, final Optional<String> revision) {
-        final LeafNode<?> identifier =
-                Builders.leafBuilder().withNodeIdentifier(IDENTIFIER_PATHARG).withValue(moduleName).build();
+    public static @NonNull ContainerNode createGetSchemaRequest(final String moduleName,
+            final Optional<String> revision) {
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder = Builders.containerBuilder()
-                .withNodeIdentifier(GET_SCHEMA_PATHARG).withChild(identifier).withChild(FORMAT_LEAF);
-
+                .withNodeIdentifier(GET_SCHEMA_PATHARG)
+                .withChild(ImmutableNodes.leafNode(IDENTIFIER_PATHARG, moduleName))
+                .withChild(FORMAT_LEAF);
         if (revision.isPresent()) {
-            builder.withChild(Builders.leafBuilder()
-                    .withNodeIdentifier(VERSION_PATHARG).withValue(revision.get()).build());
+            builder.withChild(ImmutableNodes.leafNode(VERSION_PATHARG, revision.get()));
         }
-
         return builder.build();
     }
 

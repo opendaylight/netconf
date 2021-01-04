@@ -155,7 +155,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     }
 
     // Keepalive RPC static resources
-    private static final ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
+    private static final @NonNull ContainerNode KEEPALIVE_PAYLOAD =
+        NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
             getSourceNode(NETCONF_RUNNING_QNAME), NetconfMessageTransformUtil.EMPTY_FILTER);
 
     /**

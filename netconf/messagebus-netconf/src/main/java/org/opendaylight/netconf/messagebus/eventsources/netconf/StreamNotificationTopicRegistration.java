@@ -50,7 +50,7 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
         this.mountPoint = netconfEventSource.getMount();
         this.nodeId = mountPoint.getNode().getNodeId().getValue();
         this.stream = stream;
-        setReplaySupported(stream.isReplaySupport());
+        setReplaySupported(stream.getReplaySupport());
         setActive(false);
         LOG.info("StreamNotificationTopicRegistration initialized for {}", getStreamName());
     }

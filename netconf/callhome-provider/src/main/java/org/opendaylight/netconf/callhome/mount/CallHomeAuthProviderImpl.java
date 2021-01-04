@@ -271,7 +271,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         boolean allowedUnknownKeys() {
             final Global local = current;
             // Deal with null values.
-            return local != null && Boolean.TRUE.equals(local.isAcceptAllSshKeys());
+            return local != null && Boolean.TRUE.equals(local.getAcceptAllSshKeys());
         }
 
         Credentials getCredentials() {
