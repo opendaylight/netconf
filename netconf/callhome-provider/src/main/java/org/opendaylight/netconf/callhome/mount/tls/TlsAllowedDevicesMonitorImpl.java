@@ -69,7 +69,7 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
     }
 
     @Override
-    public Optional<String> findDeviceIdByPublicKey(@NonNull final PublicKey key) {
+    public Optional<String> findDeviceIdByPublicKey(final PublicKey key) {
         // Find certificate names by the public key
         final Set<String> certificates = CERTIFICATE_TO_PUBLIC_KEY.entrySet().stream()
             .filter(v -> key.equals(v.getValue()))

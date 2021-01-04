@@ -191,7 +191,7 @@ public class NetconfDevice
 
                 // No more sources, fail or try to reconnect
                 if (cause instanceof EmptySchemaContextException) {
-                    if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().isAllowed()) {
+                    if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
                         eventExecutor.schedule(() -> {
                             LOG.warn("Reconnection is allowed! This can lead to unexpected errors at runtime.");
                             LOG.warn("{} : No more sources for schema context.", id);

@@ -155,8 +155,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis().toJava();
         final long keepaliveDelay = node.getKeepaliveDelay() == null
                 ? NetconfTopologyUtils.DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay().toJava();
-        final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
-                ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
+        final boolean reconnectOnChangedSchema = node.getReconnectOnChangedSchema() == null
+                ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.getReconnectOnChangedSchema();
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = requireNonNull(deviceHandler);
         if (keepaliveDelay > 0) {
@@ -199,7 +199,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
-        if (node.isSchemaless()) {
+        if (node.getSchemaless()) {
             device = new SchemalessNetconfDevice(netconfTopologyDeviceSetup.getBaseSchemas(), remoteDeviceId,
                 salFacade);
         } else {
@@ -225,8 +225,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         NetconfDeviceCommunicator netconfDeviceCommunicator = userCapabilities.isPresent()
             ? new NetconfDeviceCommunicator(remoteDeviceId, device, new UserPreferences(userCapabilities.get(),
-                node.getYangModuleCapabilities() == null ? false : node.getYangModuleCapabilities().isOverride(),
-                    node.getNonModuleCapabilities() == null ? false : node.getNonModuleCapabilities().isOverride()),
+                node.getYangModuleCapabilities() == null ? false : node.getYangModuleCapabilities().getOverride(),
+                    node.getNonModuleCapabilities() == null ? false : node.getNonModuleCapabilities().getOverride()),
                 rpcMessageLimit)
             : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
 
@@ -283,8 +283,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS
                 : node.getBetweenAttemptsTimeoutMillis().toJava();
-        final boolean isTcpOnly = node.isTcpOnly() == null
-                ? NetconfTopologyUtils.DEFAULT_IS_TCP_ONLY : node.isTcpOnly();
+        final boolean isTcpOnly = node.getTcpOnly() == null
+                ? NetconfTopologyUtils.DEFAULT_IS_TCP_ONLY : node.getTcpOnly();
         final BigDecimal sleepFactor = node.getSleepFactor() == null
                 ? NetconfTopologyUtils.DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 

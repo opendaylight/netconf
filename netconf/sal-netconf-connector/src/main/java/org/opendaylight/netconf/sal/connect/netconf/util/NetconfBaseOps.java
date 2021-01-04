@@ -43,6 +43,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Locale;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.ModifyAction;
@@ -327,7 +328,7 @@ public final class NetconfBaseOps {
         return editBuilder.build();
     }
 
-    public static ContainerNode getSourceNode(final QName datastore) {
+    public static @NonNull ContainerNode getSourceNode(final QName datastore) {
         return Builders.containerBuilder()
                 .withNodeIdentifier(NETCONF_SOURCE_NODEID)
                 .withChild(Builders.choiceBuilder()
@@ -337,29 +338,29 @@ public final class NetconfBaseOps {
                 .build();
     }
 
-    public static ContainerNode getLockContent(final QName datastore) {
+    public static @NonNull ContainerNode getLockContent(final QName datastore) {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_LOCK_NODEID)
                 .withChild(getTargetNode(datastore)).build();
     }
 
-    public static ContainerNode getTargetNode(final QName datastore) {
+    public static @NonNull ContainerNode getTargetNode(final QName datastore) {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_TARGET_NODEID)
                 .withChild(Builders.choiceBuilder().withNodeIdentifier(CONFIG_TARGET_NODEID).withChild(
                     Builders.leafBuilder().withNodeIdentifier(toId(datastore)).withValue(Empty.getInstance()).build())
                     .build()).build();
     }
 
-    public static ContainerNode getCopyConfigContent(final QName source, final QName target) {
+    public static @NonNull ContainerNode getCopyConfigContent(final QName source, final QName target) {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_COPY_CONFIG_NODEID)
                 .withChild(getTargetNode(target)).withChild(getSourceNode(source)).build();
     }
 
-    public static ContainerNode getValidateContent(final QName source) {
+    public static @NonNull ContainerNode getValidateContent(final QName source) {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_VALIDATE_NODEID)
                 .withChild(getSourceNode(source)).build();
     }
 
-    public static ContainerNode getUnLockContent(final QName datastore) {
+    public static @NonNull ContainerNode getUnLockContent(final QName datastore) {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_UNLOCK_NODEID)
                 .withChild(getTargetNode(datastore)).build();
     }

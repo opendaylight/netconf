@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +46,8 @@ public class KeepaliveSalFacadeResponseWaitingTest {
 
     private static final RemoteDeviceId REMOTE_DEVICE_ID =
             new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
-    private static final ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
+    private static final @NonNull ContainerNode KEEPALIVE_PAYLOAD =
+        NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
             getSourceNode(NETCONF_RUNNING_QNAME), NetconfMessageTransformUtil.EMPTY_FILTER);
 
     private KeepaliveSalFacade keepaliveSalFacade;

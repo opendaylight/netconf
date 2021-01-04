@@ -37,13 +37,13 @@ final class LockChangeListener implements DataTreeChangeListener<DatastoreLock> 
             switch (rootNode.getModificationType()) {
                 case SUBTREE_MODIFIED:
                 case WRITE:
-                    if (!rootNode.getDataAfter().isDatastoreLockAllowed()) {
+                    if (!rootNode.getDataAfter().getDatastoreLockAllowed()) {
                         LOG.warn("With blocking the lock/unlock operations, the user is coming to "
                                  + "operate in a manner which is not supported. Concurrent access to "
                                  + "the data store may interfere with data consistency.");
                     }
-                    netconfDeviceDataBroker.setLockAllowed(rootNode.getDataAfter().isDatastoreLockAllowed());
-                    netconfDataTreeService.setLockAllowed(rootNode.getDataAfter().isDatastoreLockAllowed());
+                    netconfDeviceDataBroker.setLockAllowed(rootNode.getDataAfter().getDatastoreLockAllowed());
+                    netconfDataTreeService.setLockAllowed(rootNode.getDataAfter().getDatastoreLockAllowed());
                     break;
                 case DELETE:
                     netconfDeviceDataBroker.setLockAllowed(true);

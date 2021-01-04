@@ -242,12 +242,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
         final List<SchemaSourceRegistration<?>> yanglibRegistrations;
-        if (node.isSchemaless()) {
+        if (node.getSchemaless()) {
             device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
             yanglibRegistrations = List.of();
         } else {
-            final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
-                ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
+            final boolean reconnectOnChangedSchema = node.getReconnectOnChangedSchema() == null
+                ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.getReconnectOnChangedSchema();
 
             final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node, nodeId.getValue());
             device = new NetconfDeviceBuilder()
@@ -342,7 +342,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 ? DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts().toJava();
         final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
                 ? DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis().toJava();
-        final boolean useTcp = node.isTcpOnly() == null ? DEFAULT_IS_TCP_ONLY : node.isTcpOnly();
+        final boolean useTcp = node.getTcpOnly() == null ? DEFAULT_IS_TCP_ONLY : node.getTcpOnly();
         final BigDecimal sleepFactor = node.getSleepFactor() == null ? DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 
         final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue().toJava());
@@ -434,7 +434,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         boolean overrideYangModuleCaps = false;
         if (node.getYangModuleCapabilities() != null) {
             capabilities.addAll(node.getYangModuleCapabilities().getCapability());
-            overrideYangModuleCaps = node.getYangModuleCapabilities().isOverride();
+            overrideYangModuleCaps = node.getYangModuleCapabilities().getOverride();
         }
 
         //non-module capabilities should not exist in yang module capabilities
@@ -446,7 +446,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         boolean overrideNonModuleCaps = false;
         if (node.getNonModuleCapabilities() != null) {
             capabilities.addAll(node.getNonModuleCapabilities().getCapability());
-            overrideNonModuleCaps = node.getNonModuleCapabilities().isOverride();
+            overrideNonModuleCaps = node.getNonModuleCapabilities().getOverride();
         }
 
         return Optional.of(new UserPreferences(NetconfSessionPreferences
