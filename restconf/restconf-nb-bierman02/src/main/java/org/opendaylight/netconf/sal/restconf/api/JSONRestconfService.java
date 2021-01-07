@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.sal.restconf.api;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import javax.ws.rs.core.MultivaluedMap;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;

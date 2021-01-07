@@ -24,13 +24,13 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
-import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.core.Response.Status;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -445,7 +445,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:cancel-toast";
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.absent());
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.empty());
 
         assertEquals("Output present", false, output.isPresent());
 
@@ -462,7 +462,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:testOutput";
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.absent());
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.empty());
 
         assertEquals("Output present", true, output.isPresent());
         assertNotNull("Returned null response", output.get());
@@ -479,7 +479,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:cancel-toast";
 
-        this.service.invokeRpc(uriPath, Optional.absent());
+        this.service.invokeRpc(uriPath, Optional.empty());
     }
 
     void testGet(final LogicalDatastoreType datastoreType) throws OperationFailedException {

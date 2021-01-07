@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Optional;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +17,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
@@ -149,7 +149,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
             }
 
             LOG.debug("Data missing - returning absent");
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
@@ -188,7 +188,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
             propagateExceptionAs(uriPath, e, "RPC");
         }
 
-        return Optional.fromNullable(output);
+        return Optional.ofNullable(output);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -216,7 +216,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "PATCH");
         }
-        return Optional.fromNullable(output);
+        return Optional.ofNullable(output);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -236,7 +236,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
             propagateExceptionAs(identifier, e, "RPC");
         }
 
-        return Optional.fromNullable(jsonRes);
+        return Optional.ofNullable(jsonRes);
     }
 
     private static String toJson(final PatchStatusContext patchStatusContext) throws IOException {
