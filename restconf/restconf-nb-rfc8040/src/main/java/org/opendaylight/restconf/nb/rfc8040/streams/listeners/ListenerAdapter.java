@@ -33,11 +33,8 @@ import org.slf4j.LoggerFactory;
  * {@link ListenerAdapter} is responsible to track events, which occurred by changing data in data source.
  */
 public class ListenerAdapter extends AbstractCommonSubscriber implements ClusteredDOMDataTreeChangeListener {
-
     private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapter.class);
-//    private static final String DATA_CHANGE_EVENT = "data-change-event";
     private static final String PATH = "path";
-//    private static final String OPERATION = "operation";
     private static final DataTreeCandidateFormatterFactory JSON_FORMATTER_FACTORY =
             JSONDataTreeCandidateFormatter.createFactory(JSONCodecFactorySupplier.RFC7951);
 
@@ -73,7 +70,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
             case XML:
                 return XMLDataTreeCandidateFormatter.FACTORY;
             default:
-                throw new IllegalArgumentException(("Unsupported outputType" + outputType));
+                throw new IllegalArgumentException("Unsupported outputType" + outputType);
         }
     }
 
