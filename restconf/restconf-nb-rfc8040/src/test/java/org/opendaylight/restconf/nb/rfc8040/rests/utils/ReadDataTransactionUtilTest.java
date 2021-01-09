@@ -98,7 +98,7 @@ public class ReadDataTransactionUtilTest {
         when(context.getSchemaNode()).thenReturn(containerSchemaNode);
         when(containerSchemaNode.getQName()).thenReturn(NODE_IDENTIFIER.getNodeType());
         when(containerChildNode.getQName()).thenReturn(containerChildQName);
-        when(containerSchemaNode.getDataChildByName(containerChildQName)).thenReturn(containerChildNode);
+        when(containerSchemaNode.dataChildByName(containerChildQName)).thenReturn(containerChildNode);
 
         DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());

@@ -5,13 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 import java.net.URI;
@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -142,52 +141,52 @@ public class ParserFieldsParameterTest {
     }
 
     private void initJukeboxSchemaNodes(final EffectiveModelContext schemaContext) {
-        Mockito.when(identifierJukebox.getSchemaContext()).thenReturn(schemaContext);
-        Mockito.when(containerJukebox.getQName()).thenReturn(JUKEBOX_Q_NAME);
-        Mockito.when(identifierJukebox.getSchemaNode()).thenReturn(containerJukebox);
+        when(identifierJukebox.getSchemaContext()).thenReturn(schemaContext);
+        when(containerJukebox.getQName()).thenReturn(JUKEBOX_Q_NAME);
+        when(identifierJukebox.getSchemaNode()).thenReturn(containerJukebox);
 
-        Mockito.when(containerLibrary.getQName()).thenReturn(LIBRARY_Q_NAME);
-        Mockito.when(containerJukebox.getDataChildByName(LIBRARY_Q_NAME)).thenReturn(containerLibrary);
+        when(containerLibrary.getQName()).thenReturn(LIBRARY_Q_NAME);
+        when(containerJukebox.dataChildByName(LIBRARY_Q_NAME)).thenReturn(containerLibrary);
 
-        Mockito.when(augmentedContainerLibrary.getQName()).thenReturn(AUGMENTED_LIBRARY_Q_NAME);
-        Mockito.when(containerJukebox.getDataChildByName(AUGMENTED_LIBRARY_Q_NAME))
+        when(augmentedContainerLibrary.getQName()).thenReturn(AUGMENTED_LIBRARY_Q_NAME);
+        when(containerJukebox.dataChildByName(AUGMENTED_LIBRARY_Q_NAME))
                 .thenReturn(augmentedContainerLibrary);
 
-        Mockito.when(containerPlayer.getQName()).thenReturn(PLAYER_Q_NAME);
-        Mockito.when(containerJukebox.getDataChildByName(PLAYER_Q_NAME)).thenReturn(containerPlayer);
+        when(containerPlayer.getQName()).thenReturn(PLAYER_Q_NAME);
+        when(containerJukebox.dataChildByName(PLAYER_Q_NAME)).thenReturn(containerPlayer);
 
-        Mockito.when(listAlbum.getQName()).thenReturn(ALBUM_Q_NAME);
-        Mockito.when(containerLibrary.getDataChildByName(ALBUM_Q_NAME)).thenReturn(listAlbum);
+        when(listAlbum.getQName()).thenReturn(ALBUM_Q_NAME);
+        when(containerLibrary.dataChildByName(ALBUM_Q_NAME)).thenReturn(listAlbum);
 
-        Mockito.when(leafName.getQName()).thenReturn(NAME_Q_NAME);
-        Mockito.when(listAlbum.getDataChildByName(NAME_Q_NAME)).thenReturn(leafName);
+        when(leafName.getQName()).thenReturn(NAME_Q_NAME);
+        when(listAlbum.dataChildByName(NAME_Q_NAME)).thenReturn(leafName);
     }
 
     private void initTestServicesSchemaNodes(final EffectiveModelContext schemaContext) {
-        Mockito.when(identifierTestServices.getSchemaContext()).thenReturn(schemaContext);
-        Mockito.when(containerTestData.getQName()).thenReturn(TEST_DATA_Q_NAME);
-        Mockito.when(identifierTestServices.getSchemaNode()).thenReturn(containerTestData);
+        when(identifierTestServices.getSchemaContext()).thenReturn(schemaContext);
+        when(containerTestData.getQName()).thenReturn(TEST_DATA_Q_NAME);
+        when(identifierTestServices.getSchemaNode()).thenReturn(containerTestData);
 
-        Mockito.when(listServices.getQName()).thenReturn(SERVICES_Q_NAME);
-        Mockito.when(containerTestData.getDataChildByName(SERVICES_Q_NAME)).thenReturn(listServices);
+        when(listServices.getQName()).thenReturn(SERVICES_Q_NAME);
+        when(containerTestData.dataChildByName(SERVICES_Q_NAME)).thenReturn(listServices);
 
-        Mockito.when(leafTypeOfService.getQName()).thenReturn(TYPE_OF_SERVICE_Q_NAME);
-        Mockito.when(listServices.getDataChildByName(TYPE_OF_SERVICE_Q_NAME)).thenReturn(leafTypeOfService);
+        when(leafTypeOfService.getQName()).thenReturn(TYPE_OF_SERVICE_Q_NAME);
+        when(listServices.dataChildByName(TYPE_OF_SERVICE_Q_NAME)).thenReturn(leafTypeOfService);
 
-        Mockito.when(listInstance.getQName()).thenReturn(INSTANCE_Q_NAME);
-        Mockito.when(listServices.getDataChildByName(INSTANCE_Q_NAME)).thenReturn(listInstance);
+        when(listInstance.getQName()).thenReturn(INSTANCE_Q_NAME);
+        when(listServices.dataChildByName(INSTANCE_Q_NAME)).thenReturn(listInstance);
 
-        Mockito.when(leafInstanceName.getQName()).thenReturn(INSTANCE_NAME_Q_NAME);
-        Mockito.when(listInstance.getDataChildByName(INSTANCE_NAME_Q_NAME)).thenReturn(leafInstanceName);
+        when(leafInstanceName.getQName()).thenReturn(INSTANCE_NAME_Q_NAME);
+        when(listInstance.dataChildByName(INSTANCE_NAME_Q_NAME)).thenReturn(leafInstanceName);
 
-        Mockito.when(leafProvider.getQName()).thenReturn(PROVIDER_Q_NAME);
-        Mockito.when(listInstance.getDataChildByName(PROVIDER_Q_NAME)).thenReturn(leafProvider);
+        when(leafProvider.getQName()).thenReturn(PROVIDER_Q_NAME);
+        when(listInstance.dataChildByName(PROVIDER_Q_NAME)).thenReturn(leafProvider);
 
-        Mockito.when(containerNextData.getQName()).thenReturn(NEXT_DATA_Q_NAME);
-        Mockito.when(listServices.getDataChildByName(NEXT_DATA_Q_NAME)).thenReturn(containerNextData);
+        when(containerNextData.getQName()).thenReturn(NEXT_DATA_Q_NAME);
+        when(listServices.dataChildByName(NEXT_DATA_Q_NAME)).thenReturn(containerNextData);
 
-        Mockito.when(leafNextService.getQName()).thenReturn(NEXT_SERVICE_Q_NAME);
-        Mockito.when(containerNextData.getDataChildByName(NEXT_SERVICE_Q_NAME)).thenReturn(leafNextService);
+        when(leafNextService.getQName()).thenReturn(NEXT_SERVICE_Q_NAME);
+        when(containerNextData.dataChildByName(NEXT_SERVICE_Q_NAME)).thenReturn(leafNextService);
     }
 
     /**
