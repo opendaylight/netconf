@@ -452,37 +452,4 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return Optional.of(new UserPreferences(NetconfSessionPreferences
             .fromStrings(capabilities, CapabilityOrigin.UserDefined), overrideYangModuleCaps, overrideNonModuleCaps));
     }
-
-    protected static class NetconfConnectorDTO implements AutoCloseable {
-        private final List<SchemaSourceRegistration<?>> yanglibRegistrations;
-        private final NetconfDeviceCommunicator communicator;
-        private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
-
-        public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator,
-                final RemoteDeviceHandler<NetconfSessionPreferences> facade,
-                final List<SchemaSourceRegistration<?>> yanglibRegistrations) {
-            this.communicator = communicator;
-            this.facade = facade;
-            this.yanglibRegistrations = yanglibRegistrations;
-        }
-
-        public NetconfDeviceCommunicator getCommunicator() {
-            return communicator;
-        }
-
-        public RemoteDeviceHandler<NetconfSessionPreferences> getFacade() {
-            return facade;
-        }
-
-        public NetconfClientSessionListener getSessionListener() {
-            return communicator;
-        }
-
-        @Override
-        public void close() {
-            communicator.close();
-            facade.close();
-            yanglibRegistrations.forEach(SchemaSourceRegistration::close);
-        }
-    }
 }

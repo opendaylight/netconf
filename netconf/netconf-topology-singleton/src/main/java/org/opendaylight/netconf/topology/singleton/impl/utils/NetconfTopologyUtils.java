@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
 import java.math.BigDecimal;
@@ -24,12 +23,8 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class NetconfTopologyUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyUtils.class);
-
     public static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 60000L;
     public static final int DEFAULT_KEEPALIVE_DELAY = 0;
     public static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
