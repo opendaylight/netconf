@@ -7,10 +7,11 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FluentFuture;
@@ -23,7 +24,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -113,10 +113,10 @@ public class BrokerFacade implements Closeable {
     @Inject
     public BrokerFacade(final @Reference DOMRpcService rpcService, final DOMDataBroker domDataBroker,
             final @Reference DOMNotificationService domNotification, final ControllerContext controllerContext) {
-        this.rpcService = Objects.requireNonNull(rpcService);
-        this.domDataBroker = Objects.requireNonNull(domDataBroker);
-        this.domNotification = Objects.requireNonNull(domNotification);
-        this.controllerContext = Objects.requireNonNull(controllerContext);
+        this.rpcService = requireNonNull(rpcService);
+        this.domDataBroker = requireNonNull(domDataBroker);
+        this.domNotification = requireNonNull(domNotification);
+        this.controllerContext = requireNonNull(controllerContext);
     }
 
     /**
@@ -253,9 +253,9 @@ public class BrokerFacade implements Closeable {
     public PutResult commitConfigurationDataPut(
             final EffectiveModelContext globalSchema, final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> payload, final String insert, final String point) {
-        Preconditions.checkNotNull(globalSchema);
-        Preconditions.checkNotNull(path);
-        Preconditions.checkNotNull(payload);
+        requireNonNull(globalSchema);
+        requireNonNull(path);
+        requireNonNull(payload);
 
         isMounted.set(false);
         final DOMDataTreeReadWriteTransaction newReadWriteTransaction = this.domDataBroker.newReadWriteTransaction();
@@ -290,9 +290,9 @@ public class BrokerFacade implements Closeable {
     public PutResult commitMountPointDataPut(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
-        Preconditions.checkNotNull(mountPoint);
-        Preconditions.checkNotNull(path);
-        Preconditions.checkNotNull(payload);
+        requireNonNull(mountPoint);
+        requireNonNull(path);
+        requireNonNull(payload);
 
         isMounted.set(true);
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
@@ -1265,7 +1265,7 @@ public class BrokerFacade implements Closeable {
             return;
         }
 
-        Preconditions.checkArgument(rootNormalizedPath != null, "Empty path received");
+        checkArgument(rootNormalizedPath != null, "Empty path received");
 
         final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
@@ -154,7 +155,7 @@ public class ExpressionParserTest {
     }
 
     private static String readFile(final File xml) throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(xml))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(xml, StandardCharsets.UTF_8))) {
             final StringBuilder sb = new StringBuilder();
             String line = br.readLine();
 

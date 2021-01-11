@@ -7,12 +7,12 @@
  */
 package org.opendaylight.netconf.sal.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import java.io.FileNotFoundException;
 import java.net.URI;
@@ -234,7 +234,6 @@ public class NotificationListenerTest {
                 Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString(),
                         controllerContext);
         final NotificationListenerAdapter notifi = listNotifi.get(0);
-        final String result = notifi.prepareJson(schemaContext, notificationData);
-        return Preconditions.checkNotNull(result);
+        return requireNonNull(notifi.prepareJson(schemaContext, notificationData));
     }
 }

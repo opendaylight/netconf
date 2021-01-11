@@ -19,7 +19,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Iterators;
-import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -682,9 +681,9 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     @SuppressWarnings("checkstyle:IllegalCatch")
     private static JsonArray parseJsonErrorArrayElement(final InputStream stream) throws IOException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ByteStreams.copy(stream, bos);
+        stream.transferTo(bos);
 
-        LOG.info("JSON: " + bos.toString());
+        LOG.info("JSON: {}", bos);
 
         final JsonParser parser = new JsonParser();
         JsonElement rootElement;
@@ -784,9 +783,9 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
     private static Document parseXMLDocument(final InputStream stream) throws IOException, SAXException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ByteStreams.copy(stream, bos);
+        stream.transferTo(bos);
 
-        LOG.debug("XML: " + bos.toString());
+        LOG.debug("XML: {}", bos);
 
         return UntrustedXML.newDocumentBuilder().parse(new ByteArrayInputStream(bos.toByteArray()));
     }

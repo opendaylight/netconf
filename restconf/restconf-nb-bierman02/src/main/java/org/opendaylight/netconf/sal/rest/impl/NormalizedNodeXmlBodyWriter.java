@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Optional;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -27,6 +26,7 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
@@ -101,12 +101,11 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         final NormalizedNode<?, ?> data = context.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
-        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data,
-                Optional.fromNullable(context.getWriterParameters().getDepth()));
+        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().getDepth());
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
-            final InstanceIdentifierContext<?> pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth)
+            final InstanceIdentifierContext<?> pathContext, NormalizedNode<?, ?> data, final @Nullable Integer depth)
             throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();
@@ -140,11 +139,11 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-            final EffectiveModelContext schemaContext, final SchemaPath schemaPath, final Optional<Integer> depth) {
+            final EffectiveModelContext schemaContext, final SchemaPath schemaPath, final @Nullable Integer depth) {
         final NormalizedNodeStreamWriter xmlStreamWriter =
                 XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
-        if (depth.isPresent()) {
-            return DepthAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth.get());
+        if (depth != null) {
+            return DepthAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth);
         }
 
         return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(xmlStreamWriter);

@@ -7,13 +7,13 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Preconditions;
 import java.io.FileNotFoundException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
@@ -139,9 +139,8 @@ public class URIParametersParsing {
                         .node(QName.create("urn:opendaylight:inventory", "2013-08-19", "nodes")).build()).build();
         container.withChild(pathNode);
 
-        final AugmentationSchemaNode augmentationSchema = rpcInputSchemaNode.getAvailableAugmentations().iterator()
-                .next();
-        Preconditions.checkNotNull(augmentationSchema);
+        final AugmentationSchemaNode augmentationSchema = requireNonNull(rpcInputSchemaNode.getAvailableAugmentations()
+                .iterator().next());
         final DataContainerNodeBuilder<AugmentationIdentifier, AugmentationNode> augmentationBuilder =
                 Builders.augmentationBuilder(augmentationSchema);
 

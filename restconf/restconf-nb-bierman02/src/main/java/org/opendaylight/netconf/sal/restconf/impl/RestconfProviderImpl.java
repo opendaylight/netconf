@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import java.math.BigInteger;
 import org.opendaylight.controller.md.sal.common.util.jmx.AbstractMXBean;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
@@ -30,12 +31,12 @@ public class RestconfProviderImpl extends AbstractMXBean
     private final StatisticsRestconfServiceWrapper stats;
     private Thread webSocketServerThread;
 
-    public RestconfProviderImpl(StatisticsRestconfServiceWrapper stats, IpAddress websocketAddress,
-            PortNumber websocketPort) {
+    public RestconfProviderImpl(final StatisticsRestconfServiceWrapper stats, final IpAddress websocketAddress,
+            final PortNumber websocketPort) {
         super("Draft02ProviderStatistics", "restconf-connector", null);
-        this.stats = Preconditions.checkNotNull(stats);
-        this.websocketAddress = Preconditions.checkNotNull(websocketAddress);
-        this.websocketPort = Preconditions.checkNotNull(websocketPort);
+        this.stats = requireNonNull(stats);
+        this.websocketAddress = requireNonNull(websocketAddress);
+        this.websocketPort = requireNonNull(websocketPort);
     }
 
     public void start() {

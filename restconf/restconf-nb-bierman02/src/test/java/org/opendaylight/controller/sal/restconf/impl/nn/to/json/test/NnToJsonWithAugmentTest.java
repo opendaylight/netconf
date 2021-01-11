@@ -7,9 +7,9 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.nn.to.json.test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.base.Preconditions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,8 +53,7 @@ public class NnToJsonWithAugmentTest extends AbstractBodyReaderTest {
                 .writeTo(testNN, null, null, null, mediaType, null, output);
         final String jsonOutput = output.toString();
 
-        Preconditions.checkNotNull(jsonOutput);
-
+        assertNotNull(jsonOutput);
         assertTrue(jsonOutput.contains("\"cont1\"" + ":" + '{'));
         assertTrue(jsonOutput.contains("\"lf11\"" + ":" + "\"lf11\""));
         assertTrue(jsonOutput.contains("\"lst1\"" + ":" + '['));

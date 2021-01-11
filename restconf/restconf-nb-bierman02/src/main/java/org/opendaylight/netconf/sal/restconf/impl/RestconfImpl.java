@@ -7,15 +7,18 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -209,7 +212,7 @@ public final class RestconfImpl implements RestconfService {
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode modulesSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
                 restconfModule, Draft02.RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
-        Preconditions.checkState(modulesSchemaNode instanceof ContainerSchemaNode);
+        checkState(modulesSchemaNode instanceof ContainerSchemaNode);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> moduleContainerBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
@@ -225,7 +228,6 @@ public final class RestconfImpl implements RestconfService {
     @Override
     @Deprecated
     public NormalizedNodeContext getModules(final String identifier, final UriInfo uriInfo) {
-        Preconditions.checkNotNull(identifier);
         if (!identifier.contains(ControllerContext.MOUNT)) {
             final String errMsg = "URI has bad format. If modules behind mount point should be showed,"
                     + " URI has to end with " + ControllerContext.MOUNT;
@@ -241,7 +243,7 @@ public final class RestconfImpl implements RestconfService {
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode modulesSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
                 restconfModule, Draft02.RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
-        Preconditions.checkState(modulesSchemaNode instanceof ContainerSchemaNode);
+        checkState(modulesSchemaNode instanceof ContainerSchemaNode);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> moduleContainerBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
@@ -256,8 +258,7 @@ public final class RestconfImpl implements RestconfService {
     @Override
     @Deprecated
     public NormalizedNodeContext getModule(final String identifier, final UriInfo uriInfo) {
-        Preconditions.checkNotNull(identifier);
-        final Entry<String, Revision> nameRev = getModuleNameAndRevision(identifier);
+        final Entry<String, Revision> nameRev = getModuleNameAndRevision(requireNonNull(identifier));
         Module module = null;
         DOMMountPoint mountPoint = null;
         final EffectiveModelContext schemaContext;
@@ -285,7 +286,7 @@ public final class RestconfImpl implements RestconfService {
 
         final DataSchemaNode moduleSchemaNode = this.controllerContext
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.MODULE_LIST_SCHEMA_NODE);
-        Preconditions.checkState(moduleSchemaNode instanceof ListSchemaNode);
+        checkState(moduleSchemaNode instanceof ListSchemaNode);
 
         return new NormalizedNodeContext(
                 new InstanceIdentifierContext<>(null, moduleSchemaNode, mountPoint, schemaContext), moduleMap,
@@ -300,7 +301,7 @@ public final class RestconfImpl implements RestconfService {
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode streamSchemaNode = this.controllerContext
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.STREAM_LIST_SCHEMA_NODE);
-        Preconditions.checkState(streamSchemaNode instanceof ListSchemaNode);
+        checkState(streamSchemaNode instanceof ListSchemaNode);
 
         final CollectionNodeBuilder<MapEntryNode, MapNode> listStreamsBuilder =
                 Builders.mapBuilder((ListSchemaNode) streamSchemaNode);
@@ -311,7 +312,7 @@ public final class RestconfImpl implements RestconfService {
 
         final DataSchemaNode streamsContainerSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
                 restconfModule, Draft02.RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
-        Preconditions.checkState(streamsContainerSchemaNode instanceof ContainerSchemaNode);
+        checkState(streamsContainerSchemaNode instanceof ContainerSchemaNode);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> streamsContainerBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) streamsContainerSchemaNode);
@@ -766,7 +767,7 @@ public final class RestconfImpl implements RestconfService {
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
         }
 
-        Preconditions.checkNotNull(identifier);
+        requireNonNull(identifier);
 
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
 
@@ -863,7 +864,7 @@ public final class RestconfImpl implements RestconfService {
      *
      */
     private static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodeContext payload) {
-        Preconditions.checkArgument(payload != null);
+        checkArgument(payload != null);
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
         final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
         final SchemaNode schemaNode = iiWithData.getSchemaNode();
@@ -881,7 +882,7 @@ public final class RestconfImpl implements RestconfService {
     public static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
             final List<QName> keyDefinitions) {
 
-        final Map<QName, Object> mutableCopyUriKeyValues = Maps.newHashMap(uriKeyValues);
+        final Map<QName, Object> mutableCopyUriKeyValues = new HashMap<>(uriKeyValues);
         for (final QName keyDefinition : keyDefinitions) {
             final Object uriKeyValue = RestconfDocumentedException.throwIfNull(
                 // should be caught during parsing URI to InstanceIdentifier
@@ -1379,11 +1380,11 @@ public final class RestconfImpl implements RestconfService {
     }
 
     private MapNode makeModuleMapNode(final Collection<? extends Module> modules) {
-        Preconditions.checkNotNull(modules);
+        requireNonNull(modules);
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode moduleSchemaNode = this.controllerContext
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.MODULE_LIST_SCHEMA_NODE);
-        Preconditions.checkState(moduleSchemaNode instanceof ListSchemaNode);
+        checkState(moduleSchemaNode instanceof ListSchemaNode);
 
         final CollectionNodeBuilder<MapEntryNode, MapNode> listModuleBuilder =
                 Builders.mapBuilder((ListSchemaNode) moduleSchemaNode);
@@ -1395,7 +1396,7 @@ public final class RestconfImpl implements RestconfService {
     }
 
     private MapEntryNode toModuleEntryNode(final Module module, final DataSchemaNode moduleSchemaNode) {
-        Preconditions.checkArgument(moduleSchemaNode instanceof ListSchemaNode,
+        checkArgument(moduleSchemaNode instanceof ListSchemaNode,
                 "moduleSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listModuleSchemaNode = (ListSchemaNode) moduleSchemaNode;
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> moduleNodeValues =
@@ -1404,7 +1405,7 @@ public final class RestconfImpl implements RestconfService {
         List<DataSchemaNode> instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "name");
         final DataSchemaNode nameSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(nameSchemaNode instanceof LeafSchemaNode);
+        checkState(nameSchemaNode instanceof LeafSchemaNode);
         moduleNodeValues
                 .withChild(Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue(module.getName()).build());
 
@@ -1413,7 +1414,7 @@ public final class RestconfImpl implements RestconfService {
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "revision");
         final DataSchemaNode revisionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(revisionSchemaNode instanceof LeafSchemaNode);
+        checkState(revisionSchemaNode instanceof LeafSchemaNode);
         final Optional<Revision> revision = qNameModule.getRevision();
         moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode)
                 .withValue(revision.map(Revision::toString).orElse("")).build());
@@ -1421,14 +1422,14 @@ public final class RestconfImpl implements RestconfService {
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "namespace");
         final DataSchemaNode namespaceSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(namespaceSchemaNode instanceof LeafSchemaNode);
+        checkState(namespaceSchemaNode instanceof LeafSchemaNode);
         moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) namespaceSchemaNode)
                 .withValue(qNameModule.getNamespace().toString()).build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "feature");
         final DataSchemaNode featureSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(featureSchemaNode instanceof LeafListSchemaNode);
+        checkState(featureSchemaNode instanceof LeafListSchemaNode);
         final ListNodeBuilder<Object, LeafSetEntryNode<Object>> featuresBuilder =
                 Builders.leafSetBuilder((LeafListSchemaNode) featureSchemaNode);
         for (final FeatureDefinition feature : module.getFeatures()) {
@@ -1441,7 +1442,7 @@ public final class RestconfImpl implements RestconfService {
     }
 
     protected MapEntryNode toStreamEntryNode(final String streamName, final DataSchemaNode streamSchemaNode) {
-        Preconditions.checkArgument(streamSchemaNode instanceof ListSchemaNode,
+        checkArgument(streamSchemaNode instanceof ListSchemaNode,
                 "streamSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) streamSchemaNode;
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeValues =
@@ -1450,33 +1451,33 @@ public final class RestconfImpl implements RestconfService {
         List<DataSchemaNode> instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "name");
         final DataSchemaNode nameSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(nameSchemaNode instanceof LeafSchemaNode);
+        checkState(nameSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue(streamName).build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "description");
         final DataSchemaNode descriptionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(descriptionSchemaNode instanceof LeafSchemaNode);
+        checkState(descriptionSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(
                 Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue("DESCRIPTION_PLACEHOLDER").build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-support");
         final DataSchemaNode replaySupportSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(replaySupportSchemaNode instanceof LeafSchemaNode);
+        checkState(replaySupportSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) replaySupportSchemaNode)
                 .withValue(Boolean.TRUE).build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-log-creation-time");
         final DataSchemaNode replayLogCreationTimeSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(replayLogCreationTimeSchemaNode instanceof LeafSchemaNode);
+        checkState(replayLogCreationTimeSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(
                 Builders.leafBuilder((LeafSchemaNode) replayLogCreationTimeSchemaNode).withValue("").build());
 
         instanceDataChildrenByName = ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "events");
         final DataSchemaNode eventsSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        Preconditions.checkState(eventsSchemaNode instanceof LeafSchemaNode);
+        checkState(eventsSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(
                 Builders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue(Empty.getInstance()).build());
 
@@ -1510,9 +1511,9 @@ public final class RestconfImpl implements RestconfService {
         final Iterator<LeafSetEntryNode> iterator = entryNodes.iterator();
         while (iterator.hasNext()) {
             final QName valueQName = QName.create((String) iterator.next().getValue());
-            final Module module = controllerContext.findModuleByNamespace(valueQName.getModule().getNamespace());
-            Preconditions.checkNotNull(module,
-                    "Module for namespace " + valueQName.getModule().getNamespace() + " does not exist");
+            final URI namespace = valueQName.getModule().getNamespace();
+            final Module module = controllerContext.findModuleByNamespace(namespace);
+            checkNotNull(module, "Module for namespace %s does not exist", namespace);
             NotificationDefinition notifiDef = null;
             for (final NotificationDefinition notification : module.getNotifications()) {
                 if (notification.getQName().equals(valueQName)) {
@@ -1521,8 +1522,7 @@ public final class RestconfImpl implements RestconfService {
                 }
             }
             final String moduleName = module.getName();
-            Preconditions.checkNotNull(notifiDef,
-                    "Notification " + valueQName + "doesn't exist in module " + moduleName);
+            checkNotNull(notifiDef, "Notification %s does not exist in module %s", valueQName, moduleName);
             paths.add(notifiDef.getPath());
             streamNameBuilder.append(moduleName).append(':').append(valueQName.getLocalName());
             if (iterator.hasNext()) {

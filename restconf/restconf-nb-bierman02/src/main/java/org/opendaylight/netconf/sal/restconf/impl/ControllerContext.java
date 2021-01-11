@@ -7,7 +7,10 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -18,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,8 +92,6 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     private static final String MOUNT_MODULE = "yang-ext";
 
     private static final String MOUNT_NODE = "mount";
-
-    private static final Charset URI_ENCODING_CHARSET = StandardCharsets.UTF_8;
 
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
@@ -227,12 +227,12 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     public Module findModuleByName(final String moduleName) {
         checkPreconditions();
-        Preconditions.checkArgument(moduleName != null && !moduleName.isEmpty());
+        checkArgument(moduleName != null && !moduleName.isEmpty());
         return this.globalSchema.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
     public Module findModuleByName(final DOMMountPoint mountPoint, final String moduleName) {
-        Preconditions.checkArgument(moduleName != null && mountPoint != null);
+        checkArgument(moduleName != null && mountPoint != null);
 
         final SchemaContext mountPointSchema = getModelContext(mountPoint);
         if (mountPointSchema == null) {
@@ -244,12 +244,12 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     public Module findModuleByNamespace(final URI namespace) {
         checkPreconditions();
-        Preconditions.checkArgument(namespace != null);
+        checkArgument(namespace != null);
         return this.globalSchema.findModules(namespace).stream().findFirst().orElse(null);
     }
 
     public Module findModuleByNamespace(final DOMMountPoint mountPoint, final URI namespace) {
-        Preconditions.checkArgument(namespace != null && mountPoint != null);
+        checkArgument(namespace != null && mountPoint != null);
 
         final SchemaContext mountPointSchema = getModelContext(mountPoint);
         if (mountPointSchema == null) {
@@ -261,7 +261,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     public Module findModuleByNameAndRevision(final String name, final Revision revision) {
         checkPreconditions();
-        Preconditions.checkArgument(name != null && revision != null);
+        checkArgument(name != null && revision != null);
 
         return this.globalSchema.findModule(name, revision).orElse(null);
     }
@@ -269,7 +269,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public Module findModuleByNameAndRevision(final DOMMountPoint mountPoint, final String name,
             final Revision revision) {
         checkPreconditions();
-        Preconditions.checkArgument(name != null && revision != null && mountPoint != null);
+        checkArgument(name != null && revision != null && mountPoint != null);
 
         final SchemaContext schemaContext = getModelContext(mountPoint);
         return schemaContext == null ? null : schemaContext.findModule(name, revision).orElse(null);
@@ -539,15 +539,14 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     private String toUriString(final Object object, final LeafSchemaNode leafNode, final DOMMountPoint mount)
             throws UnsupportedEncodingException {
         final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(leafNode.getType(), mount, this);
-        // FIXME: UrlEncoder looks up a well-known charset, we need something that will use it directly
-        return object == null ? "" : URLEncoder.encode(codec.serialize(object).toString(), URI_ENCODING_CHARSET.name());
+        return object == null ? "" : URLEncoder.encode(codec.serialize(object).toString(), StandardCharsets.UTF_8);
     }
 
     @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification = "Unrecognised NullableDecl")
     private InstanceIdentifierContext<?> collectPathArguments(final InstanceIdentifierBuilder builder,
             final List<String> strings, final DataNodeContainer parentNode, final DOMMountPoint mountPoint,
             final boolean returnJustMountPoint) {
-        Preconditions.checkNotNull(strings);
+        requireNonNull(strings);
 
         if (parentNode == null) {
             return null;
@@ -745,7 +744,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
             final String name, final URI namespace) {
-        Preconditions.checkNotNull(namespace);
+        requireNonNull(namespace);
 
         final Iterable<DataSchemaNode> result = Iterables.filter(findInstanceDataChildrenByName(container, name),
             node -> namespace.equals(node.getQName().getNamespace()));
@@ -754,11 +753,9 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     public static List<DataSchemaNode> findInstanceDataChildrenByName(final DataNodeContainer container,
             final String name) {
-        Preconditions.checkNotNull(container);
-        Preconditions.checkNotNull(name);
-
         final List<DataSchemaNode> instantiatedDataNodeContainers = new ArrayList<>();
-        collectInstanceDataNodeContainers(instantiatedDataNodeContainers, container, name);
+        collectInstanceDataNodeContainers(instantiatedDataNodeContainers, requireNonNull(container),
+            requireNonNull(name));
         return instantiatedDataNodeContainers;
     }
 
@@ -793,11 +790,10 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     private void addKeyValue(final HashMap<QName, Object> map, final DataSchemaNode node, final String uriValue,
             final DOMMountPoint mountPoint) {
-        Preconditions.checkNotNull(uriValue);
-        Preconditions.checkArgument(node instanceof LeafSchemaNode);
+        checkArgument(node instanceof LeafSchemaNode);
 
         final SchemaContext schemaContext = mountPoint == null ? this.globalSchema : getModelContext(mountPoint);
-        final String urlDecoded = urlPathArgDecode(uriValue);
+        final String urlDecoded = urlPathArgDecode(requireNonNull(uriValue));
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
@@ -908,29 +904,19 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     private static List<String> urlPathArgsDecode(final Iterable<String> strings) {
-        try {
-            final List<String> decodedPathArgs = new ArrayList<>();
-            for (final String pathArg : strings) {
-                final String _decode = URLDecoder.decode(pathArg, URI_ENCODING_CHARSET.name());
-                decodedPathArgs.add(_decode);
-            }
-            return decodedPathArgs;
-        } catch (final UnsupportedEncodingException e) {
-            throw new RestconfDocumentedException("Invalid URL path '" + strings + "': " + e.getMessage(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
+        final List<String> decodedPathArgs = new ArrayList<>();
+        for (final String pathArg : strings) {
+            final String _decode = URLDecoder.decode(pathArg, StandardCharsets.UTF_8);
+            decodedPathArgs.add(_decode);
         }
+        return decodedPathArgs;
     }
 
     static String urlPathArgDecode(final String pathArg) {
         if (pathArg == null) {
             return null;
         }
-        try {
-            return URLDecoder.decode(pathArg, URI_ENCODING_CHARSET.name());
-        } catch (final UnsupportedEncodingException e) {
-            throw new RestconfDocumentedException("Invalid URL path arg '" + pathArg + "': " + e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
-        }
+        return URLDecoder.decode(pathArg, StandardCharsets.UTF_8);
     }
 
     private CharSequence convertToRestconfIdentifier(final PathArgument argument, final DataSchemaNode node,
@@ -969,7 +955,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                         builder.append('/');
                     }
 
-                    Preconditions.checkState(listChild instanceof LeafSchemaNode,
+                    checkState(listChild instanceof LeafSchemaNode,
                         "List key has to consist of leaves, not %s", listChild);
 
                     final Object value = argument.getValue(key);
@@ -1015,7 +1001,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return operation.isMixin();
     }
 
-    private static EffectiveModelContext getModelContext(DOMMountPoint mountPoint) {
+    private static EffectiveModelContext getModelContext(final DOMMountPoint mountPoint) {
         return mountPoint.getService(DOMSchemaService.class)
             .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
             .orElse(null);

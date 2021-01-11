@@ -20,11 +20,6 @@
   <version>1.13.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
-  <properties>
-    <!-- FIXME: Remove this -->
-    <odlparent.modernizer.enforce>false</odlparent.modernizer.enforce>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>javax.annotation</groupId>

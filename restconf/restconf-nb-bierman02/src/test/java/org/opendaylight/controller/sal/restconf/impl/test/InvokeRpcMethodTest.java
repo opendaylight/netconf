@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
-import com.google.common.base.Optional;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -171,7 +171,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception to be thrown.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
-                    Optional.absent(), Optional.absent());
+                    Optional.empty(), Optional.empty());
         }
     }
 
@@ -214,7 +214,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception to be thrown.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, Optional.of("foo"),
-                    Optional.absent());
+                    Optional.empty());
             verifyRestconfDocumentedException(e, 1, ErrorType.RPC, ErrorTag.IN_USE, Optional.of("bar"),
                     Optional.of("app-tag"));
         }
@@ -263,7 +263,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT,
-                    Optional.absent(), Optional.absent());
+                    Optional.empty(), Optional.empty());
         }
     }
 
@@ -313,7 +313,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    Optional.absent(), Optional.absent());
+                    Optional.empty(), Optional.empty());
         }
     }
 

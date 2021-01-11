@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Optional;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,6 +24,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
@@ -97,8 +97,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         try (JsonWriter jsonWriter = createJsonWriter(entityStream, context.getWriterParameters().isPrettyPrint())) {
             jsonWriter.beginObject();
             writeNormalizedNode(
-                    jsonWriter, path, identifierCtx, data,
-                    Optional.fromNullable(context.getWriterParameters().getDepth()));
+                    jsonWriter, path, identifierCtx, data, context.getWriterParameters().getDepth());
             jsonWriter.endObject();
             jsonWriter.flush();
         }
@@ -106,7 +105,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
 
     private static void writeNormalizedNode(final JsonWriter jsonWriter, SchemaPath path,
             final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data,
-            final Optional<Integer> depth) throws IOException {
+            final @Nullable Integer depth) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         if (SchemaPath.ROOT.equals(path)) {
             /*
@@ -157,24 +156,22 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
             final InstanceIdentifierContext<SchemaNode> context, final SchemaPath path, final JsonWriter jsonWriter,
-            final Optional<Integer> depth) {
+            final @Nullable Integer depth) {
 
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
 
         final URI initialNs;
         if (schema instanceof DataSchemaNode && !((DataSchemaNode)schema).isAugmenting()
-                && !(schema instanceof SchemaContext)) {
-            initialNs = schema.getQName().getNamespace();
-        } else if (schema instanceof RpcDefinition) {
+                && !(schema instanceof SchemaContext) || schema instanceof RpcDefinition) {
             initialNs = schema.getQName().getNamespace();
         } else {
             initialNs = null;
         }
         final NormalizedNodeStreamWriter streamWriter =
                 JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, path, initialNs, jsonWriter);
-        if (depth.isPresent()) {
-            return DepthAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth.get());
+        if (depth != null) {
+            return DepthAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth);
         }
 
         return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(streamWriter);

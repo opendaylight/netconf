@@ -5,10 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.streams.websockets;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -54,11 +56,10 @@ public final class WebSocketServer implements Runnable {
     }
 
     public static WebSocketServer createInstance(final String address, final int port) {
-        Preconditions.checkState(instance == null, "createInstance() has already been called");
-        Preconditions.checkNotNull(address, "Address cannot be null.");
-        Preconditions.checkArgument(port >= 1024, "Privileged port (below 1024) is not allowed");
+        checkState(instance == null, "createInstance() has already been called");
+        checkArgument(port >= 1024, "Privileged port (below 1024) is not allowed");
 
-        instance = new WebSocketServer(address, port);
+        instance = new WebSocketServer(requireNonNull(address, "Address cannot be null."), port);
         LOG.info("Created WebSocketServer on {}:{}", address, port);
         return instance;
     }
@@ -78,8 +79,7 @@ public final class WebSocketServer implements Runnable {
      * @return instance of {@link WebSocketServer}
      */
     public static WebSocketServer getInstance() {
-        Preconditions.checkNotNull(instance, "createInstance() must be called prior to getInstance()");
-        return instance;
+        return requireNonNull(instance, "createInstance() must be called prior to getInstance()");
     }
 
     /**
@@ -101,7 +101,7 @@ public final class WebSocketServer implements Runnable {
      * Destroy the existing instance.
      */
     public static void destroyInstance() {
-        Preconditions.checkState(instance != null, "createInstance() must be called prior to destroyInstance()");
+        checkState(instance != null, "createInstance() must be called prior to destroyInstance()");
 
         instance.stop();
         instance = null;

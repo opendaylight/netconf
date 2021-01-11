@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalService;
@@ -24,8 +24,8 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
     private final SchemaRetrievalService schema;
 
     public RestconfCompositeWrapper(final RestconfService restconf, final SchemaRetrievalService schema) {
-        this.restconf = Preconditions.checkNotNull(restconf);
-        this.schema = Preconditions.checkNotNull(schema);
+        this.restconf = requireNonNull(restconf);
+        this.schema = requireNonNull(schema);
     }
 
     @Override

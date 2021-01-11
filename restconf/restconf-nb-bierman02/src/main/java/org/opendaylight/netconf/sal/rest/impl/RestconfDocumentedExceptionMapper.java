@@ -7,13 +7,15 @@
  */
 package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -89,7 +91,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
     private final ControllerContext controllerContext;
 
     public RestconfDocumentedExceptionMapper(final ControllerContext controllerContext) {
-        this.controllerContext = Preconditions.checkNotNull(controllerContext);
+        this.controllerContext = requireNonNull(controllerContext);
     }
 
     @Override
@@ -126,16 +128,14 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             return Response.status(status).type(MediaType.TEXT_PLAIN_TYPE).entity(exception.getMessage()).build();
         }
 
-        Preconditions.checkState(errorsSchemaNode instanceof ContainerSchemaNode,
-                "Found Errors SchemaNode isn't ContainerNode");
+        checkState(errorsSchemaNode instanceof ContainerSchemaNode, "Found Errors SchemaNode isn't ContainerNode");
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> errContBuild =
                 Builders.containerBuilder((ContainerSchemaNode) errorsSchemaNode);
 
         final List<DataSchemaNode> schemaList = ControllerContext.findInstanceDataChildrenByName(errorsSchemaNode,
                 Draft02.RestConfModule.ERROR_LIST_SCHEMA_NODE);
         final DataSchemaNode errListSchemaNode = Iterables.getFirst(schemaList, null);
-        Preconditions.checkState(
-                errListSchemaNode instanceof ListSchemaNode, "Found Error SchemaNode isn't ListSchemaNode");
+        checkState(errListSchemaNode instanceof ListSchemaNode, "Found Error SchemaNode isn't ListSchemaNode");
         final CollectionNodeBuilder<MapEntryNode, MapNode> listErorsBuilder = Builders
                 .mapBuilder((ListSchemaNode) errListSchemaNode);
 
@@ -159,7 +159,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
     }
 
     private static MapEntryNode toErrorEntryNode(final RestconfError error, final DataSchemaNode errListSchemaNode) {
-        Preconditions.checkArgument(errListSchemaNode instanceof ListSchemaNode,
+        checkArgument(errListSchemaNode instanceof ListSchemaNode,
                 "errListSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) errListSchemaNode;
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> errNodeValues = Builders
@@ -168,14 +168,14 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         List<DataSchemaNode> lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
                 listStreamSchemaNode, "error-type");
         final DataSchemaNode errTypSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
-        Preconditions.checkState(errTypSchemaNode instanceof LeafSchemaNode);
+        checkState(errTypSchemaNode instanceof LeafSchemaNode);
         errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errTypSchemaNode)
                 .withValue(error.getErrorType().getErrorTypeTag()).build());
 
         lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
                 listStreamSchemaNode, "error-tag");
         final DataSchemaNode errTagSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
-        Preconditions.checkState(errTagSchemaNode instanceof LeafSchemaNode);
+        checkState(errTagSchemaNode instanceof LeafSchemaNode);
         errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errTagSchemaNode)
                 .withValue(error.getErrorTag().getTagValue()).build());
 
@@ -183,7 +183,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
                     listStreamSchemaNode, "error-app-tag");
             final DataSchemaNode errAppTagSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
-            Preconditions.checkState(errAppTagSchemaNode instanceof LeafSchemaNode);
+            checkState(errAppTagSchemaNode instanceof LeafSchemaNode);
             errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errAppTagSchemaNode)
                     .withValue(error.getErrorAppTag()).build());
         }
@@ -191,7 +191,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
                 listStreamSchemaNode, "error-message");
         final DataSchemaNode errMsgSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
-        Preconditions.checkState(errMsgSchemaNode instanceof LeafSchemaNode);
+        checkState(errMsgSchemaNode instanceof LeafSchemaNode);
         errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errMsgSchemaNode)
                 .withValue(error.getErrorMessage()).build());
 
@@ -302,12 +302,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             LOG.warn("Failed to close stream writer", e);
         }
 
-        try {
-            return outStream.toString(StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            // Shouldn't happen
-            return "Failure encoding error response: " + e;
-        }
+        return outStream.toString(StandardCharsets.UTF_8);
     }
 
     private static Object toXMLResponseBody(final NormalizedNodeContext errorsNode,
@@ -408,12 +403,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             LOG.warn("Error writing error response body.", e);
         }
 
-        try {
-            return outStream.toString(StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            // Shouldn't happen
-            return "Failure encoding error response: " + e;
-        }
+        return outStream.toString(StandardCharsets.UTF_8);
     }
 
     private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,

@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.sal.rest.impl;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter.UNKNOWN_SIZE;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Collection;
@@ -52,7 +52,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
     protected final int maxDepth;
 
     private DepthAwareNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final int maxDepth) {
-        this.writer = Preconditions.checkNotNull(writer);
+        this.writer = requireNonNull(writer);
         this.maxDepth = maxDepth;
     }
 
