@@ -189,7 +189,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     @VisibleForTesting
     static NodeId getNodeId(final InstanceIdentifier.PathArgument pathArgument) {
         if (pathArgument instanceof InstanceIdentifier.IdentifiableItem<?, ?>) {
-            final Identifier key = ((InstanceIdentifier.IdentifiableItem) pathArgument).getKey();
+            final Identifier<?> key = ((InstanceIdentifier.IdentifiableItem<?, ?>) pathArgument).getKey();
             if (key instanceof NodeKey) {
                 return ((NodeKey) key).getNodeId();
             }
