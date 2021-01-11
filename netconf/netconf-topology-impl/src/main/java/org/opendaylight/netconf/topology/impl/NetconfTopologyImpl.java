@@ -33,6 +33,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
