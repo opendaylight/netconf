@@ -1,27 +1,30 @@
 /*
- * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2020 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+package org.opendaylight.netconf.topology.spi;
 
-package org.opendaylight.netconf.topology.singleton.impl.utils;
-
+import java.util.List;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 
-public class NetconfConnectorDTO implements AutoCloseable {
-
+public final class NetconfConnectorDTO implements AutoCloseable {
+    private final List<SchemaSourceRegistration<?>> yanglibRegistrations;
     private final NetconfDeviceCommunicator communicator;
     private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
 
     public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator,
-                               final RemoteDeviceHandler<NetconfSessionPreferences> facade) {
+            final RemoteDeviceHandler<NetconfSessionPreferences> facade,
+            final List<SchemaSourceRegistration<?>> yanglibRegistrations) {
         this.communicator = communicator;
         this.facade = facade;
+        this.yanglibRegistrations = yanglibRegistrations;
     }
 
     public NetconfDeviceCommunicator getCommunicator() {
@@ -38,11 +41,8 @@ public class NetconfConnectorDTO implements AutoCloseable {
 
     @Override
     public void close() {
-        if (communicator != null) {
-            communicator.close();
-        }
-        if (facade != null) {
-            facade.close();
-        }
+        communicator.close();
+        facade.close();
+        yanglibRegistrations.forEach(SchemaSourceRegistration::close);
     }
 }

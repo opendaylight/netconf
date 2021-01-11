@@ -11,7 +11,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -51,9 +50,9 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYang
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
-import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -169,9 +168,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = netconfTopologyDeviceSetup.getSchemaResourcesDTO();
 
         // pre register yang library sources as fallback schemas to schema registry
-        // FIXME: this list not used anywhere. Should it be retained or discarded? (why?)
-        //        it would seem those registrations should be bound to NetconfConnectorDTO
-        final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
+        final List<SchemaSourceRegistration<?>> registeredYangLibSources = new ArrayList<>();
         if (node.getYangLibrary() != null) {
             final String yangLibURL = node.getYangLibrary().getYangLibraryUrl().getValue();
             final String yangLibUsername = node.getYangLibrary().getUsername();
@@ -233,7 +230,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
         }
-        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade);
+        return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, registeredYangLibSources);
     }
 
     private static Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
