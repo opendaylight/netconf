@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Mon, 11 Jan 2021 16:08:51 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/94596
+Project: netconf
+Branch: refs/heads/stable/aluminium
