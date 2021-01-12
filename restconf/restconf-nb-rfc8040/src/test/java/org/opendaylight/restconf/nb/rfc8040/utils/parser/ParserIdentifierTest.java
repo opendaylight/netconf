@@ -252,7 +252,7 @@ public class ParserIdentifierTest {
             () -> ParserIdentifier.toInstanceIdentifier("" + "/" + RestconfConstants.MOUNT, SCHEMA_CONTEXT,
                 Optional.of(this.mountPointService)));
         assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Not expected error tag", ErrorTag.RESOURCE_DENIED_TRANSPORT, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
