@@ -93,7 +93,7 @@ public final class ParserIdentifier {
         final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
         final DOMMountPoint mountPoint = mountPointService.get().getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
+                    ErrorType.PROTOCOL, ErrorTag.RESOURCE_DENIED_TRANSPORT));
 
         final EffectiveModelContext mountSchemaContext = coerceModelContext(mountPoint);
         final String pathId = pathsIt.next().replaceFirst("/", "");
