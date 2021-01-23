@@ -22,6 +22,30 @@
       "revId": "b4da4fb9bde14dee16a9c53554551c7f33e4839d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "977fee4e_ecd3265f",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-01-23T18:22:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7dbc71ce_a5c47f85",
+      "range": {
+        "startLine": 94,
+        "startChar": 41,
+        "endLine": 94,
+        "endChar": 52
+      },
+      "revId": "b4da4fb9bde14dee16a9c53554551c7f33e4839d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
