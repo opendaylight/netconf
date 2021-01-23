@@ -11,13 +11,13 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
-    <version>1.9.2-SNAPSHOT</version>
+    <version>1.9.3-SNAPSHOT</version>
     <relativePath>../../parent</relativePath>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>mdsal-netconf-monitoring</artifactId>
-  <version>1.9.2-SNAPSHOT</version>
+  <version>1.9.3-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 

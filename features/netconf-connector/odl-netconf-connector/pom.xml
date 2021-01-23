@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-connector</artifactId>
-    <version>1.9.2-SNAPSHOT</version>
+    <version>1.9.3-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf Connector :: Netconf Connector</name>
@@ -42,7 +42,7 @@
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>netconf-artifacts</artifactId>
-                <version>1.9.2-SNAPSHOT</version>
+                <version>1.9.3-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -91,7 +91,7 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-encryption-service</artifactId>
-            <version>0.12.2-SNAPSHOT</version>
+            <version>0.12.3-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
