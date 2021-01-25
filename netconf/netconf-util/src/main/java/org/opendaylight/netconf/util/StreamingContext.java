@@ -8,11 +8,11 @@
 package org.opendaylight.netconf.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter.UNKNOWN_SIZE;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -160,7 +160,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
                 final Iterator<PathArgument> others) throws IOException {
             verifyActualPathArgument(first);
 
-            emitElementStart(writer, first);
+            emitElementStart(writer, first, others.hasNext() ? 1 : 0);
             if (others.hasNext()) {
                 final PathArgument childPath = others.next();
                 final StreamingContext<?> childOp = getChildOperation(childPath);
@@ -174,7 +174,8 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
                                   final PathNode subtree) throws IOException {
             verifyActualPathArgument(first);
 
-            emitElementStart(writer, first);
+            final Collection<PathNode> children = subtree.children();
+            emitElementStart(writer, first, children.size());
             for (final PathNode node : subtree.children()) {
                 emitChildTreeNode(writer, node);
             }
@@ -194,7 +195,8 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
             }
         }
 
-        abstract void emitElementStart(NormalizedNodeStreamWriter writer, PathArgument arg) throws IOException;
+        abstract void emitElementStart(NormalizedNodeStreamWriter writer, PathArgument arg,
+                                       int childSizeHint) throws IOException;
 
         @SuppressWarnings("checkstyle:illegalCatch")
         StreamingContext<?> getChildOperation(final PathArgument childPath) {
@@ -342,8 +344,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
-            writer.startChoiceNode(getIdentifier(), UNKNOWN_SIZE);
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
+            writer.startChoiceNode(getIdentifier(), childSizeHint);
         }
     }
 
@@ -388,9 +391,10 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
             final NodeIdentifierWithPredicates identifier = (NodeIdentifierWithPredicates) arg;
-            writer.startMapEntryNode(identifier, UNKNOWN_SIZE);
+            writer.startMapEntryNode(identifier, childSizeHint);
 
             for (Entry<QName, Object> entry : identifier.entrySet()) {
                 writer.startLeafNode(new NodeIdentifier(entry.getKey()));
@@ -411,8 +415,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
-            writer.startUnkeyedListItem(getIdentifier(), UNKNOWN_SIZE);
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
+            writer.startUnkeyedListItem(getIdentifier(), childSizeHint);
         }
     }
 
@@ -427,8 +432,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
-            writer.startContainerNode(getIdentifier(), UNKNOWN_SIZE);
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
+            writer.startContainerNode(getIdentifier(), childSizeHint);
         }
     }
 
@@ -457,8 +463,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
-            writer.startOrderedLeafSet(getIdentifier(), UNKNOWN_SIZE);
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
+            writer.startOrderedLeafSet(getIdentifier(), childSizeHint);
         }
     }
 
@@ -468,8 +475,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
-            writer.startLeafSet(getIdentifier(), UNKNOWN_SIZE);
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
+            writer.startLeafSet(getIdentifier(), childSizeHint);
         }
     }
 
@@ -485,7 +493,8 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
             writer.startAugmentationNode(getIdentifier());
         }
     }
@@ -496,8 +505,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
-            writer.startMapNode(getIdentifier(), UNKNOWN_SIZE);
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
+            writer.startMapNode(getIdentifier(), childSizeHint);
         }
     }
 
@@ -507,8 +517,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
-            writer.startOrderedMapNode(getIdentifier(), UNKNOWN_SIZE);
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
+            writer.startOrderedMapNode(getIdentifier(), childSizeHint);
         }
     }
 
@@ -531,8 +542,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg) throws IOException {
-            writer.startUnkeyedList(getIdentifier(), UNKNOWN_SIZE);
+        void emitElementStart(final NormalizedNodeStreamWriter writer, final PathArgument arg,
+                              final int childSizeHint) throws IOException {
+            writer.startUnkeyedList(getIdentifier(), childSizeHint);
         }
     }
 }
