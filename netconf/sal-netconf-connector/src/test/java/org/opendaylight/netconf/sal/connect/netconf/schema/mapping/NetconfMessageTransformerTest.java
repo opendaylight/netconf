@@ -32,7 +32,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -476,6 +475,52 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</rpc>");
     }
 
+    @Test
+    public void testGetLeafList() throws IOException, SAXException {
+        final YangInstanceIdentifier path = YangInstanceIdentifier.create(
+                toId(NetconfState.QNAME),
+                toId(Capabilities.QNAME),
+                toId(QName.create(Capabilities.QNAME, "capability")));
+        final DataContainerChild<?, ?> filter = toFilterStructure(path, SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
+
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<get>\n"
+                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "<capabilities>\n"
+                + "<capability/>\n"
+                + "</capabilities>\n"
+                + "</netconf-state>\n"
+                + "</filter>\n"
+                + "</get>\n"
+                + "</rpc>\n");
+    }
+
+    @Test
+    public void testGetList() throws IOException, SAXException {
+        final YangInstanceIdentifier path = YangInstanceIdentifier.create(
+                toId(NetconfState.QNAME),
+                toId(Datastores.QNAME),
+                toId(QName.create(Datastores.QNAME, "datastore")));
+        final DataContainerChild<?, ?> filter = toFilterStructure(path, SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
+
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<get>\n"
+                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "<datastores>\n"
+                + "<datastore/>\n"
+                + "</datastores>\n"
+                + "</netconf-state>\n"
+                + "</filter>\n"
+                + "</get>\n"
+                + "</rpc>\n");
+    }
+
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
         return new NetconfMessageTransformer(new EmptyMountPointContext(schema), true, BASE_SCHEMAS.getBaseSchema());
     }
@@ -543,7 +588,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void toActionRequestContainerTopLevelTest() {
-        List<PathArgument> nodeIdentifiers = Collections.singletonList(NodeIdentifier.create(DEVICE_QNAME));
+        List<PathArgument> nodeIdentifiers = List.of(NodeIdentifier.create(DEVICE_QNAME));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
         NormalizedNode<?, ?> payload = initInputAction(QName.create(DEVICE_QNAME, "start-at"), "now");
@@ -624,7 +669,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(SERVER_QNAME));
         nodeIdentifiers.add(NodeIdentifierWithPredicates.of(SERVER_QNAME, serverNameQname, "testServer"));
-        nodeIdentifiers.add(new AugmentationIdentifier(Collections.singleton(APPLICATIONS_QNAME)));
+        nodeIdentifiers.add(new AugmentationIdentifier(Set.of(APPLICATIONS_QNAME)));
         nodeIdentifiers.add(NodeIdentifier.create(APPLICATIONS_QNAME));
         nodeIdentifiers.add(NodeIdentifier.create(APPLICATION_QNAME));
         nodeIdentifiers.add(NodeIdentifierWithPredicates.of(APPLICATION_QNAME,
@@ -829,8 +874,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final YangInstanceIdentifier datastoresField = YangInstanceIdentifier.create(toId(Datastores.QNAME));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.of(
-                parentYiid, List.of(netconfStartTimeField, datastoresField))), SCHEMA);
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+            List.of(FieldsFilter.of(parentYiid, List.of(netconfStartTimeField, datastoresField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
@@ -861,8 +906,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.of(
-                parentYiid, List.of(capabilitiesField, capabilityField, datastoreField, locksFields))), SCHEMA);
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                List.of(FieldsFilter.of(parentYiid,
+                    List.of(capabilitiesField, capabilityField, datastoreField, locksFields))),
+                SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
@@ -886,8 +933,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.create(toId(Capabilities.QNAME));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.of(
-                parentYiid, List.of(capabilitiesField, YangInstanceIdentifier.empty()))), SCHEMA);
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                List.of(FieldsFilter.of(parentYiid, List.of(capabilitiesField, YangInstanceIdentifier.empty()))),
+                SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
@@ -912,8 +960,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(QName.create(Schema.QNAME, "namespace").intern()));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.of(
-                parentYiid, List.of(versionField, identifierField))), SCHEMA);
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+            List.of(FieldsFilter.of(parentYiid, List.of(versionField, identifierField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
@@ -991,8 +1039,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(Session.QNAME), NodeIdentifierWithPredicates.of(Session.QNAME));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.of(
-                parentYiid, List.of(datastoreListField, sessionListField))), SCHEMA);
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                List.of(FieldsFilter.of(parentYiid, List.of(datastoreListField, sessionListField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
@@ -1026,8 +1074,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(QName.create(Session.QNAME, "transport").intern()));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(Collections.singletonList(FieldsFilter.of(
-                parentYiid, List.of(session1Field, session2TransportField))), SCHEMA);
+        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+                List.of(FieldsFilter.of(parentYiid, List.of(session1Field, session2TransportField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
 
