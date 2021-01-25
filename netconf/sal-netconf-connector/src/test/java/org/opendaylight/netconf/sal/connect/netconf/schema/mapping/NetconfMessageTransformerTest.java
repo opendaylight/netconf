@@ -476,6 +476,52 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</rpc>");
     }
 
+    @Test
+    public void testGetLeafList() throws IOException, SAXException {
+        final YangInstanceIdentifier path = YangInstanceIdentifier.create(
+                toId(NetconfState.QNAME),
+                toId(Capabilities.QNAME),
+                toId(QName.create(Capabilities.QNAME, "capability")));
+        final DataContainerChild<?, ?> filter = toFilterStructure(path, SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
+
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<get>\n"
+                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "<capabilities>\n"
+                + "<capability/>\n"
+                + "</capabilities>\n"
+                + "</netconf-state>\n"
+                + "</filter>\n"
+                + "</get>\n"
+                + "</rpc>\n");
+    }
+
+    @Test
+    public void testGetList() throws IOException, SAXException {
+        final YangInstanceIdentifier path = YangInstanceIdentifier.create(
+                toId(NetconfState.QNAME),
+                toId(Datastores.QNAME),
+                toId(QName.create(Datastores.QNAME, "datastore")));
+        final DataContainerChild<?, ?> filter = toFilterStructure(path, SCHEMA);
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
+
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<get>\n"
+                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "<datastores>\n"
+                + "<datastore/>\n"
+                + "</datastores>\n"
+                + "</netconf-state>\n"
+                + "</filter>\n"
+                + "</get>\n"
+                + "</rpc>\n");
+    }
+
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
         return new NetconfMessageTransformer(new EmptyMountPointContext(schema), true, BASE_SCHEMAS.getBaseSchema());
     }
