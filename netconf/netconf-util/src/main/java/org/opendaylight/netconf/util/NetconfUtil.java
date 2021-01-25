@@ -210,8 +210,9 @@ public final class NetconfUtil {
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         try {
-            try (NormalizedNodeStreamWriter writer =
-                    XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath)) {
+            try (NormalizedNodeStreamWriter streamWriter =
+                    XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+                 EmptyListXmlWriter writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
                 final Iterator<PathArgument> it = query.getPathArguments().iterator();
                 final PathArgument first = it.next();
                 StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first,
@@ -246,8 +247,9 @@ public final class NetconfUtil {
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         try {
-            try (NormalizedNodeStreamWriter writer = XMLStreamNormalizedNodeStreamWriter.create(
-                    xmlWriter, context, schemaPath)) {
+            try (NormalizedNodeStreamWriter streamWriter = XMLStreamNormalizedNodeStreamWriter.create(
+                    xmlWriter, context, schemaPath);
+                 EmptyListXmlWriter writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
                 final PathArgument first = rootNode.getElement();
                 StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType())
                         .streamToWriter(writer, first, rootNode);
