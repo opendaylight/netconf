@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8bdea734_d9e2608f",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-01-26T09:44:27Z",
+      "side": 1,
+      "message": "why is that needed?\nresolvePath method should be responsible for filling-in mixin nodes into the output path",
+      "range": {
+        "startLine": 501,
+        "startChar": 7,
+        "endLine": 525,
+        "endChar": 9
+      },
+      "revId": "dfd94f83916b8b67e3b385aa87616d376e0b6106",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
