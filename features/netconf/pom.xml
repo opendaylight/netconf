@@ -41,6 +41,10 @@
     <module>odl-netconf-ssh</module>
     <module>odl-netconf-tcp</module>
     <module>odl-netconf-util</module>
+
+    <!-- CSIT features -->
+    <module>features-netconf-testing</module>
+    <module>odl-netconf-test-tools</module>
   </modules>
 
   <scm>

@@ -1,0 +1,24 @@
+module Example-notifications {
+
+  namespace "org:opendaylight:coretutorials:ncmount:example:notifications";
+
+  prefix "ex-not";
+
+  import Cisco-IOS-XR-ip-static-cfg { prefix "ip-static-cfg"; }
+
+  description
+    "Sample model used for notification utilization demonstration.
+    This model is not used by XR or any other netconf server.";
+
+  revision "2015-06-11" {
+    description
+      "Initial revision.";
+  }
+
+  notification vrf-route-notification {
+    uses ip-static-cfg:VRF-PREFIX-TABLE;
+    description "Artificial notification based on Cisco-IOS-XR-ip-static-cfg model";
+  }
+
+
+}
