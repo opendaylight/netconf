@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2021 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+      <groupId>org.opendaylight.odlparent</groupId>
+      <artifactId>feature-repo-parent</artifactId>
+      <version>8.1.0</version>
+      <relativePath/>
+  </parent>
+
+  <groupId>org.opendaylight.netconf</groupId>
+  <artifactId>features-netconf-testing</artifactId>
+  <version>1.10.0-SNAPSHOT</version>
+  <packaging>feature</packaging>
+
+  <dependencyManagement>
+      <dependencies>
+          <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>netconf-artifacts</artifactId>
+              <version>${project.version}</version>
+              <scope>import</scope>
+              <type>pom</type>
+          </dependency>
+      </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-aaa-netconf-plugin</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-aaa-netconf-plugin-no-cluster</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-all</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-api</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-client</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-impl</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-mapping-api</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-mdsal</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-netty-util</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-notifications-api</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-notifications-impl</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-ssh</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-tcp</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>odl-netconf-util</artifactId>
+          <type>xml</type>
+          <classifier>features</classifier>
+      </dependency>
+  </dependencies>
+</project>

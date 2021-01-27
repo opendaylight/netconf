@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.4.0" name="org.opendaylight.netconf.test.perf.MountedDeviceListener" immediate="true" init="2">
+  <service>
+    <provide interface="org.opendaylight.mdsal.dom.api.DOMMountPointListener"/>
+  </service>
+  <reference name="mountPointService" interface="org.opendaylight.mdsal.dom.api.DOMMountPointService" parameter="0"/>
+  <reference name="serializer" interface="org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer" parameter="1"/>
+  <implementation class="org.opendaylight.netconf.test.perf.MountedDeviceListener"/>
+</scr:component>

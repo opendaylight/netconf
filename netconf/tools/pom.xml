@@ -28,6 +28,7 @@
   </properties>
 
   <modules>
+    <module>netconf-test-perf</module>
     <module>netconf-testtool</module>
   </modules>
 </project>
