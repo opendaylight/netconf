@@ -30,6 +30,7 @@
     <module>netconf-connector</module>
     <module>restconf</module>
     <module>yanglib</module>
+    <module>odl-perf-test-tools</module>
   </modules>
 
 </project>
