@@ -65,7 +65,7 @@ public class WebInitializer {
                 .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
                     .addUrlPattern("/*").asyncSupported(true).build());
 
-        webContextSecurer.requireAuthentication(webContextBuilder, true , "/*");
+        webContextSecurer.requireAuthentication(webContextBuilder, true, RestconfConstants.BASE_URI_PATTERN + "/*");
 
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
