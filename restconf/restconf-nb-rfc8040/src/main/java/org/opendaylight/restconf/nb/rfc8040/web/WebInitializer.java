@@ -69,7 +69,7 @@ public class WebInitializer {
                         "application/xml,application/yang.data+xml,xml,application/json,application/yang.data+json")
                     .addUrlPattern("/*").asyncSupported(true).build());
 
-        webContextSecurer.requireAuthentication(webContextBuilder, true , "/*");
+        webContextSecurer.requireAuthentication(webContextBuilder, true, RestconfConstants.BASE_URI_PATTERN + "/*");
 
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
