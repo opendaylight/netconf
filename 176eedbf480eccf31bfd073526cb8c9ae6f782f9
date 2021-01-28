@@ -22,6 +22,30 @@
       "revId": "176eedbf480eccf31bfd073526cb8c9ae6f782f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "28eaa2b1_15257e62",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8908
+      },
+      "writtenOn": "2021-01-28T15:58:26Z",
+      "side": 0,
+      "message": "it present in SshProxyClientHandler",
+      "parentUuid": "ad898967_badfb67e",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 98
+      },
+      "revId": "176eedbf480eccf31bfd073526cb8c9ae6f782f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }

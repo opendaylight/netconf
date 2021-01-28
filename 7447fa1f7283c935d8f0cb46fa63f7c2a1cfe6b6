@@ -22,6 +22,30 @@
       "revId": "7447fa1f7283c935d8f0cb46fa63f7c2a1cfe6b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c5198e9_0ec29a8e",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyAwareChannelSubsystem.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8908
+      },
+      "writtenOn": "2021-01-28T15:58:26Z",
+      "side": 1,
+      "message": "We are using ChannelHandlerContext of channel (MinaSshNettyChannel) which created after netconfChannel (SubsystemChannel) is created and opened. So we can not get and set ChannelHandlerContext during ChannelSubsystem instantiation (in constructor).",
+      "parentUuid": "787d1959_313f2470",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 5
+      },
+      "revId": "7447fa1f7283c935d8f0cb46fa63f7c2a1cfe6b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
