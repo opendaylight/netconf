@@ -10,5 +10,6 @@
     <feature name="odl-netconf-connector" version="${project.version}">
         <feature version="[7,8)">odl-mdsal-model-draft-clemm-netmod-yang-network-topo-01-minimal</feature>
         <feature version="[3,4)">odl-mdsal-broker</feature>
+        <feature version="[0.13,1)">odl-aaa-encryption-service</feature>
     </feature>
 </features>

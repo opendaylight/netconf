@@ -30,24 +30,10 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-      <dependency>
-        <groupId>org.opendaylight.aaa</groupId>
-        <artifactId>aaa-artifacts</artifactId>
-        <version>0.13.0</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>odl-aaa-encryption-service</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-aaa-netconf-plugin</artifactId>
