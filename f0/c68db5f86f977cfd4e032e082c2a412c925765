@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Mon, 01 Feb 2021 09:01:55 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/94891
+Project: netconf
+Branch: refs/heads/master
