@@ -25,7 +25,7 @@ import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
+import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +44,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     static {
         final NetconfSshClient c = new NetconfClientBuilder().build();
         // Disable default timeouts from mina sshd
-        c.getProperties().put(FactoryManager.AUTH_TIMEOUT, "0");
-        c.getProperties().put(FactoryManager.IDLE_TIMEOUT, "0");
-        c.getProperties().put(FactoryManager.NIO2_READ_TIMEOUT, "0");
+        c.getProperties().put(CoreModuleProperties.AUTH_TIMEOUT.getName(), "0");
+        c.getProperties().put(CoreModuleProperties.IDLE_TIMEOUT.getName(), "0");
+        c.getProperties().put(CoreModuleProperties.NIO2_READ_TIMEOUT.getName(), "0");
 
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
