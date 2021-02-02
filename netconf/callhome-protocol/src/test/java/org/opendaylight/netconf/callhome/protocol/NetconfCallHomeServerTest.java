@@ -118,7 +118,7 @@ public class NetconfCallHomeServerTest {
             final KeyExchange kex = mock(KeyExchange.class);
             doReturn(kex).when(mockSession).getKex();
             final PublicKey serverKey = mock(PublicKey.class);
-            doReturn(serverKey).when(kex).getServerKey();
+            doReturn(serverKey).when(mockSession).getServerKey();
 
             SessionListener listener = instance.createSessionListener();
             doReturn(mockAuthFuture).when(mockContext).authorize();
