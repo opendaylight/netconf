@@ -113,7 +113,7 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     }
 
     private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession session) {
-        final PublicKey serverKey = session.getKex().getServerKey();
+        final PublicKey serverKey = session.getServerKey();
 
         return new SshFutureListener<AuthFuture>() {
             @Override
