@@ -221,7 +221,7 @@ public class AsyncSshHandlerTest {
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
 
-        final IoWriteFuture ioWriteFuture = asyncIn.writePacket(new ByteArrayBuffer());
+        final IoWriteFuture ioWriteFuture = asyncIn.writeBuffer(new ByteArrayBuffer());
 
         Futures.addCallback(stubAddListener(ioWriteFuture), new SuccessFutureListener<IoWriteFuture>() {
             @Override
@@ -254,7 +254,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final IoWriteFuture ioWriteFuture = asyncIn.writePacket(new ByteArrayBuffer());
+        final IoWriteFuture ioWriteFuture = asyncIn.writeBuffer(new ByteArrayBuffer());
 
         final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
@@ -281,7 +281,7 @@ public class AsyncSshHandlerTest {
         doThrow(WritePendingException.class).when(asyncIn).writePacket(any(Buffer.class));
         asyncSshHandler.write(ctx, Unpooled.copiedBuffer(new byte[]{0, 1, 2, 3, 4, 5}), secondWritePromise);
 
-        doReturn(ioWriteFuture).when(asyncIn).writePacket(any(Buffer.class));
+        doReturn(ioWriteFuture).when(asyncIn).writeBuffer(any(Buffer.class));
 
         verifyZeroInteractions(firstWritePromise, secondWritePromise);
 
@@ -303,7 +303,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final IoWriteFuture ioWriteFuture = asyncIn.writePacket(new ByteArrayBuffer());
+        final IoWriteFuture ioWriteFuture = asyncIn.writeBuffer(new ByteArrayBuffer());
 
         final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
@@ -323,7 +323,7 @@ public class AsyncSshHandlerTest {
 
         final ChannelPromise secondWritePromise = getMockedPromise();
         // now make write throw pending exception
-        doThrow(WritePendingException.class).when(asyncIn).writePacket(any(Buffer.class));
+        doThrow(WritePendingException.class).when(asyncIn).writeBuffer(any(Buffer.class));
         for (int i = 0; i < 1001; i++) {
             asyncSshHandler.write(ctx, Unpooled.copiedBuffer(new byte[]{0, 1, 2, 3, 4, 5}), secondWritePromise);
         }
@@ -433,7 +433,7 @@ public class AsyncSshHandlerTest {
             }
         }, MoreExecutors.directExecutor());
 
-        doReturn(ioWriteFuture).when(mock).writePacket(any(Buffer.class));
+        doReturn(ioWriteFuture).when(mock).writeBuffer(any(Buffer.class));
         doReturn(false).when(mock).isClosed();
         doReturn(false).when(mock).isClosing();
         return mock;
