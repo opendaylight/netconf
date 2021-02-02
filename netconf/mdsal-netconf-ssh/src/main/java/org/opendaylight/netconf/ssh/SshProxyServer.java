@@ -35,6 +35,7 @@ import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2Connector;
 import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2ServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController.HeartbeatType;
 import org.opendaylight.netconf.shaded.sshd.common.util.closeable.AbstractCloseable;
+import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 
 /**
@@ -91,7 +92,7 @@ public class SshProxyServer implements AutoCloseable {
         sshServer.setScheduledExecutorService(minaTimerExecutor);
 
         final int idleTimeout = sshProxyServerConfiguration.getIdleTimeout();
-        sshServer.getProperties().put(FactoryManager.IDLE_TIMEOUT, String.valueOf(idleTimeout));
+        sshServer.getProperties().put(CoreModuleProperties.IDLE_TIMEOUT.getName(), String.valueOf(idleTimeout));
         final String nioReadTimeout;
         if (idleTimeout > 0) {
             final long heartBeat = idleTimeout * 333333L;
@@ -100,8 +101,8 @@ public class SshProxyServer implements AutoCloseable {
         } else {
             nioReadTimeout = "0";
         }
-        sshServer.getProperties().put(FactoryManager.NIO2_READ_TIMEOUT, nioReadTimeout);
-        sshServer.getProperties().put(FactoryManager.AUTH_TIMEOUT, String.valueOf(idleTimeout));
+        sshServer.getProperties().put(CoreModuleProperties.NIO2_READ_TIMEOUT.getName(), nioReadTimeout);
+        sshServer.getProperties().put(CoreModuleProperties.AUTH_TIMEOUT.getName(), String.valueOf(idleTimeout));
 
         final RemoteNetconfCommand.NetconfCommandFactory netconfCommandFactory =
                 new RemoteNetconfCommand.NetconfCommandFactory(clientGroup,

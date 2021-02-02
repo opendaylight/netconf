@@ -40,7 +40,6 @@ import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoAcceptor;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactory;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchange;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 
@@ -115,10 +114,8 @@ public class NetconfCallHomeServerTest {
             doNothing().when(mockContext).openNetconfChannel();
             doReturn(mockContext).when(mockSession).getAttribute(any(Session.AttributeKey.class));
 
-            final KeyExchange kex = mock(KeyExchange.class);
-            doReturn(kex).when(mockSession).getKex();
             final PublicKey serverKey = mock(PublicKey.class);
-            doReturn(serverKey).when(kex).getServerKey();
+            doReturn(serverKey).when(mockSession).getServerKey();
 
             SessionListener listener = instance.createSessionListener();
             doReturn(mockAuthFuture).when(mockContext).authorize();

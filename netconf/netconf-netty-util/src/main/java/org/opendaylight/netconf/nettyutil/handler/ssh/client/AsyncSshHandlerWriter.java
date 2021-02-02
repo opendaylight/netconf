@@ -93,7 +93,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
 
             isWriteExecuted = true;
 
-            asyncIn.writePacket(toBuffer(byteBufMsg)).addListener(future -> {
+            asyncIn.writeBuffer(toBuffer(byteBufMsg)).addListener(future -> {
                 // synchronized block due to deadlock that happens on ssh window resize
                 // writes and pending writes would lock the underlyinch channel session
                 // window resize write would try to write the message on an already locked channelSession,
