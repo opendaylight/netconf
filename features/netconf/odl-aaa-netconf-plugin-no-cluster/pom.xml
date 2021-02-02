@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-shiro</artifactId>
-            <version>0.13.0</version>
+            <version>0.13.1-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

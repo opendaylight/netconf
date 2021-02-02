@@ -25,14 +25,14 @@
       <dependency>
         <groupId>org.opendaylight.aaa</groupId>
         <artifactId>aaa-artifacts</artifactId>
-        <version>0.13.0</version>
+        <version>0.13.1-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>bundle-parent</artifactId>
-        <version>3.0.5</version>
+        <version>3.0.6-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
