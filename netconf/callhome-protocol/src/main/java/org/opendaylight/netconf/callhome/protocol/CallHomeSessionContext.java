@@ -56,7 +56,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         this.sshSession = requireNonNull(sshSession, "sshSession");
         this.sshSession.setAttribute(SESSION_KEY, this);
         this.remoteAddress = (InetSocketAddress) this.sshSession.getIoSession().getRemoteAddress();
-        this.serverKey = this.sshSession.getKex().getServerKey();
+        this.serverKey = this.sshSession.getServerKey();
     }
 
     static CallHomeSessionContext getFrom(final ClientSession sshSession) {

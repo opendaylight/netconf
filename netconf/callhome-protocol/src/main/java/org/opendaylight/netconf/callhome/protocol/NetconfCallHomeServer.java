@@ -116,7 +116,7 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession session) {
-        final PublicKey serverKey = session.getKex().getServerKey();
+        final PublicKey serverKey = session.getServerKey();
 
         return new SshFutureListener<AuthFuture>() {
             @Override
