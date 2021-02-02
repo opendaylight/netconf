@@ -31,11 +31,11 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
-import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel.Streaming;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.AttributeRepository.AttributeKey;
+import org.opendaylight.netconf.shaded.sshd.common.channel.StreamingChannel;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoInputStream;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoOutputStream;
@@ -74,7 +74,7 @@ public class CallHomeSessionContextTest {
         Mockito.doReturn(kexMock).when(mockSession).getKex();
 
         PublicKey keyMock = Mockito.mock(PublicKey.class);
-        Mockito.doReturn(keyMock).when(kexMock).getServerKey();
+        Mockito.doReturn(keyMock).when(mockSession).getServerKey();
         IoReadFuture mockFuture = mock(IoReadFuture.class);
         IoInputStream mockIn = mock(IoInputStream.class);
         Mockito.doReturn(mockFuture).when(mockIn).read(any(Buffer.class));
@@ -126,7 +126,7 @@ public class CallHomeSessionContextTest {
         Mockito.doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString());
 
         Mockito.doReturn(null).when(mockFuture).addListener(any(SshFutureListener.class));
-        doNothing().when(mockChannelSubsystem).setStreaming(any(Streaming.class));
+        doNothing().when(mockChannelSubsystem).setStreaming(any(StreamingChannel.Streaming.class));
         instance = realFactory.createIfNotExists(mockSession, mockAuth, address);
         // when
         instance.openNetconfChannel();
