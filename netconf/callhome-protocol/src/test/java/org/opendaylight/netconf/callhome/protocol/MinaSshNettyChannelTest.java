@@ -54,7 +54,7 @@ public class MinaSshNettyChannelTest {
         IoWriteFuture mockWrFuture = mock(IoWriteFuture.class);
         Mockito.doReturn(false).when(mockOut).isClosed();
         Mockito.doReturn(false).when(mockOut).isClosing();
-        Mockito.doReturn(mockWrFuture).when(mockOut).writePacket(any(Buffer.class));
+        Mockito.doReturn(mockWrFuture).when(mockOut).writeBuffer(any(Buffer.class));
         Mockito.doReturn(null).when(mockWrFuture).addListener(any());
 
         Mockito.doReturn(mockFuture).when(mockFuture).addListener(Mockito.any());
