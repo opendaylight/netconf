@@ -169,11 +169,29 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_COMMIT_QNAME)), any(ContainerNode.class));
     }
 
+    @Test
+    public void commitRunning() {
+        try {
+            List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
+            getRunningNetconService().commit(resultsFutures);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
     private NetconfDataTreeServiceImpl getNetconService() {
         NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(
                 Collections.singletonList(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
+        return new NetconfDataTreeServiceImpl(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
+    }
+
+    private NetconfDataTreeServiceImpl getRunningNetconService() {
+        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(
+                Collections.singletonList(NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString()));
+        final RemoteDeviceId id =
+                new RemoteDeviceId("device-2", InetSocketAddress.createUnresolved("localhost", 17831));
         return new NetconfDataTreeServiceImpl(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
     }
 }

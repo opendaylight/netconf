@@ -281,8 +281,11 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
 
     private synchronized ListenableFuture<RpcResult<Void>> performCommit(
             final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+        if (!candidateSupported) {
+            unlock();
+            return resultsToStatus(id, resultsFutures);
+        }
         resultsFutures.add(netconfOps.commit(new NetconfRpcFutureCallback("Commit", id)));
-
         final ListenableFuture<RpcResult<Void>> result = resultsToStatus(id, resultsFutures);
         Futures.addCallback(result, new FutureCallback<>() {
             @Override
