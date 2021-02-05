@@ -177,24 +177,24 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
             List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
         final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
         Futures.addCallback(performCommit(resultsFutures), new FutureCallback<>() {
-            @Override
-            public void onSuccess(final RpcResult<Void> result) {
-                if (!result.isSuccessful()) {
-                    final Collection<RpcError> errors = result.getErrors();
-                    resultFuture.setException(new TransactionCommitFailedException(
-                            String.format("Commit of transaction %s failed", this),
-                            errors.toArray(new RpcError[errors.size()])));
-                    return;
+                @Override
+                public void onSuccess(final RpcResult<Void> result) {
+                    if (!result.isSuccessful()) {
+                        final Collection<RpcError> errors = result.getErrors();
+                        resultFuture.setException(new TransactionCommitFailedException(
+                                String.format("Commit of transaction %s failed", this),
+                                errors.toArray(new RpcError[errors.size()])));
+                        return;
+                    }
+                    resultFuture.set(CommitInfo.empty());
                 }
-                resultFuture.set(CommitInfo.empty());
-            }
 
-            @Override
-            public void onFailure(final Throwable failure) {
-                resultFuture.setException(new TransactionCommitFailedException(
-                        String.format("Commit of transaction %s failed", this), failure));
-            }
-        }, MoreExecutors.directExecutor());
+                @Override
+                public void onFailure(final Throwable failure) {
+                    resultFuture.setException(new TransactionCommitFailedException(
+                            String.format("Commit of transaction %s failed", this), failure));
+                }
+            }, MoreExecutors.directExecutor());
         return resultFuture;
     }
 
@@ -281,8 +281,11 @@ public class NetconfDataTreeServiceImpl implements NetconfDataTreeService {
 
     private synchronized ListenableFuture<RpcResult<Void>> performCommit(
             final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+        if (!candidateSupported) {
+            unlock();
+            return resultsToStatus(id, resultsFutures);
+        }
         resultsFutures.add(netconfOps.commit(new NetconfRpcFutureCallback("Commit", id)));
-
         final ListenableFuture<RpcResult<Void>> result = resultsToStatus(id, resultsFutures);
         Futures.addCallback(result, new FutureCallback<>() {
             @Override
