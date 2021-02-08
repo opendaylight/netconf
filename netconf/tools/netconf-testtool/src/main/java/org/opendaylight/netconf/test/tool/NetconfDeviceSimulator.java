@@ -197,7 +197,7 @@ public class NetconfDeviceSimulator implements Closeable {
             throw new IllegalStateException("Failed to create group", e);
         }
 
-        for (int i = 0; i < configuration.getDeviceCount(); i++) {
+        while (openDevices.size() != configuration.getDeviceCount()) {
             if (currentPort > 65535) {
                 LOG.warn("Port cannot be greater than 65535, stopping further attempts.");
                 break;
