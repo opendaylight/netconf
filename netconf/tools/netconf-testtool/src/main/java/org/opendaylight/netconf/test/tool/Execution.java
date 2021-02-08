@@ -30,6 +30,7 @@ public class Execution implements Callable<Void> {
     private final boolean invokeAsync;
     private final Semaphore semaphore;
     private final int throttle;
+    private final boolean retry = true;
 
     static final class DestToPayload {
 
@@ -89,21 +90,25 @@ public class Execution implements Callable<Void> {
     private void invokeSync() {
         LOG.info("Begin sending sync requests");
         for (Request request : payloads) {
-            try {
-                Response response = asyncHttpClient.executeRequest(request).get();
-                if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
-                    if (response.getStatusCode() == 409) {
-                        LOG.warn("Request failed, status code: {} - one or more of the devices"
-                                + " is already configured, skipping the whole batch", response.getStatusCode());
-                    } else {
-                        LOG.warn("Status code: {}", response.getStatusCode());
-                        LOG.warn("url: {}", request.getUrl());
-                        LOG.warn("body: {}", response.getResponseBody());
+            int statusCode = -1;
+            do {
+                try {
+                    Response response = asyncHttpClient.executeRequest(request).get();
+                    statusCode = response.getStatusCode();
+                    if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
+                        if (response.getStatusCode() == 409) {
+                            LOG.warn("Request failed, status code: {} - one or more of the devices"
+                                    + " is already configured, skipping the whole batch", response.getStatusCode());
+                        } else {
+                            LOG.warn("Status code: {}", response.getStatusCode());
+                            LOG.warn("url: {}", request.getUrl());
+                            LOG.warn("body: {}", response.getResponseBody());
+                        }
                     }
+                } catch (InterruptedException | ExecutionException | IOException e) {
+                    LOG.warn("Failed to execute request", e);
                 }
-            } catch (InterruptedException | ExecutionException | IOException e) {
-                LOG.warn("Failed to execute request", e);
-            }
+            } while (retry && statusCode != 200 && statusCode != 204);
         }
         LOG.info("End sending sync requests");
     }
@@ -117,29 +122,7 @@ public class Execution implements Callable<Void> {
             } catch (InterruptedException e) {
                 LOG.warn("Semaphore acquire interrupted");
             }
-            asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
-                @Override
-                public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
-                    super.onStatusReceived(status);
-                    if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
-                        if (status.getStatusCode() == 409) {
-                            LOG.warn("Request failed, status code: {} - one or more of the devices"
-                                    + " is already configured, skipping the whole batch", status.getStatusCode());
-                        } else {
-                            LOG.warn("Request failed, status code: {}",
-                                status.getStatusCode() + status.getStatusText());
-                            LOG.warn("request: {}", request.toString());
-                        }
-                    }
-                    return STATE.CONTINUE;
-                }
-
-                @Override
-                public Response onCompleted(final Response response) {
-                    semaphore.release();
-                    return response;
-                }
-            });
+            executeRequestAsync(request);
         }
         LOG.info("Requests sent, waiting for responses");
 
@@ -150,6 +133,37 @@ public class Execution implements Callable<Void> {
         }
 
         LOG.info("Responses received, ending...");
+    }
+
+    private void executeRequestAsync(Request request) {
+        asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
+            @Override
+            public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
+                super.onStatusReceived(status);
+                if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
+                    if (status.getStatusCode() == 409) {
+                        LOG.warn("Request failed, status code: {} - one or more of the devices"
+                                + " is already configured, skipping the whole batch", status.getStatusCode());
+                    } else {
+                        LOG.warn("Request failed, status code: {}",
+                                status.getStatusCode() + status.getStatusText());
+                        LOG.warn("request: {}", request.toString());
+                    }
+                }
+
+                return STATE.CONTINUE;
+            }
+
+            @Override
+            public Response onCompleted(final Response response) {
+                if (retry && response.getStatusCode() != 200 && response.getStatusCode() != 204) {
+                    executeRequestAsync(request);
+                } else {
+                    semaphore.release();
+                }
+                return response;
+            }
+        });
     }
 
     @Override
