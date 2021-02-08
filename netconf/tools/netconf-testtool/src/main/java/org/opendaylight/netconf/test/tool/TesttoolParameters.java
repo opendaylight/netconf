@@ -250,6 +250,7 @@ public class TesttoolParameters {
 
     public static TesttoolParameters parseArgs(final String[] args, final ArgumentParser parser) {
         final TesttoolParameters opt = new TesttoolParameters();
+
         try {
             parser.parseArgs(args, opt);
             return opt;
@@ -265,26 +266,28 @@ public class TesttoolParameters {
         if (size == 1) {
             return payloadBuilder.toString();
         }
-
         if (payloadPosition == 0) {
             payloadBuilder.insert(payloadBuilder.toString().indexOf('{', 2), "[");
-            payloadBuilder.replace(payloadBuilder.length() - 1, payloadBuilder.length(), ",");
+            payloadBuilder.delete(payloadBuilder.toString().lastIndexOf('}'), payloadBuilder.length() - 1);
+            String trimmedEnd = payloadBuilder.toString().replaceAll("\\s+$", "");
+            payloadBuilder.delete(trimmedEnd.length(), payloadBuilder.toString().length());
+            payloadBuilder.append(",\n");
         } else if (payloadPosition + 1 == size) {
-            payloadBuilder.delete(0, payloadBuilder.toString().indexOf(':') + 1);
+            payloadBuilder.replace(0, payloadBuilder.toString().indexOf(':') + 1, " ");
             payloadBuilder.insert(payloadBuilder.toString().indexOf('}', 2) + 1, "]");
         } else {
-            payloadBuilder.delete(0, payloadBuilder.toString().indexOf(':') + 1);
-            payloadBuilder.replace(payloadBuilder.length() - 2, payloadBuilder.length() - 1, ",");
-            payloadBuilder.deleteCharAt(payloadBuilder.toString().lastIndexOf('}'));
+            payloadBuilder.replace(0, payloadBuilder.toString().indexOf(':') + 1, " ");
+            payloadBuilder.delete(payloadBuilder.toString().lastIndexOf('}'), payloadBuilder.length() - 1);
+            String trimmedEnd = payloadBuilder.toString().replaceAll("\\s+$", "");
+            payloadBuilder.delete(trimmedEnd.length(), payloadBuilder.toString().length());
+            payloadBuilder.append(",\n");
         }
         return payloadBuilder.toString();
     }
 
     @SuppressWarnings("checkstyle:regexpSinglelineJava")
     void validate() {
-        if (editContent == null) {
-            stream = TesttoolParameters.class.getResourceAsStream(RESOURCE);
-        } else {
+        if (editContent != null) {
             Preconditions.checkArgument(!editContent.isDirectory(), "Edit content file is a dir");
             Preconditions.checkArgument(editContent.canRead(), "Edit content file is unreadable");
         }
@@ -299,6 +302,8 @@ public class TesttoolParameters {
         checkArgument(deviceCount > 0, "Device count has to be > 0");
         checkArgument(startingPort > 1023, "Starting port has to be > 1023");
         checkArgument(devicesPerPort > 0, "Atleast one device per port needed");
+        checkArgument(deviceCount >= generateConfigBatchSize,
+                "Generate config batch size can not be larger than number of devices");
 
         if (schemasDir != null) {
             checkArgument(schemasDir.exists(), "Schemas dir has to exist");
@@ -346,9 +351,10 @@ public class TesttoolParameters {
     public ArrayList<ArrayList<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
         final String editContentString;
         try {
-            if (stream == null) {
+            if (editContent != null) {
                 editContentString = Files.asCharSource(editContent, StandardCharsets.UTF_8).read();
             } else {
+                stream = TesttoolParameters.class.getResourceAsStream(RESOURCE);
                 editContentString = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
             }
         } catch (final IOException e) {
@@ -373,33 +379,33 @@ public class TesttoolParameters {
                 controllerDestination);
 
             for (int l = 0; l < threadAmount; l++) {
-                from = l * batchedRequests * batchedRequestsPerThread;
-                to = from + batchedRequests * batchedRequestsPerThread;
+                from = l * generateConfigBatchSize * batchedRequestsPerThread;
+                to = from + generateConfigBatchSize * batchedRequestsPerThread;
                 iterator = openDevices.subList(from, to).iterator();
                 allThreadsPayloads.add(createBatchedPayloads(batchedRequestsPerThread, iterator, editContentString,
                     destBuilder.toString()));
             }
-            ArrayList<Execution.DestToPayload> payloads = null;
+            ArrayList<Execution.DestToPayload> payloads = new ArrayList();
             if (leftoverBatchedRequests > 0) {
-                from = threadAmount * batchedRequests * batchedRequestsPerThread;
-                to = from + batchedRequests * batchedRequestsPerThread;
+                from = threadAmount * generateConfigBatchSize * batchedRequestsPerThread;
+                to = from + generateConfigBatchSize * leftoverBatchedRequests;
                 iterator = openDevices.subList(from, to).iterator();
                 payloads = createBatchedPayloads(leftoverBatchedRequests, iterator, editContentString,
                     destBuilder.toString());
             }
-            String payload = "";
 
+            String payload = "";
+            from = openDevices.size() - leftoverRequests;
+            to = openDevices.size();
+            iterator = openDevices.subList(from, to).iterator();
             for (int j = 0; j < leftoverRequests; j++) {
-                from = openDevices.size() - leftoverRequests;
-                to = openDevices.size();
-                iterator = openDevices.subList(from, to).iterator();
                 final StringBuilder payloadBuilder = new StringBuilder(
                     prepareMessage(iterator.next(), editContentString));
                 payload += modifyMessage(payloadBuilder, j, leftoverRequests);
             }
-            if (leftoverRequests > 0 || leftoverBatchedRequests > 0) {
 
-                if (payloads != null) {
+            if (leftoverRequests > 0 || leftoverBatchedRequests > 0) {
+                if (payload.length() > 0) {
                     payloads.add(new Execution.DestToPayload(destBuilder.toString(), payload));
                 }
                 allThreadsPayloads.add(payloads);
