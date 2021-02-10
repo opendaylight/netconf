@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e7e9d776_35cfa3ca",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDataTreeServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-10T15:24:45Z",
+      "side": 1,
+      "message": "unrelated reindent, please don\u0027t",
+      "revId": "8e2f73b23c76d3a4f6995793328f96d49477d2f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
