@@ -310,6 +310,7 @@ public class TesttoolParameters {
             for (final File file : files) {
                 final Matcher matcher = YANG_FILENAME_PATTERN.matcher(file.getName());
                 if (!matcher.matches()) {
+                    String correctName = null;
                     try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
                         String line = reader.readLine();
                         while (line != null && !REVISION_DATE_PATTERN.matcher(line).find()) {
@@ -323,15 +324,18 @@ public class TesttoolParameters {
                                 moduleName = moduleName.substring(0, moduleName.length() - 5);
                             }
                             final String revision = m.group(1);
-                            final String correctName = moduleName + "@" + revision + ".yang";
-                            final File correctNameFile = new File(correctName);
-                            if (!file.renameTo(correctNameFile)) {
-                                throw new IllegalStateException("Failed to rename '%s'." + file);
-                            }
+                            correctName = moduleName + "@" + revision + ".yang";
                         }
                     } catch (final IOException e) {
                         // print error to console (test tool is running from console)
                         e.printStackTrace();
+                    }
+                    if (correctName != null) {
+                        try {
+                            Files.move(file, new File(correctName));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
