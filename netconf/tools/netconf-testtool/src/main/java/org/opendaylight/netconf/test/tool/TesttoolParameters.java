@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.test.tool;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -285,15 +285,15 @@ public class TesttoolParameters {
         if (editContent == null) {
             stream = TesttoolParameters.class.getResourceAsStream(RESOURCE);
         } else {
-            Preconditions.checkArgument(!editContent.isDirectory(), "Edit content file is a dir");
-            Preconditions.checkArgument(editContent.canRead(), "Edit content file is unreadable");
+            checkArgument(!editContent.isDirectory(), "Edit content file is a dir");
+            checkArgument(editContent.canRead(), "Edit content file is unreadable");
         }
 
         if (controllerDestination != null) {
-            Preconditions.checkArgument(controllerDestination.contains(":"),
+            checkArgument(controllerDestination.contains(":"),
                 "Controller Destination needs to be in a following format <ip>:<port>");
             final String[] parts = controllerDestination.split(Pattern.quote(":"));
-            Preconditions.checkArgument(Integer.parseInt(parts[1]) > 0, "Port =< 0");
+            checkArgument(Integer.parseInt(parts[1]) > 0, "Port =< 0");
         }
 
         checkArgument(deviceCount > 0, "Device count has to be > 0");
@@ -310,24 +310,10 @@ public class TesttoolParameters {
             for (final File file : files) {
                 final Matcher matcher = YANG_FILENAME_PATTERN.matcher(file.getName());
                 if (!matcher.matches()) {
-                    try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-                        String line = reader.readLine();
-                        while (line != null && !REVISION_DATE_PATTERN.matcher(line).find()) {
-                            line = reader.readLine();
-                        }
-                        if (line != null) {
-                            final Matcher m = REVISION_DATE_PATTERN.matcher(line);
-                            Preconditions.checkState(m.find());
-                            String moduleName = file.getAbsolutePath();
-                            if (file.getName().endsWith(".yang")) {
-                                moduleName = moduleName.substring(0, moduleName.length() - 5);
-                            }
-                            final String revision = m.group(1);
-                            final String correctName = moduleName + "@" + revision + ".yang";
-                            final File correctNameFile = new File(correctName);
-                            if (!file.renameTo(correctNameFile)) {
-                                throw new IllegalStateException("Failed to rename '%s'." + file);
-                            }
+                    try {
+                        final String correctName = correctedName(file);
+                        if (correctName != null) {
+                            Files.move(file, new File(correctName));
                         }
                     } catch (final IOException e) {
                         // print error to console (test tool is running from console)
@@ -342,6 +328,27 @@ public class TesttoolParameters {
             checkArgument(rpcConfig.canRead(), "Rpc config file to be readable");
         }
     }
+
+    private static String correctedName(final File file) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
+            String line = reader.readLine();
+            while (line != null && !REVISION_DATE_PATTERN.matcher(line).find()) {
+                line = reader.readLine();
+            }
+            if (line != null) {
+                final Matcher m = REVISION_DATE_PATTERN.matcher(line);
+                checkState(m.find());
+                String moduleName = file.getAbsolutePath();
+                if (file.getName().endsWith(".yang")) {
+                    moduleName = moduleName.substring(0, moduleName.length() - 5);
+                }
+                final String revision = m.group(1);
+                return moduleName + "@" + revision + ".yang";
+            }
+        }
+        return null;
+    }
+
 
     public ArrayList<ArrayList<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
         final String editContentString;
