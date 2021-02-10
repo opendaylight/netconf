@@ -323,11 +323,10 @@ public class TesttoolParameters {
                                 moduleName = moduleName.substring(0, moduleName.length() - 5);
                             }
                             final String revision = m.group(1);
-                            final String correctName = moduleName + "@" + revision + ".yang";
-                            final File correctNameFile = new File(correctName);
-                            if (!file.renameTo(correctNameFile)) {
-                                throw new IllegalStateException("Failed to rename '%s'." + file);
-                            }
+                            String correctName = moduleName + "@" + revision + ".yang";
+                            //Reader should be closed before file rename.
+                            reader.close();
+                            Files.move(file, new File(correctName));
                         }
                     } catch (final IOException e) {
                         // print error to console (test tool is running from console)
