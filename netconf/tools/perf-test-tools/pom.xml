@@ -64,6 +64,10 @@
             <version>7.0.5</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>sal-netconf-connector</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

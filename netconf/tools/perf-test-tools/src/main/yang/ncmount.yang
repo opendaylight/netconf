@@ -1,0 +1,145 @@
+module ncmount {
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:ncmount";
+    prefix "ncmount";
+
+  import ietf-inet-types {
+    prefix "inet";
+  }
+
+    revision "2015-01-05" {
+        description "Initial revision of ncmount model";
+    }
+
+    grouping xr-node {
+    	leaf node-name {
+    		type string;
+    		description
+    			"Name of the node";
+    	}
+    	leaf status {
+    		type string;
+    		description
+    			"Node status";
+    	}
+    	leaf-list properties {
+    		type string;
+    		description
+    			"List of properties";
+    	}
+    }
+
+    rpc write-routes {
+        description
+        "Artificial RPC that illustrates:
+        How to handle a list of route entries and transform + send them to a netconf device in a single edit transaction.
+        This is not possible by using just Restconf, since Restconf can send only a single list entry in a transaction (which is much slower).
+        This RPC demonstrates a couple of things:
+            1. How to write to a mounted netconf device from (binding aware) code level
+            2. How to transform input (from rpc-input to netconf device specific data)
+            3. How to improve performance of writing to a netconf device by batching a bunch of list entries in a single transaction
+
+        A single invocation of this RPC with 20 route entries over Restconf
+        is equal to 20 invocations of typical writes over Restconf with 1 route per call";
+
+        input {
+            leaf mount-name {
+                type string;
+                description "Id of mounted note to write the l2-fibs to";
+            }
+
+            leaf vrf-id {
+                type string;
+                description "Id of Vrf which should be modified (add new routes)";
+            }
+
+            list route {
+
+              key "ipv4-prefix";
+
+                leaf ipv4-prefix {
+                    type inet:ipv4-address;
+                }
+
+                leaf ipv4-prefix-length {
+                    type uint16;
+                }
+
+                leaf ipv4-next-hop {
+                    type inet:ipv4-address;
+                }
+            }
+        }
+    }
+
+    rpc show-node {
+        description
+          "Start a new data store write test run";
+
+        input {
+            leaf node-name {
+                mandatory true;
+                type string;
+                description
+                    "Name of the mounted node to be displayed";
+            }
+        }
+        output {
+            container if-cfg-data {
+                list ifc {
+                    key "active interface-name";
+                    description "A small subset of an interface
+                        configuration; provides an example of processing
+                        of data retrieved from a device.";
+
+                    leaf interface-name {
+                        type string;
+                        description
+                          "The name of the interface";
+                    }
+                    leaf active {
+                        type string;
+                        description
+                            "Whether the interface is active or preconfigured";
+                    }
+                    leaf description {
+                        type string;
+                        description "Interface description";
+                    }
+                    leaf bandwidth {
+                        type int32;
+                        description "The bandwidth of the interface in kbps";
+                      }
+                      leaf link-status {
+                        type string;
+                        description
+                          "Enable interface and line-protocol state change
+                          alarms";
+                      }
+                }
+
+            }
+            container if-oper-data {
+
+            }
+        }
+    }
+
+    rpc list-nodes {
+        description
+          "Returns a list of netconf nodes for each data store space";
+
+        output {
+            leaf-list nc-config-nodes {
+                type string;
+                description
+                  "List of netconf nodes in the config space";
+            }
+            leaf-list nc-oper-nodes {
+                type string;
+                description
+                  "List of netconf nodes in the operational space";
+              }
+        }
+    }
+}
