@@ -15,16 +15,20 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.RemoteDevice;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
-import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +37,7 @@ public class StressClientCallable implements Callable<Boolean> {
     private static final Logger LOG = LoggerFactory.getLogger(StressClientCallable.class);
 
     private final Parameters params;
-    private final NetconfDeviceCommunicator sessionListener;
-    private final NetconfClientDispatcherImpl netconfClientDispatcher;
+    private final NativeNetconfDeviceCommunicator sessionListener;
     private final NetconfClientConfiguration cfg;
     private final NetconfClientSession netconfClientSession;
     private final ExecutionStrategy executionStrategy;
@@ -43,10 +46,10 @@ public class StressClientCallable implements Callable<Boolean> {
                                 final NetconfClientDispatcherImpl netconfClientDispatcher,
                                 final List<NetconfMessage> preparedMessages) {
         this.params = params;
-        this.sessionListener = getSessionListener(params.getInetAddress(), params.concurrentMessageLimit);
-        this.netconfClientDispatcher = netconfClientDispatcher;
+        this.sessionListener = getSessionListener(params.getInetAddress(), params.concurrentMessageLimit,
+                netconfClientDispatcher);
         cfg = getNetconfClientConfiguration(this.params, this.sessionListener);
-
+        ((NetconfDeviceCommunicator) sessionListener).setConfig(cfg);
         LOG.info("Connecting to netconf server {}:{}", params.ip, params.port);
         try {
             netconfClientSession = netconfClientDispatcher.createClient(cfg).get();
@@ -66,7 +69,8 @@ public class StressClientCallable implements Callable<Boolean> {
     }
 
     private static ExecutionStrategy getExecutionStrategy(final Parameters params,
-            final List<NetconfMessage> preparedMessages, final NetconfDeviceCommunicator sessionListener) {
+            final List<NetconfMessage> preparedMessages,
+            final NativeNetconfDeviceCommunicator sessionListener) {
         if (params.async) {
             return new AsyncExecutionStrategy(params, preparedMessages, sessionListener);
         } else {
@@ -74,16 +78,17 @@ public class StressClientCallable implements Callable<Boolean> {
         }
     }
 
-    private static NetconfDeviceCommunicator getSessionListener(
-            final InetSocketAddress inetAddress, final int messageLimit) {
-        final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> loggingRemoteDevice =
+    private static NativeNetconfDeviceCommunicator getSessionListener(final InetSocketAddress inetAddress,
+            final int messageLimit, NetconfClientDispatcher dispatcher) {
+        final RemoteDevice<NetconfSessionPreferences, NetconfMessage,
+                NativeNetconfDeviceCommunicator> loggingRemoteDevice =
             new StressClient.LoggingRemoteDevice();
-        return new NetconfDeviceCommunicator(
-            new RemoteDeviceId("secure-test", inetAddress), loggingRemoteDevice, messageLimit);
+        return new NetconfDeviceCommunicator(new RemoteDeviceId("secure-test", inetAddress), loggingRemoteDevice,
+                new NetconfNodeBuilder().setConcurrentRpcLimit(Uint16.valueOf(messageLimit)).build(), dispatcher);
     }
 
     private static NetconfClientConfiguration getNetconfClientConfiguration(final Parameters params,
-            final NetconfDeviceCommunicator sessionListener) {
+            final NativeNetconfDeviceCommunicator sessionListener) {
         final NetconfClientConfigurationBuilder netconfClientConfigurationBuilder = NetconfClientConfigurationBuilder
             .create();
         netconfClientConfigurationBuilder.withSessionListener(sessionListener);

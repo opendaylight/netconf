@@ -19,7 +19,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.netconf.ProxyNetconfService;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.NetconfDataTreeServiceRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -44,7 +44,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
      * @param askTimeout       ask timeout
      */
     public ProxyNetconfDataTreeService(final RemoteDeviceId id, final ActorRef masterNode,
-                                       final ExecutionContext executionContext, final Timeout askTimeout) {
+            final ExecutionContext executionContext, final Timeout askTimeout) {
         this.id = id;
         this.masterNode = masterNode;
         this.executionContext = executionContext;

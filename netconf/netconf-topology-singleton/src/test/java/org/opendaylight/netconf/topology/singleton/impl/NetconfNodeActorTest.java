@@ -87,8 +87,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
@@ -256,7 +256,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         // Now initialize - master should send the RegisterMountPoint message.
 
-        List<SourceIdentifier> sourceIdentifiers = Lists.newArrayList(RevisionSourceIdentifier.create("testID"));
+        final List<SourceIdentifier> sourceIdentifiers = Lists.newArrayList(RevisionSourceIdentifier.create("testID"));
         initializeMaster(sourceIdentifiers);
 
         masterRef.tell(new AskForMasterMountPoint(kit.getRef()), kit.getRef());
@@ -269,7 +269,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     @Test
     public void testRegisterAndUnregisterMountPoint() throws Exception {
 
-        ActorRef slaveRef = registerSlaveMountPoint();
+        final ActorRef slaveRef = registerSlaveMountPoint();
 
         // Unregister
 
@@ -294,7 +294,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 .when(newMockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
         doAnswer(unused -> {
-            SettableFuture<SchemaContext> future = SettableFuture.create();
+            final SettableFuture<SchemaContext> future = SettableFuture.create();
             new Thread(() -> {
                 doReturn(newMockSchemaSourceReg).when(mockRegistry).registerSchemaSource(any(),
                         withSourceId(SOURCE_IDENTIFIER1));
@@ -338,7 +338,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testRegisterMountPointWithSchemaFailures() throws Exception {
-        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
+        final SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
         final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create()
@@ -395,7 +395,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 .when(mockSchemaContextFactorySuccess).createEffectiveModelContext(anyCollection());
 
         doAnswer(unused -> {
-            SettableFuture<SchemaContext> future = SettableFuture.create();
+            final SettableFuture<SchemaContext> future = SettableFuture.create();
             new Thread(() -> {
                 doReturn(mockSchemaContextFactorySuccess).when(mockSchemaRepository)
                     .createEffectiveModelContextFactory();
@@ -421,14 +421,14 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     public void testMissingSchemaSourceOnMissingProvider() throws Exception {
         final SharedSchemaRepository repository = new SharedSchemaRepository("test");
 
-        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
+        final SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(repository).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(repository).when(schemaResourceDTO2).getSchemaRepository();
         final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
                 .setSchemaResourceDTO(schemaResourceDTO2).setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS))
                 .setBaseSchemas(BASE_SCHEMAS).build();
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
-        ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
+        final ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
 
         final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID");
 
@@ -487,7 +487,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         initializeMaster(sourceIdentifiers);
         registerSlaveMountPoint();
 
-        ArgumentCaptor<DOMRpcService> domRPCServiceCaptor = ArgumentCaptor.forClass(DOMRpcService.class);
+        final ArgumentCaptor<DOMRpcService> domRPCServiceCaptor = ArgumentCaptor.forClass(DOMRpcService.class);
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), domRPCServiceCaptor.capture());
 
         final DOMRpcService slaveDomRPCService = domRPCServiceCaptor.getValue();
@@ -556,7 +556,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         initializeMaster(sourceIdentifiers);
         registerSlaveMountPoint();
 
-        ArgumentCaptor<DOMActionService> domActionServiceCaptor = ArgumentCaptor.forClass(DOMActionService.class);
+        final ArgumentCaptor<DOMActionService> domActionServiceCaptor = ArgumentCaptor.forClass(DOMActionService.class);
         verify(mockMountPointBuilder).addService(eq(DOMActionService.class), domActionServiceCaptor.capture());
 
         final DOMActionService slaveDomActionService = domActionServiceCaptor.getValue();
@@ -612,7 +612,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         initializeMaster(Collections.emptyList());
         registerSlaveMountPoint();
 
-        ArgumentCaptor<DOMDataBroker> domDataBrokerCaptor = ArgumentCaptor.forClass(DOMDataBroker.class);
+        final ArgumentCaptor<DOMDataBroker> domDataBrokerCaptor = ArgumentCaptor.forClass(DOMDataBroker.class);
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), domDataBrokerCaptor.capture());
 
         final DOMDataBroker slaveDOMDataBroker = domDataBrokerCaptor.getValue();
@@ -633,7 +633,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         initializeMaster(Collections.emptyList());
         registerSlaveMountPoint();
 
-        ArgumentCaptor<NetconfDataTreeService> netconfCaptor = ArgumentCaptor.forClass(NetconfDataTreeService.class);
+        final ArgumentCaptor<NetconfDataTreeService> netconfCaptor =
+                ArgumentCaptor.forClass(NetconfDataTreeService.class);
         verify(mockMountPointBuilder).addService(eq(NetconfDataTreeService.class), netconfCaptor.capture());
 
         final NetconfDataTreeService slaveNetconfService = netconfCaptor.getValue();
@@ -673,7 +674,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     private ActorRef registerSlaveMountPoint() {
-        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
+        final SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
         final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(

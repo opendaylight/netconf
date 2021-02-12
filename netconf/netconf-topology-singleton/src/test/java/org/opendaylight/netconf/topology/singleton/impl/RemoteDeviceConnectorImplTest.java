@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -32,16 +30,14 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -100,6 +96,9 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
     @Mock
     private DeviceActionFactory deviceActionFactory;
 
+    @Mock
+    private NetconfDeviceCommunicatorFactory netconfDeviceCommunicatorFactory;
+
     private NetconfTopologySetup.NetconfTopologySetupBuilder builder;
     private RemoteDeviceId remoteDeviceId;
 
@@ -118,7 +117,8 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
                 .setActorSystem(actorSystem)
                 .setEventExecutor(eventExecutor)
                 .setNetconfClientDispatcher(clientDispatcher)
-                .setTopologyId(TOPOLOGY_ID);
+                .setTopologyId(TOPOLOGY_ID)
+                .setNetconfDeviceCommunicatorFactory(netconfDeviceCommunicatorFactory);
     }
 
     @SuppressWarnings("unchecked")
@@ -139,7 +139,7 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
                 .build())
             .build());
 
-        final NetconfDeviceCommunicator communicator = mock(NetconfDeviceCommunicator.class);
+        final NativeNetconfDeviceCommunicator communicator = mock(NativeNetconfDeviceCommunicator.class);
         final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
 
         final TestingRemoteDeviceConnectorImpl remoteDeviceConnection = new TestingRemoteDeviceConnectorImpl(
@@ -184,35 +184,5 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
                 remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, salFacade);
 
         assertTrue(connectorDTO.getFacade() instanceof KeepaliveSalFacade);
-    }
-
-    @Test
-    public void testGetClientConfig() {
-        final NetconfClientSessionListener listener = mock(NetconfClientSessionListener.class);
-        final Host host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
-        final PortNumber portNumber = new PortNumber(Uint16.valueOf(9999));
-        final NetconfNode testingNode = new NetconfNodeBuilder()
-                .setConnectionTimeoutMillis(Uint32.valueOf(1000))
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(2000))
-                .setHost(host)
-                .setPort(portNumber)
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser")
-                        .setPassword("testpassword").build())
-                .setTcpOnly(true)
-                .build();
-
-        final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);
-
-        final NetconfReconnectingClientConfiguration defaultClientConfig =
-                remoteDeviceConnection.getClientConfig(listener, testingNode);
-
-        assertEquals(defaultClientConfig.getConnectionTimeoutMillis().longValue(), 1000L);
-        assertEquals(defaultClientConfig.getAddress(), new InetSocketAddress(InetAddresses.forString("127.0.0.1"),
-            9999));
-        assertSame(defaultClientConfig.getSessionListener(), listener);
-        assertEquals(defaultClientConfig.getAuthHandler().getUsername(), "testuser");
-        assertEquals(defaultClientConfig.getProtocol(), NetconfClientConfiguration.NetconfClientProtocol.TCP);
     }
 }

@@ -9,17 +9,18 @@ package org.opendaylight.netconf.topology.spi;
 
 import java.util.List;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 
 public final class NetconfConnectorDTO implements AutoCloseable {
     private final List<SchemaSourceRegistration<?>> yanglibRegistrations;
-    private final NetconfDeviceCommunicator communicator;
+    private final NativeNetconfDeviceCommunicator communicator;
     private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
 
-    public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator,
+    public NetconfConnectorDTO(
+            final NativeNetconfDeviceCommunicator communicator,
             final RemoteDeviceHandler<NetconfSessionPreferences> facade,
             final List<SchemaSourceRegistration<?>> yanglibRegistrations) {
         this.communicator = communicator;
@@ -27,7 +28,7 @@ public final class NetconfConnectorDTO implements AutoCloseable {
         this.yanglibRegistrations = yanglibRegistrations;
     }
 
-    public NetconfDeviceCommunicator getCommunicator() {
+    public NativeNetconfDeviceCommunicator getCommunicator() {
         return communicator;
     }
 
