@@ -38,12 +38,12 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.AbstractTestModelTest;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.TxTestUtils;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
@@ -158,14 +158,14 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     public void commit() {
-        List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
+        final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
         netconService.commit(resultsFutures);
         verify(rpcService).invokeRpc(eq(NETCONF_COMMIT_QNAME), any(ContainerNode.class));
     }
 
     private NetconfDataTreeServiceImpl getNetconService() {
-        NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(
-                Collections.singletonList(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
+        final NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(
+                Collections.singletonList(NetconfSessionPreferences.NETCONF_CANDIDATE_URI.toString()));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         return new NetconfDataTreeServiceImpl(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);

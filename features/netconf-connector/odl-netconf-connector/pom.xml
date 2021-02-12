@@ -51,12 +51,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>odl-mdsal-broker</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-notifications-api</artifactId>
             <version>${project.version}</version>
@@ -65,8 +59,14 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-client</artifactId>
+            <artifactId>odl-native-netconf-communicator</artifactId>
             <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>odl-mdsal-broker</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -87,13 +87,6 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-topology</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.aaa</groupId>
-            <artifactId>odl-aaa-encryption-service</artifactId>
-            <version>0.13.1</version>
-            <type>xml</type>
-            <classifier>features</classifier>
         </dependency>
     </dependencies>
 </project>

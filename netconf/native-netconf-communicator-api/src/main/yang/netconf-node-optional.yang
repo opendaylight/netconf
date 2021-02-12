@@ -3,6 +3,7 @@ module netconf-node-optional {
     prefix "netnopt";
 
     import network-topology { prefix nt; revision-date 2013-10-21; }
+    import ietf-inet-types { prefix inet; revision-date "2013-07-15"; }
     import yang-ext { prefix ext; revision-date "2013-07-09";}
 
     revision "2019-06-14" {
@@ -23,6 +24,26 @@ module netconf-node-optional {
                 type uint32;
                 default 5000;
                 description "Time for reconnection - in units milliseconds. Default 5000 ms.";
+            }
+        }
+        container netconf-node-client-server {
+            leaf username {
+                type string;
+                default false;
+                description "HTTP Server username";
+            }
+            leaf password {
+                type string;
+                default false;
+                description "HTTP Server user password";
+            }
+            leaf host {
+                type inet:host;
+                description "HTTP Server IP";
+            }
+            leaf port {
+                type inet:port-number;
+                description "HTTP Server port";
             }
         }
     }
