@@ -11,9 +11,6 @@
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            odl:use-default-for-reference-types="true">
 
-    <reference id="clientDispatcherDependency"
-               interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
-               odl:type="netconf-client-dispatcher"/>
     <reference id="keepAliveExecutor"
                interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
                odl:type="global-netconf-ssh-scheduled-executor"/>
@@ -29,14 +26,19 @@
                interface="org.opendaylight.mdsal.binding.api.RpcProviderService"/>
     <reference id="mountPointService"
                interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
-    <reference id="encryptionService"
-               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
     <reference id="schemaManager"
                interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
     <reference id="baseSchemas"
                interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
+    <reference id="communicator"
+               interface="org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorInitializerFactory"/>
+    <reference id="clientDispatcherDependency"
+               interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
+               odl:type="netconf-client-dispatcher"/>
+    <reference id="encryptionService"
+               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
 
     <cm:property-placeholder persistent-id="org.opendaylight.netconf.topology.sb.keypair" update-strategy="none">
       <cm:default-properties>
@@ -52,6 +54,7 @@
                            update-strategy="container-managed"/>
         <argument value="topology-netconf"/>
         <argument ref="clientDispatcherDependency"/>
+        <argument ref="communicator"/>
         <argument ref="eventExecutor"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>

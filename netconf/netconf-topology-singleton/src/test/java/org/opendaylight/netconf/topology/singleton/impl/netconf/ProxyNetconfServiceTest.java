@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CommitRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CreateEditConfigRequest;
@@ -87,28 +87,28 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testLock() {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.lock();
         masterActor.expectMsgClass(LockRequest.class);
     }
 
     @Test
     public void testUnlock() {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.unlock();
         masterActor.expectMsgClass(UnlockRequest.class);
     }
 
     @Test
     public void testDiscardChanges() {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.discardChanges();
         masterActor.expectMsgClass(DiscardChangesRequest.class);
     }
 
     @Test
     public void testGet() throws Exception {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> get = netconf.get(PATH);
         final GetRequest getRequest = masterActor.expectMsgClass(GetRequest.class);
         assertEquals(PATH, getRequest.getPath());
@@ -121,7 +121,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testGetFailure() throws InterruptedException, TimeoutException {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
 
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> get = netconf.get(PATH);
         masterActor.expectMsgClass(GetRequest.class);
@@ -132,7 +132,7 @@ public class ProxyNetconfServiceTest {
             get.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             assertEquals(mockEx, cause.getCause());
         }
@@ -140,7 +140,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testGetEmpty() throws Exception {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> get = netconf.get(PATH);
         masterActor.expectMsgClass(GetRequest.class);
         masterActor.reply(new EmptyReadResponse());
@@ -150,7 +150,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testGetConfig() throws Exception {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig = netconf.getConfig(PATH);
         final GetConfigRequest getRequest = masterActor.expectMsgClass(GetConfigRequest.class);
         assertEquals(PATH, getRequest.getPath());
@@ -163,7 +163,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testGetConfigFailure() throws InterruptedException, TimeoutException {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
 
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig = netconf.getConfig(PATH);
         masterActor.expectMsgClass(GetConfigRequest.class);
@@ -174,7 +174,7 @@ public class ProxyNetconfServiceTest {
             getConfig.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             assertEquals(mockEx, cause.getCause());
         }
@@ -182,7 +182,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testGetConfigEmpty() throws Exception {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig = netconf.getConfig(PATH);
         masterActor.expectMsgClass(GetConfigRequest.class);
         masterActor.reply(new EmptyReadResponse());
@@ -192,7 +192,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testMerge() {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.merge(STORE, PATH, node, Optional.empty());
         final MergeEditConfigRequest mergeRequest = masterActor.expectMsgClass(MergeEditConfigRequest.class);
         assertEquals(STORE, mergeRequest.getStore());
@@ -202,7 +202,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testReplace() {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.replace(STORE, PATH, node, Optional.empty());
         final ReplaceEditConfigRequest replaceRequest = masterActor.expectMsgClass(ReplaceEditConfigRequest.class);
         assertEquals(STORE, replaceRequest.getStore());
@@ -212,7 +212,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testCreate() {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.create(STORE, PATH, node, Optional.empty());
         final CreateEditConfigRequest createRequest = masterActor.expectMsgClass(CreateEditConfigRequest.class);
         assertEquals(STORE, createRequest.getStore());
@@ -222,7 +222,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testDelete() {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.delete(STORE, PATH);
         final DeleteEditConfigRequest deleteRequest = masterActor.expectMsgClass(DeleteEditConfigRequest.class);
         assertEquals(STORE, deleteRequest.getStore());
@@ -231,7 +231,7 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testRemove() {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.remove(STORE, PATH);
         final RemoveEditConfigRequest removeRequest = masterActor.expectMsgClass(RemoveEditConfigRequest.class);
         assertEquals(STORE, removeRequest.getStore());
@@ -240,13 +240,13 @@ public class ProxyNetconfServiceTest {
 
     @Test
     public void testCommit() throws InterruptedException, ExecutionException, TimeoutException {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         commit(netconf);
     }
 
     @Test
     public void testFutureOperationsWithMasterDown() throws InterruptedException, TimeoutException {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService(
+        final ProxyNetconfService netconf = newSuccessfulProxyNetconfService(
             Timeout.apply(500, TimeUnit.MILLISECONDS));
 
         ListenableFuture<?> future = netconf.get(PATH);
@@ -257,7 +257,7 @@ public class ProxyNetconfServiceTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             verifyDocumentedException(cause.getCause());
         }
@@ -270,7 +270,7 @@ public class ProxyNetconfServiceTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
             verifyDocumentedException(cause.getCause());
         }
@@ -283,7 +283,7 @@ public class ProxyNetconfServiceTest {
             future.get(5, TimeUnit.SECONDS);
             fail("Exception should be thrown");
         } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
+            final Throwable cause = e.getCause();
             assertTrue("Unexpected cause " + cause, cause instanceof NetconfServiceFailedException);
             verifyDocumentedException(cause.getCause());
         }

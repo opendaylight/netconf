@@ -7,15 +7,14 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.List;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -24,11 +23,11 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 
 class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
 
-    private final NetconfDeviceCommunicator communicator;
+    private final NativeNetconfDeviceCommunicator communicator;
 
     TestingRemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
                                      final RemoteDeviceId remoteDeviceId,
-                                     final NetconfDeviceCommunicator communicator,
+            final NativeNetconfDeviceCommunicator communicator,
                                      final DeviceActionFactory deviceActionFactory) {
         super(netconfTopologyDeviceSetup, remoteDeviceId, deviceActionFactory);
 
@@ -39,7 +38,7 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
     public NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
             final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
         final NetconfConnectorDTO connectorDTO = new NetconfConnectorDTO(communicator, salFacade, List.of());
-        doReturn(FluentFutures.immediateNullFluentFuture()).when(communicator).initializeRemoteConnection(any(), any());
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(communicator).initializeRemoteConnection();
         return connectorDTO;
     }
 }

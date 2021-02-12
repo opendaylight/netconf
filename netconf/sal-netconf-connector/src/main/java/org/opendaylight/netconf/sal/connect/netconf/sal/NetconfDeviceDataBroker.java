@@ -18,11 +18,12 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsTransactionChain;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.FieldsAwareReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.FieldsAwareReadWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.FieldsAwareTxChain;
@@ -33,7 +34,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateRunning
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
