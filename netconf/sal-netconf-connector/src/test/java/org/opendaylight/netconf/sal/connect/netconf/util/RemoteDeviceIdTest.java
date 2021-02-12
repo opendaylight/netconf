@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.net.InetSocketAddress;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 
 public class RemoteDeviceIdTest {
 

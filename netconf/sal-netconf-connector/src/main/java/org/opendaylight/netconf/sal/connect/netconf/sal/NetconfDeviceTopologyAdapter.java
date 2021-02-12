@@ -20,8 +20,8 @@ import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
@@ -136,7 +136,8 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     public void setDeviceAsFailed(final Throwable throwable) {
-        String reason = throwable != null && throwable.getMessage() != null ? throwable.getMessage() : UNKNOWN_REASON;
+        final String reason = throwable != null && throwable.getMessage() != null ? throwable.getMessage()
+                : UNKNOWN_REASON;
 
         final NetconfNode data = new NetconfNodeBuilder()
                 .setHost(id.getHost())
@@ -158,7 +159,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
     private NetconfNode buildDataForNetconfNode(final ConnectionStatus connectionStatus,
             final NetconfDeviceCapabilities capabilities, final LogicalDatastoreType dsType, final NetconfNode node) {
-        List<AvailableCapability> capabilityList = new ArrayList<>();
+        final List<AvailableCapability> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(capabilities.getResolvedCapabilities());
 
@@ -176,7 +177,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
     private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress,
                                                          final NetconfDeviceCapabilities capabilities) {
-        List<AvailableCapability> capabilityList = new ArrayList<>();
+        final List<AvailableCapability> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(capabilities.getResolvedCapabilities());
         final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();

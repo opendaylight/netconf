@@ -25,7 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
 import org.opendaylight.netconf.topology.singleton.messages.ContainerNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
@@ -42,7 +42,7 @@ import scala.concurrent.Future;
 /**
  * Implementation of {@link DOMActionService} provided by device in Odl-Cluster environment to invoke action.
  * Communicates action message {@link InvokeActionMessage} to {@link ActorSystem} using {@link ActorRef} and transforms
- * replied NETCONF message to action result, using {@link SimpleDOMActionResult}.
+ * replied NETCONF  message to action result, using {@link SimpleDOMActionResult}.
  */
 public class ProxyDOMActionService implements DOMActionService {
 
@@ -58,7 +58,7 @@ public class ProxyDOMActionService implements DOMActionService {
      *
      * @param actorSystem ActorSystem
      * @param masterActorRef ActorRef
-     * @param remoteDeviceId {@link org.opendaylight.netconf.sal.connect.util.RemoteDeviceId} ref
+     * @param remoteDeviceId {@link org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId} ref
      * @param actorResponseWaitTime Timeout
      */
     public ProxyDOMActionService(final ActorSystem actorSystem, final ActorRef masterActorRef,

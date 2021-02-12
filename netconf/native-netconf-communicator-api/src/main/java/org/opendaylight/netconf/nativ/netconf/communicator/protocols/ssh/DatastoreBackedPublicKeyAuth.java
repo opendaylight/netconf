@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.auth;
+package org.opendaylight.netconf.nativ.netconf.communicator.protocols.ssh;
 
 import com.google.common.base.Strings;
 import java.io.IOException;
@@ -15,7 +15,6 @@ import java.util.Optional;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
@@ -28,17 +27,16 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
 
     private final String username;
     private final String pairId;
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    private final NativeNetconfKeystore keystore;
     private final AAAEncryptionService encryptionService;
 
     private Optional<KeyPair> keyPair = Optional.empty();
 
     public DatastoreBackedPublicKeyAuth(final String username, final String pairId,
-                                        final NetconfKeystoreAdapter keystoreAdapter,
-                                        final AAAEncryptionService encryptionService) {
+            final NativeNetconfKeystore keystore, final AAAEncryptionService encryptionService) {
         this.username = username;
         this.pairId = pairId;
-        this.keystoreAdapter = keystoreAdapter;
+        this.keystore = keystore;
         this.encryptionService = encryptionService;
 
         // try to immediately retrieve the pair from the adapter
@@ -62,7 +60,7 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
 
     private boolean tryToSetKeyPair() {
         LOG.debug("Trying to retrieve keypair for: {}", pairId);
-        final Optional<KeyCredential> keypairOptional = keystoreAdapter.getKeypairFromId(pairId);
+        final Optional<KeyCredential> keypairOptional = keystore.getKeypairFromId(pairId);
 
         if (keypairOptional.isPresent()) {
             final KeyCredential dsKeypair = keypairOptional.get();
@@ -74,7 +72,7 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
                                 new StringReader(encryptionService.decrypt(
                                         dsKeypair.getPrivateKey()).replaceAll("\\\\n", "\n")),
                                 encryptionService.decrypt(passPhrase)));
-            } catch (IOException exception) {
+            } catch (final IOException exception) {
                 LOG.warn("Unable to decode private key, id={}", pairId, exception);
                 return false;
             }
