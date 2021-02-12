@@ -8,10 +8,13 @@
 package org.opendaylight.netconf.test.tool;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.gson.FieldNamingPolicy.LOWER_CASE_WITH_DASHES;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +37,8 @@ import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import org.opendaylight.netconf.test.tool.model.Node;
+import org.opendaylight.netconf.test.tool.model.SingleNodePayload;
 
 @SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
 public class TesttoolParameters {
@@ -49,6 +54,12 @@ public class TesttoolParameters {
     private static final Pattern REVISION_DATE_PATTERN = Pattern.compile("revision\\s+\"?(\\d{4}-\\d{2}-\\d{2})\"?");
 
     private static final String RESOURCE = "/config-template.json";
+
+    private static final String NODE_ID_TEMPLATE = "%d-sim-device";
+    private static final String KEEP_ALIVE_DELAY = "0";
+    private static final String USERNAME = "admin";
+    private static final String PASSWORD = "admin";
+
     @Arg(dest = "edit-content")
     public File editContent;
     @Arg(dest = "async")
@@ -98,6 +109,10 @@ public class TesttoolParameters {
     public int threadPoolSize;
     @Arg(dest = "rpc-config")
     public File rpcConfig;
+
+    private static final Gson MODEL_TO_PAYLOAD_GSON = new GsonBuilder()
+            .setFieldNamingStrategy(LOWER_CASE_WITH_DASHES)
+            .create();
 
     @SuppressWarnings("checkstyle:lineLength")
     static ArgumentParser getParser() {
@@ -453,13 +468,26 @@ public class TesttoolParameters {
         final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
 
         while (openDevices.hasNext()) {
+            final SingleNodePayload payload = createSingleNodePayload(openDevices.next().shortValue());
             final StringBuilder destBuilder = new StringBuilder(DEST);
             destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT),
                 destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(), controllerDestination);
             payloads.add(new Execution.DestToPayload(
-                destBuilder.toString(), prepareMessage(openDevices.next(), editContentString)));
+                destBuilder.toString(), MODEL_TO_PAYLOAD_GSON.toJson(payload)));
         }
+
         return payloads;
+    }
+
+    private SingleNodePayload createSingleNodePayload(short port) {
+        final Node node = new Node();
+        node.setNodeId(String.format(NODE_ID_TEMPLATE, port));
+        node.setHost(generateConfigsAddress);
+        node.setPort(port);
+        node.setUsername(USERNAME);
+        node.setPassword(PASSWORD);
+        node.setTcpOnly(!ssh);
+        return new SingleNodePayload(node);
     }
 
     private ArrayList<Execution.DestToPayload> createBatchedPayloads(final int batchedRequestsCount,
