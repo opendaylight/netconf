@@ -50,6 +50,8 @@
     <module>netconf-topology</module>
     <module>netconf-topology-impl</module>
     <module>netconf-topology-singleton</module>
+    <module>native-netconf-communicator-api</module>
+    <module>native-netconf-communicator</module>
     <module>sal-netconf-connector</module>
     <module>messagebus-netconf</module>
     <module>yanglib</module>

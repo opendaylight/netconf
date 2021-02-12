@@ -41,11 +41,13 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorInitializerFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
@@ -94,6 +96,7 @@ public class NetconfTopologyManager
     private final RpcProviderService rpcProviderService;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager resourceManager;
+    private final NetconfDeviceCommunicatorFactory netconfDeviceCommunicatorFactory;
 
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
     private Registration rpcReg;
@@ -101,18 +104,15 @@ public class NetconfTopologyManager
     private String privateKeyPassphrase;
 
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
-                                  final DOMRpcProviderService rpcProviderRegistry,
-                                  final DOMActionProviderService actionProviderService,
-                                  final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
-                                  final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                                  final ActorSystemProvider actorSystemProvider,
-                                  final EventExecutor eventExecutor, final NetconfClientDispatcher clientDispatcher,
-                                  final String topologyId, final Config config,
-                                  final DOMMountPointService mountPointService,
-                                  final AAAEncryptionService encryptionService,
-                                  final RpcProviderService rpcProviderService,
-                                  final DeviceActionFactory deviceActionFactory,
-                                  final SchemaResourceManager resourceManager) {
+            final DOMRpcProviderService rpcProviderRegistry, final DOMActionProviderService actionProviderService,
+            final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
+            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+            final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
+            final NetconfClientDispatcher clientDispatcher, final String topologyId, final Config config,
+            final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
+            final RpcProviderService rpcProviderService, final DeviceActionFactory deviceActionFactory,
+            final SchemaResourceManager resourceManager,
+            final NetconfDeviceCommunicatorInitializerFactory netconfDeviceCommunicatorFactory) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
@@ -130,6 +130,7 @@ public class NetconfTopologyManager
         this.rpcProviderService = requireNonNull(rpcProviderService);
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
+        this.netconfDeviceCommunicatorFactory = netconfDeviceCommunicatorFactory.init(clientDispatcher);
     }
 
     // Blueprint init method
@@ -253,7 +254,7 @@ public class NetconfTopologyManager
     private static void close(final AutoCloseable closeable) {
         try {
             closeable.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.warn("Error closing {}", closeable, e);
         }
     }
@@ -325,7 +326,7 @@ public class NetconfTopologyManager
                 .setIdleTimeout(writeTxIdleTimeout)
                 .setPrivateKeyPath(privateKeyPath)
                 .setPrivateKeyPassphrase(privateKeyPassphrase)
-                .setEncryptionService(encryptionService);
+                .setNetconfDeviceCommunicatorFactory(netconfDeviceCommunicatorFactory);
 
         return builder.build();
     }

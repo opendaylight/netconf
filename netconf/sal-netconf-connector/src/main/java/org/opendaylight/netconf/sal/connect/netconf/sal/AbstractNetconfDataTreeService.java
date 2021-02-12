@@ -27,10 +27,10 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
@@ -354,7 +354,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             }
 
             final var builder = ImmutableList.<RpcError>builder();
-            for (ListenableFuture<? extends DOMRpcResult> future : futures) {
+            for (final ListenableFuture<? extends DOMRpcResult> future : futures) {
                 builder.addAll(Futures.getDone(future).getErrors());
             }
             return new DefaultDOMRpcResult(null, builder.build());

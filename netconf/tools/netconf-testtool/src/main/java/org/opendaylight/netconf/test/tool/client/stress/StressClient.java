@@ -30,10 +30,10 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.RemoteDevice;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
-import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.test.tool.TestToolUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CommitInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
@@ -262,10 +262,10 @@ public final class StressClient {
     }
 
     static class LoggingRemoteDevice
-            implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
+            implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> {
         @Override
         public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
-                                      final NetconfDeviceCommunicator netconfDeviceCommunicator) {
+                final NativeNetconfDeviceCommunicator netconfDeviceCommunicator) {
             LOG.info("Session established");
         }
 

@@ -31,11 +31,11 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -45,9 +45,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * SalFacade proxy that invokes keepalive RPCs to prevent session shutdown from remote device
- * and to detect incorrect session drops (netconf session is inactive, but TCP/SSH connection is still present).
- * The keepalive RPC is a get-config with empty filter.
+ * SalFacade proxy that invokes keepalive RPCs to prevent session shutdown from remote device and to detect incorrect
+ * session drops (netconf session is inactive, but TCP/SSH connection is still present). The keepalive RPC is a
+ * get-config with empty filter.
  */
 public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSessionPreferences> {
     private static final Logger LOG = LoggerFactory.getLogger(KeepaliveSalFacade.class);
@@ -68,11 +68,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
     private final RemoteDeviceId id;
 
-    private volatile NetconfDeviceCommunicator listener;
+    private volatile NativeNetconfDeviceCommunicator listener;
     private volatile DOMRpcService currentDeviceRpc;
 
     public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                              final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
+            final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
                               final long requestTimeoutMillis) {
         this.id = id;
         this.salFacade = salFacade;
@@ -83,7 +83,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     }
 
     public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                              final ScheduledExecutorService executor) {
+            final ScheduledExecutorService executor) {
         this(id, salFacade, executor, DEFAULT_DELAY, DEFAULT_TRANSACTION_TIMEOUT_MILLI);
     }
 
@@ -92,7 +92,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      *
      * @param listener netconf session listener
      */
-    public void setListener(final NetconfDeviceCommunicator listener) {
+    public void setListener(final NativeNetconfDeviceCommunicator listener) {
         this.listener = listener;
     }
 
@@ -113,7 +113,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
     @Override
     public void onDeviceConnected(final MountPointContext remoteSchemaContext,
-                          final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
+            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
         onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc, null);
     }
 
@@ -160,10 +160,10 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
             getSourceNode(NETCONF_RUNNING_QNAME), NetconfMessageTransformUtil.EMPTY_FILTER);
 
     /**
-     * Invoke keepalive RPC and check the response. In case of any received response the keepalive
-     * is considered successful and schedules next keepalive with a fixed delay. If the response is unsuccessful (no
-     * response received, or the rcp could not even be sent) immediate reconnect is triggered as netconf session
-     * is considered inactive/failed.
+     * Invoke keepalive RPC and check the response. In case of any received response the keepalive is considered
+     * successful and schedules next keepalive with a fixed delay. If the response is unsuccessful (no response
+     * received, or the rcp could not even be sent) immediate reconnect is triggered as netconf session is considered
+     * inactive/failed.
      */
     private final class KeepaliveTask implements Runnable, FutureCallback<DOMRpcResult> {
         private volatile long lastActivity;

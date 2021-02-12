@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.listener;
+package org.opendaylight.netconf.nativ.netconf.communicator;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,13 +23,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.opendaylight.netconf.client.NetconfClientSession;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NetconfDeviceCapabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class NetconfSessionPreferences {
+
+    public static final QName IETF_NETCONF_NOTIFICATIONS = QName
+            .create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications").intern();
+    public static final QName IETF_NETCONF_MONITORING =
+            QName.create(NetconfState.QNAME, "ietf-netconf-monitoring").intern();
+    public static final URI NETCONF_ROLLBACK_ON_ERROR_URI = URI
+            .create("urn:ietf:params:netconf:capability:rollback-on-error:1.0");
+    public static final URI NETCONF_CANDIDATE_URI = URI.create("urn:ietf:params:netconf:capability:candidate:1.0");
+    public static final URI NETCONF_NOTIFICATONS_URI = URI
+            .create("urn:ietf:params:netconf:capability:notification:1.0");
+    public static final URI NETCONF_RUNNING_WRITABLE_URI = URI
+            .create("urn:ietf:params:netconf:capability:writable-running:1.0");
 
     private static final class ParameterMatcher {
         private final Predicate<String> predicate;
@@ -115,26 +129,27 @@ public final class NetconfSessionPreferences {
     }
 
     public boolean isRollbackSupported() {
-        return containsNonModuleCapability(NetconfMessageTransformUtil.NETCONF_ROLLBACK_ON_ERROR_URI.toString());
+        return containsNonModuleCapability(NETCONF_ROLLBACK_ON_ERROR_URI.toString());
     }
 
     public boolean isCandidateSupported() {
-        return containsNonModuleCapability(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
+        return containsNonModuleCapability(NETCONF_CANDIDATE_URI.toString());
     }
 
     public boolean isRunningWritable() {
-        return containsNonModuleCapability(NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString());
+        return containsNonModuleCapability(NETCONF_RUNNING_WRITABLE_URI.toString());
     }
 
     public boolean isNotificationsSupported() {
-        return containsPartialNonModuleCapability(NetconfMessageTransformUtil.NETCONF_NOTIFICATONS_URI.toString())
-                || containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS);
+        return containsPartialNonModuleCapability(NETCONF_NOTIFICATONS_URI.toString())
+                || containsModuleCapability(IETF_NETCONF_NOTIFICATIONS);
     }
 
     public boolean isMonitoringSupported() {
-        return containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING)
+        return containsModuleCapability(
+                IETF_NETCONF_MONITORING)
                 || containsPartialNonModuleCapability(
-                        NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
+                        IETF_NETCONF_MONITORING.getNamespace().toString());
     }
 
     /**

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ class AsyncExecutionStrategy extends AbstractExecutionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncExecutionStrategy.class);
 
     AsyncExecutionStrategy(final Parameters params, final List<NetconfMessage> editConfigMsgs,
-                           final NetconfDeviceCommunicator sessionListener) {
+            final NativeNetconfDeviceCommunicator sessionListener) {
         super(params, editConfigMsgs, sessionListener);
     }
 

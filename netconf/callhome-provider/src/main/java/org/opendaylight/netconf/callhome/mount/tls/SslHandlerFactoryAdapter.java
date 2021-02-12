@@ -12,8 +12,9 @@ import java.util.Set;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
 import org.opendaylight.netconf.client.SslHandlerFactory;
+import org.opendaylight.netconf.nativ.netconf.communicator.protocols.ssh.NativeNetconfKeystoreImpl;
+import org.opendaylight.netconf.nativ.netconf.communicator.protocols.ssh.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
-import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +25,9 @@ public class SslHandlerFactoryAdapter implements SslHandlerFactory {
     private final SslHandlerFactory sslHandlerFactory;
 
     public SslHandlerFactoryAdapter(final DataBroker dataBroker, final TlsAllowedDevicesMonitor allowedDevicesMonitor) {
-        final NetconfKeystoreAdapter keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
-        this.sslHandlerFactory = new SslHandlerFactoryImpl(keystoreAdapter);
+        final NativeNetconfKeystoreImpl keystore = new NativeNetconfKeystoreImpl();
+        new NetconfKeystoreAdapter(dataBroker, keystore);
+        this.sslHandlerFactory = new SslHandlerFactoryImpl(keystore);
         this.allowedDevicesMonitor = allowedDevicesMonitor;
     }
 
