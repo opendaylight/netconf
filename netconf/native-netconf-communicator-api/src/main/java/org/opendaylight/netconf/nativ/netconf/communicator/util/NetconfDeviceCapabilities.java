@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.connect.netconf.listener;
+package org.opendaylight.netconf.nativ.netconf.communicator.util;
 
 import java.util.Collection;
 import java.util.HashMap;

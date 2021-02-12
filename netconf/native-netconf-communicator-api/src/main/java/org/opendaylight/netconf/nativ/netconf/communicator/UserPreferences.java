@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.connect.netconf.listener;
+package org.opendaylight.netconf.nativ.netconf.communicator;
 
 import org.eclipse.jdt.annotation.NonNull;
 
