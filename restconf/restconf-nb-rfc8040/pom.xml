@@ -13,13 +13,13 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>restconf-parent</artifactId>
-    <version>1.12.3-SNAPSHOT</version>
+    <version>1.12.3</version>
     <relativePath>../restconf-parent</relativePath>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>restconf-nb-rfc8040</artifactId>
-  <version>1.12.3-SNAPSHOT</version>
+  <version>1.12.3</version>
   <packaging>bundle</packaging>
 
   <dependencies>
