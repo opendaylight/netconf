@@ -21,7 +21,6 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -33,6 +32,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfDeviceCommunicatorInitializerFactory;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
@@ -54,8 +54,8 @@ public class CallHomeMountDispatcherTest {
     private CallHomeMountSessionManager mockSessMgr;
     private CallHomeTopology mockTopology;
     private CallHomeProtocolSessionContext mockProtoSess;
-    private AAAEncryptionService mockEncryptionService;
     private BaseNetconfSchemas mockBaseSchemas;
+    private NetconfDeviceCommunicatorInitializerFactory mockCommunicatorFactory;
 
     @Before
     public void setup() {
@@ -69,12 +69,11 @@ public class CallHomeMountDispatcherTest {
         mockSessMgr = mock(CallHomeMountSessionManager.class);
         mockTopology = mock(CallHomeTopology.class);
         mockProtoSess = mock(CallHomeProtocolSessionContext.class);
-        mockEncryptionService = mock(AAAEncryptionService.class);
         mockBaseSchemas = mock(BaseNetconfSchemas.class);
+        mockCommunicatorFactory = mock(NetconfDeviceCommunicatorInitializerFactory.class);
 
-        instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
-                mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount,
-                mockEncryptionService) {
+        instance = new CallHomeMountDispatcher(topologyId, mockCommunicatorFactory, mockExecutor, mockKeepAlive,
+                mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount) {
             @Override
             public CallHomeMountSessionManager getSessionManager() {
                 return mockSessMgr;

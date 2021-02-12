@@ -11,19 +11,19 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.RemoteDevice;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
-public class SchemalessNetconfDevice
-        implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
+public class SchemalessNetconfDevice implements
+        RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> {
     private final BaseNetconfSchemas baseSchemas;
     private final RemoteDeviceId id;
     private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
@@ -31,7 +31,7 @@ public class SchemalessNetconfDevice
     private final BaseRpcSchemalessTransformer rpcTransformer;
 
     public SchemalessNetconfDevice(final BaseNetconfSchemas baseSchemas, final RemoteDeviceId id,
-                                   final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
+            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.salFacade = salFacade;
@@ -42,8 +42,8 @@ public class SchemalessNetconfDevice
 
     @VisibleForTesting
     SchemalessNetconfDevice(final BaseNetconfSchemas baseSchemas, final RemoteDeviceId id,
-                            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                            final SchemalessMessageTransformer messageTransformer) {
+            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+            final SchemalessMessageTransformer messageTransformer) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.salFacade = salFacade;
@@ -54,12 +54,12 @@ public class SchemalessNetconfDevice
 
     @Override
     public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
-                                            final NetconfDeviceCommunicator netconfDeviceCommunicator) {
+            final NativeNetconfDeviceCommunicator netconfDeviceCommunicator) {
         final SchemalessNetconfDeviceRpc schemalessNetconfDeviceRpc = new SchemalessNetconfDeviceRpc(id,
                 netconfDeviceCommunicator, rpcTransformer, messageTransformer);
 
-        salFacade.onDeviceConnected(baseSchemas.getBaseSchema().getMountPointContext(),
-                remoteSessionCapabilities, schemalessNetconfDeviceRpc);
+        salFacade.onDeviceConnected(baseSchemas.getBaseSchema().getMountPointContext(), remoteSessionCapabilities,
+                schemalessNetconfDeviceRpc);
 
     }
 

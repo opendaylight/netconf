@@ -38,21 +38,21 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.RemoteDevice;
+import org.opendaylight.netconf.nativ.netconf.communicator.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
-import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -83,19 +83,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  This is a mediator between NetconfDeviceCommunicator and NetconfDeviceSalFacade.
+ * This is a mediator between NetconfDeviceCommunicator and NetconfDeviceSalFacade.
  */
 public class NetconfDevice
-        implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
+        implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NativeNetconfDeviceCommunicator> {
 
     @SuppressFBWarnings(value = "SLF4J_LOGGER_SHOULD_BE_PRIVATE",
             justification = "Needed for common logging of related classes")
     static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
-    private static final QName RFC8528_SCHEMA_MOUNTS_QNAME = QName.create(
-        SchemaMountConstants.RFC8528_MODULE, "schema-mounts").intern();
-    private static final YangInstanceIdentifier RFC8528_SCHEMA_MOUNTS = YangInstanceIdentifier.create(
-        NodeIdentifier.create(RFC8528_SCHEMA_MOUNTS_QNAME));
+    private static final QName RFC8528_SCHEMA_MOUNTS_QNAME = QName
+            .create(SchemaMountConstants.RFC8528_MODULE, "schema-mounts").intern();
+    private static final YangInstanceIdentifier RFC8528_SCHEMA_MOUNTS = YangInstanceIdentifier
+            .create(NodeIdentifier.create(RFC8528_SCHEMA_MOUNTS_QNAME));
 
     protected final RemoteDeviceId id;
     protected final EffectiveModelContextFactory schemaContextFactory;
@@ -125,7 +125,7 @@ public class NetconfDevice
             final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
         this(schemaResourcesDTO, baseSchemas, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null,
-            null, null, null);
+                null, null, null);
     }
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
@@ -151,7 +151,7 @@ public class NetconfDevice
 
     @Override
     public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
-                                  final NetconfDeviceCommunicator listener) {
+            final NativeNetconfDeviceCommunicator listener) {
         // SchemaContext setup has to be performed in a dedicated thread since
         // we are in a netty thread in this method
         // Yang models are being downloaded in this method and it would cause a
@@ -162,9 +162,9 @@ public class NetconfDevice
 
         final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
         final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getEffectiveModelContext(), listener,
-            new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
+                new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
         final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(
-            new DeviceSourcesResolver(id, baseSchema, initRpc, remoteSessionCapabilities, stateSchemasResolver));
+                new DeviceSourcesResolver(id, baseSchema, initRpc, remoteSessionCapabilities, stateSchemasResolver));
 
         if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
             registerToBaseNetconfStream(initRpc, listener);
@@ -199,7 +199,7 @@ public class NetconfDevice
                             onRemoteSessionDown();
                             salFacade.onDeviceReconnected(remoteSessionCapabilities, node);
                         }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime().toJava(),
-                            TimeUnit.MILLISECONDS);
+                                TimeUnit.MILLISECONDS);
                         return;
                     }
                 }
@@ -211,7 +211,7 @@ public class NetconfDevice
     }
 
     private void registerToBaseNetconfStream(final NetconfDeviceRpc deviceRpc,
-                                             final NetconfDeviceCommunicator listener) {
+            final NativeNetconfDeviceCommunicator listener) {
         // TODO check whether the model describing create subscription is present in schema
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
@@ -249,14 +249,13 @@ public class NetconfDevice
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private synchronized void handleSalInitializationSuccess(final MountPointContext result,
-                                        final NetconfSessionPreferences remoteSessionCapabilities,
-                                        final DOMRpcService deviceRpc,
-                                        final RemoteDeviceCommunicator<NetconfMessage> listener) {
-        //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
-        //since salFacade.onDeviceDisconnected was already called.
+            final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc,
+            final RemoteDeviceCommunicator<NetconfMessage> listener) {
+        // NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
+        // since salFacade.onDeviceDisconnected was already called.
         if (connected) {
             this.messageTransformer = new NetconfMessageTransformer(result, true,
-                resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
+                    resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
 
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
             this.salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
@@ -273,7 +272,7 @@ public class NetconfDevice
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void handleSalInitializationFailure(final Throwable throwable,
-                                                final RemoteDeviceCommunicator<NetconfMessage> listener) {
+            final RemoteDeviceCommunicator<NetconfMessage> listener) {
         LOG.error("{}: Initialization in sal failed, disconnecting from device", id, throwable);
         listener.close();
         onRemoteSessionDown();
@@ -302,16 +301,15 @@ public class NetconfDevice
         LOG.debug("{}: Resolved device sources to {}", id, deviceSources);
         final SchemaSourceProvider<YangTextSchemaSource> yangProvider = deviceSources.getSourceProvider();
         for (final SourceIdentifier sourceId : deviceSources.getProvidedSources()) {
-            sourceRegistrations.add(schemaRegistry.registerSchemaSource(yangProvider,
-                PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
-                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+            sourceRegistrations.add(schemaRegistry.registerSchemaSource(yangProvider, PotentialSchemaSource
+                    .create(sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
         }
 
         return new SchemaSetup(deviceSources, remoteSessionCapabilities).startResolution();
     }
 
     private ListenableFuture<MountPointContext> createMountPointContext(final EffectiveModelContext schemaContext,
-            final BaseSchema baseSchema, final NetconfDeviceCommunicator listener) {
+            final BaseSchema baseSchema, final NativeNetconfDeviceCommunicator listener) {
         final MountPointContext emptyContext = new EmptyMountPointContext(schemaContext);
         if (!schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isPresent()) {
             return Futures.immediateFuture(emptyContext);
@@ -320,12 +318,14 @@ public class NetconfDevice
         // Create a temporary RPC invoker and acquire the mount point tree
         LOG.debug("{}: Acquiring available mount points", id);
         final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(schemaContext, listener,
-            new NetconfMessageTransformer(emptyContext, false, baseSchema));
+                new NetconfMessageTransformer(emptyContext, false, baseSchema));
 
         return Futures.transform(deviceRpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_GET_QNAME,
-            Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID)
-                .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, schemaContext))
-                .build()), rpcResult -> processSchemaMounts(rpcResult, emptyContext), MoreExecutors.directExecutor());
+                        Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID)
+                                .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS,
+                                        schemaContext))
+                                .build()),
+            rpcResult -> processSchemaMounts(rpcResult, emptyContext), MoreExecutors.directExecutor());
     }
 
     private MountPointContext processSchemaMounts(final DOMRpcResult rpcResult, final MountPointContext emptyContext) {
@@ -387,10 +387,9 @@ public class NetconfDevice
         private final EffectiveModelContextFactory schemaContextFactory;
         private final NetconfDeviceSchemasResolver stateSchemasResolver;
 
-        public SchemaResourcesDTO(final SchemaSourceRegistry schemaRegistry,
-                                  final SchemaRepository schemaRepository,
-                                  final EffectiveModelContextFactory schemaContextFactory,
-                                  final NetconfDeviceSchemasResolver deviceSchemasResolver) {
+        public SchemaResourcesDTO(final SchemaSourceRegistry schemaRegistry, final SchemaRepository schemaRepository,
+                final EffectiveModelContextFactory schemaContextFactory,
+                final NetconfDeviceSchemasResolver deviceSchemasResolver) {
             this.schemaRegistry = requireNonNull(schemaRegistry);
             this.schemaRepository = requireNonNull(schemaRepository);
             this.schemaContextFactory = requireNonNull(schemaContextFactory);
@@ -447,14 +446,13 @@ public class NetconfDevice
             // If device supports notifications and does not contain necessary modules, add them automatically
             if (remoteSessionCapabilities.containsNonModuleCapability(
                     XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0)) {
-                deviceSources.getRequiredSourcesQName().addAll(
-                        Arrays.asList(
-                                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                                        .$YangModuleInfoImpl.getInstance().getName(),
-                                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                                        .$YangModuleInfoImpl.getInstance().getName()
-                        )
-                );
+                deviceSources.getRequiredSourcesQName().addAll(Arrays.asList(
+                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0
+                        .rev080714.$YangModuleInfoImpl
+                                .getInstance().getName(),
+                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types
+                        .rev130715.$YangModuleInfoImpl
+                                .getInstance().getName()));
             }
 
             requiredSources = deviceSources.getRequiredSources();
@@ -476,16 +474,21 @@ public class NetconfDevice
 
             final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(),
                     capabilities.getUnresolvedCapabilites().keySet());
-            capabilities.addCapabilities(filteredQNames.stream().map(entry -> new AvailableCapabilityBuilder()
-                    .setCapability(entry.toString()).setCapabilityOrigin(
-                            remoteSessionCapabilities.getModuleBasedCapsOrigin().get(entry)).build())
-                    .collect(Collectors.toList()));
+            capabilities
+                    .addCapabilities(filteredQNames.stream()
+                            .map(entry -> new AvailableCapabilityBuilder().setCapability(entry.toString())
+                                    .setCapabilityOrigin(
+                                            remoteSessionCapabilities.getModuleBasedCapsOrigin().get(entry))
+                                    .build())
+                            .collect(Collectors.toList()));
 
-            capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities
-                    .getNonModuleCaps().stream().map(entry -> new AvailableCapabilityBuilder()
-                            .setCapability(entry).setCapabilityOrigin(
-                                    remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry)).build())
-                    .collect(Collectors.toList()));
+            capabilities
+                    .addNonModuleBasedCapabilities(remoteSessionCapabilities.getNonModuleCaps().stream()
+                            .map(entry -> new AvailableCapabilityBuilder().setCapability(entry)
+                                    .setCapabilityOrigin(
+                                            remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry))
+                                    .build())
+                            .collect(Collectors.toList()));
 
             resultFuture.set(result);
         }
@@ -514,7 +517,7 @@ public class NetconfDevice
                 // Initiate async resolution, drive it back based on the result
                 LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
                 Futures.addCallback(schemaContextFactory.createEffectiveModelContext(requiredSources), this,
-                    MoreExecutors.directExecutor());
+                        MoreExecutors.directExecutor());
             } else {
                 LOG.debug("{}: no more sources for schema context", id);
                 resultFuture.setException(new EmptySchemaContextException(id + ": No more sources for schema context"));
@@ -536,15 +539,15 @@ public class NetconfDevice
                 final MissingSchemaSourceException exception) {
             // In case source missing, try without it
             final SourceIdentifier missingSource = exception.getSourceId();
-            LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it",
-                id, missingSource);
-            LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it",
-                id, missingSource, exception);
-            final Collection<QName> qNameOfMissingSource =
-                getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
+            LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it", id,
+                    missingSource);
+            LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it", id,
+                    missingSource, exception);
+            final Collection<QName> qNameOfMissingSource = getQNameFromSourceIdentifiers(
+                    Sets.newHashSet(missingSource));
             if (!qNameOfMissingSource.isEmpty()) {
-                capabilities.addUnresolvedCapabilities(
-                        qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
+                capabilities.addUnresolvedCapabilities(qNameOfMissingSource,
+                        UnavailableCapability.FailureReason.MissingSource);
             }
             return stripUnavailableSource(missingSource);
         }
@@ -558,9 +561,9 @@ public class NetconfDevice
                 // flawed model - exclude it
                 final SourceIdentifier failedSourceId = resolutionException.getFailedSource();
                 LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-                    id, failedSourceId);
+                        id, failedSourceId);
                 LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-                    id, failedSourceId, resolutionException);
+                        id, failedSourceId, resolutionException);
                 capabilities.addUnresolvedCapabilities(
                         getQNameFromSourceIdentifiers(Collections.singleton(failedSourceId)),
                         UnavailableCapability.FailureReason.UnableToResolve);
@@ -569,18 +572,18 @@ public class NetconfDevice
             // unsatisfied imports
             final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
             capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources),
-                UnavailableCapability.FailureReason.UnableToResolve);
+                    UnavailableCapability.FailureReason.UnableToResolve);
             LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
-                id, resolutionException.getUnsatisfiedImports());
+                    id, resolutionException.getUnsatisfiedImports());
             LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
-                id, resolutionException.getUnsatisfiedImports(), resolutionException);
+                    id, resolutionException.getUnsatisfiedImports(), resolutionException);
             return resolutionException.getResolvedSources();
         }
 
         private Collection<SourceIdentifier> stripUnavailableSource(final SourceIdentifier sourceIdToRemove) {
             final LinkedList<SourceIdentifier> sourceIdentifiers = new LinkedList<>(requiredSources);
-            checkState(sourceIdentifiers.remove(sourceIdToRemove),
-                    "%s: Trying to remove %s from %s failed", id, sourceIdToRemove, requiredSources);
+            checkState(sourceIdentifiers.remove(sourceIdToRemove), "%s: Trying to remove %s from %s failed", id,
+                    sourceIdToRemove, requiredSources);
             return sourceIdentifiers;
         }
 
@@ -605,7 +608,7 @@ public class NetconfDevice
                     return qname;
                 }
             }
-            LOG.warn("Unable to map identifier to a devices reported capability: {} Available: {}",identifier,
+            LOG.warn("Unable to map identifier to a devices reported capability: {} Available: {}", identifier,
                     deviceSources.getRequiredSourcesQName());
             // return null since we cannot find the QName,
             // this capability will be removed from required sources and not reported as unresolved-capability

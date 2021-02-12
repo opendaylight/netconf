@@ -31,11 +31,11 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.nativ.netconf.communicator.NativeNetconfDeviceCommunicator;
+import org.opendaylight.netconf.nativ.netconf.communicator.NetconfSessionPreferences;
+import org.opendaylight.netconf.nativ.netconf.communicator.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -44,8 +44,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class KeepaliveSalFacadeResponseWaitingTest {
 
-    private static final RemoteDeviceId REMOTE_DEVICE_ID =
-            new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
+    private static final RemoteDeviceId REMOTE_DEVICE_ID = new RemoteDeviceId("test",
+            new InetSocketAddress("localhost", 22));
     private static final @NonNull ContainerNode KEEPALIVE_PAYLOAD =
         NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
             getSourceNode(NETCONF_RUNNING_QNAME), NetconfMessageTransformUtil.EMPTY_FILTER);
@@ -59,7 +59,7 @@ public class KeepaliveSalFacadeResponseWaitingTest {
     private DOMRpcService deviceRpc;
 
     @Mock
-    private NetconfDeviceCommunicator listener;
+    private NativeNetconfDeviceCommunicator listener;
 
     @Before
     public void setUp() throws Exception {
@@ -80,28 +80,30 @@ public class KeepaliveSalFacadeResponseWaitingTest {
      */
     @Test
     public void testKeepaliveSalResponseWaiting() {
-        //This settable future object will be never set to any value. The test wants to simulate waiting for the result
-        //of the future object.
+        // This settable future object will be never set to any value. The test wants to simulate waiting for the result
+        // of the future object.
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
         doReturn(settableFuture).when(deviceRpc).invokeRpc(null, null);
 
-        //This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
+        // This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
         final SettableFuture<DOMRpcResult> keepaliveSettableFuture = SettableFuture.create();
-        final DOMRpcResult keepaliveResult = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
+        final DOMRpcResult keepaliveResult = new DefaultDOMRpcResult(Builders.containerBuilder()
+                .withNodeIdentifier(
+                        new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME))
+                .build());
         keepaliveSettableFuture.set(keepaliveResult);
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
-        //Invoke general RPC on simulated local facade without args (or with null args). Will be returned
-        //settableFuture variable without any set value. WaitingShaduler in keepalive sal facade should wait for any
-        //result from the RPC and reset keepalive scheduler.
+        // Invoke general RPC on simulated local facade without args (or with null args). Will be returned
+        // settableFuture variable without any set value. WaitingShaduler in keepalive sal facade should wait for any
+        // result from the RPC and reset keepalive scheduler.
         underlyingSalFacade.invokeNullRpc();
 
-        //Invoking of general RPC.
+        // Invoking of general RPC.
         verify(deviceRpc, after(2000).times(1)).invokeRpc(null, null);
 
-        //verify the keepalive RPC invoke. Should be never happen.
+        // verify the keepalive RPC invoke. Should be never happen.
         verify(deviceRpc, after(2000).never()).invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
     }
 
@@ -139,4 +141,3 @@ public class KeepaliveSalFacadeResponseWaitingTest {
         }
     }
 }
-
