@@ -66,19 +66,19 @@ public class Execution implements Callable<Void> {
                 .build());
 
         this.payloads = new ArrayList<>();
-        for (DestToPayload payload : payloads) {
+        for (final DestToPayload payload : payloads) {
             AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Accept", "application/json")
+                    .setMethod("PATCH")
                     .setBody(payload.getPayload())
                     .setRequestTimeout(Integer.MAX_VALUE);
 
-            if (params.auth != null) {
+            if (params.authUser != null && params.authPassword != null) {
                 requestBuilder.setRealm(new Realm.RealmBuilder()
                         .setScheme(Realm.AuthScheme.BASIC)
-                        .setPrincipal(params.auth.get(0))
-                        .setPassword(params.auth.get(1))
-                        .setMethodName("POST")
+                        .setPrincipal(params.authUser)
+                        .setPassword(params.authPassword)
                         .setUsePreemptiveAuth(true)
                         .build());
             }

@@ -14,7 +14,7 @@ public class Node {
     private String password;
     private String host;
     private Integer keepaliveDelay;
-    private Short port;
+    private Integer port;
     private Boolean schemaless;
     private Boolean tcpOnly;
 
@@ -66,11 +66,11 @@ public class Node {
         this.keepaliveDelay = keepaliveDelay;
     }
 
-    public Short getPort() {
+    public Integer getPort() {
         return port;
     }
 
-    public void setPort(final Short port) {
+    public void setPort(final Integer port) {
         this.port = port;
     }
 
