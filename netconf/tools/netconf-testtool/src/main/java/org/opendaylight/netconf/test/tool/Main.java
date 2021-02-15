@@ -49,7 +49,8 @@ public final class Main {
                 LOG.error("Failed to start any simulated devices, exiting...");
                 System.exit(1);
             }
-            if (params.controllerDestination != null) {
+            //FIXME should controller ip, port mandatory?
+            if (params.controllerIp != null) {
                 final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = params
                     .getThreadsPayloads(openDevices);
                 final ArrayList<Execution> executions = new ArrayList<>();
