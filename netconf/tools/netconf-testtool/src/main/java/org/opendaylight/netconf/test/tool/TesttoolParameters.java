@@ -41,26 +41,27 @@ public class TesttoolParameters {
     private static final String HOST_KEY = "{HOST}";
     private static final String PORT_KEY = "{PORT}";
     private static final String TCP_ONLY = "{TCP_ONLY}";
-    private static final String ADDRESS_PORT = "{ADDRESS:PORT}";
-    private static final String DEST =
-        "http://{ADDRESS:PORT}/restconf/config/network-topology:network-topology/topology/topology-netconf/";
+    private static final String RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE =
+        "http://%s:%s/restconf/config/network-topology:network-topology/topology/topology-netconf/";
     private static final Pattern YANG_FILENAME_PATTERN = Pattern
         .compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
     private static final Pattern REVISION_DATE_PATTERN = Pattern.compile("revision\\s+\"?(\\d{4}-\\d{2}-\\d{2})\"?");
 
     private static final String RESOURCE = "/config-template.json";
-    @Arg(dest = "edit-content")
-    public File editContent;
     @Arg(dest = "async")
     public boolean async;
     @Arg(dest = "thread-amount")
     public int threadAmount;
     @Arg(dest = "throttle")
     public int throttle;
-    @Arg(dest = "auth")
-    public ArrayList<String> auth;
-    @Arg(dest = "controller-destination")
-    public String controllerDestination;
+    @Arg(dest = "controller-auth-username")
+    public String controllerAuthUsername;
+    @Arg(dest = "controller-auth-password")
+    public String controllerAuthPassword;
+    @Arg(dest = "controller-ip")
+    public String controllerIp;
+    @Arg(dest = "controller-port")
+    public Integer controllerPort;
     @Arg(dest = "schemas-dir")
     public File schemasDir;
     @Arg(dest = "devices-count")
@@ -91,7 +92,6 @@ public class TesttoolParameters {
     public File initialConfigXMLFile;
     @Arg(dest = "time-out")
     public long timeOut;
-    private InputStream stream;
     @Arg(dest = "ip")
     public String ip;
     @Arg(dest = "thread-pool-size")
@@ -127,18 +127,33 @@ public class TesttoolParameters {
                         + "with mutltiple threads this gets divided among all threads")
                 .dest("throttle");
 
-        parser.addArgument("--auth")
-                .nargs(2)
-                .help("Username and password for HTTP basic authentication in order username password.")
-                .dest("auth");
-
-        parser.addArgument("--controller-destination")
+        parser.addArgument("--controller-auth-username")
                 .type(String.class)
-                .help("Ip address and port of controller. Must be in following format <ip>:<port> "
-                        + "if available it will be used for spawning netconf connectors via topology configuration as "
-                        + "a part of URI. Example (http://<controller destination>/restconf/config/network-topology:network-topology/topology/topology-netconf/node/<node-id>)"
+                .setDefault("admin")
+                .help("Username for HTTP basic authentication to destination controller.")
+                .dest("controller-auth-username");
+
+        parser.addArgument("--controller-auth-password")
+                .type(String.class)
+                .setDefault("admin")
+                .help("Password for HTTP basic authentication to destination controller.")
+                .dest("controller-auth-password");
+
+        parser.addArgument("--controller-ip")
+                .type(String.class)
+                .help("Ip of controller if available it will be used for spawning netconf connectors via topology"
+                        + " configuration as a part of"
+                        + " URI(http://<controller-ip>:<controller-port>/restconf/config/...)"
+                        + " otherwise it will just start simulated devices and skip the execution of PUT requests")
+                .dest("controller-ip");
+
+        parser.addArgument("--controller-port")
+                .type(Integer.class)
+                .help("Port of controller if available it will be used for spawning netconf connectors via topology "
+                        + "configuration as a part of"
+                        + " URI(http://<controller-ip>:<controller-port>/restconf/config/...) "
                         + "otherwise it will just start simulated devices and skip the execution of PUT requests")
-                .dest("controller-destination");
+                .dest("controller-port");
 
         parser.addArgument("--device-count")
                 .type(Integer.class)
@@ -282,18 +297,14 @@ public class TesttoolParameters {
 
     @SuppressWarnings("checkstyle:regexpSinglelineJava")
     void validate() {
-        if (editContent == null) {
-            stream = TesttoolParameters.class.getResourceAsStream(RESOURCE);
+        if (controllerIp != null) {
+            //FIXME Ip validation
+            checkArgument(controllerPort != null, "Controller port is missing");
+            //FIXME Is there specific bound
+            checkArgument(controllerPort >= 0, "Controller port should be non-negative integer");
+            checkArgument(controllerPort < 65354, "Controller port should be less than 65354");
         } else {
-            checkArgument(!editContent.isDirectory(), "Edit content file is a dir");
-            checkArgument(editContent.canRead(), "Edit content file is unreadable");
-        }
-
-        if (controllerDestination != null) {
-            checkArgument(controllerDestination.contains(":"),
-                "Controller Destination needs to be in a following format <ip>:<port>");
-            final String[] parts = controllerDestination.split(Pattern.quote(":"));
-            checkArgument(Integer.parseInt(parts[1]) > 0, "Port =< 0");
+            checkArgument(controllerPort == null, "Controller ip is missing");
         }
 
         checkArgument(deviceCount > 0, "Device count has to be > 0");
@@ -353,13 +364,10 @@ public class TesttoolParameters {
     public ArrayList<ArrayList<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
         final String editContentString;
         try {
-            if (stream == null) {
-                editContentString = Files.asCharSource(editContent, StandardCharsets.UTF_8).read();
-            } else {
-                editContentString = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
-            }
+            final InputStream stream = TesttoolParameters.class.getResourceAsStream(RESOURCE);
+            editContentString = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
         } catch (final IOException e) {
-            throw new IllegalArgumentException("Cannot read content of " + editContent, e);
+            throw new IllegalArgumentException("Cannot read content of " + RESOURCE, e);
         }
 
         int from;
@@ -374,17 +382,17 @@ public class TesttoolParameters {
             final int leftoverBatchedRequests = batchedRequests % threadAmount;
             final int leftoverRequests = openDevices.size() - batchedRequests * generateConfigBatchSize;
 
-            final StringBuilder destBuilder = new StringBuilder(DEST);
-            destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT),
-                destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(),
-                controllerDestination);
+            //FIXME Move this to validate() and rename it to init() or create init() and move there.
+            //FIXME Make it field.
+            final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
+                    controllerIp, controllerPort);
 
             for (int l = 0; l < threadAmount; l++) {
                 from = l * batchedRequests * batchedRequestsPerThread;
                 to = from + batchedRequests * batchedRequestsPerThread;
                 iterator = openDevices.subList(from, to).iterator();
                 allThreadsPayloads.add(createBatchedPayloads(batchedRequestsPerThread, iterator, editContentString,
-                    destBuilder.toString()));
+                        restconfNetconfTopologyPath));
             }
             ArrayList<Execution.DestToPayload> payloads = null;
             if (leftoverBatchedRequests > 0) {
@@ -392,7 +400,7 @@ public class TesttoolParameters {
                 to = from + batchedRequests * batchedRequestsPerThread;
                 iterator = openDevices.subList(from, to).iterator();
                 payloads = createBatchedPayloads(leftoverBatchedRequests, iterator, editContentString,
-                    destBuilder.toString());
+                        restconfNetconfTopologyPath);
             }
             String payload = "";
 
@@ -407,7 +415,7 @@ public class TesttoolParameters {
             if (leftoverRequests > 0 || leftoverBatchedRequests > 0) {
 
                 if (payloads != null) {
-                    payloads.add(new Execution.DestToPayload(destBuilder.toString(), payload));
+                    payloads.add(new Execution.DestToPayload(restconfNetconfTopologyPath, payload));
                 }
                 allThreadsPayloads.add(payloads);
             }
@@ -460,11 +468,12 @@ public class TesttoolParameters {
         final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
 
         while (openDevices.hasNext()) {
-            final StringBuilder destBuilder = new StringBuilder(DEST);
-            destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT),
-                destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(), controllerDestination);
+            //FIXME Move this to validate() and rename it to init() or create init() and move there.
+            //FIXME Make it field.
+            final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
+                    controllerIp, controllerPort);
             payloads.add(new Execution.DestToPayload(
-                destBuilder.toString(), prepareMessage(openDevices.next(), editContentString)));
+                    restconfNetconfTopologyPath, prepareMessage(openDevices.next(), editContentString)));
         }
         return payloads;
     }
