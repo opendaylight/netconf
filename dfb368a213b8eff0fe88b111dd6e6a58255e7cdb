@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc7547cb_58f2c0d4",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDataTreeServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2021-02-15T12:38:47Z",
+      "side": 1,
+      "message": "probably need to improve naming. e.g. nodesReceivedMap",
+      "range": {
+        "startLine": 166,
+        "startChar": 74,
+        "endLine": 166,
+        "endChar": 78
+      },
+      "revId": "dfb368a213b8eff0fe88b111dd6e6a58255e7cdb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
