@@ -73,15 +73,14 @@ public class Execution implements Callable<Void> {
                     .setBody(payload.getPayload())
                     .setRequestTimeout(Integer.MAX_VALUE);
 
-            if (params.auth != null) {
-                requestBuilder.setRealm(new Realm.RealmBuilder()
-                        .setScheme(Realm.AuthScheme.BASIC)
-                        .setPrincipal(params.auth.get(0))
-                        .setPassword(params.auth.get(1))
-                        .setMethodName("POST")
-                        .setUsePreemptiveAuth(true)
-                        .build());
-            }
+            requestBuilder.setRealm(new Realm.RealmBuilder()
+                    .setScheme(Realm.AuthScheme.BASIC)
+                    .setPrincipal(params.controllerAuthUsername)
+                    .setPassword(params.controllerAuthPassword)
+                    .setMethodName("POST")
+                    .setUsePreemptiveAuth(true)
+                    .build());
+
             this.payloads.add(requestBuilder.build());
         }
     }
