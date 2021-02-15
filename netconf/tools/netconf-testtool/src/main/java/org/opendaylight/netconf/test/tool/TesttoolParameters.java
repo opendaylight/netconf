@@ -34,6 +34,9 @@ import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import org.opendaylight.netconf.test.tool.model.Node;
+import org.opendaylight.netconf.test.tool.model.Payload;
+import org.opendaylight.netconf.test.tool.model.Topology;
 
 @SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
 public class TesttoolParameters {
@@ -460,6 +463,24 @@ public class TesttoolParameters {
                 destBuilder.toString(), prepareMessage(openDevices.next(), editContentString)));
         }
         return payloads;
+    }
+
+    public Payload createPayload(final String topologyId, final int port, final String nodeId, final String host,
+                                 final String username, final String password, final Boolean tcpOnly,
+                                 final int keepaliveDelay, final boolean schemaless) {
+        final Topology topology = new Topology(topologyId);
+        topology.addNode(new Node(nodeId, host, port, username, password, tcpOnly, keepaliveDelay, schemaless));
+        return new Payload(topology);
+    }
+
+    public Payload createPayload(final String topologyId, final Iterable<Integer> ports, final String nodeId,
+                                 final String host, final String username, final String password,
+                                 final boolean tcpOnly, final int keepaliveDelay, final boolean schemaless) {
+        final Topology topology = new Topology(topologyId);
+        for (final Integer port : ports) {
+            topology.addNode(new Node(nodeId, host, port, username, password, tcpOnly, keepaliveDelay, schemaless));
+        }
+        return new Payload(topology);
     }
 
     private ArrayList<Execution.DestToPayload> createBatchedPayloads(final int batchedRequestsCount,
