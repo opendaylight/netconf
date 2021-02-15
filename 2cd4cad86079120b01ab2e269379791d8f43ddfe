@@ -16,6 +16,24 @@
       "revId": "2cd4cad86079120b01ab2e269379791d8f43ddfe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c4303953_fc2c0186",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2021-02-15T09:08:41Z",
+      "side": 1,
+      "message": "Because in this case it will be inside try(with resources) block and in this moment file will not be closed. \nOther decision will be close it before rename, but it will couse call of close() twice. Probably it is not a problem. Will refactor to this way.",
+      "parentUuid": "4994f4d7_9768e4a2",
+      "revId": "2cd4cad86079120b01ab2e269379791d8f43ddfe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
