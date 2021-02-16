@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "de6bc936_fc321f6f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/MountPointManagerService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-16T16:57:22Z",
+      "side": 1,
+      "message": "I do not believe this is a legal entity name",
+      "range": {
+        "startLine": 2,
+        "startChar": 22,
+        "endLine": 2,
+        "endChar": 34
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "492490ab_cbb802df",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfMountPointManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-16T16:57:22Z",
+      "side": 1,
+      "message": "is this a cache (i.e. does it expire) or is this explicitly managed?",
+      "range": {
+        "startLine": 49,
+        "startChar": 16,
+        "endLine": 49,
+        "endChar": 41
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "adb4cbe2_1dfc1417",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfMountPointManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-16T16:57:22Z",
+      "side": 1,
+      "message": "this actually indicates that two distinct classes implementing getInstance() have to exist, so that this dispatch is reflected in class hierarchy design.",
+      "range": {
+        "startLine": 69,
+        "startChar": 8,
+        "endLine": 69,
+        "endChar": 39
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71988b45_45355820",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/MountPointHandler.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-16T16:57:22Z",
+      "side": 1,
+      "message": "mutable state. We utterly prefer immutable objects, anything mutable needs to be explicitly documented w.r.t. lifecycle, thread-safety, etc.",
+      "range": {
+        "startLine": 23,
+        "startChar": 16,
+        "endLine": 23,
+        "endChar": 42
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3883e0bb_ad6bda78",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfSalFacadeType.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-16T16:57:22Z",
+      "side": 1,
+      "message": "unexplained implementation hotspot. why do we even need this?!",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 34
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95c114b5_ad7773b8",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-16T16:57:22Z",
+      "side": 1,
+      "message": "a) mutable\nb) sorted() is because of List\nc) just use Set\nd) use a Set implementation which remembers hashCode",
+      "range": {
+        "startLine": 27,
+        "startChar": 78,
+        "endLine": 27,
+        "endChar": 84
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cae7a3ac_3ed8256a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-16T16:57:22Z",
+      "side": 1,
+      "message": "e) don\u0027t bother with this",
+      "range": {
+        "startLine": 33,
+        "startChar": 12,
+        "endLine": 33,
+        "endChar": 25
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "880a888a_3b8a928e",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-16T16:57:22Z",
+      "side": 1,
+      "message": "compared objects are always non-null",
+      "range": {
+        "startLine": 51,
+        "startChar": 12,
+        "endLine": 51,
+        "endChar": 26
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
