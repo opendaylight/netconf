@@ -16,6 +16,7 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -50,7 +51,7 @@ public class Execution implements Callable<Void> {
         }
     }
 
-    public Execution(final TesttoolParameters params, final ArrayList<DestToPayload> payloads) {
+    public Execution(final TesttoolParameters params, final List<DestToPayload> payloads) {
         this.invokeAsync = params.async;
         this.throttle = params.throttle / params.threadAmount;
 
