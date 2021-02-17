@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6c6848a2_86d4b1df",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-17T12:37:43Z",
+      "side": 1,
+      "message": "unrelated change, please split this into a separate patch",
+      "range": {
+        "startLine": 187,
+        "startChar": 11,
+        "endLine": 187,
+        "endChar": 35
+      },
+      "revId": "23d654b6a6265050ed217a4998618bea43c47d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "99fb64c9_9d3d62c3",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/SubscribeToStreamUtil.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-17T12:37:43Z",
+      "side": 1,
+      "message": "superfluous: already specified by abstract method",
+      "range": {
+        "startLine": 80,
+        "startChar": 8,
+        "endLine": 80,
+        "endChar": 16
+      },
+      "revId": "23d654b6a6265050ed217a4998618bea43c47d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14d95529_6d452b8b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/SubscribeToStreamUtil.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-17T12:37:43Z",
+      "side": 1,
+      "message": "Model specifies any string: why do we need to encode it?!",
+      "range": {
+        "startLine": 245,
+        "startChar": 67,
+        "endLine": 245,
+        "endChar": 84
+      },
+      "revId": "23d654b6a6265050ed217a4998618bea43c47d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
