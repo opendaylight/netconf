@@ -370,7 +370,7 @@ public class TesttoolParameters {
         }
     }
 
-    public ArrayList<ArrayList<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
+    public List<List<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
         //FIXME Move this to validate() and rename it to init() or create init() and move there.
         //FIXME Make it field.
         final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
@@ -383,16 +383,7 @@ public class TesttoolParameters {
 
         final int requestsPerThread = IntMath.divide(destinationPayloadPairs.size(), threadAmount, RoundingMode.UP);
 
-        final ArrayList<ArrayList<Execution.DestToPayload>> threadsPayloads = new ArrayList<>();
-        final List<List<Execution.DestToPayload>> partition = Lists.partition(destinationPayloadPairs,
-                requestsPerThread);
-
-        //FIXME Change signature to List<List<Integer>>
-        for (List<Execution.DestToPayload> destToPayloads : partition) {
-            final ArrayList<Execution.DestToPayload> destToPayload = new ArrayList<>(destToPayloads);
-            threadsPayloads.add(destToPayload);
-        }
-        return threadsPayloads;
+        return Lists.partition(destinationPayloadPairs, requestsPerThread);
     }
 
     private List<Payload> createPayloads(List<Integer> openDevices) {
