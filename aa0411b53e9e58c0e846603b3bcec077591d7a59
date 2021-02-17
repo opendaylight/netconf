@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f2df1def_9f861882",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-17T12:30:30Z",
+      "side": 1,
+      "message": "right, but we are inside a try-with-resources block. hence we remember the file name and move it outside of the block",
+      "range": {
+        "startLine": 328,
+        "startChar": 28,
+        "endLine": 328,
+        "endChar": 43
+      },
+      "revId": "aa0411b53e9e58c0e846603b3bcec077591d7a59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
