@@ -51,10 +51,10 @@ public final class Main {
             }
             //FIXME should controller ip, port mandatory?
             if (params.controllerIp != null) {
-                final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = params
+                final List<List<Execution.DestToPayload>> allThreadsPayloads = params
                     .getThreadsPayloads(openDevices);
-                final ArrayList<Execution> executions = new ArrayList<>();
-                for (ArrayList<Execution.DestToPayload> payloads : allThreadsPayloads) {
+                final List<Execution> executions = new ArrayList<>();
+                for (List<Execution.DestToPayload> payloads : allThreadsPayloads) {
                     executions.add(new Execution(params, payloads));
                 }
                 final ExecutorService executorService = Executors.newFixedThreadPool(params.threadAmount);
