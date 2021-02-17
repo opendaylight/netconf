@@ -44,9 +44,6 @@ import org.opendaylight.netconf.test.tool.model.Topology;
 @SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
 public class TesttoolParameters {
 
-    private static final String HOST_KEY = "{HOST}";
-    private static final String PORT_KEY = "{PORT}";
-    private static final String TCP_ONLY = "{TCP_ONLY}";
     private static final String RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE =
         "http://%s:%s/rests/data/network-topology:network-topology/topology=topology-netconf/";
     private static final Pattern YANG_FILENAME_PATTERN = Pattern
@@ -63,7 +60,6 @@ public class TesttoolParameters {
     private static final int DEFAULT_NODE_KEEPALIVE_DELAY = 0;
     private static final Boolean DEFAULT_NODE_SCHEMALESS = false;
 
-    private static final String RESOURCE = "/config-template.json";
     @Arg(dest = "async")
     public boolean async;
     @Arg(dest = "thread-amount")
@@ -292,25 +288,6 @@ public class TesttoolParameters {
         return null;
     }
 
-    private static String modifyMessage(final StringBuilder payloadBuilder, final int payloadPosition, final int size) {
-        if (size == 1) {
-            return payloadBuilder.toString();
-        }
-
-        if (payloadPosition == 0) {
-            payloadBuilder.insert(payloadBuilder.toString().indexOf('{', 2), "[");
-            payloadBuilder.replace(payloadBuilder.length() - 1, payloadBuilder.length(), ",");
-        } else if (payloadPosition + 1 == size) {
-            payloadBuilder.delete(0, payloadBuilder.toString().indexOf(':') + 1);
-            payloadBuilder.insert(payloadBuilder.toString().indexOf('}', 2) + 1, "]");
-        } else {
-            payloadBuilder.delete(0, payloadBuilder.toString().indexOf(':') + 1);
-            payloadBuilder.replace(payloadBuilder.length() - 2, payloadBuilder.length() - 1, ",");
-            payloadBuilder.deleteCharAt(payloadBuilder.toString().lastIndexOf('}'));
-        }
-        return payloadBuilder.toString();
-    }
-
     @SuppressWarnings("checkstyle:regexpSinglelineJava")
     void validate() {
         if (controllerIp != null) {
@@ -445,44 +422,6 @@ public class TesttoolParameters {
         return payloads;
     }
 
-    private String prepareMessage(final int openDevice, final String editContentString) {
-        final StringBuilder messageBuilder = new StringBuilder(editContentString);
-
-        if (editContentString.contains(HOST_KEY)) {
-            messageBuilder.replace(messageBuilder.indexOf(HOST_KEY),
-                messageBuilder.indexOf(HOST_KEY) + HOST_KEY.length(),
-                generateConfigsAddress);
-        }
-        if (editContentString.contains(PORT_KEY)) {
-            while (messageBuilder.indexOf(PORT_KEY) != -1) {
-                messageBuilder.replace(messageBuilder.indexOf(PORT_KEY),
-                    messageBuilder.indexOf(PORT_KEY) + PORT_KEY.length(),
-                    Integer.toString(openDevice));
-            }
-        }
-        if (editContentString.contains(TCP_ONLY)) {
-            messageBuilder.replace(messageBuilder.indexOf(TCP_ONLY),
-                messageBuilder.indexOf(TCP_ONLY) + TCP_ONLY.length(),
-                Boolean.toString(!ssh));
-        }
-        return messageBuilder.toString();
-    }
-
-    private ArrayList<Execution.DestToPayload> createPayloads(final Iterator<Integer> openDevices,
-                                                              final String editContentString) {
-        final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
-
-        while (openDevices.hasNext()) {
-            //FIXME Move this to validate() and rename it to init() or create init() and move there.
-            //FIXME Make it field.
-            final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
-                    controllerIp, controllerPort);
-            payloads.add(new Execution.DestToPayload(
-                    restconfNetconfTopologyPath, prepareMessage(openDevices.next(), editContentString)));
-        }
-        return payloads;
-    }
-
     public Payload createPayload(final String topologyId, final int port, final String nodeId, final String host,
                                  final String username, final String password, final Boolean tcpOnly,
                                  final int keepaliveDelay, final boolean schemaless) {
@@ -501,22 +440,6 @@ public class TesttoolParameters {
             topology.addNode(new Node(nodeId, host, port, username, password, tcpOnly, keepaliveDelay,schemaless));
         }
         return new Payload(topology);
-    }
-
-    private ArrayList<Execution.DestToPayload> createBatchedPayloads(final int batchedRequestsCount,
-            final Iterator<Integer> openDevices, final String editContentString, final String destination) {
-        final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
-
-        for (int i = 0; i < batchedRequestsCount; i++) {
-            StringBuilder payload = new StringBuilder();
-            for (int j = 0; j < generateConfigBatchSize; j++) {
-                final StringBuilder payloadBuilder = new StringBuilder(
-                    prepareMessage(openDevices.next(), editContentString));
-                payload.append(modifyMessage(payloadBuilder, j, generateConfigBatchSize));
-            }
-            payloads.add(new Execution.DestToPayload(destination, payload.toString()));
-        }
-        return payloads;
     }
 
     @Override
