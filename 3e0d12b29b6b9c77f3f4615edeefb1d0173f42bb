@@ -22,6 +22,30 @@
       "revId": "3e0d12b29b6b9c77f3f4615edeefb1d0173f42bb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1eefb46d_22658509",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/model/Node.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2021-02-18T15:47:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba375df9_31ae3140",
+      "range": {
+        "startLine": 2,
+        "startChar": 17,
+        "endLine": 2,
+        "endChar": 21
+      },
+      "revId": "3e0d12b29b6b9c77f3f4615edeefb1d0173f42bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
