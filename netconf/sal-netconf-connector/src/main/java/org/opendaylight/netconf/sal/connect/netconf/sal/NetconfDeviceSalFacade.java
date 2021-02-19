@@ -79,7 +79,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
         final NetconfDeviceDataBroker netconfDeviceDataBroker =
                 new NetconfDeviceDataBroker(id, mountContext, deviceRpc, netconfSessionPreferences);
         final NetconfDataTreeService netconfService =
-                new NetconfDataTreeServiceImpl(id, mountContext, deviceRpc, netconfSessionPreferences);
+                AbstractNetconfDataTreeService.of(id, mountContext, deviceRpc, netconfSessionPreferences);
         registerLockListener(netconfDeviceDataBroker, netconfService);
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
