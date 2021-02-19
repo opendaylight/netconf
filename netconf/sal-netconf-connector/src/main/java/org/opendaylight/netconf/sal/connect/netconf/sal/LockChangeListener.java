@@ -22,12 +22,12 @@ final class LockChangeListener implements DataTreeChangeListener<DatastoreLock> 
     private static final Logger LOG = LoggerFactory.getLogger(LockChangeListener.class);
 
     private final NetconfDeviceDataBroker netconfDeviceDataBroker;
-    private final NetconfDataTreeServiceImpl netconfDataTreeService;
+    private final AbstractNetconfDataTreeService netconfDataTreeService;
 
     LockChangeListener(final DOMDataBroker netconfDeviceDataBrokder,
                        final NetconfDataTreeService netconfDataTreeService) {
         this.netconfDeviceDataBroker = (NetconfDeviceDataBroker)netconfDeviceDataBrokder;
-        this.netconfDataTreeService = (NetconfDataTreeServiceImpl) netconfDataTreeService;
+        this.netconfDataTreeService = (AbstractNetconfDataTreeService) netconfDataTreeService;
     }
 
     @Override

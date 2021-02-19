@@ -57,7 +57,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     @Mock
     private DOMRpcService rpcService;
-    private NetconfDataTreeServiceImpl netconService;
+    private AbstractNetconfDataTreeService netconService;
     private NetconfMessageTransformer netconfMessageTransformer;
     ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
 
@@ -169,11 +169,11 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_COMMIT_QNAME)), any(ContainerNode.class));
     }
 
-    private NetconfDataTreeServiceImpl getNetconService() {
+    private AbstractNetconfDataTreeService getNetconService() {
         NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(
                 Collections.singletonList(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString()));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        return new NetconfDataTreeServiceImpl(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
+        return AbstractNetconfDataTreeService.of(id, new EmptyMountPointContext(SCHEMA_CONTEXT), rpcService, prefs);
     }
 }
