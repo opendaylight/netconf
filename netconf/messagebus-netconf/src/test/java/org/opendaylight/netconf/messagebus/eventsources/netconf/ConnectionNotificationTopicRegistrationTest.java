@@ -30,6 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.even
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 
+@Deprecated(forRemoval = true)
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ConnectionNotificationTopicRegistrationTest {
 

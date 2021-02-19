@@ -48,6 +48,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 /**
  * Facade of mounted netconf device.
  */
+@Deprecated(forRemoval = true)
 class NetconfEventSourceMount {
     private static final YangInstanceIdentifier STREAMS_PATH = YangInstanceIdentifier.builder().node(Netconf.QNAME)
             .node(Streams.QNAME).build();

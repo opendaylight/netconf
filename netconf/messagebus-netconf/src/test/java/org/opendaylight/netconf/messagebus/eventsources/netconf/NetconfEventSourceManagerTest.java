@@ -46,8 +46,8 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
+@Deprecated(forRemoval = true)
 public class NetconfEventSourceManagerTest extends AbstractCodecTest {
-
     private NetconfEventSourceManager netconfEventSourceManager;
     private ListenerRegistration<?> listenerRegistrationMock;
     private DOMMountPointService domMountPointServiceMock;

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Notification topic registration.
  */
+@Deprecated(forRemoval = true)
 abstract class NotificationTopicRegistration implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationTopicRegistration.class);

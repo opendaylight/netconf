@@ -13,6 +13,7 @@ import org.opendaylight.mdsal.binding.dom.codec.impl.BindingCodecContext;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 
+@Deprecated(forRemoval = true)
 public abstract class AbstractCodecTest {
     static BindingCodecContext SERIALIZER;
 

@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Topic registration for notification with specified namespace from stream.
  */
+@Deprecated(forRemoval = true)
 class StreamNotificationTopicRegistration extends NotificationTopicRegistration {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamNotificationTopicRegistration.class);

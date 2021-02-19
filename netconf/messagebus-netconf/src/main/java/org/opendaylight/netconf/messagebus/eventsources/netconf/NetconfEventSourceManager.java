@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * NetconfEventSourceManager implements DataChangeListener. On topology changes, it manages creation,
  * updating and removing registrations of event sources.
  */
+@Deprecated(forRemoval = true)
 public final class NetconfEventSourceManager implements DataTreeChangeListener<Node>, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceManager.class);

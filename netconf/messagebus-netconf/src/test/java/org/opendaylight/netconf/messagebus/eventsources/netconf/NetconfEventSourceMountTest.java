@@ -45,6 +45,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
+@Deprecated(forRemoval = true)
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfEventSourceMountTest extends AbstractCodecTest {
     public static final String STREAM_1 = "stream-1";
