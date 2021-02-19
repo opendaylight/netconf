@@ -28,7 +28,7 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDataTreeServiceImpl;
+import org.opendaylight.netconf.sal.connect.netconf.sal.AbstractNetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
@@ -156,7 +156,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     }
 
     protected NetconfDataTreeService newNetconfDataTreeService() {
-        return new NetconfDataTreeServiceImpl(id, currentMountContext, deviceRpc, netconfSessionPreferences);
+        return AbstractNetconfDataTreeService.of(id, currentMountContext, deviceRpc, netconfSessionPreferences);
     }
 
     private Future<Object> sendInitialDataToActor() {
