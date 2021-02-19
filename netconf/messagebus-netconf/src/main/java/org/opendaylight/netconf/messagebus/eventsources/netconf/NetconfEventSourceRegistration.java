@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Helper class to keep connection status of netconf node  and event source registration object.
  */
+@Deprecated(forRemoval = true)
 final class NetconfEventSourceRegistration implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceRegistration.class);

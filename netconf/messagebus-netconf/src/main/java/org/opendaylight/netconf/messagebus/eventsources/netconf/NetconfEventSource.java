@@ -69,6 +69,7 @@ import org.w3c.dom.Element;
  * NetconfEventSource serves as proxy between nodes and messagebus. Subscribers can join topic stream from this source.
  * Then they will receive notifications from device that matches pattern specified by topic.
  */
+@Deprecated(forRemoval = true)
 public class NetconfEventSource implements EventSource, DOMNotificationListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSource.class);

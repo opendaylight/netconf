@@ -53,6 +53,7 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
+@Deprecated(forRemoval = true)
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfEventSourceTest {
     private static final Absolute NOTIFICATION_1_PATH = Absolute.of(QName.create("ns1", "1970-01-15", "not1"));

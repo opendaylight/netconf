@@ -37,6 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
+@Deprecated(forRemoval = true)
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class StreamNotificationTopicRegistrationTest {
 
