@@ -11,7 +11,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.io.CharStreams;
-import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,6 +20,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -313,7 +315,7 @@ public class TesttoolParameters {
                     try {
                         final String correctName = correctedName(file);
                         if (correctName != null) {
-                            Files.move(file, new File(correctName));
+                            Files.move(file.toPath(), Paths.get(correctName), StandardCopyOption.ATOMIC_MOVE);
                         }
                     } catch (final IOException e) {
                         // print error to console (test tool is running from console)
@@ -354,7 +356,7 @@ public class TesttoolParameters {
         final String editContentString;
         try {
             if (stream == null) {
-                editContentString = Files.asCharSource(editContent, StandardCharsets.UTF_8).read();
+                editContentString = Files.readString(editContent.toPath());
             } else {
                 editContentString = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
             }
