@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "034f366f_8388a003",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-21T17:32:23Z",
+      "side": 1,
+      "message": "method arguments *must* be final",
+      "range": {
+        "startLine": 462,
+        "startChar": 65,
+        "endLine": 462,
+        "endChar": 100
+      },
+      "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5cec1678_d937b6b0",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-21T17:32:23Z",
+      "side": 1,
+      "message": "duplicate code, refactor properly",
+      "range": {
+        "startLine": 465,
+        "startChar": 8,
+        "endLine": 465,
+        "endChar": 36
+      },
+      "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c534ba46_b7174782",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-21T17:32:23Z",
+      "side": 1,
+      "message": "refactor this loop to use String.indexOf() and StringBuilder.append(String, int, int)",
+      "range": {
+        "startLine": 391,
+        "startChar": 12,
+        "endLine": 391,
+        "endChar": 80
+      },
+      "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ded30ab1_219fb7fd",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-02-21T17:32:23Z",
+      "side": 1,
+      "message": "okay, what the heck is this parser? what is its specification?!",
+      "range": {
+        "startLine": 400,
+        "startChar": 44,
+        "endLine": 400,
+        "endChar": 67
+      },
+      "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
