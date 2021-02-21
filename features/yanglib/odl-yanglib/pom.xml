@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-yanglib</artifactId>
-    <version>1.10.0-SNAPSHOT</version>
+    <version>1.13.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Yanglib</name>
@@ -28,7 +28,7 @@
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>netconf-artifacts</artifactId>
-                <version>1.10.0-SNAPSHOT</version>
+                <version>1.13.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

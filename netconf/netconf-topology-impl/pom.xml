@@ -11,13 +11,13 @@
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-parent</artifactId>
-        <version>1.10.0-SNAPSHOT</version>
+        <version>1.13.0-SNAPSHOT</version>
         <relativePath>../../parent</relativePath>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-topology-impl</artifactId>
-    <version>1.10.0-SNAPSHOT</version>
+    <version>1.13.0-SNAPSHOT</version>
     <description>Simple NETCONF topology</description>
     <packaging>bundle</packaging>
 
