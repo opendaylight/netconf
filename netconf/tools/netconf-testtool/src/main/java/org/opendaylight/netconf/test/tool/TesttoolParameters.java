@@ -40,55 +40,55 @@ public final class TesttoolParameters {
     private static final Pattern REVISION_DATE_PATTERN = Pattern.compile("revision\\s+\"?(\\d{4}-\\d{2}-\\d{2})\"?");
 
     @Arg(dest = "async")
-    public boolean async;
+    private boolean async;
     @Arg(dest = "thread-amount")
-    public int threadAmount;
+    private int threadAmount;
     @Arg(dest = "throttle")
-    public int throttle;
+    private int throttle;
     @Arg(dest = "controller-auth-username")
-    public String controllerAuthUsername;
+    private String controllerAuthUsername;
     @Arg(dest = "controller-auth-password")
-    public String controllerAuthPassword;
+    private String controllerAuthPassword;
     @Arg(dest = "controller-ip")
-    public String controllerIp;
+    private String controllerIp;
     @Arg(dest = "controller-port")
-    public Integer controllerPort;
+    private Integer controllerPort;
     @Arg(dest = "schemas-dir")
-    public File schemasDir;
+    private File schemasDir;
     @Arg(dest = "devices-count")
-    public int deviceCount;
+    private int deviceCount;
     @Arg(dest = "devices-per-port")
-    public int devicesPerPort;
+    private int devicesPerPort;
     @Arg(dest = "starting-port")
-    public int startingPort;
+    private int startingPort;
     @Arg(dest = "generate-config-connection-timeout")
-    public int generateConfigsTimeout;
+    private int generateConfigsTimeout;
     @Arg(dest = "generate-config-address")
-    public String generateConfigsAddress;
+    private String generateConfigsAddress;
     @Arg(dest = "distro-folder")
-    public File distroFolder;
+    private File distroFolder;
     @Arg(dest = "generate-configs-batch-size")
-    public int generateConfigBatchSize;
+    private int generateConfigBatchSize;
     @Arg(dest = "ssh")
-    public boolean ssh;
+    private boolean ssh;
     @Arg(dest = "exi")
-    public boolean exi = true;
+    private boolean exi = true;
     @Arg(dest = "debug")
-    public boolean debug;
+    private boolean debug;
     @Arg(dest = "notification-file")
-    public File notificationFile;
+    private File notificationFile;
     @Arg(dest = "md-sal")
-    public boolean mdSal;
+    private boolean mdSal;
     @Arg(dest = "initial-config-xml-file")
-    public File initialConfigXMLFile;
+    private File initialConfigXMLFile;
     @Arg(dest = "time-out")
-    public long timeOut;
+    private long timeOut;
     @Arg(dest = "ip")
-    public String ip;
+    private String ip;
     @Arg(dest = "thread-pool-size")
-    public int threadPoolSize;
+    private int threadPoolSize;
     @Arg(dest = "rpc-config")
-    public File rpcConfig;
+    private File rpcConfig;
 
     @SuppressWarnings("checkstyle:lineLength")
     static ArgumentParser getParser() {
@@ -349,5 +349,205 @@ public final class TesttoolParameters {
         } catch (final IllegalAccessException e) {
             return field.getName() + "= UNKNOWN";
         }
+    }
+
+    public boolean isAsync() {
+        return async;
+    }
+
+    public void setAsync(final boolean async) {
+        this.async = async;
+    }
+
+    public int getThreadAmount() {
+        return threadAmount;
+    }
+
+    public void setThreadAmount(final int threadAmount) {
+        this.threadAmount = threadAmount;
+    }
+
+    public int getThrottle() {
+        return throttle;
+    }
+
+    public void setThrottle(final int throttle) {
+        this.throttle = throttle;
+    }
+
+    public String getControllerAuthUsername() {
+        return controllerAuthUsername;
+    }
+
+    public void setControllerAuthUsername(final String controllerAuthUsername) {
+        this.controllerAuthUsername = controllerAuthUsername;
+    }
+
+    public String getControllerAuthPassword() {
+        return controllerAuthPassword;
+    }
+
+    public void setControllerAuthPassword(final String controllerAuthPassword) {
+        this.controllerAuthPassword = controllerAuthPassword;
+    }
+
+    public String getControllerIp() {
+        return controllerIp;
+    }
+
+    public void setControllerIp(final String controllerIp) {
+        this.controllerIp = controllerIp;
+    }
+
+    public Integer getControllerPort() {
+        return controllerPort;
+    }
+
+    public void setControllerPort(final Integer controllerPort) {
+        this.controllerPort = controllerPort;
+    }
+
+    public File getSchemasDir() {
+        return schemasDir;
+    }
+
+    public void setSchemasDir(final File schemasDir) {
+        this.schemasDir = schemasDir;
+    }
+
+    public int getDeviceCount() {
+        return deviceCount;
+    }
+
+    public void setDeviceCount(final int deviceCount) {
+        this.deviceCount = deviceCount;
+    }
+
+    public int getDevicesPerPort() {
+        return devicesPerPort;
+    }
+
+    public void setDevicesPerPort(final int devicesPerPort) {
+        this.devicesPerPort = devicesPerPort;
+    }
+
+    public int getStartingPort() {
+        return startingPort;
+    }
+
+    public void setStartingPort(final int startingPort) {
+        this.startingPort = startingPort;
+    }
+
+    public int getGenerateConfigsTimeout() {
+        return generateConfigsTimeout;
+    }
+
+    public void setGenerateConfigsTimeout(final int generateConfigsTimeout) {
+        this.generateConfigsTimeout = generateConfigsTimeout;
+    }
+
+    public String getGenerateConfigsAddress() {
+        return generateConfigsAddress;
+    }
+
+    public void setGenerateConfigsAddress(final String generateConfigsAddress) {
+        this.generateConfigsAddress = generateConfigsAddress;
+    }
+
+    public File getDistroFolder() {
+        return distroFolder;
+    }
+
+    public void setDistroFolder(final File distroFolder) {
+        this.distroFolder = distroFolder;
+    }
+
+    public int getGenerateConfigBatchSize() {
+        return generateConfigBatchSize;
+    }
+
+    public void setGenerateConfigBatchSize(final int generateConfigBatchSize) {
+        this.generateConfigBatchSize = generateConfigBatchSize;
+    }
+
+    public boolean isSsh() {
+        return ssh;
+    }
+
+    public void setSsh(final boolean ssh) {
+        this.ssh = ssh;
+    }
+
+    public boolean isExi() {
+        return exi;
+    }
+
+    public void setExi(final boolean exi) {
+        this.exi = exi;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(final boolean debug) {
+        this.debug = debug;
+    }
+
+    public File getNotificationFile() {
+        return notificationFile;
+    }
+
+    public void setNotificationFile(final File notificationFile) {
+        this.notificationFile = notificationFile;
+    }
+
+    public boolean isMdSal() {
+        return mdSal;
+    }
+
+    public void setMdSal(final boolean mdSal) {
+        this.mdSal = mdSal;
+    }
+
+    public File getInitialConfigXMLFile() {
+        return initialConfigXMLFile;
+    }
+
+    public void setInitialConfigXMLFile(final File initialConfigXMLFile) {
+        this.initialConfigXMLFile = initialConfigXMLFile;
+    }
+
+    public long getTimeOut() {
+        return timeOut;
+    }
+
+    public void setTimeOut(final long timeOut) {
+        this.timeOut = timeOut;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(final String ip) {
+        this.ip = ip;
+    }
+
+    public int getThreadPoolSize() {
+        return threadPoolSize;
+    }
+
+    public void setThreadPoolSize(final int threadPoolSize) {
+        this.threadPoolSize = threadPoolSize;
+    }
+
+    public File getRpcConfig() {
+        return rpcConfig;
+    }
+
+    public void setRpcConfig(final File rpcConfig) {
+        this.rpcConfig = rpcConfig;
     }
 }

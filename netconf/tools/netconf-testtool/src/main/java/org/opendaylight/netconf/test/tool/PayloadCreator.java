@@ -254,21 +254,22 @@ final class PayloadCreator {
 
     List<List<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
         final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
-                parameters.controllerIp, parameters.controllerPort);
+                parameters.getControllerIp(), parameters.getControllerPort());
         final List<NormalizedNode> payloads = createPayloads(openDevices);
         final List<Execution.DestToPayload> destinationPayloadPairs = payloads.stream()
                 .map(PayloadCreator::normalizedNodeToString)
                 .map(stringPayload -> new Execution.DestToPayload(restconfNetconfTopologyPath, stringPayload))
                 .collect(Collectors.toList());
-        final int requestsPerThread = IntMath.divide(destinationPayloadPairs.size(), parameters.threadAmount,
+        final int requestsPerThread = IntMath.divide(destinationPayloadPairs.size(), parameters.getThreadAmount(),
                 RoundingMode.UP);
         return Lists.partition(destinationPayloadPairs, requestsPerThread);
     }
 
     private List<NormalizedNode> createPayloads(final List<Integer> openDevices) {
         final List<NormalizedNode> payloads;
-        if (parameters.generateConfigBatchSize > 1) {
-            final List<List<Integer>> portsInBatches = Lists.partition(openDevices, parameters.generateConfigBatchSize);
+        if (parameters.getGenerateConfigBatchSize() > 1) {
+            final List<List<Integer>> portsInBatches = Lists.partition(openDevices,
+                    parameters.getGenerateConfigBatchSize());
             payloads = createBatchedPayloads(portsInBatches);
         } else {
             payloads = createSingleNodePayloads(openDevices);
@@ -280,8 +281,8 @@ final class PayloadCreator {
         final List<NormalizedNode> payloads = new ArrayList<>();
         for (final List<Integer> portsInBatch : portsInBatches) {
             payloads.add(createMultipleNodeTopology(DEFAULT_TOPOLOGY_ID, portsInBatch,
-                    parameters.generateConfigsAddress, DEFAULT_NODE_USERNAME, DEFAULT_NODE_PASSWORD,
-                    !parameters.ssh, DEFAULT_NODE_KEEPALIVE_DELAY, DEFAULT_NODE_SCHEMALESS));
+                    parameters.getGenerateConfigsAddress(), DEFAULT_NODE_USERNAME, DEFAULT_NODE_PASSWORD,
+                    !parameters.isSsh(), DEFAULT_NODE_KEEPALIVE_DELAY, DEFAULT_NODE_SCHEMALESS));
         }
         return payloads;
     }
@@ -289,8 +290,8 @@ final class PayloadCreator {
     private List<NormalizedNode> createSingleNodePayloads(final List<Integer> batchedPorts) {
         final List<NormalizedNode> payloads = new ArrayList<>();
         for (final int port : batchedPorts) {
-            payloads.add(createSingleNodeTopology(DEFAULT_TOPOLOGY_ID, port, parameters.generateConfigsAddress,
-                    DEFAULT_NODE_USERNAME, DEFAULT_NODE_PASSWORD, !parameters.ssh, DEFAULT_NODE_KEEPALIVE_DELAY,
+            payloads.add(createSingleNodeTopology(DEFAULT_TOPOLOGY_ID, port, parameters.getGenerateConfigsAddress(),
+                    DEFAULT_NODE_USERNAME, DEFAULT_NODE_PASSWORD, !parameters.isSsh(), DEFAULT_NODE_KEEPALIVE_DELAY,
                     DEFAULT_NODE_SCHEMALESS));
         }
         return payloads;
