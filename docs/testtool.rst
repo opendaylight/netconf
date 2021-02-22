@@ -152,7 +152,7 @@ Testtool help
                             [--generate-config-connection-timeout GENERATE-CONFIG-CONNECTION-TIMEOUT]
                             [--generate-config-address GENERATE-CONFIG-ADDRESS] [--generate-configs-batch-size GENERATE-CONFIGS-BATCH-SIZE]
                             [--distribution-folder DISTRO-FOLDER] [--ssh {true,false}] [--exi {true,false}] [--debug {true,false}]
-                            [--md-sal {true,false}] [--time-out TIME-OUT] [-ip IP] [--thread-pool-size THREAD-POOL-SIZE] [--rpc-config RPC-CONFIG]
+                            [--md-sal {true,false}] [--timeout TIMEOUT] [-ip IP] [--thread-pool-size THREAD-POOL-SIZE] [--rpc-config RPC-CONFIG]
 
     netconf testtool
 
@@ -194,7 +194,7 @@ Testtool help
       --exi {true,false}     Whether to use exi to transport xml content
       --debug {true,false}   Whether to use debug log level instead of INFO
       --md-sal {true,false}  Whether to use md-sal datastore instead of default simulated datastore.
-      --time-out TIME-OUT    the maximum time in seconds for executing each PUT request
+      --timeout TIMEOUT      the maximum time in seconds for executing each PATCH request
       -ip IP                 Ip address which will be used for creating a socket  address.It  can  either  be a machine name, such as java.sun.com, or a
                              textual representation of its IP address.
       --thread-pool-size THREAD-POOL-SIZE
