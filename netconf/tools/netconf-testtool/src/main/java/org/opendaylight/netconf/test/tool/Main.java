@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import ch.qos.logback.classic.Level;
@@ -28,7 +27,7 @@ public final class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
     private Main() {
-
+        // hidden on purpose
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -38,7 +37,7 @@ public final class Main {
         params.validate();
         final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
             .getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
+        root.setLevel(params.isDebug() ? Level.DEBUG : Level.INFO);
 
         final Configuration configuration = new ConfigurationBuilder().from(params).build();
         final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(configuration);
@@ -50,18 +49,20 @@ public final class Main {
                 System.exit(1);
             }
             //if ODL controller ip is not set NETCONF devices will be started, but not registered at the controller
-            if (params.controllerIp != null) {
-                final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = params
-                    .getThreadsPayloads(openDevices);
-                final ArrayList<Execution> executions = new ArrayList<>();
-                for (ArrayList<Execution.DestToPayload> payloads : allThreadsPayloads) {
+            if (params.getControllerIp() != null) {
+                final PayloadCreator payloadCreator = new PayloadCreator(params);
+                final List<List<Execution.DestToPayload>> allThreadsPayloads = payloadCreator
+                        .getThreadsPayloads(openDevices);
+                final List<Execution> executions = new ArrayList<>();
+                for (final List<Execution.DestToPayload> payloads : allThreadsPayloads) {
                     executions.add(new Execution(params, payloads));
                 }
-                final ExecutorService executorService = Executors.newFixedThreadPool(params.threadAmount);
+                final ExecutorService executorService = Executors.newFixedThreadPool(params.getThreadAmount());
                 final Stopwatch time = Stopwatch.createStarted();
-                List<Future<Void>> futures = executorService.invokeAll(executions, params.timeOut, TimeUnit.SECONDS);
+                final List<Future<Void>> futures = executorService.invokeAll(executions,
+                        params.getTimeOut(), TimeUnit.SECONDS);
                 int threadNum = 0;
-                for (Future<Void> future : futures) {
+                for (final Future<Void> future : futures) {
                     threadNum++;
                     if (future.isCancelled()) {
                         LOG.info("{}. thread timed out.",threadNum);
@@ -76,7 +77,7 @@ public final class Main {
                 time.stop();
                 LOG.info("Time spent with configuration of devices: {}.",time);
             }
-        } catch (RuntimeException | InterruptedException e) {
+        } catch (final RuntimeException | InterruptedException e) {
             LOG.error("Unhandled exception", e);
             netconfDeviceSimulator.close();
             System.exit(1);
