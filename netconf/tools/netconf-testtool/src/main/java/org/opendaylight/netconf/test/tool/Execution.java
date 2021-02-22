@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.test.tool;
 
+import com.google.common.collect.Lists;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -16,119 +17,83 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Execution implements Callable<Void> {
-
-    private final ArrayList<Request> payloads;
-    private final AsyncHttpClient asyncHttpClient;
+final class Execution implements Callable<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(Execution.class);
-    private final boolean invokeAsync;
+    private static final String NETCONF_TOPOLOGY_DESTINATION =
+            "http://%s:%s/restconf/config/network-topology:network-topology/topology/topology-netconf";
+
+    private final AsyncHttpClient httpClient;
+    private final String destination;
+    private final List<Integer> openDevices;
+    private final TesttoolParameters params;
     private final Semaphore semaphore;
+
     private final int throttle;
+    private final boolean isAsync;
 
-    static final class DestToPayload {
+    Execution(final List<Integer> openDevices, final TesttoolParameters params) {
+        httpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder()
+                .setConnectTimeout(Integer.MAX_VALUE).setRequestTimeout(Integer.MAX_VALUE)
+                .setAllowPoolingConnections(true).build());
+        destination = String.format(Locale.ROOT, NETCONF_TOPOLOGY_DESTINATION,
+                params.controllerIp, params.controllerPort);
+        this.openDevices = openDevices;
+        this.params = params;
 
-        private final String destination;
-        private final String payload;
-
-        DestToPayload(final String destination, final String payload) {
-            this.destination = destination;
-            this.payload = payload;
-        }
-
-        public String getDestination() {
-            return destination;
-        }
-
-        public String getPayload() {
-            return payload;
-        }
-    }
-
-    public Execution(final TesttoolParameters params, final ArrayList<DestToPayload> payloads) {
-        this.invokeAsync = params.async;
-        this.throttle = params.throttle / params.threadAmount;
+        throttle = params.throttle / params.threadAmount;
+        isAsync = params.async;
 
         if (params.async && params.threadAmount > 1) {
-            LOG.info("Throttling per thread: {}", this.throttle);
+            LOG.info("Throttling per thread: {}", throttle);
         }
-        this.semaphore = new Semaphore(this.throttle);
-
-        this.asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder()
-                .setConnectTimeout(Integer.MAX_VALUE)
-                .setRequestTimeout(Integer.MAX_VALUE)
-                .setAllowPoolingConnections(true)
-                .build());
-
-        this.payloads = new ArrayList<>();
-        for (DestToPayload payload : payloads) {
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Accept", "application/json")
-                    .setBody(payload.getPayload())
-                    .setRequestTimeout(Integer.MAX_VALUE);
-
-            requestBuilder.setRealm(new Realm.RealmBuilder()
-                    .setScheme(Realm.AuthScheme.BASIC)
-                    .setPrincipal(params.controllerAuthUsername)
-                    .setPassword(params.controllerAuthPassword)
-                    .setMethodName("POST")
-                    .setUsePreemptiveAuth(true)
-                    .build());
-
-            this.payloads.add(requestBuilder.build());
-        }
+        semaphore = new Semaphore(throttle);
     }
 
-    private void invokeSync() {
-        LOG.info("Begin sending sync requests");
-        for (Request request : payloads) {
-            try {
-                Response response = asyncHttpClient.executeRequest(request).get();
-                if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
-                    if (response.getStatusCode() == 409) {
-                        LOG.warn("Request failed, status code: {} - one or more of the devices"
-                                + " is already configured, skipping the whole batch", response.getStatusCode());
-                    } else {
-                        LOG.warn("Status code: {}", response.getStatusCode());
-                        LOG.warn("url: {}", request.getUrl());
-                        LOG.warn("body: {}", response.getResponseBody());
-                    }
-                }
-            } catch (InterruptedException | ExecutionException | IOException e) {
-                LOG.warn("Failed to execute request", e);
-            }
+    @Override
+    public Void call() {
+        final List<Request> requests = prepareRequests();
+        if (isAsync) {
+            this.sendAsync(requests);
+        } else {
+            this.sendSync(requests);
         }
-        LOG.info("End sending sync requests");
+        return null;
     }
 
-    private void invokeAsync() {
+    private List<Request> prepareRequests() {
+        final List<Request> requests = new ArrayList<>();
+        final List<List<Integer>> batches = Lists.partition(openDevices, params.generateConfigBatchSize);
+        for (final List<Integer> batch : batches) {
+            final String payload = PayloadCreator.createStringPayload(batch, params);
+            requests.add(prepareRequest(payload));
+        }
+        return requests;
+    }
+
+    private void sendAsync(final List<Request> requests) {
         LOG.info("Begin sending async requests");
-
-        for (final Request request : payloads) {
+        for (final Request request : requests) {
             try {
                 semaphore.acquire();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 LOG.warn("Semaphore acquire interrupted");
             }
-            asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
+            httpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
                 @Override
                 public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
                     super.onStatusReceived(status);
-                    if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
-                        if (status.getStatusCode() == 409) {
-                            LOG.warn("Request failed, status code: {} - one or more of the devices"
-                                    + " is already configured, skipping the whole batch", status.getStatusCode());
-                        } else {
-                            LOG.warn("Request failed, status code: {}",
-                                status.getStatusCode() + status.getStatusText());
-                            LOG.warn("request: {}", request.toString());
-                        }
+                    if (status.getStatusCode() != 200) {
+                        LOG.warn("Unexpected status code: {} for request to url: {}",
+                                status.getStatusCode(), request.getUrl());
                     }
                     return STATE.CONTINUE;
                 }
@@ -144,20 +109,45 @@ public class Execution implements Callable<Void> {
 
         try {
             semaphore.acquire(this.throttle);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             LOG.warn("Semaphore acquire interrupted");
         }
 
         LOG.info("Responses received, ending...");
     }
 
-    @Override
-    public Void call() {
-        if (invokeAsync) {
-            this.invokeAsync();
-        } else {
-            this.invokeSync();
+    private void sendSync(final List<Request> requests) {
+        LOG.info("Begin sending sync requests");
+        for (final Request request : requests) {
+            try {
+                final Response response = httpClient.executeRequest(request).get();
+                if (response.getStatusCode() != 200) {
+                    LOG.warn("Unexpected status code: {} for request to url: {} with response: {}",
+                            response.getStatusCode(), request.getUrl(), response.getResponseBody());
+                }
+            } catch (final InterruptedException | ExecutionException | IOException e) {
+                LOG.error("Failed to execute request: {}", request, e);
+                throw new RuntimeException("Failed to execute request", e);
+            }
         }
-        return null;
+        LOG.info("End sending sync requests");
+    }
+
+    private Request prepareRequest(final String payload) {
+        LOG.info("Creating request to: {} with payload: {}", destination, payload);
+        final AsyncHttpClient.BoundRequestBuilder requestBuilder = httpClient
+                .preparePatch(destination)
+                .addHeader("Content-Type", "application/yang-data+json")
+                .addHeader("Accept", "application/json")
+                .setBody(payload)
+                .setRequestTimeout(Integer.MAX_VALUE);
+
+        return requestBuilder.setRealm(new Realm.RealmBuilder()
+                .setScheme(Realm.AuthScheme.BASIC)
+                .setPrincipal(params.controllerAuthUsername)
+                .setPassword(params.controllerAuthPassword)
+                .setMethodName(HttpMethod.PATCH.getName())
+                .setUsePreemptiveAuth(true)
+                .build()).build();
     }
 }
