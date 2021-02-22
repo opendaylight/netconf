@@ -18,9 +18,7 @@ import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-public class SyncExecutionStrategy implements ExecutionStrategy {
-
+final class SyncExecutionStrategy implements ExecutionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(SyncExecutionStrategy.class);
 
     private final Parameters params;
@@ -28,7 +26,7 @@ public class SyncExecutionStrategy implements ExecutionStrategy {
     private final AsyncHttpClient asyncHttpClient;
 
     SyncExecutionStrategy(final Parameters params, final AsyncHttpClient asyncHttpClient,
-                          final RestPerfClient.RequestData payloads) {
+            final RestPerfClient.RequestData payloads) {
         this.params = params;
         this.asyncHttpClient = asyncHttpClient;
         this.payloads = payloads;
@@ -36,24 +34,22 @@ public class SyncExecutionStrategy implements ExecutionStrategy {
 
     @Override
     public void invoke() {
-
         LOG.info("Begin sending sync requests");
         for (int i = 0; i < payloads.getRequests(); i++) {
-            String message = RequestMessageUtils.prepareMessage(payloads.getThreadId(), i,
+            final String message = RequestMessageUtils.prepareMessage(payloads.getThreadId(), i,
                     payloads.getContentString(), payloads.getPort());
-            Request request = formRequest(asyncHttpClient, payloads.getDestination(), params, message);
+            final Request request = formRequest(asyncHttpClient, payloads.getDestination(), params, message);
             try {
-                Response response = asyncHttpClient.executeRequest(request).get();
+                final Response response = asyncHttpClient.executeRequest(request).get();
                 if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
                     LOG.warn("Status code: {}", response.getStatusCode());
                     LOG.warn("url: {}", request.getUrl());
                     LOG.warn("body: {}", response.getResponseBody());
                 }
-            } catch (InterruptedException | ExecutionException | IOException e) {
+            } catch (final InterruptedException | ExecutionException | IOException e) {
                 LOG.warn("Failed to execute request", e);
             }
         }
         LOG.info("End sending sync requests");
-
     }
 }
