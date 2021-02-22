@@ -16,6 +16,24 @@
       "revId": "a92f52760b0778889a49586b938e49636692250f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5f05d67c_32b4a99b",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2021-02-22T12:57:55Z",
+      "side": 1,
+      "message": "Squashed\n\nDone",
+      "parentUuid": "7365a0e3_5d636df0",
+      "revId": "a92f52760b0778889a49586b938e49636692250f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
