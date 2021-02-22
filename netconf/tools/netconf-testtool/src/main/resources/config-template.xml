@@ -1,9 +1,0 @@
-<node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
-    <node-id>{PORT}-sim-device</node-id>
-    <host xmlns="urn:opendaylight:netconf-node-topology">{HOST}</host>
-    <port xmlns="urn:opendaylight:netconf-node-topology">{PORT}</port>
-    <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
-    <password xmlns="urn:opendaylight:netconf-node-topology">admin</password>
-    <tcp-only xmlns="urn:opendaylight:netconf-node-topology">{TCP_ONLY}</tcp-only>
-    <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">0</keepalive-delay>
-</node>
