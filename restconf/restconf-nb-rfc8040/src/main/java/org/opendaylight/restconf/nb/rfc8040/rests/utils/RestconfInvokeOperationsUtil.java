@@ -136,7 +136,7 @@ public final class RestconfInvokeOperationsUtil {
     public static DOMActionResult invokeActionViaMountPoint(final DOMMountPoint mountPoint, final ContainerNode data,
             final Absolute schemaPath, final YangInstanceIdentifier yangIId) {
         final Optional<DOMActionService> mountPointService = mountPoint.getService(DOMActionService.class);
-        if (!mountPointService.isPresent()) {
+        if (mountPointService.isEmpty()) {
             throw new RestconfDocumentedException("DomAction service is missing.");
         }
         return prepareActionResult(mountPointService.get().invokeAction(schemaPath, prepareDataTreeId(yangIId), data));

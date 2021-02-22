@@ -139,7 +139,7 @@ public final class YangInstanceIdentifierDeserializer {
             // parse value
             final QName key = keys.next();
             Optional<DataSchemaNode> leafSchemaNode = listSchemaNode.findDataChildByName(key);
-            RestconfDocumentedException.throwIf(!leafSchemaNode.isPresent(), ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
+            RestconfDocumentedException.throwIf(leafSchemaNode.isEmpty(), ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
                     "Schema not found for %s", key);
 
             final String value = findAndParsePercentEncoded(nextIdentifierFromNextSequence(IDENTIFIER_PREDICATE));

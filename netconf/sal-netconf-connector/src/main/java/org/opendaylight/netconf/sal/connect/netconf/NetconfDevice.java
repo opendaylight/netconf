@@ -313,7 +313,7 @@ public class NetconfDevice
     private ListenableFuture<MountPointContext> createMountPointContext(final EffectiveModelContext schemaContext,
             final BaseSchema baseSchema, final NetconfDeviceCommunicator listener) {
         final MountPointContext emptyContext = new EmptyMountPointContext(schemaContext);
-        if (!schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isPresent()) {
+        if (schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isEmpty()) {
             return Futures.immediateFuture(emptyContext);
         }
 

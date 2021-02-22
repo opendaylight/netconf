@@ -45,7 +45,7 @@ public class Get extends AbstractGet {
             throws DocumentedException {
 
         final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
-        if (!dataRootOptional.isPresent()) {
+        if (dataRootOptional.isEmpty()) {
             return document.createElement(XmlNetconfConstants.DATA_KEY);
         }
 
@@ -57,7 +57,7 @@ public class Get extends AbstractGet {
                     LogicalDatastoreType.OPERATIONAL, dataRoot).get();
             transactionProvider.abortRunningTransaction(rwTx);
 
-            if (!normalizedNodeOptional.isPresent()) {
+            if (normalizedNodeOptional.isEmpty()) {
                 return document.createElement(XmlNetconfConstants.DATA_KEY);
             }
 

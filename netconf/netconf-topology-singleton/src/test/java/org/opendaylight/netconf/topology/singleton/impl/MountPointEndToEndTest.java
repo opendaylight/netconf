@@ -684,7 +684,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private void awaitMountPointNotPresent(final DOMMountPointService mountPointService) {
         await().atMost(5, TimeUnit.SECONDS).until(
-            () -> !mountPointService.getMountPoint(yangNodeInstanceId).isPresent());
+            () -> mountPointService.getMountPoint(yangNodeInstanceId).isEmpty());
     }
 
     private static DOMDataBroker getDOMDataBroker(final DOMMountPoint mountPoint) {

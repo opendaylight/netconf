@@ -404,7 +404,7 @@ public final class RestconfImpl implements RestconfService {
 
         if (mountPoint != null) {
             final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
-            if (!mountRpcServices.isPresent()) {
+            if (mountRpcServices.isEmpty()) {
                 LOG.debug("Error: Rpc service is missing.");
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
@@ -498,7 +498,7 @@ public final class RestconfImpl implements RestconfService {
         final ListenableFuture<? extends DOMRpcResult> response;
         if (mountPoint != null) {
             final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
-            if (!mountRpcServices.isPresent()) {
+            if (mountRpcServices.isEmpty()) {
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
             response = mountRpcServices.get().invokeRpc(rpc.getQName(), input);
@@ -1321,7 +1321,7 @@ public final class RestconfImpl implements RestconfService {
             final String paramName) {
         final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
             SAL_REMOTE_AUG_IDENTIFIER);
-        if (!optAugNode.isPresent()) {
+        if (optAugNode.isEmpty()) {
             return null;
         }
         final DataContainerChild<? extends PathArgument, ?> augNode = optAugNode.get();
@@ -1330,7 +1330,7 @@ public final class RestconfImpl implements RestconfService {
         }
         final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
                 new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
-        if (!enumNode.isPresent()) {
+        if (enumNode.isEmpty()) {
             return null;
         }
         final Object rawValue = enumNode.get().getValue();

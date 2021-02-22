@@ -58,7 +58,7 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
         }
 
         final Optional<XmlElement> urlElement = parent.getOnlyChildElementOptionally(URL_KEY);
-        if (!urlElement.isPresent()) {
+        if (urlElement.isEmpty()) {
             throw new DocumentedException("Invalid RPC, neither <config> not <url> element is present",
                 DocumentedException.ErrorType.PROTOCOL,
                 DocumentedException.ErrorTag.MISSING_ELEMENT,

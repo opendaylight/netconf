@@ -392,7 +392,7 @@ public final class XmlElement {
 
     public String getNamespace() throws MissingNameSpaceException {
         Optional<String> namespaceURI = getNamespaceOptionally();
-        if (!namespaceURI.isPresent()) {
+        if (namespaceURI.isEmpty()) {
             throw new MissingNameSpaceException(String.format("No namespace defined for %s", this),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,

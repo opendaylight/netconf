@@ -104,7 +104,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws IOException {
         final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
-        if (!nonEmptyInputStreamOptional.isPresent()) {
+        if (nonEmptyInputStreamOptional.isEmpty()) {
             return new PatchContext(path, null, null);
         }
 

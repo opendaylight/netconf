@@ -121,7 +121,7 @@ public final class CopyConfig extends AbstractEdit {
 
     private static XmlElement getSourceElement(final XmlElement parent) throws DocumentedException {
         final Optional<XmlElement> sourceElement = parent.getOnlyChildElementOptionally(SOURCE_KEY);
-        if (!sourceElement.isPresent()) {
+        if (sourceElement.isEmpty()) {
             throw new DocumentedException("<source> element is missing",
                 DocumentedException.ErrorType.PROTOCOL,
                 DocumentedException.ErrorTag.MISSING_ELEMENT,
