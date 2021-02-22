@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import static org.opendaylight.netconf.test.tool.client.http.perf.RequestMessageUtils.formPayload;
@@ -27,16 +26,13 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 @SuppressFBWarnings("DM_EXIT")
 public final class RestPerfClient {
-
     private static final Logger LOG = LoggerFactory.getLogger(RestPerfClient.class);
 
     static int throttle;
 
     static final class RequestData {
-
         private final String destination;
         private final String contentString;
         private final int threadId;
@@ -51,56 +47,55 @@ public final class RestPerfClient {
             this.requests = requests;
         }
 
-        public String getDestination() {
+        String getDestination() {
             return destination;
         }
 
-        public String getContentString() {
+        String getContentString() {
             return contentString;
         }
 
-        public int getThreadId() {
+        int getThreadId() {
             return threadId;
         }
 
-        public int getPort() {
+        int getPort() {
             return port;
         }
 
-        public int getRequests() {
+        int getRequests() {
             return requests;
         }
     }
 
     private RestPerfClient() {
+        // hidden on purpose
     }
 
     public static void main(final String[] args) {
-
-        Parameters parameters = parseArgs(args, Parameters.getParser());
+        final Parameters parameters = parseArgs(args, Parameters.getParser());
         parameters.validate();
-        throttle = parameters.throttle / parameters.threadAmount;
+        throttle = parameters.getThrottle() / parameters.getThreadAmount();
 
-        if (parameters.async && parameters.threadAmount > 1) {
+        if (parameters.isAsync() && parameters.getThreadAmount() > 1) {
             LOG.info("Throttling per thread: {}", throttle);
         }
 
         final String editContentString;
         try {
-            editContentString = Files.asCharSource(parameters.editContent, StandardCharsets.UTF_8).read();
+            editContentString = Files.asCharSource(parameters.getEditContent(), StandardCharsets.UTF_8).read();
         } catch (final IOException e) {
-            throw new IllegalArgumentException("Cannot read content of " + parameters.editContent, e);
+            throw new IllegalArgumentException("Cannot read content of " + parameters.getEditContent(), e);
         }
 
-        final int threadAmount = parameters.threadAmount;
+        final int threadAmount = parameters.getThreadAmount();
         LOG.info("thread amount: {}", threadAmount);
-        final int requestsPerThread = parameters.editCount / parameters.threadAmount;
+        final int requestsPerThread = parameters.getEditCount() / parameters.getThreadAmount();
         LOG.info("requestsPerThread: {}", requestsPerThread);
-        final int leftoverRequests = parameters.editCount % parameters.threadAmount;
+        final int leftoverRequests = parameters.getEditCount() % parameters.getThreadAmount();
         LOG.info("leftoverRequests: {}", leftoverRequests);
 
         final ArrayList<RequestData> allThreadsPayloads = new ArrayList<>();
-
         for (int i = 0; i < threadAmount; i++) {
             int numberOfReq = requestsPerThread;
             if (i == (threadAmount - 1)) {
@@ -117,13 +112,12 @@ public final class RestPerfClient {
         }
 
         final ExecutorService executorService = Executors.newFixedThreadPool(threadAmount);
-
         LOG.info("Starting performance test");
         boolean allThreadsCompleted = true;
         final Stopwatch started = Stopwatch.createStarted();
         try {
             final List<Future<Void>> futures = executorService.invokeAll(
-                    callables, parameters.timeout, TimeUnit.MINUTES);
+                    callables, parameters.getTimeout(), TimeUnit.MINUTES);
             for (int i = 0; i < futures.size(); i++) {
                 Future<Void> future = futures.get(i);
                 if (future.isCancelled()) {
@@ -149,8 +143,8 @@ public final class RestPerfClient {
         // If some threads failed or timed out, skip calculation of requests per second value
         // and do not log it
         if (allThreadsCompleted) {
-            LOG.info(
-                    "Requests per second: {}", parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS));
+            LOG.info("Requests per second: {}",
+                    parameters.getEditCount() * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS));
         }
         System.exit(0);
     }
@@ -167,5 +161,4 @@ public final class RestPerfClient {
         System.exit(1);
         return null;
     }
-
 }
