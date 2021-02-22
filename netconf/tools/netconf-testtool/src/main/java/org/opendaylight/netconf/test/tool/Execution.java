@@ -16,14 +16,15 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Execution implements Callable<Void> {
-
     private final ArrayList<Request> payloads;
     private final AsyncHttpClient asyncHttpClient;
     private static final Logger LOG = LoggerFactory.getLogger(Execution.class);
@@ -32,7 +33,6 @@ public class Execution implements Callable<Void> {
     private final int throttle;
 
     static final class DestToPayload {
-
         private final String destination;
         private final String payload;
 
@@ -50,11 +50,11 @@ public class Execution implements Callable<Void> {
         }
     }
 
-    public Execution(final TesttoolParameters params, final ArrayList<DestToPayload> payloads) {
-        this.invokeAsync = params.async;
-        this.throttle = params.throttle / params.threadAmount;
+    public Execution(final TesttoolParameters params, final List<DestToPayload> payloads) {
+        this.invokeAsync = params.isAsync();
+        this.throttle = params.getThrottle() / params.getThreadAmount();
 
-        if (params.async && params.threadAmount > 1) {
+        if (params.isAsync() && params.getThreadAmount() > 1) {
             LOG.info("Throttling per thread: {}", this.throttle);
         }
         this.semaphore = new Semaphore(this.throttle);
@@ -66,8 +66,9 @@ public class Execution implements Callable<Void> {
                 .build());
 
         this.payloads = new ArrayList<>();
-        for (DestToPayload payload : payloads) {
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
+        for (final DestToPayload payload : payloads) {
+            final AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient
+                    .preparePatch(payload.getDestination())
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Accept", "application/json")
                     .setBody(payload.getPayload())
@@ -75,9 +76,9 @@ public class Execution implements Callable<Void> {
 
             requestBuilder.setRealm(new Realm.RealmBuilder()
                     .setScheme(Realm.AuthScheme.BASIC)
-                    .setPrincipal(params.controllerAuthUsername)
-                    .setPassword(params.controllerAuthPassword)
-                    .setMethodName("POST")
+                    .setPrincipal(params.getControllerAuthUsername())
+                    .setPassword(params.getControllerAuthPassword())
+                    .setMethodName(HttpMethod.PATCH.getName())
                     .setUsePreemptiveAuth(true)
                     .build());
 
@@ -87,21 +88,19 @@ public class Execution implements Callable<Void> {
 
     private void invokeSync() {
         LOG.info("Begin sending sync requests");
-        for (Request request : payloads) {
+        for (final Request request : payloads) {
             try {
-                Response response = asyncHttpClient.executeRequest(request).get();
+                final Response response = asyncHttpClient.executeRequest(request).get();
                 if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
-                    if (response.getStatusCode() == 409) {
-                        LOG.warn("Request failed, status code: {} - one or more of the devices"
-                                + " is already configured, skipping the whole batch", response.getStatusCode());
-                    } else {
-                        LOG.warn("Status code: {}", response.getStatusCode());
-                        LOG.warn("url: {}", request.getUrl());
-                        LOG.warn("body: {}", response.getResponseBody());
-                    }
+                    LOG.warn("Unexpected status code: {} for request to url: {} with response: {}",
+                            response.getStatusCode(), request.getUrl(), response.getResponseBody());
                 }
-            } catch (InterruptedException | ExecutionException | IOException e) {
-                LOG.warn("Failed to execute request", e);
+                if (response.getStatusCode() == 204) {
+                    LOG.warn("Data at: {} were replaced!", request.getUrl());
+                }
+            } catch (final InterruptedException | ExecutionException | IOException e) {
+                LOG.error("Failed to execute request: {}", request, e);
+                throw new RuntimeException("Failed to execute request", e);
             }
         }
         LOG.info("End sending sync requests");
@@ -121,14 +120,11 @@ public class Execution implements Callable<Void> {
                 public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
                     super.onStatusReceived(status);
                     if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
-                        if (status.getStatusCode() == 409) {
-                            LOG.warn("Request failed, status code: {} - one or more of the devices"
-                                    + " is already configured, skipping the whole batch", status.getStatusCode());
-                        } else {
-                            LOG.warn("Request failed, status code: {}",
-                                status.getStatusCode() + status.getStatusText());
-                            LOG.warn("request: {}", request.toString());
-                        }
+                        LOG.warn("Unexpected status code: {} for request to url: {} with response: {}",
+                                status.getStatusCode(), request.getUrl(), status.getStatusText());
+                    }
+                    if (status.getStatusCode() == 204) {
+                        LOG.warn("Data at: {} were replaced!", request.getUrl());
                     }
                     return STATE.CONTINUE;
                 }
