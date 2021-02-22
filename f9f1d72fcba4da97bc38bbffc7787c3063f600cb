@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "13f98506_664b2b96",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2021-02-22T12:17:39Z",
+      "side": 1,
+      "message": "made final, squashed this change to https://git.opendaylight.org/gerrit/c/netconf/+/95210",
+      "parentUuid": "5f8f3a28_a9ac92ae",
+      "revId": "f9f1d72fcba4da97bc38bbffc7787c3063f600cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cc7549d7_ebeea3fb",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
         "patchSetId": 4
@@ -33,6 +51,24 @@
       "revId": "f9f1d72fcba4da97bc38bbffc7787c3063f600cb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "16bdba04_6b1b97f1",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2021-02-22T12:17:39Z",
+      "side": 1,
+      "message": "this method meant to be generic, that\u0027s why name is not generated here",
+      "parentUuid": "cc7549d7_ebeea3fb",
+      "revId": "f9f1d72fcba4da97bc38bbffc7787c3063f600cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
