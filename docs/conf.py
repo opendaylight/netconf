@@ -15,3 +15,8 @@ from docs_conf.conf import *
 linkcheck_ignore = [
     'http://localhost',
 ]
+
+data = ET.parse('pom.xml')
+project_version = data.getroot().find('./{http://maven.apache.org/POM/4.0.0}version').text
+version = project_version
+release = project_version
