@@ -5,60 +5,43 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import com.google.common.base.Preconditions;
 import java.io.File;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 
-public class Parameters {
-
+final class Parameters {
     @Arg(dest = "ip")
-    public String ip;
-
+    private String ip;
     @Arg(dest = "port")
-    public int port;
-
+    private int port;
     @Arg(dest = "destination")
-    public String destination;
-
+    private String destination;
     @Arg(dest = "edit-count")
-    public int editCount;
-
+    private int editCount;
     @Arg(dest = "edit-content")
-    public File editContent;
-
+    private File editContent;
     @Arg(dest = "async")
-    public boolean async;
-
+    private boolean async;
     @Arg(dest = "thread-amount")
-    public int threadAmount;
-
+    private int threadAmount;
     @Arg(dest = "same-device")
-    public boolean sameDevice;
-
+    private boolean sameDevice;
     @Arg(dest = "device-port-range-start")
-    public int devicePortRangeStart;
-
+    private int devicePortRangeStart;
     @Arg(dest = "throttle")
-    public int throttle;
-
+    private int throttle;
     @Arg(dest = "auth")
-    public ArrayList<String> auth;
-
+    private ArrayList<String> auth;
     @Arg(dest = "timeout")
-    public long timeout;
+    private long timeout;
 
     static ArgumentParser getParser() {
-        final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf stress client");
-
+        final ArgumentParser parser = ArgumentParsers.newFor("netconf stress client").build();
         parser.description("Netconf stress client");
 
         parser.addArgument("--ip")
@@ -75,7 +58,7 @@ public class Parameters {
 
         parser.addArgument("--destination")
                 .type(String.class)
-                .setDefault("/restconf/config/network-topology:network-topology/topology/topology-netconf/node/"
+                .setDefault("/rests/data/network-topology:network-topology/topology=topology-netconf/node="
                         + "{DEVICE_PORT}-sim-device/yang-ext:mount/cisco-vpp:vpp/bridge-domains/bridge-domain/a")
                 .help("Destination to send the requests to after the ip:port part of the uri. "
                         + "Use {DEVICE_PORT} tag to use the device-port-range-start argument")
@@ -148,11 +131,51 @@ public class Parameters {
         Preconditions.checkArgument(threadAmount > 0, "Parameter thread-amount must be greater than 0");
     }
 
-    public InetSocketAddress getInetAddress() {
-        try {
-            return new InetSocketAddress(InetAddress.getByName(ip), port);
-        } catch (final UnknownHostException e) {
-            throw new IllegalArgumentException("Unknown ip", e);
-        }
+    String getIp() {
+        return ip;
+    }
+
+    int getPort() {
+        return port;
+    }
+
+    String getDestination() {
+        return destination;
+    }
+
+    int getEditCount() {
+        return editCount;
+    }
+
+    File getEditContent() {
+        return editContent;
+    }
+
+    boolean isAsync() {
+        return async;
+    }
+
+    int getThreadAmount() {
+        return threadAmount;
+    }
+
+    boolean isSameDevice() {
+        return sameDevice;
+    }
+
+    int getDevicePortRangeStart() {
+        return devicePortRangeStart;
+    }
+
+    int getThrottle() {
+        return throttle;
+    }
+
+    ArrayList<String> getAuth() {
+        return auth;
+    }
+
+    long getTimeout() {
+        return timeout;
     }
 }

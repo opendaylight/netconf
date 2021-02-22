@@ -5,19 +5,21 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
+import com.google.common.math.IntMath;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
@@ -28,7 +30,7 @@ public final class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
     private Main() {
-
+        // hidden on purpose
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -37,8 +39,8 @@ public final class Main {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
         params.validate();
         final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
-            .getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
+                .getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(params.isDebug() ? Level.DEBUG : Level.INFO);
 
         final Configuration configuration = new ConfigurationBuilder().from(params).build();
         final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(configuration);
@@ -50,21 +52,17 @@ public final class Main {
                 System.exit(1);
             }
             //if ODL controller ip is not set NETCONF devices will be started, but not registered at the controller
-            if (params.controllerIp != null) {
-                final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = params
-                    .getThreadsPayloads(openDevices);
-                final ArrayList<Execution> executions = new ArrayList<>();
-                for (ArrayList<Execution.DestToPayload> payloads : allThreadsPayloads) {
-                    executions.add(new Execution(params, payloads));
-                }
-                final ExecutorService executorService = Executors.newFixedThreadPool(params.threadAmount);
+            if (params.getControllerIp() != null) {
+                final List<ExecutionThead> executionThreads = splitDevicesToThreads(openDevices, params);
+                final ExecutorService executorService = Executors.newFixedThreadPool(params.getThreadAmount());
                 final Stopwatch time = Stopwatch.createStarted();
-                List<Future<Void>> futures = executorService.invokeAll(executions, params.timeOut, TimeUnit.SECONDS);
+                final List<Future<Void>> futures = executorService.invokeAll(executionThreads,
+                        params.getTimeout(), TimeUnit.SECONDS);
                 int threadNum = 0;
-                for (Future<Void> future : futures) {
+                for (final Future<Void> future : futures) {
                     threadNum++;
                     if (future.isCancelled()) {
-                        LOG.info("{}. thread timed out.",threadNum);
+                        LOG.info("{}. thread timed out.", threadNum);
                     } else {
                         try {
                             future.get();
@@ -74,9 +72,9 @@ public final class Main {
                     }
                 }
                 time.stop();
-                LOG.info("Time spent with configuration of devices: {}.",time);
+                LOG.info("Time spent with configuration of devices: {}.", time);
             }
-        } catch (RuntimeException | InterruptedException e) {
+        } catch (final RuntimeException | InterruptedException e) {
             LOG.error("Unhandled exception", e);
             netconfDeviceSimulator.close();
             System.exit(1);
@@ -90,5 +88,13 @@ public final class Main {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static List<ExecutionThead> splitDevicesToThreads(final List<Integer> openDevices,
+            final TesttoolParameters params) {
+        final int devicesPerThread = IntMath.divide(openDevices.size(), params.getThreadAmount(), RoundingMode.UP);
+        return Lists.partition(openDevices, devicesPerThread).stream()
+                .map(t -> new ExecutionThead(t, params))
+                .collect(Collectors.toList());
     }
 }
