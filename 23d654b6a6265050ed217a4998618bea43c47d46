@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "400b3feb_27503ccf",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-02-22T07:26:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c6848a2_86d4b1df",
+      "range": {
+        "startLine": 187,
+        "startChar": 11,
+        "endLine": 187,
+        "endChar": 35
+      },
+      "revId": "23d654b6a6265050ed217a4998618bea43c47d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99fb64c9_9d3d62c3",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/SubscribeToStreamUtil.java",
         "patchSetId": 16
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "ca97d497_0256aa19",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/SubscribeToStreamUtil.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-02-22T07:26:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99fb64c9_9d3d62c3",
+      "range": {
+        "startLine": 80,
+        "startChar": 8,
+        "endLine": 80,
+        "endChar": 16
+      },
+      "revId": "23d654b6a6265050ed217a4998618bea43c47d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14d95529_6d452b8b",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/SubscribeToStreamUtil.java",
         "patchSetId": 16
@@ -68,6 +116,30 @@
       "revId": "23d654b6a6265050ed217a4998618bea43c47d46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eb205839_5fe7c9d8",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/SubscribeToStreamUtil.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-02-22T07:26:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14d95529_6d452b8b",
+      "range": {
+        "startLine": 245,
+        "startChar": 67,
+        "endLine": 245,
+        "endChar": 84
+      },
+      "revId": "23d654b6a6265050ed217a4998618bea43c47d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
