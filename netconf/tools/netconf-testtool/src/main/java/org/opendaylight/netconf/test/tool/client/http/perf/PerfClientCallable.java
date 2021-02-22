@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import com.ning.http.client.AsyncHttpClient;
@@ -16,7 +15,7 @@ import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PerfClientCallable implements Callable<Void> {
+final class PerfClientCallable implements Callable<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(PerfClientCallable.class);
 
     private final Parameters params;
@@ -24,7 +23,7 @@ public class PerfClientCallable implements Callable<Void> {
     private ExecutionStrategy executionStrategy;
     private RequestData payloads;
 
-    public PerfClientCallable(Parameters params, RequestData payloads) {
+    PerfClientCallable(final Parameters params, final RequestData payloads) {
         this.params = params;
         this.payloads = payloads;
         this.asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder()
@@ -36,7 +35,7 @@ public class PerfClientCallable implements Callable<Void> {
     }
 
     private ExecutionStrategy getExecutionStrategy() {
-        return params.async
+        return params.isAsync()
                 ? new AsyncExecutionStrategy(params, asyncHttpClient, payloads)
                 : new SyncExecutionStrategy(params, asyncHttpClient, payloads);
     }

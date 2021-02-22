@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import ch.qos.logback.classic.Level;
@@ -37,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING", "SLF4J_LOGGER_SHOULD_BE_FINAL"})
-public final class ScaleUtil {
+final class ScaleUtil {
     private static final ScheduledExecutorService EXECUTOR = new LoggingWrapperExecutor(4);
     private static final Semaphore SEMAPHORE = new Semaphore(0);
     private static final Stopwatch STOPWATCH = Stopwatch.createUnstarted();
@@ -50,10 +49,11 @@ public final class ScaleUtil {
     private static Logger resultsLog;
 
     private ScaleUtil() {
+        // hidden on purpose
     }
 
     @SuppressWarnings("checkstyle:illegalCatch")
-    public static void main(final String[] args) {
+    static void main(final String[] args) {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
 
         setUpLoggers(params);
@@ -63,7 +63,7 @@ public final class ScaleUtil {
         cleanup(runtime, params);
 
         while (true) {
-            root.warn("Starting scale test with {} devices", params.deviceCount);
+            root.warn("Starting scale test with {} devices", params.getDeviceCount());
             final ScheduledFuture<?> timeoutGuardFuture = EXECUTOR.schedule(new TimeoutGuard(), TIMEOUT,
                 TimeUnit.MINUTES);
             final Configuration configuration = new ConfigurationBuilder().from(params).build();
@@ -75,17 +75,17 @@ public final class ScaleUtil {
                 System.exit(1);
             }
 
-            if (params.distroFolder == null) {
+            if (params.getDistroFolder() == null) {
                 root.error("Distro folder is not set, exiting...");
                 System.exit(1);
             }
 
-            root.warn(params.distroFolder.getAbsolutePath());
+            root.warn(params.getDistroFolder().getAbsolutePath());
             try {
-                runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/start");
+                runtime.exec(params.getDistroFolder().getAbsolutePath() + "/bin/start");
                 String status;
                 do {
-                    final Process exec = runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/status");
+                    final Process exec = runtime.exec(params.getDistroFolder().getAbsolutePath() + "/bin/status");
                     try {
                         Thread.sleep(2000L);
                     } catch (InterruptedException e) {
@@ -94,9 +94,9 @@ public final class ScaleUtil {
                     status = CharStreams.toString(new BufferedReader(new InputStreamReader(exec.getInputStream())));
                     root.warn("Current status: {}", status);
                 } while (!status.startsWith("Running ..."));
-                root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
+                root.warn("Doing feature install {}", params.getDistroFolder().getAbsolutePath()
                     + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
-                final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
+                final Process featureInstall = runtime.exec(params.getDistroFolder().getAbsolutePath()
                     + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
@@ -113,7 +113,8 @@ public final class ScaleUtil {
 
             try {
                 EXECUTOR.schedule(
-                    new ScaleVerifyCallable(netconfDeviceSimulator, params.deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
+                    new ScaleVerifyCallable(netconfDeviceSimulator, params.getDeviceCount()),
+                        RETRY_DELAY, TimeUnit.SECONDS);
                 root.warn("First callable scheduled");
                 SEMAPHORE.acquire();
                 root.warn("semaphore released");
@@ -122,7 +123,7 @@ public final class ScaleUtil {
             }
 
             timeoutGuardFuture.cancel(false);
-            params.deviceCount += DEVICE_STEP;
+            params.setDeviceCount(params.getDeviceCount() + DEVICE_STEP);
             netconfDeviceSimulator.close();
             STOPWATCH.reset();
 
@@ -134,15 +135,14 @@ public final class ScaleUtil {
         System.setProperty("log_file_name", "scale-util.log");
 
         root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
+        root.setLevel(params.isDebug() ? Level.DEBUG : Level.INFO);
         resultsLog = LoggerFactory.getLogger("results");
     }
 
     private static void cleanup(final Runtime runtime, final TesttoolParameters params) {
         try {
             stopKaraf(runtime, params);
-            deleteFolder(new File(params.distroFolder.getAbsoluteFile() + "/data"));
-
+            deleteFolder(new File(params.getDistroFolder().getAbsoluteFile() + "/data"));
         } catch (IOException | InterruptedException e) {
             root.warn("Failed to stop karaf", e);
             System.exit(1);
@@ -162,7 +162,7 @@ public final class ScaleUtil {
 
             Thread.sleep(10000L);
         } while (!controllerPid.isEmpty());
-        deleteFolder(new File(params.distroFolder.getAbsoluteFile() + "/data"));
+        deleteFolder(new File(params.getDistroFolder().getAbsoluteFile() + "/data"));
     }
 
     private static void deleteFolder(final File folder) {
@@ -186,8 +186,8 @@ public final class ScaleUtil {
     private static class ScaleVerifyCallable implements Callable<Void> {
         private static final Logger LOG = LoggerFactory.getLogger(ScaleVerifyCallable.class);
 
-        private static final String RESTCONF_URL = "http://127.0.0.1:8181/restconf/operational/"
-                + "network-topology:network-topology/topology/topology-netconf/";
+        private static final String RESTCONF_URL = "http://127.0.0.1:8181/rests/data/"
+                + "network-topology:network-topology/topology=topology-netconf/";
         private static final Pattern PATTERN = Pattern.compile("connected");
 
         private final AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new Builder()
@@ -255,8 +255,8 @@ public final class ScaleUtil {
     }
 
     @SuppressWarnings("checkstyle:illegalCatch")
-    public static class LoggingWrapperExecutor extends ScheduledThreadPoolExecutor {
-        public LoggingWrapperExecutor(final int corePoolSize) {
+    static class LoggingWrapperExecutor extends ScheduledThreadPoolExecutor {
+        LoggingWrapperExecutor(final int corePoolSize) {
             super(corePoolSize);
         }
 
