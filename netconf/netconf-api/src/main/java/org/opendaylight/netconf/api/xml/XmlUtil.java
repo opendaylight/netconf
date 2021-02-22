@@ -122,7 +122,7 @@ public final class XmlUtil {
 
     public static Element createElement(final Document document, final String qname,
             final Optional<String> namespaceURI) {
-        if (!namespaceURI.isPresent()) {
+        if (namespaceURI.isEmpty()) {
             return document.createElement(qname);
         }
 

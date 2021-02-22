@@ -161,7 +161,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
         FluentFuture.from(feature).addCallback(new FutureCallback<>() {
             @Override
             public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
-                if (!result.isPresent()) {
+                if (result.isEmpty()) {
                     sender.tell(new EmptyReadResponse(), self);
                     return;
                 }

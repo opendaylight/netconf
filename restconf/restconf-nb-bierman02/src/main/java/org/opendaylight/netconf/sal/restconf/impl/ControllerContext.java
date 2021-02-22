@@ -583,7 +583,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
                 final YangInstanceIdentifier partialPath = this.dataNormalizer.toNormalized(builder.build());
                 final Optional<DOMMountPoint> mountOpt = this.mountService.getMountPoint(partialPath);
-                if (!mountOpt.isPresent()) {
+                if (mountOpt.isEmpty()) {
                     LOG.debug("Instance identifier to missing mount point: {}", partialPath);
                     throw new RestconfDocumentedException("Mount point does not exist.", ErrorType.PROTOCOL,
                             ErrorTag.DATA_MISSING);

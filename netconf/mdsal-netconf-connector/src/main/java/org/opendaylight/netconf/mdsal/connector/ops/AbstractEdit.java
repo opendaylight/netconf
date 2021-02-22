@@ -87,7 +87,7 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         final String elementName = element.getName();
         final Optional<DataSchemaNode> schemaNode = module.findDataChildByName(QName.create(module.getQNameModule(),
                     element.getName()));
-        if (!schemaNode.isPresent()) {
+        if (schemaNode.isEmpty()) {
             throw new DocumentedException(
                 "Unable to find node " + elementName + " with namespace: " + namespace + "in module: "
                     + module.toString(),

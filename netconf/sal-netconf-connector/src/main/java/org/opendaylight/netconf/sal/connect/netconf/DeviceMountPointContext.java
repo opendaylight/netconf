@@ -67,7 +67,7 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
 
     static MountPointContext create(final MountPointContext emptyContext, final ContainerNode mountData) {
         final Optional<DataContainerChild<?, ?>> optMountPoint = mountData.getChild(MOUNT_POINT);
-        if (!optMountPoint.isPresent()) {
+        if (optMountPoint.isEmpty()) {
             LOG.debug("mount-point list not present in {}", mountData);
             return emptyContext;
         }
@@ -102,7 +102,7 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
             final ChoiceNode schemaRef = (ChoiceNode) child;
 
             final Optional<DataContainerChild<?, ?>> maybeShared = schemaRef.getChild(SHARED_SCHEMA);
-            if (!maybeShared.isPresent()) {
+            if (maybeShared.isEmpty()) {
                 LOG.debug("Ignoring non-shared mountpoint entry {}", entry);
                 continue;
             }

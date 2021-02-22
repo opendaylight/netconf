@@ -51,7 +51,7 @@ class ReadAdapter {
         tx.read(store, path).addCallback(new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
             @Override
             public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
-                if (!result.isPresent()) {
+                if (result.isEmpty()) {
                     sender.tell(new EmptyReadResponse(), self);
                     return;
                 }

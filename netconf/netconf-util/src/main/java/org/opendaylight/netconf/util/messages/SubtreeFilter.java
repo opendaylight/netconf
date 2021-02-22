@@ -43,7 +43,7 @@ public final class SubtreeFilter {
             Optional<XmlElement> maybeFilter = operationNameAndNamespace.getOperationElement()
                     .getOnlyChildElementOptionally(XmlNetconfConstants.FILTER,
                             XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-            if (!maybeFilter.isPresent()) {
+            if (maybeFilter.isEmpty()) {
                 return rpcReply;
             }
             XmlElement filter = maybeFilter.get();

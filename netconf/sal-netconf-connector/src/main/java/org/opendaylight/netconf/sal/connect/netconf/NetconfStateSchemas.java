@@ -145,7 +145,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         final Optional<? extends NormalizedNode<?, ?>> optSchemasNode = findSchemasNode(schemasNodeResult.getResult(),
                 schemaContext);
-        if (!optSchemasNode.isPresent()) {
+        if (optSchemasNode.isEmpty()) {
             LOG.warn("{}: Unable to detect available schemas, get to {} was empty", id, STATE_SCHEMAS_IDENTIFIER);
             return EMPTY;
         }
@@ -174,9 +174,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         for (final MapEntryNode schemaNode : ((MapNode) child.get()).getValue()) {
             final Optional<RemoteYangSchema> fromCompositeNode =
                     RemoteYangSchema.createFromNormalizedNode(id, schemaNode);
-            if (fromCompositeNode.isPresent()) {
-                availableYangSchemas.add(fromCompositeNode.get());
-            }
+            fromCompositeNode.ifPresent(availableYangSchemas::add);
         }
 
         return new NetconfStateSchemas(availableYangSchemas);
@@ -188,7 +186,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             return Optional.empty();
         }
         final Optional<DataContainerChild<?, ?>> rpcResultOpt = ((ContainerNode)result).getChild(NETCONF_DATA_NODEID);
-        if (!rpcResultOpt.isPresent()) {
+        if (rpcResultOpt.isEmpty()) {
             return Optional.empty();
         }
 
@@ -206,7 +204,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         final Optional<DataContainerChild<?, ?>> nStateNode = ((DataContainerNode<?>) dataNode).getChild(
             toId(NetconfState.QNAME));
-        if (!nStateNode.isPresent()) {
+        if (nStateNode.isEmpty()) {
             return Optional.empty();
         }
 
@@ -246,7 +244,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE;
             final Optional<String> namespaceValue = getSingleChildNodeValue(schemaNode, childNode);
-            if (!namespaceValue.isPresent()) {
+            if (namespaceValue.isEmpty()) {
                 LOG.warn("{}: Ignoring schema due to missing namespace", id);
                 return Optional.empty();
             }

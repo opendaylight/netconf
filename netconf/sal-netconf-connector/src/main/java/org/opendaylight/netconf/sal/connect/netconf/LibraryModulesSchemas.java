@@ -264,7 +264,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             LOG.warn("Unable to download yang library from {}", connection.getURL(), e);
         }
 
-        if (!optionalModulesStateNode.isPresent()) {
+        if (optionalModulesStateNode.isEmpty()) {
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
 

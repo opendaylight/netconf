@@ -54,7 +54,7 @@ public class GetConfig extends AbstractGet {
         }
 
         final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
-        if (!dataRootOptional.isPresent()) {
+        if (dataRootOptional.isEmpty()) {
             return document.createElement(XmlNetconfConstants.DATA_KEY);
         }
 
@@ -71,7 +71,7 @@ public class GetConfig extends AbstractGet {
                 transactionProvider.abortRunningTransaction(rwTx);
             }
 
-            if (!normalizedNodeOptional.isPresent()) {
+            if (normalizedNodeOptional.isEmpty()) {
                 return document.createElement(XmlNetconfConstants.DATA_KEY);
             }
 

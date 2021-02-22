@@ -198,7 +198,7 @@ public class FilterContentValidator {
         for (final QName qualifiedName : keyDefinition) {
             final Optional<XmlElement> childElements =
                     current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
-            if (!childElements.isPresent()) {
+            if (childElements.isEmpty()) {
                 return Collections.emptyMap();
             }
             final Optional<String> keyValue = childElements.get().getOnlyTextContentOptionally();

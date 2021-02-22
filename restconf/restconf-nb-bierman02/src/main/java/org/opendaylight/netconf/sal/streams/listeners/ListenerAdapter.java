@@ -209,7 +209,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                 break;
         }
 
-        if (!optionalNormalizedNode.isPresent()) {
+        if (optionalNormalizedNode.isEmpty()) {
             LOG.error("No node present in notification for {}", candidateNode);
             return;
         }

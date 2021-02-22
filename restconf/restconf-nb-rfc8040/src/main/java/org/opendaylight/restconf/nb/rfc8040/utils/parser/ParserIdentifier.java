@@ -84,7 +84,7 @@ public final class ParserIdentifier {
         if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
             return createIIdContext(schemaContext, identifier, null);
         }
-        if (!mountPointService.isPresent()) {
+        if (mountPointService.isEmpty()) {
             throw new RestconfDocumentedException("Mount point service is not available");
         }
 

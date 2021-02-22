@@ -69,12 +69,12 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
         // Replay not supported
         final Optional<XmlElement> startTime =
                 operationElement.getOnlyChildElementWithSameNamespaceOptionally("startTime");
-        checkArgument(!startTime.isPresent(), "StartTime element not yet supported");
+        checkArgument(startTime.isEmpty(), "StartTime element not yet supported");
 
         // Stop time not supported
         final Optional<XmlElement> stopTime =
                 operationElement.getOnlyChildElementWithSameNamespaceOptionally("stopTime");
-        checkArgument(!stopTime.isPresent(), "StopTime element not yet supported");
+        checkArgument(stopTime.isEmpty(), "StopTime element not yet supported");
 
         final StreamNameType streamNameType = parseStreamIfPresent(operationElement);
 

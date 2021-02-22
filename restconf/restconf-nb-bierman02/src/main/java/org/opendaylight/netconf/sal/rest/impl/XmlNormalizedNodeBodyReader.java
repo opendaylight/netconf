@@ -103,7 +103,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             XMLStreamException, ParserConfigurationException, URISyntaxException {
         final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
         final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
-        if (!nonEmptyInputStreamOptional.isPresent()) {
+        if (nonEmptyInputStreamOptional.isEmpty()) {
             // represent empty nopayload input
             return new NormalizedNodeContext(path, null);
         }

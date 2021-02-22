@@ -74,7 +74,7 @@ public class TransactionProvider implements AutoCloseable {
                 ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
 
-        if (!getCandidateTransaction().isPresent()) {
+        if (getCandidateTransaction().isEmpty()) {
             // Validating empty transaction, just return true
             LOG.debug("Validating empty candidate transaction for session {}", netconfSessionIdForReporting);
             return;
@@ -93,7 +93,7 @@ public class TransactionProvider implements AutoCloseable {
     }
 
     public synchronized boolean commitTransaction() throws DocumentedException {
-        if (!getCandidateTransaction().isPresent()) {
+        if (getCandidateTransaction().isEmpty()) {
             //making empty commit without prior opened transaction, just return true
             LOG.debug("Making commit without open candidate transaction for session {}", netconfSessionIdForReporting);
             return true;
@@ -119,7 +119,7 @@ public class TransactionProvider implements AutoCloseable {
     public synchronized void abortTransaction() {
         LOG.debug("Aborting current candidateTransaction");
         final Optional<DOMDataTreeReadWriteTransaction> otx = getCandidateTransaction();
-        if (!otx.isPresent()) {
+        if (otx.isEmpty()) {
             LOG.warn("discard-changes triggerd on an empty transaction for session: {}", netconfSessionIdForReporting);
             return;
         }

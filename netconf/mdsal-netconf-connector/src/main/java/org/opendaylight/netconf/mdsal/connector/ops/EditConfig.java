@@ -121,7 +121,7 @@ public final class EditConfig extends AbstractEdit {
                 break;
             case DELETE:
                 try {
-                    if (!rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get().isPresent()) {
+                    if (rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get().isEmpty()) {
                         throw new DocumentedException("Data is missing, cannot execute DELETE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
                     }

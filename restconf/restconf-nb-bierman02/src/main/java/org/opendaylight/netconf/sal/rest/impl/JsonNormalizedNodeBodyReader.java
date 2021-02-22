@@ -101,7 +101,7 @@ public class JsonNormalizedNodeBodyReader
                                                   final InputStream entityStream, final boolean isPost)
             throws IOException {
         final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
-        if (!nonEmptyInputStreamOptional.isPresent()) {
+        if (nonEmptyInputStreamOptional.isEmpty()) {
             return new NormalizedNodeContext(path, null);
         }
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
