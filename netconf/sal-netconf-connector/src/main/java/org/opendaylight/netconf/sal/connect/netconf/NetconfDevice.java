@@ -182,7 +182,7 @@ public class NetconfDevice
             @Override
             public void onSuccess(final MountPointContext result) {
                 handleSalInitializationSuccess(result, remoteSessionCapabilities,
-                    getDeviceSpecificRpc(result, listener), listener);
+                        getDeviceSpecificRpc(result, listener, baseSchema), listener);
             }
 
             @Override
@@ -373,9 +373,9 @@ public class NetconfDevice
     }
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
-            final RemoteDeviceCommunicator<NetconfMessage> listener) {
+            final RemoteDeviceCommunicator<NetconfMessage> listener, final BaseSchema schema) {
         return new NetconfDeviceRpc(result.getEffectiveModelContext(), listener,
-            new NetconfMessageTransformer(result, true, baseSchemas.getBaseSchema()));
+            new NetconfMessageTransformer(result, true, schema));
     }
 
     /**
