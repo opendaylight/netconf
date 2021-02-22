@@ -16,9 +16,11 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +52,7 @@ public class Execution implements Callable<Void> {
         }
     }
 
-    public Execution(final TesttoolParameters params, final ArrayList<DestToPayload> payloads) {
+    public Execution(final TesttoolParameters params, final List<DestToPayload> payloads) {
         this.invokeAsync = params.async;
         this.throttle = params.throttle / params.threadAmount;
 
@@ -67,7 +69,7 @@ public class Execution implements Callable<Void> {
 
         this.payloads = new ArrayList<>();
         for (DestToPayload payload : payloads) {
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
+            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePatch(payload.getDestination())
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Accept", "application/json")
                     .setBody(payload.getPayload())
@@ -77,7 +79,7 @@ public class Execution implements Callable<Void> {
                     .setScheme(Realm.AuthScheme.BASIC)
                     .setPrincipal(params.controllerAuthUsername)
                     .setPassword(params.controllerAuthPassword)
-                    .setMethodName("POST")
+                    .setMethodName(HttpMethod.PATCH.getName())
                     .setUsePreemptiveAuth(true)
                     .build());
 
