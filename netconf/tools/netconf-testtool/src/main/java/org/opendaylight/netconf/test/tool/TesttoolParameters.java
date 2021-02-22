@@ -9,57 +9,35 @@ package org.opendaylight.netconf.test.tool;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.gson.FieldNamingPolicy.LOWER_CASE_WITH_DASHES;
 
-import com.google.common.collect.Lists;
-import com.google.common.math.IntMath;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import org.opendaylight.netconf.test.tool.model.Node;
-import org.opendaylight.netconf.test.tool.model.Payload;
-import org.opendaylight.netconf.test.tool.model.Topology;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 
 @SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
 public final class TesttoolParameters {
-
-    private static final String RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE =
-        "http://%s:%s/rests/data/network-topology:network-topology/topology=topology-netconf";
     private static final Pattern YANG_FILENAME_PATTERN = Pattern
         .compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
     private static final Pattern REVISION_DATE_PATTERN = Pattern.compile("revision\\s+\"?(\\d{4}-\\d{2}-\\d{2})\"?");
-    private static final Gson RESTCONF_REQUEST_GSON = new GsonBuilder()
-            .setFieldNamingStrategy(LOWER_CASE_WITH_DASHES).create();
-    private static final String DEFAULT_TOPOLOGY_ID = "topology-netconf";
-    private static final String DEFAULT_NODE_PASSWORD = "admin";
-    private static final String DEFAULT_NODE_USERNAME = "admin";
-    private static final Boolean DEFAULT_NODE_SCHEMALESS = false;
-    private static final int DEFAULT_NODE_KEEPALIVE_DELAY = 0;
 
     @Arg(dest = "async")
     public boolean async;
@@ -354,96 +332,6 @@ public final class TesttoolParameters {
         return null;
     }
 
-    List<List<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
-        final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
-                controllerIp, controllerPort);
-        final List<Payload> payloads = createPayloads(openDevices);
-        final List<Execution.DestToPayload> destinationPayloadPairs = payloads.stream()
-                .map(RESTCONF_REQUEST_GSON::toJson)
-                .map(stringPayload -> new Execution.DestToPayload(restconfNetconfTopologyPath, stringPayload))
-                .collect(Collectors.toList());
-        final int requestsPerThread = IntMath.divide(destinationPayloadPairs.size(), threadAmount, RoundingMode.UP);
-        return Lists.partition(destinationPayloadPairs, requestsPerThread);
-    }
-
-    private List<Payload> createPayloads(final List<Integer> openDevices) {
-        final List<Payload> payloads;
-        if (generateConfigBatchSize > 1) {
-            final List<List<Integer>> portsInBatches = Lists.partition(openDevices, generateConfigBatchSize);
-            payloads = createBatchedPayloads(portsInBatches);
-        } else {
-            payloads = createSingleNodePayloads(openDevices);
-        }
-        return payloads;
-    }
-
-    private List<Payload> createBatchedPayloads(final List<List<Integer>> portsInBatches) {
-        final List<List<String>> nodeIdsInBatches = portsInBatches.stream()
-                .map(portsInRequest -> portsInRequest.stream()
-                        .map(TesttoolParameters::createNodeID)
-                        .collect(Collectors.toList()))
-                .collect(Collectors.toList());
-        return createBatchedPayloads(DEFAULT_TOPOLOGY_ID, portsInBatches, nodeIdsInBatches, generateConfigsAddress,
-                DEFAULT_NODE_USERNAME, DEFAULT_NODE_PASSWORD, !ssh, DEFAULT_NODE_KEEPALIVE_DELAY,
-                DEFAULT_NODE_SCHEMALESS);
-    }
-
-    private static List<Payload> createBatchedPayloads(final String topologyId,
-            final List<List<Integer>> portsInBatches, final List<List<String>> nodeIdsInBatches, final String host,
-            final String username, final String password, final boolean tcpOnly, final int keepaliveDelay,
-            final boolean schemaless) {
-        final List<Payload> payloads = new ArrayList<>();
-        final Iterator<List<String>> nodeIdsIterator = nodeIdsInBatches.iterator();
-        for (final List<Integer> portsInBatch : portsInBatches) {
-            final List<String> nodeIdsInBatch = nodeIdsIterator.next();
-            payloads.add(createPayload(topologyId, portsInBatch, nodeIdsInBatch ,host, username, password, tcpOnly,
-                    keepaliveDelay, schemaless));
-        }
-        return payloads;
-    }
-
-    private List<Payload> createSingleNodePayloads(final List<Integer> batchedPorts) {
-        final List<String> nodeIdsInBatches = batchedPorts.stream()
-                .map(TesttoolParameters::createNodeID)
-                .collect(Collectors.toList());
-        return createSingleNodePayloads(DEFAULT_TOPOLOGY_ID, batchedPorts, nodeIdsInBatches, generateConfigsAddress,
-                DEFAULT_NODE_USERNAME, DEFAULT_NODE_PASSWORD, !ssh, DEFAULT_NODE_KEEPALIVE_DELAY,
-                DEFAULT_NODE_SCHEMALESS);
-    }
-
-    private static List<Payload> createSingleNodePayloads(final String topologyId, final List<Integer> portsInBatches,
-            final List<String> nodeIdsInBatches, final String host, final String username, final String password,
-            final boolean tcpOnly, final int keepaliveDelay, final boolean schemaless) {
-        final List<Payload> payloads = new ArrayList<>();
-        final Iterator<String> nodeIdsIterator = nodeIdsInBatches.iterator();
-        for (final int portsInBatch : portsInBatches) {
-            final String nodeIdsInBatch = nodeIdsIterator.next();
-            payloads.add(createPayload(topologyId, portsInBatch, nodeIdsInBatch ,host, username, password, tcpOnly,
-                    keepaliveDelay, schemaless));
-        }
-        return payloads;
-    }
-
-    private static Payload createPayload(final String topologyId, final int port, final String nodeId,
-            final String host, final String username, final String password, final Boolean tcpOnly,
-            final int keepaliveDelay, final boolean schemaless) {
-        final Topology topology = new Topology(topologyId);
-        topology.addNode(new Node(nodeId, host, port, username, password, tcpOnly, keepaliveDelay, schemaless));
-        return new Payload(topology);
-    }
-
-    private static Payload createPayload(final String topologyId, final Iterable<Integer> ports,
-            final Iterable<String> nodeIds, final String host, final String username, final String password,
-            final boolean tcpOnly, final int keepaliveDelay, final boolean schemaless) {
-        final Topology topology = new Topology(topologyId);
-        final Iterator<String> nodeIdsIterator = nodeIds.iterator();
-        for (final Integer port : ports) {
-            final String nodeId = nodeIdsIterator.next();
-            topology.addNode(new Node(nodeId, host, port, username, password, tcpOnly, keepaliveDelay,schemaless));
-        }
-        return new Payload(topology);
-    }
-
     @Override
     public String toString() {
         final List<Field> fields = Arrays.asList(this.getClass().getDeclaredFields());
@@ -461,9 +349,5 @@ public final class TesttoolParameters {
         } catch (final IllegalAccessException e) {
             return field.getName() + "= UNKNOWN";
         }
-    }
-
-    private static String createNodeID(final Integer port) {
-        return String.format("%d-sim-device", port);
     }
 }
