@@ -10,23 +10,18 @@ package org.opendaylight.netconf.test.tool;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.io.CharStreams;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
@@ -38,69 +33,62 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 
-@SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
-public class TesttoolParameters {
-
-    private static final String HOST_KEY = "{HOST}";
-    private static final String PORT_KEY = "{PORT}";
-    private static final String TCP_ONLY = "{TCP_ONLY}";
-    private static final String RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE =
-        "http://%s:%s/restconf/config/network-topology:network-topology/topology/topology-netconf/";
+@SuppressFBWarnings({"DM_EXIT"})
+public final class TesttoolParameters {
     private static final Pattern YANG_FILENAME_PATTERN = Pattern
-        .compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
+            .compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
     private static final Pattern REVISION_DATE_PATTERN = Pattern.compile("revision\\s+\"?(\\d{4}-\\d{2}-\\d{2})\"?");
 
-    private static final String RESOURCE = "/config-template.json";
     @Arg(dest = "async")
-    public boolean async;
+    private boolean async;
     @Arg(dest = "thread-amount")
-    public int threadAmount;
+    private int threadAmount;
     @Arg(dest = "throttle")
-    public int throttle;
+    private int throttle;
     @Arg(dest = "controller-auth-username")
-    public String controllerAuthUsername;
+    private String controllerAuthUsername;
     @Arg(dest = "controller-auth-password")
-    public String controllerAuthPassword;
+    private String controllerAuthPassword;
     @Arg(dest = "controller-ip")
-    public String controllerIp;
+    private String controllerIp;
     @Arg(dest = "controller-port")
-    public Integer controllerPort;
+    private Integer controllerPort;
     @Arg(dest = "schemas-dir")
-    public File schemasDir;
+    private File schemasDir;
     @Arg(dest = "devices-count")
-    public int deviceCount;
+    private int deviceCount;
     @Arg(dest = "devices-per-port")
-    public int devicesPerPort;
+    private int devicesPerPort;
     @Arg(dest = "starting-port")
-    public int startingPort;
+    private int startingPort;
     @Arg(dest = "generate-config-connection-timeout")
-    public int generateConfigsTimeout;
+    private int generateConfigsTimeout;
     @Arg(dest = "generate-config-address")
-    public String generateConfigsAddress;
+    private String generateConfigsAddress;
     @Arg(dest = "distro-folder")
-    public File distroFolder;
+    private File distroFolder;
     @Arg(dest = "generate-configs-batch-size")
-    public int generateConfigBatchSize;
+    private int generateConfigBatchSize;
     @Arg(dest = "ssh")
-    public boolean ssh;
+    private boolean ssh;
     @Arg(dest = "exi")
-    public boolean exi = true;
+    private boolean exi = true;
     @Arg(dest = "debug")
-    public boolean debug;
+    private boolean debug;
     @Arg(dest = "notification-file")
-    public File notificationFile;
+    private File notificationFile;
     @Arg(dest = "md-sal")
-    public boolean mdSal;
+    private boolean mdSal;
     @Arg(dest = "initial-config-xml-file")
-    public File initialConfigXMLFile;
+    private File initialConfigXMLFile;
     @Arg(dest = "time-out")
-    public long timeOut;
+    private long timeOut;
     @Arg(dest = "ip")
-    public String ip;
+    private String ip;
     @Arg(dest = "thread-pool-size")
-    public int threadPoolSize;
+    private int threadPoolSize;
     @Arg(dest = "rpc-config")
-    public File rpcConfig;
+    private File rpcConfig;
 
     @SuppressWarnings("checkstyle:lineLength")
     static ArgumentParser getParser() {
@@ -146,7 +134,7 @@ public class TesttoolParameters {
                 .type(String.class)
                 .help("Ip of controller if available it will be used for spawning netconf connectors via topology"
                         + " configuration as a part of"
-                        + " URI(http://<controller-ip>:<controller-port>/restconf/config/...)"
+                        + " URI(http://<controller-ip>:<controller-port>/rests/data/...)"
                         + " otherwise it will just start simulated devices and skip the execution of PUT requests")
                 .dest("controller-ip");
 
@@ -154,7 +142,7 @@ public class TesttoolParameters {
                 .type(Integer.class)
                 .help("Port of controller if available it will be used for spawning netconf connectors via topology "
                         + "configuration as a part of"
-                        + " URI(http://<controller-ip>:<controller-port>/restconf/config/...) "
+                        + " URI(http://<controller-ip>:<controller-port>/rests/data/...) "
                         + "otherwise it will just start simulated devices and skip the execution of PUT requests")
                 .dest("controller-port");
 
@@ -266,7 +254,7 @@ public class TesttoolParameters {
         return parser;
     }
 
-    public static TesttoolParameters parseArgs(final String[] args, final ArgumentParser parser) {
+    static TesttoolParameters parseArgs(final String[] args, final ArgumentParser parser) {
         final TesttoolParameters opt = new TesttoolParameters();
         try {
             parser.parseArgs(args, opt);
@@ -277,25 +265,6 @@ public class TesttoolParameters {
 
         System.exit(1);
         return null;
-    }
-
-    private static String modifyMessage(final StringBuilder payloadBuilder, final int payloadPosition, final int size) {
-        if (size == 1) {
-            return payloadBuilder.toString();
-        }
-
-        if (payloadPosition == 0) {
-            payloadBuilder.insert(payloadBuilder.toString().indexOf('{', 2), "[");
-            payloadBuilder.replace(payloadBuilder.length() - 1, payloadBuilder.length(), ",");
-        } else if (payloadPosition + 1 == size) {
-            payloadBuilder.delete(0, payloadBuilder.toString().indexOf(':') + 1);
-            payloadBuilder.insert(payloadBuilder.toString().indexOf('}', 2) + 1, "]");
-        } else {
-            payloadBuilder.delete(0, payloadBuilder.toString().indexOf(':') + 1);
-            payloadBuilder.replace(payloadBuilder.length() - 2, payloadBuilder.length() - 1, ",");
-            payloadBuilder.deleteCharAt(payloadBuilder.toString().lastIndexOf('}'));
-        }
-        return payloadBuilder.toString();
     }
 
     @SuppressWarnings("checkstyle:regexpSinglelineJava")
@@ -312,7 +281,7 @@ public class TesttoolParameters {
 
         checkArgument(deviceCount > 0, "Device count has to be > 0");
         checkArgument(startingPort > 1023, "Starting port has to be > 1023");
-        checkArgument(devicesPerPort > 0, "Atleast one device per port needed");
+        checkArgument(devicesPerPort > 0, "At least one device per port needed");
 
         if (schemasDir != null) {
             checkArgument(schemasDir.exists(), "Schemas dir has to exist");
@@ -363,140 +332,6 @@ public class TesttoolParameters {
         return null;
     }
 
-
-    public ArrayList<ArrayList<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
-        final String editContentString;
-        try {
-            final InputStream stream = TesttoolParameters.class.getResourceAsStream(RESOURCE);
-            editContentString = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
-        } catch (final IOException e) {
-            throw new IllegalArgumentException("Cannot read content of " + RESOURCE, e);
-        }
-
-        int from;
-        int to;
-        Iterator<Integer> iterator;
-
-        final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = new ArrayList<>();
-        if (generateConfigBatchSize > 1) {
-
-            final int batchedRequests = openDevices.size() / generateConfigBatchSize;
-            final int batchedRequestsPerThread = batchedRequests / threadAmount;
-            final int leftoverBatchedRequests = batchedRequests % threadAmount;
-            final int leftoverRequests = openDevices.size() - batchedRequests * generateConfigBatchSize;
-
-            //FIXME Move this to validate() and rename it to init() or create init() and move there.
-            //FIXME Make it field.
-            final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
-                    controllerIp, controllerPort);
-
-            for (int l = 0; l < threadAmount; l++) {
-                from = l * batchedRequests * batchedRequestsPerThread;
-                to = from + batchedRequests * batchedRequestsPerThread;
-                iterator = openDevices.subList(from, to).iterator();
-                allThreadsPayloads.add(createBatchedPayloads(batchedRequestsPerThread, iterator, editContentString,
-                        restconfNetconfTopologyPath));
-            }
-            ArrayList<Execution.DestToPayload> payloads = null;
-            if (leftoverBatchedRequests > 0) {
-                from = threadAmount * batchedRequests * batchedRequestsPerThread;
-                to = from + batchedRequests * batchedRequestsPerThread;
-                iterator = openDevices.subList(from, to).iterator();
-                payloads = createBatchedPayloads(leftoverBatchedRequests, iterator, editContentString,
-                        restconfNetconfTopologyPath);
-            }
-            String payload = "";
-
-            for (int j = 0; j < leftoverRequests; j++) {
-                from = openDevices.size() - leftoverRequests;
-                to = openDevices.size();
-                iterator = openDevices.subList(from, to).iterator();
-                final StringBuilder payloadBuilder = new StringBuilder(
-                    prepareMessage(iterator.next(), editContentString));
-                payload += modifyMessage(payloadBuilder, j, leftoverRequests);
-            }
-            if (leftoverRequests > 0 || leftoverBatchedRequests > 0) {
-
-                if (payloads != null) {
-                    payloads.add(new Execution.DestToPayload(restconfNetconfTopologyPath, payload));
-                }
-                allThreadsPayloads.add(payloads);
-            }
-        } else {
-            final int requestPerThreads = openDevices.size() / threadAmount;
-            final int leftoverRequests = openDevices.size() % threadAmount;
-
-            for (int i = 0; i < threadAmount; i++) {
-                from = i * requestPerThreads;
-                to = from + requestPerThreads;
-                iterator = openDevices.subList(from, to).iterator();
-                allThreadsPayloads.add(createPayloads(iterator, editContentString));
-            }
-
-            if (leftoverRequests > 0) {
-                from = threadAmount * requestPerThreads;
-                to = from + leftoverRequests;
-                iterator = openDevices.subList(from, to).iterator();
-                allThreadsPayloads.add(createPayloads(iterator, editContentString));
-            }
-        }
-        return allThreadsPayloads;
-    }
-
-    private String prepareMessage(final int openDevice, final String editContentString) {
-        final StringBuilder messageBuilder = new StringBuilder(editContentString);
-
-        if (editContentString.contains(HOST_KEY)) {
-            messageBuilder.replace(messageBuilder.indexOf(HOST_KEY),
-                messageBuilder.indexOf(HOST_KEY) + HOST_KEY.length(),
-                generateConfigsAddress);
-        }
-        if (editContentString.contains(PORT_KEY)) {
-            while (messageBuilder.indexOf(PORT_KEY) != -1) {
-                messageBuilder.replace(messageBuilder.indexOf(PORT_KEY),
-                    messageBuilder.indexOf(PORT_KEY) + PORT_KEY.length(),
-                    Integer.toString(openDevice));
-            }
-        }
-        if (editContentString.contains(TCP_ONLY)) {
-            messageBuilder.replace(messageBuilder.indexOf(TCP_ONLY),
-                messageBuilder.indexOf(TCP_ONLY) + TCP_ONLY.length(),
-                Boolean.toString(!ssh));
-        }
-        return messageBuilder.toString();
-    }
-
-    private ArrayList<Execution.DestToPayload> createPayloads(final Iterator<Integer> openDevices,
-                                                              final String editContentString) {
-        final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
-
-        while (openDevices.hasNext()) {
-            //FIXME Move this to validate() and rename it to init() or create init() and move there.
-            //FIXME Make it field.
-            final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
-                    controllerIp, controllerPort);
-            payloads.add(new Execution.DestToPayload(
-                    restconfNetconfTopologyPath, prepareMessage(openDevices.next(), editContentString)));
-        }
-        return payloads;
-    }
-
-    private ArrayList<Execution.DestToPayload> createBatchedPayloads(final int batchedRequestsCount,
-            final Iterator<Integer> openDevices, final String editContentString, final String destination) {
-        final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
-
-        for (int i = 0; i < batchedRequestsCount; i++) {
-            StringBuilder payload = new StringBuilder();
-            for (int j = 0; j < generateConfigBatchSize; j++) {
-                final StringBuilder payloadBuilder = new StringBuilder(
-                    prepareMessage(openDevices.next(), editContentString));
-                payload.append(modifyMessage(payloadBuilder, j, generateConfigBatchSize));
-            }
-            payloads.add(new Execution.DestToPayload(destination, payload.toString()));
-        }
-        return payloads;
-    }
-
     @Override
     public String toString() {
         final List<Field> fields = Arrays.asList(this.getClass().getDeclaredFields());
@@ -514,5 +349,205 @@ public class TesttoolParameters {
         } catch (final IllegalAccessException e) {
             return field.getName() + "= UNKNOWN";
         }
+    }
+
+    public boolean isAsync() {
+        return async;
+    }
+
+    public void setAsync(final boolean async) {
+        this.async = async;
+    }
+
+    public int getThreadAmount() {
+        return threadAmount;
+    }
+
+    public void setThreadAmount(final int threadAmount) {
+        this.threadAmount = threadAmount;
+    }
+
+    public int getThrottle() {
+        return throttle;
+    }
+
+    public void setThrottle(final int throttle) {
+        this.throttle = throttle;
+    }
+
+    public String getControllerAuthUsername() {
+        return controllerAuthUsername;
+    }
+
+    public void setControllerAuthUsername(final String controllerAuthUsername) {
+        this.controllerAuthUsername = controllerAuthUsername;
+    }
+
+    public String getControllerAuthPassword() {
+        return controllerAuthPassword;
+    }
+
+    public void setControllerAuthPassword(final String controllerAuthPassword) {
+        this.controllerAuthPassword = controllerAuthPassword;
+    }
+
+    public String getControllerIp() {
+        return controllerIp;
+    }
+
+    public void setControllerIp(final String controllerIp) {
+        this.controllerIp = controllerIp;
+    }
+
+    public Integer getControllerPort() {
+        return controllerPort;
+    }
+
+    public void setControllerPort(final Integer controllerPort) {
+        this.controllerPort = controllerPort;
+    }
+
+    public File getSchemasDir() {
+        return schemasDir;
+    }
+
+    public void setSchemasDir(final File schemasDir) {
+        this.schemasDir = schemasDir;
+    }
+
+    public int getDeviceCount() {
+        return deviceCount;
+    }
+
+    public void setDeviceCount(final int deviceCount) {
+        this.deviceCount = deviceCount;
+    }
+
+    public int getDevicesPerPort() {
+        return devicesPerPort;
+    }
+
+    public void setDevicesPerPort(final int devicesPerPort) {
+        this.devicesPerPort = devicesPerPort;
+    }
+
+    public int getStartingPort() {
+        return startingPort;
+    }
+
+    public void setStartingPort(final int startingPort) {
+        this.startingPort = startingPort;
+    }
+
+    public int getGenerateConfigsTimeout() {
+        return generateConfigsTimeout;
+    }
+
+    public void setGenerateConfigsTimeout(final int generateConfigsTimeout) {
+        this.generateConfigsTimeout = generateConfigsTimeout;
+    }
+
+    public String getGenerateConfigsAddress() {
+        return generateConfigsAddress;
+    }
+
+    public void setGenerateConfigsAddress(final String generateConfigsAddress) {
+        this.generateConfigsAddress = generateConfigsAddress;
+    }
+
+    public File getDistroFolder() {
+        return distroFolder;
+    }
+
+    public void setDistroFolder(final File distroFolder) {
+        this.distroFolder = distroFolder;
+    }
+
+    public int getGenerateConfigBatchSize() {
+        return generateConfigBatchSize;
+    }
+
+    public void setGenerateConfigBatchSize(final int generateConfigBatchSize) {
+        this.generateConfigBatchSize = generateConfigBatchSize;
+    }
+
+    public boolean isSsh() {
+        return ssh;
+    }
+
+    public void setSsh(final boolean ssh) {
+        this.ssh = ssh;
+    }
+
+    public boolean isExi() {
+        return exi;
+    }
+
+    public void setExi(final boolean exi) {
+        this.exi = exi;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(final boolean debug) {
+        this.debug = debug;
+    }
+
+    public File getNotificationFile() {
+        return notificationFile;
+    }
+
+    public void setNotificationFile(final File notificationFile) {
+        this.notificationFile = notificationFile;
+    }
+
+    public boolean isMdSal() {
+        return mdSal;
+    }
+
+    public void setMdSal(final boolean mdSal) {
+        this.mdSal = mdSal;
+    }
+
+    public File getInitialConfigXMLFile() {
+        return initialConfigXMLFile;
+    }
+
+    public void setInitialConfigXMLFile(final File initialConfigXMLFile) {
+        this.initialConfigXMLFile = initialConfigXMLFile;
+    }
+
+    public long getTimeOut() {
+        return timeOut;
+    }
+
+    public void setTimeOut(final long timeOut) {
+        this.timeOut = timeOut;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(final String ip) {
+        this.ip = ip;
+    }
+
+    public int getThreadPoolSize() {
+        return threadPoolSize;
+    }
+
+    public void setThreadPoolSize(final int threadPoolSize) {
+        this.threadPoolSize = threadPoolSize;
+    }
+
+    public File getRpcConfig() {
+        return rpcConfig;
+    }
+
+    public void setRpcConfig(final File rpcConfig) {
+        this.rpcConfig = rpcConfig;
     }
 }
