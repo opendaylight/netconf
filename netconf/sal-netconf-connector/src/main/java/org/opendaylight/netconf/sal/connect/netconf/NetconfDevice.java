@@ -181,8 +181,9 @@ public class NetconfDevice
         Futures.addCallback(futureContext, new FutureCallback<MountPointContext>() {
             @Override
             public void onSuccess(final MountPointContext result) {
+                BaseSchema schema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
                 handleSalInitializationSuccess(result, remoteSessionCapabilities,
-                    getDeviceSpecificRpc(result, listener), listener);
+                        getDeviceSpecificRpc(result, listener, schema), listener);
             }
 
             @Override
@@ -373,9 +374,9 @@ public class NetconfDevice
     }
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
-            final RemoteDeviceCommunicator<NetconfMessage> listener) {
+            final RemoteDeviceCommunicator<NetconfMessage> listener, BaseSchema schema) {
         return new NetconfDeviceRpc(result.getEffectiveModelContext(), listener,
-            new NetconfMessageTransformer(result, true, baseSchemas.getBaseSchema()));
+            new NetconfMessageTransformer(result, true, schema));
     }
 
     /**
