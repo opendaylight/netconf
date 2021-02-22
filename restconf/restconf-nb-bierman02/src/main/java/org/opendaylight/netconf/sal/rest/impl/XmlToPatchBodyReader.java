@@ -99,7 +99,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         try {
             final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
             final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
-            if (!nonEmptyInputStreamOptional.isPresent()) {
+            if (nonEmptyInputStreamOptional.isEmpty()) {
                 // represent empty nopayload input
                 return new PatchContext(path, null, null);
             }

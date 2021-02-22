@@ -82,7 +82,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final URI namespaceURI = createNsUri(namespace);
         final Optional<? extends Module> module = getModule(namespaceURI);
 
-        if (!module.isPresent()) {
+        if (module.isEmpty()) {
             LOG.debug("Cannot handle rpc: {}, {}", netconfOperationName, namespace);
             return HandlingPriority.CANNOT_HANDLE;
         }
@@ -135,7 +135,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final URI namespaceURI = createNsUri(netconfOperationNamespace);
         final Optional<? extends Module> moduleOptional = getModule(namespaceURI);
 
-        if (!moduleOptional.isPresent()) {
+        if (moduleOptional.isEmpty()) {
             throw new DocumentedException("Unable to find module in Schema Context with namespace and name : "
                         + namespaceURI + " " + netconfOperationName + schemaContext.getCurrentContext(),
                     ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
@@ -144,7 +144,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final Optional<RpcDefinition> rpcDefinitionOptional = getRpcDefinitionFromModule(moduleOptional.get(),
                 namespaceURI, netconfOperationName);
 
-        if (!rpcDefinitionOptional.isPresent()) {
+        if (rpcDefinitionOptional.isEmpty()) {
             throw new DocumentedException(
                     "Unable to find RpcDefinition with namespace and name : "
                         + namespaceURI + " " + netconfOperationName,

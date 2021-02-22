@@ -548,8 +548,8 @@ public class BrokerFacade implements Closeable {
 
         try {
             final Optional<NormalizedNode<?, ?>> optional = transaction.read(datastore, path).get();
-            return !optional.isPresent() ? null : withDefa == null ? optional.get() :
-                prepareDataByParamWithDef(optional.get(), path, withDefa);
+            return optional.map(normalizedNode -> withDefa == null ? normalizedNode :
+                prepareDataByParamWithDef(normalizedNode, path, withDefa)).orElse(null);
         } catch (InterruptedException e) {
             LOG.warn("Error reading {} from datastore {}", path, datastore.name(), e);
             throw new RestconfDocumentedException("Error reading data.", e);

@@ -78,7 +78,7 @@ public final class NetconfMessageUtil {
         // Extract child element <capabilities> from <hello> with or without(fallback) the same namespace
         Optional<XmlElement> capabilitiesElement = responseElement
                 .getOnlyChildElementWithSameNamespaceOptionally(XmlNetconfConstants.CAPABILITIES);
-        if (!capabilitiesElement.isPresent()) {
+        if (capabilitiesElement.isEmpty()) {
             capabilitiesElement = responseElement.getOnlyChildElementOptionally(XmlNetconfConstants.CAPABILITIES);
         }
 

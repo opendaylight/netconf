@@ -48,7 +48,7 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         final Optional<BaseListenerInterface> listener = listenersBroker.getListenerFor(streamName);
 
-        if (!listener.isPresent()) {
+        if (listener.isEmpty()) {
             LOG.debug("Listener for stream with name {} was not found.", streamName);
             throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
         }
