@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f8f3a28_a9ac92ae",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2021-02-22T09:25:17Z",
+      "side": 1,
+      "message": "can we make these methods private?",
+      "revId": "f9f1d72fcba4da97bc38bbffc7787c3063f600cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc7549d7_ebeea3fb",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2021-02-22T09:25:17Z",
+      "side": 1,
+      "message": "do we really need nodeIds here?",
+      "revId": "f9f1d72fcba4da97bc38bbffc7787c3063f600cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
