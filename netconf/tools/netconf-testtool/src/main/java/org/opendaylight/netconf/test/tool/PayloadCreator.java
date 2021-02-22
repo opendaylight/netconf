@@ -1,0 +1,203 @@
+/*
+ * Copyright (c) 2021 Pantheon Technologies, s.r.o. and others. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.test.tool;
+
+import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.math.IntMath;
+import com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.netconf.test.tool.Execution.DestToPayload;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeFields;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+final class PayloadCreator {
+    private static final Logger LOG = LoggerFactory.getLogger(PayloadCreator.class);
+
+    private static final EffectiveModelContext NETWORK_TOPOLOGY_SCHEMA_CONTEXT = BindingRuntimeHelpers
+            .createEffectiveModel(ImmutableList.of($YangModuleInfoImpl.getInstance()));
+    private static final JSONCodecFactory NETWORK_TOPOLOGY_JSON_CODEC_FACTORY = JSONCodecFactorySupplier
+            .DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(NETWORK_TOPOLOGY_SCHEMA_CONTEXT);
+
+    private static final QName TOPOLOGY_ID_QNAME = QName.create(Topology.QNAME, "topology-id").intern();
+    private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id").intern();
+
+    private static final NodeIdentifier PORT_NODE_IDENTIFIER = NodeIdentifier
+            .create(QName.create(NetconfNodeFields.QNAME, "port"));
+    private static final NodeIdentifier HOST_NODE_IDENTIFIER = NodeIdentifier
+            .create(QName.create(NetconfNodeFields.QNAME,"host"));
+    private static final NodeIdentifier USERNAME_NODE_IDENTIFIER = NodeIdentifier
+            .create(QName.create(NetconfNodeFields.QNAME,"username"));
+    private static final NodeIdentifier PASSWORD_NODE_IDENTIFIER = NodeIdentifier
+            .create(QName.create(NetconfNodeFields.QNAME, "password"));
+    private static final NodeIdentifier CREDENTIALS_NODE_IDENTIFIER = NodeIdentifier.create(Credentials.QNAME);
+    private static final NodeIdentifier TCP_ONLY_NODE_IDENTIFIER = NodeIdentifier
+            .create(QName.create(NetconfNodeFields.QNAME, "tcp-only"));
+    private static final NodeIdentifier KEEPALIVE_DELAY_NODE_IDENTIFIER = NodeIdentifier
+            .create(QName.create(NetconfNodeFields.QNAME, "keepalive-delay"));
+    private static final NodeIdentifier SCHEMALESS_NODE_IDENTIFIER = NodeIdentifier
+            .create(QName.create(NetconfNodeFields.QNAME, "schemaless"));
+
+    private static final String RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE =
+            "http://%s:%s/rests/data/network-topology:network-topology/topology=topology-netconf";
+    private static final String DEFAULT_TOPOLOGY_ID = "topology-netconf";
+    private static final String DEFAULT_NODE_PASSWORD = "admin";
+    private static final String DEFAULT_NODE_USERNAME = "admin";
+
+    private static final boolean DEFAULT_NODE_SCHEMALESS = false;
+    private static final int DEFAULT_NODE_KEEPALIVE_DELAY = 0;
+    private static final int DEFAULT_REQUEST_PAYLOAD_INDENTATION = 2;
+
+    private final TesttoolParameters parameters;
+
+    PayloadCreator(final TesttoolParameters parameters) {
+        this.parameters = parameters;
+    }
+
+    List<List<DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
+        final String restconfNetconfTopologyPath = String.format(RESTCONF_NETCONF_TOPOLOGY_PATH_TEMPLATE,
+                parameters.getControllerIp(), parameters.getControllerPort());
+        final List<NormalizedNode> payloads = createPayloads(openDevices);
+        final List<DestToPayload> destinationPayloadPairs = payloads.stream()
+                .map(PayloadCreator::normalizedNodeToString)
+                .map(stringPayload -> new DestToPayload(restconfNetconfTopologyPath, stringPayload))
+                .collect(Collectors.toList());
+        final int requestsPerThread = IntMath.divide(destinationPayloadPairs.size(), parameters.getThreadAmount(),
+                RoundingMode.UP);
+        return Lists.partition(destinationPayloadPairs, requestsPerThread);
+    }
+
+    private List<NormalizedNode> createPayloads(final List<Integer> openDevices) {
+        final List<NormalizedNode> payloads = new ArrayList<>();
+        final List<List<Integer>> batches = Lists.partition(openDevices, parameters.getGenerateConfigBatchSize());
+        for (final var batch : batches) {
+            payloads.add(createPayload(batch));
+        }
+        return payloads;
+    }
+
+    private static String normalizedNodeToString(final NormalizedNode node) {
+        final StringWriter writer = new StringWriter();
+        final JsonWriter jsonWriter = JsonWriterFactory
+                .createJsonWriter(writer, DEFAULT_REQUEST_PAYLOAD_INDENTATION);
+        final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter
+                .createExclusiveWriter(NETWORK_TOPOLOGY_JSON_CODEC_FACTORY,
+                        SchemaPath.create(true, NetworkTopology.QNAME), null, jsonWriter);
+        try (NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream)) {
+            nodeWriter.write(node);
+        } catch (final IOException e) {
+            LOG.error("Failed to serialize node: {} to JSON", node, e);
+            throw new RuntimeException("Failed to serialize node to JSON", e);
+        }
+        return writer.toString();
+    }
+
+    private NormalizedNode createPayload(final List<Integer> devices) {
+        final var nodeBuilder = Builders.mapBuilder().withNodeIdentifier(NodeIdentifier.create(Node.QNAME));
+        for (int i = 0; i < devices.size(); i++) {
+            nodeBuilder.withChild(Builders.mapEntryBuilder()
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, createNodeID(i)))
+                    .withChild(leafPort(parameters.getStartingPort() + i))
+                    .withChild(leafHost(parameters.getGenerateConfigsAddress()))
+                    .withChild(containerCredentials(DEFAULT_NODE_USERNAME, DEFAULT_NODE_PASSWORD))
+                    .withChild(leafTcpOnly(!parameters.isSsh()))
+                    .withChild(leafKeepaliveDelay(DEFAULT_NODE_KEEPALIVE_DELAY))
+                    .withChild(leafSchemaless(DEFAULT_NODE_SCHEMALESS))
+                    .build());
+        }
+
+        return Builders.mapBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(Topology.QNAME))
+                .withChild(Builders.mapEntryBuilder().withNodeIdentifier(NodeIdentifierWithPredicates
+                        .of(Topology.QNAME, TOPOLOGY_ID_QNAME, DEFAULT_TOPOLOGY_ID))
+                        .withChild(nodeBuilder.build())
+                        .build())
+                .build();
+    }
+
+    private static String createNodeID(final Integer port) {
+        return String.format("%d-sim-device", port);
+    }
+
+    private static LeafNode<Uint16> leafPort(final int port) {
+        return Builders.<Uint16>leafBuilder()
+                .withNodeIdentifier(PORT_NODE_IDENTIFIER)
+                .withValue(Uint16.valueOf(port))
+                .build();
+    }
+
+    private static LeafNode<String> leafHost(final String host) {
+        return Builders.<String>leafBuilder()
+                .withNodeIdentifier(HOST_NODE_IDENTIFIER)
+                .withValue(host)
+                .build();
+    }
+
+    private static ChoiceNode containerCredentials(final String username, final String password) {
+        return Builders.choiceBuilder().withNodeIdentifier(CREDENTIALS_NODE_IDENTIFIER)
+                .withChild(Builders.<String>leafBuilder()
+                        .withNodeIdentifier(USERNAME_NODE_IDENTIFIER)
+                        .withValue(username)
+                        .build())
+                .withChild(Builders.<String>leafBuilder()
+                        .withNodeIdentifier(PASSWORD_NODE_IDENTIFIER)
+                        .withValue(password)
+                        .build())
+                .build();
+    }
+
+    private static LeafNode<Boolean> leafTcpOnly(final Boolean tcpOnly) {
+        return Builders.<Boolean>leafBuilder()
+                .withNodeIdentifier(TCP_ONLY_NODE_IDENTIFIER)
+                .withValue(tcpOnly)
+                .build();
+    }
+
+    private static LeafNode<Integer> leafKeepaliveDelay(final Integer keepaliveDelay) {
+        return Builders.<Integer>leafBuilder()
+                .withNodeIdentifier(KEEPALIVE_DELAY_NODE_IDENTIFIER)
+                .withValue(keepaliveDelay)
+                .build();
+    }
+
+    private static LeafNode<Boolean> leafSchemaless(final Boolean schemaless) {
+        return Builders.<Boolean>leafBuilder()
+                .withNodeIdentifier(SCHEMALESS_NODE_IDENTIFIER)
+                .withValue(schemaless)
+                .build();
+    }
+}
