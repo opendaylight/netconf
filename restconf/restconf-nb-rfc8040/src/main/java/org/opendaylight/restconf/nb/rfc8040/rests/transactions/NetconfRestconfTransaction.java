@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
@@ -33,7 +34,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     NetconfRestconfTransaction(final NetconfDataTreeService netconfService) {
         this.netconfService = requireNonNull(netconfService);
-        this.resultsFutures = netconfService.lock();
+        this.resultsFutures = new ArrayList<>(netconfService.lock());
     }
 
     @Override
