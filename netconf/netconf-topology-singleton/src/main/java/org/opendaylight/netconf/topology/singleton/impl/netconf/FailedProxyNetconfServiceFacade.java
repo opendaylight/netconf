@@ -7,16 +7,14 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.netconf;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -31,102 +29,112 @@ import org.slf4j.LoggerFactory;
 public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacade {
     private static final Logger LOG = LoggerFactory.getLogger(FailedProxyNetconfServiceFacade.class);
 
-    private final RemoteDeviceId id;
-    private final Throwable failure;
+    private final @NonNull RemoteDeviceId id;
+    private final @NonNull Throwable failure;
 
     public FailedProxyNetconfServiceFacade(final RemoteDeviceId id, final Throwable failure) {
-        this.id = Objects.requireNonNull(id);
-        this.failure = Objects.requireNonNull(failure);
+        this.id = requireNonNull(id);
+        this.failure = requireNonNull(failure);
     }
 
     @Override
-    public List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public ListenableFuture<DOMRpcResult> lock() {
         LOG.debug("{}: Lock - failure", id, failure);
-        return Collections.singletonList(
-            FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("lock", failure)));
+        return serviceFailed("lock");
     }
 
     @Override
-    public void unlock() {
+    public ListenableFuture<DOMRpcResult> unlock() {
         LOG.debug("{}: Unlock - failure", id, failure);
+        return serviceFailed("unlock");
     }
 
     @Override
-    public void discardChanges() {
+    public ListenableFuture<DOMRpcResult> discardChanges() {
         LOG.debug("{}: Discard changes - failure", id, failure);
+        return serviceFailed("discard changes");
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
         LOG.debug("{}: Get {} {} - failure", id, OPERATIONAL, path, failure);
-        return FluentFutures.immediateFailedFluentFuture(new ReadFailedException("get", failure));
+        return readFailed("get");
     }
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
-                                                                final List<YangInstanceIdentifier> fields) {
+            final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: Get {} {} with fields {} - failure", id, OPERATIONAL, path, fields, failure);
-        return FluentFutures.immediateFailedFluentFuture(new ReadFailedException("get", failure));
+        return readFailed("get");
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
         LOG.debug("{}: GetConfig {} {} - failure", id, CONFIGURATION, path, failure);
-        return FluentFutures.immediateFailedFluentFuture(new ReadFailedException("getConfig", failure));
+        return readFailed("getConfig");
     }
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
-                                                                      final List<YangInstanceIdentifier> fields) {
+            final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: GetConfig {} {} with fields {} - failure", id, CONFIGURATION, path, fields, failure);
-        return FluentFutures.immediateFailedFluentFuture(new ReadFailedException("getConfig", failure));
+        return readFailed("getConfig");
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                          NormalizedNode<?, ?> data,
-                                                          Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Merge {} {} - failure", id, store, path, failure);
-        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("merge", failure));
+        return serviceFailed("merge");
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                            NormalizedNode<?, ?> data,
-                                                            Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Replace {} {} - failure", id, store, path, failure);
-        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("replace", failure));
+        return serviceFailed("replace");
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                           NormalizedNode<?, ?> data,
-                                                           Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Create {} {} - failure", id, store, path, failure);
-        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("create", failure));
+        return serviceFailed("create");
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> delete(LogicalDatastoreType store, YangInstanceIdentifier path) {
+    public ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
         LOG.debug("{}: Delete {} {} - failure", id, store, path, failure);
-        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("delete", failure));
+        return serviceFailed("delete");
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> remove(LogicalDatastoreType store, YangInstanceIdentifier path) {
+    public ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
         LOG.debug("{}: Remove {} {} - failure", id, store, path, failure);
-        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("remove", failure));
+        return serviceFailed("remove");
     }
 
     @Override
-    public ListenableFuture<? extends CommitInfo> commit(
-        List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+    public ListenableFuture<? extends DOMRpcResult> commit() {
         LOG.debug("{}: Commit - failure", id, failure);
-        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("commit", failure));
+        return serviceFailed("commit");
     }
 
     @Override
-    public @NonNull Object getDeviceId() {
+    public Object getDeviceId() {
         return id;
+    }
+
+    private <T> ListenableFuture<T> readFailed(final String operation) {
+        return FluentFutures.immediateFailedFluentFuture(new ReadFailedException(operation, failure));
+    }
+
+    private <T> ListenableFuture<T> serviceFailed(final String operation) {
+        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException(operation, failure));
     }
 }

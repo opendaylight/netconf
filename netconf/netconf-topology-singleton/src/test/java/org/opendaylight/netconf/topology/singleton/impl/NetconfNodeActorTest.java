@@ -647,7 +647,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final FluentFuture<Optional<Object>> result = immediateFluentFuture(Optional.of(NODE));
         doReturn(result).when(netconfService).get(PATH);
         doReturn(result).when(netconfService).getConfig(PATH);
-        doReturn(emptyFluentFuture()).when(netconfService).commit(any());
+        doReturn(emptyFluentFuture()).when(netconfService).commit();
 
         slaveNetconfService.get(PATH);
         slaveNetconfService.getConfig(PATH);
@@ -658,7 +658,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         slaveNetconfService.delete(STORE, PATH);
         slaveNetconfService.remove(STORE, PATH);
         slaveNetconfService.discardChanges();
-        slaveNetconfService.commit(Collections.emptyList());
+        slaveNetconfService.commit();
 
         verify(netconfService, timeout(1000)).get(PATH);
         verify(netconfService, timeout(1000)).getConfig(PATH);
@@ -669,7 +669,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(netconfService, timeout(1000)).delete(STORE, PATH);
         verify(netconfService, timeout(1000)).remove(STORE, PATH);
         verify(netconfService, timeout(1000)).discardChanges();
-        verify(netconfService, timeout(1000)).commit(any());
+        verify(netconfService, timeout(1000)).commit();
     }
 
     private ActorRef registerSlaveMountPoint() {

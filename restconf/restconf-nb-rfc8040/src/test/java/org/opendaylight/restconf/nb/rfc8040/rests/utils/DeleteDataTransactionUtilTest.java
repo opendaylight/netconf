@@ -9,10 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -28,6 +28,7 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -60,7 +61,12 @@ public class DeleteDataTransactionUtilTest {
     public void init() {
         Mockito.when(this.transactionChain.newReadWriteTransaction()).thenReturn(this.readWrite);
         Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
         Mockito.when(this.context.getInstanceIdentifier()).thenReturn(YangInstanceIdentifier.empty());
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
@@ -95,7 +101,7 @@ public class DeleteDataTransactionUtilTest {
         ret.setException(new TransactionCommitFailedException(
             String.format("Commit of transaction %s failed", this), exception));
 
-        Mockito.when(this.netconfService.commit(any())).thenAnswer(invocation -> ret);
+        Mockito.when(this.netconfService.commit()).thenAnswer(invocation -> ret);
 
         // test and assert error
         deleteFail(new MdsalRestconfStrategy(transactionChainHandler));

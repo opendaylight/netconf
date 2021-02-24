@@ -20,7 +20,7 @@ import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +44,7 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.MergeEditCon
 import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.UnlockRequest;
+import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -274,7 +275,7 @@ public class ProxyNetconfServiceTest {
             verifyDocumentedException(cause.getCause());
         }
 
-        future = netconf.commit(new ArrayList<>());
+        future = netconf.commit();
         masterActor.expectMsgClass(CommitRequest.class);
 
         // master doesn't reply
@@ -290,9 +291,9 @@ public class ProxyNetconfServiceTest {
 
     private void commit(final ProxyNetconfService netconf)
         throws InterruptedException, ExecutionException, TimeoutException {
-        final ListenableFuture<?> submit = netconf.commit(new ArrayList<>());
+        final ListenableFuture<?> submit = netconf.commit();
         masterActor.expectMsgClass(CommitRequest.class);
-        masterActor.reply(new Status.Success(null));
+        masterActor.reply(new InvokeRpcMessageReply(null, Collections.emptyList()));
         submit.get(5, TimeUnit.SECONDS);
     }
 
