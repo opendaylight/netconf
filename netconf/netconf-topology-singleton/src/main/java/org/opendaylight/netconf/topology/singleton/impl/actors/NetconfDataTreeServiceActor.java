@@ -50,6 +50,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     private final long idleTimeout;
 
     private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
+    private ListenableFuture<Void> lockFuture;
 
     private NetconfDataTreeServiceActor(final NetconfDataTreeService netconfService, final Duration idleTimeout) {
         this.netconfService = netconfService;
@@ -93,7 +94,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof LockRequest) {
-            resultsFutures.addAll(netconfService.lock());
+            lockFuture = netconfService.lock();
         } else if (message instanceof MergeEditConfigRequest) {
             final MergeEditConfigRequest request = (MergeEditConfigRequest) message;
             resultsFutures.add(netconfService.merge(

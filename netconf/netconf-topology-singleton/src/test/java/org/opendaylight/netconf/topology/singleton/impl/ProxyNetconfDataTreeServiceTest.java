@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CommitRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CreateEditConfigRequest;
@@ -225,11 +224,11 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     private void lock() {
-        final List<ListenableFuture<? extends DOMRpcResult>> lock = proxy.lock();
+        final ListenableFuture<Void> lock = proxy.lock();
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
-
-        assertTrue(lock.isEmpty());
+        // FIXME: todo
+        assertTrue(lock.isDone());
         masterActor.expectMsgClass(LockRequest.class);
     }
 

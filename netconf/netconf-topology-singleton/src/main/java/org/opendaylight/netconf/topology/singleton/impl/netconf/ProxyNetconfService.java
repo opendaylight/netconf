@@ -70,11 +70,11 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public ListenableFuture<Void> lock() {
         LOG.debug("{}: Lock", id);
-        final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
-        processNetconfOperation(facade -> resultsFutures.addAll(facade.lock()));
-        return resultsFutures;
+        final SettableFuture<Void> future = SettableFuture.create();
+        processNetconfOperation(facade -> future.setFuture(facade.lock()));
+        return future;
     }
 
     @Override
