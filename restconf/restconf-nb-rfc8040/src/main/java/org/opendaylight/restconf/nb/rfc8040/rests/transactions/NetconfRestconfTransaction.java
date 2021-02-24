@@ -10,7 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,15 +28,21 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class NetconfRestconfTransaction extends RestconfTransaction {
-    private final NetconfDataTreeService netconfService;
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfRestconfTransaction.class);
 
+    private final NetconfDataTreeService netconfService;
+    private final ListenableFuture<Void> lockResult;
     private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures;
 
     NetconfRestconfTransaction(final NetconfDataTreeService netconfService) {
         this.netconfService = requireNonNull(netconfService);
-        this.resultsFutures = new ArrayList<>(netconfService.lock());
+        final List<ListenableFuture<? extends DOMRpcResult>> lockFutures = netconfService.lock();
+        this.resultsFutures = new ArrayList<>(lockFutures);
+        this.lockResult = wrapLockResults(lockFutures);
     }
 
     @Override
@@ -46,18 +54,22 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     @Override
     public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        resultsFutures.add(netconfService.delete(store, path));
+        resultsFutures.add(Futures.transformAsync(lockResult, result -> netconfService.delete(store, path),
+            MoreExecutors.directExecutor()));
     }
 
     @Override
     public void remove(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        resultsFutures.add(netconfService.remove(store, path));
+        resultsFutures.add(Futures.transformAsync(lockResult, result -> netconfService.remove(store, path),
+            MoreExecutors.directExecutor()));
     }
 
     @Override
     public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data) {
-        resultsFutures.add(netconfService.merge(store, path, data, Optional.empty()));
+        resultsFutures.add(Futures.transformAsync(lockResult,
+            result -> netconfService.merge(store, path, data, Optional.empty()),
+            MoreExecutors.directExecutor()));
     }
 
     @Override
@@ -70,10 +82,14 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
             for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-                resultsFutures.add(netconfService.create(store, childPath, child, Optional.empty()));
+                resultsFutures.add(Futures.transformAsync(lockResult,
+                    result -> netconfService.create(store, childPath, child, Optional.empty()),
+                    MoreExecutors.directExecutor()));
             }
         } else {
-            resultsFutures.add(netconfService.create(store, path, data, Optional.empty()));
+            resultsFutures.add(Futures.transformAsync(lockResult,
+                result -> netconfService.create(store, path, data, Optional.empty()),
+                MoreExecutors.directExecutor()));
         }
     }
 
@@ -87,15 +103,33 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
             for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-                resultsFutures.add(netconfService.replace(store, childPath, child, Optional.empty()));
+                resultsFutures.add(Futures.transformAsync(lockResult,
+                    result -> netconfService.replace(store, childPath, child, Optional.empty()),
+                    MoreExecutors.directExecutor()));
             }
         } else {
-            resultsFutures.add(netconfService.replace(store, path, data, Optional.empty()));
+            resultsFutures.add(Futures.transformAsync(lockResult,
+                result -> netconfService.replace(store, path, data, Optional.empty()),
+                MoreExecutors.directExecutor()));
         }
     }
 
     @Override
     public FluentFuture<? extends @NonNull CommitInfo> commit() {
         return FluentFuture.from(netconfService.commit(resultsFutures));
+    }
+
+    // To build a complex chain of async operations over NetconfDataTreeService
+    // we need to create a future that will hold the initial lock results.
+    // Any other operations over NetconfDataTreeService will be invoked only
+    // after this future completed successfully.
+    private ListenableFuture<Void> wrapLockResults(final List<ListenableFuture<? extends DOMRpcResult>> lockResults) {
+        return Futures.transformAsync(Futures.allAsList(lockResults), results -> {
+            if (results.isEmpty() || results.stream().allMatch(result -> result.getErrors().isEmpty())) {
+                return Futures.immediateVoidFuture();
+            } else {
+                return Futures.immediateFailedFuture(new RuntimeException("Lock operation failed"));
+            }
+        }, MoreExecutors.directExecutor());
     }
 }

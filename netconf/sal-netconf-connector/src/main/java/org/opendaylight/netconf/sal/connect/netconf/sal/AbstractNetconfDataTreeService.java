@@ -318,6 +318,23 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     public synchronized ListenableFuture<? extends CommitInfo> commit(
             final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
         final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
+        // It doesn't make sense to execute commit if any of the previous commands failed
+        final ListenableFuture<List<DOMRpcResult>> aggregatedResultsFuture = Futures.allAsList(resultsFutures);
+        Futures.addCallback(aggregatedResultsFuture, new FutureCallback<>() {
+            @Override
+            public void onSuccess(List<DOMRpcResult> results) {
+
+            }
+
+            @Override
+            public void onFailure(final Throwable failure) {
+                // FIXME: check if the DOMRpcResult contain details about failed locks
+                unlock();
+                resultFuture.setException(new TransactionCommitFailedException(
+                    String.format("Commit of transaction %s failed", this), failure));
+            }
+        }, MoreExecutors.directExecutor());
+
         Futures.addCallback(commitImpl(resultsFutures), new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
