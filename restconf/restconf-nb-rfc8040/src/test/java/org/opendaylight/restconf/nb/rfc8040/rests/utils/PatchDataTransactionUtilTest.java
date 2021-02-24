@@ -20,9 +20,11 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +36,9 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -171,7 +175,14 @@ public class PatchDataTransactionUtilTest {
         /* Mocks */
         doReturn(this.rwTransaction).when(this.transactionChain).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).merge(any(), any(),
+            any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).replace(any(), any(),
+            any(), any());
     }
 
     @Test
@@ -190,6 +201,9 @@ public class PatchDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.instanceIdMerge, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
 
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .remove(LogicalDatastoreType.CONFIGURATION, targetNodeMerge);
+
         patch(patchContext, new MdsalRestconfStrategy(transactionChainHandler), false);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
     }
@@ -200,6 +214,11 @@ public class PatchDataTransactionUtilTest {
             this.instanceIdContainer);
         doReturn(immediateTrueFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.targetNodeForCreateAndDelete);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, this.instanceIdContainer, this.buildBaseContainerForTests,
+                Optional.empty());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityCreate =
                 new PatchEntity("edit1", CREATE, this.instanceIdContainer, this.buildBaseContainerForTests);
@@ -224,11 +243,13 @@ public class PatchDataTransactionUtilTest {
         final NetconfDocumentedException exception = new NetconfDocumentedException("id",
             DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.from("data-missing"),
             DocumentedException.ErrorSeverity.ERROR);
-        final SettableFuture<? extends CommitInfo> ret = SettableFuture.create();
+        final SettableFuture<? extends DOMRpcResult> ret = SettableFuture.create();
         ret.setException(new TransactionCommitFailedException(
             String.format("Commit of transaction %s failed", this), exception));
 
-        Mockito.when(this.netconfService.commit(any())).thenAnswer(invocation -> ret);
+        Mockito.when(this.netconfService.commit()).thenAnswer(invocation -> ret);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityDelete = new PatchEntity("edit", DELETE, this.targetNodeForCreateAndDelete);
         final List<PatchEntity> entities = new ArrayList<>();

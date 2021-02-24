@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
+import com.google.common.util.concurrent.Futures;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -166,6 +168,8 @@ public class PutDataTransactionUtilTest {
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
     }
 
     @Test
@@ -241,10 +245,14 @@ public class PutDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid2);
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .replace(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(),
+                payload.getData(), Optional.empty());
 
         PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
+        verify(this.netconfService).lock();
         verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
@@ -258,7 +266,10 @@ public class PutDataTransactionUtilTest {
 
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))))
                 .when(this.netconfService).getConfig(this.iid2);
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .replace(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
 
         PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
@@ -296,7 +307,10 @@ public class PutDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
 
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid);
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .replace(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
 
         PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
@@ -313,7 +327,10 @@ public class PutDataTransactionUtilTest {
 
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))))
                 .when(this.netconfService).getConfig(this.iid);
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .replace(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
 
         PutDataTransactionUtil.putData(payload, this.schema,
                 new NetconfRestconfStrategy(netconfService), null, null);
@@ -349,7 +366,9 @@ public class PutDataTransactionUtilTest {
 
         doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService)
                 .getConfig(this.iid2);
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .replace(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData(), Optional.empty());
 
         PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
@@ -366,7 +385,10 @@ public class PutDataTransactionUtilTest {
 
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(this.netconfService)
                 .getConfig(this.iid2);
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .replace(LogicalDatastoreType.CONFIGURATION,
+                this.iid2, payload.getData(), Optional.empty());
 
         PutDataTransactionUtil.putData(payload, this.schema,
                 new NetconfRestconfStrategy(netconfService), null, null);

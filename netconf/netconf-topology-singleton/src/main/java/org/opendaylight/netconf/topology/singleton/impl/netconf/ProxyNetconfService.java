@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
@@ -70,27 +69,31 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public ListenableFuture<DOMRpcResult> lock() {
         LOG.debug("{}: Lock", id);
-        final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
-        processNetconfOperation(facade -> resultsFutures.addAll(facade.lock()));
-        return resultsFutures;
+        final SettableFuture<DOMRpcResult> future = SettableFuture.create();
+        processNetconfOperation(facade -> future.setFuture(facade.lock()));
+        return future;
     }
 
     @Override
-    public void unlock() {
+    public ListenableFuture<DOMRpcResult> unlock() {
         LOG.debug("{}: Unlock", id);
-        processNetconfOperation(NetconfDataTreeService::unlock);
+        final SettableFuture<DOMRpcResult> future = SettableFuture.create();
+        processNetconfOperation(facade -> future.setFuture(facade.unlock()));
+        return future;
     }
 
     @Override
-    public void discardChanges() {
+    public ListenableFuture<DOMRpcResult> discardChanges() {
         LOG.debug("{}: Discard changes", id);
-        processNetconfOperation(NetconfDataTreeService::discardChanges);
+        final SettableFuture<DOMRpcResult> future = SettableFuture.create();
+        processNetconfOperation(facade -> future.setFuture(facade.discardChanges()));
+        return future;
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
         LOG.debug("{}: Get {} {}", id, OPERATIONAL, path);
         final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.get(path)));
@@ -107,7 +110,7 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
         LOG.debug("{}: Get config {} {}", id, CONFIGURATION, path);
         final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.getConfig(path)));
@@ -124,9 +127,9 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                          NormalizedNode<?, ?> data,
-                                                          Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Merge {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.merge(store, path, data, defaultOperation)));
@@ -134,9 +137,9 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                            NormalizedNode<?, ?> data,
-                                                            Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Replace {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.replace(store, path, data, defaultOperation)));
@@ -144,9 +147,9 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                           NormalizedNode<?, ?> data,
-                                                           Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Create {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.create(store, path, data, defaultOperation)));
@@ -154,7 +157,8 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> delete(LogicalDatastoreType store, YangInstanceIdentifier path) {
+    public ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
         LOG.debug("{}: Delete {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.delete(store, path)));
@@ -162,7 +166,8 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> remove(LogicalDatastoreType store, YangInstanceIdentifier path) {
+    public ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
         LOG.debug("{}: Remove {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.remove(store, path)));
@@ -170,11 +175,10 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<? extends CommitInfo> commit(
-        List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+    public ListenableFuture<? extends DOMRpcResult> commit() {
         LOG.debug("{}: Commit", id);
-        final SettableFuture<CommitInfo> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.commit(resultsFutures)));
+        final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.commit()));
         return returnFuture;
     }
 

@@ -10,26 +10,22 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.ModifyAction;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
@@ -37,8 +33,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallbac
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -56,24 +51,18 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
          * really sensitive to blocking calls.
          */
         @Override
-        public void discardChanges() {
-            netconfOps.discardChanges(new NetconfRpcFutureCallback("Discarding candidate", id));
+        public ListenableFuture<? extends DOMRpcResult> discardChanges() {
+            return netconfOps.discardChanges(new NetconfRpcFutureCallback("Discard candidate", id));
         }
 
         @Override
         ListenableFuture<? extends DOMRpcResult> lockSingle() {
-            return netconfOps.lockCandidate(new NetconfRpcFutureCallback("Lock candidate", id) {
-                @Override
-                public void onFailure(final Throwable throwable) {
-                    super.onFailure(throwable);
-                    discardChanges();
-                }
-            });
+            return netconfOps.lockCandidate(new NetconfRpcFutureCallback("Lock candidate", id));
         }
 
         @Override
-        void unlockImpl() {
-            netconfOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
+        List<ListenableFuture<? extends DOMRpcResult>> unlockImpl() {
+            return List.of(netconfOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id)));
         }
 
         @Override
@@ -83,24 +72,6 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             return defaultOperation == null ? netconfOps.editConfigCandidate(callback, editStructure, rollbackSupport)
                 : netconfOps.editConfigCandidate(callback, editStructure, defaultOperation, rollbackSupport);
         }
-
-        @Override
-        ListenableFuture<RpcResult<Void>> commitImpl(final List<ListenableFuture<? extends DOMRpcResult>> results) {
-            results.add(netconfOps.commit(new NetconfRpcFutureCallback("Commit", id)));
-            final ListenableFuture<RpcResult<Void>> result = resultsToStatus(id, results);
-            Futures.addCallback(result, new FutureCallback<>() {
-                @Override
-                public void onSuccess(final RpcResult<Void> result) {
-                    // do nothing, as callback is only used to catch failures
-                }
-
-                @Override
-                public void onFailure(final Throwable throwable) {
-                    discardChanges();
-                }
-            }, MoreExecutors.directExecutor());
-            return result;
-        }
     }
 
     private static final class Running extends AbstractNetconfDataTreeService {
@@ -109,8 +80,9 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         @Override
-        public void discardChanges() {
+        public ListenableFuture<DOMRpcResult> discardChanges() {
             // Changes cannot be discarded from running
+            return RPC_SUCCESS;
         }
 
         @Override
@@ -119,8 +91,8 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         @Override
-        void unlockImpl() {
-            netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+        List<ListenableFuture<? extends DOMRpcResult>> unlockImpl() {
+            return List.of(netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id)));
         }
 
         @Override
@@ -129,12 +101,6 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             final NetconfRpcFutureCallback callback = new NetconfRpcFutureCallback("Edit running", id);
             return defaultOperation == null ? netconfOps.editConfigRunning(callback, editStructure, rollbackSupport)
                 : netconfOps.editConfigRunning(callback, editStructure, defaultOperation, rollbackSupport);
-        }
-
-        @Override
-        ListenableFuture<RpcResult<Void>> commitImpl(final List<ListenableFuture<? extends DOMRpcResult>> results) {
-            unlock();
-            return resultsToStatus(id, results);
         }
     }
 
@@ -150,12 +116,12 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         @Override
-        public void discardChanges() {
-            candidate.discardChanges();
+        public ListenableFuture<? extends DOMRpcResult> discardChanges() {
+            return candidate.discardChanges();
         }
 
         @Override
-        ListenableFuture<? extends DOMRpcResult> lockSingle() {
+        ListenableFuture<DOMRpcResult> lockSingle() {
             throw new UnsupportedOperationException();
         }
 
@@ -165,9 +131,8 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         @Override
-        void unlockImpl() {
-            running.unlock();
-            candidate.unlock();
+        List<ListenableFuture<? extends DOMRpcResult>> unlockImpl() {
+            return List.of(running.unlock(), candidate.unlock());
         }
 
         @Override
@@ -176,13 +141,11 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             return candidate.editConfig(editStructure, defaultOperation);
         }
 
-        @Override
-        ListenableFuture<RpcResult<Void>> commitImpl(final List<ListenableFuture<? extends DOMRpcResult>> results) {
-            return candidate.commitImpl(results);
-        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfDataTreeService.class);
+    private static final ListenableFuture<DOMRpcResult> RPC_SUCCESS =
+        Futures.immediateFuture(new DefaultDOMRpcResult());
 
     final @NonNull RemoteDeviceId id;
     final NetconfBaseOps netconfOps;
@@ -219,12 +182,36 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     }
 
     @Override
-    public synchronized List<ListenableFuture<? extends DOMRpcResult>> lock() {
-        if (isLockAllowed) {
-            return lockImpl();
+    public synchronized ListenableFuture<DOMRpcResult> lock() {
+        if (!isLockAllowed) {
+            LOG.trace("Lock is not allowed by device configuration, ignoring lock results: {}", id);
+            return RPC_SUCCESS;
         }
-        LOG.trace("Lock is not allowed: {}", id);
-        return List.of();
+
+        final ListenableFuture<DOMRpcResult> result = mergeFutures(lockImpl());
+        Futures.addCallback(result, new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                final var errors = result.getErrors();
+                if (errors.isEmpty()) {
+                    LOG.debug("{}: Lock successful.", id);
+                    return;
+                }
+                if (allWarnings(errors)) {
+                    LOG.info("{}: Lock successful with warnings {}", errors, id);
+                    return;
+                }
+
+                LOG.warn("{}: Lock failed with errors {}", id, errors);
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.warn("{}: Lock failed.", id, throwable);
+            }
+        }, MoreExecutors.directExecutor());
+
+        return result;
     }
 
     List<ListenableFuture<? extends DOMRpcResult>> lockImpl() {
@@ -234,17 +221,40 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     abstract ListenableFuture<? extends DOMRpcResult> lockSingle();
 
     @Override
-    // FIXME: this should be asynchronous as well
-    public synchronized void unlock() {
+    public synchronized ListenableFuture<DOMRpcResult> unlock() {
         // FIXME: deal with lock with lifecycle?
-        if (isLockAllowed) {
-            unlockImpl();
-        } else {
+        if (!isLockAllowed) {
             LOG.trace("Unlock is not allowed: {}", id);
+            return RPC_SUCCESS;
         }
+
+        final ListenableFuture<DOMRpcResult> result = mergeFutures(unlockImpl());
+        Futures.addCallback(result, new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                final var errors = result.getErrors();
+                if (errors.isEmpty()) {
+                    LOG.debug("{}: Unlock successful.", id);
+                    return;
+                }
+
+                if (errors.stream().allMatch(error -> error.getSeverity() == ErrorSeverity.WARNING)) {
+                    LOG.info("{}: Unlock successful with warnings {}", errors, id);
+                    return;
+                }
+
+                LOG.error("{}: Unlock failed with errors {}", id, errors);
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.error("{}: Unlock failed.", id, throwable);
+            }
+        }, MoreExecutors.directExecutor());
+        return result;
     }
 
-    abstract void unlockImpl();
+    abstract List<ListenableFuture<? extends DOMRpcResult>> unlockImpl();
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
@@ -315,34 +325,9 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     }
 
     @Override
-    public synchronized ListenableFuture<? extends CommitInfo> commit(
-            final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
-        final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
-        Futures.addCallback(commitImpl(resultsFutures), new FutureCallback<>() {
-            @Override
-            public void onSuccess(final RpcResult<Void> result) {
-                if (!result.isSuccessful()) {
-                    final Collection<RpcError> errors = result.getErrors();
-                    resultFuture.setException(new TransactionCommitFailedException(
-                            String.format("Commit of transaction %s failed", this),
-                            errors.toArray(new RpcError[errors.size()])));
-                    return;
-                }
-                unlock();
-                resultFuture.set(CommitInfo.empty());
-            }
-
-            @Override
-            public void onFailure(final Throwable failure) {
-                unlock();
-                resultFuture.setException(new TransactionCommitFailedException(
-                        String.format("Commit of transaction %s failed", this), failure));
-            }
-        }, MoreExecutors.directExecutor());
-        return resultFuture;
+    public synchronized ListenableFuture<? extends DOMRpcResult> commit() {
+        return netconfOps.commit(new NetconfRpcFutureCallback("Commit", id));
     }
-
-    abstract ListenableFuture<RpcResult<Void>> commitImpl(List<ListenableFuture<? extends DOMRpcResult>> results);
 
     @Override
     public final Object getDeviceId() {
@@ -362,89 +347,30 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
         justification = "https://github.com/spotbugs/spotbugs/issues/811")
-    private static ListenableFuture<RpcResult<Void>> resultsToStatus(
-            final RemoteDeviceId id, final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
-        final SettableFuture<RpcResult<Void>> transformed = SettableFuture.create();
+    private List<ListenableFuture<?>> discardAndUnlock() {
+        return List.of(discardChanges(), unlock());
+    }
 
-        Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<>() {
-            @Override
-            public void onSuccess(final List<DOMRpcResult> domRpcResults) {
-                if (!transformed.isDone()) {
-                    extractResult(domRpcResults, transformed, id);
-                }
+    // Transform list of futures related to RPC operation into a single Future
+    private static ListenableFuture<DOMRpcResult> mergeFutures(
+            final List<ListenableFuture<? extends DOMRpcResult>> futures) {
+        return Futures.whenAllComplete(futures).call(() -> {
+            if (futures.size() == 1) {
+                // Fast path
+                return Futures.getDone(futures.get(0));
             }
 
-            @Override
-            public void onFailure(final Throwable throwable) {
-                final NetconfDocumentedException exception =
-                        new NetconfDocumentedException(
-                                id + ":RPC during tx returned an exception" + throwable.getMessage(),
-                                new Exception(throwable),
-                                DocumentedException.ErrorType.APPLICATION,
-                                DocumentedException.ErrorTag.OPERATION_FAILED,
-                                DocumentedException.ErrorSeverity.ERROR);
-                transformed.setException(exception);
+            final var builder = ImmutableList.<RpcError>builder();
+            for (ListenableFuture<? extends DOMRpcResult> future : futures) {
+                builder.addAll(Futures.getDone(future).getErrors());
             }
+            return new DefaultDOMRpcResult(null, builder.build());
         }, MoreExecutors.directExecutor());
-
-        return transformed;
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
-    private static void extractResult(final List<DOMRpcResult> domRpcResults,
-                                      final SettableFuture<RpcResult<Void>> transformed,
-                                      final RemoteDeviceId id) {
-        DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
-        DocumentedException.ErrorSeverity errSeverity = DocumentedException.ErrorSeverity.ERROR;
-        StringJoiner msgBuilder = new StringJoiner(" ");
-        boolean errorsEncouneterd = false;
-        String errorTag = "operation-failed";
-
-        for (final DOMRpcResult domRpcResult : domRpcResults) {
-            if (!domRpcResult.getErrors().isEmpty()) {
-                errorsEncouneterd = true;
-                final RpcError error = domRpcResult.getErrors().iterator().next();
-                final RpcError.ErrorType errorType = error.getErrorType();
-                switch (errorType) {
-                    case RPC:
-                        errType = DocumentedException.ErrorType.RPC;
-                        break;
-                    case PROTOCOL:
-                        errType = DocumentedException.ErrorType.PROTOCOL;
-                        break;
-                    case TRANSPORT:
-                        errType = DocumentedException.ErrorType.TRANSPORT;
-                        break;
-                    case APPLICATION:
-                    default:
-                        errType = DocumentedException.ErrorType.APPLICATION;
-                        break;
-                }
-                final RpcError.ErrorSeverity severity = error.getSeverity();
-                switch (severity) {
-                    case WARNING:
-                        errSeverity = DocumentedException.ErrorSeverity.WARNING;
-                        break;
-                    case ERROR:
-                    default:
-                        errSeverity = DocumentedException.ErrorSeverity.ERROR;
-                        break;
-                }
-                msgBuilder.add(error.getMessage());
-                msgBuilder.add(error.getInfo());
-                errorTag = error.getTag();
-            }
-        }
-        if (errorsEncouneterd) {
-            final NetconfDocumentedException exception = new NetconfDocumentedException(id
-                    + ":RPC during tx failed. " + msgBuilder.toString(),
-                    errType,
-                    DocumentedException.ErrorTag.from(errorTag),
-                    errSeverity);
-            transformed.setException(exception);
-            return;
-        }
-        transformed.set(RpcResultBuilder.<Void>success().build());
+        justification = "https://github.com/spotbugs/spotbugs/issues/811")
+    private static boolean allWarnings(final Collection<? extends @NonNull RpcError> errors) {
+        return errors.stream().allMatch(error -> error.getSeverity() == ErrorSeverity.WARNING);
     }
 }

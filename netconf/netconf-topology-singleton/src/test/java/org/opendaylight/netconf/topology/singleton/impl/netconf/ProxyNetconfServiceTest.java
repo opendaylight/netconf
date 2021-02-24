@@ -274,7 +274,7 @@ public class ProxyNetconfServiceTest {
             verifyDocumentedException(cause.getCause());
         }
 
-        future = netconf.commit(new ArrayList<>());
+        future = netconf.commit();
         masterActor.expectMsgClass(CommitRequest.class);
 
         // master doesn't reply
@@ -290,7 +290,7 @@ public class ProxyNetconfServiceTest {
 
     private void commit(final ProxyNetconfService netconf)
         throws InterruptedException, ExecutionException, TimeoutException {
-        final ListenableFuture<?> submit = netconf.commit(new ArrayList<>());
+        final ListenableFuture<?> submit = netconf.commit();
         masterActor.expectMsgClass(CommitRequest.class);
         masterActor.reply(new Status.Success(null));
         submit.get(5, TimeUnit.SECONDS);
