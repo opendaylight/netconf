@@ -46,10 +46,12 @@ import scala.concurrent.duration.Duration;
 public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDataTreeServiceActor.class);
 
+    private final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
     private final NetconfDataTreeService netconfService;
     private final long idleTimeout;
 
-    private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
+    // FIXME: also unlock future
+    private ListenableFuture<?> lockFuture;
 
     private NetconfDataTreeServiceActor(final NetconfDataTreeService netconfService, final Duration idleTimeout) {
         this.netconfService = netconfService;
@@ -93,7 +95,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof LockRequest) {
-            resultsFutures.addAll(netconfService.lock());
+            lockFuture = netconfService.lock();
         } else if (message instanceof MergeEditConfigRequest) {
             final MergeEditConfigRequest request = (MergeEditConfigRequest) message;
             resultsFutures.add(netconfService.merge(
