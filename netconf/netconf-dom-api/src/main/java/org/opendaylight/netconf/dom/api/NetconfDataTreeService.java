@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.dom.api;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import edu.umd.cs.findbugs.annotations.CheckReturnValue;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
@@ -25,27 +26,32 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  * According to RFC-6241.
  */
 public interface NetconfDataTreeService extends DOMService {
-
     /**
      * The &lt;lock&gt; operation.
      * Allows the client to lock the entire configuration datastore system of a device.
      *
      * @return result of &lt;lock&gt; operation
      */
-    List<ListenableFuture<? extends DOMRpcResult>> lock();
+    @CheckReturnValue
+    ListenableFuture<? extends DOMRpcResult> lock();
 
     /**
      * The &lt;unlock&gt; operation.
      * Used to release a configuration lock, previously obtained with the &lt;lock&gt; operation.
+     *
+     * @return result of &lt;unlock&gt; operation
      */
-    void unlock();
+    @CheckReturnValue
+    ListenableFuture<? extends DOMRpcResult> unlock();
 
     /**
      * The &lt;discard-changes&gt; operation.
      * If device supports :candidate capability, discards any uncommitted changes by resetting
      * the candidate configuration with the content of the running configuration.
+     *
+     * @return result of &lt;discard-changes&gt; operation
      */
-    void discardChanges();
+    ListenableFuture<? extends DOMRpcResult> discardChanges();
 
     /**
      * The &lt;get&gt; operation.
@@ -139,6 +145,7 @@ public interface NetconfDataTreeService extends DOMService {
      *
      * @return result of &lt;commit&gt; operation
      */
+    // FIXME: this should be DOMRpcResult
     ListenableFuture<? extends CommitInfo> commit(List<ListenableFuture<? extends DOMRpcResult>> resultsFutures);
 
     /**
