@@ -8,9 +8,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.Futures;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -155,6 +158,8 @@ public class PlainPatchDataTransactionUtilTest {
                 .build();
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
     }
 
@@ -166,7 +171,9 @@ public class PlainPatchDataTransactionUtilTest {
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .merge(any(), any(),any(),any());
 
         PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
                 this.schema);
@@ -187,7 +194,9 @@ public class PlainPatchDataTransactionUtilTest {
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .merge(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
 
         PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
                 this.schema);
@@ -196,6 +205,7 @@ public class PlainPatchDataTransactionUtilTest {
 
         PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
                 this.schema);
+        verify(this.netconfService).lock();
         verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
@@ -208,7 +218,9 @@ public class PlainPatchDataTransactionUtilTest {
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .merge(any(), any(),any(),any());
 
         PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
                 this.schema);

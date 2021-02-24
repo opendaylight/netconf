@@ -19,11 +19,8 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_LOCK_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,7 +31,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -79,7 +75,9 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     public void unlock() {
+        netconService.lock();
         netconService.unlock();
+        verify(rpcService).invokeRpc(eq(NETCONF_LOCK_QNAME), any(ContainerNode.class));
         verify(rpcService).invokeRpc(eq(NETCONF_UNLOCK_QNAME), any(ContainerNode.class));
     }
 
@@ -158,8 +156,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     public void commit() {
-        List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
-        netconService.commit(resultsFutures);
+        netconService.commit();
         verify(rpcService).invokeRpc(eq(NETCONF_COMMIT_QNAME), any(ContainerNode.class));
     }
 
