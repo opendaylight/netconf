@@ -24,9 +24,8 @@ import akka.testkit.TestActorRef;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
-import com.google.common.util.concurrent.FluentFuture;
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
@@ -38,6 +37,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -150,9 +150,8 @@ public class NetconfDataTreeServiceActorTest {
 
     @Test
     public void testLock() {
-        final List<FluentFuture<DefaultDOMRpcResult>> futures =
-            Arrays.asList(immediateFluentFuture(new DefaultDOMRpcResult()));
-        doReturn(futures).when(netconfService).lock();
+        final ListenableFuture<? extends DOMRpcResult> future = Futures.immediateFuture(new DefaultDOMRpcResult());
+        doReturn(future).when(netconfService).lock();
         actorRef.tell(new LockRequest(), probe.ref());
         verify(netconfService).lock();
     }
@@ -225,6 +224,8 @@ public class NetconfDataTreeServiceActorTest {
     public void testIdleTimeout() {
         final TestProbe testProbe = new TestProbe(system);
         testProbe.watch(actorRef);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
         verify(netconfService, timeout(3000)).discardChanges();
         verify(netconfService, timeout(3000)).unlock();
         testProbe.expectTerminated(actorRef, TIMEOUT.duration());
