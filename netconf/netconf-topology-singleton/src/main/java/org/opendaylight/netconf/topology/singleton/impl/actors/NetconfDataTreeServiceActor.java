@@ -12,8 +12,8 @@ import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.Status;
 import akka.actor.UntypedAbstractActor;
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
@@ -46,10 +46,12 @@ import scala.concurrent.duration.Duration;
 public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDataTreeServiceActor.class);
 
+    private final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
     private final NetconfDataTreeService netconfService;
     private final long idleTimeout;
 
-    private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
+    // FIXME: also unlock future
+    private ListenableFuture<?> lockFuture;
 
     private NetconfDataTreeServiceActor(final NetconfDataTreeService netconfService, final Duration idleTimeout) {
         this.netconfService = netconfService;
@@ -93,7 +95,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof LockRequest) {
-            resultsFutures.addAll(netconfService.lock());
+            lockFuture = netconfService.lock();
         } else if (message instanceof MergeEditConfigRequest) {
             final MergeEditConfigRequest request = (MergeEditConfigRequest) message;
             resultsFutures.add(netconfService.merge(
@@ -125,9 +127,11 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             context().stop(self());
             submit(sender(), self());
         } else if (message instanceof DiscardChangesRequest) {
+            // FIXME: send response back
             netconfService.discardChanges();
         } else if (message instanceof UnlockRequest) {
             context().stop(self());
+            // FIXME: send response back
             netconfService.unlock();
         } else if (message instanceof ReceiveTimeout) {
             LOG.warn("Haven't received any message for {} seconds, cancelling transaction and stopping actor",
@@ -141,8 +145,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     }
 
     private void submit(final ActorRef requester, final ActorRef self) {
-        final ListenableFuture<? extends CommitInfo> submitFuture = netconfService.commit(resultsFutures);
-        FluentFuture.from(submitFuture).addCallback(new FutureCallback<CommitInfo>() {
+        Futures.addCallback(netconfService.commit(resultsFutures), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
                 requester.tell(new Status.Success(null), self);
@@ -155,10 +158,9 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
         }, MoreExecutors.directExecutor());
     }
 
-    private void sendResult(final ListenableFuture<Optional<NormalizedNode<?, ?>>> feature,
-                            final YangInstanceIdentifier path,
-                            final ActorRef sender, final ActorRef self) {
-        FluentFuture.from(feature).addCallback(new FutureCallback<>() {
+    private static void sendResult(final ListenableFuture<Optional<NormalizedNode<?, ?>>> feature,
+            final YangInstanceIdentifier path, final ActorRef sender, final ActorRef self) {
+        Futures.addCallback(feature, new FutureCallback<>() {
             @Override
             public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
                 if (!result.isPresent()) {
