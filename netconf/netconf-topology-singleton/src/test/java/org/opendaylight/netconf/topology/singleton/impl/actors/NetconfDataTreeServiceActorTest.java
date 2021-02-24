@@ -8,12 +8,10 @@
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
@@ -24,9 +22,8 @@ import akka.testkit.TestActorRef;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
-import com.google.common.util.concurrent.FluentFuture;
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
@@ -38,8 +35,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.netconf.topology.singleton.impl.netconf.NetconfServiceFailedException;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CommitRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CreateEditConfigRequest;
@@ -50,6 +49,7 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.LockRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.MergeEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditConfigRequest;
+import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -150,9 +150,8 @@ public class NetconfDataTreeServiceActorTest {
 
     @Test
     public void testLock() {
-        final List<FluentFuture<DefaultDOMRpcResult>> futures =
-            Arrays.asList(immediateFluentFuture(new DefaultDOMRpcResult()));
-        doReturn(futures).when(netconfService).lock();
+        final ListenableFuture<? extends DOMRpcResult> future = Futures.immediateFuture(new DefaultDOMRpcResult());
+        doReturn(future).when(netconfService).lock();
         actorRef.tell(new LockRequest(), probe.ref());
         verify(netconfService).lock();
     }
@@ -202,21 +201,23 @@ public class NetconfDataTreeServiceActorTest {
 
     @Test
     public void testCommit() {
-        doReturn(emptyFluentFuture()).when(netconfService).commit(any());
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         actorRef.tell(new CommitRequest(), probe.ref());
 
-        verify(netconfService).commit(any());
-        probe.expectMsgClass(Status.Success.class);
+        verify(netconfService).commit();
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
     public void testCommitFail() {
         final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "fail", "fail");
-        final TransactionCommitFailedException cause = new TransactionCommitFailedException("fail", rpcError);
-        when(netconfService.commit(any())).thenReturn(FluentFutures.immediateFailedFluentFuture(cause));
+        final TransactionCommitFailedException failure = new TransactionCommitFailedException("fail", rpcError);
+        final NetconfServiceFailedException cause = new NetconfServiceFailedException(
+            String.format("%s: Commit of operation failed", 1), failure);
+        when(netconfService.commit()).thenReturn(FluentFutures.immediateFailedFluentFuture(cause));
         actorRef.tell(new CommitRequest(), probe.ref());
 
-        verify(netconfService).commit(any());
+        verify(netconfService).commit();
         final Status.Failure response = probe.expectMsgClass(Status.Failure.class);
         assertEquals(cause, response.cause());
     }
@@ -225,6 +226,8 @@ public class NetconfDataTreeServiceActorTest {
     public void testIdleTimeout() {
         final TestProbe testProbe = new TestProbe(system);
         testProbe.watch(actorRef);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
         verify(netconfService, timeout(3000)).discardChanges();
         verify(netconfService, timeout(3000)).unlock();
         testProbe.expectTerminated(actorRef, TIMEOUT.duration());

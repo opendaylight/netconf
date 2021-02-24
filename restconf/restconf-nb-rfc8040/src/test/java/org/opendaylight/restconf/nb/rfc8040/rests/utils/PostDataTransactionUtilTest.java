@@ -12,12 +12,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 
+import com.google.common.util.concurrent.Futures;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -37,6 +39,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -140,6 +143,8 @@ public class PostDataTransactionUtilTest {
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
     }
 
     @Test
@@ -156,7 +161,10 @@ public class PostDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(),
+                payload.getData(), Optional.empty());
 
         Response response = PostDataTransactionUtil.postData(this.uriInfo, payload,
                         new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
@@ -187,7 +195,11 @@ public class PostDataTransactionUtilTest {
         doReturn(immediateFalseFluentFuture()).when(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.netconfService).commit(Mockito.any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+            .merge(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).create(
+            LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
 
         Response response = PostDataTransactionUtil.postData(this.uriInfo, payload,
                         new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
@@ -221,7 +233,10 @@ public class PostDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
         final DOMException domException = new DOMException((short) 414, "Post request failed");
         doReturn(immediateFailedFluentFuture(domException)).when(this.readWrite).commit();
-        doReturn(immediateFailedFluentFuture(domException)).when(this.netconfService).commit(Mockito.any());
+        doReturn(immediateFailedFluentFuture(domException)).when(this.netconfService)
+            .create(any(), any(), any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
 
         try {
             PostDataTransactionUtil.postData(this.uriInfo, payload,
