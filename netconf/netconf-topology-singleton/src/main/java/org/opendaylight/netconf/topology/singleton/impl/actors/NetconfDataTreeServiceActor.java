@@ -12,13 +12,15 @@ import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.Status;
 import akka.actor.UntypedAbstractActor;
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -36,7 +38,9 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.MergeEditCon
 import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.UnlockRequest;
+import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -46,10 +50,9 @@ import scala.concurrent.duration.Duration;
 public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDataTreeServiceActor.class);
 
+    private final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
     private final NetconfDataTreeService netconfService;
     private final long idleTimeout;
-
-    private List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
 
     private NetconfDataTreeServiceActor(final NetconfDataTreeService netconfService, final Duration idleTimeout) {
         this.netconfService = netconfService;
@@ -93,7 +96,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof LockRequest) {
-            resultsFutures.addAll(netconfService.lock());
+            invokeRpcCall(netconfService::lock, sender(), self());
         } else if (message instanceof MergeEditConfigRequest) {
             final MergeEditConfigRequest request = (MergeEditConfigRequest) message;
             resultsFutures.add(netconfService.merge(
@@ -125,15 +128,15 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             context().stop(self());
             submit(sender(), self());
         } else if (message instanceof DiscardChangesRequest) {
-            netconfService.discardChanges();
+            invokeRpcCall(netconfService::discardChanges, sender(), self());
         } else if (message instanceof UnlockRequest) {
             context().stop(self());
-            netconfService.unlock();
+            invokeRpcCall(netconfService::unlock, sender(), self());
         } else if (message instanceof ReceiveTimeout) {
             LOG.warn("Haven't received any message for {} seconds, cancelling transaction and stopping actor",
                 idleTimeout);
-            netconfService.discardChanges();
-            netconfService.unlock();
+            invokeRpcCall(netconfService::discardChanges, sender(), self());
+            invokeRpcCall(netconfService::unlock, sender(), self());
             context().stop(self());
         } else {
             unhandled(message);
@@ -141,8 +144,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     }
 
     private void submit(final ActorRef requester, final ActorRef self) {
-        final ListenableFuture<? extends CommitInfo> submitFuture = netconfService.commit(resultsFutures);
-        FluentFuture.from(submitFuture).addCallback(new FutureCallback<CommitInfo>() {
+        Futures.addCallback(netconfService.commit(resultsFutures), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
                 requester.tell(new Status.Success(null), self);
@@ -155,10 +157,32 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
         }, MoreExecutors.directExecutor());
     }
 
-    private void sendResult(final ListenableFuture<Optional<NormalizedNode<?, ?>>> feature,
-                            final YangInstanceIdentifier path,
-                            final ActorRef sender, final ActorRef self) {
-        FluentFuture.from(feature).addCallback(new FutureCallback<>() {
+    private void invokeRpcCall(final Supplier<ListenableFuture<? extends DOMRpcResult>> operation,
+        final ActorRef requester, final ActorRef self) {
+        Futures.addCallback(operation.get(), new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(@Nullable final DOMRpcResult rpcResult) {
+                if (rpcResult == null) {
+                    requester.tell(new EmptyResultResponse(), getSender());
+                    return;
+                }
+                NormalizedNodeMessage nodeMessageResp = null;
+                if (rpcResult.getResult() != null) {
+                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.empty(), rpcResult.getResult());
+                }
+                requester.tell(new InvokeRpcMessageReply(nodeMessageResp, rpcResult.getErrors()), self);
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                requester.tell(new Status.Failure(throwable), self);
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    private static void sendResult(final ListenableFuture<Optional<NormalizedNode<?, ?>>> feature,
+            final YangInstanceIdentifier path, final ActorRef sender, final ActorRef self) {
+        Futures.addCallback(feature, new FutureCallback<>() {
             @Override
             public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
                 if (!result.isPresent()) {

@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME;
@@ -78,8 +79,16 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void unlock() {
+    public void unlockWithoutLock() {
         netconService.unlock();
+        verify(rpcService, never()).invokeRpc(eq(NETCONF_UNLOCK_QNAME), any(ContainerNode.class));
+    }
+
+    @Test
+    public void unlock() {
+        netconService.lock();
+        netconService.unlock();
+        verify(rpcService).invokeRpc(eq(NETCONF_LOCK_QNAME), any(ContainerNode.class));
         verify(rpcService).invokeRpc(eq(NETCONF_UNLOCK_QNAME), any(ContainerNode.class));
     }
 
