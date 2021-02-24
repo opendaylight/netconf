@@ -15,10 +15,10 @@ import akka.dispatch.OnComplete;
 import akka.pattern.AskTimeoutException;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -70,26 +70,29 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public ListenableFuture<DOMRpcResult> lock() {
         LOG.debug("{}: Lock via actor {}", id, masterActor);
+        // FIXME: ask + complete
         masterActor.tell(new LockRequest(), ActorRef.noSender());
-        return new ArrayList<>();
+        return Futures.immediateVoidFuture();
     }
 
     @Override
-    public void unlock() {
+    public ListenableFuture<DOMRpcResult> unlock() {
         LOG.debug("{}: Unlock via actor {}", id, masterActor);
+        // FIXME: ask + complete
         masterActor.tell(new UnlockRequest(), ActorRef.noSender());
     }
 
     @Override
-    public void discardChanges() {
+    public ListenableFuture<DOMRpcResult> discardChanges() {
         LOG.debug("{}: Discard changes via actor {}", id, masterActor);
+        // FIXME: ask + complete
         masterActor.tell(new DiscardChangesRequest(), ActorRef.noSender());
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
         LOG.debug("{}: Get {} {} via actor {}", id, OPERATIONAL, path, masterActor);
         final Future<Object> future = Patterns.ask(masterActor, new GetRequest(path), askTimeout);
         return read(future, OPERATIONAL, path);
@@ -97,14 +100,14 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
-                                                                final List<YangInstanceIdentifier> fields) {
+            final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: Get {} {} with fields {} via actor {}", id, OPERATIONAL, path, fields, masterActor);
         final Future<Object> future = Patterns.ask(masterActor, new GetWithFieldsRequest(path, fields), askTimeout);
         return read(future, OPERATIONAL, path);
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
         LOG.debug("{}: GetConfig {} {} via actor {}", id, CONFIGURATION, path, masterActor);
         final Future<Object> future = Patterns.ask(masterActor, new GetConfigRequest(path), askTimeout);
         return read(future, CONFIGURATION, path);
@@ -112,7 +115,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
-                                                                      final List<YangInstanceIdentifier> fields) {
+            final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: GetConfig {} {} with fields {} via actor {}", id, CONFIGURATION, path, fields, masterActor);
         final Future<Object> future = Patterns.ask(masterActor,
                 new GetConfigWithFieldsRequest(path, fields), askTimeout);
@@ -120,9 +123,9 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                          NormalizedNode<?, ?> data,
-                                                          Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Merge {} {} via actor {}", id, store, path, masterActor);
         masterActor.tell(new MergeEditConfigRequest(
             store, new NormalizedNodeMessage(path, data), defaultOperation.orElse(null)), ActorRef.noSender());
@@ -131,9 +134,9 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                            NormalizedNode<?, ?> data,
-                                                            Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Replace {} {} via actor {}", id, store, path, masterActor);
 
         masterActor.tell(new ReplaceEditConfigRequest(
@@ -142,9 +145,9 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                           NormalizedNode<?, ?> data,
-                                                           Optional<ModifyAction> defaultOperation) {
+    public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Create {} {} via actor {}", id, store, path, masterActor);
         masterActor.tell(new CreateEditConfigRequest(
             store, new NormalizedNodeMessage(path, data), defaultOperation.orElse(null)), ActorRef.noSender());
@@ -152,14 +155,16 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> delete(LogicalDatastoreType store, YangInstanceIdentifier path) {
+    public ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
         LOG.debug("{}: Delete {} {} via actor {}", id, store, path, masterActor);
         masterActor.tell(new DeleteEditConfigRequest(store, path), ActorRef.noSender());
         return createResult();
     }
 
     @Override
-    public ListenableFuture<? extends DOMRpcResult> remove(LogicalDatastoreType store, YangInstanceIdentifier path) {
+    public ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
         LOG.debug("{}: Remove {} {} via actor {}", id, store, path, masterActor);
         masterActor.tell(new RemoveEditConfigRequest(store, path), ActorRef.noSender());
         return createResult();
@@ -167,7 +172,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
 
     @Override
     public ListenableFuture<? extends CommitInfo> commit(
-        List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+            final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
         LOG.debug("{}: Commit via actor {}", id, masterActor);
 
         final Future<Object> future = Patterns.ask(masterActor, new CommitRequest(), askTimeout);

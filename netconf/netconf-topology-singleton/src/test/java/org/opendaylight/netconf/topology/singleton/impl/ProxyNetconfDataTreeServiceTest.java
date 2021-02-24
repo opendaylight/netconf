@@ -19,7 +19,6 @@ import akka.util.Timeout;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
@@ -225,15 +224,15 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     private void lock() {
-        final List<ListenableFuture<? extends DOMRpcResult>> lock = proxy.lock();
+        final ListenableFuture<DOMRpcResult> lock = proxy.lock();
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
-
-        assertTrue(lock.isEmpty());
+        // FIXME: todo
+        assertTrue(lock.isDone());
         masterActor.expectMsgClass(LockRequest.class);
     }
 
-    private void checkException(IllegalStateException exception) {
+    private void checkException(final IllegalStateException exception) {
         assertEquals(String.format("%s: Device's datastore must be locked first", DEVICE_ID), exception.getMessage());
         masterActor.expectNoMessage(EXP_NO_MESSAGE_TIMEOUT);
     }
