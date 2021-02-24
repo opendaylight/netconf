@@ -59,6 +59,12 @@ public final class NetconfDeviceRpc implements DOMRpcService {
             @Override
             public void onSuccess(final RpcResult<NetconfMessage> result) {
                 try {
+                    // FIXME: emulate really slow device
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        System.out.println("commit failed" + e.getMessage());
+                    }
                     ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
                             : new DefaultDOMRpcResult(result.getErrors()));
                 } catch (Exception cause) {
