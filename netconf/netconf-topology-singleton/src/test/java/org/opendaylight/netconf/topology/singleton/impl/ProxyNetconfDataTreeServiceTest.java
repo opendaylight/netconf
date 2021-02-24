@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -16,10 +17,11 @@ import akka.actor.Status;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.net.InetSocketAddress;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
@@ -39,6 +41,7 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.NetconfDataT
 import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.UnlockRequest;
+import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -225,15 +228,19 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     private void lock() {
-        final List<ListenableFuture<? extends DOMRpcResult>> lock = proxy.lock();
+        final ListenableFuture<DOMRpcResult> lock = proxy.lock();
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
-
-        assertTrue(lock.isEmpty());
         masterActor.expectMsgClass(LockRequest.class);
+        masterActor.reply(new InvokeRpcMessageReply(null, Collections.emptyList()));
+        Futures.whenAllComplete(lock).run(() -> {
+            assertTrue(lock.isDone());
+            assertNotNull(Futures.getUnchecked(lock));
+            }, MoreExecutors.directExecutor()
+        );
     }
 
-    private void checkException(IllegalStateException exception) {
+    private void checkException(final IllegalStateException exception) {
         assertEquals(String.format("%s: Device's datastore must be locked first", DEVICE_ID), exception.getMessage());
         masterActor.expectNoMessage(EXP_NO_MESSAGE_TIMEOUT);
     }
