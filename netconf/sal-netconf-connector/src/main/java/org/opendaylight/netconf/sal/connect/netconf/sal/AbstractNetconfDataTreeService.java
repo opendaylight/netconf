@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeService {
     private static final class Candidate extends AbstractNetconfDataTreeService {
+        private volatile boolean locked = false;
+
         Candidate(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
             super(id, netconfOps, rollbackSupport);
         }
@@ -55,6 +57,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
          * This has to be non blocking since it is called from a callback on commit and it is netty threadpool that is
          * really sensitive to blocking calls.
          */
+        // TODO: return ListenableFuture and handle correctly
         @Override
         public void discardChanges() {
             netconfOps.discardChanges(new NetconfRpcFutureCallback("Discarding candidate", id));
@@ -62,18 +65,22 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
         @Override
         ListenableFuture<? extends DOMRpcResult> lockSingle() {
-            return netconfOps.lockCandidate(new NetconfRpcFutureCallback("Lock candidate", id) {
-                @Override
-                public void onFailure(final Throwable throwable) {
-                    super.onFailure(throwable);
-                    discardChanges();
-                }
-            });
+            // TODO: revisit this. Assumption is that it doesn't make sense to fail everything from this point,
+            //  because of 1. there is no changes before lock acquired; 2. consumer might want a different behavior;
+            final ListenableFuture<? extends DOMRpcResult> lockFuture = netconfOps.lockCandidate(
+                new NetconfRpcFutureCallback("Lock candidate", id));
+            onSuccessDOMRpcResult(lockFuture, () -> locked = true);
+            return lockFuture;
         }
 
         @Override
         void unlockImpl() {
-            netconfOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
+            // only execute unlock operation if the device was successfully locked by this session before
+            if (locked) {
+                final ListenableFuture<? extends DOMRpcResult> unlockFuture = netconfOps.unlockCandidate(
+                    new NetconfRpcFutureCallback("Unlock candidate", id));
+                onSuccessDOMRpcResult(unlockFuture, () -> locked = true);
+            }
         }
 
         @Override
@@ -104,6 +111,8 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     }
 
     private static final class Running extends AbstractNetconfDataTreeService {
+        private volatile boolean locked = false;
+
         Running(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
             super(id, netconfOps, rollbackSupport);
         }
@@ -115,12 +124,20 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
         @Override
         ListenableFuture<? extends DOMRpcResult> lockSingle() {
-            return netconfOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id));
+            final ListenableFuture<? extends DOMRpcResult> lockResult = netconfOps.lockRunning(
+                new NetconfRpcFutureCallback("Lock running", id));
+            onSuccessDOMRpcResult(lockResult, () -> locked = true);
+            return lockResult;
         }
 
         @Override
         void unlockImpl() {
-            netconfOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+            // only execute unlock operation if the device was successfully locked by this session before
+            if (locked) {
+                final ListenableFuture<? extends DOMRpcResult> unlockResult = netconfOps.unlockRunning(
+                    new NetconfRpcFutureCallback("Unlock running", id));
+                onSuccessDOMRpcResult(unlockResult, () -> locked = false);
+            }
         }
 
         @Override
@@ -133,7 +150,6 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
         @Override
         ListenableFuture<RpcResult<Void>> commitImpl(final List<ListenableFuture<? extends DOMRpcResult>> results) {
-            unlock();
             return resultsToStatus(id, results);
         }
     }
@@ -219,12 +235,12 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     }
 
     @Override
-    public synchronized List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public synchronized ListenableFuture<Void> lock() {
         if (isLockAllowed) {
-            return lockImpl();
+            return transformDOMRpcFuturesList(lockImpl());
         }
-        LOG.trace("Lock is not allowed: {}", id);
-        return List.of();
+        LOG.trace("Lock is not allowed by device configuration, ignoring lock results: {}", id);
+        return Futures.immediateVoidFuture();
     }
 
     List<ListenableFuture<? extends DOMRpcResult>> lockImpl() {
@@ -317,7 +333,29 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     @Override
     public synchronized ListenableFuture<? extends CommitInfo> commit(
             final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures) {
+//        if (resultsFutures.isEmpty()) {
+//            // possible use case
+//        }
+//        final ListenableFuture<List<DOMRpcResult>> resultsList = Futures.allAsList(resultsFutures);
+
+        // trigger commit only if all previous operations completed successfully
+        final ListenableFuture<RpcResult<Void>> operationsResultFuture = resultsToStatus(id, resultsFutures);
         final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
+        Futures.addCallback(operationsResultFuture, new FutureCallback<RpcResult<Void>>() {
+            @Override
+            public void onSuccess(final RpcResult<Void> voidRpcResult) {
+                n
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                unlock();
+                resultFuture.setException(new TransactionCommitFailedException(
+                    String.format("Commit of transaction %s failed", this), throwable));
+            }
+        }, MoreExecutors.directExecutor());
+
+
         Futures.addCallback(commitImpl(resultsFutures), new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
@@ -446,5 +484,38 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             return;
         }
         transformed.set(RpcResultBuilder.<Void>success().build());
+    }
+
+    // There is not much sense in exposing the list of futures related to the lock operation,
+    // the consumer wouldn't be able to do anything useful with them, as the lock/unlock operation
+    // implementations are not exposed externally.
+    private ListenableFuture<Void> transformDOMRpcFuturesList(
+        final List<ListenableFuture<? extends DOMRpcResult>> futuresList) {
+
+        return Futures.transformAsync(Futures.allAsList(futuresList), results -> {
+            if (results != null && results.stream().anyMatch(result -> !result.getErrors().isEmpty())) {
+                return Futures.immediateFailedFuture(new RuntimeException("Lock operation failed"));
+            } else {
+                return Futures.immediateVoidFuture();
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    // TODO: check if we can remove this method by introducing a decorator around existing NetconfRpcFutureCallback
+    private static void onSuccessDOMRpcResult(final ListenableFuture<? extends DOMRpcResult> domFuture,
+                                              final Runnable operation) {
+        Futures.addCallback(domFuture, new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(final DOMRpcResult rpcResult) {
+                if (rpcResult.getErrors().isEmpty()) {
+                    operation.run();
+                }
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                // ignore failure in this listener
+            }
+        }, MoreExecutors.directExecutor());
     }
 }
