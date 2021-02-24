@@ -40,10 +40,9 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
     }
 
     @Override
-    public List<ListenableFuture<? extends DOMRpcResult>> lock() {
+    public ListenableFuture<Void>  lock() {
         LOG.debug("{}: Lock - failure", id, failure);
-        return Collections.singletonList(
-            FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("lock", failure)));
+        return FluentFutures.immediateFailedFluentFuture(new NetconfServiceFailedException("lock", failure));
     }
 
     @Override
