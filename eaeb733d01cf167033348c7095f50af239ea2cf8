@@ -22,6 +22,30 @@
       "revId": "eaeb733d01cf167033348c7095f50af239ea2cf8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c644e695_a2455833",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/model/Node.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2021-03-01T10:54:27Z",
+      "side": 1,
+      "message": "1. It is used for request payload creation with GSON: https://git.opendaylight.org/gerrit/c/netconf/+/95210/12/netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java#369\n2. There is no YANG binding \u003c-\u003e json mapper.",
+      "parentUuid": "d583b0f4_bf022a31",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 19
+      },
+      "revId": "eaeb733d01cf167033348c7095f50af239ea2cf8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
