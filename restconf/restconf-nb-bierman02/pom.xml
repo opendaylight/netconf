@@ -11,13 +11,13 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>restconf-parent</artifactId>
-    <version>1.10.4.2-SNAPSHOT</version>
+    <version>1.10.4.2</version>
     <relativePath>../restconf-parent</relativePath>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>restconf-nb-bierman02</artifactId>
-  <version>1.10.4.2-SNAPSHOT</version>
+  <version>1.10.4.2</version>
   <packaging>bundle</packaging>
 
   <dependencies>
