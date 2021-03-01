@@ -20,7 +20,7 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>shaded-sshd-jar</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.4.2-SNAPSHOT</version>
+    <version>1.7.4.3-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
     <properties>

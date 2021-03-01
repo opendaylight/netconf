@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-callhome-ssh</artifactId>
-    <version>1.7.4.2-SNAPSHOT</version>
+    <version>1.7.4.3-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf Connector :: Netconf Callhome Connector + Netconf SSH Server</name>
