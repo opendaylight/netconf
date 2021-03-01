@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba9b077e_5339fb14",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/PerfClientCallable.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2021-03-01T12:42:45Z",
+      "side": 1,
+      "message": "Does it mean we always have the same payload? (If I understand correctly ArrayList\u003cRequest\u003e is replaced RequestData)",
+      "revId": "dd56fe4374ee3955c6b6e13dccbf94ec3eb33de9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
