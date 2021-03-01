@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-clustered-topology</artifactId>
-    <version>1.7.4.1-SNAPSHOT</version>
+    <version>1.7.4.2-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Clustered Netconf Topology :: Netconf Connector + Netconf SSH Server</name>
