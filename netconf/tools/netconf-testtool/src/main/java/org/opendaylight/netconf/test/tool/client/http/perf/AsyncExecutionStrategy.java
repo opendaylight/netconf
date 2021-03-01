@@ -13,23 +13,23 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.HttpResponseStatus;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
-import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.opendaylight.netconf.test.tool.client.http.perf.RequestMessageUtils.formRequest;
 
 public class AsyncExecutionStrategy implements ExecutionStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(AsyncExecutionStrategy.class);
 
     private final Parameters params;
-    private final ArrayList<Request> payloads;
     private final AsyncHttpClient asyncHttpClient;
     private final Semaphore semaphore;
+    RestPerfClient.RequestData payloads;
 
     AsyncExecutionStrategy(final Parameters params, final AsyncHttpClient asyncHttpClient,
-                           final ArrayList<Request> payloads) {
+                           final RestPerfClient.RequestData payloads) {
         this.params = params;
         this.asyncHttpClient = asyncHttpClient;
         this.payloads = payloads;
@@ -40,7 +40,9 @@ public class AsyncExecutionStrategy implements ExecutionStrategy {
     public void invoke() {
         LOG.info("Begin sending async requests");
 
-        for (final Request request : payloads) {
+        for (int i = 0; i < payloads.getRequests(); i++) {
+            String message = RequestMessageUtils.prepareMessage(payloads.getThreadId(), i, payloads.getContentString(), payloads.getPort());
+            Request request = formRequest(asyncHttpClient, payloads.getDestination(), params, message);
             try {
                 semaphore.acquire();
             } catch (InterruptedException e) {
