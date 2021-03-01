@@ -10,11 +10,8 @@ package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Request;
-import java.util.ArrayList;
 import java.util.concurrent.Callable;
-import org.opendaylight.netconf.test.tool.client.http.perf.RestPerfClient.DestToPayload;
+import org.opendaylight.netconf.test.tool.client.http.perf.RestPerfClient.RequestData;
 import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,36 +20,18 @@ public class PerfClientCallable implements Callable<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(PerfClientCallable.class);
 
     private final Parameters params;
-    private final ArrayList<Request> payloads;
     private final AsyncHttpClient asyncHttpClient;
     private ExecutionStrategy executionStrategy;
+    private RequestData payloads;
 
-    public PerfClientCallable(Parameters params, ArrayList<DestToPayload> payloads) {
+    public PerfClientCallable(Parameters params, RequestData payloads) {
         this.params = params;
+        this.payloads = payloads;
         this.asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder()
                 .setConnectTimeout(Integer.MAX_VALUE)
                 .setRequestTimeout(Integer.MAX_VALUE)
                 .setAllowPoolingConnections(true)
                 .build());
-        this.payloads = new ArrayList<>();
-        for (DestToPayload payload : payloads) {
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
-                    .addHeader("content-type", "application/json")
-                    .addHeader("Accept", "application/xml")
-                    .setBody(payload.getPayload())
-                    .setRequestTimeout(Integer.MAX_VALUE);
-
-            if (params.auth != null) {
-                requestBuilder.setRealm(new Realm.RealmBuilder()
-                        .setScheme(Realm.AuthScheme.BASIC)
-                        .setPrincipal(params.auth.get(0))
-                        .setPassword(params.auth.get(1))
-                        .setUsePreemptiveAuth(true)
-                        .build());
-            }
-
-            this.payloads.add(requestBuilder.build());
-        }
         executionStrategy = getExecutionStrategy();
     }
 

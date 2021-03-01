@@ -11,6 +11,10 @@ package org.opendaylight.netconf.test.tool.client.http.perf;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -20,53 +24,53 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import org.opendaylight.netconf.test.tool.TestToolUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.opendaylight.netconf.test.tool.client.http.perf.RequestMessageUtils.formPayload;
 
 @SuppressFBWarnings("DM_EXIT")
 public final class RestPerfClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestPerfClient.class);
 
-    private static final String HOST_KEY = "{HOST}";
-    private static final String PORT_KEY = "{PORT}";
-    private static final String DEVICE_PORT_KEY = "{DEVICE_PORT}";
-
-    private static final String PEER_KEY = "{PEERID}";
-    private static final String INT_LEAF_KEY = "{INTLEAF}";
-
-    private static final String PHYS_ADDR_PLACEHOLDER = "{PHYS_ADDR}";
-
-    private static final String DEST = "http://{HOST}:{PORT}";
-
-    private static long macStart = 0xAABBCCDD0000L;
-
     static int throttle;
 
-    static final class DestToPayload {
+    static final class RequestData {
 
         private final String destination;
-        private final String payload;
+        private final String contentString;
+        private final int threadId;
+        private final int port;
+        private final int requests;
 
-        DestToPayload(final String destination, final String payload) {
+        RequestData(final String destination, final String contentString, int threadId, int port, int requests) {
             this.destination = destination;
-            this.payload = payload;
+            this.contentString = contentString;
+            this.threadId = threadId;
+            this.port = port;
+            this.requests = requests;
         }
 
         public String getDestination() {
             return destination;
         }
 
-        public String getPayload() {
-            return payload;
+        public String getContentString() {
+            return contentString;
+        }
+
+        public int getThreadId() {
+            return threadId;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public int getRequests() {
+            return requests;
         }
     }
 
     private RestPerfClient() {
-
     }
 
     public static void main(final String[] args) {
@@ -93,67 +97,20 @@ public final class RestPerfClient {
         final int leftoverRequests = parameters.editCount % parameters.threadAmount;
         LOG.info("leftoverRequests: {}", leftoverRequests);
 
-        final ArrayList<ArrayList<DestToPayload>> allThreadsPayloads = new ArrayList<>();
+        final ArrayList<RequestData> allThreadsPayloads = new ArrayList<>();
+
         for (int i = 0; i < threadAmount; i++) {
-            final ArrayList<DestToPayload> payloads = new ArrayList<>();
-            for (int j = 0; j < requestsPerThread; j++) {
-                final int devicePort = parameters.sameDevice
-                    ? parameters.devicePortRangeStart : parameters.devicePortRangeStart + i;
-                final StringBuilder destBuilder = new StringBuilder(DEST);
-                destBuilder.replace(
-                        destBuilder.indexOf(HOST_KEY),
-                        destBuilder.indexOf(HOST_KEY) + HOST_KEY.length(),
-                        parameters.ip)
-                    .replace(
-                        destBuilder.indexOf(PORT_KEY),
-                        destBuilder.indexOf(PORT_KEY) + PORT_KEY.length(),
-                        parameters.port + "");
-                final StringBuilder suffixBuilder = new StringBuilder(parameters.destination);
-                if (suffixBuilder.indexOf(DEVICE_PORT_KEY) != -1) {
-                    suffixBuilder.replace(
-                        suffixBuilder.indexOf(DEVICE_PORT_KEY),
-                        suffixBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(),
-                        devicePort + "");
-                }
-                destBuilder.append(suffixBuilder);
+            int numberOfReq = requestsPerThread;
+            if (i == (threadAmount - 1))
+                numberOfReq += leftoverRequests;
 
-                payloads.add(
-                    new DestToPayload(destBuilder.toString(), prepareMessage(i, j, editContentString, devicePort)));
-            }
-            allThreadsPayloads.add(payloads);
-        }
-
-        for (int i = 0; i < leftoverRequests; i++) {
-            final int devicePort = parameters.sameDevice
-                ? parameters.devicePortRangeStart : parameters.devicePortRangeStart + threadAmount - 1;
-            final StringBuilder destBuilder = new StringBuilder(DEST);
-            destBuilder.replace(
-                    destBuilder.indexOf(HOST_KEY),
-                    destBuilder.indexOf(HOST_KEY) + HOST_KEY.length(),
-                    parameters.ip)
-                .replace(
-                    destBuilder.indexOf(PORT_KEY),
-                    destBuilder.indexOf(PORT_KEY) + PORT_KEY.length(),
-                    parameters.port + "");
-            final StringBuilder suffixBuilder = new StringBuilder(parameters.destination);
-            if (suffixBuilder.indexOf(DEVICE_PORT_KEY) != -1) {
-                suffixBuilder.replace(
-                    suffixBuilder.indexOf(DEVICE_PORT_KEY),
-                    suffixBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(),
-                    devicePort + "");
-            }
-            destBuilder.append(suffixBuilder);
-
-            final ArrayList<DestToPayload> payloads = allThreadsPayloads.get(allThreadsPayloads.size() - 1);
-            payloads.add(
-                new DestToPayload(
-                    destBuilder.toString(),
-                    prepareMessage(threadAmount - 1, requestsPerThread + i, editContentString, devicePort)));
+            RequestData payload = formPayload(parameters, editContentString, i, numberOfReq);
+            allThreadsPayloads.add(payload);
         }
 
         final ArrayList<PerfClientCallable> callables = new ArrayList<>();
-        for (ArrayList<DestToPayload> payloads : allThreadsPayloads) {
-            callables.add(new PerfClientCallable(parameters, payloads));
+        for (RequestData payload : allThreadsPayloads) {
+            callables.add(new PerfClientCallable(parameters, payload));
         }
 
         final ExecutorService executorService = Executors.newFixedThreadPool(threadAmount);
@@ -163,7 +120,7 @@ public final class RestPerfClient {
         final Stopwatch started = Stopwatch.createStarted();
         try {
             final List<Future<Void>> futures = executorService.invokeAll(
-                callables, parameters.timeout, TimeUnit.MINUTES);
+                    callables, parameters.timeout, TimeUnit.MINUTES);
             for (int i = 0; i < futures.size(); i++) {
                 Future<Void> future = futures.get(i);
                 if (future.isCancelled()) {
@@ -190,7 +147,7 @@ public final class RestPerfClient {
         // and do not log it
         if (allThreadsCompleted) {
             LOG.info(
-                "Requests per second: {}", parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS));
+                    "Requests per second: {}", parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS));
         }
         System.exit(0);
     }
@@ -208,34 +165,4 @@ public final class RestPerfClient {
         return null;
     }
 
-    private static String prepareMessage(final int idi, final int idj, final String editContentString,
-                                         final int devicePort) {
-        StringBuilder messageBuilder = new StringBuilder(editContentString);
-        if (editContentString.contains(PEER_KEY)) {
-            messageBuilder.replace(
-                    messageBuilder.indexOf(PEER_KEY),
-                    messageBuilder.indexOf(PEER_KEY) + PEER_KEY.length(),
-                    Integer.toString(idi))
-                .replace(
-                    messageBuilder.indexOf(INT_LEAF_KEY),
-                    messageBuilder.indexOf(INT_LEAF_KEY) + INT_LEAF_KEY.length(),
-                    Integer.toString(idj));
-        }
-
-        if (messageBuilder.indexOf(DEVICE_PORT_KEY) != -1) {
-            messageBuilder.replace(
-                messageBuilder.indexOf(DEVICE_PORT_KEY),
-                messageBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(),
-                Integer.toString(devicePort));
-        }
-
-        int idx = messageBuilder.indexOf(PHYS_ADDR_PLACEHOLDER);
-
-        while (idx != -1) {
-            messageBuilder.replace(idx, idx + PHYS_ADDR_PLACEHOLDER.length(), TestToolUtils.getMac(macStart++));
-            idx = messageBuilder.indexOf(PHYS_ADDR_PLACEHOLDER);
-        }
-
-        return messageBuilder.toString();
-    }
 }
