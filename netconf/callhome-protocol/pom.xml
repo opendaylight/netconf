@@ -11,13 +11,13 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
-    <version>1.7.4.2-SNAPSHOT</version>
+    <version>1.7.4.3-SNAPSHOT</version>
     <relativePath>../netconf-parent</relativePath>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>callhome-protocol</artifactId>
-  <version>1.7.4.2-SNAPSHOT</version>
+  <version>1.7.4.3-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
