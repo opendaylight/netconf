@@ -9,7 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.Application;
@@ -22,6 +22,11 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBo
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RequestLogger;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.ResponseWithBodyLogger;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.ResponseWithoutBodyLogger;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingBroker;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonPatchBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonPatchStatusBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlPatchBodyReader;
@@ -34,12 +39,15 @@ abstract class AbstractRestconfApplication extends Application {
     private final SchemaContextHandler schemaContextHandler;
     private final DOMMountPointService mountPointService;
     private final List<Object> services;
+    private final RestconfLoggingConfiguration restconfLoggingConfiguration;
 
     AbstractRestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService, final List<Object> services) {
+                                final DOMMountPointService mountPointService, final List<Object> services,
+                                final RestconfLoggingConfiguration restconfLoggingConfiguration) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.mountPointService = requireNonNull(mountPointService);
         this.services = requireNonNull(services);
+        this.restconfLoggingConfiguration = requireNonNull(restconfLoggingConfiguration);
     }
 
     @Override
@@ -52,13 +60,18 @@ abstract class AbstractRestconfApplication extends Application {
 
     @Override
     public final Set<Object> getSingletons() {
-        return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 5)
-            .addAll(services)
-            .add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService))
-            .add(new JsonPatchBodyReader(schemaContextHandler, mountPointService))
-            .add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService))
-            .add(new XmlPatchBodyReader(schemaContextHandler, mountPointService))
-            .add(new RestconfDocumentedExceptionMapper(schemaContextHandler))
-            .build();
+        final Set<Object> singletons = new HashSet<>(services);
+        singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService));
+        singletons.add(new JsonPatchBodyReader(schemaContextHandler, mountPointService));
+        singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService));
+        singletons.add(new XmlPatchBodyReader(schemaContextHandler, mountPointService));
+        singletons.add(new RestconfDocumentedExceptionMapper(schemaContextHandler));
+        if (restconfLoggingConfiguration.isRestconfLoggingEnabled()) {
+            final RestconfLoggingBroker restconfLoggingBroker = new RestconfLoggingBroker(restconfLoggingConfiguration);
+            singletons.add(new RequestLogger(restconfLoggingBroker));
+            singletons.add(new ResponseWithoutBodyLogger(restconfLoggingBroker));
+            singletons.add(new ResponseWithBodyLogger(restconfLoggingBroker));
+        }
+        return singletons;
     }
 }

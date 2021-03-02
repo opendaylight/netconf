@@ -18,6 +18,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
@@ -33,7 +34,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final DOMMountPointService mountPointService, final RestconfStreamsSubscriptionService streamSubscription,
             final DOMDataBroker dataBroker, final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
-            final Configuration configuration) {
+            final Configuration configuration, final RestconfLoggingConfiguration restconfLoggingConfiguration) {
         super(schemaContextHandler, mountPointService, List.of(
             streamSubscription,
             new RestconfDataServiceImpl(schemaContextHandler, dataBroker, mountPointService, streamSubscription,
@@ -42,7 +43,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
             new RestconfOperationsServiceImpl(schemaContextHandler, mountPointService),
             new RestconfSchemaServiceImpl(schemaContextHandler, mountPointService,
                 domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class)),
-            new RestconfImpl(schemaContextHandler)));
+            new RestconfImpl(schemaContextHandler)), restconfLoggingConfiguration);
 
     }
 
@@ -51,10 +52,12 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService,
-            final DOMSchemaService domSchemaService, final Configuration configuration) {
+            final DOMSchemaService domSchemaService, final Configuration configuration,
+                               final RestconfLoggingConfiguration restconfLoggingConfiguration) {
         this(schemaContextHandler, mountPointService,
             new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, schemaContextHandler,
                 configuration),
-            dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration);
+            dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration,
+                restconfLoggingConfiguration);
     }
 }
