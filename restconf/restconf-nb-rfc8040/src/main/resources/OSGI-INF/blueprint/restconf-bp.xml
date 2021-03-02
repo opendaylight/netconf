@@ -26,7 +26,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <cm:property-placeholder persistent-id="org.opendaylight.restconf.nb.rfc8040">
+  <cm:property-placeholder persistent-id="org.opendaylight.restconf.nb.rfc8040" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="maximum-fragment-length" value="0"/>
       <cm:property name="heartbeat-interval" value="10000"/>
@@ -34,6 +34,11 @@
       <cm:property name="ping-executor-name-prefix" value="ping-executor"/>
       <cm:property name="max-thread-count" value="1"/>
       <cm:property name="use-sse" value="true"/>
+      <cm:property name="restconf-logging-enabled" value="false"/>
+      <cm:property name="logging-headers-enabled" value="true"/>
+      <cm:property name="logging-query-parameters-enabled" value="true"/>
+      <cm:property name="logging-body-enabled" value="true"/>
+      <cm:property name="hidden-http-headers" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -57,6 +62,15 @@
     <argument value="${idle-timeout}"/>
     <argument value="${heartbeat-interval}"/>
     <argument value="${use-sse}" />
+  </bean>
+
+  <bean id="restconfLoggingConfiguration"
+        class="org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingConfiguration">
+    <argument value="${restconf-logging-enabled}"/>
+    <argument value="${logging-headers-enabled}"/>
+    <argument value="${logging-query-parameters-enabled}"/>
+    <argument value="${logging-body-enabled}"/>
+    <argument value="${hidden-http-headers}"/>
   </bean>
 
   <bean id="servicesWrapper" factory-ref="rfc8040RestConfWiring" factory-method="getServicesWrapper" />
