@@ -9,7 +9,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
   <!-- Restconf providers -->
-  <cm:property-placeholder persistent-id="org.opendaylight.restconf.nb.rfc8040">
+  <cm:property-placeholder persistent-id="org.opendaylight.restconf.nb.rfc8040" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="maximum-fragment-length" value="0"/>
       <cm:property name="heartbeat-interval" value="10000"/>
@@ -17,6 +17,11 @@
       <cm:property name="ping-executor-name-prefix" value="ping-executor"/>
       <cm:property name="max-thread-count" value="1"/>
       <cm:property name="use-sse" value="true"/>
+      <cm:property name="restconf-logging-enabled" value="false"/>
+      <cm:property name="logging-headers-enabled" value="true"/>
+      <cm:property name="logging-query-parameters-enabled" value="true"/>
+      <cm:property name="logging-body-enabled" value="true"/>
+      <cm:property name="hidden-http-headers" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -43,6 +48,7 @@
     <argument ref="schemaContextHandler"/>
     <argument ref="dOMMountPointService"/>
     <argument ref="restconfDataStreamServiceImpl"/>
+    <argument ref="restconfLoggingConfiguration"/>
   </bean>
   <bean id="restconfApplication" class="org.opendaylight.restconf.nb.rfc8040.RestconfApplication">
     <argument ref="schemaContextHandler"/>
@@ -53,6 +59,7 @@
     <argument ref="dOMNotificationService"/>
     <argument ref="dOMSchemaService"/>
     <argument ref="configuration"/>
+    <argument ref="restconfLoggingConfiguration"/>
   </bean>
   <bean id="restconfDataStreamServiceImpl" class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl">
     <argument ref="scheduledThreadPool"/>
@@ -85,4 +92,12 @@
   <reference id="dOMNotificationService" interface="org.opendaylight.mdsal.dom.api.DOMNotificationService"/>
   <reference id="dOMRpcService" interface="org.opendaylight.mdsal.dom.api.DOMRpcService"/>
   <reference id="dOMSchemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
+  <bean id="restconfLoggingConfiguration"
+        class="org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingConfiguration">
+    <argument value="${restconf-logging-enabled}"/>
+    <argument value="${logging-headers-enabled}"/>
+    <argument value="${logging-query-parameters-enabled}"/>
+    <argument value="${logging-body-enabled}"/>
+    <argument value="${hidden-http-headers}"/>
+  </bean>
 </blueprint>
