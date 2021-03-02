@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
 
 /**
@@ -21,7 +22,8 @@ public class RestconfNotifApplication extends AbstractRestconfApplication<Servic
     @Inject
     public RestconfNotifApplication(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointServiceHandler mountPointServiceHandler,
-            final ServicesNotifWrapper servicesNotifWrapper) {
-        super(schemaContextHandler, mountPointServiceHandler, servicesNotifWrapper);
+            final ServicesNotifWrapper servicesNotifWrapper,
+            final RestconfLoggingConfiguration restconfLoggingConfiguration) {
+        super(schemaContextHandler, mountPointServiceHandler, servicesNotifWrapper, restconfLoggingConfiguration);
     }
 }

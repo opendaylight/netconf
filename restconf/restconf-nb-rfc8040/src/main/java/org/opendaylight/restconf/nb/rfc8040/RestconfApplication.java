@@ -11,13 +11,15 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication<ServicesWrapper> {
     @Inject
     public RestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler mountPointServiceHandler, final ServicesWrapper servicesNotifWrapper) {
-        super(schemaContextHandler, mountPointServiceHandler, servicesNotifWrapper);
+            final DOMMountPointServiceHandler mountPointServiceHandler, final ServicesWrapper servicesNotifWrapper,
+            final RestconfLoggingConfiguration restconfLoggingConfiguration) {
+        super(schemaContextHandler, mountPointServiceHandler, servicesNotifWrapper, restconfLoggingConfiguration);
     }
 }
