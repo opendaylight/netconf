@@ -46,6 +46,30 @@
       "revId": "eaeb733d01cf167033348c7095f50af239ea2cf8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d5607ed_a5a16c6d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/model/Node.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2021-03-03T10:39:43Z",
+      "side": 1,
+      "message": "Regarding second point: found yang-data-codec-json, checking is it suitable for request body creation...",
+      "parentUuid": "c644e695_a2455833",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 19
+      },
+      "revId": "eaeb733d01cf167033348c7095f50af239ea2cf8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
