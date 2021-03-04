@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6bc6e248_e9354257",
+        "filename": "netconf/tools/netconf-test-perf/src/main/java/org/opendaylight/test/endtoend/EndtoendTestService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-03-04T18:01:08Z",
+      "side": 1,
+      "message": "I am not sure if this is the correct year now. You can use $today.year in IDE.",
+      "revId": "305905a220ee7bde3c13a29010c25510842d343e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
