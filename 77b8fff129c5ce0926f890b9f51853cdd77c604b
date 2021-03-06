@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a34c291_30780875",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/api/MountPointManagerService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2021-03-06T05:09:27Z",
+      "side": 1,
+      "message": "I took reference of class MdsalNetconfOperationService and interface NetconfOperationService.\n\nPlease suggest you want different interface name",
+      "parentUuid": "de6bc936_fc321f6f",
+      "range": {
+        "startLine": 2,
+        "startChar": 22,
+        "endLine": 2,
+        "endChar": 34
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "492490ab_cbb802df",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfMountPointManager.java",
         "patchSetId": 12
@@ -45,6 +69,30 @@
       "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b1500fcd_d13f5f92",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfMountPointManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2021-03-06T05:09:27Z",
+      "side": 1,
+      "message": "cachedMountPointContext does not use Cache server. It is just a name which defines that  MountPointContext object does not get created multiple times if Capabilities are same.",
+      "parentUuid": "492490ab_cbb802df",
+      "range": {
+        "startLine": 49,
+        "startChar": 16,
+        "endLine": 49,
+        "endChar": 41
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "737b8859_5dbf04fb",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfMountPointManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2021-03-06T05:09:27Z",
+      "side": 1,
+      "message": "In general, Previously RemoteDeviceHandler\u0027s implementation  objects were created in different places. Now  getInstance method is used to create   new object of RemoteDeviceHandler\u0027s implementations in one place as well some business logic.  \n\nPlease let me know if you need more explanation or your ask is different.",
+      "parentUuid": "adb4cbe2_1dfc1417",
+      "range": {
+        "startLine": 69,
+        "startChar": 8,
+        "endLine": 69,
+        "endChar": 39
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "71988b45_45355820",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/MountPointHandler.java",
         "patchSetId": 12
@@ -91,6 +163,30 @@
       "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6339bf0_7e11ae2a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/MountPointHandler.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2021-03-06T05:09:27Z",
+      "side": 1,
+      "message": "MountPointHandler class is like a POJO, which is use for holding RemoteDeviceHandler and \n\nLife cycle is - \n1. New MountPointHandler object created , when getInstance method invoked         - new \n2. setRemoteDeviceHandler is called inside getInstance method                     - Update\n3. setCachedMountPointContext when updateNetconfMountPointHandler is called       - Update \n4. MountPointHandler Object becomes orphan when onDeviceDisconnected is called    - End \n\n\nPlease let me know your input if life cycle is managed by other way in ODL",
+      "parentUuid": "71988b45_45355820",
+      "range": {
+        "startLine": 23,
+        "startChar": 16,
+        "endLine": 23,
+        "endChar": 42
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "1ed3096b_92a46058",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfSalFacadeType.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2021-03-06T05:09:27Z",
+      "side": 1,
+      "message": "In getInstance method, we create a new object of RemoteDeviceHandler\u0027s implementation  based on NetconfSalFacadeType.",
+      "parentUuid": "3883e0bb_ad6bda78",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 34
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "95c114b5_ad7773b8",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
         "patchSetId": 12
@@ -137,6 +257,30 @@
       "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2735396f_7e636373",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2021-03-06T05:09:27Z",
+      "side": 1,
+      "message": "Fixed mutable of input set of nonModuleCap. \n\nSorting is required because List of string can give different hash if list not sorted (multiple same devices can have different order of capabilities but they should be recognize same)\n\nPlease suggest a sorted set which remember hash-Code",
+      "parentUuid": "95c114b5_ad7773b8",
+      "range": {
+        "startLine": 27,
+        "startChar": 78,
+        "endLine": 27,
+        "endChar": 84
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "12007443_1b1d0d26",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2021-03-06T05:09:27Z",
+      "side": 1,
+      "message": "It will be faster if we reuse  calculated hashcode for subsequent calling hashCode() method.",
+      "parentUuid": "cae7a3ac_3ed8256a",
+      "range": {
+        "startLine": 33,
+        "startChar": 12,
+        "endLine": 33,
+        "endChar": 25
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "880a888a_3b8a928e",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
         "patchSetId": 12
@@ -183,6 +351,30 @@
       "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63a008b3_942b05d3",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/Capability.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2021-03-06T05:09:27Z",
+      "side": 1,
+      "message": "Correct because we already checking it.",
+      "parentUuid": "880a888a_3b8a928e",
+      "range": {
+        "startLine": 51,
+        "startChar": 12,
+        "endLine": 51,
+        "endChar": 26
+      },
+      "revId": "77b8fff129c5ce0926f890b9f51853cdd77c604b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
