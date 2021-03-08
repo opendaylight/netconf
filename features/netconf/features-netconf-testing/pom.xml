@@ -18,7 +18,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>features-netconf-testing</artifactId>
-  <version>1.13.1-SNAPSHOT</version>
+  <version>1.13.2-SNAPSHOT</version>
   <packaging>feature</packaging>
 
   <dependencyManagement>
