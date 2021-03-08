@@ -13,13 +13,13 @@
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-parent</artifactId>
-        <version>1.13.1-SNAPSHOT</version>
+        <version>1.13.2-SNAPSHOT</version>
         <relativePath>../../parent</relativePath>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>yanglib</artifactId>
-    <version>1.13.1-SNAPSHOT</version>
+    <version>1.13.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <build>
