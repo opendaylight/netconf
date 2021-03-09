@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "17569853_1d8802dd",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2021-03-09T11:36:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9eeb73a_3b16c725",
+      "revId": "0c1c7fc7c66b93b3436e4a1878931bf175a1d77a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "719a05c8_03f855b7",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "0c1c7fc7c66b93b3436e4a1878931bf175a1d77a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e18fe0da_64de2ac6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2021-03-09T11:36:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "719a05c8_03f855b7",
+      "revId": "0c1c7fc7c66b93b3436e4a1878931bf175a1d77a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }

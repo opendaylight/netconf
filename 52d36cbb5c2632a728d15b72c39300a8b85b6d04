@@ -16,6 +16,24 @@
       "revId": "52d36cbb5c2632a728d15b72c39300a8b85b6d04",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6f615c39_a4df5af1",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2021-03-09T11:36:03Z",
+      "side": 0,
+      "message": "Will fix)",
+      "parentUuid": "a8378461_bba00baa",
+      "revId": "52d36cbb5c2632a728d15b72c39300a8b85b6d04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
