@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7af99fdd_c0937b88",
+        "filename": "netconf/tools/netconf-testtool/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-03-09T18:27:35Z",
+      "side": 1,
+      "message": "superfluous version declaration",
+      "range": {
+        "startLine": 148,
+        "startChar": 11,
+        "endLine": 148,
+        "endChar": 36
+      },
+      "revId": "51950e9f110c7fcb2bdb4149780507252da1d3b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "801c7337_5f020281",
+        "filename": "netconf/tools/netconf-testtool/src/main/resources/network-topology-yangs/ietf-inet-types@2013-07-15.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-03-09T18:27:35Z",
+      "side": 1,
+      "message": "please pull these from their packaged artifacts rather than duplicating them",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 22
+      },
+      "revId": "51950e9f110c7fcb2bdb4149780507252da1d3b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
