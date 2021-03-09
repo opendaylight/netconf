@@ -51,7 +51,8 @@ public final class Main {
             }
             //if ODL controller ip is not set NETCONF devices will be started, but not registered at the controller
             if (params.controllerIp != null) {
-                final List<List<Execution.DestToPayload>> allThreadsPayloads = params
+                final PayloadsCreationService payloadsCreationService = new PayloadsCreationService(params);
+                final List<List<Execution.DestToPayload>> allThreadsPayloads = payloadsCreationService
                     .getThreadsPayloads(openDevices);
                 final List<Execution> executions = new ArrayList<>();
                 for (List<Execution.DestToPayload> payloads : allThreadsPayloads) {
