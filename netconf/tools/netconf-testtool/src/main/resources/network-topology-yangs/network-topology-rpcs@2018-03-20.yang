@@ -1,0 +1,248 @@
+module network-topology-rpcs {
+
+    yang-version 1.1;
+
+    namespace "urn:tech.pantheon.netconfdevice.network.topology.rpcs";
+    prefix "ntr";
+
+    import network-topology { prefix "nt"; revision-date 2013-10-21; }
+    import netconf-node-topology { prefix "nnt"; revision-date 2015-01-14; }
+
+    organization "Pantheon Technologies";
+
+    description
+        "This module represents rpc operations on network-topology module";
+
+
+    revision "2018-03-20" {
+        description
+            "Initial revision";
+    }
+
+    grouping node-data {
+       list node {
+          description "The list of network nodes defined for the topology.";
+          key "node-id";
+          uses nt:node-attributes;
+          uses nnt:netconf-node-fields;
+          must "boolean(../underlay-topology[*]/node[./supporting-nodes/node-ref])";
+              // This constraint is meant to ensure that a referenced node is in fact
+              // a node in an underlay topology.
+          list termination-point {
+              description
+                  "A termination point can terminate a link.
+                  Depending on the type of topology, a termination point could,
+                  for example, refer to a port or an interface.";
+              key "tp-id";
+              uses nt:tp-attributes;
+          }
+       }
+    }
+
+    grouping topology-data {
+       list topology {
+          description "
+              This is the model of an abstract topology.
+              A topology contains nodes and links.
+              Each topology MUST be identified by
+              unique topology-id for reason that a network could contain many
+              topologies.
+          ";
+          key "topology-id";
+          leaf topology-id {
+              type nt:topology-id;
+              description "
+                  It is presumed that a datastore will contain many topologies. To
+                  distinguish between topologies it is vital to have UNIQUE
+                  topology identifiers.
+              ";
+          }
+          uses node-data;
+       }
+    }
+
+    rpc get-node-from-topology-by-id {
+        description "
+            Returns a specific node from specific topology with option to choose
+            between config or operational data.
+        ";
+        input {
+           leaf is-config {
+              type boolean;
+              mandatory true;
+              description
+               "Whethere to use config datastore or operation datastore";
+           }
+           leaf topology-id {
+              type nt:topology-id;
+              mandatory true;
+              description "
+                  It is presumed that a datastore will contain many topologies. To
+                  distinguish between topologies it is vital to have UNInQUE
+                  topology identifiers.
+              ";
+           }
+           leaf node-id {
+              type nt:node-id;
+              mandatory true;
+              description "
+                  It is presumed that a datastore will contain many topologies. To
+                  distinguish between topologies it is vital to have UNIQUE
+                  topology identifiers.
+              ";
+           }
+        }
+        output {
+           uses node-data;
+        }
+    }
+
+    rpc get-topology-ids {
+       description "
+           Returns all the topology ids available in network-topology.
+       ";
+       output {
+          leaf-list topology-ids {
+             type nt:topology-id;
+             description "
+                 It is presumed that a datastore will contain many topologies. To
+                 distinguish between topologies it is vital to have UNInQUE
+                 topology identifiers.
+             ";
+          }
+       }
+    }
+
+    rpc get-topology-by-id {
+       description "
+           Return specific topology with its nodes.
+       ";
+       input {
+          leaf topology-id {
+             type nt:topology-id;
+             mandatory true;
+             description "
+                 It is presumed that a datastore will contain many topologies. To
+                 distinguish between topologies it is vital to have UNInQUE
+                 topology identifiers.
+             ";
+          }
+       }
+       output {
+          uses topology-data;
+       }
+    }
+
+    rpc get-topologies {
+       description "
+           Return all topologies with nodes and their config data saved in datastore.
+       ";
+       output {
+          container network-topology {
+             uses topology-data;
+          }
+       }
+    }
+
+    rpc create-topology {
+        description "
+            Create empty topology.
+            ";
+        input {
+           leaf topology-id {
+              type nt:topology-id;
+              mandatory true;
+              description "
+                  It is presumed that a datastore will contain many topologies. To
+                  distinguish between topologies it is vital to have UNIQUE
+                  topology identifiers.
+              ";
+           }
+        }
+    }
+
+    rpc add-node-into-topology {
+       description "
+           Add node or multiple nodes to the specific topology.
+       ";
+       input {
+          leaf topology-id {
+             type nt:topology-id;
+             mandatory true;
+             description "
+                 It is presumed that a datastore will contain many topologies. To
+                 distinguish between topologies it is vital to have UNIQUE
+                 topology identifiers.
+             ";
+          }
+          uses node-data;
+       }
+    }
+
+
+    rpc remove-node-from-topology {
+       description "
+           Remove node from specific topology.
+       ";
+       input {
+          leaf topology-id {
+             type nt:topology-id;
+             mandatory true;
+             description "
+                 It is presumed that a datastore will contain many topologies. To
+                 distinguish between topologies it is vital to have UNInQUE
+                 topology identifiers.
+             ";
+          }
+          leaf node-id {
+             type nt:node-id;
+             mandatory true;
+             description "
+                 It is presumed that a datastore will contain many topologies. To
+                 distinguish between topologies it is vital to have UNIQUE
+                 topology identifiers.
+             ";
+          }
+       }
+    }
+
+    rpc remove-topology {
+       description "
+           Remove whole topology with given topology-id.
+       ";
+       input {
+          leaf topology-id {
+             type nt:topology-id;
+             mandatory true;
+             description "
+                 It is presumed that a datastore will contain many topologies. To
+                 distinguish between topologies it is vital to have UNInQUE
+                 topology identifiers.
+             ";
+          }
+       }
+    }
+
+    rpc remove-all-topologies {
+       description "
+           Removes all topologies and its data from datastore.
+       ";
+    }
+
+    notification new-topology-created {
+        description "Triggered when new topology was created";
+        leaf topology-id {
+            type nt:topology-id;
+            description "Described created topology";
+        }
+    }
+
+        notification topology-deleted {
+            description "Triggered when new topology was created";
+            leaf-list topology-ids {
+                type nt:topology-id;
+                description "Described created topology";
+            }
+        }
+
+}
