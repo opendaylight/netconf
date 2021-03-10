@@ -28,7 +28,8 @@ public class NetconfClientBuilder extends ClientBuilder {
     // Add them to ensure interop with modern highly-secured devices.
     private static final ImmutableList<NamedFactory<Signature>> FULL_SIGNATURE_PREFERENCE =
             Streams.concat(DEFAULT_SIGNATURE_PREFERENCE.stream(), Arrays.asList(
-                BuiltinSignatures.rsaSHA512, BuiltinSignatures.rsaSHA256).stream())
+                BuiltinSignatures.rsaSHA512, BuiltinSignatures.rsaSHA256, BuiltinSignatures.rsa)
+                .stream())
             .filter(BuiltinSignatures::isSupported)
             .distinct()
             .collect(ImmutableList.<NamedFactory<Signature>>toImmutableList());
