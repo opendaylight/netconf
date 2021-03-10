@@ -13,9 +13,13 @@ import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.common.NamedFactory;
+import org.opendaylight.netconf.shaded.sshd.common.kex.BuiltinDHFactories;
+import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 import org.opendaylight.netconf.shaded.sshd.common.signature.Signature;
 
@@ -33,6 +37,15 @@ public class NetconfClientBuilder extends ClientBuilder {
             .distinct()
             .collect(ImmutableList.<NamedFactory<Signature>>toImmutableList());
 
+    // The SHA1 algorithm is disabled by default in Mina SSHD since 2.6.0.
+    // More details available here: https://issues.apache.org/jira/browse/SSHD-1004
+    // This block adds diffie-hellman-group14-sha1 back to the list of supported algorithms.
+    private static final ImmutableList<BuiltinDHFactories> FULL_DH_FACTORIES_LIST =
+        Streams.concat(DEFAULT_KEX_PREFERENCE.stream(), Stream.of(BuiltinDHFactories.dhg14))
+            .collect(ImmutableList.toImmutableList());
+    private static final List<KeyExchangeFactory> FULL_KEX_PREFERENCE =
+        NamedFactory.setUpTransformedFactories(true, FULL_DH_FACTORIES_LIST, DH2KEX);
+
     @Override
     public NetconfSshClient build() {
         final SshClient client = super.build();
@@ -47,6 +60,9 @@ public class NetconfClientBuilder extends ClientBuilder {
         }
         if (signatureFactories == null) {
             signatureFactories = FULL_SIGNATURE_PREFERENCE;
+        }
+        if (keyExchangeFactories == null) {
+            keyExchangeFactories = FULL_KEX_PREFERENCE;
         }
         return super.fillWithDefaultValues();
     }
