@@ -12,14 +12,14 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
-    <version>1.13.1-SNAPSHOT</version>
+    <version>1.13.1</version>
     <relativePath>../../parent</relativePath>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-netty-util</artifactId>
   <packaging>bundle</packaging>
-  <version>1.13.1-SNAPSHOT</version>
+  <version>1.13.1</version>
   <name>${project.artifactId}</name>
 
   <dependencies>
