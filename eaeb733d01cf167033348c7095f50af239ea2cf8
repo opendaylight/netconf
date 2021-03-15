@@ -70,6 +70,30 @@
       "revId": "eaeb733d01cf167033348c7095f50af239ea2cf8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "45a1eb7a_e2f00a93",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/model/Node.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2021-03-15T15:07:53Z",
+      "side": 1,
+      "message": "Refactored with yang binding, yang data codec gson:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/95434\n\nDone",
+      "parentUuid": "4d5607ed_a5a16c6d",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 19
+      },
+      "revId": "eaeb733d01cf167033348c7095f50af239ea2cf8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
