@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b2cb46eb_d937ae97",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2021-03-15T13:39:49Z",
+      "side": 1,
+      "message": "typo in crate here",
+      "range": {
+        "startLine": 599,
+        "startChar": 29,
+        "endLine": 599,
+        "endChar": 45
+      },
+      "revId": "4ebc24e29239cbd504eb4e9456be52e7a115bac8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
