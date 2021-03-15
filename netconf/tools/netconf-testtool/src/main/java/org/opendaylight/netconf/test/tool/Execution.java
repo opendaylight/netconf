@@ -54,10 +54,10 @@ public class Execution implements Callable<Void> {
     }
 
     public Execution(final TesttoolParameters params, final List<DestToPayload> payloads) {
-        this.invokeAsync = params.async;
-        this.throttle = params.throttle / params.threadAmount;
+        this.invokeAsync = params.isAsync();
+        this.throttle = params.getThrottle() / params.getThreadAmount();
 
-        if (params.async && params.threadAmount > 1) {
+        if (params.isAsync() && params.getThreadAmount() > 1) {
             LOG.info("Throttling per thread: {}", this.throttle);
         }
         this.semaphore = new Semaphore(this.throttle);
@@ -78,8 +78,8 @@ public class Execution implements Callable<Void> {
 
             requestBuilder.setRealm(new Realm.RealmBuilder()
                     .setScheme(Realm.AuthScheme.BASIC)
-                    .setPrincipal(params.controllerAuthUsername)
-                    .setPassword(params.controllerAuthPassword)
+                    .setPrincipal(params.getControllerAuthUsername())
+                    .setPassword(params.getControllerAuthPassword())
                     .setMethodName(PATCH.getName())
                     .setUsePreemptiveAuth(true)
                     .build());

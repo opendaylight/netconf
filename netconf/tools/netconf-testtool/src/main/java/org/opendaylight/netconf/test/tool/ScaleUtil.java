@@ -63,7 +63,7 @@ public final class ScaleUtil {
         cleanup(runtime, params);
 
         while (true) {
-            root.warn("Starting scale test with {} devices", params.deviceCount);
+            root.warn("Starting scale test with {} devices", params.getDeviceCount());
             final ScheduledFuture<?> timeoutGuardFuture = EXECUTOR.schedule(new TimeoutGuard(), TIMEOUT,
                 TimeUnit.MINUTES);
             final Configuration configuration = new ConfigurationBuilder().from(params).build();
@@ -75,17 +75,17 @@ public final class ScaleUtil {
                 System.exit(1);
             }
 
-            if (params.distroFolder == null) {
+            if (params.getDistroFolder() == null) {
                 root.error("Distro folder is not set, exiting...");
                 System.exit(1);
             }
 
-            root.warn(params.distroFolder.getAbsolutePath());
+            root.warn(params.getDistroFolder().getAbsolutePath());
             try {
-                runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/start");
+                runtime.exec(params.getDistroFolder().getAbsolutePath() + "/bin/start");
                 String status;
                 do {
-                    final Process exec = runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/status");
+                    final Process exec = runtime.exec(params.getDistroFolder().getAbsolutePath() + "/bin/status");
                     try {
                         Thread.sleep(2000L);
                     } catch (InterruptedException e) {
@@ -94,9 +94,9 @@ public final class ScaleUtil {
                     status = CharStreams.toString(new BufferedReader(new InputStreamReader(exec.getInputStream())));
                     root.warn("Current status: {}", status);
                 } while (!status.startsWith("Running ..."));
-                root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
+                root.warn("Doing feature install {}", params.getDistroFolder().getAbsolutePath()
                     + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
-                final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
+                final Process featureInstall = runtime.exec(params.getDistroFolder().getAbsolutePath()
                     + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
@@ -113,7 +113,8 @@ public final class ScaleUtil {
 
             try {
                 EXECUTOR.schedule(
-                    new ScaleVerifyCallable(netconfDeviceSimulator, params.deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
+                    new ScaleVerifyCallable(netconfDeviceSimulator, params.getDeviceCount()), RETRY_DELAY,
+                        TimeUnit.SECONDS);
                 root.warn("First callable scheduled");
                 SEMAPHORE.acquire();
                 root.warn("semaphore released");
@@ -122,7 +123,7 @@ public final class ScaleUtil {
             }
 
             timeoutGuardFuture.cancel(false);
-            params.deviceCount += DEVICE_STEP;
+            params.setDeviceCount(params.getDeviceCount() + DEVICE_STEP);
             netconfDeviceSimulator.close();
             STOPWATCH.reset();
 
@@ -134,14 +135,14 @@ public final class ScaleUtil {
         System.setProperty("log_file_name", "scale-util.log");
 
         root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
+        root.setLevel(params.isDebug() ? Level.DEBUG : Level.INFO);
         resultsLog = LoggerFactory.getLogger("results");
     }
 
     private static void cleanup(final Runtime runtime, final TesttoolParameters params) {
         try {
             stopKaraf(runtime, params);
-            deleteFolder(new File(params.distroFolder.getAbsoluteFile() + "/data"));
+            deleteFolder(new File(params.getDistroFolder().getAbsoluteFile() + "/data"));
 
         } catch (IOException | InterruptedException e) {
             root.warn("Failed to stop karaf", e);
@@ -162,7 +163,7 @@ public final class ScaleUtil {
 
             Thread.sleep(10000L);
         } while (!controllerPid.isEmpty());
-        deleteFolder(new File(params.distroFolder.getAbsoluteFile() + "/data"));
+        deleteFolder(new File(params.getDistroFolder().getAbsoluteFile() + "/data"));
     }
 
     private static void deleteFolder(final File folder) {

@@ -136,17 +136,17 @@ public class ConfigurationBuilder {
     }
 
     public ConfigurationBuilder from(final TesttoolParameters testtoolParameters) {
-        this.configuration.setGenerateConfigsTimeout(testtoolParameters.generateConfigsTimeout);
-        this.configuration.setStartingPort(testtoolParameters.startingPort);
-        this.configuration.setDeviceCount(testtoolParameters.deviceCount);
-        this.configuration.setSsh(testtoolParameters.ssh);
-        this.configuration.setIp(testtoolParameters.ip);
-        this.configuration.setMdSal(testtoolParameters.mdSal);
-        this.configuration.setRpcConfigFile(testtoolParameters.rpcConfig);
-        this.configuration.setInitialConfigXMLFile(testtoolParameters.initialConfigXMLFile);
-        this.configuration.setNotificationFile(testtoolParameters.notificationFile);
-        this.configuration.setSchemasDir(testtoolParameters.schemasDir);
-        this.configuration.setCapabilities(testtoolParameters.exi ? Configuration.DEFAULT_BASE_CAPABILITIES_EXI
+        this.configuration.setGenerateConfigsTimeout(testtoolParameters.getGenerateConfigsTimeout());
+        this.configuration.setStartingPort(testtoolParameters.getStartingPort());
+        this.configuration.setDeviceCount(testtoolParameters.getDeviceCount());
+        this.configuration.setSsh(testtoolParameters.isSsh());
+        this.configuration.setIp(testtoolParameters.getIp());
+        this.configuration.setMdSal(testtoolParameters.isMdSal());
+        this.configuration.setRpcConfigFile(testtoolParameters.getRpcConfig());
+        this.configuration.setInitialConfigXMLFile(testtoolParameters.getInitialConfigXMLFile());
+        this.configuration.setNotificationFile(testtoolParameters.getNotificationFile());
+        this.configuration.setSchemasDir(testtoolParameters.getSchemasDir());
+        this.configuration.setCapabilities(testtoolParameters.isExi() ? Configuration.DEFAULT_BASE_CAPABILITIES_EXI
                 : Configuration.DEFAULT_BASE_CAPABILITIES);
         return this;
     }
