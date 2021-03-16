@@ -16,6 +16,24 @@
       "revId": "0d8851187e22d8c32da1a47b0fdbac7bc99dc483",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1d8adac5_f0407fcb",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/AsyncExecutionStrategy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8808
+      },
+      "writtenOn": "2021-03-16T15:40:07Z",
+      "side": 1,
+      "message": "This fix will not make any influence on the test result. We discussed and test it with Martin Balaz on high load test. And he had already used patched test tool in his performance tests. It  reduce memory usage from 6gb to 400mb.\nDifference in test result is less than 1%. And creation of Object take 0.0252-0.1155 us of time. \nSo may I leave this changes? \n\nAlso I think Illia has a task (as far as I heard) to change something of input parameters.",
+      "parentUuid": "a03ef110_c601fa9b",
+      "revId": "0d8851187e22d8c32da1a47b0fdbac7bc99dc483",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
