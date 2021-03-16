@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a03ef110_c601fa9b",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/AsyncExecutionStrategy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2021-03-16T14:30:36Z",
+      "side": 1,
+      "message": "I dont think we want to move the payload generation into the actual test run, as its going to influence the results. I cant find the input format file anywhere, but we might be able to keep the static part of the file as just two strings in memory and generate only the parametric part of the payload.\n\nIt might also be worthwhile to change the edit-content file format somewhat, as I dont think all of the different parametric parameters are even needed.",
+      "revId": "0d8851187e22d8c32da1a47b0fdbac7bc99dc483",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
