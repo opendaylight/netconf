@@ -49,7 +49,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     private ActorRef masterActorRef;
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final AtomicBoolean stopped = new AtomicBoolean(false);
-    private volatile boolean isMaster;
+    private final AtomicBoolean isMaster = new AtomicBoolean(false);
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
             final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -69,9 +69,11 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     @Override
     public void instantiateServiceInstance() {
-        LOG.info("Master was selected: {}", remoteDeviceId.getHost().getIpAddress());
-
-        isMaster = true;
+        if (isMaster.compareAndSet(false, true)) {
+            LOG.info("Master was selected: {}", remoteDeviceId.getHost().getIpAddress());
+        } else {
+            LOG.warn("The same master was already selected: {}", remoteDeviceId.getHost().getIpAddress());
+        }
 
         // master should not listen on netconf-node operational datastore
         if (netconfNodeManager != null) {
@@ -79,6 +81,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             netconfNodeManager = null;
         }
 
+        // establish connections to devices
         if (!closed.get()) {
             final String masterAddress =
                     Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
@@ -88,12 +91,16 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
             remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
         }
-
     }
 
     // called when master is down/changed to slave
     @Override
     public ListenableFuture<?> closeServiceInstance() {
+        if (isMaster.compareAndSet(true, false)) {
+            LOG.info("Master was removed: {}", remoteDeviceId.getHost().getIpAddress());
+        } else {
+            LOG.warn("The same master was already removed: {}", remoteDeviceId.getHost().getIpAddress());
+        }
 
         if (!closed.get()) {
             // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
@@ -126,9 +133,9 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
         if (netconfNodeManager != null) {
             netconfNodeManager.close();
+            netconfNodeManager = null;
         }
         stopDeviceConnectorAndActor();
-
     }
 
     /**
@@ -140,16 +147,16 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
                 netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
 
-        if (isMaster) {
+        if (isMaster.get()) {
             remoteDeviceConnector.stopRemoteDeviceConnection();
         }
-        if (!isMaster) {
+        if (!isMaster.get()) {
             netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
         }
         remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
             deviceActionFactory);
 
-        if (isMaster) {
+        if (isMaster.get()) {
             final Future<Object> future = Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(
                 netconfTopologyDeviceSetup, remoteDeviceId), actorResponseWaitTime);
             future.onComplete(new OnComplete<Object>() {
