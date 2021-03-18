@@ -34,11 +34,6 @@ repositories:
     - netconf
 committers:
     - <<: *odl_netconf_ptl
-    - name: 'Jakub Toth'
-      email: 'jakubt4@gmail.com'
-      company: ''
-      id: 'JakubToth'
-      timezone: 'Unknown/Unknown'
     - name: 'Tomas Cere'
       email: 'tomas.cere@pantheon.tech'
       company: 'pantheon'
