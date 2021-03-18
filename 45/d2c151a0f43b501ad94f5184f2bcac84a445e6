@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng
+Code-Review+2: Tomas Cere <tomas.cere@pantheon.tech>
+Code-Review+1: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Submitted-by: Tomas Cere <tomas.cere@pantheon.tech>
+Submitted-at: Thu, 18 Mar 2021 13:57:30 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/95395
+Project: netconf
+Branch: refs/heads/master
