@@ -10,15 +10,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>single-feature-parent</artifactId>
-        <version>8.1.0</version>
-        <relativePath/>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>feature-parent</artifactId>
+        <version>1.13.2-SNAPSHOT</version>
+        <relativePath>../../parent</relativePath>
     </parent>
 
-    <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-native-netconf-communicator</artifactId>
-    <version>1.10.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Native Netconf Communicator :: Native Netconf Communicator</name>
@@ -48,7 +46,7 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-encryption-service</artifactId>
-            <version>0.13.1</version>
+            <version>0.13.2</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

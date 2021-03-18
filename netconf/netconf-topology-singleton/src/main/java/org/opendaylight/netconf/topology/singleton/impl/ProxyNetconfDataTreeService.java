@@ -84,6 +84,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
         ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.get(path, fields);
     }
+
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
         final Future<Object> masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
