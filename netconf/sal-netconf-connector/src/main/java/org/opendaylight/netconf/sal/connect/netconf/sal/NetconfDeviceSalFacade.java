@@ -20,7 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeFieldsOptional;
@@ -86,8 +85,8 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
         salProvider.getMountInstance()
                 .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, netconfService,
                         deviceRpc, notificationService, deviceAction);
-        salProvider.getTopologyDatastoreAdapter()
-                .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connected,
+                netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.OPERATIONAL, null);
     }
 
     @Override
@@ -99,7 +98,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().removeDeviceData();
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
         closeLockChangeListener();
     }

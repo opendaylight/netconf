@@ -47,8 +47,6 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
-    private final AtomicBoolean closed = new AtomicBoolean(false);
-    private final AtomicBoolean stopped = new AtomicBoolean(false);
     private final AtomicBoolean isMaster = new AtomicBoolean(false);
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
@@ -82,18 +80,18 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         }
 
         // establish connections to devices
-        if (!closed.get()) {
-            final String masterAddress =
-                    Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
-            masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
-                    netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService),
-                    NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
+        final String masterAddress =
+                Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
+        masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
+                netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService),
+                NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
-            remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
-        }
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup,
+                remoteDeviceId, deviceActionFactory);
+        remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
     }
 
-    // called when master is down/changed to slave
+    // called when leader is down/changed to follower
     @Override
     public ListenableFuture<?> closeServiceInstance() {
         if (isMaster.compareAndSet(true, false)) {
@@ -102,12 +100,17 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             LOG.warn("The same master was already removed: {}", remoteDeviceId.getHost().getIpAddress());
         }
 
-        if (!closed.get()) {
-            // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
-            netconfNodeManager = createNodeDeviceManager();
+        if (remoteDeviceConnector != null) {
+            remoteDeviceConnector.stopRemoteDeviceConnection();
+            remoteDeviceConnector = null;
         }
-        stopDeviceConnectorAndActor();
 
+        if (masterActorRef != null) {
+            netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
+            masterActorRef = null;
+        }
+
+        netconfNodeManager = createNodeDeviceManager();
         return FluentFutures.immediateNullFluentFuture();
     }
 
@@ -127,15 +130,18 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     @Override
     public void close() {
-        if (!closed.compareAndSet(false, true)) {
-            return;
-        }
-
         if (netconfNodeManager != null) {
             netconfNodeManager.close();
             netconfNodeManager = null;
         }
-        stopDeviceConnectorAndActor();
+        if (remoteDeviceConnector != null) {
+            remoteDeviceConnector.stopRemoteDeviceConnection();
+            remoteDeviceConnector = null;
+        }
+        if (masterActorRef != null) {
+            netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
+            masterActorRef = null;
+        }
     }
 
     /**
@@ -169,21 +175,6 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
                     remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
                 }
             }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
-        }
-    }
-
-    private void stopDeviceConnectorAndActor() {
-        if (!stopped.compareAndSet(false, true)) {
-            return;
-        }
-        if (remoteDeviceConnector != null) {
-            remoteDeviceConnector.stopRemoteDeviceConnection();
-            remoteDeviceConnector = null;
-        }
-
-        if (masterActorRef != null) {
-            netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
-            masterActorRef = null;
         }
     }
 

@@ -115,9 +115,12 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update");
     }
 
-    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
-        updateDeviceData(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting, capabilities,
-                LogicalDatastoreType.OPERATIONAL, null);
+    public void removeDeviceData() {
+        LOG.info("Removing device data.");
+        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+        writeTx.delete(LogicalDatastoreType.CONFIGURATION, id.getTopologyBindingPath());
+        writeTx.delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
+        commitTransaction(writeTx, "remove");
     }
 
     public void updateClusteredDeviceData(final boolean up, final String masterAddress,
