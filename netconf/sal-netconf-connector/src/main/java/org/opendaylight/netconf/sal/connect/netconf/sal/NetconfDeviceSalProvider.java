@@ -100,10 +100,11 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         mountInstance.close();
         if (topologyDatastoreAdapter != null) {
             topologyDatastoreAdapter.close();
+            topologyDatastoreAdapter = null;
         }
-        topologyDatastoreAdapter = null;
         if (txChain != null) {
             txChain.close();
+            txChain = null;
         }
     }
 
