@@ -91,13 +91,12 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             Futures.addCallback(result, new FutureCallback<>() {
                 @Override
                 public void onSuccess(final RpcResult<Void> result) {
-                    unlock();
+                    // do nothing, as callback is only used to catch failures
                 }
 
                 @Override
                 public void onFailure(final Throwable throwable) {
                     discardChanges();
-                    unlock();
                 }
             }, MoreExecutors.directExecutor());
             return result;
@@ -329,11 +328,13 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
                             errors.toArray(new RpcError[errors.size()])));
                     return;
                 }
+                unlock();
                 resultFuture.set(CommitInfo.empty());
             }
 
             @Override
             public void onFailure(final Throwable failure) {
+                unlock();
                 resultFuture.setException(new TransactionCommitFailedException(
                         String.format("Commit of transaction %s failed", this), failure));
             }
