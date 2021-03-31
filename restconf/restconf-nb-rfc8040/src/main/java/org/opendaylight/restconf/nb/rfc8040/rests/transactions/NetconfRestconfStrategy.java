@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
@@ -50,7 +51,7 @@ public class NetconfRestconfStrategy implements RestconfStrategy {
 
     @Override
     public void prepareReadWriteExecution() {
-        resultsFutures = netconfService.lock();
+        resultsFutures = new ArrayList<>(netconfService.lock());
     }
 
     @Override
