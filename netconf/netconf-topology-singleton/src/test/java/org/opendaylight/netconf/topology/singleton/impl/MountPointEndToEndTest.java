@@ -417,7 +417,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         final NetconfTopologyContext slaveNetconfTopologyContext =
                 slaveNetconfTopologyContextFuture.get(5, TimeUnit.SECONDS);
-        verify(slaveNetconfTopologyContext, never()).newMasterSalFacade();
+        verify(slaveNetconfTopologyContext, never()).createSalFacade(any());
 
         LOG.info("****** Testing slave DOMDataBroker operations");
 

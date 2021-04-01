@@ -82,8 +82,10 @@ public class NetconfTopologyManager
     private final DOMRpcProviderService rpcProviderRegistry;
     private final DOMActionProviderService actionProviderRegistry;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-    private final ScheduledExecutorService keepaliveExecutor;
-    private final ListeningExecutorService processingExecutor;
+    private final ScheduledThreadPool keepaliveExecutor;
+    private final ScheduledExecutorService keepaliveExecutorService;
+    private final ThreadPool processingExecutor;
+    private final ListeningExecutorService processingExecutorService;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher clientDispatcher;
@@ -118,8 +120,10 @@ public class NetconfTopologyManager
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
         this.actionProviderRegistry = requireNonNull(actionProviderService);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
-        this.keepaliveExecutor = keepaliveExecutor.getExecutor();
-        this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
+        this.keepaliveExecutor = keepaliveExecutor;
+        this.keepaliveExecutorService = keepaliveExecutor.getExecutor();
+        this.processingExecutor = processingExecutor;
+        this.processingExecutorService = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
         this.actorSystem = requireNonNull(actorSystemProvider).getActorSystem();
         this.eventExecutor = requireNonNull(eventExecutor);
         this.clientDispatcher = requireNonNull(clientDispatcher);
@@ -227,8 +231,14 @@ public class NetconfTopologyManager
     protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
             final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
             final DeviceActionFactory deviceActionFact) {
-        return new NetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, mountPointService,
-            deviceActionFact);
+        return new NetconfTopologyContext(setup.getTopologyId(), setup.getNetconfClientDispatcher(),
+                setup.getEventExecutor(), keepaliveExecutor,
+                processingExecutor, resourceManager,
+                dataBroker, mountPointService,
+                encryptionService, deviceActionFactory,
+                baseSchemas, actorResponseWaitTime,
+                setup.getActorSystem(), setup.getNode(),
+                serviceGroupIdent, setup);
     }
 
     @Override
@@ -317,8 +327,8 @@ public class NetconfTopologyManager
                 .setNode(node)
                 .setActorSystem(actorSystem)
                 .setEventExecutor(eventExecutor)
-                .setKeepaliveExecutor(keepaliveExecutor)
-                .setProcessingExecutor(processingExecutor)
+                .setKeepaliveExecutor(keepaliveExecutorService)
+                .setProcessingExecutor(processingExecutorService)
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
                 .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode, deviceId))
