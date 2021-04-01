@@ -180,7 +180,8 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     }
 
     protected MasterSalFacade newMasterSalFacade() {
-        return new MasterSalFacade(remoteDeviceId, netconfTopologyDeviceSetup.getActorSystem(), masterActorRef,
-                actorResponseWaitTime, mountService, netconfTopologyDeviceSetup.getDataBroker());
+        return new MasterSalFacade(remoteDeviceId, netconfTopologyDeviceSetup.getActorSystem(),
+                masterActorRef, actorResponseWaitTime, mountService, netconfTopologyDeviceSetup.getDataBroker(),
+                netconfTopologyDeviceSetup.getTopologyId());
     }
 }

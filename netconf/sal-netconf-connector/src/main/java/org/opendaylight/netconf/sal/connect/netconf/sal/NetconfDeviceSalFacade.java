@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +56,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
         this(id, new NetconfDeviceSalProvider(id, mountPointService, dataBroker), dataBroker, topologyId);
     }
 
-    @VisibleForTesting
-    NetconfDeviceSalFacade(final RemoteDeviceId id, final NetconfDeviceSalProvider salProvider,
+    public NetconfDeviceSalFacade(final RemoteDeviceId id, final NetconfDeviceSalProvider salProvider,
             final DataBroker dataBroker, final String topologyId) {
         this.id = id;
         this.salProvider = salProvider;
@@ -149,6 +147,5 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
                 .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
                 .child(Node.class, new NodeKey(new NodeId(id.getName())))
                 .child(DatastoreLock.class);
-
     }
 }

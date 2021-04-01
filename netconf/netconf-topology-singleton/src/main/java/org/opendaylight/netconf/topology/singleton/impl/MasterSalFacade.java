@@ -7,193 +7,100 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.cluster.Cluster;
-import akka.dispatch.OnComplete;
-import akka.pattern.Patterns;
 import akka.util.Timeout;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.sal.AbstractNetconfDataTreeService;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.Future;
 
 class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessionPreferences> {
-
     private static final Logger LOG = LoggerFactory.getLogger(MasterSalFacade.class);
 
     private final RemoteDeviceId id;
+    private final ActorSystem actorSystem;
+    private final ActorRef masterActorRef;
     private final Timeout actorResponseWaitTime;
     private final NetconfDeviceSalProvider salProvider;
-    private final ActorRef masterActorRef;
-    private final ActorSystem actorSystem;
+    private final NetconfDeviceSalFacade salFacade;
 
-    private MountPointContext currentMountContext = null;
-    private NetconfSessionPreferences netconfSessionPreferences = null;
-    private DOMRpcService deviceRpc = null;
-    private DOMDataBroker deviceDataBroker = null;
-    private NetconfDataTreeService netconfService = null;
-    private DOMActionService deviceAction = null;
-
-    MasterSalFacade(final RemoteDeviceId id,
-                    final ActorSystem actorSystem,
-                    final ActorRef masterActorRef,
-                    final Timeout actorResponseWaitTime,
-                    final DOMMountPointService mountService,
-                    final DataBroker dataBroker) {
+    MasterSalFacade(final RemoteDeviceId id, final ActorSystem actorSystem, final ActorRef masterActorRef,
+            final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService,
+            final DataBroker dataBroker, final String topologyId) {
         this.id = id;
-        this.salProvider = new NetconfDeviceSalProvider(id, mountService, dataBroker);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         this.actorResponseWaitTime = actorResponseWaitTime;
+        salProvider = new NetconfDeviceSalProvider(id, mountPointService, dataBroker);
+        salFacade = new NetconfDeviceSalFacade(id, mountPointService, dataBroker, topologyId);
     }
 
     @Override
     public void onDeviceConnected(final MountPointContext mountContext,
-                                  final NetconfSessionPreferences sessionPreferences,
-                                  final DOMRpcService domRpcService, final DOMActionService domActionService) {
-        this.deviceAction = domActionService;
-        LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
-            + "DOMActionService exposed for the device", id);
-        onDeviceConnected(mountContext, sessionPreferences, domRpcService);
-    }
-
-    @Override
-    public void onDeviceConnected(final MountPointContext mountContext,
-                                  final NetconfSessionPreferences sessionPreferences,
-                                  final DOMRpcService domRpcService) {
-        this.currentMountContext = mountContext;
-        this.netconfSessionPreferences = sessionPreferences;
-        this.deviceRpc = domRpcService;
-
+            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
+            final DOMActionService deviceAction) {
         LOG.info("Device {} connected - registering master mount point", id);
+        registerMasterMountPoint(mountContext, netconfSessionPreferences, deviceRpc, deviceAction);
+    }
 
-        registerMasterMountPoint();
-
-        sendInitialDataToActor().onComplete(new OnComplete<>() {
-            @Override
-            public void onComplete(final Throwable failure, final Object success) {
-                if (failure == null) {
-                    updateDeviceData();
-                    return;
-                }
-
-                LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
-            }
-        }, actorSystem.dispatcher());
-
+    @Override
+    public void onDeviceConnected(final MountPointContext mountContext,
+            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
+        LOG.info("Device {} connected - registering master mount point", id);
+        registerMasterMountPoint(mountContext, netconfSessionPreferences, deviceRpc, null);
     }
 
     @Override
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
-        unregisterMasterMountPoint();
+        salFacade.onDeviceDisconnected();
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
-        salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
-        unregisterMasterMountPoint();
+        LOG.info("Device {} failed - unregistering master mount point", id);
+        salFacade.onDeviceFailed(throwable);
     }
 
     @Override
     public void onNotification(final DOMNotification domNotification) {
-        salProvider.getMountInstance().publish(domNotification);
+        salFacade.onNotification(domNotification);
     }
 
     @Override
     public void close() {
-        unregisterMasterMountPoint();
-        closeGracefully(salProvider);
+        LOG.info("Device {} closed - unregistering master mount point", id);
+        salFacade.close();
     }
 
-    private void registerMasterMountPoint() {
-        requireNonNull(id);
-        requireNonNull(currentMountContext, "Device has no remote schema context yet. Probably not fully connected.");
-        requireNonNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
-
-        final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
-        deviceDataBroker = newDeviceDataBroker();
-        netconfService = newNetconfDataTreeService();
-
-        // We need to create ProxyDOMDataBroker so accessing mountpoint
-        // on leader node would be same as on follower node
+    // TODO NETCONF-629
+    private void registerMasterMountPoint(final MountPointContext mountContext,
+            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
+            final DOMActionService deviceAction) {
+        // register proxy mount point
         final ProxyDOMDataBroker proxyDataBroker = new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(),
-            actorResponseWaitTime);
+                actorResponseWaitTime);
         final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
-            actorSystem.dispatcher(), actorResponseWaitTime);
-        salProvider.getMountInstance().onTopologyDeviceConnected(currentMountContext.getEffectiveModelContext(),
-            proxyDataBroker, proxyNetconfService, deviceRpc, notificationService, deviceAction);
-    }
+                actorSystem.dispatcher(), actorResponseWaitTime);
+        salProvider.getMountInstance().onTopologyDeviceConnected(mountContext.getEffectiveModelContext(),
+            proxyDataBroker, proxyNetconfService, deviceRpc, new NetconfDeviceNotificationService(), deviceAction);
 
-    protected DOMDataBroker newDeviceDataBroker() {
-        return new NetconfDeviceDataBroker(id, currentMountContext, deviceRpc, netconfSessionPreferences);
-    }
-
-    protected NetconfDataTreeService newNetconfDataTreeService() {
-        return AbstractNetconfDataTreeService.of(id, currentMountContext, deviceRpc, netconfSessionPreferences);
-    }
-
-    private Future<Object> sendInitialDataToActor() {
-        final List<SourceIdentifier> sourceIdentifiers = SchemaContextUtil.getConstituentModuleIdentifiers(
-            currentMountContext.getEffectiveModelContext()).stream()
-                .map(mi -> RevisionSourceIdentifier.create(mi.getName(), mi.getRevision()))
-                .collect(Collectors.toList());
-
-        LOG.debug("{}: Sending CreateInitialMasterActorData with sourceIdentifiers {} to {}", id, sourceIdentifiers,
-            masterActorRef);
-
-        // send initial data to master actor
-        return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, netconfService,
-            sourceIdentifiers, deviceRpc, deviceAction), actorResponseWaitTime);
-    }
-
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
-    private void updateDeviceData() {
+        // update device status to connected in operational datastore with master address
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
-        LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
         salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress,
                 netconfSessionPreferences.getNetconfDeviceCapabilities());
-    }
-
-    private void unregisterMasterMountPoint() {
-        salProvider.getMountInstance().onTopologyDeviceDisconnected();
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private void closeGracefully(final AutoCloseable resource) {
-        if (resource != null) {
-            try {
-                resource.close();
-            } catch (final Exception e) {
-                LOG.error("{}: Ignoring exception while closing {}", id, resource, e);
-            }
-        }
     }
 }

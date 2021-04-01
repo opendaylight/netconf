@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -293,25 +292,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 mockRpcProviderRegistry, mockActionProviderRegistry, masterClusterSingletonServiceProvider,
                 mockKeepaliveExecutor, mockThreadPool, mockMasterActorSystemProvider, eventExecutor,
                 mockClientDispatcher, TOPOLOGY_ID, config, masterMountPointService, mockEncryptionService,
-                mockRpcProviderService, deviceActionFactory, resourceManager) {
-            @Override
-            protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
-                final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
-                final DeviceActionFactory deviceActionFact) {
-                NetconfTopologyContext context =
-                    super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, deviceActionFact);
-
-                NetconfTopologyContext spiedContext = spy(context);
-                doAnswer(invocation -> {
-                    final MasterSalFacade spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
-                    doReturn(deviceDOMDataBroker).when(spiedFacade).newDeviceDataBroker();
-                    masterSalFacadeFuture.set(spiedFacade);
-                    return spiedFacade;
-                }).when(spiedContext).newMasterSalFacade();
-
-                return spiedContext;
-            }
-        };
+                mockRpcProviderService, deviceActionFactory, resourceManager);
 
         masterNetconfTopologyManager.init();
 
