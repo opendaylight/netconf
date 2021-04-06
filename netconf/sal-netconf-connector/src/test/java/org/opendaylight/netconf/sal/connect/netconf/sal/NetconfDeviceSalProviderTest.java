@@ -83,6 +83,6 @@ public class NetconfDeviceSalProviderTest {
     public void closeWithoutNPE() throws Exception {
         provider.close();
         provider.close();
-        verify(chain, times(2)).close();
+        verify(chain, times(1)).close();
     }
 }

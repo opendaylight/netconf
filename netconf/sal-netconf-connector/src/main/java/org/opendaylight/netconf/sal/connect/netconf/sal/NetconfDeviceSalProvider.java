@@ -43,6 +43,9 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
     private TransactionChain txChain;
 
+    private volatile boolean closed;
+    private volatile boolean closedTopology;
+
     private final TransactionChainListener transactionChainListener =  new TransactionChainListener() {
         @Override
         public void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
@@ -97,14 +100,34 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
     @Override
     public void close() {
-        mountInstance.close();
-        if (topologyDatastoreAdapter != null) {
-            topologyDatastoreAdapter.close();
+        if (closed) {
+            return;
         }
-        topologyDatastoreAdapter = null;
-        if (txChain != null) {
+        mountInstance.close();
+        topologyDatastoreAdapter.close();
+        txChain.close();
+        closed = true;
+    }
+
+    public void close(final boolean isMaster) {
+        if (closed) {
+            return;
+        }
+        mountInstance.close();
+        if (isMaster) {
+            topologyDatastoreAdapter.close();
             txChain.close();
         }
+        closed = true;
+    }
+
+    public void closeTopology() {
+        if (closedTopology) {
+            return;
+        }
+        topologyDatastoreAdapter.close();
+        txChain.close();
+        closedTopology = true;
     }
 
     public static class MountInstance implements AutoCloseable {
@@ -175,5 +198,4 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
                 .publishNotification(domNotification);
         }
     }
-
 }
