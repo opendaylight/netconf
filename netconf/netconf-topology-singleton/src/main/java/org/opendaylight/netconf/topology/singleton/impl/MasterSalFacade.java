@@ -55,6 +55,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private NetconfDataTreeService netconfService = null;
     private DOMActionService deviceAction = null;
 
+    private boolean isMaster;
+
     MasterSalFacade(final RemoteDeviceId id,
                     final ActorSystem actorSystem,
                     final ActorRef masterActorRef,
@@ -94,26 +96,31 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             @Override
             public void onComplete(final Throwable failure, final Object success) {
                 if (failure == null) {
-                    updateDeviceData();
+                    if (isMaster) {
+                        updateDeviceData();
+                    }
                     return;
                 }
 
                 LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
             }
         }, actorSystem.dispatcher());
-
     }
 
     @Override
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        if (isMaster) {
+            salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        }
         unregisterMasterMountPoint();
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
-        salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
+        if (isMaster) {
+            salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
+        }
         unregisterMasterMountPoint();
     }
 
@@ -125,7 +132,11 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     @Override
     public void close() {
         unregisterMasterMountPoint();
-        closeGracefully(salProvider);
+        salProvider.close(isMaster);
+    }
+
+    public void closeTopology() {
+        salProvider.closeTopology();
     }
 
     private void registerMasterMountPoint() {
@@ -178,14 +189,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private void closeGracefully(final AutoCloseable resource) {
-        if (resource != null) {
-            try {
-                resource.close();
-            } catch (final Exception e) {
-                LOG.error("{}: Ignoring exception while closing {}", id, resource, e);
-            }
-        }
+    public void setMaster(final boolean master) {
+        isMaster = master;
     }
 }
