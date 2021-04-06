@@ -34,22 +34,21 @@ import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
 
 class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyContext.class);
 
     private final ServiceGroupIdentifier serviceGroupIdent;
     private final Timeout actorResponseWaitTime;
     private final DOMMountPointService mountService;
     private final DeviceActionFactory deviceActionFactory;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+    private final AtomicBoolean master = new AtomicBoolean(false);
 
     private NetconfTopologySetup netconfTopologyDeviceSetup;
     private RemoteDeviceId remoteDeviceId;
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
-    private final AtomicBoolean closed = new AtomicBoolean(false);
-    private final AtomicBoolean stopped = new AtomicBoolean(false);
-    private volatile boolean isMaster;
+    private MasterSalFacade masterSalFacade;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
             final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -67,11 +66,21 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         netconfNodeManager = createNodeDeviceManager();
     }
 
+    /**
+     * Called when this node is owner of the shard data.
+     */
     @Override
     public void instantiateServiceInstance() {
-        LOG.info("Master was selected: {}", remoteDeviceId.getHost().getIpAddress());
+        if (closed.get()) {
+            LOG.warn("Instance is already closed.");
+            return;
+        }
 
-        isMaster = true;
+        if (master.compareAndSet(false, true)) {
+            LOG.info("Master was selected: {}", remoteDeviceId.getHost().getIpAddress());
+        } else {
+            LOG.warn("The same master was already selected: {}", remoteDeviceId.getHost().getIpAddress());
+        }
 
         // master should not listen on netconf-node operational datastore
         if (netconfNodeManager != null) {
@@ -79,27 +88,43 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             netconfNodeManager = null;
         }
 
-        if (!closed.get()) {
-            final String masterAddress =
-                    Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
-            masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
-                    netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService),
-                    NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
+        // start master actor
+        final String masterAddress = Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
+        masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
+                netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService),
+                NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
-            remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
-        }
-
+        // start master connection to device
+        masterSalFacade = newMasterSalFacade();
+        masterSalFacade.setMaster(true);
+        remoteDeviceConnector.startRemoteDeviceConnection(masterSalFacade);
     }
 
-    // called when master is down/changed to slave
+    /**
+     * Called when this node is follower of the shard data or when this node is owner and data are deleted.
+     *
+     * @return {@code FluentFutures#immediateNullFluentFuture}
+     */
     @Override
     public ListenableFuture<?> closeServiceInstance() {
-
-        if (!closed.get()) {
-            // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
-            netconfNodeManager = createNodeDeviceManager();
+        if (closed.get()) {
+            LOG.warn("Instance is already closed.");
+            return FluentFutures.immediateNullFluentFuture();
         }
-        stopDeviceConnectorAndActor();
+
+        if (master.compareAndSet(true, false)) {
+            LOG.info("Master was removed: {}", remoteDeviceId.getHost().getIpAddress());
+        } else {
+            LOG.warn("The same master was already removed: {}", remoteDeviceId.getHost().getIpAddress());
+        }
+
+        // stop master connection
+        masterSalFacade.setMaster(false);
+        remoteDeviceConnector.stopRemoteDeviceConnection();
+        netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
+
+        // register listener
+        netconfNodeManager = createNodeDeviceManager();
 
         return FluentFutures.immediateNullFluentFuture();
     }
@@ -118,64 +143,63 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         return ndm;
     }
 
+    /**
+     * Called by {@code NetconfTopologyManager} when configuration data are deleted.
+     */
     @Override
     public void close() {
         if (!closed.compareAndSet(false, true)) {
+            LOG.warn("Instance is already closed.");
             return;
         }
 
-        if (netconfNodeManager != null) {
-            netconfNodeManager.close();
-        }
-        stopDeviceConnectorAndActor();
+        // when data are deleted then first #closeServiceInstance is called thus we do not have master anymore
+        netconfNodeManager.close();
 
+        // if this node was at least once master it can delete node from topology
+        if (masterSalFacade != null) {
+            masterSalFacade.closeTopology();
+        }
     }
 
     /**
      * Refresh, if configuration data was changed.
-     * @param setup new setup
+     * @param setup new {@code NetconfTopologySetup}
      */
     void refresh(final @NonNull NetconfTopologySetup setup) {
+        if (closed.get()) {
+            LOG.warn("Instance is already closed.");
+            return;
+        }
+
         netconfTopologyDeviceSetup = requireNonNull(setup);
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
                 netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
 
-        if (isMaster) {
+        if (master.get()) {
             remoteDeviceConnector.stopRemoteDeviceConnection();
         }
-        if (!isMaster) {
+        if (!master.get()) {
             netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
         }
         remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
             deviceActionFactory);
 
-        if (isMaster) {
+        if (master.get()) {
             final Future<Object> future = Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(
                 netconfTopologyDeviceSetup, remoteDeviceId), actorResponseWaitTime);
-            future.onComplete(new OnComplete<Object>() {
+            future.onComplete(new OnComplete<>() {
                 @Override
                 public void onComplete(final Throwable failure, final Object success) {
                     if (failure != null) {
                         LOG.error("Failed to refresh master actor data", failure);
                         return;
                     }
-                    remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
+                    masterSalFacade = newMasterSalFacade();
+                    masterSalFacade.setMaster(true);
+                    remoteDeviceConnector.startRemoteDeviceConnection(masterSalFacade);
                 }
             }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
-        }
-    }
-
-    private void stopDeviceConnectorAndActor() {
-        if (!stopped.compareAndSet(false, true)) {
-            return;
-        }
-        if (remoteDeviceConnector != null) {
-            remoteDeviceConnector.stopRemoteDeviceConnection();
-        }
-
-        if (masterActorRef != null) {
-            netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
-            masterActorRef = null;
         }
     }
 
