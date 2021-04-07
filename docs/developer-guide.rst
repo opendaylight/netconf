@@ -236,3 +236,183 @@ returns it from ``showNode``.
     More information can be found in the source code of ncmount sample
     app + on wiki:
     https://wiki-archive.opendaylight.org/view/Controller_Core_Functionality_Tutorials:Tutorials:Netconf_Mount
+
+Reading selected fields from device
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Using NETCONF DOM API it is also possible to read only selected fields
+from NETCONF device. NETCONF mountpoint exposes 2 services that provides
+this functionality:
+
+a. **NetconfDataTreeService** - It provides overloaded methods 'get'
+   (operational data) and 'getConfig' (configuration data)
+   with 'List<YangInstanceIdentifier> fields' parameters. This service
+   should be used if transaction properties are not required.
+b. **NetconfDOMDataBrokerFieldsExtension** - It implements DOMDataBroker
+   interface - provides the same transaction functionality plus method
+   for reading of data with selected fields: read(LogicalDatastoreType,
+   YangInstanceIdentifier, List<YangInstanceIdentifier>).
+   Instance of NetconfDOMDataBrokerFieldsExtension can be obtained
+   using 'getExtensions()' method on the DOMDataBroker instance.
+
+'List<YangInstanceIdentifier> fields' parameter specifies list of paths
+that are read from device using subtree filtering. These paths must be
+relative to parent path - returned data follows schema of the last path
+argument of parent path.
+
+**Mechanics**
+
+* parent path: /a/b/c
+* fields: [/x/y; /w/z]
+
+NETCONF server will read data on following paths:
+* /a/b/c/x/y
+* /a/b/c/w/z
+
+And place read data under /a/b/c path - thus returned data will have
+following structure:
+
+.. code-block::
+
+    c: {
+        x: {
+            y: {
+                // data ...
+            }
+        }
+        w: {
+            z: {
+                // data ...
+            }
+        }
+    }
+
+From the view of DOM API, YangInstanceIdentifier (first parameter) represents
+the parent path, and List<YangInstanceIdentifier> represents list of selected
+fields.
+
+**Example: using NetconfDataTreeService**
+
+The following method demonstrates reading of 2 fields under parent list 'l1':
+
+* parent path: /c1/l1
+* fields (leaves 'x1' and 'x2'): [/c2/x1, /c2/l2/x2]
+
+Result will contain whole MapNode with possibly multiple MapEntryNode-s that
+contain only keys of list elements and selected fields.
+
+.. code-block:: java
+
+    public void readData(final DOMMountPoint mountPoint) {
+        final NetconfDataTreeService dataTreeService = mountPoint.getService(NetconfDataTreeService.class).get();
+
+        final YangInstanceIdentifier parentPath = YangInstanceIdentifier.builder()
+                .node(CONTAINER_C1_NI)   // container 'c1' (root element)
+                .node(LIST_L1_NI)        // list 'l1' placed under container 'c1'
+                .build();
+        final YangInstanceIdentifier leafX1Field = YangInstanceIdentifier.builder()
+                .node(CONTAINER_C2_NI)   // container 'c2' placed under list 'l1'
+                .node(LEAF_X1_NI)        // leaf 'x1' placed under container 'c2'
+                .build();
+        final YangInstanceIdentifier leafX2Field = YangInstanceIdentifier.builder()
+                .node(CONTAINER_C2_NI)   // container 'c2' placed under list 'l1'
+                .node(NESTED_LIST_L2_NI) // list 'l2' placed under container 'c2'
+                .node(LEAF_X2_NI)        // leaf 'x2' placed under list 'l2'
+                .build();
+
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> config = dataTreeService.getConfig(
+                parentPath, Lists.newArrayList(leafX1Field, leafX2Field));
+
+        Futures.addCallback(config, new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
+            @Override
+            public void onSuccess(@Nullable final Optional<NormalizedNode<?, ?>> normalizedNode) {
+                normalizedNode.ifPresent(node -> LOG.info("Read data: {}", NormalizedNodes.toStringTree(node)));
+                /*
+                We expect data with following structure:
+                l1: [
+                    {
+                        key-l1: "k1",
+                        c2: {
+                            x1: 10,
+                            l2: [
+                                {
+                                    key-l2: 1,
+                                    x2: "foo"
+                                },
+                                ...
+                            ]
+                        }
+                    },
+                    ...
+                ]
+                */
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.error("Failed to read data: {}", parentPath, throwable);
+            }
+        });
+    }
+
+**Example: using NetconfDOMDataBrokerFieldsExtension**
+
+The following method demonstrates reading of 2 fields under parent
+container 'c1':
+
+* parent path: /c1
+* fields (leaf-list 'll1 'and container 'c2'): [/ll1, /l1=k1/c2]
+
+Result will contain ContainerNode with identifier 'c1' and children
+nodes (if they are present) of type LeafSetNode and MapNode.
+
+.. code-block:: java
+
+    public void readData(final DOMMountPoint mountPoint) {
+        final DOMDataBroker domDataBroker = mountPoint.getService(DOMDataBroker.class).get();
+        final NetconfDOMDataBrokerFieldsExtension domFieldsDataBroker = domDataBroker.getExtensions().getInstance(
+                NetconfDOMDataBrokerFieldsExtension.class);
+
+        final YangInstanceIdentifier parentPath = YangInstanceIdentifier.builder()
+                .node(CONTAINER_C1_NI)   // container 'c1' (root element)
+                .build();
+        final YangInstanceIdentifier ll1Field = YangInstanceIdentifier.builder()
+                .node(LEAF_LIST_LL1_NI)  // leaf-list 'll1' placed under container 'c1'
+                .build();
+        final YangInstanceIdentifier c2Field = YangInstanceIdentifier.builder()
+                .node(LIST_L1_NI)        // list 'l1' placed under container 'c1'
+                .nodeWithKey(LIST_L1_QN, LIST_L1_KEY_QN, "k1") // specific list entry with key value 'k1'
+                .node(CONTAINER_C2_NI)   // container 'c2' placed under container 'c1'
+                .build();
+
+        final FluentFuture<Optional<NormalizedNode<?, ?>>> data;
+        try (NetconfDOMFieldsReadTransaction roTx = domFieldsDataBroker.newReadOnlyTransaction()) {
+           data = roTx.read(LogicalDatastoreType.CONFIGURATION, parentPath, Lists.newArrayList(ll1Field, c2Field));
+        }
+
+        data.addCallback(new FutureCallback<>() {
+            @Override
+            public void onSuccess(@Nullable final Optional<NormalizedNode<?, ?>> normalizedNode) {
+                normalizedNode.ifPresent(node -> LOG.info("Read data: {}", NormalizedNodes.toStringTree(node)));
+                /*
+                We expect data with following structure:
+                c1: {
+                    ll1: [...],
+                    l1: [
+                        {
+                            l1-key: "k1",
+                            c2: {
+                                // data ...
+                            }
+                        }
+                    ]
+                }
+                */
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.error("Failed to read data: {}", parentPath, throwable);
+            }
+        }, MoreExecutors.directExecutor());
+    }

@@ -1191,3 +1191,378 @@ blueprint configuration file.
 The device **must** initiate the connection and the server will not try to re-establish the
 connection in case of a drop. By requirement, the server cannot assume it has connectivity
 to the device due to NAT or firewalls among others.
+
+Reading data with selected fields
+---------------------------------
+
+Overview
+~~~~~~~~
+
+If user would like to read only selected fields from NETCONF device, it is possible to use
+fields query parameter that is described by RFC-8040. RESTCONF parses content of query
+parameter into format that is accepted by NETCONF subtree filtering - filtering of data is done
+on NETCONF server, not on NETCONF client side. This approach optimizes network traffic load,
+because data in which user doesn't have interest, is not transferred over network.
+
+Next advantages:
+
+* using single RESTCONF request and single NETCONF RPC for reading multiple subtrees
+* possibility to read only selected fields under list node across multiple hierarchies
+  (it cannot be done without proper selection API)
+
+.. note::
+
+  More information about fields query parameter: `RFC 8071 <https://tools.ietf.org/html/rfc8040#section-4.8.3>`__
+
+Preparation of data
+~~~~~~~~~~~~~~~~~~~
+
+Mounting NETCONF device that runs on NETCONF testtool:
+
+.. code-block:: bash
+
+  curl --location --request PUT 'http://127.0.0.1:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=testtool' \
+  --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "node": [
+          {
+              "node-id": "testtool",
+              "netconf-node-topology:host": "127.0.0.1",
+              "netconf-node-topology:port": 36000,
+              "netconf-node-topology:keepalive-delay": 100,
+              "netconf-node-topology:tcp-only": false,
+              "netconf-node-topology:username": "admin",
+              "netconf-node-topology:password": "admin"
+          }
+      ]
+  }'
+
+Setting initial configuration on NETCONF device:
+
+.. code-block:: bash
+
+  curl --location --request PUT 'http://127.0.0.1:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root' \
+  --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "root": {
+          "simple-root": {
+              "leaf-a": "asddhg",
+              "leaf-b": "ffffff",
+              "ll": [
+                  "str1",
+                  "str2",
+                  "str3"
+              ],
+              "nested": {
+                  "sample-x": true,
+                  "sample-y": false
+              }
+          },
+          "list-root": {
+              "branch-ab": 5,
+              "top-list": [
+                  {
+                      "key-1": "ka",
+                      "key-2": "kb",
+                      "next-data": {
+                          "switch-1": [
+                              null
+                          ],
+                          "switch-2": [
+                              null
+                          ]
+                      },
+                      "nested-list": [
+                          {
+                              "identifier": "f1",
+                              "foo": 1
+                          },
+                          {
+                              "identifier": "f2",
+                              "foo": 10
+                          },
+                          {
+                              "identifier": "f3",
+                              "foo": 20
+                          }
+                      ]
+                  },
+                  {
+                      "key-1": "kb",
+                      "key-2": "ka",
+                      "next-data": {
+                          "switch-1": [
+                              null
+                          ]
+                      },
+                      "nested-list": [
+                          {
+                              "identifier": "e1",
+                              "foo": 1
+                          },
+                          {
+                              "identifier": "e2",
+                              "foo": 2
+                          },
+                          {
+                              "identifier": "e3",
+                              "foo": 3
+                          }
+                      ]
+                  },
+                  {
+                      "key-1": "kc",
+                      "key-2": "ke",
+                      "next-data": {
+                          "switch-2": [
+                              null
+                          ]
+                      },
+                      "nested-list": [
+                          {
+                              "identifier": "q1",
+                              "foo": 13
+                          },
+                          {
+                              "identifier": "q2",
+                              "foo": 14
+                          },
+                          {
+                              "identifier": "q3",
+                              "foo": 15
+                          }
+                      ]
+                  }
+              ]
+          }
+      }
+  }'
+
+Examples
+--------
+
+1. Reading whole leaf-list 'll' and leaf 'nested/sample-x' under 'simple-root' container.
+
+RESTCONF request:
+
+.. code-block:: bash
+
+    curl --location --request GET 'http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/simple-root?content=config&fields=ll;nested/sample-x' \
+    --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
+    --header 'Cookie: JSESSIONID=node01h4w82eorc1k61866b71qjgj503.node0'
+
+Generated NETCONF RPC request:
+
+.. code-block:: xml
+
+    <rpc message-id="m-18" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <get-config>
+            <source>
+                <running/>
+            </source>
+            <filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+                <root xmlns="urn:ietf:params:xml:ns:yang:test-model">
+                    <simple-root>
+                        <ll/>
+                        <nested>
+                            <sample-x/>
+                        </nested>
+                    </simple-root>
+                </root>
+            </filter>
+        </get-config>
+    </rpc>
+
+.. note::
+
+    Using fields query parameter it is also possible to read whole leaf-list or list without
+    necessity to specify value / key predicate (without reading parent entity). Such scenario
+    is not permitted in RFC-8040 paths alone - fields query parameter can be used as
+    workaround for this case.
+
+RESTCONF response:
+
+.. code-block:: json
+
+    {
+        "test-module:simple-root": {
+            "ll": [
+                "str3",
+                "str1",
+                "str2"
+            ],
+            "nested": {
+                "sample-x": true
+            }
+        }
+    }
+
+2. Reading all identifiers of 'nested-list' under all elements of 'top-list'.
+
+RESTCONF request:
+
+.. code-block:: bash
+
+    curl --location --request GET 'http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/list-root?content=config&fields=top-list(nested-list/identifier)' \
+    --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
+    --header 'Cookie: JSESSIONID=node01h4w82eorc1k61866b71qjgj503.node0'
+
+Generated NETCONF RPC request:
+
+.. code-block:: xml
+
+    <rpc message-id="m-27" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <get-config>
+            <source>
+                <running/>
+            </source>
+            <filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+                <root xmlns="urn:ietf:params:xml:ns:yang:test-model">
+                    <list-root>
+                        <top-list>
+                            <nested-list>
+                                <identifier/>
+                            </nested-list>
+                            <key-1/>
+                            <key-2/>
+                        </top-list>
+                    </list-root>
+                </root>
+            </filter>
+        </get-config>
+    </rpc>
+
+.. note::
+
+    NETCONF client automatically fetches values of list keys since they are required for correct
+    deserialization of NETCONF response and at the end serialization of response to RESTCONF
+    response (JSON/XML).
+
+RESTCONF response:
+
+.. code-block:: json
+
+    {
+        "test-module:list-root": {
+            "top-list": [
+                {
+                    "key-1": "ka",
+                    "key-2": "kb",
+                    "nested-list": [
+                        {
+                            "identifier": "f3"
+                        },
+                        {
+                            "identifier": "f2"
+                        },
+                        {
+                            "identifier": "f1"
+                        }
+                    ]
+                },
+                {
+                    "key-1": "kb",
+                    "key-2": "ka",
+                    "nested-list": [
+                        {
+                            "identifier": "e3"
+                        },
+                        {
+                            "identifier": "e2"
+                        },
+                        {
+                            "identifier": "e1"
+                        }
+                    ]
+                },
+                {
+                    "key-1": "kc",
+                    "key-2": "ke",
+                    "nested-list": [
+                        {
+                            "identifier": "q3"
+                        },
+                        {
+                            "identifier": "q2"
+                        },
+                        {
+                            "identifier": "q1"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+
+3. Reading value of leaf 'branch-ab' and all values of leaves 'switch-1' that are placed
+   under 'top-list' list elements.
+
+RESTCONF request:
+
+.. code-block:: bash
+
+    curl --location --request GET 'http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/list-root?content=config&fields=branch-ab;top-list/next-data/switch-1' \
+    --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
+    --header 'Cookie: JSESSIONID=node01jx6o5thwae9t1ft7c2zau5zbz4.node0'
+
+Generated NETCONF RPC request:
+
+.. code-block:: xml
+
+    <rpc message-id="m-42" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <get-config>
+            <source>
+                <running/>
+            </source>
+            <filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+                <root xmlns="urn:ietf:params:xml:ns:yang:test-model">
+                    <list-root>
+                        <branch-ab/>
+                        <top-list>
+                            <next-data>
+                                <switch-1/>
+                            </next-data>
+                            <key-1/>
+                            <key-2/>
+                        </top-list>
+                    </list-root>
+                </root>
+            </filter>
+        </get-config>
+    </rpc>
+
+RESTCONF response:
+
+.. code-block:: json
+
+    {
+        "test-module:list-root": {
+            "branch-ab": 5,
+            "top-list": [
+                {
+                    "key-1": "ka",
+                    "key-2": "kb",
+                    "next-data": {
+                        "switch-1": [
+                            null
+                        ]
+                    }
+                },
+                {
+                    "key-1": "kb",
+                    "key-2": "ka",
+                    "next-data": {
+                        "switch-1": [
+                            null
+                        ]
+                    }
+                },
+                {
+                    "key-1": "kc",
+                    "key-2": "ke"
+                }
+            ]
+        }
+    }
