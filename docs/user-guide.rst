@@ -2304,3 +2304,231 @@ OpenAPI URLs in that case would look like this:
 
     The URL links for OpenAPI are made for device with name *17830-sim-device* and model toaster
     with *2009-11-20* revision and need to be changed accordingly to connected device.
+
+RESTCONF audit logs
+-------------------
+
+Overview
+~~~~~~~~
+
+This feature can be used for logging of all HTTP requests and responses. Logging is part of the odl-restconf-nb-rfc8040
+feature - no new bundle is required to be installed. However logging is disabled by default.
+
+Example - formatting of output logs:
+
+.. code-block:: text
+
+    2021-04-14T08:20:24,807 | TRACE | 1618381224807 | RestconfLoggingBroker | REQ | 3 | GET | operations | 0:0:0:0:0:0:0:1:47202 | admin@sdn | {depth:[1]} | {Authorization:[[Basic YWRtaW46YWRtaW4=]], Cookie:[[JSESSIONID=node013s67t0vnhnp41xb0cmvncdgag2.node0]], Accept:[[*/*]], Cache-Control:[[no-cache]], User-Agent:[[PostmanRuntime/7.26.8]], Connection:[[keep-alive]], Postman-Token:[[ddb4cbd1-fe28-4823-940b-eb13829a0879]], Host:[[localhost:8181]], Accept-Encoding:[[gzip, deflate, br]], Content-Length:[[15]], Content-Type:[[application/json]]} | 15
+    {"example": 10}
+    2021-04-14T08:20:24,811 | TRACE | 1618381224811 | RestconfLoggingBroker | RES | 3 | 200 | 4 | {Content-Type:[[application/yang-data+json]]} | 2066
+    {"ietf-restconf:operations":{"ietf-netconf:get":[null],"cluster-admin:change-member-voting-states-for-shard":[null],"ietf-netconf:delete-config":[null],"ietf-netconf:close-session":[null],"cluster-admin:add-shard-replica":[null],"sal-remote:create-data-change-event-subscription":[null],"ietf-netconf-nmda:get-data":[null],"aaa-cert-rpc:setODLCertificate":[null],"ietf-netconf:kill-session":[null],"cluster-admin:remove-prefix-shard-replica":[null],"ietf-netconf-monitoring:get-schema":[null],"netconf-keystore:add-keystore-entry":[null],"cluster-admin:add-prefix-shard-replica":[null],"cluster-admin:remove-shard-replica":[null],"netconf-keystore:add-trusted-certificate":[null],"sal-remote:create-notification-stream":[null],"ietf-netconf:cancel-commit":[null],"netconf-keystore:remove-keystore-entry":[null],"aaa-cert-rpc:getNodeCertificate":[null],"cluster-admin:remove-all-shard-replicas":[null],"ietf-netconf:discard-changes":[null],"cluster-admin:get-prefix-shard-role":[null],"sal-remote:begin-transaction":[null],"cluster-admin:flip-member-voting-states-for-all-shards":[null],"ietf-netconf:lock":[null],"ietf-netconf-nmda:edit-data":[null],"cluster-admin:make-leader-local":[null],"netconf-keystore:add-private-key":[null],"cluster-admin:backup-datastore":[null],"aaa-cert-rpc:getODLCertificate":[null],"cluster-admin:change-member-voting-states-for-all-shards":[null],"ietf-netconf:copy-config":[null],"cluster-admin:add-replicas-for-all-shards":[null],"ietf-netconf:commit":[null],"aaa-cert-rpc:setNodeCertificate":[null],"netconf-keystore:remove-private-key":[null],"netconf-node-topology:delete-device":[null],"cluster-admin:get-known-clients-for-all-shards":[null],"cluster-admin:locate-shard":[null],"notifications:create-subscription":[null],"aaa-cert-rpc:getODLCertificateReq":[null],"ietf-netconf:get-config":[null],"ietf-netconf:unlock":[null],"ietf-netconf:validate":[null],"cluster-admin:get-shard-role":[null],"netconf-node-topology:create-device":[null],"ietf-netconf:edit-config":[null],"netconf-keystore:remove-trusted-certificate":[null]}}
+
+.. list-table:: Description of the lines
+   :widths: 5 100
+   :header-rows: 1
+
+   * - Index
+     - Description
+   * - 0
+     - Information about HTTP request.
+   * - 1
+     - HTTP request body. If HTTP request doesn't contain body, this line is not present in the logs. Also, it is possible
+       to
+   * - 2
+     - Information about HTTP response.
+   * - 3
+     - HTTP response body. If HTTP response doesn't contain body, this line is not present in the logs.
+
+.. list-table:: Description of request fields
+   :widths: 5 10 100
+   :header-rows: 1
+
+   * - Index
+     - Example
+     - Description
+   * - 0
+     - 2021-04-14T08:20:24,807
+     - Time at which request arrived in RESTCONF layer and was processed (formatting of time can be adjusted from
+       org.ops4j.pax.logging.cfg).
+   * - 1
+     - TRACE
+     - Level at which log was generated. Currently, all logs are generated at TRACE level.
+   * - 2
+     - 1618381224807
+     - UNIX format of the timestamp. It can be used for simplified parsing of logs from external application.
+   * - 3
+     - RestconfLoggingBroker
+     - Name of the class that is responsible for writing of log. Currently all RESTCONF audit logs are generated from
+       the same broker class - it simplifies applications of global settings for all audit logs.
+   * - 4
+     - REQ
+     - Identifier of the request log line.
+   * - 5
+     - 3
+     - Unique message ID used for pairing of requests and corresponding responses.
+   * - 6
+     - GET
+     - Identifier of HTTP method.
+   * - 7
+     - operations
+     - Identifier of the requested resource in the RESTCONF RFC-8040 URI format.
+   * - 8
+     - 0:0:0:0:0:0:0:1:46764
+     - Identifier of the source machine that issued HTTP request. Format: [host-ip-address]:[source-port].
+   * - 9
+     - admin@sdn
+     - Username and domain name ([username]@[domain]) of authenticated ODL subject.
+   * - 10
+     - {depth:[1]}
+     - Query parameters - each query parameter has an identifier and list of values enclosed in [] brackets. Multiple
+       parameters are separated by comma and space characters. Logging of query parameters can be disabled using
+       configuration file.
+   * - 11
+     - {Authorization:[[Basic YWRtaW46YWRtaW4=]], Accept:[[*/*]]}
+     - HTTP headers - each HTTP header has an identifier and list of values enclosed in [] brackets. Multiple headers
+       are separated by comma and space characters. Logging of HTTP headers can be disabled using configuration file.
+   * - 12
+     - 15
+     - Length of HTTP body expressed in number of bytes. If HTTP body is not present, then 0 is displayed.
+   * - 13
+     - {"example": 10}
+     - HTTP request body. Note that body is always placed on a new line to improve readability.
+
+.. list-table:: Description of response fields
+   :widths: 5 10 100
+   :header-rows: 1
+
+   * - Index
+     - Example
+     - Description
+   * - 0
+     - 2021-04-14T08:20:24,807
+     - Time at which response was generated by RESTCONF layer (formatting of time can be adjusted from
+       org.ops4j.pax.logging.cfg).
+   * - 1
+     - TRACE
+     - Level at which log was generated. Currently, all logs are generated at TRACE level.
+   * - 2
+     - 1618381224807
+     - UNIX format of the timestamp. It can be used for simplified parsing of logs from external application.
+   * - 3
+     - RestconfLoggingBroker
+     - Name of the class that is responsible for writing of log. Currently all RESTCONF audit logs are generated from
+       the same broker class - it simplifies applications of global settings for all audit logs.
+   * - 4
+     - RES
+     - Identifier of the response log line.
+   * - 5
+     - 3
+     - Unique message ID used for pairing of requests and corresponding responses.
+   * - 6
+     - 200
+     - HTTP response/status code.
+   * - 7
+     - 4
+     - Duration between received + recognized HTTP request and generated HTTP response (processing duration).
+       Value is expressed in milliseconds.
+   * - 8
+     - {Content-Type:[[application/yang-data+json]]}
+     - Response HTTP headers - each HTTP header has an identifier and list of values enclosed in [] brackets.
+       Multiple headers are separated by comma and space characters. Logging of HTTP headers can be disabled using
+       configuration file.
+   * - 9
+     - 2066
+     - Length of HTTP body expressed in number of bytes. If HTTP body is not present, then 0 is displayed.
+
+.. note::
+
+    If some field is missing in the HTTP request/response (for example, there aren't any HTTP query parameters),
+    then an empty | | block is still present in the log line - total number of columns is consistent.
+    However, if some logging field is disabled by configuration, then it is skipped from output at all - an empty
+    | | is not present in the log line.
+
+Configuration
+~~~~~~~~~~~~~
+
+All available settings related to audit logs are placed in 'org.opendaylight.restconf.nb.rfc8040.cfg' file.
+
+Example:
+
+.. code-block:: text
+
+    restconf-logging-enabled=true
+    #logging-headers-enabled=true
+    #logging-query-parameters-enabled=true
+    #logging-body-enabled=true
+    #hidden-http-headers=Authorization,Cookie
+
+By default, RESTCONF audit logs are disabled - it must be enabled by setting 'restconf-logging-enabled' to 'true' value.
+After logging is enabled, all configurable logging fields are by default enabled too.
+
+.. list-table:: Description of available settings
+   :widths: 5 20 100
+   :header-rows: 1
+
+   * - Property
+     - Default
+     - Description
+   * - restconf-logging-enabled
+     - false
+     - If it is set to 'true', then RESTCONF audit logs are enabled - logs are written to loggers. If this property
+       is set to 'false', then RESTCONF audit logging is disabled despite of other settings.
+   * - logging-query-parameters-enabled
+     - true
+     - If it is set to 'true', then HTTP query parameters are logged.
+   * - logging-query-parameters-enabled
+     - true
+     - If it is set to 'true', then HTTP headers in both requests and responses are logged.
+   * - logging-body-enabled
+     - true
+     - If it is set to 'true', then both HTTP request and response headers are present in the logs.
+   * - hidden-http-headers
+     - ""
+     - Names of HTTP headers which should not be displayed in the logs. It is convenient to hide, for example,
+       Authorization and Cookie headers.
+
+.. note::
+
+    Settings inside 'org.opendaylight.restconf.nb.rfc8040.cfg' can be adjusted at runtime. It causes reloading
+    of corresponding OSGi bundles.
+
+Logger
+~~~~~~
+
+By default all logs from 'org.opendaylight.restconf.*' packages are streamed to default logger with INFO threshold
+- it is necessary to lower threshold level to TRACE level for the following class:
+'org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingBroker'. It can be done in Karaf using
+following command:
+
+.. code-block:: text
+
+    log set TRACE org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingBroker
+
+Afterwards, you should be able to see RESTCONF audit logs in both Karaf console and 'data/log/karaf.log' file.
+
+Another, more flexible, option is to forward logs to separate file by configuring 'org.ops4j.pax.logging.cfg' file
+- introduction of separate file appender and logger for RESTCONF audit logs:
+
+.. code-block:: text
+
+    # RESTCONF
+    log4j2.appender.restconf.type = RollingRandomAccessFile
+    log4j2.appender.restconf.name = Restconf
+    log4j2.appender.restconf.fileName = ${karaf.data}/log/restconf.log
+    log4j2.appender.restconf.filePattern = ${karaf.data}/log/restconf.log.%i
+    log4j2.appender.restconf.append = true
+    log4j2.appender.restconf.layout.type = PatternLayout
+    log4j2.appender.restconf.layout.pattern = %d{ISO8601} | %-5p | %d{UNIX_MILLIS} | %c{1} | %m%n
+    log4j2.appender.restconf.policies.type = Policies
+    log4j2.appender.restconf.policies.size.type = SizeBasedTriggeringPolicy
+    log4j2.appender.restconf.policies.size.size = 64MB
+    log4j2.appender.restconf.strategy.type = DefaultRolloverStrategy
+    log4j2.appender.restconf.strategy.max = 7
+    log4j2.logger.restconf.name = org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingBroker
+    log4j2.logger.restconf.level = TRACE
+    log4j2.logger.restconf.additivity = false
+    log4j2.logger.restconf.appenderRef.Restconf.ref = Restconf
+
+In that case, logs will be written to 'data/log/restconf.log' file. Note that logger name must be set to
+'org.opendaylight.restconf.nb.rfc8040.jersey.providers.logging.RestconfLoggingBroker' and logger level must be set
+to 'TRACE' level.
