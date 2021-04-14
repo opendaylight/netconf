@@ -53,7 +53,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -98,7 +97,6 @@ import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoi
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.NotMasterException;
-import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
@@ -220,26 +218,6 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     public void teardown() {
         TestKit.shutdownActorSystem(system, true);
         system = null;
-    }
-
-    @Test
-    public void testInitializeAndRefreshMasterData() {
-
-        // Test CreateInitialMasterActorData.
-
-        initializeMaster(new ArrayList<>());
-
-        // Test RefreshSetupMasterActorData.
-
-        final RemoteDeviceId newRemoteDeviceId = new RemoteDeviceId("netconf-topology2",
-                new InetSocketAddress(InetAddresses.forString("127.0.0.2"), 9999));
-
-        final NetconfTopologySetup newSetup = NetconfTopologySetupBuilder.create().setBaseSchemas(BASE_SCHEMAS)
-                .setSchemaResourceDTO(schemaResourceDTO).setActorSystem(system).build();
-
-        masterRef.tell(new RefreshSetupMasterActorData(newSetup, newRemoteDeviceId), testKit.getRef());
-
-        testKit.expectMsgClass(MasterActorDataInitialized.class);
     }
 
     @Test

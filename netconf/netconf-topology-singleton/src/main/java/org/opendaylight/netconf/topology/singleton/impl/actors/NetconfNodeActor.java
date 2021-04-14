@@ -49,7 +49,6 @@ import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterA
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.NotMasterException;
-import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
@@ -130,10 +129,6 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
             sender().tell(new MasterActorDataInitialized(), self());
             LOG.debug("{}: Master is ready.", id);
-        } else if (message instanceof RefreshSetupMasterActorData) {
-            setup = ((RefreshSetupMasterActorData) message).getNetconfTopologyDeviceSetup();
-            id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
-            sender().tell(new MasterActorDataInitialized(), self());
         } else if (message instanceof AskForMasterMountPoint) { // master
             AskForMasterMountPoint askForMasterMountPoint = (AskForMasterMountPoint) message;
             // only master contains reference to deviceDataBroker
