@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ac600c2_e0b986cf",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8762
+      },
+      "writtenOn": "2021-04-19T19:31:28Z",
+      "side": 1,
+      "message": "I\u0027m confused that MasterSalFacade might not be a master; it looks like a flag that indicates that MasterSalFacade is opened/closed. Is it a correct assumption?",
+      "revId": "ea8ce3a81e231de27525f9faa679ce16fe0c3528",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
