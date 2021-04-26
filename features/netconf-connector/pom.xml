@@ -27,7 +27,6 @@
 
     <modules>
         <module>features-netconf-connector</module>
-        <module>odl-message-bus</module>
         <module>odl-netconf-clustered-topology</module>
         <module>odl-netconf-connector</module>
         <module>odl-netconf-connector-all</module>
