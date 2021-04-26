@@ -122,11 +122,6 @@
                 <artifactId>sal-netconf-connector</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>messagebus-netconf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -398,13 +393,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>features-netconf-connector</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>odl-message-bus</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>
