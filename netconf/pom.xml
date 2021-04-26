@@ -51,7 +51,6 @@
     <module>netconf-topology-impl</module>
     <module>netconf-topology-singleton</module>
     <module>sal-netconf-connector</module>
-    <module>messagebus-netconf</module>
     <module>yanglib</module>
     <module>models</module>
     <module>tools</module>
