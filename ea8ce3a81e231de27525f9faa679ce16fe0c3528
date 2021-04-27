@@ -16,6 +16,24 @@
       "revId": "ea8ce3a81e231de27525f9faa679ce16fe0c3528",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "67cf23ee_d147b387",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-04-27T10:42:03Z",
+      "side": 1,
+      "message": "I will try to rework isMaster to closed :D",
+      "parentUuid": "5ac600c2_e0b986cf",
+      "revId": "ea8ce3a81e231de27525f9faa679ce16fe0c3528",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
