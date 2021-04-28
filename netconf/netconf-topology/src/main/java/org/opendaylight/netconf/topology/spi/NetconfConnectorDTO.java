@@ -39,6 +39,10 @@ public final class NetconfConnectorDTO implements AutoCloseable {
         return communicator;
     }
 
+    public List<SchemaSourceRegistration<?>> getYanglibRegistrations() {
+        return yanglibRegistrations;
+    }
+
     @Override
     public void close() {
         communicator.close();

@@ -16,10 +16,8 @@ import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.List;
-import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -40,14 +38,13 @@ import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
 
 class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessionPreferences> {
-
     private static final Logger LOG = LoggerFactory.getLogger(MasterSalFacade.class);
 
     private final RemoteDeviceId id;
+    private final ActorSystem actorSystem;
+    private final ActorRef masterActorRef;
     private final Timeout actorResponseWaitTime;
     private final NetconfDeviceSalProvider salProvider;
-    private final ActorRef masterActorRef;
-    private final ActorSystem actorSystem;
 
     private MountPointContext currentMountContext = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
@@ -56,26 +53,28 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private NetconfDataTreeService netconfService = null;
     private DOMActionService deviceAction = null;
 
-    private boolean isMaster;
+    private volatile boolean closed;
 
     MasterSalFacade(final RemoteDeviceId id,
                     final ActorSystem actorSystem,
                     final ActorRef masterActorRef,
                     final Timeout actorResponseWaitTime,
-                    final DOMMountPointService mountService,
-                    final DataBroker dataBroker) {
+                    final NetconfDeviceSalProvider salProvider) {
         this.id = id;
-        salProvider = new NetconfDeviceSalProvider(id, mountService, dataBroker);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         this.actorResponseWaitTime = actorResponseWaitTime;
+        this.salProvider = salProvider;
     }
 
     @Override
     public void onDeviceConnected(final MountPointContext mountContext,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService, final DOMActionService domActionService) {
-        deviceAction = domActionService;
+        if (isClosed()) {
+            return;
+        }
+        this.deviceAction = domActionService;
         LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
             + "DOMActionService exposed for the device", id);
         onDeviceConnected(mountContext, sessionPreferences, domRpcService);
@@ -85,9 +84,12 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     public void onDeviceConnected(final MountPointContext mountContext,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService) {
-        currentMountContext = mountContext;
-        netconfSessionPreferences = sessionPreferences;
-        deviceRpc = domRpcService;
+        if (isClosed()) {
+            return;
+        }
+        this.currentMountContext = mountContext;
+        this.netconfSessionPreferences = sessionPreferences;
+        this.deviceRpc = domRpcService;
 
         LOG.info("Device {} connected - registering master mount point", id);
 
@@ -97,9 +99,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
             @Override
             public void onComplete(final Throwable failure, final Object success) {
                 if (failure == null) {
-                    if (isMaster) {
-                        updateDeviceData();
-                    }
+                    updateDeviceData();
                     return;
                 }
 
@@ -110,34 +110,46 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     @Override
     public void onDeviceDisconnected() {
-        LOG.info("Device {} disconnected - unregistering master mount point", id);
-        if (isMaster) {
-            salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        if (isClosed()) {
+            return;
         }
+        LOG.info("Device {} disconnected - unregistering master mount point", id);
+        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
         unregisterMasterMountPoint();
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
-        if (isMaster) {
-            salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
+        if (isClosed()) {
+            return;
         }
+        salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
         unregisterMasterMountPoint();
     }
 
     @Override
     public void onNotification(final DOMNotification domNotification) {
+        if (isClosed()) {
+            return;
+        }
         salProvider.getMountInstance().publish(domNotification);
     }
 
     @Override
     public void close() {
+        if (isClosed()) {
+            return;
+        }
         unregisterMasterMountPoint();
-        salProvider.close(isMaster);
+        closed = true;
     }
 
-    public void closeTopology() {
-        salProvider.closeTopology();
+    private boolean isClosed() {
+        if (closed) {
+            LOG.warn("{} is already closed.", MasterSalFacade.class.getSimpleName());
+            return true;
+        }
+        return false;
     }
 
     private void registerMasterMountPoint() {
@@ -188,9 +200,5 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     private void unregisterMasterMountPoint() {
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
-    }
-
-    public void setMaster(final boolean master) {
-        isMaster = master;
     }
 }
