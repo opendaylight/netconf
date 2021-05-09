@@ -60,7 +60,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         this.validator = new FilterContentValidator(schemaContext);
     }
 
-    protected Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data,
+    protected Node transformNormalizedNode(final Document document, final NormalizedNode data,
                                            final YangInstanceIdentifier dataRoot) {
 
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
@@ -98,10 +98,10 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     }
 
     private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
-                                  final ContainerNode data) {
+                                         final ContainerNode data) {
         try {
-            if (data.getNodeType().equals(SchemaContext.NAME)) {
-                for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+            if (data.getIdentifier().getNodeType().equals(SchemaContext.NAME)) {
+                for (final DataContainerChild child : data.body()) {
                     nnWriter.write(child);
                 }
             } else {
@@ -117,8 +117,8 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
                                          final MapNode data) {
         try {
-            if (data.getNodeType().equals(SchemaContext.NAME)) {
-                for (final MapEntryNode child : data.getValue()) {
+            if (data.getIdentifier().getNodeType().equals(SchemaContext.NAME)) {
+                for (final MapEntryNode child : data.body()) {
                     nnWriter.write(child);
                 }
             } else {
@@ -132,7 +132,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     }
 
     protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot,
-                                                       final NormalizedNode<?, ?> node) {
+                                                       final NormalizedNode node) {
         if (!dataRoot.equals(ROOT)) {
             return (Element) transformNormalizedNode(document,
                     ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
