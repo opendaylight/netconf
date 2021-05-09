@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import com.ning.http.client.AsyncHttpClient;
@@ -29,7 +28,8 @@ public final class RequestMessageUtils {
 
     private static long macStart = 0xAABBCCDD0000L;
 
-    private RequestMessageUtils(){
+    private RequestMessageUtils() {
+        // Hidden on purpose
     }
 
     public static String prepareMessage(final int idi, final int idj, final String editContentString,

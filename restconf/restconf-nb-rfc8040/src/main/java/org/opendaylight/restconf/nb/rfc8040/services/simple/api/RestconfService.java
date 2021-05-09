@@ -17,10 +17,8 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 
 /**
  * Service for getting yang library version.
- *
  */
 public interface RestconfService extends UpdateHandlers {
-
     /**
      * Get yang library version.
      *
@@ -28,7 +26,12 @@ public interface RestconfService extends UpdateHandlers {
      */
     @GET
     @Path("/yang-library-version")
-    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getLibraryVersion();
 }

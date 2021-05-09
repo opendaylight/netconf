@@ -19,12 +19,9 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 
 /**
- * Container that provides access to the data-model specific operations
- * supported by the server.
- *
+ * Container that provides access to the data-model specific operations supported by the server.
  */
 public interface RestconfOperationsService extends UpdateHandlers {
-
     /**
      * List of rpc or action operations supported by the server.
      *
@@ -34,8 +31,13 @@ public interface RestconfOperationsService extends UpdateHandlers {
      */
     @GET
     @Path("/operations")
-    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
 
     /**
@@ -49,7 +51,12 @@ public interface RestconfOperationsService extends UpdateHandlers {
      */
     @GET
     @Path("/operations/{identifier:.+}")
-    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 }

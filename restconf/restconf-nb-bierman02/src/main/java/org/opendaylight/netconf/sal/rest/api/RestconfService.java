@@ -69,8 +69,13 @@ public interface RestconfService {
     @Deprecated
     @GET
     @Path("/modules")
-    @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.API + JSON,
+        Draft02.MediaTypes.API + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getModules(@Context UriInfo uriInfo);
 
     /**
@@ -87,8 +92,13 @@ public interface RestconfService {
     @Deprecated
     @GET
     @Path("/modules/{identifier:.+}")
-    @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.API + JSON,
+        Draft02.MediaTypes.API + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
@@ -105,8 +115,13 @@ public interface RestconfService {
     @Deprecated
     @GET
     @Path("/modules/module/{identifier:.+}")
-    @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.API + JSON,
+        Draft02.MediaTypes.API + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
@@ -121,8 +136,13 @@ public interface RestconfService {
     @Deprecated
     @GET
     @Path("/operations")
-    @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.API + JSON,
+        Draft02.MediaTypes.API + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
 
     /**
@@ -139,8 +159,13 @@ public interface RestconfService {
     @Deprecated
     @GET
     @Path("/operations/{identifier:.+}")
-    @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.API + JSON,
+        Draft02.MediaTypes.API + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
@@ -159,12 +184,24 @@ public interface RestconfService {
     @Deprecated
     @POST
     @Path("/operations/{identifier:.+}")
-    @Produces({ Draft02.MediaTypes.OPERATION + JSON, Draft02.MediaTypes.OPERATION + XML,
-            Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    @Consumes({ Draft02.MediaTypes.OPERATION + JSON, Draft02.MediaTypes.OPERATION + XML,
-            Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.OPERATION + JSON,
+        Draft02.MediaTypes.OPERATION + XML,
+        Draft02.MediaTypes.DATA + JSON,
+        Draft02.MediaTypes.DATA + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    @Consumes({
+        Draft02.MediaTypes.OPERATION + JSON,
+        Draft02.MediaTypes.OPERATION + XML,
+        Draft02.MediaTypes.DATA + JSON,
+        Draft02.MediaTypes.DATA + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
@@ -182,8 +219,13 @@ public interface RestconfService {
     @Deprecated
     @GET
     @Path("/config/{identifier:.+}")
-    @Produces({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.DATA + JSON,
+        Draft02.MediaTypes.DATA + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext readConfigurationData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
@@ -201,8 +243,13 @@ public interface RestconfService {
     @Deprecated
     @GET
     @Path("/operational/{identifier:.+}")
-    @Produces({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.DATA + JSON,
+        Draft02.MediaTypes.DATA + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext readOperationalData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
@@ -220,8 +267,13 @@ public interface RestconfService {
     @Deprecated
     @PUT
     @Path("/config/{identifier:.+}")
-    @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({
+        Draft02.MediaTypes.DATA + JSON,
+        Draft02.MediaTypes.DATA + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response updateConfigurationData(@Encoded @PathParam("identifier") String identifier,
             NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
@@ -241,8 +293,13 @@ public interface RestconfService {
     @Deprecated
     @POST
     @Path("/config/{identifier:.+}")
-    @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({
+        Draft02.MediaTypes.DATA + JSON,
+        Draft02.MediaTypes.DATA + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response createConfigurationData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
@@ -260,8 +317,13 @@ public interface RestconfService {
     @Deprecated
     @POST
     @Path("/config")
-    @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({
+        Draft02.MediaTypes.DATA + JSON,
+        Draft02.MediaTypes.DATA + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response createConfigurationData(NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
     /**
@@ -306,8 +368,13 @@ public interface RestconfService {
     @Deprecated
     @GET
     @Path("/streams")
-    @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Draft02.MediaTypes.API + JSON,
+        Draft02.MediaTypes.API + XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getAvailableStreams(@Context UriInfo uriInfo);
 
     /**
@@ -326,8 +393,14 @@ public interface RestconfService {
     @Deprecated
     @Patch
     @Path("/config/{identifier:.+}")
-    @Consumes({MediaTypes.PATCH + JSON, MediaTypes.PATCH + XML})
-    @Produces({MediaTypes.PATCH_STATUS + JSON, MediaTypes.PATCH_STATUS + XML})
+    @Consumes({
+        MediaTypes.PATCH + JSON,
+        MediaTypes.PATCH + XML
+    })
+    @Produces({
+        MediaTypes.PATCH_STATUS + JSON,
+        MediaTypes.PATCH_STATUS + XML
+    })
     PatchStatusContext patchConfigurationData(@Encoded @PathParam("identifier") String identifier, PatchContext
             context, @Context UriInfo uriInfo);
 
@@ -345,7 +418,13 @@ public interface RestconfService {
     @Deprecated
     @Patch
     @Path("/config")
-    @Consumes({MediaTypes.PATCH + JSON, MediaTypes.PATCH + XML})
-    @Produces({MediaTypes.PATCH_STATUS + JSON, MediaTypes.PATCH_STATUS + XML})
+    @Consumes({
+        MediaTypes.PATCH + JSON,
+        MediaTypes.PATCH + XML
+    })
+    @Produces({
+        MediaTypes.PATCH_STATUS + JSON,
+        MediaTypes.PATCH_STATUS + XML
+    })
     PatchStatusContext patchConfigurationData(PatchContext context, @Context UriInfo uriInfo);
 }

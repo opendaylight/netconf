@@ -6,13 +6,13 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 @XmlSchema(
-        elementFormDefault = XmlNsForm.QUALIFIED,
-        xmlns = {
-                @XmlNs(namespaceURI = MonitoringConstants.EXTENSION_NAMESPACE, prefix =
-                        MonitoringConstants.EXTENSION_NAMESPACE_PREFIX),
-                @XmlNs(namespaceURI = MonitoringConstants.NAMESPACE, prefix = "")
-        },
-        namespace = MonitoringConstants.NAMESPACE
+    elementFormDefault = XmlNsForm.QUALIFIED,
+    xmlns = {
+        @XmlNs(namespaceURI = MonitoringConstants.EXTENSION_NAMESPACE,
+               prefix = MonitoringConstants.EXTENSION_NAMESPACE_PREFIX),
+        @XmlNs(namespaceURI = MonitoringConstants.NAMESPACE, prefix = "")
+    },
+    namespace = MonitoringConstants.NAMESPACE
 )
 package org.opendaylight.netconf.test.tool.monitoring;
 

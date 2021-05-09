@@ -53,8 +53,13 @@ import org.xml.sax.SAXException;
  */
 @Deprecated
 @Provider
-@Produces({ Draft02.MediaTypes.API + RestconfService.XML, Draft02.MediaTypes.DATA + RestconfService.XML,
-        Draft02.MediaTypes.OPERATION + RestconfService.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+@Produces({
+    Draft02.MediaTypes.API + RestconfService.XML,
+    Draft02.MediaTypes.DATA + RestconfService.XML,
+    Draft02.MediaTypes.OPERATION + RestconfService.XML,
+    MediaType.APPLICATION_XML,
+    MediaType.TEXT_XML
+})
 public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final XMLOutputFactory XML_FACTORY;

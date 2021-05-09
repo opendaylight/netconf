@@ -64,8 +64,12 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 @Provider
-@Consumes({ Draft02.MediaTypes.DATA + RestconfService.XML, Draft02.MediaTypes.OPERATION + RestconfService.XML,
-        MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+@Consumes({
+    Draft02.MediaTypes.DATA + RestconfService.XML,
+    Draft02.MediaTypes.OPERATION + RestconfService.XML,
+    MediaType.APPLICATION_XML,
+    MediaType.TEXT_XML
+})
 public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider
         implements MessageBodyReader<NormalizedNodeContext> {
 

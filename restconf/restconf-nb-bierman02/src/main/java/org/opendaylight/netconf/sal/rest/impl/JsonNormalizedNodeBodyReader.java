@@ -54,8 +54,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Provider
-@Consumes({ Draft02.MediaTypes.DATA + RestconfService.JSON, Draft02.MediaTypes.OPERATION + RestconfService.JSON,
-        MediaType.APPLICATION_JSON })
+@Consumes({
+    Draft02.MediaTypes.DATA + RestconfService.JSON,
+    Draft02.MediaTypes.OPERATION + RestconfService.JSON,
+    MediaType.APPLICATION_JSON
+})
 public class JsonNormalizedNodeBodyReader
         extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
 
