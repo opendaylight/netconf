@@ -17,7 +17,7 @@ public class PatchEntity {
     private final PatchEditOperation operation;
     private final String editId;
     private final YangInstanceIdentifier targetNode;
-    private final NormalizedNode<?,?> node;
+    private final NormalizedNode node;
 
     /**
      * Constructor to create PatchEntity for Patch operations which require value leaf representing data to be present.
@@ -27,7 +27,7 @@ public class PatchEntity {
      * @param node Data defined by value leaf used by edit operation
      */
     public PatchEntity(final String editId, final PatchEditOperation operation, final YangInstanceIdentifier targetNode,
-                       final NormalizedNode<?, ?> node) {
+                       final NormalizedNode node) {
         this.editId = requireNonNull(editId);
         this.operation = requireNonNull(operation);
         this.targetNode = requireNonNull(targetNode);
@@ -61,7 +61,7 @@ public class PatchEntity {
         return targetNode;
     }
 
-    public NormalizedNode<?, ?> getNode() {
+    public NormalizedNode getNode() {
         return node;
     }
 

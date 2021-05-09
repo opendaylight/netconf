@@ -417,7 +417,7 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testInvokeRpcWithInput() throws Exception {
-        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
+        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode)null);
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(MAKE_TOAST_QNAME),
             any(NormalizedNode.class));
 
@@ -440,7 +440,7 @@ public class JSONRestconfServiceImplTest {
 
     @Test
     public void testInvokeRpcWithNoInput() throws Exception {
-        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
+        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode)null);
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(any(QName.class), any());
 
         final String uriPath = "toaster:cancel-toast";

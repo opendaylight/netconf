@@ -26,10 +26,10 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.NormalizedMetadataWriter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -40,11 +40,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -137,7 +135,7 @@ public final class NetconfUtil {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized, final DOMResult result,
+    public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
                                            final SchemaPath schemaPath, final EffectiveModelContext context)
             throws IOException, XMLStreamException {
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
@@ -161,7 +159,7 @@ public final class NetconfUtil {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized,
+    public static void writeNormalizedNode(final NormalizedNode normalized,
                                            final @Nullable NormalizedMetadata metadata,
                                            final DOMResult result, final SchemaPath schemaPath,
                                            final EffectiveModelContext context) throws IOException, XMLStreamException {
@@ -357,17 +355,11 @@ public final class NetconfUtil {
             final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlCodecFactory codecs = XmlCodecFactory.create(mountContext);
-
-        // FIXME: we probably need to propagate MountPointContext here and not just the child nodes
-        final ContainerSchemaNode dataRead = new NodeContainerProxy(NETCONF_DATA_QNAME,
-            mountContext.getEffectiveModelContext().getChildNodes());
-        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead)) {
+        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, mountContext)) {
             xmlParserStream.traverse(value);
         }
         return resultHolder;
     }
-
 
     // FIXME: document this interface contract. Does it support RFC8528/RFC8542? How?
     public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final EffectiveModelContext schemaContext,
