@@ -9,7 +9,6 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,12 +23,14 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -48,7 +49,7 @@ abstract class AbstractEdit extends AbstractConfigOperation {
     }
 
     protected void parseIntoNormalizedNode(final DataSchemaNode schemaNode, final XmlElement element,
-                                         final NormalizedNodeStreamWriter writer) throws DocumentedException {
+                                           final NormalizedNodeStreamWriter writer) throws DocumentedException {
         if (!(schemaNode instanceof ContainerSchemaNode) && !(schemaNode instanceof ListSchemaNode)) {
             // This should never happen since any edit operation on any other node type
             // should not be possible nor makes sense
@@ -56,7 +57,8 @@ abstract class AbstractEdit extends AbstractConfigOperation {
             throw new UnsupportedOperationException("implement exception if parse fails");
         }
 
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext.getCurrentContext(), schemaNode);
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
+            schemaContext.getCurrentContext(), schemaNode.getPath()).toInference());
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
         } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
@@ -71,8 +73,8 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         try {
             // Returns module with newest revision since findModuleByNamespace returns a set of modules and we only
             // need the newest one
-            it = schemaContext.getCurrentContext().findModules(new URI(namespace)).iterator();
-        } catch (final URISyntaxException e) {
+            it = schemaContext.getCurrentContext().findModules(XMLNamespace.of(namespace)).iterator();
+        } catch (final IllegalArgumentException e) {
             throw new NetconfDocumentedException("Unable to create URI for namespace : " + namespace, e,
                 ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }

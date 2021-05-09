@@ -9,35 +9,32 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import java.io.FileNotFoundException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -54,13 +51,14 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -69,7 +67,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class InvokeRpcMethodTest {
@@ -96,8 +93,8 @@ public class InvokeRpcMethodTest {
 
         uriInfo = mock(UriInfo.class);
         final MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
-        map.put("prettyPrint", Collections.singletonList("true"));
-        when(uriInfo.getQueryParameters(any(Boolean.class))).thenReturn(map);
+        map.put("prettyPrint", List.of("true"));
+        doReturn(map).when(uriInfo).getQueryParameters(any(Boolean.class));
     }
 
     /**
@@ -108,18 +105,14 @@ public class InvokeRpcMethodTest {
     @Test
     @Ignore
     public void invokeRpcMethodTest() {
-        try {
-            controllerContext.findModuleNameByNamespace(new URI("invoke:rpc:module"));
-        } catch (final URISyntaxException e) {
-            assertTrue("Uri wasn't created sucessfuly", false);
-        }
+        controllerContext.findModuleNameByNamespace(XMLNamespace.of("invoke:rpc:module"));
 
         final NormalizedNodeContext payload = prepareDomPayload();
 
         final NormalizedNodeContext rpcResponse =
                 restconfImpl.invokeRpc("invoke-rpc-module:rpc-test", payload, uriInfo);
-        assertTrue(rpcResponse != null);
-        assertTrue(rpcResponse.getData() == null);
+        assertNotNull(rpcResponse);
+        assertNull(rpcResponse.getData());
 
     }
 
@@ -128,30 +121,29 @@ public class InvokeRpcMethodTest {
         final Module rpcModule = schema.findModules("invoke-rpc-module").iterator().next();
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "rpc-test");
-        final QName rpcInputQName = QName.create(rpcModule.getQNameModule(),"input");
         ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
+                rpcInputSchemaNode = rpc.getInput();
                 break;
             }
         }
         assertNotNull(rpcInputSchemaNode);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> container =
-                Builders.containerBuilder(rpcInputSchemaNode);
+                SchemaAwareBuilders.containerBuilder(rpcInputSchemaNode);
 
         final QName contQName = QName.create(rpcModule.getQNameModule(), "cont");
         final DataSchemaNode contSchemaNode = rpcInputSchemaNode.getDataChildByName(contQName);
         assertTrue(contSchemaNode instanceof ContainerSchemaNode);
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contNode =
-                Builders.containerBuilder((ContainerSchemaNode) contSchemaNode);
+                SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) contSchemaNode);
 
         final QName lfQName = QName.create(rpcModule.getQNameModule(), "lf");
         final DataSchemaNode lfSchemaNode = ((ContainerSchemaNode) contSchemaNode).getDataChildByName(lfQName);
         assertTrue(lfSchemaNode instanceof LeafSchemaNode);
         final LeafNode<Object> lfNode =
-                Builders.leafBuilder((LeafSchemaNode) lfSchemaNode).withValue("any value").build();
+                SchemaAwareBuilders.leafBuilder((LeafSchemaNode) lfSchemaNode).withValue("any value").build();
         contNode.withChild(lfNode);
         container.withChild(contNode.build());
 
@@ -164,26 +156,22 @@ public class InvokeRpcMethodTest {
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
 
         doReturn(immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("testExeption")))
-        .when(brokerFacade).invokeRpc(eq(qname), any());
+            .when(brokerFacade).invokeRpc(eq(qname), any());
 
-        try {
-            this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
-            fail("Expected an exception to be thrown.");
-        } catch (final RestconfDocumentedException e) {
-            verifyRestconfDocumentedException(e, 0, ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
-                    Optional.empty(), Optional.empty());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+        verifyRestconfDocumentedException(ex, 0, ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
+            Optional.empty(), Optional.empty());
     }
 
     void verifyRestconfDocumentedException(final RestconfDocumentedException restDocumentedException, final int index,
             final ErrorType expErrorType, final ErrorTag expErrorTag, final Optional<String> expErrorMsg,
             final Optional<String> expAppTag) {
-        RestconfError actual = null;
-        try {
-            actual = restDocumentedException.getErrors().get(index);
-        } catch (final ArrayIndexOutOfBoundsException ex) {
-            fail("RestconfError not found at index " + index);
-        }
+
+        final List<RestconfError> errors = restDocumentedException.getErrors();
+        assertTrue("RestconfError not found at index " + index, errors.size() > index);
+
+        RestconfError actual = errors.get(index);
 
         assertEquals("getErrorType", expErrorType, actual.getErrorType());
         assertEquals("getErrorTag", expErrorTag, actual.getErrorTag());
@@ -209,20 +197,17 @@ public class InvokeRpcMethodTest {
         final QName path = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(path), any());
 
-        try {
-            this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
-            fail("Expected an exception to be thrown.");
-        } catch (final RestconfDocumentedException e) {
-            verifyRestconfDocumentedException(e, 0, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, Optional.of("foo"),
-                    Optional.empty());
-            verifyRestconfDocumentedException(e, 1, ErrorType.RPC, ErrorTag.IN_USE, Optional.of("bar"),
-                    Optional.of("app-tag"));
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+        verifyRestconfDocumentedException(ex, 0, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, Optional.of("foo"),
+            Optional.empty());
+        verifyRestconfDocumentedException(ex, 1, ErrorType.RPC, ErrorTag.IN_USE, Optional.of("bar"),
+            Optional.of("app-tag"));
     }
 
     @Test
     public void testInvokeRpcWithNoPayload_Success() {
-        final NormalizedNode<?, ?> resultObj = null;
+        final NormalizedNode resultObj = null;
         final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
@@ -238,33 +223,25 @@ public class InvokeRpcMethodTest {
 
     @Test
     public void testInvokeRpcWithEmptyOutput() {
-        final ContainerNode resultObj = Mockito.mock(ContainerNode.class);
-        Mockito.when(resultObj.getValue()).thenReturn(Collections.emptySet());
+        final ContainerNode resultObj = mock(ContainerNode.class);
+        doReturn(Set.of()).when(resultObj).body();
+        doCallRealMethod().when(resultObj).isEmpty();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(qname), any());
 
-        WebApplicationException exceptionToBeThrown = null;
-        try {
-            this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
-        } catch (final WebApplicationException exception) {
-            exceptionToBeThrown = exception;
-
-        }
-        Assert.assertNotNull("WebApplicationException with status code 204 is expected.", exceptionToBeThrown);
-        Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), exceptionToBeThrown.getResponse().getStatus());
+        WebApplicationException exceptionToBeThrown = assertThrows(WebApplicationException.class,
+            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), exceptionToBeThrown.getResponse().getStatus());
     }
 
     @Test
     public void testInvokeRpcMethodWithBadMethodName() {
-        try {
-            this.restconfImpl.invokeRpc("toaster:bad-method", null, uriInfo);
-            fail("Expected an exception");
-        } catch (final RestconfDocumentedException e) {
-            verifyRestconfDocumentedException(e, 0, ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT,
-                    Optional.empty(), Optional.empty());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> this.restconfImpl.invokeRpc("toaster:bad-method", null, uriInfo));
+        verifyRestconfDocumentedException(ex, 0, ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT,
+            Optional.empty(), Optional.empty());
     }
 
     @Test
@@ -276,13 +253,12 @@ public class InvokeRpcMethodTest {
         final Module rpcModule = schemaContext.findModules("toaster").iterator().next();
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "make-toast");
-        final QName rpcInputQName = QName.create(rpcModule.getQNameModule(),"input");
 
         RpcDefinition rpcDef = null;
         ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
+                rpcInputSchemaNode = rpc.getInput();
                 rpcDef = rpc;
                 break;
             }
@@ -291,7 +267,7 @@ public class InvokeRpcMethodTest {
         assertNotNull(rpcDef);
         assertNotNull(rpcInputSchemaNode);
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
-                Builders.containerBuilder(rpcInputSchemaNode);
+                SchemaAwareBuilders.containerBuilder(rpcInputSchemaNode);
 
         final NormalizedNodeContext payload =
                 new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode,
@@ -308,13 +284,10 @@ public class InvokeRpcMethodTest {
 
     @Test
     public void testThrowExceptionWhenSlashInModuleName() {
-        try {
-            this.restconfImpl.invokeRpc("toaster/slash", null, uriInfo);
-            fail("Expected an exception.");
-        } catch (final RestconfDocumentedException e) {
-            verifyRestconfDocumentedException(e, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    Optional.empty(), Optional.empty());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> this.restconfImpl.invokeRpc("toaster/slash", null, uriInfo));
+        verifyRestconfDocumentedException(ex, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            Optional.empty(), Optional.empty());
     }
 
     @Test
@@ -329,7 +302,7 @@ public class InvokeRpcMethodTest {
         ContainerLike rpcOutputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcOutputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcOutputQName);
+                rpcOutputSchemaNode = rpc.getOutput();
                 rpcDef = rpc;
                 break;
             }
@@ -337,12 +310,12 @@ public class InvokeRpcMethodTest {
         assertNotNull(rpcDef);
         assertNotNull(rpcOutputSchemaNode);
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
-                Builders.containerBuilder(rpcOutputSchemaNode);
+                SchemaAwareBuilders.containerBuilder(rpcOutputSchemaNode);
         final DataSchemaNode leafSchema = rpcOutputSchemaNode
                 .getDataChildByName(QName.create(rpcModule.getQNameModule(), "textOut"));
         assertTrue(leafSchema instanceof LeafSchemaNode);
         final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
-                Builders.leafBuilder((LeafSchemaNode) leafSchema);
+                SchemaAwareBuilders.leafBuilder((LeafSchemaNode) leafSchema);
         leafBuilder.withValue("brm");
         containerBuilder.withChild(leafBuilder.build());
         final ContainerNode container = containerBuilder.build();
@@ -366,7 +339,7 @@ public class InvokeRpcMethodTest {
      * invoked.
      */
     @Test
-    @Ignore // FIXME find how to use mockito for it
     public void testMountedRpcCallNoPayload_Success() throws Exception {
+        // FIXME find how to use mockito for it
     }
 }

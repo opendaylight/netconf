@@ -7,16 +7,16 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.InetSocketAddress;
-import java.util.Collections;
+import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,8 +33,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableAnyXmlNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
@@ -53,7 +51,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
 
     @Before
     public void setUp() throws Exception {
-        final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Collections.emptySet());
+        final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Set.of());
         final FluentFuture<DOMRpcResult> response = FluentFutures.immediateFluentFuture(value);
         doReturn(response).when(service).invokeRpc(any(QName.class), any(ContainerNode.class));
 
@@ -65,14 +63,14 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
     public void testGetSource() throws Exception {
         final SourceIdentifier identifier = RevisionSourceIdentifier.create("test", Revision.of("2016-02-08"));
         final YangTextSchemaSource source = provider.getSource(identifier).get();
-        Assert.assertEquals(identifier, source.getIdentifier());
+        assertEquals(identifier, source.getIdentifier());
         verify(service).invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME,
                 NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest(identifier.getName(),
                     identifier.getRevision().map(Revision::toString))
         );
     }
 
-    private static NormalizedNode<?, ?> getNode() throws ParserConfigurationException {
+    private static ContainerNode getNode() throws ParserConfigurationException {
         final YangInstanceIdentifier.NodeIdentifier id = YangInstanceIdentifier.NodeIdentifier.create(
                 QName.create("urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring", "2010-10-04", "output")
         );
@@ -82,9 +80,12 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         Document xmlDoc = UntrustedXML.newDocumentBuilder().newDocument();
         Element root = xmlDoc.createElement("data");
         root.setTextContent("module test {}");
-        final DOMSource v = new DOMSource(root);
-        DataContainerChild<?, ?> child =
-                ImmutableAnyXmlNodeBuilder.create().withNodeIdentifier(childId).withValue(v).build();
-        return ImmutableContainerNodeBuilder.create().withNodeIdentifier(id).withChild(child).build();
+        return ImmutableContainerNodeBuilder.create()
+            .withNodeIdentifier(id)
+            .withChild(ImmutableAnyXmlNodeBuilder.create()
+                .withNodeIdentifier(childId)
+                .withValue(new DOMSource(root))
+                .build())
+            .build();
     }
 }

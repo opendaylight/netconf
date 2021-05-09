@@ -40,11 +40,12 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
+import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,15 +76,16 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final SchemaNode parentSchema;
+        final EffectiveStatementInference parentSchema;
         if (isPost) {
-            parentSchema = path.getSchemaNode();
+            parentSchema = SchemaInferenceStack.ofInstantiatedPath(path.getSchemaContext(),
+                path.getSchemaNode().getPath()).toInference();
         } else if (path.getSchemaNode() instanceof SchemaContext
             || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
-            parentSchema = path.getSchemaContext();
+            parentSchema = SchemaInferenceStack.of(path.getSchemaContext()).toInference();
         } else {
-            parentSchema = SchemaContextUtil
-                    .findDataSchemaNode(path.getSchemaContext(), path.getSchemaNode().getPath().getParent());
+            parentSchema = SchemaInferenceStack.ofInstantiatedPath(path.getSchemaContext(),
+                path.getSchemaNode().getPath().getParent()).toInference();
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
@@ -92,21 +94,21 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final JsonReader reader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
         jsonParser.parse(reader);
 
-        NormalizedNode<?, ?> result = resultHolder.getResult();
+        NormalizedNode result = resultHolder.getResult();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> newIIContext;
 
         while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
-            final Object childNode = ((DataContainerNode<?>) result).getValue().iterator().next();
+            final Object childNode = ((DataContainerNode) result).body().iterator().next();
             if (isPost) {
                 iiToDataList.add(result.getIdentifier());
             }
-            result = (NormalizedNode<?, ?>) childNode;
+            result = (NormalizedNode) childNode;
         }
 
         if (isPost) {
             if (result instanceof MapEntryNode) {
-                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getNodeType()));
+                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getIdentifier().getNodeType()));
                 iiToDataList.add(result.getIdentifier());
             } else {
                 if (!(parentSchema instanceof OperationDefinition)) {
@@ -115,7 +117,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
             }
         } else {
             if (result instanceof MapNode) {
-                result = Iterables.getOnlyElement(((MapNode) result).getValue());
+                result = Iterables.getOnlyElement(((MapNode) result).body());
             }
         }
 

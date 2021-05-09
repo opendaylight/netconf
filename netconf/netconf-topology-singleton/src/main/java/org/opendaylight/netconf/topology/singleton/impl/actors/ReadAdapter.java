@@ -48,9 +48,9 @@ class ReadAdapter {
 
     private void read(final YangInstanceIdentifier path, final LogicalDatastoreType store, final ActorRef sender,
                       final ActorRef self) {
-        tx.read(store, path).addCallback(new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
+        tx.read(store, path).addCallback(new FutureCallback<Optional<NormalizedNode>>() {
             @Override
-            public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
+            public void onSuccess(final Optional<NormalizedNode> result) {
                 if (result.isEmpty()) {
                     sender.tell(new EmptyReadResponse(), self);
                     return;

@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.handlers;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Throwables;
-import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
@@ -30,9 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.mo
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
@@ -102,12 +99,11 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
         return schemaContext;
     }
 
-    private void putData(
-            final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode) {
+    private void putData(final ContainerNode normNode) {
         final DOMTransactionChain transactionChain = this.transactionChainHandler.get();
         final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
         wTx.put(LogicalDatastoreType.OPERATIONAL,
-                YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getNodeType())), normNode);
+                YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getIdentifier().getNodeType())), normNode);
         try {
             wTx.commit().get();
         } catch (InterruptedException e) {

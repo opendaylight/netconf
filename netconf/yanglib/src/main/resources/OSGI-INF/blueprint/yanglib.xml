@@ -17,7 +17,7 @@
   <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
   <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
   <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
-  <reference id="parserFactory" interface="org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory" />
+  <reference id="parserFactory" interface="org.opendaylight.yangtools.yang.parser.api.YangParserFactory" />
 
   <bean id="yangLibProvider" class="org.opendaylight.yanglib.impl.YangLibProvider"
           init-method="init" destroy-method="close">

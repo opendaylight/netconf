@@ -203,13 +203,13 @@ public class ProxyReadWriteTransactionTest {
     public void testRead() throws Exception {
         ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> read = tx.read(STORE, PATH);
+        final ListenableFuture<Optional<NormalizedNode>> read = tx.read(STORE, PATH);
         final ReadRequest readRequest = masterActor.expectMsgClass(ReadRequest.class);
         assertEquals(STORE, readRequest.getStore());
         assertEquals(PATH, readRequest.getPath());
 
         masterActor.reply(new NormalizedNodeMessage(PATH, node));
-        final Optional<NormalizedNode<?, ?>> result = read.get(5, TimeUnit.SECONDS);
+        final Optional<NormalizedNode> result = read.get(5, TimeUnit.SECONDS);
         assertTrue(result.isPresent());
         assertEquals(node, result.get());
     }
@@ -218,10 +218,10 @@ public class ProxyReadWriteTransactionTest {
     public void testReadEmpty() throws Exception {
         ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> read = tx.read(STORE, PATH);
+        final ListenableFuture<Optional<NormalizedNode>> read = tx.read(STORE, PATH);
         masterActor.expectMsgClass(ReadRequest.class);
         masterActor.reply(new EmptyReadResponse());
-        final Optional<NormalizedNode<?, ?>> result = read.get(5, TimeUnit.SECONDS);
+        final Optional<NormalizedNode> result = read.get(5, TimeUnit.SECONDS);
         assertFalse(result.isPresent());
     }
 
@@ -229,7 +229,7 @@ public class ProxyReadWriteTransactionTest {
     public void testReadFailure() throws InterruptedException, TimeoutException {
         ProxyReadWriteTransaction tx = newSuccessfulProxyTx();
 
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> read = tx.read(STORE, PATH);
+        final ListenableFuture<Optional<NormalizedNode>> read = tx.read(STORE, PATH);
         masterActor.expectMsgClass(ReadRequest.class);
         final RuntimeException mockEx = new RuntimeException("fail");
         masterActor.reply(new Failure(mockEx));
@@ -327,7 +327,7 @@ public class ProxyReadWriteTransactionTest {
         ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, promise.future(),
                 system.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
 
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> read = tx.read(STORE, PATH);
+        final ListenableFuture<Optional<NormalizedNode>> read = tx.read(STORE, PATH);
         final ListenableFuture<Boolean> exists = tx.exists(STORE, PATH);
 
         tx.put(STORE, PATH, node);

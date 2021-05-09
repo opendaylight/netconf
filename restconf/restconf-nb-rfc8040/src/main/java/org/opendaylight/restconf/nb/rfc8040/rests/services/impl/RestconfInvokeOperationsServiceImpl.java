@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import java.net.URI;
 import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
@@ -29,6 +28,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOpe
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -55,7 +55,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final EffectiveModelContext refSchemaCtx = this.schemaContextHandler.get();
         final QName schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
+        final XMLNamespace namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
 
         final DOMRpcResult response;
         final EffectiveModelContext schemaContextRef;
@@ -79,13 +79,13 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final DOMRpcResult result = RestconfInvokeOperationsUtil.checkResponse(response);
 
         RpcDefinition resultNodeSchema = null;
-        NormalizedNode<?, ?> resultData = null;
+        NormalizedNode resultData = null;
         if (result != null && result.getResult() != null) {
             resultData = result.getResult();
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
         }
 
-        if (resultData != null && ((ContainerNode) resultData).getValue().isEmpty()) {
+        if (resultData != null && ((ContainerNode) resultData).isEmpty()) {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         } else {
             return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint,

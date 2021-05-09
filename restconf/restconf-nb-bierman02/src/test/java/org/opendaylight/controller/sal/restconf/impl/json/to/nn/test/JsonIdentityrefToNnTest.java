@@ -46,11 +46,9 @@ public class JsonIdentityrefToNnTest extends AbstractBodyReaderTest {
         final NormalizedNodeContext normalizedNodeContext = this.jsonBodyReader.readFrom(
                 null, null, null, this.mediaType, null, inputStream);
 
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
 
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
 
         assertTrue(dataTree.contains("cont1"));
         assertTrue(dataTree
@@ -67,5 +65,4 @@ public class JsonIdentityrefToNnTest extends AbstractBodyReaderTest {
     protected MediaType getMediaType() {
         return null;
     }
-
 }

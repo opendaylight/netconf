@@ -63,7 +63,7 @@ public abstract class RestconfStrategy {
      * @param path the data object path
      * @return a ListenableFuture containing the result of the read
      */
-    public abstract ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+    public abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
         YangInstanceIdentifier path);
 
     /**
@@ -74,7 +74,7 @@ public abstract class RestconfStrategy {
      * @param fields paths to selected fields relative to parent path
      * @return a ListenableFuture containing the result of the read
      */
-    public abstract ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+    public abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store,
             YangInstanceIdentifier path, List<YangInstanceIdentifier> fields);
 
     /**
