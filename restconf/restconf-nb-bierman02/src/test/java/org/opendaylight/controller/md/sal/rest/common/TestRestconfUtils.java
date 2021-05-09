@@ -114,7 +114,7 @@ public final class TestRestconfUtils {
         final InputStream inputStream = TestJsonBodyWriter.class.getResourceAsStream(pathToInputFile);
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
-            final NormalizedNode<?, ?> nn = parse(iiContext, doc);
+            final NormalizedNode nn = parse(iiContext, doc);
             return new NormalizedNodeContext(iiContext, nn);
         } catch (final Exception e) {
             LOG.error("Load xml file " + pathToInputFile + " fail.", e);
@@ -122,7 +122,7 @@ public final class TestRestconfUtils {
         return null;
     }
 
-    private static NormalizedNode<?, ?> parse(final InstanceIdentifierContext<?> iiContext, final Document doc)
+    private static NormalizedNode parse(final InstanceIdentifierContext<?> iiContext, final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = iiContext.getSchemaNode();
         DataSchemaNode schemaNode = null;
