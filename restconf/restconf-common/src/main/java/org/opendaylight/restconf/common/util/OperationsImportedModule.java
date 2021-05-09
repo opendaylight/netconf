@@ -10,9 +10,7 @@ package org.opendaylight.restconf.common.util;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -43,12 +41,12 @@ final class OperationsImportedModule extends AbstractOperationsModule {
 
     @Override
     public Collection<DataSchemaNode> getChildNodes() {
-        return Collections.emptySet();
+        return List.of();
     }
 
     @Override
-    public Optional<DataSchemaNode> findDataChildByName(final QName name) {
-        return Optional.empty();
+    public DataSchemaNode dataChildByName(final QName name) {
+        return null;
     }
 
     @Override
