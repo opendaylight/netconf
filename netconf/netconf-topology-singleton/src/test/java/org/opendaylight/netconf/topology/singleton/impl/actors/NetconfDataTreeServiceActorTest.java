@@ -56,7 +56,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import scala.concurrent.duration.Duration;
 
@@ -65,8 +66,9 @@ public class NetconfDataTreeServiceActorTest {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
-    static final NormalizedNode<?, ?> NODE = Builders.containerBuilder()
-        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont"))).build();
+    static final ContainerNode NODE = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
+        .build();
 
     private static ActorSystem system = ActorSystem.apply();
 

@@ -56,26 +56,26 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path) {
         LOG.debug("{}: Get {} {} - failure", id, OPERATIONAL, path, failure);
         return readFailed("get");
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: Get {} {} with fields {} - failure", id, OPERATIONAL, path, fields, failure);
         return readFailed("get");
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path) {
         LOG.debug("{}: GetConfig {} {} - failure", id, CONFIGURATION, path, failure);
         return readFailed("getConfig");
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: GetConfig {} {} with fields {} - failure", id, CONFIGURATION, path, fields, failure);
         return readFailed("getConfig");
@@ -83,7 +83,7 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Merge {} {} - failure", id, store, path, failure);
         return serviceFailed("merge");
@@ -91,7 +91,7 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Replace {} {} - failure", id, store, path, failure);
         return serviceFailed("replace");
@@ -99,7 +99,7 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Create {} {} - failure", id, store, path, failure);
         return serviceFailed("create");

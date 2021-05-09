@@ -8,13 +8,13 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import java.util.Map;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointChild;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContextFactory;
 import org.opendaylight.yangtools.rfc8528.data.api.YangLibraryConstants.ContainerName;
+import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.parser.api.YangParserException;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 
 // TODO: this should really come from mdsal-yanglib-rfc8525
 final class NetconfMountPointContextFactory implements MountPointContextFactory {

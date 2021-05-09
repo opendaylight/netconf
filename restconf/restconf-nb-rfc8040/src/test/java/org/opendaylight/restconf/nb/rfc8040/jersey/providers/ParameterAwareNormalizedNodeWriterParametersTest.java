@@ -49,47 +49,40 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
 
     private NodeIdentifier containerNodeIdentifier;
     private NodeIdentifier leafSetNodeIdentifier;
-    private NodeWithValue<?> leafSetEntryNodeIdentifier;
-    private NodeIdentifier rootDataContainerIdentifier;
+    private NodeWithValue<String> leafSetEntryNodeIdentifier;
 
-    private Collection<DataContainerChild<?, ?>> containerNodeValue;
+    private Collection<DataContainerChild> containerNodeValue;
     private Collection<LeafSetEntryNode<String>> leafSetNodeValue;
     private String leafSetEntryNodeValue;
-    private Collection<DataContainerChild<?, ?>> rootDataContainerValue;
+    private Collection<DataContainerChild> rootDataContainerValue;
 
     @Before
     public void setUp() {
         // identifiers
         containerNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "container"));
         Mockito.when(containerNodeData.getIdentifier()).thenReturn(containerNodeIdentifier);
-        Mockito.when(containerNodeData.getNodeType()).thenReturn(containerNodeIdentifier.getNodeType());
 
         final QName leafSetEntryNodeQName = QName.create("namespace", "leaf-set-entry");
         leafSetEntryNodeValue = "leaf-set-value";
         leafSetEntryNodeIdentifier = new NodeWithValue<>(leafSetEntryNodeQName, leafSetEntryNodeValue);
         Mockito.when(leafSetEntryNodeData.getIdentifier()).thenReturn(leafSetEntryNodeIdentifier);
-        Mockito.when(leafSetEntryNodeData.getNodeType()).thenReturn(leafSetEntryNodeIdentifier.getNodeType());
-        Mockito.when(leafSetEntryNodeData.getNodeType()).thenReturn(leafSetEntryNodeQName);
 
         leafSetNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "leaf-set"));
         Mockito.when(leafSetNodeData.getIdentifier()).thenReturn(leafSetNodeIdentifier);
-        Mockito.when(leafSetNodeData.getNodeType()).thenReturn(leafSetNodeIdentifier.getNodeType());
-
-        rootDataContainerIdentifier = NodeIdentifier.create(
-                QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data"));
-        Mockito.when(rootDataContainerData.getNodeType()).thenReturn(rootDataContainerIdentifier.getNodeType());
 
         // values
-        Mockito.when(leafSetEntryNodeData.getValue()).thenReturn(leafSetEntryNodeValue);
+        Mockito.when(leafSetEntryNodeData.body()).thenReturn(leafSetEntryNodeValue);
 
         leafSetNodeValue = Collections.singletonList(leafSetEntryNodeData);
-        Mockito.when(leafSetNodeData.getValue()).thenReturn(leafSetNodeValue);
+        Mockito.when(leafSetNodeData.body()).thenReturn(leafSetNodeValue);
 
         containerNodeValue = Collections.singleton(leafSetNodeData);
-        Mockito.when(containerNodeData.getValue()).thenReturn(containerNodeValue);
+        Mockito.when(containerNodeData.body()).thenReturn(containerNodeValue);
 
         rootDataContainerValue = Collections.singleton(leafSetNodeData);
-        Mockito.when(rootDataContainerData.getValue()).thenReturn(rootDataContainerValue);
+        Mockito.when(rootDataContainerData.getIdentifier()).thenReturn(NodeIdentifier.create(
+            QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data")));
+        Mockito.when(rootDataContainerData.body()).thenReturn(rootDataContainerValue);
     }
 
     /**

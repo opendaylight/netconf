@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev131019.restconf.restconf.modules;
 
 import static org.junit.Assert.assertEquals;
@@ -16,7 +15,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev131019.restconf.restconf.modules.Module.Revision;
 
 public class RevisionBuilderTest {
-
     @Test
     public void testEmptyString() {
         final RevisionBuilder revisionBuilder = new RevisionBuilder();
@@ -42,7 +40,7 @@ public class RevisionBuilderTest {
         RevisionBuilder.getDefaultInstance("badFormat");
     }
 
-    private void validate(final Revision revisionUnderTest, final String expectedRevisionString,
+    private static void validate(final Revision revisionUnderTest, final String expectedRevisionString,
             final RevisionIdentifier expectedRevisionIdentifier) {
         assertNotNull(revisionUnderTest);
         assertEquals(expectedRevisionString, revisionUnderTest.getString());

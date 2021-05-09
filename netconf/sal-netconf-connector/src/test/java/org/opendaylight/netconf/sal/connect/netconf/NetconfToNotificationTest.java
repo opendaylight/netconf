@@ -9,9 +9,9 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Iterables;
 import java.io.InputStream;
 import java.util.Collection;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -62,12 +62,12 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
         return context;
     }
 
-    @Test(expected =  IllegalArgumentException.class)
+    @Test
     public void testMostRecentWrongYangModel() throws Exception {
         final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), true);
         messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true,
             BASE_SCHEMAS.getBaseSchema());
-        messageTransformer.toNotification(userNotification);
+        assertThrows(IllegalArgumentException.class, () -> messageTransformer.toNotification(userNotification));
     }
 
     @Test
@@ -78,8 +78,8 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
         final DOMNotification domNotification = messageTransformer.toNotification(userNotification);
         final ContainerNode root = domNotification.getBody();
         assertNotNull(root);
-        assertEquals(6, Iterables.size(root.getValue()));
-        assertEquals("user-visited-page", root.getNodeType().getLocalName());
+        assertEquals(6, root.body().size());
+        assertEquals("user-visited-page", root.getIdentifier().getNodeType().getLocalName());
         assertEquals(NetconfNotification.RFC3339_DATE_PARSER.apply("2015-10-23T09:42:27.67175+00:00").toInstant(),
                 ((DOMEvent) domNotification).getEventInstant());
     }

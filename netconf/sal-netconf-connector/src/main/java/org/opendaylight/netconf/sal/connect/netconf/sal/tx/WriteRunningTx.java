@@ -83,9 +83,8 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     @Override
-    protected void editConfig(final YangInstanceIdentifier path,
-                              final Optional<NormalizedNode<?, ?>> data,
-                              final DataContainerChild<?, ?> editStructure,
+    protected void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode> data,
+                              final DataContainerChild editStructure,
                               final Optional<ModifyAction> defaultOperation,
                               final String operation) {
         changes.add(new Change(editStructure, defaultOperation));
@@ -101,10 +100,10 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     private static final class Change {
 
-        private final DataContainerChild<?, ?> editStructure;
+        private final DataContainerChild editStructure;
         private final Optional<ModifyAction> defaultOperation;
 
-        Change(final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation) {
+        Change(final DataContainerChild editStructure, final Optional<ModifyAction> defaultOperation) {
             this.editStructure = editStructure;
             this.defaultOperation = defaultOperation;
         }

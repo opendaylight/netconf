@@ -18,7 +18,6 @@ import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +51,7 @@ import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
@@ -72,11 +72,10 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -231,32 +230,26 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return this.globalSchema.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
-    public Module findModuleByName(final DOMMountPoint mountPoint, final String moduleName) {
+    public static Module findModuleByName(final DOMMountPoint mountPoint, final String moduleName) {
         checkArgument(moduleName != null && mountPoint != null);
 
-        final SchemaContext mountPointSchema = getModelContext(mountPoint);
-        if (mountPointSchema == null) {
-            return null;
-        }
-
-        return mountPointSchema.findModules(moduleName).stream().findFirst().orElse(null);
+        final EffectiveModelContext mountPointSchema = getModelContext(mountPoint);
+        return mountPointSchema == null ? null
+            : mountPointSchema.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
-    public Module findModuleByNamespace(final URI namespace) {
+    public Module findModuleByNamespace(final XMLNamespace namespace) {
         checkPreconditions();
         checkArgument(namespace != null);
         return this.globalSchema.findModules(namespace).stream().findFirst().orElse(null);
     }
 
-    public Module findModuleByNamespace(final DOMMountPoint mountPoint, final URI namespace) {
+    public static Module findModuleByNamespace(final DOMMountPoint mountPoint, final XMLNamespace namespace) {
         checkArgument(namespace != null && mountPoint != null);
 
-        final SchemaContext mountPointSchema = getModelContext(mountPoint);
-        if (mountPointSchema == null) {
-            return null;
-        }
-
-        return mountPointSchema.findModules(namespace).stream().findFirst().orElse(null);
+        final EffectiveModelContext mountPointSchema = getModelContext(mountPoint);
+        return mountPointSchema == null ? null
+            : mountPointSchema.findModules(namespace).stream().findFirst().orElse(null);
     }
 
     public Module findModuleByNameAndRevision(final String name, final Revision revision) {
@@ -271,7 +264,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         checkPreconditions();
         checkArgument(name != null && revision != null && mountPoint != null);
 
-        final SchemaContext schemaContext = getModelContext(mountPoint);
+        final EffectiveModelContext schemaContext = getModelContext(mountPoint);
         return schemaContext == null ? null : schemaContext.findModule(name, revision).orElse(null);
     }
 
@@ -302,7 +295,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         final StringBuilder builder = new StringBuilder();
         final PathArgument head = elements.iterator().next();
         final QName startQName = head.getNodeType();
-        final SchemaContext schemaContext;
+        final EffectiveModelContext schemaContext;
         if (mount != null) {
             schemaContext = getModelContext(mount);
         } else {
@@ -327,24 +320,24 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return builder.toString();
     }
 
-    public String findModuleNameByNamespace(final URI namespace) {
+    public String findModuleNameByNamespace(final XMLNamespace namespace) {
         checkPreconditions();
 
         final Module module = this.findModuleByNamespace(namespace);
         return module == null ? null : module.getName();
     }
 
-    public String findModuleNameByNamespace(final DOMMountPoint mountPoint, final URI namespace) {
+    public String findModuleNameByNamespace(final DOMMountPoint mountPoint, final XMLNamespace namespace) {
         final Module module = this.findModuleByNamespace(mountPoint, namespace);
         return module == null ? null : module.getName();
     }
 
-    public URI findNamespaceByModuleName(final String moduleName) {
+    public XMLNamespace findNamespaceByModuleName(final String moduleName) {
         final Module module = this.findModuleByName(moduleName);
         return module == null ? null : module.getNamespace();
     }
 
-    public URI findNamespaceByModuleName(final DOMMountPoint mountPoint, final String moduleName) {
+    public XMLNamespace findNamespaceByModuleName(final DOMMountPoint mountPoint, final String moduleName) {
         final Module module = this.findModuleByName(mountPoint, moduleName);
         return module == null ? null : module.getNamespace();
     }
@@ -352,7 +345,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public Collection<? extends Module> getAllModules(final DOMMountPoint mountPoint) {
         checkPreconditions();
 
-        final SchemaContext schemaContext = mountPoint == null ? null : getModelContext(mountPoint);
+        final EffectiveModelContext schemaContext = mountPoint == null ? null : getModelContext(mountPoint);
         return schemaContext == null ? null : schemaContext.getModules();
     }
 
@@ -361,35 +354,24 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return this.globalSchema.getModules();
     }
 
-    private static CharSequence toRestconfIdentifier(final SchemaContext context, final QName qname) {
+    private static String toRestconfIdentifier(final EffectiveModelContext context, final QName qname) {
         final Module schema = context.findModule(qname.getModule()).orElse(null);
         return schema == null ? null : schema.getName() + ':' + qname.getLocalName();
     }
 
-    public CharSequence toRestconfIdentifier(final QName qname, final DOMMountPoint mount) {
-        final SchemaContext schema;
-        if (mount != null) {
-            schema = getModelContext(mount);
-        } else {
-            checkPreconditions();
-            schema = this.globalSchema;
-        }
-
-        return toRestconfIdentifier(schema, qname);
+    public String toRestconfIdentifier(final QName qname, final DOMMountPoint mountPoint) {
+        return mountPoint != null ? toRestconfIdentifier(getModelContext(mountPoint), qname)
+            : toRestconfIdentifier(qname);
     }
 
-    public CharSequence toRestconfIdentifier(final QName qname) {
+    public String toRestconfIdentifier(final QName qname) {
         checkPreconditions();
 
         return toRestconfIdentifier(this.globalSchema, qname);
     }
 
-    public CharSequence toRestconfIdentifier(final DOMMountPoint mountPoint, final QName qname) {
-        if (mountPoint == null) {
-            return null;
-        }
-
-        return toRestconfIdentifier(getModelContext(mountPoint), qname);
+    public static String toRestconfIdentifier(final DOMMountPoint mountPoint, final QName qname) {
+        return mountPoint == null ? null : toRestconfIdentifier(getModelContext(mountPoint), qname);
     }
 
     public Module getRestconfModule() {
@@ -743,7 +725,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
-            final String name, final URI namespace) {
+            final String name, final XMLNamespace namespace) {
         requireNonNull(namespace);
 
         final Iterable<DataSchemaNode> result = Iterables.filter(findInstanceDataChildrenByName(container, name),
@@ -792,12 +774,13 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             final DOMMountPoint mountPoint) {
         checkArgument(node instanceof LeafSchemaNode);
 
-        final SchemaContext schemaContext = mountPoint == null ? this.globalSchema : getModelContext(mountPoint);
+        final EffectiveModelContext schemaContext = mountPoint == null ? globalSchema : getModelContext(mountPoint);
         final String urlDecoded = urlPathArgDecode(requireNonNull(uriValue));
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaContextUtil.getBaseTypeForLeafRef((LeafrefTypeDefinition) baseType, schemaContext, node);
+            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, node.getPath())
+                .resolveLeafref((LeafrefTypeDefinition) baseType);
         }
         final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(typedef, mountPoint, this);
         Object decoded = codec.deserialize(urlDecoded);
@@ -846,7 +829,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return str.substring(idx + 1);
     }
 
-    private QName toQName(final SchemaContext schemaContext, final String name,
+    private QName toQName(final EffectiveModelContext schemaContext, final String name,
             final Optional<Revision> revisionDate) {
         checkPreconditions();
         final String module = toModuleName(name);
@@ -855,7 +838,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return m == null ? null : QName.create(m.getQNameModule(), node);
     }
 
-    private QName toQName(final SchemaContext schemaContext, final String name) {
+    private QName toQName(final EffectiveModelContext schemaContext, final String name) {
         checkPreconditions();
         final String module = toModuleName(name);
         final String node = toNodeName(name);

@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -165,7 +166,7 @@ public class NetconfDeviceTopologyAdapterTest {
                 .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
                 .node(netconfTestLeafQname).build();
 
-        NormalizedNode<?, ?> augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId)
+        NormalizedNode augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId)
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(netconfTestLeafQname)).build();
 
         DOMDataTreeWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
@@ -173,11 +174,11 @@ public class NetconfDeviceTopologyAdapterTest {
         wtx.commit().get(5, TimeUnit.SECONDS);
 
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
-        Optional<NormalizedNode<?, ?>> testNode = domDataBroker.newReadOnlyTransaction()
+        Optional<NormalizedNode> testNode = domDataBroker.newReadOnlyTransaction()
                 .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).get(2, TimeUnit.SECONDS);
 
-        assertEquals("Augmented node data should be still present after device update.", true, testNode.isPresent());
-        assertEquals("Augmented data should be the same as before update node.", dataTestId, testNode.get().getValue());
+        assertTrue("Augmented node data should be still present after device update.", testNode.isPresent());
+        assertEquals("Augmented data should be the same as before update node.", dataTestId, testNode.get().body());
 
         adapter.setDeviceAsFailed(null);
         testNode = domDataBroker.newReadOnlyTransaction()
@@ -185,7 +186,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         assertEquals("Augmented node data should be still present after device failed.", true, testNode.isPresent());
         assertEquals("Augmented data should be the same as before failed device.",
-                dataTestId, testNode.get().getValue());
+                dataTestId, testNode.get().body());
     }
 
     @Test
@@ -199,5 +200,4 @@ public class NetconfDeviceTopologyAdapterTest {
         verify(writeTx).delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
         verify(writeTx, times(2)).commit();
     }
-
 }

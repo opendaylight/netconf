@@ -53,7 +53,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
     }
 
     @Override
-    public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
+    public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
         LOG.trace("{}: Rpc operation invoked with schema type: {} and node: {}.", id, type, input);
 
         final NormalizedNodeMessage normalizedNodeMessage = input != null
