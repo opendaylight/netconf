@@ -71,7 +71,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.datastore.locks.lock.type.partial.lock.PartialLock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -79,17 +79,17 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -286,7 +286,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
         final DOMSource schemaContent = ((DOMSourceAnyxmlNode) ((ContainerNode) compositeNodeRpcResult.getResult())
-                .getValue().iterator().next()).getValue();
+                .body().iterator().next()).body();
         assertThat(schemaContent.getNode().getTextContent(),
                 CoreMatchers.containsString("Random YANG SCHEMA"));
     }
@@ -313,13 +313,13 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
 
-        final List<DataContainerChild<?, ?>> values = Lists.newArrayList(
+        final List<DataContainerChild> values = Lists.newArrayList(
                 NetconfRemoteSchemaYangSourceProvider
-                        .createGetSchemaRequest("module", Optional.of("2012-12-12")).getValue());
+                        .createGetSchemaRequest("module", Optional.of("2012-12-12")).body());
 
         final Map<QName, Object> keys = new HashMap<>();
-        for (final DataContainerChild<?, ?> value : values) {
-            keys.put(value.getNodeType(), value.getValue());
+        for (final DataContainerChild value : values) {
+            keys.put(value.getIdentifier().getNodeType(), value.body());
         }
 
         final NodeIdentifierWithPredicates identifierWithPredicates =
@@ -328,27 +328,27 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
         final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) ((ContainerNode) compositeNodeRpcResult.getResult())
-                .getChild(toId(NETCONF_DATA_QNAME)).get();
+                .findChildByArg(toId(NETCONF_DATA_QNAME)).get();
 
         NormalizedNodeResult nodeResult =
-                NetconfUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.getValue());
+                NetconfUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
         ContainerNode result = (ContainerNode) nodeResult.getResult();
-        final ContainerNode state = (ContainerNode) result.getChild(toId(NetconfState.QNAME)).get();
-        final ContainerNode schemas = (ContainerNode) state.getChild(toId(Schemas.QNAME)).get();
-        final MapNode schemaParent = (MapNode) schemas.getChild(toId(Schema.QNAME)).get();
-        assertEquals(1, Iterables.size(schemaParent.getValue()));
+        final ContainerNode state = (ContainerNode) result.findChildByArg(toId(NetconfState.QNAME)).get();
+        final ContainerNode schemas = (ContainerNode) state.findChildByArg(toId(Schemas.QNAME)).get();
+        final MapNode schemaParent = (MapNode) schemas.findChildByArg(toId(Schema.QNAME)).get();
+        assertEquals(1, Iterables.size(schemaParent.body()));
 
-        assertEquals(schemaNode, schemaParent.getValue().iterator().next());
+        assertEquals(schemaNode, schemaParent.body().iterator().next());
     }
 
     @Test
     public void testGetConfigLeafRequest() throws Exception {
-        final DataContainerChild<?, ?> filter = toFilterStructure(
+        final AnyxmlNode<?> filter = toFilterStructure(
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME), toId(Schema.QNAME),
                     NodeIdentifierWithPredicates.of(Schema.QNAME),
                     toId(QName.create(Schemas.QNAME, "version"))), SCHEMA);
 
-        final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
+        final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
@@ -373,10 +373,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testGetConfigRequest() throws Exception {
-        final DataContainerChild<?, ?> filter = toFilterStructure(
+        final AnyxmlNode<?> filter = toFilterStructure(
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME)), SCHEMA);
 
-        final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
+        final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
@@ -397,13 +397,13 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testEditConfigRequest() throws Exception {
-        final List<DataContainerChild<?, ?>> values = Lists.newArrayList(
+        final List<DataContainerChild> values = Lists.newArrayList(
                 NetconfRemoteSchemaYangSourceProvider
-                        .createGetSchemaRequest("module", Optional.of("2012-12-12")).getValue());
+                        .createGetSchemaRequest("module", Optional.of("2012-12-12")).body());
 
         final Map<QName, Object> keys = new HashMap<>();
-        for (final DataContainerChild<?, ?> value : values) {
-            keys.put(value.getNodeType(), value.getValue());
+        for (final DataContainerChild value : values) {
+            keys.put(value.getIdentifier().getNodeType(), value.body());
         }
 
         final NodeIdentifierWithPredicates identifierWithPredicates =
@@ -414,11 +414,11 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final YangInstanceIdentifier id = YangInstanceIdentifier.builder()
                 .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
                 .nodeWithKey(Schema.QNAME, keys).build();
-        final DataContainerChild<?, ?> editConfigStructure =
+        final DataContainerChild editConfigStructure =
                 createEditConfigStructure(BASE_SCHEMAS.getBaseSchemaWithNotifications().getEffectiveModelContext(), id,
                     Optional.empty(), Optional.ofNullable(schemaNode));
 
-        final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
+        final DataContainerChild target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 
         final ContainerNode wrap =
                 NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_QNAME, editConfigStructure, target);
@@ -455,7 +455,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testGetRequest() throws Exception {
 
         final QName capability = QName.create(Capabilities.QNAME, "capability");
-        final DataContainerChild<?, ?> filter = toFilterStructure(
+        final DataContainerChild filter = toFilterStructure(
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability),
                     new NodeWithValue<>(capability, "a:b:c")), SCHEMA);
 
@@ -481,7 +481,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(NetconfState.QNAME),
                 toId(Capabilities.QNAME),
                 toId(QName.create(Capabilities.QNAME, "capability")));
-        final DataContainerChild<?, ?> filter = toFilterStructure(path, SCHEMA);
+        final DataContainerChild filter = toFilterStructure(path, SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
 
@@ -504,7 +504,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(NetconfState.QNAME),
                 toId(Datastores.QNAME),
                 toId(QName.create(Datastores.QNAME, "datastore")));
-        final DataContainerChild<?, ?> filter = toFilterStructure(path, SCHEMA);
+        final DataContainerChild filter = toFilterStructure(path, SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
 
@@ -591,7 +591,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         List<PathArgument> nodeIdentifiers = List.of(NodeIdentifier.create(DEVICE_QNAME));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initInputAction(QName.create(DEVICE_QNAME, "start-at"), "now");
+        ContainerNode payload = initInputAction(QName.create(DEVICE_QNAME, "start-at"), "now");
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 START_DEVICE_PATH, domDataTreeIdentifier, payload);
 
@@ -611,7 +611,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initInputAction(QName.create(BOX_OUT_QNAME, "start-at"), "now");
+        ContainerNode payload = initInputAction(QName.create(BOX_OUT_QNAME, "start-at"), "now");
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 OPEN_BOXES_PATH, domDataTreeIdentifier, payload);
 
@@ -638,7 +638,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initEmptyInputAction(INTERFACE_QNAME);
+        ContainerNode payload = initEmptyInputAction(INTERFACE_QNAME);
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 ENABLE_INTERFACE_PATH, domDataTreeIdentifier, payload);
 
@@ -677,7 +677,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initEmptyInputAction(APPLICATION_QNAME);
+        ContainerNode payload = initEmptyInputAction(APPLICATION_QNAME);
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 KILL_SERVER_APP_PATH, domDataTreeIdentifier, payload);
 
@@ -722,11 +722,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        ImmutableLeafNodeBuilder<Byte> immutableLeafNodeBuilder = new ImmutableLeafNodeBuilder<>();
-        DataContainerChild<NodeIdentifier, Byte> build = immutableLeafNodeBuilder.withNodeIdentifier(
-                NodeIdentifier.create(barInputQname)).withValue(barInput).build();
-        NormalizedNode<?, ?> payload = ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
-                QName.create(barInputQname, "input"))).withChild(build).build();
+        ContainerNode payload = ImmutableContainerNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(QName.create(barInputQname, "input")))
+                .withChild(ImmutableNodes.leafNode(barInputQname, barInput))
+                .build();
 
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 XYZZY_BAR_PATH, domDataTreeIdentifier, payload);
@@ -754,7 +753,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(FOO_QNAME));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
-        NormalizedNode<?, ?> payload = initInputAction(fooInputQname, "test");
+        ContainerNode payload = initInputAction(fooInputQname, "test");
 
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 XYZZY_FOO_PATH, domDataTreeIdentifier, payload);
@@ -775,7 +774,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         nodeIdentifiers.add(NodeIdentifier.create(CONFLICT_CHOICE_QNAME));
         nodeIdentifiers.add(NodeIdentifier.create(CHOICE_CONT_QNAME));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
-        NormalizedNode<?, ?> payload = initEmptyInputAction(CHOICE_ACTION_QNAME);
+        NormalizedNode payload = initEmptyInputAction(CHOICE_ACTION_QNAME);
 
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 CHOICE_ACTION_PATH, domDataTreeIdentifier, payload);
@@ -801,7 +800,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initEmptyInputAction(INTERFACE_QNAME);
+        NormalizedNode payload = initEmptyInputAction(INTERFACE_QNAME);
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 DISABLE_INTERFACE_PATH, domDataTreeIdentifier, payload);
 
@@ -824,7 +823,6 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 DISABLE_QNAME.getNamespace().toString());
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void toActionResultTest() throws Exception {
         NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
@@ -837,8 +835,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertNotNull(actionResult);
         ContainerNode containerNode = actionResult.getOutput().get();
         assertNotNull(containerNode);
-        LeafNode<String> leaf = (LeafNode) containerNode.getValue().iterator().next();
-        assertEquals("now", leaf.getValue());
+        assertEquals("now", containerNode.body().iterator().next().body());
     }
 
     @Test
@@ -874,7 +871,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final YangInstanceIdentifier datastoresField = YangInstanceIdentifier.create(toId(Datastores.QNAME));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+        final AnyxmlNode<?> filterStructure = toFilterStructure(
             List.of(FieldsFilter.of(parentYiid, List.of(netconfStartTimeField, datastoresField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
@@ -906,7 +903,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+        final AnyxmlNode<?> filterStructure = toFilterStructure(
                 List.of(FieldsFilter.of(parentYiid,
                     List.of(capabilitiesField, capabilityField, datastoreField, locksFields))),
                 SCHEMA);
@@ -933,7 +930,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.create(toId(Capabilities.QNAME));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+        final AnyxmlNode<?> filterStructure = toFilterStructure(
                 List.of(FieldsFilter.of(parentYiid, List.of(capabilitiesField, YangInstanceIdentifier.empty()))),
                 SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
@@ -960,7 +957,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(QName.create(Schema.QNAME, "namespace").intern()));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+        final AnyxmlNode<?> filterStructure = toFilterStructure(
             List.of(FieldsFilter.of(parentYiid, List.of(versionField, identifierField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
@@ -1000,7 +997,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 QName.create(Locks.QNAME, "locked-by-session").intern());
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+        final AnyxmlNode<?> filterStructure = toFilterStructure(
             List.of(FieldsFilter.of(parentYiid, List.of(lockedTimeField, lockedBySessionField))),
             SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
@@ -1039,7 +1036,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(Session.QNAME), NodeIdentifierWithPredicates.of(Session.QNAME));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+        final AnyxmlNode<?> filterStructure = toFilterStructure(
                 List.of(FieldsFilter.of(parentYiid, List.of(datastoreListField, sessionListField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
@@ -1074,7 +1071,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 toId(QName.create(Session.QNAME, "transport").intern()));
 
         // building filter structure and NETCONF message
-        final DataContainerChild<?, ?> filterStructure = toFilterStructure(
+        final AnyxmlNode<?> filterStructure = toFilterStructure(
                 List.of(FieldsFilter.of(parentYiid, List.of(session1Field, session2TransportField))), SCHEMA);
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
                 NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
@@ -1136,17 +1133,16 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     private static ContainerNode initInputAction(final QName qname, final String value) {
-        ImmutableLeafNodeBuilder<String> immutableLeafNodeBuilder = new ImmutableLeafNodeBuilder<>();
-        DataContainerChild<NodeIdentifier, String> build = immutableLeafNodeBuilder.withNodeIdentifier(
-                NodeIdentifier.create(qname)).withValue(value).build();
-        ContainerNode data = ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
-                QName.create(qname, "input"))).withChild(build).build();
-        return data;
+        return ImmutableContainerNodeBuilder.create()
+            .withNodeIdentifier(NodeIdentifier.create(QName.create(qname, "input")))
+            .withChild(ImmutableNodes.leafNode(qname, value))
+            .build();
     }
 
     private static ContainerNode initEmptyInputAction(final QName qname) {
-        return ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
-                QName.create(qname, "input"))).build();
+        return ImmutableContainerNodeBuilder.create()
+            .withNodeIdentifier(NodeIdentifier.create(QName.create(qname, "input")))
+            .build();
     }
 
     private static void checkNode(final Node childServer, final String expectedLocalName, final String expectedNodeName,

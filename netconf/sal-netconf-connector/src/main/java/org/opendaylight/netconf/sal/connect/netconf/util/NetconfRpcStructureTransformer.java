@@ -16,6 +16,7 @@ import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -38,14 +39,13 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public Optional<NormalizedNode<?, ?>> selectFromDataStructure(
-            final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data,
+    public Optional<NormalizedNode> selectFromDataStructure(final DataContainerChild data,
             final YangInstanceIdentifier path) {
         if (data instanceof DOMSourceAnyxmlNode) {
             final NormalizedNodeResult node;
             try {
                 node = NetconfUtil.transformDOMSourceToNormalizedNode(mountContext,
-                    ((DOMSourceAnyxmlNode)data).getValue());
+                    ((DOMSourceAnyxmlNode)data).body());
                 return NormalizedNodes.findNode(node.getResult(), path.getPathArguments());
             } catch (final XMLStreamException | URISyntaxException | IOException | SAXException e) {
                 LOG.error("Cannot parse anyxml.", e);
@@ -57,7 +57,7 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode<?, ?>> data,
+    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode> data,
                                                          final YangInstanceIdentifier dataPath,
                                                          final Optional<ModifyAction> operation) {
         // FIXME: propagate MountPointContext
@@ -66,13 +66,13 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier path) {
+    public AnyxmlNode<?> toFilterStructure(final YangInstanceIdentifier path) {
         // FIXME: propagate MountPointContext
         return NetconfMessageTransformUtil.toFilterStructure(path, mountContext.getEffectiveModelContext());
     }
 
     @Override
-    public DataContainerChild<?, ?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
+    public AnyxmlNode<?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
         // FIXME: propagate MountPointContext
         return NetconfMessageTransformUtil.toFilterStructure(fieldsFilters, mountContext.getEffectiveModelContext());
     }

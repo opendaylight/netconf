@@ -29,7 +29,7 @@ public final class FieldsAwareReadOnlyTx extends AbstractReadOnlyTx implements N
     }
 
     @Override
-    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+    public FluentFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
         switch (store) {
             case CONFIGURATION:
@@ -44,13 +44,13 @@ public final class FieldsAwareReadOnlyTx extends AbstractReadOnlyTx implements N
         }
     }
 
-    private @NonNull FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(
+    private @NonNull FluentFuture<Optional<NormalizedNode>> readConfigurationData(
             final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
         return remapException(netconfOps.getConfigRunningData(
                 new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path), fields));
     }
 
-    private @NonNull FluentFuture<Optional<NormalizedNode<?, ?>>> readOperationalData(final YangInstanceIdentifier path,
+    private @NonNull FluentFuture<Optional<NormalizedNode>> readOperationalData(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         return remapException(netconfOps.getData(
                 new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path), fields));

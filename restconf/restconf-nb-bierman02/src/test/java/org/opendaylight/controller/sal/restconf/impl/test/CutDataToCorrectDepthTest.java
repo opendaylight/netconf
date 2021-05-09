@@ -48,17 +48,18 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
@@ -68,11 +69,11 @@ import org.slf4j.LoggerFactory;
 public class CutDataToCorrectDepthTest extends JerseyTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(JerseyTest.class);
-
-    private static NormalizedNode<?, ?> depth1Cont;
-    private static NormalizedNode<?, ?> depth2Cont1;
-    private NormalizedNode<?, ?> globalPayload;
     private static EffectiveModelContext schemaContextModules;
+    private static NormalizedNode depth1Cont;
+    private static NormalizedNode depth2Cont1;
+
+    private NormalizedNode globalPayload;
 
     private final ControllerContext controllerContext =
             TestRestconfUtils.newControllerContext(schemaContextModules, null);
@@ -88,7 +89,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
 
             final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
 
-            NormalizedNode<?, ?> data = null;
+            NormalizedNode data = null;
             if (identifier.equals("nested-module:depth1-cont/depth2-cont1")) {
                 data = depth2Cont1;
             } else if (identifier.equals("nested-module:depth1-cont")) {
@@ -216,7 +217,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         target(uri).request(mediaType).put(Entity.entity(responseStr, mediaType));
     }
 
-    private void verifyResponse(final NormalizedNode<?, ?> nodeData) throws WebApplicationException, IOException {
+    private void verifyResponse(final NormalizedNode nodeData) throws WebApplicationException, IOException {
         assertNotNull(this.globalPayload);
         assertEquals(this.globalPayload, nodeData);
         this.globalPayload = null;
@@ -236,10 +237,10 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         return Builders.leafBuilder().withNodeIdentifier(toIdentifier(localName)).withValue(value).build();
     }
 
-    private static ContainerNode container(final String localName, final DataContainerChild<?, ?>... children) {
+    private static ContainerNode container(final String localName, final DataContainerChild... children) {
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
                 Builders.containerBuilder();
-        for (final DataContainerChild<?, ?> child : children) {
+        for (final DataContainerChild child : children) {
             containerBuilder.withChild(child);
         }
         containerBuilder.withNodeIdentifier(toIdentifier(localName));
@@ -258,19 +259,18 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         return builder.build();
     }
 
-    private static UnkeyedListEntryNode unkeyedEntry(final String localName,
-                                                     final DataContainerChild<?, ?>... children) {
+    private static UnkeyedListEntryNode unkeyedEntry(final String localName, final DataContainerChild... children) {
         final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> builder =
                 Builders.unkeyedListEntryBuilder();
         builder.withNodeIdentifier(toIdentifier(localName));
-        for (final DataContainerChild<?, ?> child : children) {
+        for (final DataContainerChild child : children) {
             builder.withChild(child);
         }
         return builder.build();
     }
 
     private static MapNode mapNode(final String localName, final MapEntryNode... entryNodes) {
-        final CollectionNodeBuilder<MapEntryNode, MapNode> builder = Builders.mapBuilder();
+        final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder = Builders.mapBuilder();
         builder.withNodeIdentifier(toIdentifier(localName));
         for (final MapEntryNode mapEntryNode : entryNodes) {
             builder.withChild(mapEntryNode);
@@ -279,7 +279,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     private static MapEntryNode mapEntryNode(final String localName, final int keysNumber,
-                                             final DataContainerChild<?, ?>... children) {
+                                             final DataContainerChild... children) {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
                 Builders.mapEntryBuilder();
         final Map<QName, Object> keys = new HashMap<>();
@@ -288,15 +288,15 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         }
         builder.withNodeIdentifier(toIdentifier(localName, keys));
 
-        for (final DataContainerChild<?, ?> child : children) {
+        for (final DataContainerChild child : children) {
             builder.withChild(child);
         }
         return builder.build();
     }
 
     private static LeafSetNode<?> leafList(final String localName, final String... children) {
-        final ListNodeBuilder<Object, LeafSetEntryNode<Object>> builder = Builders.leafSetBuilder();
-        builder.withNodeIdentifier(toIdentifier(localName));
+        final ListNodeBuilder<Object, SystemLeafSetNode<Object>> builder = Builders.leafSetBuilder()
+            .withNodeIdentifier(toIdentifier(localName));
         for (final String child : children) {
             builder.withChild(Builders.leafSetEntryBuilder().withNodeIdentifier(toIdentifier(localName, child))
                     .withValue(child).build());

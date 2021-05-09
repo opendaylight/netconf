@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,11 +55,13 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -217,8 +218,8 @@ public class RestGetOperationTest extends JerseyTest {
         return YangInstanceIdentifier.create(parameters);
     }
 
-    private static QName newTestModuleQName(final String localPart) throws Exception {
-        return QName.create(URI.create("test:module"), Revision.of("2014-01-09"), localPart);
+    private static QName newTestModuleQName(final String localPart) {
+        return QName.create(XMLNamespace.of("test:module"), Revision.of("2014-01-09"), localPart);
     }
 
     @Test
@@ -232,7 +233,6 @@ public class RestGetOperationTest extends JerseyTest {
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getDataWithIdentityrefInURL() throws Exception {
         setControllerContext(schemaContextTestModule);
@@ -243,13 +243,15 @@ public class RestGetOperationTest extends JerseyTest {
                 newTestModuleQName("name"), "foo");
         final YangInstanceIdentifier iid = YangInstanceIdentifier.builder().node(newTestModuleQName("modules"))
                 .node(moduleQN).nodeWithKey(moduleQN, keyMap).build();
-        @SuppressWarnings("rawtypes")
-        final NormalizedNode data = ImmutableMapNodeBuilder.create().withNodeIdentifier(
-                new NodeIdentifier(moduleQN)).withChild(ImmutableNodes.mapEntryBuilder()
+        final MapNode data = ImmutableMapNodeBuilder.create()
+                .withNodeIdentifier(new NodeIdentifier(moduleQN))
+                .withChild(ImmutableNodes.mapEntryBuilder()
                     .withNodeIdentifier(NodeIdentifierWithPredicates.of(moduleQN, keyMap))
                     .withChild(ImmutableNodes.leafNode(newTestModuleQName("type"), newTestModuleQName("test-identity")))
                     .withChild(ImmutableNodes.leafNode(newTestModuleQName("name"), "foo"))
-                    .withChild(ImmutableNodes.leafNode(newTestModuleQName("data"), "bar")).build()).build();
+                    .withChild(ImmutableNodes.leafNode(newTestModuleQName("data"), "bar"))
+                    .build())
+                .build();
         when(brokerFacade.readConfigurationData(iid, null)).thenReturn(data);
 
         final String uri = "/config/test-module:modules/module/test-module:test-identity/foo";
