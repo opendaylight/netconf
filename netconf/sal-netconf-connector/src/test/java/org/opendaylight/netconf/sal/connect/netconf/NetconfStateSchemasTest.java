@@ -10,6 +10,8 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -28,7 +30,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -55,9 +56,8 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,18 +81,15 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     @Before
     public void setUp() throws Exception {
         schemaContext = BASE_SCHEMAS.getBaseSchemaWithNotifications().getEffectiveModelContext();
-        final DataSchemaNode schemasNode =
-                ((ContainerSchemaNode) schemaContext.findDataChildByName(NetconfState.QNAME).orElseThrow())
-                .findDataChildByName(Schemas.QNAME).orElseThrow();
 
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext, schemasNode, false);
+        final XmlParserStream xmlParser = XmlParserStream.create(writer,
+            SchemaInferenceStack.ofDataTreePath(schemaContext, NetconfState.QNAME, Schemas.QNAME).toInference(), false);
 
         xmlParser.parse(UntrustedXML.createXMLStreamReader(getClass().getResourceAsStream(
                 "/netconf-state.schemas.payload.xml")));
         compositeNodeSchemas = (ContainerNode) resultHolder.getResult();
-
     }
 
     @Test
@@ -137,7 +134,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
         final NetconfSessionPreferences caps = NetconfSessionPreferences.fromStrings(Collections.emptySet());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, caps, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
-        Assert.assertTrue(availableYangSchemasQNames.isEmpty());
+        assertTrue(availableYangSchemasQNames.isEmpty());
     }
 
     @Test
@@ -146,7 +143,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
                 immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("not available")));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
-        Assert.assertTrue(availableYangSchemasQNames.isEmpty());
+        assertTrue(availableYangSchemasQNames.isEmpty());
     }
 
     @Test
@@ -156,7 +153,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
             .invokeRpc(eq(NETCONF_GET_QNAME), any());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
-        Assert.assertTrue(availableYangSchemasQNames.isEmpty());
+        assertTrue(availableYangSchemasQNames.isEmpty());
     }
 
     @SuppressWarnings({ "checkstyle:IllegalThrows", "checkstyle:avoidHidingCauseException" })
@@ -190,9 +187,9 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
                 new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
         final NetconfStateSchemas.RemoteYangSchema schema3 =
                 new NetconfStateSchemas.RemoteYangSchema(Schemas.QNAME);
-        Assert.assertEquals(schema1, schema2);
-        Assert.assertEquals(schema2, schema1);
-        Assert.assertNotEquals(schema1, schema3);
-        Assert.assertNotEquals(schema2, schema3);
+        assertEquals(schema1, schema2);
+        assertEquals(schema2, schema1);
+        assertNotEquals(schema1, schema3);
+        assertNotEquals(schema2, schema3);
     }
 }

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,15 +27,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -52,47 +52,51 @@ public class CreateStreamUtilTest {
 
     @Test
     public void createStreamTest() {
-        this.payload = prepareDomPayload("create-data-change-event-subscription", "input", "toaster", "path");
+        this.payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster",
+            "path");
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
         assertEquals(result.getErrors(), Collections.emptyList());
-        final NormalizedNode<?, ?> testedNn = result.getResult();
+        final NormalizedNode testedNn = result.getResult();
         assertNotNull(testedNn);
-        final NormalizedNodeContext contextRef = prepareDomPayload("create-data-change-event-subscription", "output",
-                "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name");
+        final NormalizedNodeContext contextRef = prepareDomPayload("create-data-change-event-subscription",
+            RpcDefinition::getOutput,
+            "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name");
         assertEquals(contextRef.getData(), testedNn);
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void createStreamWrongValueTest() {
-        this.payload = prepareDomPayload("create-data-change-event-subscription", "input", "String value", "path");
+        this.payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput,
+            "String value", "path");
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
         assertEquals(result.getErrors(), Collections.emptyList());
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void createStreamWrongInputRpcTest() {
-        this.payload = prepareDomPayload("create-data-change-event-subscription2", "input", "toaster", "path2");
+        this.payload = prepareDomPayload("create-data-change-event-subscription2", RpcDefinition::getInput, "toaster",
+            "path2");
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
         assertEquals(result.getErrors(), Collections.emptyList());
     }
 
-    private NormalizedNodeContext prepareDomPayload(final String rpcName, final String inputOutput,
-            final String toasterValue, final String inputOutputName) {
+    private NormalizedNodeContext prepareDomPayload(final String rpcName,
+            final Function<RpcDefinition, ContainerLike> rpcToContainer, final String toasterValue,
+            final String inputOutputName) {
         final EffectiveModelContext schema = this.refSchemaCtx;
         final Module rpcModule = schema.findModules("sal-remote").iterator().next();
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), rpcName);
-        final QName rpcInputQName = QName.create(rpcModule.getQNameModule(), inputOutput);
         ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
+                rpcInputSchemaNode = rpcToContainer.apply(rpc);
                 break;
             }
         }
         assertNotNull(rpcInputSchemaNode);
 
         final DataContainerNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> container =
-                Builders.containerBuilder(rpcInputSchemaNode);
+            SchemaAwareBuilders.containerBuilder(rpcInputSchemaNode);
 
         final QName lfQName = QName.create(rpcModule.getQNameModule(), inputOutputName);
         final DataSchemaNode lfSchemaNode = rpcInputSchemaNode.findDataChildByName(lfQName).orElseThrow();
@@ -106,7 +110,7 @@ public class CreateStreamUtilTest {
         } else {
             o = toasterValue;
         }
-        final LeafNode<Object> lfNode = Builders.leafBuilder((LeafSchemaNode) lfSchemaNode)
+        final LeafNode<Object> lfNode = SchemaAwareBuilders.leafBuilder((LeafSchemaNode) lfSchemaNode)
                 .withValue(o).build();
         container.withChild(lfNode);
 

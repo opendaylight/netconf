@@ -7,18 +7,21 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.nn.to.xml.test;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.base.VerifyException;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyReaderTest;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -29,29 +32,25 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition;
-import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
-import org.opendaylight.yangtools.yang.model.util.type.BitsTypeBuilder;
-import org.opendaylight.yangtools.yang.model.util.type.EnumerationTypeBuilder;
-import org.opendaylight.yangtools.yang.model.util.type.UnionTypeBuilder;
+import org.opendaylight.yangtools.yang.model.ri.type.BaseTypes;
+import org.opendaylight.yangtools.yang.model.ri.type.BitsTypeBuilder;
+import org.opendaylight.yangtools.yang.model.ri.type.EnumerationTypeBuilder;
+import org.opendaylight.yangtools.yang.model.ri.type.UnionTypeBuilder;
 
 public class NnToXmlTest extends AbstractBodyReaderTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    private static EffectiveModelContext schemaContext;
 
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
-    private static EffectiveModelContext schemaContext;
 
     public NnToXmlTest() {
         super(schemaContext, null);
@@ -83,8 +82,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
     @Test
     public void nnAsYangLeafrefWithPrefixToXMLTest() throws Exception {
-        final NormalizedNodeContext normalizedNodeContext = prepareLeafrefData();
-        nnToXml(normalizedNodeContext, "<lfBoolean>true</lfBoolean>", "<lfLfref>true</lfLfref>");
+        nnToXml(prepareLeafrefData(), "<lfBoolean>true</lfBoolean>", "<lfLfref>true</lfLfref>");
     }
 
     /**
@@ -95,9 +93,12 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public void nnAsYangLeafrefWithPrefixToXMLNegativeTest() throws Exception {
         final NormalizedNodeContext normalizedNodeContext = prepareLeafrefNegativeData();
 
-        thrown.expect(VerifyException.class);
-        nnToXml(normalizedNodeContext, "<not-existing>value</not-existing>",
-                "<lfLfrefNegative>value</lfLfrefnegative>");
+        final IOException ex = assertThrows(IOException.class, () -> nnToXml(normalizedNodeContext,
+            "<not-existing>value</not-existing>", "<lfLfrefNegative>value</lfLfrefnegative>"));
+        final Throwable rootCause = Throwables.getRootCause(ex);
+        assertThat(rootCause, instanceOf(IllegalArgumentException.class));
+        assertEquals("Data tree child (basic:module?revision=2013-12-02)not-existing not present",
+            rootCause.getMessage());
     }
 
     @Test
@@ -197,7 +198,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final BitsTypeDefinition.Bit mockBit2 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit2.getName()).thenReturn("two");
         Mockito.when(mockBit2.getPosition()).thenReturn(Uint32.TWO);
-        final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(Mockito.mock(SchemaPath.class));
+        final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(QName.create("foo", "foo"));
         bitsTypeBuilder.addBit(mockBit1);
         bitsTypeBuilder.addBit(mockBit2);
 
@@ -213,7 +214,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         Mockito.when(mockEnum.getName()).thenReturn("enum2");
 
         final EnumerationTypeBuilder enumerationTypeBuilder = BaseTypes
-                .enumerationTypeBuilder(Mockito.mock(SchemaPath.class));
+                .enumerationTypeBuilder(QName.create("foo", "foo"));
         enumerationTypeBuilder.addEnum(mockEnum);
 
         final String elName = "lfEnumeration";
@@ -251,11 +252,11 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         Mockito.when(mockBit2.getName()).thenReturn("second");
         Mockito.when(mockBit2.getPosition()).thenReturn(Uint32.TWO);
 
-        final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(Mockito.mock(SchemaPath.class));
+        final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(QName.create("foo", "foo"));
         bitsTypeBuilder.addBit(mockBit1);
         bitsTypeBuilder.addBit(mockBit2);
 
-        final UnionTypeBuilder unionTypeBuilder = BaseTypes.unionTypeBuilder(Mockito.mock(SchemaPath.class));
+        final UnionTypeBuilder unionTypeBuilder = BaseTypes.unionTypeBuilder(QName.create("foo", "foo"));
         unionTypeBuilder.addType(BaseTypes.int8Type());
         unionTypeBuilder.addType(bitsTypeBuilder.build());
         unionTypeBuilder.addType(BaseTypes.booleanType());
@@ -294,14 +295,14 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) contSchema);
 
         final List<DataSchemaNode> instanceLf = ControllerContext
                 .findInstanceDataChildrenByName((DataNodeContainer) contSchema, lf.getLocalName());
         final DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
 
-        contData.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue(object).build());
+        contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue(object).build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
                 new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
@@ -326,20 +327,20 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) contSchema);
 
         List<DataSchemaNode> instanceLf = ControllerContext
                 .findInstanceDataChildrenByName((DataNodeContainer) contSchema, lfBoolean.getLocalName());
         DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
 
-        contData.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue(Boolean.TRUE).build());
+        contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue(Boolean.TRUE).build());
 
         instanceLf = ControllerContext.findInstanceDataChildrenByName((DataNodeContainer) contSchema,
                 lfLfref.getLocalName());
         schemaLf = Iterables.getFirst(instanceLf, null);
 
-        contData.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue("true").build());
+        contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue("true").build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
                 new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
@@ -352,14 +353,14 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final QName lfLfref = QName.create("basic:module", "2013-12-02", "lfLfrefNegative");
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) contSchema);
 
         final List<DataSchemaNode> instanceLf = ControllerContext.findInstanceDataChildrenByName((DataNodeContainer)
                 contSchema, lfLfref.getLocalName());
         final DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
 
-        contData.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue("value").build());
+        contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue("value").build());
 
         return new NormalizedNodeContext(
                 new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
@@ -372,12 +373,12 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) contSchema);
 
         final DataSchemaNode cont1Schema = ((ContainerSchemaNode) contSchema).getDataChildByName(cont1);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> cont1Data = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> cont1Data = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) cont1Schema);
 
         Object value = null;
@@ -391,7 +392,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
                 .findInstanceDataChildrenByName((DataNodeContainer) cont1Schema, lf11.getLocalName());
         final DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
 
-        cont1Data.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue(value).build());
+        cont1Data.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue(value).build());
 
         contData.withChild(cont1Data.build());
 

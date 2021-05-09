@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.yangtools.concepts.Identifiable;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -62,7 +63,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         // We try to look up if this node was added by augmentation
         if (schema instanceof DataSchemaNode && result.isAugmenting()) {
             for (final AugmentationSchemaNode aug : ((AugmentationTarget)schema).getAvailableAugmentations()) {
-                if (aug.findDataChildByName(result.getQName()).isPresent()) {
+                if (aug.dataChildByName(result.getQName()) != null) {
                     return new Augmentation(aug, schema);
                 }
             }
@@ -366,7 +367,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
     private static final class LeafListEntry extends AbstractSimple<NodeWithValue<?>> {
         LeafListEntry(final LeafListSchemaNode potential) {
-            super(new NodeWithValue<>(potential.getQName(), null));
+            super(new NodeWithValue<>(potential.getQName(), Empty.getInstance()));
         }
 
         @Override
