@@ -15,7 +15,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +32,7 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -58,14 +58,11 @@ public class ParserFieldsParameterTest {
     private InstanceIdentifierContext<ContainerSchemaNode> identifierTestServices;
 
     private static final QNameModule Q_NAME_MODULE_JUKEBOX = QNameModule.create(
-            URI.create("http://example.com/ns/example-jukebox"),
-            Revision.of("2015-04-04"));
+        XMLNamespace.of("http://example.com/ns/example-jukebox"), Revision.of("2015-04-04"));
     private static final QNameModule Q_NAME_MODULE_TEST_SERVICES = QNameModule.create(
-            URI.create("tests:test-services"),
-            Revision.of("2019-03-25"));
+        XMLNamespace.of("tests:test-services"), Revision.of("2019-03-25"));
     private static final QNameModule Q_NAME_MODULE_AUGMENTED_JUKEBOX = QNameModule.create(
-            URI.create("http://example.com/ns/augmented-jukebox"),
-            Revision.of("2016-05-05"));
+        XMLNamespace.of("http://example.com/ns/augmented-jukebox"), Revision.of("2016-05-05"));
 
     // container jukebox
     @Mock

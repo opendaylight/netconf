@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -19,7 +20,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  * Transforms rpc structures to normalized nodes and vice versa.
  */
 interface RpcStructureTransformer {
-
     /**
      * Transforms data and path to the config element structure. It means creating of parent xml structure
      * specified by path and appending data to the structure. Operation is set as attribute on data element.
@@ -29,8 +29,8 @@ interface RpcStructureTransformer {
      * @param operation operation
      * @return config structure
      */
-    DOMSourceAnyxmlNode createEditConfigStructure(Optional<NormalizedNode<?, ?>> data,
-                                                  YangInstanceIdentifier dataPath, Optional<ModifyAction> operation);
+    DOMSourceAnyxmlNode createEditConfigStructure(Optional<NormalizedNode> data, YangInstanceIdentifier dataPath,
+                                                  Optional<ModifyAction> operation);
 
     /**
      * Transforms path to filter structure.
@@ -38,7 +38,7 @@ interface RpcStructureTransformer {
      * @param path path
      * @return filter structure
      */
-    DataContainerChild<?,?> toFilterStructure(YangInstanceIdentifier path);
+    AnyxmlNode<?> toFilterStructure(YangInstanceIdentifier path);
 
     /**
      * Transforms list of fields filters to filter structure.
@@ -47,7 +47,7 @@ interface RpcStructureTransformer {
      * @param fieldsFilters list of: parent path and selection fields
      * @return filter structure
      */
-    DataContainerChild<?,?> toFilterStructure(List<FieldsFilter> fieldsFilters);
+    AnyxmlNode<?> toFilterStructure(List<FieldsFilter> fieldsFilters);
 
     /**
      * Selects data specified by path from data node. Data must be product of get-config rpc with filter created by
@@ -57,6 +57,5 @@ interface RpcStructureTransformer {
      * @param path path to select
      * @return selected data
      */
-    Optional<NormalizedNode<?, ?>> selectFromDataStructure(
-            DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data, YangInstanceIdentifier path);
+    Optional<NormalizedNode> selectFromDataStructure(DataContainerChild data, YangInstanceIdentifier path);
 }

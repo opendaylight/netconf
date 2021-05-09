@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.Identifiable;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -92,7 +93,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
 
     private static final class LeafListEntryNormalization extends SimpleTypeNormalization<NodeWithValue> {
         LeafListEntryNormalization(final LeafListSchemaNode potential) {
-            super(new NodeWithValue(potential.getQName(), null));
+            super(new NodeWithValue<>(potential.getQName(), Empty.getInstance()));
         }
     }
 
@@ -368,7 +369,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
     }
 
     private static @Nullable DataSchemaNode findChildSchemaNode(final DataNodeContainer parent, final QName child) {
-        final DataSchemaNode potential = parent.getDataChildByName(child);
+        final DataSchemaNode potential = parent.dataChildByName(child);
         return potential != null ? potential : findChoice(parent, child);
     }
 
@@ -396,20 +397,12 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static DataNormalizationOperation<?> fromAugmentation(final DataNodeContainer parent,
             final AugmentationTarget parentAug, final DataSchemaNode child) {
-        AugmentationSchemaNode augmentation = null;
         for (final AugmentationSchemaNode aug : parentAug.getAvailableAugmentations()) {
-            final DataSchemaNode potential = aug.getDataChildByName(child.getQName());
-            if (potential != null) {
-                augmentation = aug;
-                break;
+            if (aug.dataChildByName(child.getQName()) != null) {
+                return new AugmentationNormalization(aug, parent);
             }
-
         }
-        if (augmentation != null) {
-            return new AugmentationNormalization(augmentation, parent);
-        } else {
-            return fromDataSchemaNode(child);
-        }
+        return fromDataSchemaNode(child);
     }
 
     static DataNormalizationOperation<?> fromDataSchemaNode(final DataSchemaNode potential) {

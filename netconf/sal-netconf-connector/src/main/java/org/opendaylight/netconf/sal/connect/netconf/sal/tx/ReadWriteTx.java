@@ -35,13 +35,13 @@ public class ReadWriteTx<T extends DOMDataTreeReadTransaction> implements DOMDat
 
     @Override
     public final void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                          final NormalizedNode<?, ?> data) {
+                          final NormalizedNode data) {
         delegateWriteTx.put(store, path, data);
     }
 
     @Override
     public final void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                            final NormalizedNode<?, ?> data) {
+                            final NormalizedNode data) {
         delegateWriteTx.merge(store, path, data);
     }
 
@@ -56,7 +56,7 @@ public class ReadWriteTx<T extends DOMDataTreeReadTransaction> implements DOMDat
     }
 
     @Override
-    public final FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+    public final FluentFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         return delegateReadTx.read(store, path);
     }

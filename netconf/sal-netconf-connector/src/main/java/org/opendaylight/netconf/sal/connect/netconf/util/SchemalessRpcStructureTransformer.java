@@ -32,6 +32,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -54,11 +55,11 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
      * @return selected data
      */
     @Override
-    public Optional<NormalizedNode<?, ?>> selectFromDataStructure(
-            final DataContainerChild<? extends PathArgument, ?> data, final YangInstanceIdentifier path) {
+    public Optional<NormalizedNode> selectFromDataStructure(final DataContainerChild data,
+            final YangInstanceIdentifier path) {
         Preconditions.checkArgument(data instanceof DOMSourceAnyxmlNode);
         final List<XmlElement> xmlElements = selectMatchingNodes(
-            getSourceElement(((DOMSourceAnyxmlNode)data).getValue()), path);
+            getSourceElement(((DOMSourceAnyxmlNode)data).body()), path);
         final Document result = XmlUtil.newDocument();
         final Element dataElement =
                 result.createElementNS(NETCONF_DATA_QNAME.getNamespace().toString(), NETCONF_DATA_QNAME.getLocalName());
@@ -82,14 +83,14 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
      * @return config structure
      */
     @Override
-    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode<?, ?>> data,
+    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode> data,
             final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation) {
         Preconditions.checkArgument(data.isPresent());
         Preconditions.checkArgument(data.get() instanceof DOMSourceAnyxmlNode);
 
         final DOMSourceAnyxmlNode anxmlData = (DOMSourceAnyxmlNode) data.get();
         final Document document = XmlUtil.newDocument();
-        final Element dataNode = (Element) document.importNode(getSourceElement(anxmlData.getValue()), true);
+        final Element dataNode = (Element) document.importNode(getSourceElement(anxmlData.body()), true);
         checkDataValidForPath(dataPath, dataNode);
 
         final Element configElement = document.createElementNS(NETCONF_CONFIG_QNAME.getNamespace().toString(),
@@ -121,7 +122,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
      * @return filter structure
      */
     @Override
-    public DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier path) {
+    public AnyxmlNode<?> toFilterStructure(final YangInstanceIdentifier path) {
         final Document document = XmlUtil.newDocument();
         final Element filterElement = prepareFilterElement(document);
         instanceIdToXmlStructure(path.getPathArguments(), filterElement);
@@ -129,7 +130,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public DataContainerChild<?, ?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
+    public AnyxmlNode<?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
         final Document document = XmlUtil.newDocument();
         final Element filterElement = prepareFilterElement(document);
         for (final FieldsFilter filter : fieldsFilters) {
@@ -148,7 +149,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         return filter;
     }
 
-    private static DataContainerChild<?, ?> buildFilterXmlNode(final Document document) {
+    private static AnyxmlNode<?> buildFilterXmlNode(final Document document) {
         return Builders.anyXmlBuilder()
                 .withNodeIdentifier(NETCONF_FILTER_NODEID)
                 .withValue(new DOMSource(document.getDocumentElement()))

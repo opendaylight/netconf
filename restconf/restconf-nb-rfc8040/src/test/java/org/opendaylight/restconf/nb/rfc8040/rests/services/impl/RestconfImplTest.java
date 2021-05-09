@@ -26,6 +26,6 @@ public class RestconfImplTest {
         final RestconfImpl restconfImpl = new RestconfImpl(schemaContextHandler);
         final NormalizedNodeContext libraryVersion = restconfImpl.getLibraryVersion();
         final LeafNode<?> value = (LeafNode<?>) libraryVersion.getData();
-        assertEquals(IetfYangLibrary.REVISION.toString(), value.getValue());
+        assertEquals(IetfYangLibrary.REVISION.toString(), value.body());
     }
 }

@@ -185,12 +185,6 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
     }
 
     @Override
-    public void startYangModeledAnyXmlNode(final NodeIdentifier name, final int childSizeHint) throws IOException {
-        writer.startYangModeledAnyXmlNode(name, childSizeHint);
-        pushPath(name);
-    }
-
-    @Override
     public void endNode() throws IOException {
         final ModifyAction prevAction = actions.peek();
         if (prevAction != null) {
