@@ -9,7 +9,6 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,6 +23,7 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -71,8 +71,8 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         try {
             // Returns module with newest revision since findModuleByNamespace returns a set of modules and we only
             // need the newest one
-            it = schemaContext.getCurrentContext().findModules(new URI(namespace)).iterator();
-        } catch (final URISyntaxException e) {
+            it = schemaContext.getCurrentContext().findModules(XMLNamespace.of(namespace)).iterator();
+        } catch (final IllegalArgumentException e) {
             throw new NetconfDocumentedException("Unable to create URI for namespace : " + namespace, e,
                 ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }
