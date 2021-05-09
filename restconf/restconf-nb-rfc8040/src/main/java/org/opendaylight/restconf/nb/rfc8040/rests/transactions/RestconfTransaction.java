@@ -63,7 +63,7 @@ public abstract class RestconfTransaction {
      * @param path the data object path
      * @param data the data object to be merged to the specified path
      */
-    public abstract void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data);
+    public abstract void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode data);
 
     /**
      * Stores a piece of data at the specified path.
@@ -73,7 +73,7 @@ public abstract class RestconfTransaction {
      * @param data          the data object to be merged to the specified path
      * @param schemaContext static view of compiled yang files
      */
-    public abstract void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data,
+    public abstract void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode data,
                                 SchemaContext schemaContext);
 
     /**
@@ -84,6 +84,6 @@ public abstract class RestconfTransaction {
      * @param data          the data object to be merged to the specified path
      * @param schemaContext static view of compiled yang files
      */
-    public abstract void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data,
+    public abstract void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode data,
                                  SchemaContext schemaContext);
 }

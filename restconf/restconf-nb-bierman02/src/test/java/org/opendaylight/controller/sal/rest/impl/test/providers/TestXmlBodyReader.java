@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
@@ -30,8 +29,8 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -47,7 +46,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
     private final XmlNormalizedNodeBodyReader xmlBodyReader;
     private static EffectiveModelContext schemaContext;
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
-        URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
+        XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
 
     public TestXmlBodyReader() {
         super(schemaContext, null);
@@ -85,15 +84,15 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
         assertTrue(nnc.getData() instanceof MapEntryNode);
         final MapEntryNode data = (MapEntryNode) nnc.getData();
-        assertTrue(data.getValue().size() == 2);
-        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+        assertEquals(2, data.size());
+        for (final DataContainerChild child : data.body()) {
             switch (child.getNodeType().getLocalName()) {
                 case "key-leaf":
-                    assertEquals("key-value", child.getValue());
+                    assertEquals("key-value", child.body());
                     break;
 
                 case "ordinary-leaf":
-                    assertEquals("leaf-value", child.getValue());
+                    assertEquals("leaf-value", child.body());
                     break;
                 default:
                     fail();
@@ -153,7 +152,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
     public void moduleSubContainerAugmentDataPostTest() throws Exception {
         final DataSchemaNode dataSchemaNode =
                 schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final Module augmentModule = schemaContext.findModules(new URI("augment:module")).iterator().next();
+        final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
         final YangInstanceIdentifier.AugmentationIdentifier augII = new YangInstanceIdentifier.AugmentationIdentifier(
                 Sets.newHashSet(contAugmentQName));
@@ -173,7 +172,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
     public void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
         final DataSchemaNode dataSchemaNode =
                 schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final Module augmentModule = schemaContext.findModules(new URI("augment:module")).iterator().next();
+        final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");
@@ -205,16 +204,15 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         checkNormalizedNodeContext(returnValue);
         final ContainerNode contNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName.create(contNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode
-                .getChild(yangCont.getLastPathArgument());
+        final Optional<DataContainerChild> contDataNodePotential = contNode
+                .findChildByArg(yangCont.getLastPathArgument());
         assertTrue(contDataNodePotential.isPresent());
         final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
         final YangInstanceIdentifier yangLeaf =
                 YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
-            yangLeaf.getLastPathArgument());
+        final Optional<DataContainerChild> leafDataNode = contDataNode.findChildByArg(yangLeaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
-        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
+        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().body().toString()));
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,

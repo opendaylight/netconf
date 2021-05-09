@@ -68,9 +68,9 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     private NodeIdentifier keyLeafNodeIdentifier;
     private NodeIdentifier anotherLeafNodeIdentifier;
 
-    private Collection<DataContainerChild<?, ?>> containerNodeValue;
+    private Collection<DataContainerChild> containerNodeValue;
     private Collection<MapEntryNode> mapNodeValue;
-    private Collection<DataContainerChild<?, ?>> mapEntryNodeValue;
+    private Collection<DataContainerChild> mapEntryNodeValue;
     private Collection<LeafSetEntryNode<String>> leafSetNodeValue;
     private String leafSetEntryNodeValue;
     private String keyLeafNodeValue;

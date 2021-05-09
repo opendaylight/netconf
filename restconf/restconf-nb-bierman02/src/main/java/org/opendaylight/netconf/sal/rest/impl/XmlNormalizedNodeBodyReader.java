@@ -155,12 +155,12 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             final QName scQName = schemaNode.getQName();
             Preconditions.checkState(
                     docRootElm.equals(scQName.getLocalName())
-                            && docRootNamespace.equals(scQName.getNamespace().toASCIIString()),
+                            && docRootNamespace.equals(scQName.getNamespace().toString()),
                     String.format("Not correct message root element \"%s\", should be \"%s\"",
                             docRootElm, scQName));
         }
 
-        NormalizedNode<?, ?> parsed;
+        NormalizedNode parsed;
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
@@ -178,7 +178,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             if (parsed instanceof MapNode) {
                 final MapNode mapNode = (MapNode) parsed;
                 // extracting the MapEntryNode
-                parsed = mapNode.getValue().iterator().next();
+                parsed = mapNode.body().iterator().next();
             }
 
             if (schemaNode instanceof  ListSchemaNode && isPost()) {

@@ -23,11 +23,12 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -55,7 +56,7 @@ public class CreateStreamUtilTest {
         this.payload = prepareDomPayload("create-data-change-event-subscription", "input", "toaster", "path");
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
         assertEquals(result.getErrors(), Collections.emptyList());
-        final NormalizedNode<?, ?> testedNn = result.getResult();
+        final NormalizedNode testedNn = result.getResult();
         assertNotNull(testedNn);
         final NormalizedNodeContext contextRef = prepareDomPayload("create-data-change-event-subscription", "output",
                 "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name");
@@ -91,7 +92,7 @@ public class CreateStreamUtilTest {
         }
         assertNotNull(rpcInputSchemaNode);
 
-        final DataContainerNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> container =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> container =
                 Builders.containerBuilder(rpcInputSchemaNode);
 
         final QName lfQName = QName.create(rpcModule.getQNameModule(), inputOutputName);

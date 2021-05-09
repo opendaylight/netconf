@@ -11,10 +11,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
 import com.google.common.collect.Lists;
 import java.net.URI;
@@ -34,6 +30,9 @@ import org.opendaylight.yangtools.util.SingletonSet;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -170,7 +169,7 @@ public class XmlNotificationListenerTest {
         assertXmlMatches(result, control);
     }
 
-    private static void assertXmlMatches(String result, String control) {
+    private static void assertXmlMatches(final String result, final String control) {
         XmlAssert.assertThat(result).and(control)
                 // text values have localName null but we want to compare those, ignore only nodes that have localName
                 // with eventTime value
@@ -183,7 +182,7 @@ public class XmlNotificationListenerTest {
         final AugmentationIdentifier augmId = new AugmentationIdentifier(SingletonSet.of(leaf.getNodeType()));
         when(augm.getIdentifier()).thenReturn(augmId);
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(leaf);
 
         when(augm.getValue()).thenReturn(childs);
@@ -197,10 +196,10 @@ public class XmlNotificationListenerTest {
         when(entry.getIdentifier()).thenReturn(nodeId);
         when(entry.getChild(any())).thenReturn(Optional.of(leaf));
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(leaf);
 
-        when(entry.getValue()).thenReturn(childs);
+        when(entry.body()).thenReturn(childs);
         return entry;
     }
 
@@ -211,12 +210,11 @@ public class XmlNotificationListenerTest {
         return list;
     }
 
-    private static ContainerNode mockCont(final QName contQName,
-                                          final DataContainerChild<? extends PathArgument, ?> child) {
+    private static ContainerNode mockCont(final QName contQName, final DataContainerChild child) {
         final ContainerNode cont = mock(ContainerNode.class);
         when(cont.getIdentifier()).thenReturn(NodeIdentifier.create(contQName));
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(child);
         when(cont.getValue()).thenReturn(childs);
         return cont;

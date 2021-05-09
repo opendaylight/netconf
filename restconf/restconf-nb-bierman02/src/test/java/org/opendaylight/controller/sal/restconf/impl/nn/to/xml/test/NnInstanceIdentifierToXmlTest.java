@@ -27,14 +27,14 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -235,8 +235,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         dataLst11Vaule.withChild(buildLeaf(lst11Schema, lf11, dataLst11,
                 "/cont/cont1/lf12"));
 
-        dataLst11Vaule.withChild(buildLeaf(lst11Schema, lf12, dataLst11,
-                "lf12 value"));
+        dataLst11Vaule.withChild(buildLeaf(lst11Schema, lf12, dataLst11, "lf12 value"));
 
         dataLst11.withChild(dataLst11Vaule.build());
 
@@ -250,7 +249,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         return testNormalizedNodeContext;
     }
 
-    private static DataContainerChild<?, ?> buildLeaf(final DataSchemaNode lst11Schema, final QName qname,
+    private static LeafNode<?> buildLeaf(final DataSchemaNode lst11Schema, final QName qname,
             final CollectionNodeBuilder<MapEntryNode, MapNode> dataLst11, final Object value) {
 
         final List<DataSchemaNode> instanceLf = ControllerContext

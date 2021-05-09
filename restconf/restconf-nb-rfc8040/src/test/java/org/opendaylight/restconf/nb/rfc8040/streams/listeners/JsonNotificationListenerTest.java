@@ -33,7 +33,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -175,7 +174,7 @@ public class JsonNotificationListenerTest {
         final AugmentationIdentifier augmId = new AugmentationIdentifier(SingletonSet.of(leaf.getNodeType()));
         when(augm.getIdentifier()).thenReturn(augmId);
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(leaf);
 
         when(augm.getValue()).thenReturn(childs);
@@ -189,7 +188,7 @@ public class JsonNotificationListenerTest {
         when(entry.getIdentifier()).thenReturn(nodeId);
         when(entry.getChild(any())).thenReturn(Optional.of(leaf));
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(leaf);
 
         when(entry.getValue()).thenReturn(childs);
@@ -203,12 +202,11 @@ public class JsonNotificationListenerTest {
         return list;
     }
 
-    private static ContainerNode mockCont(final QName contQName,
-                                          final DataContainerChild<? extends PathArgument, ?> child) {
+    private static ContainerNode mockCont(final QName contQName, final DataContainerChild child) {
         final ContainerNode cont = mock(ContainerNode.class);
         when(cont.getIdentifier()).thenReturn(NodeIdentifier.create(contQName));
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(child);
         when(cont.getValue()).thenReturn(childs);
         return cont;

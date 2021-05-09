@@ -125,11 +125,11 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         } else if (!isOperation) {
             final QName scQName = schemaNode.getQName();
             checkState(docRootElm.equals(scQName.getLocalName())
-                && docRootNamespace.equals(scQName.getNamespace().toASCIIString()),
+                && docRootNamespace.equals(scQName.getNamespace().toString()),
                 "Not correct message root element \"%s\", should be \"%s\"", docRootElm, scQName);
         }
 
-        NormalizedNode<?, ?> parsed;
+        NormalizedNode parsed;
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 

@@ -23,13 +23,13 @@ public class NormalizedNodeMessage implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private YangInstanceIdentifier identifier;
-    private NormalizedNode<?, ?> node;
+    private NormalizedNode node;
 
     public NormalizedNodeMessage() {
         // empty constructor needed for Externalizable
     }
 
-    public NormalizedNodeMessage(final YangInstanceIdentifier identifier, final NormalizedNode<?, ?> node) {
+    public NormalizedNodeMessage(final YangInstanceIdentifier identifier, final NormalizedNode node) {
         this.identifier = identifier;
         this.node = node;
     }
@@ -38,7 +38,7 @@ public class NormalizedNodeMessage implements Externalizable {
         return identifier;
     }
 
-    public NormalizedNode<?, ?> getNode() {
+    public NormalizedNode getNode() {
         return node;
     }
 

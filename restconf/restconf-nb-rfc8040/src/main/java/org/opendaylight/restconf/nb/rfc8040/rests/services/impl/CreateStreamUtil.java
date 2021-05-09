@@ -28,7 +28,6 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -155,7 +154,7 @@ final class CreateStreamUtil {
      *     are going to be generated.
      */
     private static YangInstanceIdentifier preparePath(final ContainerNode data, final QName qualifiedName) {
-        final Optional<DataContainerChild<? extends PathArgument, ?>> path = data.getChild(
+        final Optional<DataContainerChild> path = data.getChild(
                 new YangInstanceIdentifier.NodeIdentifier(QName.create(
                         qualifiedName,
                         RestconfStreamsConstants.STREAM_PATH_PARAM_NAME)));
@@ -182,16 +181,16 @@ final class CreateStreamUtil {
      * @return Parsed enumeration.
      */
     private static <T> T parseEnum(final ContainerNode data, final Class<T> clazz, final String paramName) {
-        final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = data.getChild(
+        final Optional<DataContainerChild> optAugNode = data.getChild(
                 RestconfStreamsConstants.SAL_REMOTE_AUG_IDENTIFIER);
         if (optAugNode.isEmpty()) {
             return null;
         }
-        final DataContainerChild<? extends PathArgument, ?> augNode = optAugNode.get();
+        final DataContainerChild augNode = optAugNode.get();
         if (!(augNode instanceof AugmentationNode)) {
             return null;
         }
-        final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
+        final Optional<DataContainerChild> enumNode = ((AugmentationNode) augNode).getChild(
                 new NodeIdentifier(QName.create(RestconfStreamsConstants.SAL_REMOTE_AUGMENT, paramName)));
         if (enumNode.isEmpty()) {
             return null;

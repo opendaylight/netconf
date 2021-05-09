@@ -70,7 +70,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -242,16 +241,16 @@ public class RestconfDataServiceImplTest {
         assertNotNull(response);
         assertEquals(200, response.getStatus());
 
-        final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodeContext) response.getEntity()).getData();
         assertTrue(data instanceof ContainerNode);
-        final Collection<DataContainerChild<? extends PathArgument, ?>> rootNodes = ((ContainerNode) data).getValue();
+        final Collection<DataContainerChild> rootNodes = ((ContainerNode) data).body();
         assertEquals(1, rootNodes.size());
-        final Collection<DataContainerChild<? extends PathArgument, ?>> allDataChildren
-                = ((ContainerNode) rootNodes.iterator().next()).getValue();
+        final Collection<DataContainerChild> allDataChildren
+                = ((ContainerNode) rootNodes.iterator().next()).body();
         assertEquals(3, allDataChildren.size());
     }
 
-    private static ContainerNode wrapNodeByDataRootContainer(final DataContainerChild<?, ?> data) {
+    private static ContainerNode wrapNodeByDataRootContainer(final DataContainerChild data) {
         return ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(NodeIdentifier.create(SchemaContext.NAME))
                 .withChild(data)
@@ -277,9 +276,9 @@ public class RestconfDataServiceImplTest {
         assertEquals(200, response.getStatus());
 
         // response must contain all child nodes from config and operational containers merged in one container
-        final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodeContext) response.getEntity()).getData();
         assertTrue(data instanceof ContainerNode);
-        assertEquals(3, ((ContainerNode) data).getValue().size());
+        assertEquals(3, ((ContainerNode) data).size());
         assertTrue(((ContainerNode) data).getChild(this.buildPlayerCont.getIdentifier()).isPresent());
         assertTrue(((ContainerNode) data).getChild(this.buildLibraryCont.getIdentifier()).isPresent());
         assertTrue(((ContainerNode) data).getChild(this.buildPlaylistList.getIdentifier()).isPresent());
@@ -313,7 +312,7 @@ public class RestconfDataServiceImplTest {
         assertEquals(200, response.getStatus());
 
         // response must contain only config data
-        final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodeContext) response.getEntity()).getData();
 
         // config data present
         assertTrue(((ContainerNode) data).getChild(this.buildPlayerCont.getIdentifier()).isPresent());
@@ -341,7 +340,7 @@ public class RestconfDataServiceImplTest {
         assertEquals(200, response.getStatus());
 
         // response must contain only operational data
-        final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodeContext) response.getEntity()).getData();
 
         // state data present
         assertTrue(((ContainerNode) data).getChild(this.buildPlayerCont.getIdentifier()).isPresent());
@@ -408,7 +407,7 @@ public class RestconfDataServiceImplTest {
                 new InstanceIdentifierContext<>(this.iidBase, null, null, this.contextRef);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildList);
         final MapNode data = (MapNode) payload.getData();
-        final MapEntryNode entryNode = data.getValue().iterator().next();
+        final MapEntryNode entryNode = data.body().iterator().next();
         final NodeIdentifierWithPredicates identifier = entryNode.getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);

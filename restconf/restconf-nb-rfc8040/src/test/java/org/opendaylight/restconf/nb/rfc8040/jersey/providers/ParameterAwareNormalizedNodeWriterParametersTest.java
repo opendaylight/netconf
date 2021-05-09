@@ -52,10 +52,10 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
     private NodeWithValue<?> leafSetEntryNodeIdentifier;
     private NodeIdentifier rootDataContainerIdentifier;
 
-    private Collection<DataContainerChild<?, ?>> containerNodeValue;
+    private Collection<DataContainerChild> containerNodeValue;
     private Collection<LeafSetEntryNode<String>> leafSetNodeValue;
     private String leafSetEntryNodeValue;
-    private Collection<DataContainerChild<?, ?>> rootDataContainerValue;
+    private Collection<DataContainerChild> rootDataContainerValue;
 
     @Before
     public void setUp() {

@@ -8,11 +8,9 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter.UNKNOWN_SIZE;
 
 import com.google.common.collect.Iterables;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -28,12 +26,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
-import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UserLeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +99,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      * @throws IOException when thrown from the backing writer.
      */
     @Override
-    public final DepthAwareNormalizedNodeWriter write(final NormalizedNode<?, ?> node) throws IOException {
+    public final DepthAwareNormalizedNodeWriter write(final NormalizedNode node) throws IOException {
         if (wasProcessedAsCompositeNode(node)) {
             return this;
         }
@@ -124,41 +122,29 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
         writer.close();
     }
 
-    /**
-     * Emit a best guess of a hint for a particular set of children. It evaluates the
-     * iterable to see if the size can be easily gotten to. If it is, we hint at the
-     * real number of child nodes. Otherwise we emit UNKNOWN_SIZE.
-     *
-     * @param children Child nodes
-     * @return Best estimate of the collection size required to hold all the children.
-     */
-    static final int childSizeHint(final Iterable<?> children) {
-        return children instanceof Collection ? ((Collection<?>) children).size() : UNKNOWN_SIZE;
-    }
-
-    private boolean wasProcessAsSimpleNode(final NormalizedNode<?, ?> node) throws IOException {
+    private boolean wasProcessAsSimpleNode(final NormalizedNode node) throws IOException {
         if (node instanceof LeafSetEntryNode) {
             if (currentDepth < maxDepth) {
                 final LeafSetEntryNode<?> nodeAsLeafList = (LeafSetEntryNode<?>) node;
                 writer.startLeafSetEntryNode(nodeAsLeafList.getIdentifier());
-                writer.scalarValue(nodeAsLeafList.getValue());
+                writer.scalarValue(nodeAsLeafList.body());
                 writer.endNode();
             }
             return true;
         } else if (node instanceof LeafNode) {
             final LeafNode<?> nodeAsLeaf = (LeafNode<?>)node;
             writer.startLeafNode(nodeAsLeaf.getIdentifier());
-            writer.scalarValue(nodeAsLeaf.getValue());
+            writer.scalarValue(nodeAsLeaf.body());
             writer.endNode();
             return true;
         } else if (node instanceof AnyxmlNode) {
             final AnyxmlNode<?> anyxmlNode = (AnyxmlNode<?>)node;
-            final Class<?> objectModel = anyxmlNode.getValueObjectModel();
+            final Class<?> objectModel = anyxmlNode.bodyObjectModel();
             if (writer.startAnyxmlNode(anyxmlNode.getIdentifier(), objectModel)) {
                 if (DOMSource.class.isAssignableFrom(objectModel)) {
-                    writer.domSourceValue((DOMSource) anyxmlNode.getValue());
+                    writer.domSourceValue((DOMSource) anyxmlNode.body());
                 } else {
-                    writer.scalarValue(anyxmlNode.getValue());
+                    writer.scalarValue(anyxmlNode.body());
                 }
                 writer.endNode();
             }
@@ -175,9 +161,9 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      * @return True
      * @throws IOException when the writer reports it
      */
-    protected final boolean writeChildren(final Iterable<? extends NormalizedNode<?, ?>> children) throws IOException {
+    protected final boolean writeChildren(final Iterable<? extends NormalizedNode> children) throws IOException {
         if (currentDepth < maxDepth) {
-            for (final NormalizedNode<?, ?> child : children) {
+            for (final NormalizedNode child : children) {
                 write(child);
             }
         }
@@ -187,7 +173,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
 
     protected boolean writeMapEntryChildren(final MapEntryNode mapEntryNode) throws IOException {
         if (currentDepth < maxDepth) {
-            writeChildren(mapEntryNode.getValue());
+            writeChildren(mapEntryNode.body());
         } else if (currentDepth == maxDepth) {
             writeOnlyKeys(mapEntryNode.getIdentifier().entrySet());
         }
@@ -204,58 +190,58 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
     }
 
     protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
-        writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
+        writer.startMapEntryNode(node.getIdentifier(), node.size());
         currentDepth++;
         writeMapEntryChildren(node);
         currentDepth--;
         return true;
     }
 
-    private boolean wasProcessedAsCompositeNode(final NormalizedNode<?, ?> node) throws IOException {
+    private boolean wasProcessedAsCompositeNode(final NormalizedNode node) throws IOException {
         boolean processedAsCompositeNode = false;
         if (node instanceof ContainerNode) {
             final ContainerNode n = (ContainerNode) node;
-            writer.startContainerNode(n.getIdentifier(), childSizeHint(n.getValue()));
+            writer.startContainerNode(n.getIdentifier(), n.size());
             currentDepth++;
-            processedAsCompositeNode = writeChildren(n.getValue());
+            processedAsCompositeNode = writeChildren(n.body());
             currentDepth--;
         } else if (node instanceof MapEntryNode) {
             processedAsCompositeNode = writeMapEntryNode((MapEntryNode) node);
         } else if (node instanceof UnkeyedListEntryNode) {
             final UnkeyedListEntryNode n = (UnkeyedListEntryNode) node;
-            writer.startUnkeyedListItem(n.getIdentifier(), childSizeHint(n.getValue()));
+            writer.startUnkeyedListItem(n.getIdentifier(), n.size());
             currentDepth++;
-            processedAsCompositeNode = writeChildren(n.getValue());
+            processedAsCompositeNode = writeChildren(n.body());
             currentDepth--;
         } else if (node instanceof ChoiceNode) {
             final ChoiceNode n = (ChoiceNode) node;
-            writer.startChoiceNode(n.getIdentifier(), childSizeHint(n.getValue()));
-            processedAsCompositeNode = writeChildren(n.getValue());
+            writer.startChoiceNode(n.getIdentifier(), n.size());
+            processedAsCompositeNode = writeChildren(n.body());
         } else if (node instanceof AugmentationNode) {
             final AugmentationNode n = (AugmentationNode) node;
             writer.startAugmentationNode(n.getIdentifier());
-            processedAsCompositeNode = writeChildren(n.getValue());
+            processedAsCompositeNode = writeChildren(n.body());
         } else if (node instanceof UnkeyedListNode) {
             final UnkeyedListNode n = (UnkeyedListNode) node;
-            writer.startUnkeyedList(n.getIdentifier(), childSizeHint(n.getValue()));
-            processedAsCompositeNode = writeChildren(n.getValue());
-        } else if (node instanceof OrderedMapNode) {
-            final OrderedMapNode n = (OrderedMapNode) node;
-            writer.startOrderedMapNode(n.getIdentifier(), childSizeHint(n.getValue()));
-            processedAsCompositeNode = writeChildren(n.getValue());
-        } else if (node instanceof MapNode) {
-            final MapNode n = (MapNode) node;
-            writer.startMapNode(n.getIdentifier(), childSizeHint(n.getValue()));
-            processedAsCompositeNode = writeChildren(n.getValue());
+            writer.startUnkeyedList(n.getIdentifier(), n.size());
+            processedAsCompositeNode = writeChildren(n.body());
+        } else if (node instanceof UserMapNode) {
+            final UserMapNode n = (UserMapNode) node;
+            writer.startOrderedMapNode(n.getIdentifier(), n.size());
+            processedAsCompositeNode = writeChildren(n.body());
+        } else if (node instanceof SystemMapNode) {
+            final SystemMapNode n = (SystemMapNode) node;
+            writer.startMapNode(n.getIdentifier(), n.size());
+            processedAsCompositeNode = writeChildren(n.body());
         } else if (node instanceof LeafSetNode) {
             final LeafSetNode<?> n = (LeafSetNode<?>) node;
-            if (node instanceof OrderedLeafSetNode) {
-                writer.startOrderedLeafSet(n.getIdentifier(), childSizeHint(n.getValue()));
+            if (node instanceof UserLeafSetNode) {
+                writer.startOrderedLeafSet(n.getIdentifier(), n.size());
             } else {
-                writer.startLeafSet(n.getIdentifier(), childSizeHint(n.getValue()));
+                writer.startLeafSet(n.getIdentifier(), n.size());
             }
             currentDepth++;
-            processedAsCompositeNode = writeChildren(n.getValue());
+            processedAsCompositeNode = writeChildren(n.body());
             currentDepth--;
         }
 
@@ -272,12 +258,12 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
         @Override
         protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
             final NormalizedNodeStreamWriter writer = getWriter();
-            writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
+            writer.startMapEntryNode(node.getIdentifier(), node.size());
 
             final Set<QName> qnames = node.getIdentifier().keySet();
             // Write out all the key children
             for (final QName qname : qnames) {
-                final Optional<? extends NormalizedNode<?, ?>> child = node.getChild(new NodeIdentifier(qname));
+                final Optional<? extends NormalizedNode> child = node.findChildByArg(new NodeIdentifier(qname));
                 if (child.isPresent()) {
                     write(child.get());
                 } else {
@@ -287,11 +273,11 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
 
             // Write all the rest
             currentDepth++;
-            final boolean result = writeChildren(Iterables.filter(node.getValue(), input -> {
+            final boolean result = writeChildren(Iterables.filter(node.body(), input -> {
                 if (input instanceof AugmentationNode) {
                     return true;
                 }
-                if (!qnames.contains(input.getNodeType())) {
+                if (!qnames.contains(input.getIdentifier().getNodeType())) {
                     return true;
                 }
 

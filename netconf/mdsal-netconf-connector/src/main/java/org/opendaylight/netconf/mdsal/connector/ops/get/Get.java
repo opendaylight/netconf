@@ -53,7 +53,7 @@ public class Get extends AbstractGet {
 
         final DOMDataTreeReadWriteTransaction rwTx = getTransaction(Datastore.running);
         try {
-            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
+            final Optional<NormalizedNode> normalizedNodeOptional = rwTx.read(
                     LogicalDatastoreType.OPERATIONAL, dataRoot).get();
             transactionProvider.abortRunningTransaction(rwTx);
 

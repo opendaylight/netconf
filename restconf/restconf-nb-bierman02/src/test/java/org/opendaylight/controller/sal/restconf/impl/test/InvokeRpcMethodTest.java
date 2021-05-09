@@ -21,8 +21,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import java.io.FileNotFoundException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,13 +52,14 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -108,11 +107,7 @@ public class InvokeRpcMethodTest {
     @Test
     @Ignore
     public void invokeRpcMethodTest() {
-        try {
-            controllerContext.findModuleNameByNamespace(new URI("invoke:rpc:module"));
-        } catch (final URISyntaxException e) {
-            assertTrue("Uri wasn't created sucessfuly", false);
-        }
+        controllerContext.findModuleNameByNamespace(XMLNamespace.of("invoke:rpc:module"));
 
         final NormalizedNodeContext payload = prepareDomPayload();
 
@@ -222,7 +217,7 @@ public class InvokeRpcMethodTest {
 
     @Test
     public void testInvokeRpcWithNoPayload_Success() {
-        final NormalizedNode<?, ?> resultObj = null;
+        final NormalizedNode resultObj = null;
         final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
@@ -239,7 +234,7 @@ public class InvokeRpcMethodTest {
     @Test
     public void testInvokeRpcWithEmptyOutput() {
         final ContainerNode resultObj = Mockito.mock(ContainerNode.class);
-        Mockito.when(resultObj.getValue()).thenReturn(Collections.emptySet());
+        Mockito.when(resultObj.body()).thenReturn(Collections.emptySet());
         final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");

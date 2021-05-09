@@ -32,7 +32,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.mo
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -91,11 +90,11 @@ public class RestconfMappingNodeUtilTest {
         assertNotNull(normNode);
         final List<Object> listOfValues = new ArrayList<>();
 
-        for (final DataContainerChild<?, ?> child : normNode.getValue()) {
+        for (final DataContainerChild child : normNode.body()) {
             if (child.getNodeType().equals(Capabilities.QNAME)) {
-                for (final DataContainerChild<?, ?> dataContainerChild : ((ContainerNode) child).getValue()) {
-                    for (final Object entry : ((LeafSetNode<?>) dataContainerChild).getValue()) {
-                        listOfValues.add(((LeafSetEntryNode<?>) entry).getValue());
+                for (final DataContainerChild dataContainerChild : ((ContainerNode) child).c()) {
+                    for (final Object entry : ((LeafSetNode<?>) dataContainerChild).body()) {
+                        listOfValues.add(((LeafSetEntryNode<?>) entry).body());
                     }
                 }
             }
@@ -151,11 +150,11 @@ public class RestconfMappingNodeUtilTest {
 
     private static void assertMappedData(final Map<QName, Object> map, final MapEntryNode mappedData) {
         assertNotNull(mappedData);
-        for (final DataContainerChild<?, ?> child : mappedData.getValue()) {
+        for (final DataContainerChild child : mappedData.body()) {
             if (child instanceof LeafNode) {
                 final LeafNode<?> leaf = (LeafNode<?>) child;
                 assertTrue(map.containsKey(leaf.getNodeType()));
-                assertEquals(map.get(leaf.getNodeType()), leaf.getValue());
+                assertEquals(map.get(leaf.getNodeType()), leaf.body());
             }
         }
     }
@@ -168,10 +167,10 @@ public class RestconfMappingNodeUtilTest {
      */
     private static void verifyDeviations(final ContainerNode containerNode) {
         int deviationsFound = 0;
-        for (final DataContainerChild<?, ?> child : containerNode.getValue()) {
+        for (final DataContainerChild child : containerNode.body()) {
             if (child instanceof MapNode) {
-                for (final MapEntryNode mapEntryNode : ((MapNode) child).getValue()) {
-                    for (final DataContainerChild<?, ?> dataContainerChild : mapEntryNode.getValue()) {
+                for (final MapEntryNode mapEntryNode : ((MapNode) child).body()) {
+                    for (final DataContainerChild dataContainerChild : mapEntryNode.body()) {
                         if (dataContainerChild.getNodeType()
                                 .equals(IetfYangLibrary.SPECIFIC_MODULE_DEVIATION_LIST_QNAME)) {
                             deviationsFound++;
@@ -193,17 +192,16 @@ public class RestconfMappingNodeUtilTest {
 
         final Map<String, String> loadedModules = new HashMap<>();
 
-        for (final DataContainerChild<? extends PathArgument, ?> child : containerNode.getValue()) {
+        for (final DataContainerChild child : containerNode.getValue()) {
             if (child instanceof LeafNode) {
                 assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, child.getNodeType());
             }
             if (child instanceof MapNode) {
                 assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, child.getNodeType());
-                for (final MapEntryNode mapEntryNode : ((MapNode) child).getValue()) {
+                for (final MapEntryNode mapEntryNode : ((MapNode) child).body()) {
                     String name = "";
                     String revision = "";
-                    for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : mapEntryNode
-                            .getValue()) {
+                    for (final DataContainerChild dataContainerChild : mapEntryNode.body()) {
                         switch (dataContainerChild.getNodeType().getLocalName()) {
                             case IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF:
                                 name = String.valueOf(dataContainerChild.getValue());
