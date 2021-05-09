@@ -11,15 +11,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.Optional;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider.NetconfYangTextSchemaSource;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
@@ -33,7 +30,6 @@ import org.slf4j.LoggerFactory;
  * Provides YANG schema sources from yang library.
  */
 public final class YangLibrarySchemaYangSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
-
     private static final Logger LOG = LoggerFactory.getLogger(YangLibrarySchemaYangSourceProvider.class);
 
     private final Map<SourceIdentifier, URL> availableSources;
@@ -50,10 +46,9 @@ public final class YangLibrarySchemaYangSourceProvider implements SchemaSourcePr
         final URL url = availableSources.get(requireNonNull(sourceIdentifier));
         checkArgument(url != null);
         try (InputStream in = url.openStream()) {
-            // FIXME: defaultCharset() seems to be wrong here
-            final String schemaContent = new String(ByteStreams.toByteArray(in), Charset.defaultCharset());
+            final byte[] schemaContent = in.readAllBytes();
             final NetconfYangTextSchemaSource yangSource = new NetconfYangTextSchemaSource(id, sourceIdentifier,
-                Optional.of(schemaContent));
+                url.toString(), schemaContent);
             LOG.debug("Source {} downloaded from a yang library's url {}", sourceIdentifier, url);
             return Futures.immediateFuture(yangSource);
         } catch (IOException e) {

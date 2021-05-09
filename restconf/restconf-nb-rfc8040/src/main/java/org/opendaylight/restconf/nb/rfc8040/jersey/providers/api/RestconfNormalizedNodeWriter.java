@@ -15,5 +15,5 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public interface RestconfNormalizedNodeWriter extends Flushable, Closeable {
 
-    RestconfNormalizedNodeWriter write(NormalizedNode<?, ?> node) throws IOException;
+    RestconfNormalizedNodeWriter write(NormalizedNode node) throws IOException;
 }

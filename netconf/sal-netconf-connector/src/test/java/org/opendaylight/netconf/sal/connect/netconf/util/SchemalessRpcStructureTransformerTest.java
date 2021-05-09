@@ -119,7 +119,7 @@ public class SchemalessRpcStructureTransformerTest {
 
         final DOMSourceAnyxmlNode anyXmlNode =
                 adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE));
-        final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
+        final String s = XmlUtil.toString((Element) anyXmlNode.body().getNode());
         Diff diff = new Diff(expectedConfig, s);
         assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
     }
@@ -127,7 +127,7 @@ public class SchemalessRpcStructureTransformerTest {
     @Test
     public void testToFilterStructure() throws Exception {
         final DOMSourceAnyxmlNode anyXmlNode = (DOMSourceAnyxmlNode) adapter.toFilterStructure(path);
-        final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
+        final String s = XmlUtil.toString((Element) anyXmlNode.body().getNode());
         Diff diff = new Diff(expectedFilter, s);
         assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
     }
@@ -140,7 +140,7 @@ public class SchemalessRpcStructureTransformerTest {
                 .build();
         final DOMSourceAnyxmlNode dataStructure = (DOMSourceAnyxmlNode) adapter.selectFromDataStructure(data, path)
                 .get();
-        final XmlElement s = XmlElement.fromDomDocument((Document) dataStructure.getValue().getNode());
+        final XmlElement s = XmlElement.fromDomDocument((Document) dataStructure.body().getNode());
         final String dataFromReply = XmlUtil.toString(s.getOnlyChildElement().getDomElement());
         final String expectedData = XmlUtil.toString((Element) source.getNode());
         Diff diff = new Diff(expectedData, dataFromReply);

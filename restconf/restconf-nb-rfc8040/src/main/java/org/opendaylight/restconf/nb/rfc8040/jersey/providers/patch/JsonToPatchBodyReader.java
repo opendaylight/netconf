@@ -366,7 +366,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode<?, ?> readEditData(final @NonNull JsonReader in,
+    private static NormalizedNode readEditData(final @NonNull JsonReader in,
              final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
@@ -421,7 +421,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         private PatchEditOperation operation;
         private YangInstanceIdentifier target;
         private SchemaNode targetSchemaNode;
-        private NormalizedNode<?, ?> data;
+        private NormalizedNode data;
 
         String getId() {
             return id;
@@ -455,11 +455,11 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
             this.targetSchemaNode = requireNonNull(targetSchemaNode);
         }
 
-        NormalizedNode<?, ?> getData() {
+        NormalizedNode getData() {
             return data;
         }
 
-        void setData(final NormalizedNode<?, ?> data) {
+        void setData(final NormalizedNode data) {
             this.data = requireNonNull(data);
         }
 

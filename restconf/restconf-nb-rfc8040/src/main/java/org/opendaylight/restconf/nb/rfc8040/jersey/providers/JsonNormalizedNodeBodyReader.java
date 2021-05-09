@@ -92,21 +92,21 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final JsonReader reader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
         jsonParser.parse(reader);
 
-        NormalizedNode<?, ?> result = resultHolder.getResult();
+        NormalizedNode result = resultHolder.getResult();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> newIIContext;
 
         while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
-            final Object childNode = ((DataContainerNode<?>) result).getValue().iterator().next();
+            final Object childNode = ((DataContainerNode) result).body().iterator().next();
             if (isPost) {
                 iiToDataList.add(result.getIdentifier());
             }
-            result = (NormalizedNode<?, ?>) childNode;
+            result = (NormalizedNode) childNode;
         }
 
         if (isPost) {
             if (result instanceof MapEntryNode) {
-                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getNodeType()));
+                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getIdentifier().getNodeType()));
                 iiToDataList.add(result.getIdentifier());
             } else {
                 if (!(parentSchema instanceof OperationDefinition)) {
@@ -115,7 +115,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
             }
         } else {
             if (result instanceof MapNode) {
-                result = Iterables.getOnlyElement(((MapNode) result).getValue());
+                result = Iterables.getOnlyElement(((MapNode) result).body());
             }
         }
 

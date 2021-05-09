@@ -15,7 +15,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -37,13 +36,14 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableUnkeyedListEntryNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableUnkeyedListNodeBuilder;
@@ -68,7 +68,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private static final QName ERROR_MESSAGE_QNAME = qnameOf("error-message");
     private static final QName ERROR_INFO_QNAME = qnameOf("error-info");
     private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
-    private static final URI IETF_RESTCONF_URI = Errors.QNAME.getModule().getNamespace();
+    private static final XMLNamespace IETF_RESTCONF_URI = Errors.QNAME.getModule().getNamespace();
 
     @Context
     private HttpHeaders headers;
@@ -200,7 +200,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         }
     }
 
-    private static String writeNormalizedNode(final NormalizedNode<?, ?> errorsContainer,
+    private static String writeNormalizedNode(final NormalizedNode errorsContainer,
             final ByteArrayOutputStream outputStream, final StreamWriterWithDisabledValidation streamWriter) {
         try (NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
             nnWriter.write(errorsContainer);
