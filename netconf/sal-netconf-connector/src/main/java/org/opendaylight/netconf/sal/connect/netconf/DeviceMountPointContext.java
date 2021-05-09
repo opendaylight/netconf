@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.util.AbstractEffectiveModelContextProvider;
+import org.opendaylight.yangtools.yang.model.spi.AbstractEffectiveModelContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,21 +66,21 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
     }
 
     static MountPointContext create(final MountPointContext emptyContext, final ContainerNode mountData) {
-        final Optional<DataContainerChild<?, ?>> optMountPoint = mountData.getChild(MOUNT_POINT);
+        final Optional<DataContainerChild> optMountPoint = mountData.findChildByArg(MOUNT_POINT);
         if (optMountPoint.isEmpty()) {
             LOG.debug("mount-point list not present in {}", mountData);
             return emptyContext;
         }
 
         final EffectiveModelContext schemaContext = emptyContext.getEffectiveModelContext();
-        final DataContainerChild<?, ?> mountPoint = optMountPoint.get();
+        final DataContainerChild mountPoint = optMountPoint.get();
         checkArgument(mountPoint instanceof MapNode, "mount-point list %s is not a MapNode", mountPoint);
 
         final Map<MountPointIdentifier, NetconfMountPointContextFactory> mountPoints = new HashMap<>();
-        for (MapEntryNode entry : ((MapNode) mountPoint).getValue()) {
-            final String moduleName = entry.getChild(MODULE).map(mod -> {
+        for (MapEntryNode entry : ((MapNode) mountPoint).body()) {
+            final String moduleName = entry.findChildByArg(MODULE).map(mod -> {
                 checkArgument(mod instanceof LeafNode, "Unexpected module leaf %s", mod);
-                final Object value = mod.getValue();
+                final Object value = mod.body();
                 checkArgument(value instanceof String, "Unexpected module leaf value %s", value);
                 return (String) value;
             }).orElseThrow(() -> new IllegalArgumentException("Mount module missing in " + entry));
@@ -89,19 +89,19 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
             final QNameModule module = it.next().getQNameModule();
 
             final MountPointIdentifier mountId = MountPointIdentifier.of(QName.create(module,
-                entry.getChild(LABEL).map(lbl -> {
+                entry.findChildByArg(LABEL).map(lbl -> {
                     checkArgument(lbl instanceof LeafNode, "Unexpected label leaf %s", lbl);
-                    final Object value = lbl.getValue();
+                    final Object value = lbl.body();
                     checkArgument(value instanceof String, "Unexpected label leaf value %s", value);
                     return (String) value;
                 }).orElseThrow(() -> new IllegalArgumentException("Mount module missing in " + entry))));
 
-            final DataContainerChild<?, ?> child = entry.getChild(SCHEMA_REF).orElseThrow(
+            final DataContainerChild child = entry.findChildByArg(SCHEMA_REF).orElseThrow(
                 () -> new IllegalArgumentException("Missing schema-ref choice in " + entry));
             checkArgument(child instanceof ChoiceNode, "Unexpected schema-ref choice %s", child);
             final ChoiceNode schemaRef = (ChoiceNode) child;
 
-            final Optional<DataContainerChild<?, ?>> maybeShared = schemaRef.getChild(SHARED_SCHEMA);
+            final Optional<DataContainerChild> maybeShared = schemaRef.findChildByArg(SHARED_SCHEMA);
             if (maybeShared.isEmpty()) {
                 LOG.debug("Ignoring non-shared mountpoint entry {}", entry);
                 continue;

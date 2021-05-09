@@ -37,13 +37,13 @@ abstract class AbstractReadOnlyTx implements DOMDataTreeReadTransaction {
         this.id = id;
     }
 
-    private FluentFuture<Optional<NormalizedNode<?, ?>>> readConfigurationData(
+    private FluentFuture<Optional<NormalizedNode>> readConfigurationData(
             final YangInstanceIdentifier path) {
         return remapException(netconfOps.getConfigRunningData(
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
     }
 
-    private FluentFuture<Optional<NormalizedNode<?, ?>>> readOperationalData(
+    private FluentFuture<Optional<NormalizedNode>> readOperationalData(
             final YangInstanceIdentifier path) {
         return remapException(netconfOps.getData(
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
@@ -73,7 +73,7 @@ abstract class AbstractReadOnlyTx implements DOMDataTreeReadTransaction {
     }
 
     @Override
-    public final FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+    public final FluentFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         switch (store) {
             case CONFIGURATION:

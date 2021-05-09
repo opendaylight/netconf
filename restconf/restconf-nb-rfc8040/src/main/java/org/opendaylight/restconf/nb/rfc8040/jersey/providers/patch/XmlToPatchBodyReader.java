@@ -11,7 +11,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,6 +37,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -109,7 +110,8 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
                     ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
 
             // find module according to namespace
-            final Module module = pathContext.getSchemaContext().findModules(URI.create(namespace)).iterator().next();
+            final Module module = pathContext.getSchemaContext().findModules(XMLNamespace.of(namespace)).iterator()
+                .next();
 
             // initialize codec + set default prefix derived from module name
             final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
@@ -144,12 +146,13 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
             }
 
             if (oper.isWithValue()) {
-                final NormalizedNode<?, ?> parsed;
+                final NormalizedNode parsed;
                 if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
                     final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer, pathContext.getSchemaContext(),
-                            schemaNode);
+                    final XmlParserStream xmlParser = XmlParserStream.create(writer,
+                        SchemaInferenceStack.ofInstantiatedPath(pathContext.getSchemaContext(), schemaNode.getPath())
+                            .toInference());
                     xmlParser.traverse(new DOMSource(firstValueElement));
                     parsed = resultHolder.getResult();
                 } else {

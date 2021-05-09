@@ -23,7 +23,7 @@ final class ComponentNormalizedNodeStreamWriter extends ImmutableMetadataNormali
         super(result);
     }
 
-    NormalizedNode<?, ?> build() {
+    NormalizedNode build() {
         return popState().getDataBuilder().build();
     }
 }

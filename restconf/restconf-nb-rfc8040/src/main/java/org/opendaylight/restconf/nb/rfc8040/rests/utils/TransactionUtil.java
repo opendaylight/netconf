@@ -57,7 +57,7 @@ public final class TransactionUtil {
             return;
         }
 
-        final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
+        final NormalizedNode parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
         transaction.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
     }

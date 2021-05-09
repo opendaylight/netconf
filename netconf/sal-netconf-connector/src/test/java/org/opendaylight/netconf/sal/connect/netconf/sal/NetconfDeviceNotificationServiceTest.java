@@ -12,7 +12,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.net.URI;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,15 +42,14 @@ public class NetconfDeviceNotificationServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        final Absolute path1 = Absolute.of(QName.create(new URI("namespace1"), "path1"));
-        final Absolute path2 = Absolute.of(QName.create(new URI("namespace2"), "path2"));
+        final Absolute path1 = Absolute.of(QName.create("namespace1", "path1"));
+        final Absolute path2 = Absolute.of(QName.create("namespace2", "path2"));
         service = new NetconfDeviceNotificationService();
         service.registerNotificationListener(listener1, path1);
         registration = service.registerNotificationListener(listener2, path2);
 
         doReturn(path1).when(notification1).getType();
         doReturn(path2).when(notification2).getType();
-
     }
 
     @Test

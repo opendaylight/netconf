@@ -46,10 +46,8 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
         final NormalizedNodeContext normalizedNodeContext = this.jsonBodyReader.readFrom(
                 null, null, null, this.mediaType, null, inputStream);
 
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("lf2 121"));
     }
 
@@ -57,5 +55,4 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
     protected MediaType getMediaType() {
         return null;
     }
-
 }

@@ -193,7 +193,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
             final YangInstanceIdentifier parentYiid, final EffectiveModelContext schemaContext,
             final DataSchemaContextTree dataSchemaContextTree) {
 
-        Optional<NormalizedNode<?,?>> optionalNormalizedNode = Optional.empty();
+        Optional<NormalizedNode> optionalNormalizedNode = Optional.empty();
         switch (candidateNode.getModificationType()) {
             case APPEARED:
             case SUBTREE_MODIFIED:
@@ -214,7 +214,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
             return;
         }
 
-        NormalizedNode<?,?> normalizedNode = optionalNormalizedNode.get();
+        NormalizedNode normalizedNode = optionalNormalizedNode.get();
         YangInstanceIdentifier yiid = YangInstanceIdentifier.builder(parentYiid)
                                                             .append(normalizedNode.getIdentifier()).build();
 
