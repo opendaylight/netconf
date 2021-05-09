@@ -58,7 +58,7 @@ public interface NetconfDataTreeService extends DOMService {
      *
      * @return result of &lt;get&gt; operation
      */
-    ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path);
+    ListenableFuture<Optional<NormalizedNode>> get(YangInstanceIdentifier path);
 
     /**
      * The &lt;get&gt; operation with specific fields that are read from device.
@@ -67,8 +67,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @param fields list of fields (paths relative to parent path)
      * @return result of &lt;get&gt; operation
      */
-    ListenableFuture<Optional<NormalizedNode<?, ?>>> get(YangInstanceIdentifier path,
-                                                         List<YangInstanceIdentifier> fields);
+    ListenableFuture<Optional<NormalizedNode>> get(YangInstanceIdentifier path, List<YangInstanceIdentifier> fields);
 
     /**
      * The &lt;get-config&gt; operation.
@@ -76,15 +75,15 @@ public interface NetconfDataTreeService extends DOMService {
      *
      * @return result of &lt;get-config&gt; operation
      */
-    ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path);
+    ListenableFuture<Optional<NormalizedNode>> getConfig(YangInstanceIdentifier path);
 
     /**
      * The &lt;get-config&gt; operation with specified fields that are read from device.
      *
      * @return result of &lt;get-config&gt; operation
      */
-    ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(YangInstanceIdentifier path,
-                                                               List<YangInstanceIdentifier> fields);
+    ListenableFuture<Optional<NormalizedNode>> getConfig(YangInstanceIdentifier path,
+                                                         List<YangInstanceIdentifier> fields);
 
     /**
      * The &lt;edit-config&gt; operation with "merge" attribute.
@@ -94,8 +93,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                   NormalizedNode<?, ?> data,
-                                                   Optional<ModifyAction> defaultOperation);
+                                                   NormalizedNode data, Optional<ModifyAction> defaultOperation);
 
     /**
      * The &lt;edit-config&gt; operation with "replace" attribute.
@@ -105,8 +103,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                     NormalizedNode<?, ?> data,
-                                                     Optional<ModifyAction> defaultOperation);
+                                                     NormalizedNode data, Optional<ModifyAction> defaultOperation);
 
     /**
      * The &lt;edit-config&gt; operation with "create" attribute.
@@ -116,8 +113,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                    NormalizedNode<?, ?> data,
-                                                    Optional<ModifyAction> defaultOperation);
+                                                    NormalizedNode data, Optional<ModifyAction> defaultOperation);
 
     /**
      * The &lt;edit-config&gt; operation with "create" attribute.
