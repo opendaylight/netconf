@@ -26,10 +26,10 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.NormalizedMetadataWriter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -137,7 +137,7 @@ public final class NetconfUtil {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized, final DOMResult result,
+    public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
                                            final SchemaPath schemaPath, final EffectiveModelContext context)
             throws IOException, XMLStreamException {
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
@@ -161,7 +161,7 @@ public final class NetconfUtil {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized,
+    public static void writeNormalizedNode(final NormalizedNode normalized,
                                            final @Nullable NormalizedMetadata metadata,
                                            final DOMResult result, final SchemaPath schemaPath,
                                            final EffectiveModelContext context) throws IOException, XMLStreamException {
@@ -367,7 +367,6 @@ public final class NetconfUtil {
         }
         return resultHolder;
     }
-
 
     // FIXME: document this interface contract. Does it support RFC8528/RFC8542? How?
     public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final EffectiveModelContext schemaContext,
