@@ -28,7 +28,8 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
 
-    public void serialize(DataTreeCandidate candidate, boolean leafNodesOnly, boolean skipData) throws T {
+    public void serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly, final boolean skipData)
+            throws T {
         final Deque<PathArgument> path = new ArrayDeque<>();
         path.addAll(candidate.getRootPath().getPathArguments());
         if (leafNodesOnly) {
@@ -39,9 +40,9 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
         serializeData(path, candidate.getRootNode(), skipData);
     }
 
-    void serializeLeafNodesOnly(Deque<PathArgument> path, DataTreeCandidateNode candidate, boolean skipData)
-            throws T {
-        NormalizedNode<?, ?> node = null;
+    void serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
+            final boolean skipData) throws T {
+        NormalizedNode node = null;
         switch (candidate.getModificationType()) {
             case UNMODIFIED:
                 // no reason to do anything with an unmodified node
@@ -84,7 +85,7 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     abstract void serializeOperation(DataTreeCandidateNode candidate) throws T;
 
-    String convertPath(Collection<PathArgument> path) {
+    String convertPath(final Collection<PathArgument> path) {
         final StringBuilder pathBuilder = new StringBuilder();
 
         for (PathArgument pathArgument : path) {
@@ -112,7 +113,7 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
         return pathBuilder.toString();
     }
 
-    String modificationTypeToOperation(DataTreeCandidateNode candidate, ModificationType modificationType) {
+    String modificationTypeToOperation(final DataTreeCandidateNode candidate, final ModificationType modificationType) {
         switch (modificationType) {
             case UNMODIFIED:
                 // shouldn't ever happen since the root of a modification is only triggered by some event

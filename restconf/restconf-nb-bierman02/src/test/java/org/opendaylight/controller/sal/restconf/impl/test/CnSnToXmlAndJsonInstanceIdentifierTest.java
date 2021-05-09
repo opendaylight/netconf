@@ -12,8 +12,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -122,30 +120,29 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
 
     }
 
-    private static YangInstanceIdentifier createInstanceIdentifier() throws URISyntaxException {
+    private static YangInstanceIdentifier createInstanceIdentifier() {
         final List<PathArgument> pathArguments = new ArrayList<>();
-        pathArguments.add(new NodeIdentifier(QName.create(new URI("instance:identifier:module"), "cont")));
-        pathArguments.add(new NodeIdentifier(QName.create(new URI("instance:identifier:module"), "cont1")));
+        pathArguments.add(new NodeIdentifier(QName.create("instance:identifier:module", "cont")));
+        pathArguments.add(new NodeIdentifier(QName.create("instance:identifier:module", "cont1")));
 
-        final QName qName = QName.create(new URI("augment:module"), "lst11");
+        final QName qName = QName.create("augment:module", "lst11");
         final Map<QName, Object> keyValues = new HashMap<>();
-        keyValues.put(QName.create(new URI("augment:module"), "keyvalue111"), "value1");
-        keyValues.put(QName.create(new URI("augment:module"), "keyvalue112"), "value2");
+        keyValues.put(QName.create("augment:module", "keyvalue111"), "value1");
+        keyValues.put(QName.create("augment:module", "keyvalue112"), "value2");
         final NodeIdentifierWithPredicates nodeIdentifierWithPredicates =
                 NodeIdentifierWithPredicates.of(qName, keyValues);
         pathArguments.add(nodeIdentifierWithPredicates);
 
-        pathArguments.add(new NodeIdentifier(QName.create(new URI("augment:augment:module"), "lf112")));
+        pathArguments.add(new NodeIdentifier(QName.create("augment:augment:module", "lf112")));
 
         return YangInstanceIdentifier.create(pathArguments);
     }
 
-    private static YangInstanceIdentifier createInstanceIdentifierWithLeafList() throws URISyntaxException {
+    private static YangInstanceIdentifier createInstanceIdentifierWithLeafList() {
         final List<PathArgument> pathArguments = new ArrayList<>();
-        pathArguments.add(new NodeIdentifier(QName.create(new URI("instance:identifier:module"), "cont")));
-        pathArguments.add(new NodeIdentifier(QName.create(new URI("instance:identifier:module"), "cont1")));
-        pathArguments.add(new NodeWithValue<>(QName.create(new URI("augment:module:leaf:list"), "lflst11"),
-                "lflst11_1"));
+        pathArguments.add(new NodeIdentifier(QName.create("instance:identifier:module", "cont")));
+        pathArguments.add(new NodeIdentifier(QName.create("instance:identifier:module", "cont1")));
+        pathArguments.add(new NodeWithValue<>(QName.create("augment:module:leaf:list", "lflst11"), "lflst11_1"));
 
         return YangInstanceIdentifier.create(pathArguments);
     }

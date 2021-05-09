@@ -49,7 +49,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetExceptio
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class JsonNormalizedNodeBodyReader
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
 
-    public JsonNormalizedNodeBodyReader(ControllerContext controllerContext) {
+    public JsonNormalizedNodeBodyReader(final ControllerContext controllerContext) {
         super(controllerContext);
     }
 
@@ -110,49 +110,48 @@ public class JsonNormalizedNodeBodyReader
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final SchemaNode parentSchema;
+        final SchemaInferenceStack parentSchema;
         if (isPost) {
             // FIXME: We need dispatch for RPC.
-            parentSchema = path.getSchemaNode();
-        } else if (path.getSchemaNode() instanceof SchemaContext) {
-            parentSchema = path.getSchemaContext();
+            parentSchema = SchemaInferenceStack.ofInstantiatedPath(path.getSchemaContext(),
+                path.getSchemaNode().getPath());
+        } else if (path.getSchemaNode() instanceof SchemaContext
+                || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
+            parentSchema = SchemaInferenceStack.of(path.getSchemaContext());
         } else {
-            if (SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
-                parentSchema = path.getSchemaContext();
-            } else {
-                parentSchema = SchemaContextUtil
-                        .findDataSchemaNode(path.getSchemaContext(), path.getSchemaNode().getPath().getParent());
-            }
+            parentSchema = SchemaInferenceStack.ofInstantiatedPath(path.getSchemaContext(),
+                path.getSchemaNode().getPath().getParent());
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
-            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(path.getSchemaContext()), parentSchema);
+            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(path.getSchemaContext()),
+            parentSchema.toInference());
         final JsonReader reader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get(),
                 StandardCharsets.UTF_8));
         jsonParser.parse(reader);
 
-        NormalizedNode<?, ?> result = resultHolder.getResult();
+        NormalizedNode result = resultHolder.getResult();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> newIIContext;
 
         while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
-            final Object childNode = ((DataContainerNode<?>) result).getValue().iterator().next();
+            final Object childNode = ((DataContainerNode) result).body().iterator().next();
             if (isPost) {
                 iiToDataList.add(result.getIdentifier());
             }
-            result = (NormalizedNode<?, ?>) childNode;
+            result = (NormalizedNode) childNode;
         }
 
         if (isPost) {
             if (result instanceof MapEntryNode) {
-                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getNodeType()));
+                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getIdentifier().getNodeType()));
                 iiToDataList.add(result.getIdentifier());
             } else {
                 iiToDataList.add(result.getIdentifier());
             }
         } else {
             if (result instanceof MapNode) {
-                result = Iterables.getOnlyElement(((MapNode) result).getValue());
+                result = Iterables.getOnlyElement(((MapNode) result).body());
             }
         }
 

@@ -15,18 +15,14 @@ import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
 import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
+import org.opendaylight.yangtools.yang.model.ri.type.BaseTypes;
 
 public class RestCodecExceptionsTest {
-
-    private static final SchemaPath PATH = SchemaPath.create(true, QName.create("test", "2014-05-30", "test"));
-
     @Test
     public void serializeExceptionTest() {
-        final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(BaseTypes.bitsTypeBuilder(PATH).build(),
-            null, null);
+        final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(
+            BaseTypes.bitsTypeBuilder(QName.create("test", "2014-05-30", "test")).build(), null, null);
         final String serializedValue = (String) codec.serialize("incorrect value"); // set
                                                                               // expected
         assertEquals("incorrect value", serializedValue);
@@ -39,5 +35,4 @@ public class RestCodecExceptionsTest {
         final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(mockedIidentityrefType, null, null);
         assertNull(codec.deserialize("incorrect value"));
     }
-
 }

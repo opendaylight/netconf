@@ -109,12 +109,12 @@ public class ProxyNetconfServiceTest {
     @Test
     public void testGet() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> get = netconf.get(PATH);
+        final ListenableFuture<Optional<NormalizedNode>> get = netconf.get(PATH);
         final GetRequest getRequest = masterActor.expectMsgClass(GetRequest.class);
         assertEquals(PATH, getRequest.getPath());
 
         masterActor.reply(new NormalizedNodeMessage(PATH, node));
-        final Optional<NormalizedNode<?, ?>> result = get.get(5, TimeUnit.SECONDS);
+        final Optional<NormalizedNode> result = get.get(5, TimeUnit.SECONDS);
         assertTrue(result.isPresent());
         assertEquals(node, result.get());
     }
@@ -123,7 +123,7 @@ public class ProxyNetconfServiceTest {
     public void testGetFailure() throws InterruptedException, TimeoutException {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
 
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> get = netconf.get(PATH);
+        final ListenableFuture<Optional<NormalizedNode>> get = netconf.get(PATH);
         masterActor.expectMsgClass(GetRequest.class);
         final RuntimeException mockEx = new RuntimeException("fail");
         masterActor.reply(new Status.Failure(mockEx));
@@ -141,22 +141,22 @@ public class ProxyNetconfServiceTest {
     @Test
     public void testGetEmpty() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> get = netconf.get(PATH);
+        final ListenableFuture<Optional<NormalizedNode>> get = netconf.get(PATH);
         masterActor.expectMsgClass(GetRequest.class);
         masterActor.reply(new EmptyReadResponse());
-        final Optional<NormalizedNode<?, ?>> result = get.get(5, TimeUnit.SECONDS);
+        final Optional<NormalizedNode> result = get.get(5, TimeUnit.SECONDS);
         assertFalse(result.isPresent());
     }
 
     @Test
     public void testGetConfig() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig = netconf.getConfig(PATH);
+        final ListenableFuture<Optional<NormalizedNode>> getConfig = netconf.getConfig(PATH);
         final GetConfigRequest getRequest = masterActor.expectMsgClass(GetConfigRequest.class);
         assertEquals(PATH, getRequest.getPath());
 
         masterActor.reply(new NormalizedNodeMessage(PATH, node));
-        final Optional<NormalizedNode<?, ?>> result = getConfig.get(5, TimeUnit.SECONDS);
+        final Optional<NormalizedNode> result = getConfig.get(5, TimeUnit.SECONDS);
         assertTrue(result.isPresent());
         assertEquals(node, result.get());
     }
@@ -165,7 +165,7 @@ public class ProxyNetconfServiceTest {
     public void testGetConfigFailure() throws InterruptedException, TimeoutException {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
 
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig = netconf.getConfig(PATH);
+        final ListenableFuture<Optional<NormalizedNode>> getConfig = netconf.getConfig(PATH);
         masterActor.expectMsgClass(GetConfigRequest.class);
         final RuntimeException mockEx = new RuntimeException("fail");
         masterActor.reply(new Status.Failure(mockEx));
@@ -183,10 +183,10 @@ public class ProxyNetconfServiceTest {
     @Test
     public void testGetConfigEmpty() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig = netconf.getConfig(PATH);
+        final ListenableFuture<Optional<NormalizedNode>> getConfig = netconf.getConfig(PATH);
         masterActor.expectMsgClass(GetConfigRequest.class);
         masterActor.reply(new EmptyReadResponse());
-        final Optional<NormalizedNode<?, ?>> result = getConfig.get(5, TimeUnit.SECONDS);
+        final Optional<NormalizedNode> result = getConfig.get(5, TimeUnit.SECONDS);
         assertFalse(result.isPresent());
     }
 

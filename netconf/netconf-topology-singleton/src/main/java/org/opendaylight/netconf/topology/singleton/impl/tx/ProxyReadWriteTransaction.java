@@ -53,7 +53,7 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
             final ExecutionContext executionContext, final Timeout askTimeout) {
         this.id = id;
 
-        masterTxActorFuture.onComplete(new OnComplete<Object>() {
+        masterTxActorFuture.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object masterTxActor) {
                 final ProxyTransactionFacade newTransactionFacade;
@@ -82,11 +82,11 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
     }
 
     @Override
-    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+    public FluentFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {}", id, store, path);
 
-        final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
+        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
         processTransactionOperation(facade -> returnFuture.setFuture(facade.read(store, path)));
         return FluentFuture.from(returnFuture);
     }
@@ -109,16 +109,14 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
     }
 
     @Override
-    public void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                    final NormalizedNode<?, ?> data) {
+    public void put(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data) {
         checkOpen();
         LOG.debug("{}: Put {} {}", id, store, path);
         processTransactionOperation(facade -> facade.put(store, path, data));
     }
 
     @Override
-    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                      final NormalizedNode<?, ?> data) {
+    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data) {
         checkOpen();
         LOG.debug("{}: Merge {} {}", id, store, path);
         processTransactionOperation(facade -> facade.merge(store, path, data));

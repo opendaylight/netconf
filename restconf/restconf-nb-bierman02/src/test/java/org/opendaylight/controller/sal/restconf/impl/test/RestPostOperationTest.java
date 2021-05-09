@@ -129,7 +129,6 @@ public class RestPostOperationTest extends JerseyTest {
 
         final ArgumentCaptor<YangInstanceIdentifier> instanceIdCaptor =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        @SuppressWarnings("rawtypes")
         final ArgumentCaptor<NormalizedNode> compNodeCaptor = ArgumentCaptor.forClass(NormalizedNode.class);
 
 

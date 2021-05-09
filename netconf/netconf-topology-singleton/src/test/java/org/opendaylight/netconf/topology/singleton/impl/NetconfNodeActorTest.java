@@ -494,7 +494,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         assertTrue(slaveDomRPCService instanceof ProxyDOMRpcService);
 
         final QName testQName = QName.create("", "TestQname");
-        final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
+        final NormalizedNode outputNode = ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(testQName))
                 .withChild(ImmutableNodes.leafNode(testQName, "foo")).build();
         final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, null, "Rpc invocation failed.");
@@ -641,8 +641,9 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
         final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
-        final NormalizedNode<?, ?> NODE = Builders.containerBuilder()
-            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont"))).build();
+        final ContainerNode NODE = Builders.containerBuilder()
+            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
+            .build();
 
         final FluentFuture<Optional<Object>> result = immediateFluentFuture(Optional.of(NODE));
         doReturn(result).when(netconfService).get(PATH);

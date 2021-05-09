@@ -57,12 +57,14 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -76,7 +78,6 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -122,7 +123,7 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull QName IETF_NETCONF_NOTIFICATIONS =
             QName.create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications").intern();
 
-    public static final URI NETCONF_URI = NETCONF_QNAME.getNamespace();
+    public static final XMLNamespace NETCONF_URI = NETCONF_QNAME.getNamespace();
 
     public static final @NonNull NodeIdentifier NETCONF_DATA_NODEID = NodeIdentifier.create(NETCONF_DATA_QNAME);
 
@@ -223,12 +224,7 @@ public final class NetconfMessageTransformUtil {
 
     public static final @NonNull NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(NETCONF_FILTER_QNAME);
 
-    public static final @NonNull DataContainerChild<?, ?> EMPTY_FILTER;
-
-    static {
-        final Element element = getNetconfFilterElement();
-        EMPTY_FILTER = buildFilterStructure(element);
-    }
+    public static final @NonNull AnyxmlNode<?> EMPTY_FILTER = buildFilterStructure(getNetconfFilterElement());
 
     /**
      * Creation of the subtree filter structure using {@link YangInstanceIdentifier} path.
@@ -237,8 +233,8 @@ public final class NetconfMessageTransformUtil {
      * @param ctx        mountpoint schema context
      * @return created DOM structure with subtree filter
      */
-    public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
-                                                             final EffectiveModelContext ctx) {
+    public static AnyxmlNode<?> toFilterStructure(final YangInstanceIdentifier identifier,
+                                                       final EffectiveModelContext ctx) {
         final Element element = getNetconfFilterElement();
         try {
             NetconfUtil.writeFilter(identifier, new DOMResult(element), SchemaPath.ROOT, ctx);
@@ -256,8 +252,8 @@ public final class NetconfMessageTransformUtil {
      * @param ctx           mountpoint schema context
      * @return created DOM structure with subtree filter
      */
-    public static DataContainerChild<?, ?> toFilterStructure(final List<FieldsFilter> fieldsFilters,
-                                                             final EffectiveModelContext ctx) {
+    public static AnyxmlNode<?> toFilterStructure(final List<FieldsFilter> fieldsFilters,
+                                                  final EffectiveModelContext ctx) {
         Preconditions.checkState(!fieldsFilters.isEmpty(), "An empty list of subtree filters is not allowed");
         final Element element = getNetconfFilterElement();
 
@@ -281,7 +277,7 @@ public final class NetconfMessageTransformUtil {
         return element;
     }
 
-    private static DataContainerChild<?, ?> buildFilterStructure(final Element element) {
+    private static AnyxmlNode<?> buildFilterStructure(final Element element) {
         return Builders.anyXmlBuilder()
                 .withNodeIdentifier(NETCONF_FILTER_NODEID)
                 .withValue(new DOMSource(element))
@@ -376,29 +372,24 @@ public final class NetconfMessageTransformUtil {
         return new NodeContainerProxy(NETCONF_DATA_QNAME, schemaContext.getChildNodes());
     }
 
-    public static @NonNull ContainerSchemaNode createSchemaForNotification(final NotificationDefinition next) {
-        return new NodeContainerProxy(next.getQName(), next.getChildNodes(), next.getAvailableAugmentations());
-    }
-
     @Deprecated
-    public static @NonNull ContainerNode wrap(final QName name, final DataContainerChild<?, ?>... node) {
+    public static @NonNull ContainerNode wrap(final QName name, final DataContainerChild... node) {
         return wrap(toId(name), node);
     }
 
-    public static @NonNull ContainerNode wrap(final NodeIdentifier name, final DataContainerChild<?, ?>... node) {
+    public static @NonNull ContainerNode wrap(final NodeIdentifier name, final DataContainerChild... node) {
         return Builders.containerBuilder().withNodeIdentifier(name).withValue(ImmutableList.copyOf(node)).build();
     }
 
     public static DOMSourceAnyxmlNode createEditConfigAnyxml(
             final EffectiveModelContext ctx, final YangInstanceIdentifier dataPath,
-            final Optional<ModifyAction> operation,
-            final Optional<NormalizedNode<?, ?>> lastChildOverride) {
-        final NormalizedNode<?, ?> configContent;
+            final Optional<ModifyAction> operation, final Optional<NormalizedNode> lastChildOverride) {
+        final NormalizedNode configContent;
         final NormalizedMetadata metadata;
         if (dataPath.isEmpty()) {
             Preconditions.checkArgument(lastChildOverride.isPresent(),
                     "Data has to be present when creating structure for top level element");
-            Preconditions.checkArgument(lastChildOverride.get() instanceof DataContainerChild<?, ?>,
+            Preconditions.checkArgument(lastChildOverride.get() instanceof DataContainerChild,
                     "Data has to be either container or a list node when creating structure for top level element, "
                             + "but was: %s", lastChildOverride.get());
             configContent = lastChildOverride.get();
@@ -445,9 +436,9 @@ public final class NetconfMessageTransformUtil {
         }
     }
 
-    public static DataContainerChild<?, ?> createEditConfigStructure(final EffectiveModelContext ctx,
+    public static DataContainerChild createEditConfigStructure(final EffectiveModelContext ctx,
             final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
-            final Optional<NormalizedNode<?, ?>> lastChildOverride) {
+            final Optional<NormalizedNode> lastChildOverride) {
         return Builders.choiceBuilder().withNodeIdentifier(EDIT_CONTENT_NODEID)
                 .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
     }
@@ -570,7 +561,7 @@ public final class NetconfMessageTransformUtil {
                     XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, inputPath)) {
                 try (SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
                         new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, inputPath)) {
-                    final Collection<DataContainerChild<?, ?>> value = normalized.getValue();
+                    final Collection<DataContainerChild> value = normalized.body();
                     normalizedNodeWriter.write(value);
                     normalizedNodeWriter.flush();
                 }

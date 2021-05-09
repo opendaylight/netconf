@@ -19,9 +19,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.FluentFuture;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -53,8 +52,8 @@ import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -90,8 +89,8 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_VOID_INVOKER = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
-            return immediateFluentFuture(new DefaultDOMRpcResult(null, Collections.emptyList()));
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+            return immediateFluentFuture(new DefaultDOMRpcResult(null, List.of()));
         }
 
         @Override
@@ -102,7 +101,7 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_FAILED_INVOCATION = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
             return immediateFailedFluentFuture(new DOMRpcException("rpc invocation not implemented yet") {
                 private static final long serialVersionUID = 1L;
             });
@@ -116,9 +115,8 @@ public class RuntimeRpcTest {
 
     private final DOMRpcService rpcServiceSuccessfulInvocation = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
-            final Collection<DataContainerChild<? extends PathArgument, ?>> children =
-                    ((ContainerNode) input).getValue();
+        public FluentFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
+            final Collection<DataContainerChild> children = ((ContainerNode) input).body();
             final Module module = SCHEMA_CONTEXT.findModules(type.getNamespace()).stream()
                 .findFirst().orElse(null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(),
@@ -278,7 +276,7 @@ public class RuntimeRpcTest {
         assertTrue(dd.identical());
     }
 
-    private static RpcDefinition getRpcDefinitionFromModule(final Module module, final URI namespaceURI,
+    private static RpcDefinition getRpcDefinitionFromModule(final Module module, final XMLNamespace namespaceURI,
             final String name) {
         for (final RpcDefinition rpcDef : module.getRpcs()) {
             if (rpcDef.getQName().getNamespace().equals(namespaceURI)
