@@ -58,9 +58,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -222,7 +222,7 @@ public class InvokeRpcMethodTest {
 
     @Test
     public void testInvokeRpcWithNoPayload_Success() {
-        final NormalizedNode<?, ?> resultObj = null;
+        final NormalizedNode resultObj = null;
         final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
@@ -239,7 +239,7 @@ public class InvokeRpcMethodTest {
     @Test
     public void testInvokeRpcWithEmptyOutput() {
         final ContainerNode resultObj = Mockito.mock(ContainerNode.class);
-        Mockito.when(resultObj.getValue()).thenReturn(Collections.emptySet());
+        Mockito.when(resultObj.body()).thenReturn(Collections.emptySet());
         final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
 
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
