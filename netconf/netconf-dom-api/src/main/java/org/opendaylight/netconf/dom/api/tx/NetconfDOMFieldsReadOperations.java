@@ -29,6 +29,6 @@ public interface NetconfDOMFieldsReadOperations {
      *         also next fields that are required to successfully build output {@link NormalizedNode}.
      * @throws NullPointerException if any argument is null
      */
-    @NonNull FluentFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                               List<YangInstanceIdentifier> fields);
+    @NonNull FluentFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path,
+                                                         List<YangInstanceIdentifier> fields);
 }

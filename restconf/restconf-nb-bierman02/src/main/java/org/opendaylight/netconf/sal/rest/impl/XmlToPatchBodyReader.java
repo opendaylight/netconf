@@ -79,7 +79,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
 
-    public XmlToPatchBodyReader(ControllerContext controllerContext) {
+    public XmlToPatchBodyReader(final ControllerContext controllerContext) {
         super(controllerContext);
     }
 
@@ -173,7 +173,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             }
 
             if (oper.isWithValue()) {
-                final NormalizedNode<?, ?> parsed;
+                final NormalizedNode parsed;
                 if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
                     final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);

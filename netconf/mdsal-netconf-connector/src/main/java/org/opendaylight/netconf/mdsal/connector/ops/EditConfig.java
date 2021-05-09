@@ -24,6 +24,9 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -32,7 +35,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -95,7 +97,7 @@ public final class EditConfig extends AbstractEdit {
     private void executeChange(final DOMDataTreeReadWriteTransaction rwtx, final DataTreeChange change)
             throws DocumentedException {
         final YangInstanceIdentifier path = change.getPath();
-        final NormalizedNode<?, ?> changeData = change.getChangeRoot();
+        final NormalizedNode changeData = change.getChangeRoot();
         switch (change.getAction()) {
             case NONE:
                 return;
@@ -139,16 +141,17 @@ public final class EditConfig extends AbstractEdit {
     }
 
     private void mergeParentMixin(final DOMDataTreeReadWriteTransaction rwtx, final YangInstanceIdentifier path,
-                                final NormalizedNode<?, ?> change) {
+                                  final NormalizedNode change) {
         final YangInstanceIdentifier parentNodeYid = path.getParent();
         if (change instanceof MapEntryNode) {
-            final SchemaNode schemaNode = SchemaContextUtil.findNodeInSchemaContext(
-                    schemaContext.getCurrentContext(),
-                    parentNodeYid.getPathArguments().stream()
-                            // filter out identifiers not present in the schema tree
-                            .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
-                            .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
-                            .map(YangInstanceIdentifier.PathArgument::getNodeType).collect(Collectors.toList()));
+            final SchemaNode schemaNode = schemaContext.getCurrentContext()
+                .findDataTreeChild(parentNodeYid.getPathArguments().stream()
+                    // filter out identifiers not present in the schema tree
+                    .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
+                    .filter(arg -> !(arg instanceof AugmentationIdentifier))
+                    .map(PathArgument::getNodeType)
+                    .collect(Collectors.toList()))
+                .orElse(null);
 
             // we should have the schema node that points to the parent list now, enforce it
             Preconditions.checkState(schemaNode instanceof ListSchemaNode, "Schema node is not pointing to a list.");
