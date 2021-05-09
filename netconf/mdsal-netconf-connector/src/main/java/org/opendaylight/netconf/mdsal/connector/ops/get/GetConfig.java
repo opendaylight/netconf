@@ -65,7 +65,7 @@ public class GetConfig extends AbstractGet {
 
         final DOMDataTreeReadWriteTransaction rwTx = getTransaction(getConfigExecution.getDatastore().get());
         try {
-            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
+            final Optional<NormalizedNode> normalizedNodeOptional = rwTx.read(
                     LogicalDatastoreType.CONFIGURATION, dataRoot).get();
             if (getConfigExecution.getDatastore().get() == Datastore.running) {
                 transactionProvider.abortRunningTransaction(rwTx);

@@ -26,8 +26,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.parser.api.YangParserException;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
+import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import org.xml.sax.SAXException;
 
 public class NotificationsTransformUtilTest {
@@ -51,7 +51,7 @@ public class NotificationsTransformUtilTest {
 
     @BeforeClass
     public static void beforeClass() throws YangParserException {
-        UTIL = new NotificationsTransformUtil(new YangParserFactoryImpl(), new DefaultBindingRuntimeGenerator(),
+        UTIL = new NotificationsTransformUtil(new DefaultYangParserFactory(), new DefaultBindingRuntimeGenerator(),
             new DefaultBindingDOMCodecFactory());
     }
 
