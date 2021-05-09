@@ -22,8 +22,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -50,11 +48,12 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapEntryNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -172,12 +171,7 @@ public final class TestUtils {
     }
 
     public static QName buildQName(final String name, final String uri, final String date, final String prefix) {
-        try {
-            final URI u = new URI(uri);
-            return QName.create(u, Revision.ofNullable(date), name);
-        } catch (final URISyntaxException e) {
-            return null;
-        }
+        return QName.create(XMLNamespace.of(uri), Revision.ofNullable(date), name);
     }
 
     public static QName buildQName(final String name, final String uri, final String date) {
@@ -246,7 +240,7 @@ public final class TestUtils {
         return NodeIdentifierWithPredicates.of(QName.create(namespace, revision, localName), predicate);
     }
 
-    public static NormalizedNode<?, ?> prepareNormalizedNodeWithIetfInterfacesInterfacesData() throws ParseException {
+    public static NormalizedNode prepareNormalizedNodeWithIetfInterfacesInterfacesData() throws ParseException {
         final String ietfInterfacesDate = "2013-07-04";
         final String namespace = "urn:ietf:params:xml:ns:yang:ietf-interfaces";
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryNode =

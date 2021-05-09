@@ -16,7 +16,6 @@ import com.google.gson.stream.JsonWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +37,16 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.ForwardingNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -53,10 +54,8 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -130,13 +129,13 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         checkState(errorsSchemaNode instanceof ContainerSchemaNode, "Found Errors SchemaNode isn't ContainerNode");
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> errContBuild =
-                Builders.containerBuilder((ContainerSchemaNode) errorsSchemaNode);
+                SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) errorsSchemaNode);
 
         final List<DataSchemaNode> schemaList = ControllerContext.findInstanceDataChildrenByName(errorsSchemaNode,
                 Draft02.RestConfModule.ERROR_LIST_SCHEMA_NODE);
         final DataSchemaNode errListSchemaNode = Iterables.getFirst(schemaList, null);
         checkState(errListSchemaNode instanceof ListSchemaNode, "Found Error SchemaNode isn't ListSchemaNode");
-        final CollectionNodeBuilder<MapEntryNode, MapNode> listErorsBuilder = Builders
+        final CollectionNodeBuilder<MapEntryNode, SystemMapNode> listErorsBuilder = SchemaAwareBuilders
                 .mapBuilder((ListSchemaNode) errListSchemaNode);
 
 
@@ -162,21 +161,21 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         checkArgument(errListSchemaNode instanceof ListSchemaNode,
                 "errListSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) errListSchemaNode;
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> errNodeValues = Builders
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> errNodeValues = SchemaAwareBuilders
                 .mapEntryBuilder(listStreamSchemaNode);
 
         List<DataSchemaNode> lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
                 listStreamSchemaNode, "error-type");
         final DataSchemaNode errTypSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
         checkState(errTypSchemaNode instanceof LeafSchemaNode);
-        errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errTypSchemaNode)
+        errNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) errTypSchemaNode)
                 .withValue(error.getErrorType().getErrorTypeTag()).build());
 
         lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
                 listStreamSchemaNode, "error-tag");
         final DataSchemaNode errTagSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
         checkState(errTagSchemaNode instanceof LeafSchemaNode);
-        errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errTagSchemaNode)
+        errNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) errTagSchemaNode)
                 .withValue(error.getErrorTag().getTagValue()).build());
 
         if (error.getErrorAppTag() != null) {
@@ -184,7 +183,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
                     listStreamSchemaNode, "error-app-tag");
             final DataSchemaNode errAppTagSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
             checkState(errAppTagSchemaNode instanceof LeafSchemaNode);
-            errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errAppTagSchemaNode)
+            errNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) errAppTagSchemaNode)
                     .withValue(error.getErrorAppTag()).build());
         }
 
@@ -192,7 +191,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
                 listStreamSchemaNode, "error-message");
         final DataSchemaNode errMsgSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
         checkState(errMsgSchemaNode instanceof LeafSchemaNode);
-        errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errMsgSchemaNode)
+        errNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) errMsgSchemaNode)
                 .withValue(error.getErrorMessage()).build());
 
         if (error.getErrorInfo() != null) {
@@ -211,7 +210,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
     private static Object toJsonResponseBody(final NormalizedNodeContext errorsNode,
                                              final DataNodeContainer errorsSchemaNode) {
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        NormalizedNode<?, ?> data = errorsNode.getData();
+        NormalizedNode data = errorsNode.getData();
         final InstanceIdentifierContext<?> context = errorsNode.getInstanceIdentifierContext();
         final DataSchemaNode schema = (DataSchemaNode) context.getSchemaNode();
 
@@ -222,7 +221,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
 
         boolean isDataRoot = false;
-        URI initialNs = null;
+        XMLNamespace initialNs = null;
         if (SchemaPath.ROOT.equals(path)) {
             isDataRoot = true;
         } else {
@@ -286,7 +285,9 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
                 writeDataRoot(outputWriter,nnWriter,(ContainerNode) data);
             } else {
                 if (data instanceof MapEntryNode) {
-                    data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild((MapEntryNode) data).build();
+                    data = ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
+                        .withChild((MapEntryNode) data)
+                        .build();
                 }
                 nnWriter.write(data);
             }
@@ -316,7 +317,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-        NormalizedNode<?, ?> data = errorsNode.getData();
+        NormalizedNode data = errorsNode.getData();
         SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
         boolean isDataRoot = false;
@@ -394,7 +395,9 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
                 if (data instanceof MapEntryNode) {
                     // Restconf allows returning one list item. We need to wrap it
                     // in map node in order to serialize it properly
-                    data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).addChild((MapEntryNode) data).build();
+                    data = ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
+                        .addChild((MapEntryNode) data)
+                        .build();
                 }
                 nnWriter.write(data);
                 nnWriter.flush();
@@ -411,7 +414,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final QName name = SchemaContext.NAME;
         try {
             xmlWriter.writeStartElement(name.getNamespace().toString(), name.getLocalName());
-            for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+            for (final DataContainerChild child : data.body()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();
@@ -424,7 +427,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
     private static void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter,
                                       final ContainerNode data) throws IOException {
-        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+        for (final DataContainerChild child : data.body()) {
             nnWriter.write(child);
             nnWriter.flush();
         }

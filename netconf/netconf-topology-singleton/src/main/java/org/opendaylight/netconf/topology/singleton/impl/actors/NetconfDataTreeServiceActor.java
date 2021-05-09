@@ -67,27 +67,27 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
         if (message instanceof GetWithFieldsRequest) {
             final GetWithFieldsRequest getRequest = (GetWithFieldsRequest) message;
             final YangInstanceIdentifier path = getRequest.getPath();
-            final ListenableFuture<Optional<NormalizedNode<?, ?>>> future = netconfService.get(
+            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.get(
                     getRequest.getPath(), getRequest.getFields());
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof GetRequest) {
             final GetRequest getRequest = (GetRequest) message;
             final YangInstanceIdentifier path = getRequest.getPath();
-            final ListenableFuture<Optional<NormalizedNode<?, ?>>> future = netconfService.get(path);
+            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.get(path);
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof GetConfigWithFieldsRequest) {
             final GetConfigWithFieldsRequest getConfigRequest = (GetConfigWithFieldsRequest) message;
             final YangInstanceIdentifier path = getConfigRequest.getPath();
-            final ListenableFuture<Optional<NormalizedNode<?, ?>>> future = netconfService.getConfig(
+            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.getConfig(
                     path, getConfigRequest.getFields());
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof GetConfigRequest) {
             final GetConfigRequest getConfigRequest = (GetConfigRequest) message;
             final YangInstanceIdentifier path = getConfigRequest.getPath();
-            final ListenableFuture<Optional<NormalizedNode<?, ?>>> future = netconfService.getConfig(path);
+            final ListenableFuture<Optional<NormalizedNode>> future = netconfService.getConfig(path);
             context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof LockRequest) {
@@ -182,11 +182,11 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
         }, MoreExecutors.directExecutor());
     }
 
-    private static void sendResult(final ListenableFuture<Optional<NormalizedNode<?, ?>>> feature,
+    private static void sendResult(final ListenableFuture<Optional<NormalizedNode>> feature,
             final YangInstanceIdentifier path, final ActorRef sender, final ActorRef self) {
         Futures.addCallback(feature, new FutureCallback<>() {
             @Override
-            public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
+            public void onSuccess(final Optional<NormalizedNode> result) {
                 if (result.isEmpty()) {
                     sender.tell(new EmptyReadResponse(), self);
                     return;

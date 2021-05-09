@@ -52,7 +52,7 @@ public final class RestconfInvokeOperationsUtil {
      *             schema path of data
      * @return {@link DOMRpcResult}
      */
-    public static DOMRpcResult invokeRpcViaMountPoint(final DOMMountPoint mountPoint, final NormalizedNode<?, ?> data,
+    public static DOMRpcResult invokeRpcViaMountPoint(final DOMMountPoint mountPoint, final NormalizedNode data,
             final QName schemaPath) {
         final Optional<DOMRpcService> mountPointService = mountPoint.getService(DOMRpcService.class);
         if (mountPointService.isPresent()) {
@@ -74,12 +74,11 @@ public final class RestconfInvokeOperationsUtil {
      *             rpc service to invoke rpc
      * @return {@link DOMRpcResult}
      */
-    public static DOMRpcResult invokeRpc(final NormalizedNode<?, ?> data, final QName rpc,
-            final DOMRpcService rpcService) {
+    public static DOMRpcResult invokeRpc(final NormalizedNode data, final QName rpc, final DOMRpcService rpcService) {
         return prepareResult(rpcService.invokeRpc(rpc, nonnullInput(rpc, data)));
     }
 
-    private static @NonNull NormalizedNode<?, ?> nonnullInput(final QName type, final NormalizedNode<?, ?> input) {
+    private static @NonNull NormalizedNode nonnullInput(final QName type, final NormalizedNode input) {
         return input != null ? input
                 : ImmutableNodes.containerNode(YangConstants.operationInputQName(type.getModule()));
     }

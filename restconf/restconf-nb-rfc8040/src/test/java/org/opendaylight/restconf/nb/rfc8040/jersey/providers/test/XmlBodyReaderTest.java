@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
@@ -30,8 +29,8 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBo
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
@@ -44,7 +43,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class XmlBodyReaderTest extends AbstractBodyReaderTest {
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
-        URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
+        XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
 
     private static EffectiveModelContext schemaContext;
 
@@ -86,15 +85,14 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
 
         assertTrue(nnc.getData() instanceof MapEntryNode);
         final MapEntryNode data = (MapEntryNode) nnc.getData();
-        assertTrue(data.getValue().size() == 2);
-        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
-            switch (child.getNodeType().getLocalName()) {
+        assertEquals(2, data.size());
+        for (final DataContainerChild child : data.body()) {
+            switch (child.getIdentifier().getNodeType().getLocalName()) {
                 case "key-leaf":
-                    assertEquals("key-value", child.getValue());
+                    assertEquals("key-value", child.body());
                     break;
-
                 case "ordinary-leaf":
-                    assertEquals("leaf-value", child.getValue());
+                    assertEquals("leaf-value", child.body());
                     break;
                 default:
                     fail();
@@ -172,7 +170,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleSubContainerAugmentDataPostTest() throws Exception {
         final DataSchemaNode dataSchemaNode = schemaContext
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final Module augmentModule = schemaContext.findModules(new URI("augment:module")).iterator().next();
+        final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
         final YangInstanceIdentifier.AugmentationIdentifier augII = new YangInstanceIdentifier.AugmentationIdentifier(
                 Sets.newHashSet(contAugmentQName));
@@ -192,7 +190,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
         final DataSchemaNode dataSchemaNode = schemaContext
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final Module augmentModule = schemaContext.findModules(new URI("augment:module")).iterator().next();
+        final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");
@@ -237,9 +235,9 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         checkNormalizedNodeContext(returnValue);
         // check if container was found both according to its name and namespace
         assertEquals("Not correct container found, name was ignored", "foo-bar-container",
-                returnValue.getData().getNodeType().getLocalName());
+                returnValue.getData().getIdentifier().getNodeType().getLocalName());
         assertEquals("Not correct container found, namespace was ignored", "foo:module",
-                returnValue.getData().getNodeType().getNamespace().toString());
+                returnValue.getData().getIdentifier().getNodeType().getNamespace().toString());
     }
 
     /**
@@ -260,9 +258,9 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         checkNormalizedNodeContext(returnValue);
         // check if container was found both according to its name and namespace
         assertEquals("Not correct container found, name was ignored", "foo-bar-container",
-                returnValue.getData().getNodeType().getLocalName());
+                returnValue.getData().getIdentifier().getNodeType().getLocalName());
         assertEquals("Not correct container found, namespace was ignored", "bar:module",
-                returnValue.getData().getNodeType().getNamespace().toString());
+                returnValue.getData().getIdentifier().getNodeType().getNamespace().toString());
     }
 
     /**

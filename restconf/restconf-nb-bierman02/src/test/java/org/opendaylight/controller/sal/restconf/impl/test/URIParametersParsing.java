@@ -41,8 +41,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -52,7 +52,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class URIParametersParsing {
@@ -115,26 +114,24 @@ public class URIParametersParsing {
         final Module rpcSalRemoteModule = schema.findModule("sal-remote", Revision.of("2014-01-14")).get();
         final QName rpcQName =
                 QName.create(rpcSalRemoteModule.getQNameModule(), "create-data-change-event-subscription");
-        final QName rpcInputQName =
-                QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "input");
         final RpcDefinition rpcDef = Mockito.mock(RpcDefinition.class);
         ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcSalRemoteModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
+                rpcInputSchemaNode = rpc.getInput();
                 break;
             }
         }
         assertNotNull("RPC ContainerSchemaNode was not found!", rpcInputSchemaNode);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> container =
-                Builders.containerBuilder(rpcInputSchemaNode);
+                SchemaAwareBuilders.containerBuilder(rpcInputSchemaNode);
 
         final QName pathQName =
                 QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "path");
         final DataSchemaNode pathSchemaNode = rpcInputSchemaNode.getDataChildByName(pathQName);
         assertTrue(pathSchemaNode instanceof LeafSchemaNode);
-        final LeafNode<Object> pathNode = Builders.leafBuilder((LeafSchemaNode) pathSchemaNode)
+        final LeafNode<Object> pathNode = SchemaAwareBuilders.leafBuilder((LeafSchemaNode) pathSchemaNode)
                 .withValue(YangInstanceIdentifier.builder()
                         .node(QName.create("urn:opendaylight:inventory", "2013-08-19", "nodes")).build()).build();
         container.withChild(pathNode);
@@ -142,19 +139,19 @@ public class URIParametersParsing {
         final AugmentationSchemaNode augmentationSchema = requireNonNull(rpcInputSchemaNode.getAvailableAugmentations()
                 .iterator().next());
         final DataContainerNodeBuilder<AugmentationIdentifier, AugmentationNode> augmentationBuilder =
-                Builders.augmentationBuilder(augmentationSchema);
+                SchemaAwareBuilders.augmentationBuilder(augmentationSchema);
 
         final QName dataStoreQName = QName.create("urn:sal:restconf:event:subscription", "2014-07-08", "datastore");
         final DataSchemaNode dsSchemaNode = augmentationSchema.getDataChildByName(dataStoreQName);
         assertTrue(dsSchemaNode instanceof LeafSchemaNode);
-        final LeafNode<Object> dsNode = Builders.leafBuilder((LeafSchemaNode) dsSchemaNode)
+        final LeafNode<Object> dsNode = SchemaAwareBuilders.leafBuilder((LeafSchemaNode) dsSchemaNode)
                 .withValue(datastore).build();
         augmentationBuilder.withChild(dsNode);
 
         final QName scopeQName = QName.create("urn:sal:restconf:event:subscription", "2014-07-08", "scope");
         final DataSchemaNode scopeSchemaNode = augmentationSchema.getDataChildByName(scopeQName);
         assertTrue(scopeSchemaNode instanceof LeafSchemaNode);
-        final LeafNode<Object> scopeNode = Builders.leafBuilder((LeafSchemaNode) scopeSchemaNode)
+        final LeafNode<Object> scopeNode = SchemaAwareBuilders.leafBuilder((LeafSchemaNode) scopeSchemaNode)
                 .withValue(scope).build();
         augmentationBuilder.withChild(scopeNode);
 
@@ -163,7 +160,7 @@ public class URIParametersParsing {
         final DataSchemaNode outputSchemaNode = augmentationSchema.getDataChildByName(outputQName);
         assertTrue(outputSchemaNode instanceof LeafSchemaNode);
         final LeafNode<Object> outputNode =
-                Builders.leafBuilder((LeafSchemaNode) outputSchemaNode).withValue("XML").build();
+            SchemaAwareBuilders.leafBuilder((LeafSchemaNode) outputSchemaNode).withValue("XML").build();
         augmentationBuilder.withChild(outputNode);
 
         container.withChild(augmentationBuilder.build());

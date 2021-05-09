@@ -93,42 +93,42 @@ public class ProxyNetconfService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path) {
         LOG.debug("{}: Get {} {}", id, OPERATIONAL, path);
-        final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
+        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.get(path)));
         return returnFuture;
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
-                                                                final List<YangInstanceIdentifier> fields) {
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path,
+                                                          final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: Get {} {} with fields: {}", id, OPERATIONAL, path, fields);
-        final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
+        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.get(path, fields)));
         return returnFuture;
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path) {
         LOG.debug("{}: Get config {} {}", id, CONFIGURATION, path);
-        final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
+        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.getConfig(path)));
         return returnFuture;
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
-                                                                      final List<YangInstanceIdentifier> fields) {
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path,
+                                                                final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: Get config {} {} with fields: {}", id, CONFIGURATION, path, fields);
-        final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
+        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
         processNetconfOperation(facade -> returnFuture.setFuture(facade.getConfig(path, fields)));
         return returnFuture;
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Merge {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
@@ -138,7 +138,7 @@ public class ProxyNetconfService implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Replace {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
@@ -148,7 +148,7 @@ public class ProxyNetconfService implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Create {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();

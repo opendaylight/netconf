@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,11 +43,12 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfUtil;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -63,7 +63,7 @@ import org.xml.sax.SAXException;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfBaseOpsTest extends AbstractTestModelTest {
     private static final QNameModule TEST_MODULE = QNameModule.create(
-            URI.create("test:namespace"), Revision.of("2013-07-22"));
+            XMLNamespace.of("test:namespace"), Revision.of("2013-07-22"));
 
     private static final QName CONTAINER_C_QNAME = QName.create(TEST_MODULE, "c");
     private static final NodeIdentifier CONTAINER_C_NID = NodeIdentifier.create(CONTAINER_C_QNAME);
@@ -198,21 +198,20 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         verifyMessageSent("copy-config", NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME);
     }
 
-
     @Test
     public void testGetConfigRunningData() throws Exception {
-        final Optional<NormalizedNode<?, ?>> dataOpt =
+        final Optional<NormalizedNode> dataOpt =
                 baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
         assertTrue(dataOpt.isPresent());
-        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getIdentifier().getNodeType());
     }
 
     @Test
     public void testGetData() throws Exception {
-        final Optional<NormalizedNode<?, ?>> dataOpt =
+        final Optional<NormalizedNode> dataOpt =
                 baseOps.getData(callback, Optional.of(YangInstanceIdentifier.empty())).get();
         assertTrue(dataOpt.isPresent());
-        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+        assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getIdentifier().getNodeType());
     }
 
     @Test
@@ -252,7 +251,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 .node(CONTAINER_C_QNAME)
                 .node(LEAF_A_NID)
                 .build();
-        final DataContainerChild<?, ?> structure = baseOps.createEditConfigStrcture(Optional.of(leaf),
+        final DataContainerChild structure = baseOps.createEditConfigStrcture(Optional.of(leaf),
                 Optional.of(ModifyAction.REPLACE), leafId);
         baseOps.editConfigCandidate(callback, structure, true);
         verifyMessageSent("edit-config-test-module", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
@@ -268,7 +267,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 .node(CONTAINER_C_NID)
                 .node(LEAF_A_NID)
                 .build();
-        final DataContainerChild<?, ?> structure = baseOps.createEditConfigStrcture(Optional.of(leaf),
+        final DataContainerChild structure = baseOps.createEditConfigStrcture(Optional.of(leaf),
                 Optional.of(ModifyAction.REPLACE), leafId);
         baseOps.editConfigRunning(callback, structure, ModifyAction.MERGE, true);
         verifyMessageSent("edit-config-test-module-running", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);

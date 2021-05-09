@@ -50,7 +50,7 @@ public final class NetconfDeviceRpc implements DOMRpcService {
 
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
+    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
         final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
             transformer.toRpcRequest(type, input), type);
 

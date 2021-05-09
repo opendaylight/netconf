@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.rest.api;
 
 import java.io.Closeable;
@@ -15,5 +14,5 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public interface RestconfNormalizedNodeWriter extends Flushable, Closeable {
 
-    RestconfNormalizedNodeWriter write(NormalizedNode<?, ?> node) throws IOException;
+    RestconfNormalizedNodeWriter write(NormalizedNode node) throws IOException;
 }

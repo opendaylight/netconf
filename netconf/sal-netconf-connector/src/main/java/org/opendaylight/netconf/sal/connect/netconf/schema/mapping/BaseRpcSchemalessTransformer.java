@@ -54,7 +54,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
     }
 
     @Override
-    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode<?, ?> payload) {
+    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode payload) {
         // In case no input for rpc is defined, we can simply construct the payload here
 
         final RpcDefinition mappedRpc = Preconditions.checkNotNull(mappedRpcs.get(rpc),
@@ -83,7 +83,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
 
     @Override
     public DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
-        final NormalizedNode<?, ?> normalizedNode;
+        final NormalizedNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
             final Document data = XmlUtil.newDocument();

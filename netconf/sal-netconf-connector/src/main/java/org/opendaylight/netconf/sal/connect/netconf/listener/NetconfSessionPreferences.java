@@ -17,7 +17,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +25,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,7 +206,7 @@ public final class NetconfSessionPreferences {
     }
 
     private static QName cachedQName(final String namespace, final String moduleName) {
-        return QName.create(URI.create(namespace), moduleName).withoutRevision().intern();
+        return QName.create(XMLNamespace.of(namespace), moduleName).withoutRevision().intern();
     }
 
     public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {
