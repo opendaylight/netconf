@@ -58,7 +58,7 @@
             <artifactId>netconf-util</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.inject</groupId>
+            <groupId>com.guicedee.services</groupId>
             <artifactId>javax.inject</artifactId>
             <optional>true</optional>
         </dependency>
