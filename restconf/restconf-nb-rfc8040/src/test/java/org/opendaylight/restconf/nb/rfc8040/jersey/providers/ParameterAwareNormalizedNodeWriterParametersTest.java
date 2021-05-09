@@ -49,13 +49,13 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
 
     private NodeIdentifier containerNodeIdentifier;
     private NodeIdentifier leafSetNodeIdentifier;
-    private NodeWithValue<?> leafSetEntryNodeIdentifier;
+    private NodeWithValue<String> leafSetEntryNodeIdentifier;
     private NodeIdentifier rootDataContainerIdentifier;
 
-    private Collection<DataContainerChild<?, ?>> containerNodeValue;
+    private Collection<DataContainerChild> containerNodeValue;
     private Collection<LeafSetEntryNode<String>> leafSetNodeValue;
     private String leafSetEntryNodeValue;
-    private Collection<DataContainerChild<?, ?>> rootDataContainerValue;
+    private Collection<DataContainerChild> rootDataContainerValue;
 
     @Before
     public void setUp() {
@@ -80,16 +80,16 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
         Mockito.when(rootDataContainerData.getNodeType()).thenReturn(rootDataContainerIdentifier.getNodeType());
 
         // values
-        Mockito.when(leafSetEntryNodeData.getValue()).thenReturn(leafSetEntryNodeValue);
+        Mockito.when(leafSetEntryNodeData.body()).thenReturn(leafSetEntryNodeValue);
 
         leafSetNodeValue = Collections.singletonList(leafSetEntryNodeData);
-        Mockito.when(leafSetNodeData.getValue()).thenReturn(leafSetNodeValue);
+        Mockito.when(leafSetNodeData.body()).thenReturn(leafSetNodeValue);
 
         containerNodeValue = Collections.singleton(leafSetNodeData);
-        Mockito.when(containerNodeData.getValue()).thenReturn(containerNodeValue);
+        Mockito.when(containerNodeData.body()).thenReturn(containerNodeValue);
 
         rootDataContainerValue = Collections.singleton(leafSetNodeData);
-        Mockito.when(rootDataContainerData.getValue()).thenReturn(rootDataContainerValue);
+        Mockito.when(rootDataContainerData.body()).thenReturn(rootDataContainerValue);
     }
 
     /**

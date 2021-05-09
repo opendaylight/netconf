@@ -78,6 +78,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -108,8 +109,8 @@ public class BrokerFacadeTest {
     private DOMDataTreeReadWriteTransaction rwTransaction;
 
     private BrokerFacade brokerFacade;
-    private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
-    private final FluentFuture<Optional<NormalizedNode<?, ?>>> dummyNodeInFuture = wrapDummyNode(this.dummyNode);
+    private final ContainerNode dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
+    private final FluentFuture<Optional<NormalizedNode>> dummyNodeInFuture = wrapDummyNode(this.dummyNode);
     private final QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
     private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(this.qname).build();
     private ControllerContext controllerContext;
@@ -127,7 +128,7 @@ public class BrokerFacadeTest {
             DOMDataTreeChangeService.class, Mockito.mock(DOMDataTreeChangeService.class)));
     }
 
-    private static FluentFuture<Optional<NormalizedNode<?, ?>>> wrapDummyNode(final NormalizedNode<?, ?> dummyNode) {
+    private static FluentFuture<Optional<NormalizedNode>> wrapDummyNode(final NormalizedNode dummyNode) {
         return immediateFluentFuture(Optional.of(dummyNode));
     }
 
@@ -138,10 +139,10 @@ public class BrokerFacadeTest {
     /**
      * Value of this node shouldn't be important for testing purposes.
      */
-    private static NormalizedNode<?, ?> createDummyNode(final String namespace, final String date,
-            final String localName) {
+    private static ContainerNode createDummyNode(final String namespace, final String date, final String localName) {
         return Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(namespace, date, localName))).build();
+                .withNodeIdentifier(new NodeIdentifier(QName.create(namespace, date, localName)))
+                .build();
     }
 
     @Test
@@ -149,7 +150,7 @@ public class BrokerFacadeTest {
         when(this.readTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
                 this.dummyNodeInFuture);
 
-        final NormalizedNode<?, ?> actualNode = this.brokerFacade.readConfigurationData(this.instanceID);
+        final NormalizedNode actualNode = this.brokerFacade.readConfigurationData(this.instanceID);
 
         assertSame("readConfigurationData", this.dummyNode, actualNode);
     }
@@ -159,7 +160,7 @@ public class BrokerFacadeTest {
         when(this.readTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
                 this.dummyNodeInFuture);
 
-        final NormalizedNode<?, ?> actualNode = this.brokerFacade.readOperationalData(this.instanceID);
+        final NormalizedNode actualNode = this.brokerFacade.readOperationalData(this.instanceID);
 
         assertSame("readOperationalData", this.dummyNode, actualNode);
     }

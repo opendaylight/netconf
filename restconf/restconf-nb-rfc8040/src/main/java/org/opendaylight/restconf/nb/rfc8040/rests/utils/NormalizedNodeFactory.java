@@ -11,15 +11,9 @@ import java.util.Optional;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-class NormalizedNodeFactory extends FutureDataFactory<Optional<NormalizedNode<?, ?>>>
-        implements Builder<NormalizedNode<?, ?>> {
-
+class NormalizedNodeFactory extends FutureDataFactory<Optional<NormalizedNode>> implements Builder<NormalizedNode> {
     @Override
-    public NormalizedNode<?, ?> build() {
-        if (this.result.isPresent()) {
-            return this.result.get();
-        }
-        return null;
+    public NormalizedNode build() {
+        return result.orElse(null);
     }
-
 }

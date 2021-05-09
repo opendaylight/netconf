@@ -89,7 +89,7 @@ public final class PostDataTransactionUtil {
      * @return {@link FluentFuture}
      */
     private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
-                                                                 final NormalizedNode<?, ?> data,
+                                                                 final NormalizedNode data,
                                                                  final RestconfStrategy strategy,
                                                                  final EffectiveModelContext schemaContext,
                                                                  final Insert insert, final String point) {
@@ -100,11 +100,11 @@ public final class PostDataTransactionUtil {
         }
 
         PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
-        final NormalizedNode<?, ?> readData;
+        final NormalizedNode readData;
         switch (insert) {
             case FIRST:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
-                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
                     return transaction.commit();
                 }
@@ -119,23 +119,23 @@ public final class PostDataTransactionUtil {
                 return transaction.commit();
             case BEFORE:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
-                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
                     return transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
                 insertWithPointPost(path, data, schemaContext, point,
-                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, true, transaction);
+                    (NormalizedNodeContainer<?>) readData, true, transaction);
                 return transaction.commit();
             case AFTER:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
-                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
                     return transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
                 insertWithPointPost(path, data, schemaContext, point,
-                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, false, transaction);
+                    (NormalizedNodeContainer<?>) readData, false, transaction);
                 return transaction.commit();
             default:
                 throw new RestconfDocumentedException(
@@ -144,17 +144,16 @@ public final class PostDataTransactionUtil {
         }
     }
 
-    private static void insertWithPointPost(final YangInstanceIdentifier path,
-                                            final NormalizedNode<?, ?> data,
+    private static void insertWithPointPost(final YangInstanceIdentifier path, final NormalizedNode data,
                                             final EffectiveModelContext schemaContext, final String point,
-                                            final NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>> readList,
+                                            final NormalizedNodeContainer<?> readList,
                                             final boolean before, final RestconfTransaction transaction) {
         final YangInstanceIdentifier parent = path.getParent().getParent();
         transaction.remove(LogicalDatastoreType.CONFIGURATION, parent);
         final InstanceIdentifierContext<?> instanceIdentifier =
             ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
-        for (final NormalizedNode<?, ?> nodeChild : readList.getValue()) {
+        for (final NormalizedNode nodeChild : readList.body()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
@@ -164,10 +163,10 @@ public final class PostDataTransactionUtil {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
+        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
         transaction.merge(LogicalDatastoreType.CONFIGURATION,
             YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        for (final NormalizedNode<?, ?> nodeChild : readList.getValue()) {
+        for (final NormalizedNode nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
             }
@@ -177,7 +176,7 @@ public final class PostDataTransactionUtil {
         }
     }
 
-    private static void makePost(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+    private static void makePost(final YangInstanceIdentifier path, final NormalizedNode data,
                                  final SchemaContext schemaContext, final RestconfTransaction transaction) {
         try {
             transaction.create(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
@@ -197,14 +196,14 @@ public final class PostDataTransactionUtil {
      * @return {@link URI}
      */
     private static URI resolveLocation(final UriInfo uriInfo, final YangInstanceIdentifier initialPath,
-                                       final EffectiveModelContext schemaContext, final NormalizedNode<?, ?> data) {
+                                       final EffectiveModelContext schemaContext, final NormalizedNode data) {
         if (uriInfo == null) {
             return null;
         }
 
         YangInstanceIdentifier path = initialPath;
         if (data instanceof MapNode) {
-            final Collection<MapEntryNode> children = ((MapNode) data).getValue();
+            final Collection<MapEntryNode> children = ((MapNode) data).body();
             if (!children.isEmpty()) {
                 path = path.node(children.iterator().next().getIdentifier());
             }

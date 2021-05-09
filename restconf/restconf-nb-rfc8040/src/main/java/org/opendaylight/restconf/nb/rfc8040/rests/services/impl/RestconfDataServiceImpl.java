@@ -136,7 +136,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        final NormalizedNode<?, ?> node;
+        final NormalizedNode node;
         if (parameters.getFieldPaths() != null && !parameters.getFieldPaths().isEmpty()) {
             node = ReadDataTransactionUtil.readData(parameters.getContent(), instanceIdentifier.getInstanceIdentifier(),
                     strategy, parameters.getWithDefault(), schemaContextRef, parameters.getFieldPaths());
@@ -146,7 +146,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
-            final String value = (String) node.getValue();
+            final String value = (String) node.body();
             final String streamName = value.substring(value.indexOf(NOTIFICATION_STREAM + '/'));
             this.delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
         }
@@ -183,7 +183,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param uriInfo       uri info
      * @return {@link NormalizedNode}
      */
-    private NormalizedNode<?, ?> readData(final String identifier, final String content,
+    private NormalizedNode readData(final String identifier, final String content,
             final YangInstanceIdentifier path, final RestconfStrategy strategy, final String withDefa,
             final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
@@ -389,7 +389,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final Absolute schemaPath = Absolute.of(ImmutableList.copyOf(context.getSchemaNode().getPath()
             .getPathFromRoot()));
         final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
-        final NormalizedNode<?, ?> data = payload.getData();
+        final NormalizedNode data = payload.getData();
 
         if (yangIIdContext.isEmpty() && !RestconfDataServiceConstant.NETCONF_BASE_QNAME.equals(data.getNodeType())) {
             throw new RestconfDocumentedException("Instance identifier need to contain at least one path argument",
@@ -419,7 +419,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             }
         }
 
-        if (resultData != null && resultData.getValue().isEmpty()) {
+        if (resultData != null && resultData.isEmpty()) {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
 

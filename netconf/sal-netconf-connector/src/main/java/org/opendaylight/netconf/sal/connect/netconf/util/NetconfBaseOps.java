@@ -67,9 +67,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 
 /**
  * Provides base operations for netconf e.g. get, get-config, edit-config, (un)lock, commit etc.
@@ -202,7 +202,7 @@ public final class NetconfBaseOps {
 
         final ListenableFuture<? extends DOMRpcResult> future;
         if (isFilterPresent(filterPath)) {
-            final DataContainerChild<?, ?> node = transformer.toFilterStructure(filterPath.get());
+            final DataContainerChild node = transformer.toFilterStructure(filterPath.get());
             future = rpc.invokeRpc(NETCONF_GET_CONFIG_QNAME,
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore), node));
         } else {
@@ -220,15 +220,15 @@ public final class NetconfBaseOps {
         requireNonNull(callback);
         requireNonNull(datastore);
 
-        final NormalizedNode<?, ?> rpcInput;
+        final NormalizedNode rpcInput;
         if (isFilterPresent(filterPath)) {
-            final DataContainerChild<?, ?> node = transformer.toFilterStructure(
+            final DataContainerChild node = transformer.toFilterStructure(
                     Collections.singletonList(FieldsFilter.of(filterPath.get(), fields)));
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore), node);
         } else if (containsEmptyPath(fields)) {
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore));
         } else {
-            final DataContainerChild<?, ?> subtreeFilter = getSubtreeFilterFromRootFields(fields);
+            final DataContainerChild subtreeFilter = getSubtreeFilterFromRootFields(fields);
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
                     getSourceNode(datastore), subtreeFilter);
         }
@@ -244,8 +244,8 @@ public final class NetconfBaseOps {
      * @param filterPath path to requested data
      * @return asynchronous completion token with read {@link NormalizedNode} wrapped in {@link Optional} instance
      */
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
-            final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
+    public ListenableFuture<Optional<NormalizedNode>> getConfigRunningData(final FutureCallback<DOMRpcResult> callback,
+            final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, getConfigRunning(callback, filterPath));
     }
 
@@ -258,7 +258,7 @@ public final class NetconfBaseOps {
      * @param fields     paths to specific fields that are selected under parent path
      * @return asynchronous completion token with read {@link NormalizedNode} wrapped in {@link Optional} instance
      */
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
+    public ListenableFuture<Optional<NormalizedNode>> getConfigRunningData(
             final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath,
             final List<YangInstanceIdentifier> fields) {
         if (fields.isEmpty()) {
@@ -278,8 +278,8 @@ public final class NetconfBaseOps {
      * @param filterPath path to requested data
      * @return asynchronous completion token with read {@link NormalizedNode} wrapped in {@link Optional} instance
      */
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
-                                                                    final Optional<YangInstanceIdentifier> filterPath) {
+    public ListenableFuture<Optional<NormalizedNode>> getData(final FutureCallback<DOMRpcResult> callback,
+                                                              final Optional<YangInstanceIdentifier> filterPath) {
         return extractData(filterPath, get(callback, filterPath));
     }
 
@@ -292,7 +292,7 @@ public final class NetconfBaseOps {
      * @param fields     paths to specific fields that are selected under parent path
      * @return asynchronous completion token with read {@link NormalizedNode} wrapped in {@link Optional} instance
      */
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
+    public ListenableFuture<Optional<NormalizedNode>> getData(final FutureCallback<DOMRpcResult> callback,
             final Optional<YangInstanceIdentifier> filterPath, final List<YangInstanceIdentifier> fields) {
         if (fields.isEmpty()) {
             // RFC doesn't allow to build subtree filter that would expect just empty element in response
@@ -303,13 +303,13 @@ public final class NetconfBaseOps {
         return extractData(filterPath, response);
     }
 
-    private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
-            final Optional<YangInstanceIdentifier> path, final ListenableFuture<? extends DOMRpcResult> configRunning) {
+    private ListenableFuture<Optional<NormalizedNode>> extractData(final Optional<YangInstanceIdentifier> path,
+            final ListenableFuture<? extends DOMRpcResult> configRunning) {
         return Futures.transform(configRunning, result -> {
             checkArgument(result.getErrors().isEmpty(), "Unable to read data: %s, errors: %s", path,
                 result.getErrors());
-            final DataContainerChild<?, ?> dataNode = ((ContainerNode) result.getResult())
-                    .getChild(NetconfMessageTransformUtil.NETCONF_DATA_NODEID).get();
+            final DataContainerChild dataNode = ((ContainerNode) result.getResult())
+                    .findChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID).get();
             return transformer.selectFromDataStructure(dataNode, path.get());
         }, MoreExecutors.directExecutor());
     }
@@ -346,14 +346,14 @@ public final class NetconfBaseOps {
             final Optional<YangInstanceIdentifier> filterPath, final List<YangInstanceIdentifier> fields) {
         requireNonNull(callback);
 
-        final NormalizedNode<?, ?> rpcInput;
+        final NormalizedNode rpcInput;
         if (isFilterPresent(filterPath)) {
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, transformer.toFilterStructure(
                     Collections.singletonList(FieldsFilter.of(filterPath.get(), fields))));
         } else if (containsEmptyPath(fields)) {
             rpcInput = GET_RPC_CONTENT;
         } else {
-            final DataContainerChild<?, ?> subtreeFilter = getSubtreeFilterFromRootFields(fields);
+            final DataContainerChild subtreeFilter = getSubtreeFilterFromRootFields(fields);
             rpcInput = NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, subtreeFilter);
         }
         final ListenableFuture<? extends DOMRpcResult> response = rpc.invokeRpc(NETCONF_GET_QNAME, rpcInput);
@@ -365,7 +365,7 @@ public final class NetconfBaseOps {
         return fields.stream().anyMatch(YangInstanceIdentifier::isEmpty);
     }
 
-    private DataContainerChild<?, ?> getSubtreeFilterFromRootFields(final List<YangInstanceIdentifier> fields) {
+    private DataContainerChild getSubtreeFilterFromRootFields(final List<YangInstanceIdentifier> fields) {
         final Map<YangInstanceIdentifier, List<YangInstanceIdentifier>> getConfigEntries = fields.stream()
                 .map(fieldPath -> {
                     final YangInstanceIdentifier rootPath = YangInstanceIdentifier.create(
@@ -387,32 +387,32 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<? extends DOMRpcResult> editConfigCandidate(
-            final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure,
+            final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild editStructure,
             final ModifyAction modifyAction, final boolean rollback) {
         return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.of(modifyAction), rollback);
     }
 
     public ListenableFuture<? extends DOMRpcResult> editConfigCandidate(
-            final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure,
+            final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild editStructure,
             final boolean rollback) {
         return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.empty(), rollback);
     }
 
     public ListenableFuture<? extends DOMRpcResult> editConfigRunning(
-            final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure,
+            final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild editStructure,
             final ModifyAction modifyAction, final boolean rollback) {
         return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.of(modifyAction), rollback);
     }
 
     public ListenableFuture<? extends DOMRpcResult> editConfigRunning(
-            final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure,
+            final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild editStructure,
             final boolean rollback) {
         return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.empty(), rollback);
     }
 
     public ListenableFuture<? extends DOMRpcResult> editConfig(
             final FutureCallback<? super DOMRpcResult> callback, final QName datastore,
-            final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> modifyAction,
+            final DataContainerChild editStructure, final Optional<ModifyAction> modifyAction,
             final boolean rollback) {
         requireNonNull(callback);
 
@@ -423,7 +423,7 @@ public final class NetconfBaseOps {
         return future;
     }
 
-    public ChoiceNode createEditConfigStrcture(final Optional<NormalizedNode<?, ?>> lastChild,
+    public ChoiceNode createEditConfigStrcture(final Optional<NormalizedNode> lastChild,
                                                final Optional<ModifyAction> operation,
                                                final YangInstanceIdentifier dataPath) {
         return Builders.choiceBuilder()
@@ -432,8 +432,7 @@ public final class NetconfBaseOps {
                 .build();
     }
 
-    private static ContainerNode getEditConfigContent(
-            final QName datastore, final DataContainerChild<?, ?> editStructure,
+    private static ContainerNode getEditConfigContent(final QName datastore, final DataContainerChild editStructure,
             final Optional<ModifyAction> defaultOperation, final boolean rollback) {
         final DataContainerNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> editBuilder =
                 Builders.containerBuilder().withNodeIdentifier(NETCONF_EDIT_CONFIG_NODEID);

@@ -67,7 +67,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
 
-    public JsonToPatchBodyReader(ControllerContext controllerContext) {
+    public JsonToPatchBodyReader(final ControllerContext controllerContext) {
         super(controllerContext);
     }
 
@@ -368,8 +368,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode<?, ?> readEditData(final @NonNull JsonReader in,
-            final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
+    private static NormalizedNode readEditData(final @NonNull JsonReader in, final @NonNull SchemaNode targetSchemaNode,
+            final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer,
@@ -424,7 +424,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         private PatchEditOperation operation;
         private YangInstanceIdentifier target;
         private SchemaNode targetSchemaNode;
-        private NormalizedNode<?, ?> data;
+        private NormalizedNode data;
 
         public String getId() {
             return this.id;
@@ -458,11 +458,11 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
             this.targetSchemaNode = targetSchemaNode;
         }
 
-        public NormalizedNode<?, ?> getData() {
+        public NormalizedNode getData() {
             return this.data;
         }
 
-        public void setData(final NormalizedNode<?, ?> data) {
+        public void setData(final NormalizedNode data) {
             this.data = data;
         }
 

@@ -45,8 +45,8 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
-                                                                 final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
+                                                           final YangInstanceIdentifier path) {
         switch (store) {
             case CONFIGURATION:
                 return netconfService.getConfig(path);
@@ -61,7 +61,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+    public ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
         switch (store) {
             case CONFIGURATION:

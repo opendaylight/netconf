@@ -23,7 +23,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Streams;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.AbstractMap;
@@ -59,6 +58,7 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -85,6 +85,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -96,7 +97,7 @@ import org.xml.sax.SAXException;
 public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
-    private static final ImmutableSet<URI> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
+    private static final ImmutableSet<XMLNamespace> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
         NETCONF_URI,
         IETF_NETCONF_NOTIFICATIONS.getNamespace(),
         CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
@@ -185,15 +186,13 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         final NotificationDefinition mostRecentNotification = getMostRecentNotification(notificationDefinitions);
 
-        final ContainerSchemaNode notificationAsContainerSchemaNode =
-                NetconfMessageTransformUtil.createSchemaForNotification(mostRecentNotification);
-
         final ContainerNode content;
         try {
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                    notificationAsContainerSchemaNode, strictParsing);
+                    SchemaInferenceStack.ofInstantiatedPath(mountContext.getEffectiveModelContext(),
+                        mostRecentNotification.getPath()).toInference(), strictParsing);
             xmlParser.traverse(new DOMSource(element));
             content = (ContainerNode) resultHolder.getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException
@@ -214,7 +213,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private Optional<NestedNotificationInfo> findNestedNotification(final NetconfMessage message,
             final Element element) {
         final Iterator<? extends Module> modules = mountContext.getEffectiveModelContext()
-                .findModules(URI.create(element.getNamespaceURI())).iterator();
+                .findModules(XMLNamespace.of(element.getNamespaceURI())).iterator();
         if (!modules.hasNext()) {
             throw new IllegalArgumentException(
                     "Unable to parse notification " + message + ", cannot find top level module");
@@ -323,7 +322,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode<?, ?> payload) {
+    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode payload) {
         // In case no input for rpc is defined, we can simply construct the payload here
 
         // Determine whether a base netconf operation is being invoked
@@ -368,7 +367,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     @Override
     public NetconfMessage toActionRequest(final Absolute action, final DOMDataTreeIdentifier domDataTreeIdentifier,
-            final NormalizedNode<?, ?> payload) {
+            final NormalizedNode payload) {
         final ActionDefinition actionDef = actions.get(action);
         Preconditions.checkArgument(actionDef != null, "Action does not exist: %s", action);
 
@@ -400,7 +399,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     @Override
     public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
-        final NormalizedNode<?, ?> normalizedNode;
+        final NormalizedNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             normalizedNode = Builders.containerBuilder()
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
@@ -443,8 +442,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         }
     }
 
-    private NormalizedNode<?, ?> parseResult(final NetconfMessage message,
-            final OperationDefinition operationDefinition) {
+    private NormalizedNode parseResult(final NetconfMessage message, final OperationDefinition operationDefinition) {
         final Optional<XmlElement> okResponseElement = XmlElement.fromDomDocument(message.getDocument())
                 .getOnlyChildElementWithSameNamespaceOptionally("ok");
         if (operationDefinition.getOutput().getChildNodes().isEmpty()) {
@@ -462,7 +460,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                        operationDefinition.getOutput(), strictParsing);
+                        // FIXME: we should have a cached inference here
+                        SchemaInferenceStack.ofInstantiatedPath(mountContext.getEffectiveModelContext(),
+                            operationDefinition.getOutput().getPath()).toInference(), strictParsing);
                 xmlParser.traverse(new DOMSource(element));
                 return resultHolder.getResult();
             } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
@@ -480,7 +480,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         NetconfDeviceNotification(final ContainerNode content, final Instant eventTime) {
             this.content = content;
             this.eventTime = eventTime;
-            this.schemaPath = Absolute.of(content.getNodeType());
+            this.schemaPath = Absolute.of(content.getIdentifier().getNodeType());
         }
 
         NetconfDeviceNotification(final ContainerNode content, final Absolute schemaPath, final Instant eventTime) {

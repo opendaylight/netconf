@@ -23,5 +23,4 @@ class FutureDataFactory<T> {
     boolean getFailureStatus() {
         return statusFail;
     }
-
 }

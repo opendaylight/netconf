@@ -99,7 +99,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-        final NormalizedNode<?, ?> data = context.getData();
+        final NormalizedNode data = context.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
         writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().getDepth(),
@@ -107,7 +107,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter,
-            final SchemaPath path, final InstanceIdentifierContext<?> pathContext, final NormalizedNode<?, ?> data,
+            final SchemaPath path, final InstanceIdentifierContext<?> pathContext, final NormalizedNode data,
             final Integer depth, final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();
@@ -142,7 +142,11 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             if (data instanceof MapEntryNode) {
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
-                nnWriter.write(ImmutableNodes.mapNodeBuilder(data.getNodeType()).addChild((MapEntryNode) data).build());
+                final MapEntryNode child = (MapEntryNode) data;
+
+                nnWriter.write(ImmutableNodes.mapNodeBuilder(child.getIdentifier().getNodeType())
+                    .addChild(child)
+                    .build());
             } else {
                 nnWriter.write(data);
             }
@@ -166,7 +170,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,
                     name.getLocalName(), name.getNamespace().toString());
             xmlWriter.writeDefaultNamespace(name.getNamespace().toString());
-            for (final NormalizedNode<?,?> child : data.getValue()) {
+            for (final NormalizedNode child : data.body()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();
