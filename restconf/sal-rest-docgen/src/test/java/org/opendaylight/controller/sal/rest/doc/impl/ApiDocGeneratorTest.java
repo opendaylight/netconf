@@ -16,19 +16,19 @@ import static org.junit.Assert.fail;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import java.sql.Date;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorDraftO2;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
@@ -36,9 +36,9 @@ public class ApiDocGeneratorTest {
 
     private static final String NAMESPACE = "http://netconfcentral.org/ns/toaster2";
     private static final String STRING_DATE = "2009-11-20";
-    private static final Date DATE = Date.valueOf(STRING_DATE);
+    private static final Optional<Revision> DATE = Optional.of(Revision.of(STRING_DATE));
     private static final String NAMESPACE_2 = "http://netconfcentral.org/ns/toaster";
-    private static final Date REVISION_2 = Date.valueOf(STRING_DATE);
+    private static final Optional<Revision> REVISION_2 = Optional.of(Revision.of(STRING_DATE));
     private ApiDocGeneratorDraftO2 generator;
     private DocGenTestHelper helper;
     private EffectiveModelContext schemaContext;
@@ -51,10 +51,6 @@ public class ApiDocGeneratorTest {
         this.schemaContext = this.helper.getSchemaContext();
 
         this.generator = new ApiDocGeneratorDraftO2(this.helper.createMockSchemaService(this.schemaContext));
-    }
-
-    @After
-    public void after() throws Exception {
     }
 
     /**
@@ -78,7 +74,7 @@ public class ApiDocGeneratorTest {
     /**
      * Validates whether doc {@code doc} contains concrete specified models.
      */
-    private void validateSwaggerModules(final SwaggerObject doc) {
+    private static void validateSwaggerModules(final SwaggerObject doc) {
         final ObjectNode definitions = doc.getDefinitions();
         assertNotNull(definitions);
 
@@ -129,8 +125,8 @@ public class ApiDocGeneratorTest {
     /**
      * Checks whether object {@code mainObject} contains in properties/items key $ref with concrete value.
      */
-    private void containsReferences(final JsonNode mainObject, final String childObject,
-                                    final String expectedRef) {
+    private static void containsReferences(final JsonNode mainObject, final String childObject,
+            final String expectedRef) {
         final JsonNode properties = mainObject.get("properties");
         assertNotNull(properties);
 
@@ -199,7 +195,7 @@ public class ApiDocGeneratorTest {
      * @param doc Api declaration
      * @throws Exception if operation fails
      */
-    private void validateToaster(final SwaggerObject doc) throws Exception {
+    private static void validateToaster(final SwaggerObject doc) throws Exception {
         final Set<String> expectedUrls =
                 new TreeSet<>(Arrays.asList("/restconf/config", "/restconf/config/toaster2:toaster",
                         "/restconf/config/toaster2:toaster/toasterSlot/{slotId}",

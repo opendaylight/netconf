@@ -26,6 +26,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -84,7 +85,7 @@ public class DocGenTestHelper {
 
         final ArgumentCaptor<String> moduleCapture = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<Optional> dateCapture = ArgumentCaptor.forClass(Optional.class);
-        final ArgumentCaptor<URI> namespaceCapture = ArgumentCaptor.forClass(URI.class);
+        final ArgumentCaptor<XMLNamespace> namespaceCapture = ArgumentCaptor.forClass(XMLNamespace.class);
         when(mockContext.findModule(moduleCapture.capture(), dateCapture.capture())).then(
             invocation -> {
                 final String module = moduleCapture.getValue();
@@ -98,7 +99,7 @@ public class DocGenTestHelper {
             });
         when(mockContext.findModule(namespaceCapture.capture(), dateCapture.capture())).then(
             invocation -> {
-                final URI namespace = namespaceCapture.getValue();
+                final XMLNamespace namespace = namespaceCapture.getValue();
                 final Optional<?> date = dateCapture.getValue();
                 for (final Module m : DocGenTestHelper.this.modules) {
                     if (m.getNamespace().equals(namespace) && m.getRevision().equals(date)) {

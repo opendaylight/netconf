@@ -160,10 +160,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>aaa-shiro-api</artifactId>
     </dependency>

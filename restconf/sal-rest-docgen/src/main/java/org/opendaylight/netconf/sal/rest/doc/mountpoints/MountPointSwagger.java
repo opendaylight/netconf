@@ -138,7 +138,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
                                             final String revision, final URIType uriType, final OAversion oaversion) {
         final YangInstanceIdentifier iid = getInstanceId(id);
-        final SchemaContext context = getSchemaContext(iid);
+        final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
         final String deviceName  = extractDeviceName(iid);
 
@@ -157,7 +157,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum,
                                             final URIType uriType, final OAversion oaversion) {
         final YangInstanceIdentifier iid = getInstanceId(id);
-        final SchemaContext context = getSchemaContext(iid);
+        final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
         final String deviceName  = extractDeviceName(iid);
 

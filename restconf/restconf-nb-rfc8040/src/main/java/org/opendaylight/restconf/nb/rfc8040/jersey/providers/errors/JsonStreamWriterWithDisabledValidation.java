@@ -10,9 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.URI;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -39,7 +39,8 @@ final class JsonStreamWriterWithDisabledValidation extends StreamWriterWithDisab
      * @param schemaContextHandler Handler that holds actual schema context.
      */
     JsonStreamWriterWithDisabledValidation(final QName excludedQName, final OutputStreamWriter outputWriter,
-            final SchemaPath schemaPath, final URI initialNs, final SchemaContextHandler schemaContextHandler) {
+            final SchemaPath schemaPath, final XMLNamespace initialNs,
+            final SchemaContextHandler schemaContextHandler) {
         super(excludedQName);
         this.jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter);
         this.jsonNodeStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(

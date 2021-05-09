@@ -38,7 +38,7 @@ public class ReadOnlyTxTest {
     @Mock
     private DOMRpcService rpc;
     @Mock
-    private NormalizedNode<?, ?> mockedNode;
+    private NormalizedNode mockedNode;
 
     @Before
     public void setUp() {

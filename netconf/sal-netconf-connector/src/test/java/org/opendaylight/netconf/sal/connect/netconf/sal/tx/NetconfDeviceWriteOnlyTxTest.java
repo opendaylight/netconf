@@ -63,7 +63,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Before
     public void setUp() {
         final FluentFuture<DefaultDOMRpcResult> successFuture =
-                FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null));
+                FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null));
 
         doReturn(successFuture)
                 .doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("Failed tx")))
@@ -88,7 +88,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testDiscardChanges() throws InterruptedException {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
                 .when(rpc).invokeRpc(any(QName.class), isNull());
 
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
@@ -117,7 +117,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         final FluentFuture<DefaultDOMRpcResult> rpcErrorFuture = FluentFutures.immediateFluentFuture(
                 new DefaultDOMRpcResult(RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "a", "m")));
 
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
                 .doReturn(rpcErrorFuture).when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
 
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
@@ -133,7 +133,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testDiscardChangesNotSentWithoutCandidate() {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
                 .doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("Failed tx")))
                 .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
 
@@ -154,7 +154,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testListenerSuccess() throws Exception {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
                 .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchema().getMountPointContext()), false);
@@ -170,7 +170,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testListenerCancellation() throws Exception {
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
                 .when(rpc).invokeRpc(any(QName.class), isNull());
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BASE_SCHEMAS.getBaseSchema().getMountPointContext()), false);

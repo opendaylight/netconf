@@ -22,7 +22,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Optional;
@@ -44,6 +43,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
@@ -143,14 +143,14 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             return EMPTY;
         }
 
-        final Optional<? extends NormalizedNode<?, ?>> optSchemasNode = findSchemasNode(schemasNodeResult.getResult(),
+        final Optional<? extends NormalizedNode> optSchemasNode = findSchemasNode(schemasNodeResult.getResult(),
                 schemaContext);
         if (optSchemasNode.isEmpty()) {
             LOG.warn("{}: Unable to detect available schemas, get to {} was empty", id, STATE_SCHEMAS_IDENTIFIER);
             return EMPTY;
         }
 
-        final NormalizedNode<?, ?> schemasNode = optSchemasNode.get();
+        final NormalizedNode schemasNode = optSchemasNode.get();
         checkState(schemasNode instanceof ContainerNode, "Expecting container containing schemas, but was %s",
             schemasNode);
         return create(id, (ContainerNode) schemasNode);
@@ -163,15 +163,15 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     protected static NetconfStateSchemas create(final RemoteDeviceId id, final ContainerNode schemasNode) {
         final Set<RemoteYangSchema> availableYangSchemas = new HashSet<>();
 
-        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child =
-                schemasNode.getChild(toId(Schema.QNAME));
+        final Optional<DataContainerChild> child =
+                schemasNode.findChildByArg(toId(Schema.QNAME));
         checkState(child.isPresent(), "Unable to find list: %s in response: %s", Schema.QNAME.withoutRevision(),
             schemasNode);
         checkState(child.get() instanceof MapNode,
                 "Unexpected structure for container: %s in response: %s. Expecting a list",
                 Schema.QNAME.withoutRevision(), schemasNode);
 
-        for (final MapEntryNode schemaNode : ((MapNode) child.get()).getValue()) {
+        for (final MapEntryNode schemaNode : ((MapNode) child.get()).body()) {
             final Optional<RemoteYangSchema> fromCompositeNode =
                     RemoteYangSchema.createFromNormalizedNode(id, schemaNode);
             fromCompositeNode.ifPresent(availableYangSchemas::add);
@@ -180,35 +180,35 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         return new NetconfStateSchemas(availableYangSchemas);
     }
 
-    private static Optional<? extends NormalizedNode<?, ?>> findSchemasNode(final NormalizedNode<?, ?> result,
+    private static Optional<? extends NormalizedNode> findSchemasNode(final NormalizedNode result,
             final EffectiveModelContext schemaContext) {
         if (result == null) {
             return Optional.empty();
         }
-        final Optional<DataContainerChild<?, ?>> rpcResultOpt = ((ContainerNode)result).getChild(NETCONF_DATA_NODEID);
+        final Optional<DataContainerChild> rpcResultOpt = ((ContainerNode)result).findChildByArg(NETCONF_DATA_NODEID);
         if (rpcResultOpt.isEmpty()) {
             return Optional.empty();
         }
 
-        final DataContainerChild<?, ?> rpcResult = rpcResultOpt.get();
+        final DataContainerChild rpcResult = rpcResultOpt.get();
         verify(rpcResult instanceof DOMSourceAnyxmlNode, "Unexpected result %s", rpcResult);
-        final NormalizedNode<?, ?> dataNode;
+        final NormalizedNode dataNode;
 
         try {
             dataNode = NetconfUtil.transformDOMSourceToNormalizedNode(schemaContext,
-                    ((DOMSourceAnyxmlNode) rpcResult).getValue()).getResult();
+                    ((DOMSourceAnyxmlNode) rpcResult).body()).getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Failed to transform {}", rpcResult, e);
             return Optional.empty();
         }
 
-        final Optional<DataContainerChild<?, ?>> nStateNode = ((DataContainerNode<?>) dataNode).getChild(
+        final Optional<DataContainerChild> nStateNode = ((DataContainerNode) dataNode).findChildByArg(
             toId(NetconfState.QNAME));
         if (nStateNode.isEmpty()) {
             return Optional.empty();
         }
 
-        return ((DataContainerNode<?>) nStateNode.get()).getChild(toId(Schemas.QNAME));
+        return ((DataContainerNode) nStateNode.get()).findChildByArg(toId(Schemas.QNAME));
     }
 
     public static final class RemoteYangSchema {
@@ -224,7 +224,8 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         static Optional<RemoteYangSchema> createFromNormalizedNode(final RemoteDeviceId id,
                                                                    final MapEntryNode schemaNode) {
-            checkArgument(schemaNode.getNodeType().equals(Schema.QNAME), "Wrong QName %s", schemaNode.getNodeType());
+            final QName schemaNodeId = schemaNode.getIdentifier().getNodeType();
+            checkArgument(schemaNodeId.equals(Schema.QNAME), "Wrong QName %s", schemaNodeId);
 
             QName childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_FORMAT;
 
@@ -259,7 +260,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
             final QName moduleQName = revisionAsString.isPresent()
                     ? QName.create(namespaceAsString, revisionAsString.get(), moduleNameAsString)
-                    : QName.create(URI.create(namespaceAsString), moduleNameAsString);
+                    : QName.create(XMLNamespace.of(namespaceAsString), moduleNameAsString);
 
             return Optional.of(new RemoteYangSchema(moduleQName));
         }
@@ -267,23 +268,21 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         /**
          * Extracts all values of a leaf-list node as a set of strings.
          */
-        private static Set<String> getAllChildNodeValues(final DataContainerNode<?> schemaNode,
+        private static Set<String> getAllChildNodeValues(final DataContainerNode schemaNode,
                                                          final QName childNodeQName) {
             final Set<String> extractedValues = new HashSet<>();
-            final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child =
-                    schemaNode.getChild(toId(childNodeQName));
+            final Optional<DataContainerChild> child = schemaNode.findChildByArg(toId(childNodeQName));
             checkArgument(child.isPresent(), "Child nodes %s not present", childNodeQName);
             checkArgument(child.get() instanceof LeafSetNode<?>, "Child nodes %s not present", childNodeQName);
-            for (final LeafSetEntryNode<?> childNode : ((LeafSetNode<?>) child.get()).getValue()) {
+            for (final LeafSetEntryNode<?> childNode : ((LeafSetNode<?>) child.get()).body()) {
                 extractedValues.add(getValueOfSimpleNode(childNode).get());
             }
             return extractedValues;
         }
 
-        private static Optional<String> getSingleChildNodeValue(final DataContainerNode<?> schemaNode,
+        private static Optional<String> getSingleChildNodeValue(final DataContainerNode schemaNode,
                                                                 final QName childNode) {
-            final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> node =
-                    schemaNode.getChild(toId(childNode));
+            final Optional<DataContainerChild> node = schemaNode.findChildByArg(toId(childNode));
             if (node.isPresent()) {
                 return getValueOfSimpleNode(node.get());
             }
@@ -291,9 +290,8 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             return Optional.empty();
         }
 
-        private static Optional<String> getValueOfSimpleNode(
-                final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
-            final String valueStr = node.getValue().toString();
+        private static Optional<String> getValueOfSimpleNode(final NormalizedNode node) {
+            final String valueStr = node.body().toString();
             return Strings.isNullOrEmpty(valueStr) ? Optional.empty() : Optional.of(valueStr.trim());
         }
 

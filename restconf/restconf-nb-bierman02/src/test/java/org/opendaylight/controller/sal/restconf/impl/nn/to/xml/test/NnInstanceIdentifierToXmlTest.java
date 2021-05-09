@@ -28,13 +28,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -44,13 +44,12 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 
 public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
-
     private static EffectiveModelContext schemaContext;
-    NormalizedNodeXmlBodyWriter xmlBodyWriter;
+
+    private final NormalizedNodeXmlBodyWriter xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
 
     public NnInstanceIdentifierToXmlTest() {
         super(schemaContext, null);
-        xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
     @BeforeClass
@@ -64,8 +63,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
 
         final OutputStream output = new ByteArrayOutputStream();
 
-        xmlBodyWriter.writeTo(normalizedNodeContext, null, null, null,
-                mediaType, null, output);
+        xmlBodyWriter.writeTo(normalizedNodeContext, null, null, null, mediaType, null, output);
 
         assertNotNull(output);
 
@@ -108,13 +106,13 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
 
         final DataSchemaNode schemaCont = schemaContext.getDataChildByName(cont);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) schemaCont);
 
         final DataSchemaNode schemaCont1 = ((ContainerSchemaNode) schemaCont)
                 .getDataChildByName(cont1);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont1 = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont1 = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) schemaCont1);
 
         final List<DataSchemaNode> instanceLfLst11 = ControllerContext
@@ -123,11 +121,10 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
 
         final DataSchemaNode lfLst11Schema = Iterables
                 .getFirst(instanceLfLst11, null);
-        final ListNodeBuilder<Object, LeafSetEntryNode<Object>> lfLst11Data = Builders
+        final ListNodeBuilder<Object, SystemLeafSetNode<Object>> lfLst11Data = SchemaAwareBuilders
                 .leafSetBuilder((LeafListSchemaNode) lfLst11Schema);
 
-        lfLst11Data.withChild(Builders
-                .leafSetEntryBuilder((LeafListSchemaNode) lfLst11Schema)
+        lfLst11Data.withChild(SchemaAwareBuilders.leafSetEntryBuilder((LeafListSchemaNode) lfLst11Schema)
                 .withValue("lflst11 value").build());
         dataCont1.withChild(lfLst11Data.build());
 
@@ -136,7 +133,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
                         (DataNodeContainer) schemaCont1, lf11.getLocalName());
         final DataSchemaNode lf11Schema = Iterables.getFirst(instanceLf11, null);
 
-        dataCont1.withChild(Builders.leafBuilder((LeafSchemaNode) lf11Schema)
+        dataCont1.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) lf11Schema)
                 .withValue("/instanceidentifier/").build());
         dataCont.withChild(dataCont1.build());
 
@@ -206,13 +203,13 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
 
         final DataSchemaNode schemaCont = schemaContext.getDataChildByName(cont);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) schemaCont);
 
         final DataSchemaNode schemaCont1 = ((ContainerSchemaNode) schemaCont)
                 .getDataChildByName(cont1);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont1 = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont1 = SchemaAwareBuilders
                 .containerBuilder((ContainerSchemaNode) schemaCont1);
 
         final List<DataSchemaNode> instanceLst11 = ControllerContext
@@ -220,46 +217,37 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
                         (DataNodeContainer) schemaCont1, lst11.getLocalName());
         final DataSchemaNode lst11Schema = Iterables.getFirst(instanceLst11, null);
 
-        final CollectionNodeBuilder<MapEntryNode, MapNode> dataLst11 = Builders
+        final CollectionNodeBuilder<MapEntryNode, SystemMapNode> dataLst11 = SchemaAwareBuilders
                 .mapBuilder((ListSchemaNode) lst11Schema);
 
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> dataLst11Vaule = Builders
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> dataLst11Vaule = SchemaAwareBuilders
                 .mapEntryBuilder((ListSchemaNode) lst11Schema);
 
-        dataLst11Vaule.withChild(buildLeaf(lst11Schema, keyvalue111, dataLst11,
-                "keyvalue111"));
+        dataLst11Vaule.withChild(buildLeaf(lst11Schema, keyvalue111, dataLst11, "keyvalue111"));
 
-        dataLst11Vaule.withChild(buildLeaf(lst11Schema, keyvalue112, dataLst11,
-                "keyvalue112"));
+        dataLst11Vaule.withChild(buildLeaf(lst11Schema, keyvalue112, dataLst11, "keyvalue112"));
 
-        dataLst11Vaule.withChild(buildLeaf(lst11Schema, lf11, dataLst11,
-                "/cont/cont1/lf12"));
+        dataLst11Vaule.withChild(buildLeaf(lst11Schema, lf11, dataLst11, "/cont/cont1/lf12"));
 
-        dataLst11Vaule.withChild(buildLeaf(lst11Schema, lf12, dataLst11,
-                "lf12 value"));
+        dataLst11Vaule.withChild(buildLeaf(lst11Schema, lf12, dataLst11, "lf12 value"));
 
         dataLst11.withChild(dataLst11Vaule.build());
 
         dataCont1.withChild(dataLst11.build());
         dataCont.withChild(dataCont1.build());
 
-        final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, schemaCont,
-                        null, schemaContext), dataCont.build());
-
-        return testNormalizedNodeContext;
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, schemaCont, null, schemaContext),
+            dataCont.build());
     }
 
-    private static DataContainerChild<?, ?> buildLeaf(final DataSchemaNode lst11Schema, final QName qname,
-            final CollectionNodeBuilder<MapEntryNode, MapNode> dataLst11, final Object value) {
+    private static DataContainerChild buildLeaf(final DataSchemaNode lst11Schema, final QName qname,
+            final CollectionNodeBuilder<MapEntryNode, SystemMapNode> dataLst11, final Object value) {
 
-        final List<DataSchemaNode> instanceLf = ControllerContext
-                .findInstanceDataChildrenByName(
-                        (DataNodeContainer) lst11Schema, qname.getLocalName());
+        final List<DataSchemaNode> instanceLf = ControllerContext.findInstanceDataChildrenByName(
+            (DataNodeContainer) lst11Schema, qname.getLocalName());
         final DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
 
-        return Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue(value)
-                .build();
+        return SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue(value).build();
     }
 
     @Override

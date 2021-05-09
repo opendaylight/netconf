@@ -10,24 +10,25 @@ package org.opendaylight.controller.sal.rest.doc.impl;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import java.sql.Date;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 
 public class SwaggerObjectTest {
 
     private static final String NAMESPACE = "urn:opendaylight:groupbasedpolicy:opflex";
     private static final String STRING_DATE = "2014-05-28";
-    private static final Date REVISION = Date.valueOf(STRING_DATE);
+    private static final Optional<Revision> REVISION = Optional.of(Revision.of(STRING_DATE));
     private DocGenTestHelper helper;
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
 
     @Before
     public void setUp() throws Exception {
