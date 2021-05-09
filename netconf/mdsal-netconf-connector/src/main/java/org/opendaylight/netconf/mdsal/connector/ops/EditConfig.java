@@ -95,7 +95,7 @@ public final class EditConfig extends AbstractEdit {
     private void executeChange(final DOMDataTreeReadWriteTransaction rwtx, final DataTreeChange change)
             throws DocumentedException {
         final YangInstanceIdentifier path = change.getPath();
-        final NormalizedNode<?, ?> changeData = change.getChangeRoot();
+        final NormalizedNode changeData = change.getChangeRoot();
         switch (change.getAction()) {
             case NONE:
                 return;
@@ -139,7 +139,7 @@ public final class EditConfig extends AbstractEdit {
     }
 
     private void mergeParentMixin(final DOMDataTreeReadWriteTransaction rwtx, final YangInstanceIdentifier path,
-                                final NormalizedNode<?, ?> change) {
+                                  final NormalizedNode change) {
         final YangInstanceIdentifier parentNodeYid = path.getParent();
         if (change instanceof MapEntryNode) {
             final SchemaNode schemaNode = SchemaContextUtil.findNodeInSchemaContext(
