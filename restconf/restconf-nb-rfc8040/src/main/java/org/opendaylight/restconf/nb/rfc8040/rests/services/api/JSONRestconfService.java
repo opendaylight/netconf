@@ -15,8 +15,11 @@ import org.opendaylight.yangtools.yang.common.OperationFailedException;
 /**
  * Provides restconf CRUD operations via code with input/output data in JSON format.
  *
+ * @deprecated This interface is type-unsafe and does not document encoding sufficiently. Use proper MD-SAL interfaces
+ *             instead.
  * @author Thomas Pantelis.
  */
+@Deprecated(since = "1.13.2", forRemoval = true)
 public interface JSONRestconfService {
     /**
      * The data tree root path.
