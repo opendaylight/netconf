@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +22,7 @@ import org.opendaylight.restconf.common.util.IdentityValuesDTO.Predicate;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -255,7 +255,7 @@ public final class RestCodec {
             final List<IdentityValue> identities = data.getValuesWithNamespaces();
             for (int i = 0; i < identities.size(); i++) {
                 final IdentityValue identityValue = identities.get(i);
-                URI validNamespace = resolveValidNamespace(identityValue.getNamespace(), this.mountPoint,
+                XMLNamespace validNamespace = resolveValidNamespace(identityValue.getNamespace(), this.mountPoint,
                         controllerContext);
                 final DataSchemaNode node = ControllerContext.findInstanceDataChildByNameAndNamespace(
                         parentContainer, identityValue.getValue(), validNamespace);
@@ -337,7 +337,7 @@ public final class RestCodec {
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static Module getModuleByNamespace(final String namespace, final DOMMountPoint mountPoint,
             final ControllerContext controllerContext) {
-        final URI validNamespace = resolveValidNamespace(namespace, mountPoint, controllerContext);
+        final XMLNamespace validNamespace = resolveValidNamespace(namespace, mountPoint, controllerContext);
 
         Module module = null;
         if (mountPoint != null) {
@@ -352,16 +352,16 @@ public final class RestCodec {
         return module;
     }
 
-    private static URI resolveValidNamespace(final String namespace, final DOMMountPoint mountPoint,
+    private static XMLNamespace resolveValidNamespace(final String namespace, final DOMMountPoint mountPoint,
             final ControllerContext controllerContext) {
-        URI validNamespace;
+        XMLNamespace validNamespace;
         if (mountPoint != null) {
             validNamespace = controllerContext.findNamespaceByModuleName(mountPoint, namespace);
         } else {
             validNamespace = controllerContext.findNamespaceByModuleName(namespace);
         }
         if (validNamespace == null) {
-            validNamespace = URI.create(namespace);
+            validNamespace = XMLNamespace.of(namespace);
         }
 
         return validNamespace;

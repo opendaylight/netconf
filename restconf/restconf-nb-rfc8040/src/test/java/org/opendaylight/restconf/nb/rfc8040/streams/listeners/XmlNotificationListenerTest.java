@@ -11,17 +11,13 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
 import com.google.common.collect.Lists;
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,10 +26,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
-import org.opendaylight.yangtools.util.SingletonSet;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -46,7 +45,8 @@ import org.xmlunit.assertj.XmlAssert;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNotificationListenerTest {
-    private static final QNameModule MODULE = QNameModule.create(URI.create("notifi:mod"), Revision.of("2016-11-23"));
+    private static final QNameModule MODULE =
+        QNameModule.create(XMLNamespace.of("notifi:mod"), Revision.of("2016-11-23"));
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
@@ -170,7 +170,7 @@ public class XmlNotificationListenerTest {
         assertXmlMatches(result, control);
     }
 
-    private static void assertXmlMatches(String result, String control) {
+    private static void assertXmlMatches(final String result, final String control) {
         XmlAssert.assertThat(result).and(control)
                 // text values have localName null but we want to compare those, ignore only nodes that have localName
                 // with eventTime value
@@ -180,53 +180,51 @@ public class XmlNotificationListenerTest {
 
     private static AugmentationNode mockAugm(final LeafNode<String> leaf) {
         final AugmentationNode augm = mock(AugmentationNode.class);
-        final AugmentationIdentifier augmId = new AugmentationIdentifier(SingletonSet.of(leaf.getNodeType()));
+        final AugmentationIdentifier augmId = new AugmentationIdentifier(Set.of(leaf.getIdentifier().getNodeType()));
         when(augm.getIdentifier()).thenReturn(augmId);
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(leaf);
 
-        when(augm.getValue()).thenReturn(childs);
+        when(augm.body()).thenReturn(childs);
         return augm;
     }
 
     private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode<String> leaf) {
         final MapEntryNode entry = mock(MapEntryNode.class);
-        final NodeIdentifierWithPredicates nodeId = NodeIdentifierWithPredicates.of(leaf.getNodeType(),
-                leaf.getNodeType(), "value");
+        final NodeIdentifierWithPredicates nodeId = NodeIdentifierWithPredicates.of(leaf.getIdentifier().getNodeType(),
+                leaf.getIdentifier().getNodeType(), "value");
         when(entry.getIdentifier()).thenReturn(nodeId);
-        when(entry.getChild(any())).thenReturn(Optional.of(leaf));
+        when(entry.findChildByArg(any())).thenReturn(Optional.of(leaf));
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(leaf);
 
-        when(entry.getValue()).thenReturn(childs);
+        when(entry.body()).thenReturn(childs);
         return entry;
     }
 
     private static MapNode mockList(final QName listQName, final MapEntryNode... entries) {
         final MapNode list = mock(MapNode.class);
         when(list.getIdentifier()).thenReturn(NodeIdentifier.create(listQName));
-        when(list.getValue()).thenReturn(Lists.newArrayList(entries));
+        when(list.body()).thenReturn(Lists.newArrayList(entries));
         return list;
     }
 
-    private static ContainerNode mockCont(final QName contQName,
-                                          final DataContainerChild<? extends PathArgument, ?> child) {
+    private static ContainerNode mockCont(final QName contQName, final DataContainerChild child) {
         final ContainerNode cont = mock(ContainerNode.class);
         when(cont.getIdentifier()).thenReturn(NodeIdentifier.create(contQName));
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(child);
-        when(cont.getValue()).thenReturn(childs);
+        when(cont.body()).thenReturn(childs);
         return cont;
     }
 
     private static LeafNode<String> mockLeaf(final QName leafQName) {
         final LeafNode<String> child = mock(LeafNode.class);
-        when(child.getNodeType()).thenReturn(leafQName);
         when(child.getIdentifier()).thenReturn(NodeIdentifier.create(leafQName));
-        when(child.getValue()).thenReturn("value");
+        when(child.body()).thenReturn("value");
         return child;
     }
 

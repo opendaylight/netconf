@@ -36,6 +36,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public final class TestRestconfUtils {
         final InputStream inputStream = TestRestconfUtils.class.getResourceAsStream(pathToInputFile);
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
-            final NormalizedNode<?, ?> nn = parse(iiContext, doc);
+            final NormalizedNode nn = parse(iiContext, doc);
             return new NormalizedNodeContext(iiContext, nn);
         } catch (final Exception e) {
             LOG.error("Load xml file " + pathToInputFile + " fail.", e);
@@ -87,7 +88,7 @@ public final class TestRestconfUtils {
         return null;
     }
 
-    private static NormalizedNode<?, ?> parse(final InstanceIdentifierContext<?> iiContext, final Document doc)
+    private static NormalizedNode parse(final InstanceIdentifierContext<?> iiContext, final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = iiContext.getSchemaNode();
         DataSchemaNode schemaNode = null;
@@ -120,7 +121,8 @@ public final class TestRestconfUtils {
 
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, iiContext.getSchemaContext(), schemaNode);
+        final XmlParserStream xmlParser = XmlParserStream.create(writer,
+            SchemaInferenceStack.ofInstantiatedPath(iiContext.getSchemaContext(), schemaNode.getPath()).toInference());
 
         if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));

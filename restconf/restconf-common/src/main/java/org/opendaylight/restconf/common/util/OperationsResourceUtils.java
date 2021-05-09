@@ -18,9 +18,9 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -52,8 +52,8 @@ public final class OperationsResourceUtils {
         modules.add(new OperationsRestconfModule(operatationsSchema));
 
         // Now build the operations container and combine it with the context
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> operationsBuilder =
-                Builders.containerBuilder(operatationsSchema);
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> operationsBuilder = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(OperationsContainerSchemaNode.QNAME));
         for (final OperationsLeafSchemaNode leaf : rpcLeafSchemas) {
             operationsBuilder.withChild(ImmutableNodes.leafNode(leaf.getQName(), Empty.getInstance()));
         }
