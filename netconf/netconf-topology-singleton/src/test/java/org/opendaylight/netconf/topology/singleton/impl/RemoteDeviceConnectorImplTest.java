@@ -57,7 +57,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
+import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import scala.concurrent.duration.Duration;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -172,7 +172,7 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
 
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(netconfNode).build();
 
-        builder.setSchemaResourceDTO(new DefaultSchemaResourceManager(new YangParserFactoryImpl())
+        builder.setSchemaResourceDTO(new DefaultSchemaResourceManager(new DefaultYangParserFactory())
             .getSchemaResources(netconfNode, "foo"));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =

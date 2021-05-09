@@ -22,11 +22,11 @@ import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
-import org.opendaylight.yangtools.yang.model.repo.util.InMemorySchemaSourceCache;
+import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
+import org.opendaylight.yangtools.yang.model.repo.spi.GuavaSchemaSourceCache;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRSchemaSource;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
@@ -108,7 +108,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         // helps establishing different sets of contexts, as they can share this pre-made cache.
         repository.registerSchemaSourceListener(
             // FIXME: add knobs to control cache lifetime explicitly
-            InMemorySchemaSourceCache.createSoftCache(repository, IRSchemaSource.class));
+            GuavaSchemaSourceCache.createSoftCache(repository, IRSchemaSource.class));
 
         // Attach the filesystem cache, providing persistence capability, so that restarts do not require us to
         // re-populate the cache. This also acts as a side-load capability, as anything pre-populated into that

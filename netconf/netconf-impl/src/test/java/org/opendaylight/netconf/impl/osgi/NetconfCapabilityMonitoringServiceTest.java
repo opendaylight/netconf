@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -48,6 +47,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -88,14 +88,14 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
+        doReturn(XMLNamespace.of(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
         doReturn(Optional.of(TEST_MODULE_DATE)).when(moduleMock).getRevision();
         moduleCapability1 = new YangModuleCapability(moduleMock, TEST_MODULE_CONTENT);
 
         capabilities.add(moduleCapability1);
 
-        doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock2).getNamespace();
+        doReturn(XMLNamespace.of(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock2).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock2).getName();
         doReturn(Optional.of(TEST_MODULE_DATE2)).when(moduleMock2).getRevision();
         moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);

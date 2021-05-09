@@ -37,9 +37,9 @@ final class BatchedExistenceCheck {
 
     static BatchedExistenceCheck start(final DOMDataTreeReadOperations tx,
                                        final LogicalDatastoreType datastore, final YangInstanceIdentifier parentPath,
-                                       final Collection<? extends NormalizedNode<?, ?>> children) {
+                                       final Collection<? extends NormalizedNode> children) {
         final BatchedExistenceCheck ret = new BatchedExistenceCheck(children.size());
-        for (NormalizedNode<?, ?> child : children) {
+        for (NormalizedNode child : children) {
             final YangInstanceIdentifier path = parentPath.node(child.getIdentifier());
             tx.exists(datastore, path).addCallback(new FutureCallback<Boolean>() {
                 @Override

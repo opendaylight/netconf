@@ -78,20 +78,19 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data) {
+    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data) {
         enqueueOperation(() -> netconfService.merge(store, path, data, Optional.empty()));
     }
 
     @Override
     public void create(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-           final NormalizedNode<?, ?> data, final SchemaContext schemaContext) {
+           final NormalizedNode data, final SchemaContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
             merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubTree.getIdentifier()),
                 emptySubTree);
 
-            for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
+            for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 enqueueOperation(() -> netconfService.create(store, childPath, child, Optional.empty()));
             }
@@ -101,14 +100,14 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data, final SchemaContext schemaContext) {
+    public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data,
+            final SchemaContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
             merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubTree.getIdentifier()),
                 emptySubTree);
 
-            for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
+            for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 enqueueOperation(() -> netconfService.replace(store, childPath, child, Optional.empty()));
             }

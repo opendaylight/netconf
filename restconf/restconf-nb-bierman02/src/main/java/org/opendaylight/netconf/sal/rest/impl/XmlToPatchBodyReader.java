@@ -7,13 +7,15 @@
  */
 package org.opendaylight.netconf.sal.rest.impl;
 
+import static com.google.common.base.Verify.verify;
+import static com.google.common.base.Verify.verifyNotNull;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,6 +46,7 @@ import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -57,7 +60,8 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
+import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -79,7 +83,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
 
-    public XmlToPatchBodyReader(ControllerContext controllerContext) {
+    public XmlToPatchBodyReader(final ControllerContext controllerContext) {
         super(controllerContext);
     }
 
@@ -138,7 +142,8 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                     ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
 
             // find module according to namespace
-            final Module module = pathContext.getSchemaContext().findModules(URI.create(namespace)).iterator().next();
+            final Module module = pathContext.getSchemaContext().findModules(XMLNamespace.of(namespace)).iterator()
+                .next();
 
             // initialize codec + set default prefix derived from module name
             final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
@@ -156,14 +161,14 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                         .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
                                 namespace,
                                 module.getQNameModule().getRevision().map(Revision::toString).orElse(null))));
-
-                targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                        codec.getDataContextTree().findChild(targetII).orElseThrow().getDataSchemaNode().getPath()
-                            .getParent());
-
                 // move schema node
-                schemaNode = (DataSchemaNode) SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                        codec.getDataContextTree().findChild(targetII).orElseThrow().getDataSchemaNode().getPath());
+                schemaNode = verifyNotNull(codec.getDataContextTree().findChild(targetII).orElseThrow()
+                    .getDataSchemaNode());
+
+                final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
+                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();
+                verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
+                targetNode = (SchemaNode) parentStmt;
             }
 
             if (targetNode == null) {
@@ -173,12 +178,13 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             }
 
             if (oper.isWithValue()) {
-                final NormalizedNode<?, ?> parsed;
+                final NormalizedNode parsed;
                 if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
                     final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer, pathContext.getSchemaContext(),
-                            schemaNode);
+                    final XmlParserStream xmlParser = XmlParserStream.create(writer,
+                        SchemaInferenceStack.ofInstantiatedPath(pathContext.getSchemaContext(), schemaNode.getPath())
+                            .toInference());
                     xmlParser.traverse(new DOMSource(firstValueElement));
                     parsed = resultHolder.getResult();
                 } else {
@@ -254,8 +260,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
 
         while (args.hasNext()) {
             final String s = args.next();
-            nonCondXpath.append("/");
-            nonCondXpath.append(s);
+            nonCondXpath.append('/').append(s);
             childNode = ((DataNodeContainer) childNode).getDataChildByName(QName.create(namespace, revision, s));
 
             if (childNode instanceof ListSchemaNode && args.hasNext()) {

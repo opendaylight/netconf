@@ -8,9 +8,7 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -34,8 +32,8 @@ import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
@@ -43,10 +41,11 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -78,7 +77,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     @Override
     protected HandlingPriority canHandle(final String netconfOperationName, final String namespace) {
-        final URI namespaceURI = createNsUri(namespace);
+        final XMLNamespace namespaceURI = createNsUri(namespace);
         final Optional<? extends Module> module = getModule(namespaceURI);
 
         if (module.isEmpty()) {
@@ -96,21 +95,20 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         throw new UnsupportedOperationException("Runtime rpc does not have a stable name");
     }
 
-    private static URI createNsUri(final String namespace) {
+    private static XMLNamespace createNsUri(final String namespace) {
         // May throw IllegalArgumentException, but that should never happen, as the namespace comes from parsed XML
-        return URI.create(namespace);
+        return XMLNamespace.of(namespace);
     }
 
     //this returns module with the newest revision if more then 1 module with same namespace is found
-    private Optional<? extends Module> getModule(final URI namespaceURI) {
-        return schemaContext.getCurrentContext().findModules(namespaceURI).stream().findFirst();
+    private Optional<? extends Module> getModule(final XMLNamespace namespace) {
+        return schemaContext.getCurrentContext().findModules(namespace).stream().findFirst();
     }
 
-    private static Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final URI namespaceURI,
+    private static Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final XMLNamespace namespace,
             final String name) {
         for (final RpcDefinition rpcDef : module.getRpcs()) {
-            if (rpcDef.getQName().getNamespace().equals(namespaceURI)
-                    && rpcDef.getQName().getLocalName().equals(name)) {
+            if (rpcDef.getQName().getNamespace().equals(namespace) && rpcDef.getQName().getLocalName().equals(name)) {
                 return Optional.of(rpcDef);
             }
         }
@@ -131,7 +129,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
                     ErrorType.PROTOCOL, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
         }
 
-        final URI namespaceURI = createNsUri(netconfOperationNamespace);
+        final XMLNamespace namespaceURI = createNsUri(netconfOperationNamespace);
         final Optional<? extends Module> moduleOptional = getModule(namespaceURI);
 
         if (moduleOptional.isEmpty()) {
@@ -151,7 +149,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         }
 
         final RpcDefinition rpcDefinition = rpcDefinitionOptional.get();
-        final ContainerNode inputNode = rpcToNNode(operationElement, rpcDefinition.getInput());
+        final ContainerNode inputNode = rpcToNNode(operationElement, rpcDefinition);
 
         final DOMRpcResult result;
         try {
@@ -201,7 +199,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         return document;
     }
 
-    private Element transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data,
+    private Element transformNormalizedNode(final Document document, final NormalizedNode data,
                                             final SchemaPath rpcOutputPath) {
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.RPC_REPLY_KEY));
 
@@ -235,8 +233,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     private static void writeRootElement(final XMLStreamWriter xmlWriter,
             final SchemaOrderedNormalizedNodeWriter nnWriter, final ContainerNode data) {
         try {
-            final Collection<DataContainerChild<?, ?>> value = data.getValue();
-            nnWriter.write(value);
+            nnWriter.write(data.body());
             nnWriter.flush();
             xmlWriter.flush();
         } catch (XMLStreamException | IOException e) {
@@ -248,14 +245,16 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
      * Parses xml element rpc input into normalized node or null if rpc does not take any input.
      *
      * @param element rpc xml element
-     * @param input   input container schema node, or null if rpc does not take any input
+     * @param rpcDefinition   input container schema node, or null if rpc does not take any input
      * @return parsed rpc into normalized node, or null if input schema is null
      */
     private @Nullable ContainerNode rpcToNNode(final XmlElement element,
-            final @Nullable InputSchemaNode input) throws DocumentedException {
+            final RpcDefinition rpcDefinition) throws DocumentedException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext.getCurrentContext(), input);
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.of(
+            schemaContext.getCurrentContext(),
+            Absolute.of(rpcDefinition.getQName(), rpcDefinition.getInput().getQName())).toInference());
 
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));

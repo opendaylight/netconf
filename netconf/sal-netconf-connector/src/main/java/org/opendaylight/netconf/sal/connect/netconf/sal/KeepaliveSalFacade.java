@@ -325,7 +325,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         }
 
         @Override
-        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
+        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
             keepaliveTask.disableKeepalive();
             final ListenableFuture<? extends DOMRpcResult> deviceFuture = deviceRpc.invokeRpc(type, input);
 
