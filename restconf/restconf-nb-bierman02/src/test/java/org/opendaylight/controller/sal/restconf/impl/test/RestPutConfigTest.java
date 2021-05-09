@@ -128,7 +128,7 @@ public class RestPutConfigTest {
         this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
-    private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode<?, ?> data) {
+    private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode data) {
         final PutResult result = Mockito.mock(PutResult.class);
         Mockito.when(this.brokerFacade.commitConfigurationDataPut(schemaContext, yii, data, null, null))
                 .thenReturn(result);

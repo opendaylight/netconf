@@ -31,7 +31,8 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadRequest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
 /**
@@ -43,8 +44,9 @@ public abstract class ReadTransactionActorTestAdapter {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
-    static final NormalizedNode<?, ?> NODE = Builders.containerBuilder()
-            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont"))).build();
+    static final ContainerNode NODE = Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
+            .build();
 
     private DOMDataTreeReadOperations mockReadTx;
     private TestProbe probe;

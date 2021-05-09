@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,6 +23,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -66,7 +66,7 @@ public class FieldsSchemalessRpcStructureTransformerTest {
      * }
      */
     private static final QNameModule TEST_MODULE = QNameModule.create(
-            URI.create("test-namespace"), Revision.of("2020-10-25"));
+            XMLNamespace.of("test-namespace"), Revision.of("2020-10-25"));
 
     private static final NodeIdentifier C1_NID = toId(QName.create(TEST_MODULE, "c-1"));
     private static final NodeIdentifier C2_NID = toId(QName.create(TEST_MODULE, "c-2"));
@@ -120,7 +120,7 @@ public class FieldsSchemalessRpcStructureTransformerTest {
 
     private static Diff getDiff(final String filterFileName, final DOMSourceAnyxmlNode filterStructure)
             throws IOException, SAXException, URISyntaxException {
-        final String body = XmlUtil.toString((Element) filterStructure.getValue().getNode());
+        final String body = XmlUtil.toString((Element) filterStructure.body().getNode());
         final String expectedBody = new String(Files.readAllBytes(Paths.get(FieldsSchemalessRpcStructureTransformerTest
                 .class.getResource("/schemaless/filter/" + filterFileName).toURI())));
         return new Diff(expectedBody, body);

@@ -71,14 +71,14 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path) {
         final Future<Object> masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
         ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.get(path);
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         final Future<Object> masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
         ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
@@ -86,14 +86,14 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path) {
         final Future<Object> masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
         ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.getConfig(path);
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         final Future<Object> masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
         ProxyNetconfService netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
@@ -102,7 +102,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         isLocked();
         return proxyNetconfService.merge(store, path, data, defaultOperation);
@@ -110,7 +110,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         isLocked();
         return proxyNetconfService.replace(store, path, data, defaultOperation);
@@ -118,7 +118,7 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         isLocked();
         return proxyNetconfService.create(store, path, data, defaultOperation);

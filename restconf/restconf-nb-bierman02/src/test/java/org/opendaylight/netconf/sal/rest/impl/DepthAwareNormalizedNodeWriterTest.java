@@ -65,9 +65,9 @@ public class DepthAwareNormalizedNodeWriterTest {
     private NodeIdentifier keyLeafNodeIdentifier;
     private NodeIdentifier anotherLeafNodeIdentifier;
 
-    private Collection<DataContainerChild<?, ?>> containerNodeValue;
+    private Collection<DataContainerChild> containerNodeValue;
     private Collection<MapEntryNode> mapNodeValue;
-    private Collection<DataContainerChild<?, ?>> mapEntryNodeValue;
+    private Collection<DataContainerChild> mapEntryNodeValue;
     private Collection<LeafSetEntryNode<String>> leafSetNodeValue;
     private String leafSetEntryNodeValue;
     private String keyLeafNodeValue;
@@ -97,31 +97,31 @@ public class DepthAwareNormalizedNodeWriterTest {
         mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
                 QName.create("namespace", "list-entry"), mapEntryNodeKey, keyLeafNodeValue);
         when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
-        when(mapEntryNodeData.getChild(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
+        when(mapEntryNodeData.findChildByArg(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
 
-        when(keyLeafNodeData.getValue()).thenReturn(keyLeafNodeValue);
+        when(keyLeafNodeData.body()).thenReturn(keyLeafNodeValue);
         when(keyLeafNodeData.getIdentifier()).thenReturn(keyLeafNodeIdentifier);
 
         anotherLeafNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "another-field"));
         anotherLeafNodeValue = "another-value";
 
-        when(anotherLeafNodeData.getValue()).thenReturn(anotherLeafNodeValue);
+        when(anotherLeafNodeData.body()).thenReturn(anotherLeafNodeValue);
         when(anotherLeafNodeData.getIdentifier()).thenReturn(anotherLeafNodeIdentifier);
 
         // values
-        when(leafSetEntryNodeData.getValue()).thenReturn(leafSetEntryNodeValue);
+        when(leafSetEntryNodeData.body()).thenReturn(leafSetEntryNodeValue);
 
         leafSetNodeValue = Collections.singletonList(leafSetEntryNodeData);
-        when(leafSetNodeData.getValue()).thenReturn(leafSetNodeValue);
+        when(leafSetNodeData.body()).thenReturn(leafSetNodeValue);
 
         containerNodeValue = Collections.singleton(leafSetNodeData);
-        when(containerNodeData.getValue()).thenReturn(containerNodeValue);
+        when(containerNodeData.body()).thenReturn(containerNodeValue);
 
         mapEntryNodeValue = Sets.newHashSet(keyLeafNodeData, anotherLeafNodeData);
-        when(mapEntryNodeData.getValue()).thenReturn(mapEntryNodeValue);
+        when(mapEntryNodeData.body()).thenReturn(mapEntryNodeValue);
 
         mapNodeValue = Collections.singleton(mapEntryNodeData);
-        when(mapNodeData.getValue()).thenReturn(mapNodeValue);
+        when(mapNodeData.body()).thenReturn(mapNodeValue);
     }
 
     /**

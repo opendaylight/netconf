@@ -58,8 +58,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev19
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -223,7 +223,7 @@ public class NetconfDevice
             @Override
             public void onSuccess(final DOMRpcResult domRpcResult) {
                 notificationHandler.addNotificationFilter(notification -> {
-                    if (NetconfCapabilityChange.QNAME.equals(notification.getBody().getNodeType())) {
+                    if (NetconfCapabilityChange.QNAME.equals(notification.getBody().getIdentifier().getNodeType())) {
                         LOG.info("{}: Schemas change detected, reconnecting", id);
                         // Only disconnect is enough,
                         // the reconnecting nature of the connector will take care of reconnecting
@@ -333,7 +333,7 @@ public class NetconfDevice
         if (!errors.isEmpty()) {
             LOG.warn("{}: Schema-mounts acquisition resulted in errors {}", id, errors);
         }
-        final NormalizedNode<?, ?> schemaMounts = rpcResult.getResult();
+        final NormalizedNode schemaMounts = rpcResult.getResult();
         if (schemaMounts == null) {
             LOG.debug("{}: device does not define any schema mounts", id);
             return emptyContext;

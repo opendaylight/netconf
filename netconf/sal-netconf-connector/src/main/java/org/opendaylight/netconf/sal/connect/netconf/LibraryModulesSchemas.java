@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -55,6 +54,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -74,6 +74,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -91,6 +93,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
     private static final EffectiveModelContext LIBRARY_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(
         YangLibrary.class);
+    private static final Inference MODULES_STATE_INFERENCE =
+        SchemaInferenceStack.ofDataTreePath(LIBRARY_CONTEXT, ModulesState.QNAME).toInference();
 
     // FIXME: this is legacy RFC7895, add support for RFC8525 containers, too
     private static final NodeIdentifier MODULES_STATE_NID = NodeIdentifier.create(ModulesState.QNAME);
@@ -179,10 +183,10 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
 
-        final Optional<? extends NormalizedNode<?, ?>> modulesStateNode =
+        final Optional<DataContainerChild> modulesStateNode =
                 findModulesStateNode(moduleListNodeResult.getResult());
         if (modulesStateNode.isPresent()) {
-            final NormalizedNode<?, ?> node = modulesStateNode.get();
+            final DataContainerChild node = modulesStateNode.get();
             checkState(node instanceof ContainerNode, "Expecting container containing schemas, but was %s", node);
             return create((ContainerNode) node);
         }
@@ -192,14 +196,14 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
-        final Optional<DataContainerChild<?, ?>> moduleListNode = modulesStateNode.getChild(MODULE_NID);
+        final Optional<DataContainerChild> moduleListNode = modulesStateNode.findChildByArg(MODULE_NID);
         checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", MODULE_NID, modulesStateNode);
-        final DataContainerChild<?, ?> node = moduleListNode.get();
+        final DataContainerChild node = moduleListNode.get();
         checkState(node instanceof MapNode, "Unexpected structure for container: %s in : %s. Expecting a list",
             MODULE_NID, modulesStateNode);
 
         final MapNode moduleList = (MapNode) node;
-        final Collection<MapEntryNode> modules = moduleList.getValue();
+        final Collection<MapEntryNode> modules = moduleList.body();
         final ImmutableMap.Builder<QName, URL> schemasMapping = ImmutableMap.builderWithExpectedSize(modules.size());
         for (final MapEntryNode moduleNode : modules) {
             final Entry<QName, URL> entry = createFromEntry(moduleNode);
@@ -231,17 +235,16 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         return createFromURLConnection(connection);
     }
 
-    private static Optional<? extends NormalizedNode<?, ?>> findModulesStateNode(final NormalizedNode<?, ?> result) {
+    private static Optional<DataContainerChild> findModulesStateNode(final NormalizedNode result) {
         if (result == null) {
             return Optional.empty();
         }
-        final Optional<DataContainerChild<?, ?>> dataNode =
-                ((DataContainerNode<?>) result).getChild(NETCONF_DATA_NODEID);
-        if (dataNode.isPresent() == false) {
+        final Optional<DataContainerChild> dataNode = ((DataContainerNode) result).findChildByArg(NETCONF_DATA_NODEID);
+        if (dataNode.isEmpty()) {
             return Optional.empty();
         }
 
-        return ((DataContainerNode<?>) dataNode.get()).getChild(MODULES_STATE_NID);
+        return ((DataContainerNode) dataNode.get()).findChildByArg(MODULES_STATE_NID);
     }
 
     private static LibraryModulesSchemas createFromURLConnection(final URLConnection connection) {
@@ -257,7 +260,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         checkState(contentType.equals("application/json") || contentType.equals("application/xml"),
                 "Only XML and JSON types are supported.");
 
-        Optional<NormalizedNode<?, ?>> optionalModulesStateNode = Optional.empty();
+        Optional<NormalizedNode> optionalModulesStateNode = Optional.empty();
         try (InputStream in = connection.getInputStream()) {
             optionalModulesStateNode = contentType.equals("application/json") ? readJson(in) : readXml(in);
         } catch (final IOException e) {
@@ -268,7 +271,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
 
-        final NormalizedNode<?, ?> modulesStateNode = optionalModulesStateNode.get();
+        final NormalizedNode modulesStateNode = optionalModulesStateNode.get();
         checkState(modulesStateNode instanceof ContainerNode, "Expecting container containing module list, but was %s",
             modulesStateNode);
         final ContainerNode modulesState = (ContainerNode) modulesStateNode;
@@ -283,7 +286,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         return i != 1 && ".json".equalsIgnoreCase(fileName.substring(i));
     }
 
-    private static Optional<NormalizedNode<?, ?>> readJson(final InputStream in) {
+    private static Optional<NormalizedNode> readJson(final InputStream in) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
@@ -295,7 +298,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         return resultHolder.isFinished() ? Optional.of(resultHolder.getResult()) : Optional.empty();
     }
 
-    private static Optional<NormalizedNode<?, ?>> readXml(final InputStream in) {
+    private static Optional<NormalizedNode> readXml(final InputStream in) {
         try {
             final DocumentBuilder docBuilder = UntrustedXML.newDocumentBuilder();
 
@@ -318,11 +321,9 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, LIBRARY_CONTEXT,
-                    LIBRARY_CONTEXT.findDataChildByName(ModulesState.QNAME).orElseThrow());
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, MODULES_STATE_INFERENCE);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
-            final NormalizedNode<?, ?> parsed = resultHolder.getResult();
-            return Optional.of(parsed);
+            return Optional.of(resultHolder.getResult());
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Unable to parse yang library xml content", e);
         }
@@ -331,7 +332,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static @Nullable Entry<QName, URL> createFromEntry(final MapEntryNode moduleNode) {
-        checkArgument(moduleNode.getNodeType().equals(Module.QNAME), "Wrong QName %s", moduleNode.getNodeType());
+        final QName moduleNodeId = moduleNode.getIdentifier().getNodeType();
+        checkArgument(moduleNodeId.equals(Module.QNAME), "Wrong QName %s", moduleNodeId);
 
         final String moduleName = getSingleChildNodeValue(moduleNode, NAME_NID).get();
         final Optional<String> revision = getSingleChildNodeValue(moduleNode, REVISION_NID);
@@ -349,7 +351,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         final QName moduleQName = revision.isPresent()
                 ? QName.create(moduleNameSpace, revision.get(), moduleName)
-                : QName.create(URI.create(moduleNameSpace), moduleName);
+                : QName.create(XMLNamespace.of(moduleNameSpace), moduleName);
 
         try {
             return new SimpleImmutableEntry<>(moduleQName, new URL(schemaUriAsString.get()));
@@ -360,15 +362,15 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         }
     }
 
-    private static Optional<String> getSingleChildNodeValue(final DataContainerNode<?> schemaNode,
+    private static Optional<String> getSingleChildNodeValue(final DataContainerNode schemaNode,
                                                             final NodeIdentifier childNodeId) {
-        final Optional<DataContainerChild<?, ?>> node = schemaNode.getChild(childNodeId);
+        final Optional<DataContainerChild> node = schemaNode.findChildByArg(childNodeId);
         checkArgument(node.isPresent(), "Child node %s not present", childNodeId.getNodeType());
         return getValueOfSimpleNode(node.get());
     }
 
-    private static Optional<String> getValueOfSimpleNode(final NormalizedNode<?, ?> node) {
-        final String valueStr = node.getValue().toString();
+    private static Optional<String> getValueOfSimpleNode(final NormalizedNode node) {
+        final String valueStr = node.body().toString();
         return Strings.isNullOrEmpty(valueStr) ? Optional.empty() : Optional.of(valueStr.trim());
     }
 
