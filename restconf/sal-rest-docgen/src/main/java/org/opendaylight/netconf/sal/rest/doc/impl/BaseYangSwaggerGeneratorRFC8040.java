@@ -45,14 +45,14 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
     }
 
     @Override
-    public String getResourcePathPart(String resourceType) {
+    public String getResourcePathPart(final String resourceType) {
         if (isData(resourceType)) {
             return "data";
         }
         return "operations";
     }
 
-    private boolean isData(String dataStore) {
+    private static boolean isData(final String dataStore) {
         return "config".contains(dataStore) || "operational".contains(dataStore);
     }
 

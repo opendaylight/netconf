@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
@@ -36,6 +35,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -47,7 +47,7 @@ public class RestconfDocumentedExceptionMapperTest {
     private static final String EMPTY_XML = "<errors xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"></errors>";
     private static final String EMPTY_JSON = "{}";
     private static final QNameModule MONITORING_MODULE_INFO = QNameModule.create(
-            URI.create("instance:identifier:patch:module"), Revision.of("2015-11-21"));
+        XMLNamespace.of("instance:identifier:patch:module"), Revision.of("2015-11-21"));
 
     private static RestconfDocumentedExceptionMapper exceptionMapper;
 

@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.test.tool;
 
-import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.Collections2;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -19,7 +18,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.BindException;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
@@ -66,10 +64,10 @@ import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
-import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
@@ -362,19 +360,11 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private static void registerSource(final SharedSchemaRepository consumer, final String resource,
-                                final SourceIdentifier sourceId) {
-        consumer.registerSchemaSource(sourceIdentifier -> Futures.immediateFuture(new YangTextSchemaSource(sourceId) {
-            @Override
-            protected ToStringHelper addToStringAttributes(final ToStringHelper toStringHelper) {
-                return toStringHelper;
-            }
-
-            @Override
-            public InputStream openStream() {
-                return getClass().getResourceAsStream(resource);
-            }
-        }), PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
-            PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
+            final SourceIdentifier sourceId) {
+        consumer.registerSchemaSource(sourceIdentifier -> Futures.immediateFuture(
+            YangTextSchemaSource.forResource(NetconfDeviceSimulator.class, resource)),
+            PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
+                PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
     }
 
     private static InetSocketAddress getAddress(final String ip, final int port) {

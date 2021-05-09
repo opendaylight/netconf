@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorDraftO2;
@@ -53,10 +52,6 @@ public class ApiDocGeneratorTest {
         this.generator = new ApiDocGeneratorDraftO2(this.helper.createMockSchemaService(this.schemaContext));
     }
 
-    @After
-    public void after() throws Exception {
-    }
-
     /**
      * Method: getApiDeclaration(String module, String revision, UriInfo uriInfo).
      */
@@ -78,7 +73,7 @@ public class ApiDocGeneratorTest {
     /**
      * Validates whether doc {@code doc} contains concrete specified models.
      */
-    private void validateSwaggerModules(final SwaggerObject doc) {
+    private static void validateSwaggerModules(final SwaggerObject doc) {
         final ObjectNode definitions = doc.getDefinitions();
         assertNotNull(definitions);
 
@@ -129,7 +124,7 @@ public class ApiDocGeneratorTest {
     /**
      * Checks whether object {@code mainObject} contains in properties/items key $ref with concrete value.
      */
-    private void containsReferences(final JsonNode mainObject, final String childObject,
+    private static void containsReferences(final JsonNode mainObject, final String childObject,
                                     final String expectedRef) {
         final JsonNode properties = mainObject.get("properties");
         assertNotNull(properties);
@@ -199,7 +194,7 @@ public class ApiDocGeneratorTest {
      * @param doc Api declaration
      * @throws Exception if operation fails
      */
-    private void validateToaster(final SwaggerObject doc) throws Exception {
+    private static void validateToaster(final SwaggerObject doc) throws Exception {
         final Set<String> expectedUrls =
                 new TreeSet<>(Arrays.asList("/restconf/config", "/restconf/config/toaster2:toaster",
                         "/restconf/config/toaster2:toaster/toasterSlot/{slotId}",

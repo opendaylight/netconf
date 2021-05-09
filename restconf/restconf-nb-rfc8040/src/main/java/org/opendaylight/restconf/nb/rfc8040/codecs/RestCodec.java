@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,6 +27,7 @@ import org.opendaylight.restconf.common.util.IdentityValuesDTO.Predicate;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -269,7 +269,7 @@ public final class RestCodec {
             final List<IdentityValue> identities = data.getValuesWithNamespaces();
             for (int i = 0; i < identities.size(); i++) {
                 final IdentityValue identityValue = identities.get(i);
-                URI validNamespace =
+                XMLNamespace validNamespace =
                         resolveValidNamespace(identityValue.getNamespace(), this.mountPoint, schemaContext);
                 final DataSchemaNode node = findInstanceDataChildByNameAndNamespace(
                         parentContainer, identityValue.getValue(), validNamespace);
@@ -350,7 +350,7 @@ public final class RestCodec {
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static Module getModuleByNamespace(final String namespace, final DOMMountPoint mountPoint,
             final SchemaContext schemaContext) {
-        final URI validNamespace = resolveValidNamespace(namespace, mountPoint, schemaContext);
+        final XMLNamespace validNamespace = resolveValidNamespace(namespace, mountPoint, schemaContext);
         Module module = null;
         if (mountPoint != null) {
             module = modelContext(mountPoint).findModules(validNamespace).iterator().next();
@@ -364,22 +364,22 @@ public final class RestCodec {
         return module;
     }
 
-    private static URI resolveValidNamespace(final String namespace, final DOMMountPoint mountPoint,
+    private static XMLNamespace resolveValidNamespace(final String namespace, final DOMMountPoint mountPoint,
             final SchemaContext schemaContext) {
-        URI validNamespace;
+        XMLNamespace validNamespace;
         if (mountPoint != null) {
             validNamespace = findFirstModuleByName(modelContext(mountPoint), namespace);
         } else {
             validNamespace = findFirstModuleByName(schemaContext, namespace);
         }
         if (validNamespace == null) {
-            validNamespace = URI.create(namespace);
+            validNamespace = XMLNamespace.of(namespace);
         }
 
         return validNamespace;
     }
 
-    private static URI findFirstModuleByName(final SchemaContext schemaContext, final String name) {
+    private static XMLNamespace findFirstModuleByName(final SchemaContext schemaContext, final String name) {
         for (final Module module : schemaContext.getModules()) {
             if (module.getName().equals(name)) {
                 return module.getNamespace();
@@ -391,7 +391,7 @@ public final class RestCodec {
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
-            final String name, final URI namespace) {
+            final String name, final XMLNamespace namespace) {
         requireNonNull(namespace);
 
         final Iterable<DataSchemaNode> result = Iterables.filter(findInstanceDataChildrenByName(container, name),

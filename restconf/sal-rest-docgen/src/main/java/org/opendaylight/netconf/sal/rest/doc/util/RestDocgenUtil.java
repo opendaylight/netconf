@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.util;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -23,7 +23,8 @@ public final class RestDocgenUtil {
     private RestDocgenUtil() {
     }
 
-    private static final Map<URI, Map<Optional<Revision>, Module>> NAMESPACE_AND_REVISION_TO_MODULE = new HashMap<>();
+    private static final Map<XMLNamespace, Map<Optional<Revision>, Module>> NAMESPACE_AND_REVISION_TO_MODULE =
+        new HashMap<>();
 
     /**
      * Resolve path argument name for {@code node}.
@@ -52,7 +53,7 @@ public final class RestDocgenUtil {
 
     private static synchronized String resolveFullNameFromNode(final SchemaNode node,
             final SchemaContext schemaContext) {
-        final URI namespace = node.getQName().getNamespace();
+        final XMLNamespace namespace = node.getQName().getNamespace();
         final Optional<Revision> revision = node.getQName().getRevision();
 
         Map<Optional<Revision>, Module> revisionToModule =

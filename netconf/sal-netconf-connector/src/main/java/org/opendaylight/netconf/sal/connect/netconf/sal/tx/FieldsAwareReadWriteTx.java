@@ -26,7 +26,7 @@ public final class FieldsAwareReadWriteTx extends ReadWriteTx<NetconfDOMFieldsRe
     }
 
     @Override
-    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+    public FluentFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
         return delegateReadTx.read(store, path, fields);
     }

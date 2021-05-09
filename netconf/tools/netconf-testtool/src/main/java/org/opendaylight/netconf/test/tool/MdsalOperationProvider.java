@@ -54,9 +54,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -173,13 +173,13 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final QName location = QName.create(Schema.QNAME, "location");
             final QName namespace = QName.create(Schema.QNAME, "namespace");
 
-            CollectionNodeBuilder<MapEntryNode, MapNode> schemaMapEntryNodeMapNodeCollectionNodeBuilder = Builders
-                    .mapBuilder().withNodeIdentifier(new NodeIdentifier(Schema.QNAME));
+            CollectionNodeBuilder<MapEntryNode, SystemMapNode> schemaMapEntryNodeMapNodeCollectionNodeBuilder =
+                Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(Schema.QNAME));
             LeafSetEntryNode locationLeafSetEntryNode = Builders.leafSetEntryBuilder().withNodeIdentifier(
                             new NodeWithValue<>(location, "NETCONF")).withValue("NETCONF").build();
 
             Map<QName, Object> keyValues = new HashMap<>();
-            for (final Schema schema : monitor.getSchemas().getSchema().values()) {
+            for (final Schema schema : monitor.getSchemas().nonnullSchema().values()) {
                 keyValues.put(identifier, schema.getIdentifier());
                 keyValues.put(version, schema.getVersion());
                 keyValues.put(format, Yang.QNAME);
@@ -194,7 +194,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                             .withValue(Yang.QNAME).build())
                         .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(namespace))
                             .withValue(schema.getNamespace().getValue()).build())
-                        .withChild((DataContainerChild<?, ?>) Builders.leafSetBuilder().withNodeIdentifier(
+                        .withChild((DataContainerChild) Builders.leafSetBuilder().withNodeIdentifier(
                                         new NodeIdentifier(location))
                                 .withChild(locationLeafSetEntryNode).build())
                         .build();
@@ -202,7 +202,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                 schemaMapEntryNodeMapNodeCollectionNodeBuilder.withChild(schemaMapEntryNode);
             }
 
-            DataContainerChild<?, ?> schemaList = schemaMapEntryNodeMapNodeCollectionNodeBuilder.build();
+            DataContainerChild schemaList = schemaMapEntryNodeMapNodeCollectionNodeBuilder.build();
 
             ContainerNode schemasContainer = Builders.containerBuilder().withNodeIdentifier(
                     new NodeIdentifier(Schemas.QNAME)).withChild(schemaList).build();

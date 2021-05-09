@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,7 +54,6 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -92,7 +90,6 @@ public class RestGetOperationTest extends JerseyTest {
     private static EffectiveModelContext schemaContextModules;
     private static EffectiveModelContext schemaContextBehindMountPoint;
 
-    @SuppressWarnings("rawtypes")
     private static NormalizedNode answerFromGet;
 
     private BrokerFacade brokerFacade;
@@ -168,7 +165,6 @@ public class RestGetOperationTest extends JerseyTest {
     /**
      * MountPoint test. URI represents mount point.
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void getDataWithUrlMountPoint() throws Exception {
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
@@ -218,7 +214,7 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     private static QName newTestModuleQName(final String localPart) throws Exception {
-        return QName.create(URI.create("test:module"), Revision.of("2014-01-09"), localPart);
+        return QName.create("test:module", "2014-01-09", localPart);
     }
 
     @Test
@@ -232,7 +228,6 @@ public class RestGetOperationTest extends JerseyTest {
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getDataWithIdentityrefInURL() throws Exception {
         setControllerContext(schemaContextTestModule);
@@ -243,9 +238,9 @@ public class RestGetOperationTest extends JerseyTest {
                 newTestModuleQName("name"), "foo");
         final YangInstanceIdentifier iid = YangInstanceIdentifier.builder().node(newTestModuleQName("modules"))
                 .node(moduleQN).nodeWithKey(moduleQN, keyMap).build();
-        @SuppressWarnings("rawtypes")
-        final NormalizedNode data = ImmutableMapNodeBuilder.create().withNodeIdentifier(
-                new NodeIdentifier(moduleQN)).withChild(ImmutableNodes.mapEntryBuilder()
+        final NormalizedNode data = ImmutableMapNodeBuilder.create()
+                .withNodeIdentifier(new NodeIdentifier(moduleQN))
+                .withChild(ImmutableNodes.mapEntryBuilder()
                     .withNodeIdentifier(NodeIdentifierWithPredicates.of(moduleQN, keyMap))
                     .withChild(ImmutableNodes.leafNode(newTestModuleQName("type"), newTestModuleQName("test-identity")))
                     .withChild(ImmutableNodes.leafNode(newTestModuleQName("name"), "foo"))
@@ -582,7 +577,6 @@ public class RestGetOperationTest extends JerseyTest {
      *           type string;
      *       }
      */
-    @SuppressWarnings("rawtypes")
     private static NormalizedNode prepareCnDataForMountPointTest(final boolean wrapToCont) throws Exception {
         final String testModuleDate = "2014-01-09";
         final ContainerNode contChild = Builders
@@ -602,21 +596,17 @@ public class RestGetOperationTest extends JerseyTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     private void mockReadOperationalDataMethod() {
         when(brokerFacade.readOperationalData(any(YangInstanceIdentifier.class))).thenReturn(answerFromGet);
     }
 
-    @SuppressWarnings("unchecked")
     private void mockReadConfigurationDataMethod() {
         when(brokerFacade.readConfigurationData(any(YangInstanceIdentifier.class), isNull()))
                 .thenReturn(answerFromGet);
     }
 
-    @SuppressWarnings("rawtypes")
     private static NormalizedNode prepareCnDataForSlashesBehindMountPointTest() throws Exception {
-        return ImmutableMapEntryNodeBuilder
-                .create()
+        return ImmutableMapEntryNodeBuilder.create()
                 .withNodeIdentifier(
                         TestUtils.getNodeIdentifierPredicate("lst1", "test:module", "2014-01-09", "lf11",
                                 "GigabitEthernet0/0/0/0"))
@@ -680,7 +670,6 @@ public class RestGetOperationTest extends JerseyTest {
         getDataWithInvalidDepthParameterTest(mockInfo);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private void getDataWithInvalidDepthParameterTest(final UriInfo uriInfo) {
         try {
             final QName qNameDepth1Cont = QName.create("urn:nested:module", "2014-06-3", "depth1-cont");

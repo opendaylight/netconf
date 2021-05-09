@@ -135,14 +135,14 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path) {
         LOG.debug("{}: Get {} {} via actor {}", id, OPERATIONAL, path, masterActor);
         final Future<Object> future = Patterns.ask(masterActor, new GetRequest(path), askTimeout);
         return read(future, OPERATIONAL, path);
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: Get {} {} with fields {} via actor {}", id, OPERATIONAL, path, fields, masterActor);
         final Future<Object> future = Patterns.ask(masterActor, new GetWithFieldsRequest(path, fields), askTimeout);
@@ -150,14 +150,14 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path) {
         LOG.debug("{}: GetConfig {} {} via actor {}", id, CONFIGURATION, path, masterActor);
         final Future<Object> future = Patterns.ask(masterActor, new GetConfigRequest(path), askTimeout);
         return read(future, CONFIGURATION, path);
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         LOG.debug("{}: GetConfig {} {} with fields {} via actor {}", id, CONFIGURATION, path, fields, masterActor);
         final Future<Object> future = Patterns.ask(masterActor,
@@ -167,7 +167,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Merge {} {} via actor {}", id, store, path, masterActor);
         masterActor.tell(new MergeEditConfigRequest(
@@ -178,7 +178,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Replace {} {} via actor {}", id, store, path, masterActor);
 
@@ -189,7 +189,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Create {} {} via actor {}", id, store, path, masterActor);
         masterActor.tell(new CreateEditConfigRequest(
@@ -248,10 +248,9 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
         return id;
     }
 
-    private SettableFuture<Optional<NormalizedNode<?, ?>>> read(final Future<Object> future,
-                                                                final LogicalDatastoreType store,
-                                                                final YangInstanceIdentifier path) {
-        final SettableFuture<Optional<NormalizedNode<?, ?>>> settableFuture = SettableFuture.create();
+    private SettableFuture<Optional<NormalizedNode>> read(final Future<Object> future, final LogicalDatastoreType store,
+                                                          final YangInstanceIdentifier path) {
+        final SettableFuture<Optional<NormalizedNode>> settableFuture = SettableFuture.create();
         future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {

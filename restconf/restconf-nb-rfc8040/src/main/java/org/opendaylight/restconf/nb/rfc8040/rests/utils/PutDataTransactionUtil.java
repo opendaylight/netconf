@@ -75,10 +75,11 @@ public final class PutDataTransactionUtil {
      * @param payload data
      */
     public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodeContext payload) {
-        final String payloadName = payload.getData().getNodeType().getLocalName();
+        final String payloadName = payload.getData().getIdentifier().getNodeType().getLocalName();
 
         if (path.isEmpty()) {
-            if (!payload.getData().getNodeType().equals(RestconfDataServiceConstant.NETCONF_BASE_QNAME)) {
+            if (!payload.getData().getIdentifier().getNodeType().equals(
+                RestconfDataServiceConstant.NETCONF_BASE_QNAME)) {
                 throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
                         ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
@@ -102,7 +103,7 @@ public final class PutDataTransactionUtil {
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
         final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
         final SchemaNode schemaNode = iiWithData.getSchemaNode();
-        final NormalizedNode<?, ?> data = payload.getData();
+        final NormalizedNode data = payload.getData();
         if (schemaNode instanceof ListSchemaNode) {
             final List<QName> keyDefinitions = ((ListSchemaNode) schemaNode).getKeyDefinition();
             if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
@@ -173,7 +174,7 @@ public final class PutDataTransactionUtil {
     private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
                                                                  final EffectiveModelContext schemaContext,
                                                                  final RestconfStrategy strategy,
-                                                                 final NormalizedNode<?, ?> data,
+                                                                 final NormalizedNode data,
                                                                  final Insert insert, final String point) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         if (insert == null) {
@@ -181,11 +182,11 @@ public final class PutDataTransactionUtil {
         }
 
         checkListAndOrderedType(schemaContext, path);
-        final NormalizedNode<?, ?> readData;
+        final NormalizedNode readData;
         switch (insert) {
             case FIRST:
                 readData = readList(strategy, path.getParent());
-                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     return makePut(path, schemaContext, transaction, data);
                 }
                 transaction.remove(LogicalDatastoreType.CONFIGURATION, path.getParent());
@@ -196,19 +197,19 @@ public final class PutDataTransactionUtil {
                 return makePut(path, schemaContext, transaction, data);
             case BEFORE:
                 readData = readList(strategy, path.getParent());
-                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     return makePut(path, schemaContext, transaction, data);
                 }
-                insertWithPointPut(transaction, path, data, schemaContext, point,
-                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, true);
+                insertWithPointPut(transaction, path, data, schemaContext, point, (NormalizedNodeContainer<?>) readData,
+                    true);
                 return transaction.commit();
             case AFTER:
                 readData = readList(strategy, path.getParent());
-                if (readData == null || ((NormalizedNodeContainer<?, ?, ?>) readData).getValue().isEmpty()) {
+                if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     return makePut(path, schemaContext, transaction, data);
                 }
-                insertWithPointPut(transaction, path, data, schemaContext, point,
-                    (NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) readData, false);
+                insertWithPointPut(transaction, path, data, schemaContext, point, (NormalizedNodeContainer<?>) readData,
+                    false);
                 return transaction.commit();
             default:
                 throw new RestconfDocumentedException(
@@ -219,22 +220,21 @@ public final class PutDataTransactionUtil {
 
     // FIXME: this method is only called from a context where we are modifying data. This should be part of strategy,
     //        requiring an already-open transaction. It also must return a future, so it can be properly composed.
-    static NormalizedNode<?, ?> readList(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
-        return ReadDataTransactionUtil.readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION,
-            path,false);
+    static NormalizedNode readList(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
+        return ReadDataTransactionUtil.readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
+            false);
     }
 
     private static void insertWithPointPut(final RestconfTransaction transaction,
                                            final YangInstanceIdentifier path,
-                                           final NormalizedNode<?, ?> data,
+                                           final NormalizedNode data,
                                            final EffectiveModelContext schemaContext, final String point,
-                                           final NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>> readList,
-                                           final boolean before) {
+                                           final NormalizedNodeContainer<?> readList, final boolean before) {
         transaction.remove(LogicalDatastoreType.CONFIGURATION, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
             ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
-        for (final NormalizedNode<?, ?> nodeChild : readList.getValue()) {
+        for (final NormalizedNode nodeChild : readList.body()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
@@ -244,11 +244,11 @@ public final class PutDataTransactionUtil {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
+        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
         transaction.merge(LogicalDatastoreType.CONFIGURATION,
             YangInstanceIdentifier.create(emptySubtree.getIdentifier()),
             emptySubtree);
-        for (final NormalizedNode<?, ?> nodeChild : readList.getValue()) {
+        for (final NormalizedNode nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
             }
@@ -261,7 +261,7 @@ public final class PutDataTransactionUtil {
     private static FluentFuture<? extends CommitInfo> makePut(final YangInstanceIdentifier path,
                                                               final SchemaContext schemaContext,
                                                               final RestconfTransaction transaction,
-                                                              final NormalizedNode<?, ?> data) {
+                                                              final NormalizedNode data) {
         transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
         return transaction.commit();
     }
