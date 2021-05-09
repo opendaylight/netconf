@@ -46,8 +46,14 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @GET
     @Path("/data/{identifier:.+}")
-    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-            Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response readData(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
@@ -59,8 +65,14 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @GET
     @Path("/data")
-    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-            Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response readData(@Context UriInfo uriInfo);
 
     /**
@@ -74,8 +86,14 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @PUT
     @Path("/data/{identifier:.+}")
-    @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-            Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
@@ -92,8 +110,14 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @POST
     @Path("/data/{identifier:.+}")
-    @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-            Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response postData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
@@ -108,8 +132,14 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @POST
     @Path("/data")
-    @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-            Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response postData(NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
     /**
@@ -137,10 +167,14 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @Patch
     @Path("/data/{identifier:.+}")
-    @Consumes({ Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
-            Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML })
-    @Produces({ Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
-            Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML })
+    @Consumes({
+        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML
+    })
+    @Produces({
+        Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML
+    })
     PatchStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PatchContext context,
                                  @Context UriInfo uriInfo);
 
@@ -155,10 +189,14 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @Patch
     @Path("/data")
-    @Consumes({ Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
-            Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML })
-    @Produces({ Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
-            Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML })
+    @Consumes({
+        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML
+    })
+    @Produces({
+        Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML
+    })
     PatchStatusContext patchData(PatchContext context, @Context UriInfo uriInfo);
 
 
@@ -173,8 +211,14 @@ public interface RestconfDataService extends UpdateHandlers {
      */
     @Patch
     @Path("/data/{identifier:.+}")
-    @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-            Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     Response patchData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
                        @Context UriInfo uriInfo);
 }

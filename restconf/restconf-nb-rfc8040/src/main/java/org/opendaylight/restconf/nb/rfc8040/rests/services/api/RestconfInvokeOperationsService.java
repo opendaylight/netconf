@@ -24,10 +24,8 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 /**
  * An operation resource represents a protocol operation defined with the YANG
  * "rpc" statement. It is invoked using a POST method on the operation resource.
- *
  */
 public interface RestconfInvokeOperationsService extends UpdateHandlers {
-
     /**
      * Invoke RPC operation.
      *
@@ -42,10 +40,20 @@ public interface RestconfInvokeOperationsService extends UpdateHandlers {
      */
     @POST
     @Path("/operations/{identifier:.+}")
-    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    @Consumes({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier,
             NormalizedNodeContext payload, @Context UriInfo uriInfo);
 }

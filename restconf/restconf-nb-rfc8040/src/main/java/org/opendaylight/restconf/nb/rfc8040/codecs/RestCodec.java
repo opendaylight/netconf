@@ -248,8 +248,10 @@ public final class RestCodec {
             return identityValuesDTO;
         }
 
-        @SuppressFBWarnings(value = {"NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
-                "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"}, justification = "Unrecognised NullableDecl")
+        @SuppressFBWarnings(value = {
+            "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
+            "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"
+        }, justification = "Unrecognised NullableDecl")
         @Override
         public YangInstanceIdentifier deserialize(final IdentityValuesDTO data) {
             final List<PathArgument> result = new ArrayList<>();

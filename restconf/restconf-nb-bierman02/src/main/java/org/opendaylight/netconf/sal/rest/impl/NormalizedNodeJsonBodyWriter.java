@@ -57,8 +57,12 @@ import org.xml.sax.SAXException;
  */
 @Deprecated
 @Provider
-@Produces({ Draft02.MediaTypes.API + RestconfService.JSON, Draft02.MediaTypes.DATA + RestconfService.JSON,
-        Draft02.MediaTypes.OPERATION + RestconfService.JSON, MediaType.APPLICATION_JSON })
+@Produces({
+    Draft02.MediaTypes.API + RestconfService.JSON,
+    Draft02.MediaTypes.DATA + RestconfService.JSON,
+    Draft02.MediaTypes.OPERATION + RestconfService.JSON,
+    MediaType.APPLICATION_JSON
+})
 public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
