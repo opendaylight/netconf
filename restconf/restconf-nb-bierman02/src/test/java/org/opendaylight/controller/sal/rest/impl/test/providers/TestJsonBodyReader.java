@@ -28,7 +28,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
@@ -170,14 +169,13 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
         final ContainerNode inputNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName
                 .create(inputNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNode = inputNode
-                .getChild(yangCont.getLastPathArgument());
+        final Optional<DataContainerChild> contDataNode = inputNode.getChild(yangCont.getLastPathArgument());
         assertTrue(contDataNode.isPresent());
         assertTrue(contDataNode.get() instanceof ContainerNode);
         final YangInstanceIdentifier yangleaf = YangInstanceIdentifier.of(QName
                 .create(inputNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = ((ContainerNode) contDataNode
-                .get()).getChild(yangleaf.getLastPathArgument());
+        final Optional<DataContainerChild> leafDataNode = ((ContainerNode) contDataNode.get())
+            .getChild(yangleaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue()
                 .toString()));
