@@ -54,6 +54,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -125,18 +126,18 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         } else if (!isOperation) {
             final QName scQName = schemaNode.getQName();
             checkState(docRootElm.equals(scQName.getLocalName())
-                && docRootNamespace.equals(scQName.getNamespace().toASCIIString()),
+                && docRootNamespace.equals(scQName.getNamespace().toString()),
                 "Not correct message root element \"%s\", should be \"%s\"", docRootElm, scQName);
         }
 
-        NormalizedNode<?, ?> parsed;
+        NormalizedNode parsed;
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, pathContext.getSchemaContext(),
-                    schemaNode);
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
+                pathContext.getSchemaContext(), schemaNode.getPath()).toInference());
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult();
 
@@ -147,7 +148,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             if (parsed instanceof MapNode) {
                 final MapNode mapNode = (MapNode) parsed;
                 // extracting the MapEntryNode
-                parsed = mapNode.getValue().iterator().next();
+                parsed = mapNode.body().iterator().next();
             }
 
             if (schemaNode instanceof  ListSchemaNode && isPost()) {

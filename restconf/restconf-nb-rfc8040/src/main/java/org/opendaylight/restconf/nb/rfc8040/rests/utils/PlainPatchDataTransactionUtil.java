@@ -49,7 +49,7 @@ public final class PlainPatchDataTransactionUtil {
 
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-        NormalizedNode<?, ?> data = payload.getData();
+        NormalizedNode data = payload.getData();
 
         try {
             LOG.trace("Merge CONFIGURATION within Restconf Patch: {} with payload {}", path, data);

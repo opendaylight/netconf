@@ -60,26 +60,24 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                      final NormalizedNode<?, ?> data) {
+    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data) {
         verifyNotNull(rwTx).merge(store, path, data);
     }
 
     @Override
-    public void create(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                       final NormalizedNode<?, ?> data, final SchemaContext schemaContext) {
+    public void create(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data,
+                       final SchemaContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
             merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubTree.getIdentifier()),
                 emptySubTree);
             TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
 
-            final Collection<? extends NormalizedNode<?, ?>> children =
-                ((NormalizedNodeContainer<?, ?, ?>) data).getValue();
+            final Collection<? extends NormalizedNode> children = ((NormalizedNodeContainer<?>) data).body();
             final BatchedExistenceCheck check =
                 BatchedExistenceCheck.start(verifyNotNull(rwTx), LogicalDatastoreType.CONFIGURATION, path, children);
 
-            for (final NormalizedNode<?, ?> child : children) {
+            for (final NormalizedNode child : children) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 verifyNotNull(rwTx).put(store, childPath, child);
             }
@@ -94,15 +92,15 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                        final NormalizedNode<?, ?> data, final SchemaContext schemaContext) {
+    public void replace(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data,
+                        final SchemaContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubtree.getIdentifier()),
                 emptySubtree);
             TransactionUtil.ensureParentsByMerge(path, schemaContext, this);
 
-            for (final NormalizedNode<?, ?> child : ((NormalizedNodeContainer<?, ?, ?>) data).getValue()) {
+            for (final NormalizedNode child : ((NormalizedNodeContainer<?>) data).body()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 verifyNotNull(rwTx).put(store, childPath, child);
             }

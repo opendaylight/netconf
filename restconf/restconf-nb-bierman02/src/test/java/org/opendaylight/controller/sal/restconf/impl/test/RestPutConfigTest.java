@@ -65,7 +65,6 @@ public class RestPutConfigTest {
         final QName qNameKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "name");
         final NodeIdentifierWithPredicates identWithPredicates =
                 NodeIdentifierWithPredicates.of(qName, qNameKey, "key");
-        Mockito.when(data.getNodeType()).thenReturn(qName);
         Mockito.when(data.getIdentifier()).thenReturn(identWithPredicates);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iiCx, data);
 
@@ -87,7 +86,6 @@ public class RestPutConfigTest {
         final QName qNameSubKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "sub-name");
         final NodeIdentifierWithPredicates identWithPredicates =
                 NodeIdentifierWithPredicates.of(qName, qNameSubKey, "subkey");
-        Mockito.when(data.getNodeType()).thenReturn(qName);
         Mockito.when(data.getIdentifier()).thenReturn(identWithPredicates);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iiCx, data);
 
@@ -115,7 +113,6 @@ public class RestPutConfigTest {
         final QName qNameKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "name");
         final NodeIdentifierWithPredicates identWithPredicates =
                 NodeIdentifierWithPredicates.of(qName, qNameKey, "notSameKey");
-        Mockito.when(data.getNodeType()).thenReturn(qName);
         Mockito.when(data.getIdentifier()).thenReturn(identWithPredicates);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iiCx, data);
 
@@ -128,7 +125,7 @@ public class RestPutConfigTest {
         this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
-    private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode<?, ?> data) {
+    private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode data) {
         final PutResult result = Mockito.mock(PutResult.class);
         Mockito.when(this.brokerFacade.commitConfigurationDataPut(schemaContext, yii, data, null, null))
                 .thenReturn(result);

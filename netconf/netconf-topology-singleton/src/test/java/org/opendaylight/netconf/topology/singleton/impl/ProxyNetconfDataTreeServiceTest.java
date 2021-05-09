@@ -44,7 +44,8 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.UnlockReques
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
@@ -55,8 +56,9 @@ public class ProxyNetconfDataTreeServiceTest {
         new RemoteDeviceId("dev1", InetSocketAddress.createUnresolved("localhost", 17830));
     private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
     private static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
-    private static final NormalizedNode<?, ?> NODE = Builders.containerBuilder()
-        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont"))).build();
+    private static final ContainerNode NODE = Builders.containerBuilder()
+        .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
+        .build();
 
 
     private static ActorSystem system = ActorSystem.apply();

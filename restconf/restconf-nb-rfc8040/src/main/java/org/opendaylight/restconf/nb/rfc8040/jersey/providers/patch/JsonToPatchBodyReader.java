@@ -50,6 +50,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -366,12 +367,13 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode<?, ?> readEditData(final @NonNull JsonReader in,
+    private static NormalizedNode readEditData(final @NonNull JsonReader in,
              final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
-            targetSchemaNode).parse(in);
+            SchemaInferenceStack.ofInstantiatedPath(path.getSchemaContext(), targetSchemaNode.getPath()).toInference())
+            .parse(in);
 
         return resultHolder.getResult();
     }
@@ -421,7 +423,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         private PatchEditOperation operation;
         private YangInstanceIdentifier target;
         private SchemaNode targetSchemaNode;
-        private NormalizedNode<?, ?> data;
+        private NormalizedNode data;
 
         String getId() {
             return id;
@@ -455,11 +457,11 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
             this.targetSchemaNode = requireNonNull(targetSchemaNode);
         }
 
-        NormalizedNode<?, ?> getData() {
+        NormalizedNode getData() {
             return data;
         }
 
-        void setData(final NormalizedNode<?, ?> data) {
+        void setData(final NormalizedNode data) {
             this.data = requireNonNull(data);
         }
 
