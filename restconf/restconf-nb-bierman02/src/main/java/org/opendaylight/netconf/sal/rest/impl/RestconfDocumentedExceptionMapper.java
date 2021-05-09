@@ -40,12 +40,13 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.ForwardingNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -55,8 +56,6 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -211,7 +210,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
     private static Object toJsonResponseBody(final NormalizedNodeContext errorsNode,
                                              final DataNodeContainer errorsSchemaNode) {
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        NormalizedNode<?, ?> data = errorsNode.getData();
+        NormalizedNode data = errorsNode.getData();
         final InstanceIdentifierContext<?> context = errorsNode.getInstanceIdentifierContext();
         final DataSchemaNode schema = (DataSchemaNode) context.getSchemaNode();
 
@@ -316,7 +315,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-        NormalizedNode<?, ?> data = errorsNode.getData();
+        NormalizedNode data = errorsNode.getData();
         SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
         boolean isDataRoot = false;
@@ -411,7 +410,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final QName name = SchemaContext.NAME;
         try {
             xmlWriter.writeStartElement(name.getNamespace().toString(), name.getLocalName());
-            for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+            for (final DataContainerChild child : data.body()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();
@@ -424,8 +423,9 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
     private static void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter,
                                       final ContainerNode data) throws IOException {
-        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+        for (final DataContainerChild child : data.body()) {
             nnWriter.write(child);
+            // FIXME: flush after all children?
             nnWriter.flush();
         }
     }

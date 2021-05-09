@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
@@ -242,13 +243,13 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return mountPointSchema.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
-    public Module findModuleByNamespace(final URI namespace) {
+    public Module findModuleByNamespace(final XMLNamespace namespace) {
         checkPreconditions();
         checkArgument(namespace != null);
         return this.globalSchema.findModules(namespace).stream().findFirst().orElse(null);
     }
 
-    public Module findModuleByNamespace(final DOMMountPoint mountPoint, final URI namespace) {
+    public Module findModuleByNamespace(final DOMMountPoint mountPoint, final XMLNamespace namespace) {
         checkArgument(namespace != null && mountPoint != null);
 
         final SchemaContext mountPointSchema = getModelContext(mountPoint);
@@ -339,12 +340,12 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return module == null ? null : module.getName();
     }
 
-    public URI findNamespaceByModuleName(final String moduleName) {
+    public XMLNamespace findNamespaceByModuleName(final String moduleName) {
         final Module module = this.findModuleByName(moduleName);
         return module == null ? null : module.getNamespace();
     }
 
-    public URI findNamespaceByModuleName(final DOMMountPoint mountPoint, final String moduleName) {
+    public XMLNamespace findNamespaceByModuleName(final DOMMountPoint mountPoint, final String moduleName) {
         final Module module = this.findModuleByName(mountPoint, moduleName);
         return module == null ? null : module.getNamespace();
     }
