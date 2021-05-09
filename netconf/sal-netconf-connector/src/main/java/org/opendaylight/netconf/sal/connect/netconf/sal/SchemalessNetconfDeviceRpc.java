@@ -52,7 +52,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     }
 
     @Override
-    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode<?, ?> input) {
+    public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final NormalizedNode input) {
         final MessageTransformer<NetconfMessage> transformer;
         if (input instanceof DOMSourceAnyxmlNode) {
             transformer = schemalessTransformer;
@@ -65,8 +65,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
         return handleRpc(type, input, transformer);
     }
 
-    private ListenableFuture<DOMRpcResult> handleRpc(
-            final @NonNull QName type, final @NonNull NormalizedNode<?, ?> input,
+    private ListenableFuture<DOMRpcResult> handleRpc(final @NonNull QName type, final @NonNull NormalizedNode input,
             final MessageTransformer<NetconfMessage> transformer) {
         final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = listener.sendRequest(
             transformer.toRpcRequest(type, input), type);

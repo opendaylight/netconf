@@ -17,9 +17,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
 class TestData {
@@ -33,8 +33,8 @@ class TestData {
     final ContainerNode data4;
     final MapNode listData;
     final MapNode listData2;
-    final OrderedMapNode orderedMapNode1;
-    final OrderedMapNode orderedMapNode2;
+    final UserMapNode orderedMapNode1;
+    final UserMapNode orderedMapNode2;
     final LeafNode<?> contentLeaf;
     final LeafNode<?> contentLeaf2;
     final MapEntryNode checkData;
@@ -70,8 +70,7 @@ class TestData {
                 .withNodeIdentifier(new NodeIdentifier(QName.create(base, "leaf-content-different")))
                 .withValue("content-different")
                 .build();
-        final DataContainerChild<?, ?> dataContainer =
-                Builders.leafBuilder()
+        final DataContainerChild dataContainer = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(listQname, "identifier")))
                 .withValue("id")
                 .build();

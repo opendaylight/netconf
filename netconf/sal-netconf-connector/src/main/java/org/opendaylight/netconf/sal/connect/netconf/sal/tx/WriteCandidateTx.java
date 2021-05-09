@@ -53,8 +53,8 @@ public class WriteCandidateTx extends AbstractWriteTx {
         this(id, netconfOps, rollbackSupport, true);
     }
 
-    public WriteCandidateTx(RemoteDeviceId id, NetconfBaseOps netconfOps, boolean rollbackSupport,
-            boolean isLockAllowed) {
+    public WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+            final boolean isLockAllowed) {
         super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 
@@ -69,7 +69,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
             LOG.trace("Lock is not allowed.");
             return;
         }
-        final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
+        final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
                 if (isSuccess(result)) {
@@ -131,10 +131,8 @@ public class WriteCandidateTx extends AbstractWriteTx {
     }
 
     @Override
-    protected void editConfig(final YangInstanceIdentifier path,
-                              final Optional<NormalizedNode<?, ?>> data,
-                              final DataContainerChild<?, ?> editStructure,
-                              final Optional<ModifyAction> defaultOperation,
+    protected void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode> data,
+                              final DataContainerChild editStructure, final Optional<ModifyAction> defaultOperation,
                               final String operation) {
 
         final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit candidate", id);
@@ -158,5 +156,4 @@ public class WriteCandidateTx extends AbstractWriteTx {
             LOG.trace("Unlock is not allowed: {}", id);
         }
     }
-
 }

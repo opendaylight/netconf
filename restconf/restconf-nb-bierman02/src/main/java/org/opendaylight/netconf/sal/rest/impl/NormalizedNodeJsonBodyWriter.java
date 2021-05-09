@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
@@ -31,7 +30,7 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -88,7 +87,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 httpHeaders.add(entry.getKey(), entry.getValue());
             }
         }
-        NormalizedNode<?, ?> data = context.getData();
+        NormalizedNode data = context.getData();
         if (data == null) {
             return;
         }
@@ -97,33 +96,32 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final InstanceIdentifierContext<SchemaNode> identifierCtx =
                 (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
 
-        final SchemaPath path = identifierCtx.getSchemaNode().getPath();
         try (JsonWriter jsonWriter = createJsonWriter(entityStream, context.getWriterParameters().isPrettyPrint())) {
             jsonWriter.beginObject();
-            writeNormalizedNode(
-                    jsonWriter, path, identifierCtx, data, context.getWriterParameters().getDepth());
+            writeNormalizedNode(jsonWriter, identifierCtx, data, context.getWriterParameters().getDepth());
             jsonWriter.endObject();
             jsonWriter.flush();
         }
     }
 
-    private static void writeNormalizedNode(final JsonWriter jsonWriter, SchemaPath path,
-            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data,
+    private static void writeNormalizedNode(final JsonWriter jsonWriter,
+            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode data,
             final @Nullable Integer depth) throws IOException {
+        SchemaPath path = context.getSchemaNode().getPath();
         final RestconfNormalizedNodeWriter nnWriter;
         if (SchemaPath.ROOT.equals(path)) {
             /*
              *  Creates writer without initialNs and we write children of root data container
              *  which is not visible in restconf
              */
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
             if (data instanceof ContainerNode) {
                 writeChildren(nnWriter,(ContainerNode) data);
             } else if (data instanceof DOMSourceAnyxmlNode) {
                 try {
                     writeChildren(nnWriter,
                             (ContainerNode) NetconfUtil.transformDOMSourceToNormalizedNode(
-                                    context.getSchemaContext(), ((DOMSourceAnyxmlNode)data).getValue()).getResult());
+                                    context.getSchemaContext(), ((DOMSourceAnyxmlNode)data).body()).getResult());
                 } catch (XMLStreamException | URISyntaxException | SAXException e) {
                     throw new IOException("Cannot write anyxml.", e);
                 }
@@ -134,7 +132,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  so we need to emit initial output declaratation..
              */
             path = ((RpcDefinition) context.getSchemaNode()).getOutput().getPath();
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
             jsonWriter.name("output");
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
@@ -143,9 +141,11 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             path = path.getParent();
 
             if (data instanceof MapEntryNode) {
-                data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild((MapEntryNode) data).build();
+                data = ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
+                    .withChild((MapEntryNode) data)
+                    .build();
             }
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
             nnWriter.write(data);
         }
         nnWriter.flush();
@@ -153,7 +153,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
 
     private static void writeChildren(final RestconfNormalizedNodeWriter nnWriter, final ContainerNode data)
             throws IOException {
-        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+        for (final DataContainerChild child : data.body()) {
             nnWriter.write(child);
         }
     }
@@ -165,7 +165,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
 
-        final URI initialNs;
+        final XMLNamespace initialNs;
         if (schema instanceof DataSchemaNode && !((DataSchemaNode)schema).isAugmenting()
                 && !(schema instanceof SchemaContext) || schema instanceof RpcDefinition) {
             initialNs = schema.getQName().getNamespace();
