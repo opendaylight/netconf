@@ -67,7 +67,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
 
-    public JsonToPatchBodyReader(ControllerContext controllerContext) {
+    public JsonToPatchBodyReader(final ControllerContext controllerContext) {
         super(controllerContext);
     }
 
@@ -368,8 +368,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode<?, ?> readEditData(final @NonNull JsonReader in,
-            final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
+    private static NormalizedNode readEditData(final @NonNull JsonReader in, final @NonNull SchemaNode targetSchemaNode,
+            final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer,

@@ -98,7 +98,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
     @Override
     public synchronized void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                                 final NormalizedNode<?, ?> data) {
+                                 final NormalizedNode data) {
         checkEditable(store);
 
         // Trying to write only mixin nodes (not visible when serialized).
@@ -108,14 +108,14 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.ofNullable(data),
+        final DataContainerChild editStructure = netOps.createEditConfigStrcture(Optional.ofNullable(data),
                         Optional.of(ModifyAction.REPLACE), path);
         editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "put");
     }
 
     @Override
     public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                                   final NormalizedNode<?, ?> data) {
+                                   final NormalizedNode data) {
         checkEditable(store);
 
         // Trying to write only mixin nodes (not visible when serialized).
@@ -125,7 +125,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure =  netOps.createEditConfigStrcture(Optional.ofNullable(data),
+        final DataContainerChild editStructure =  netOps.createEditConfigStrcture(Optional.ofNullable(data),
             Optional.empty(), path);
         editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "merge");
     }
@@ -133,8 +133,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     /**
      * Check whether the data to be written consists only from mixins.
      */
-    private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path,
-                                                      final NormalizedNode<?, ?> data) {
+    private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path, final NormalizedNode data) {
         // There's only one such case:top level list (pathArguments == 1 && data is Mixin)
         // any other mixin nodes are contained by a "regular" node thus visible when serialized
         return path.getPathArguments().size() == 1 && data instanceof MixinNode;
@@ -143,7 +142,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     @Override
     public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         checkEditable(store);
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.empty(),
+        final DataContainerChild editStructure = netOps.createEditConfigStrcture(Optional.empty(),
                         Optional.of(ModifyAction.DELETE), path);
         editConfig(path, Optional.empty(), editStructure, Optional.of(ModifyAction.NONE), "delete");
     }
@@ -209,8 +208,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                 "Can edit only configuration data, not %s", store);
     }
 
-    protected abstract void editConfig(YangInstanceIdentifier path, Optional<NormalizedNode<?, ?>> data,
-                                       DataContainerChild<?, ?> editStructure,
+    protected abstract void editConfig(YangInstanceIdentifier path, Optional<NormalizedNode> data,
+                                       DataContainerChild editStructure,
                                        Optional<ModifyAction> defaultOperation, String operation);
 
     protected ListenableFuture<RpcResult<Void>> resultsToTxStatus() {

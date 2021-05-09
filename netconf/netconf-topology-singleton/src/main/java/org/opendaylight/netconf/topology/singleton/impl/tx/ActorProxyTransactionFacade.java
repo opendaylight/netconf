@@ -71,7 +71,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
 
         final Future<Object> future = Patterns.ask(masterTxActor, new CancelRequest(), askTimeout);
 
-        future.onComplete(new OnComplete<Object>() {
+        future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
@@ -87,14 +87,14 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
     }
 
     @Override
-    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+    public FluentFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {} via actor {}", id, store, path, masterTxActor);
 
         final Future<Object> future = Patterns.ask(masterTxActor, new ReadRequest(store, path), askTimeout);
 
-        final SettableFuture<Optional<NormalizedNode<?, ?>>> settableFuture = SettableFuture.create();
-        future.onComplete(new OnComplete<Object>() {
+        final SettableFuture<Optional<NormalizedNode>> settableFuture = SettableFuture.create();
+        future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
@@ -134,7 +134,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
         final Future<Object> future = Patterns.ask(masterTxActor, new ExistsRequest(store, path), askTimeout);
 
         final SettableFuture<Boolean> settableFuture = SettableFuture.create();
-        future.onComplete(new OnComplete<Object>() {
+        future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
@@ -166,15 +166,13 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
     }
 
     @Override
-    public void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data) {
+    public void put(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data) {
         LOG.debug("{}: Put {} {} via actor {}", id, store, path, masterTxActor);
         masterTxActor.tell(new PutRequest(store, new NormalizedNodeMessage(path, data)), ActorRef.noSender());
     }
 
     @Override
-    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data) {
+    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode data) {
         LOG.debug("{}: Merge {} {} via actor {}", id, store, path, masterTxActor);
         masterTxActor.tell(new MergeRequest(store, new NormalizedNodeMessage(path, data)), ActorRef.noSender());
     }
@@ -186,7 +184,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
         final Future<Object> future = Patterns.ask(masterTxActor, new SubmitRequest(), askTimeout);
 
         final SettableFuture<CommitInfo> settableFuture = SettableFuture.create();
-        future.onComplete(new OnComplete<Object>() {
+        future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {

@@ -66,7 +66,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         @Override
-        ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild<?, ?> editStructure,
+        ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild editStructure,
                 final ModifyAction defaultOperation) {
             final NetconfRpcFutureCallback callback = new NetconfRpcFutureCallback("Edit candidate", id);
             return defaultOperation == null ? netconfOps.editConfigCandidate(callback, editStructure, rollbackSupport)
@@ -96,7 +96,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         @Override
-        ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild<?, ?> editStructure,
+        ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild editStructure,
                 final ModifyAction defaultOperation) {
             final NetconfRpcFutureCallback callback = new NetconfRpcFutureCallback("Edit running", id);
             return defaultOperation == null ? netconfOps.editConfigRunning(callback, editStructure, rollbackSupport)
@@ -136,11 +136,10 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }
 
         @Override
-        ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild<?, ?> editStructure,
+        ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild editStructure,
                 final ModifyAction defaultOperation) {
             return candidate.editConfig(editStructure, defaultOperation);
         }
-
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfDataTreeService.class);
@@ -256,24 +255,24 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     abstract List<ListenableFuture<? extends DOMRpcResult>> unlockImpl();
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path) {
         return netconfOps.getData(new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path));
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> get(final YangInstanceIdentifier path,
+    public ListenableFuture<Optional<NormalizedNode>> get(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         return netconfOps.getData(new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path), fields);
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path) {
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path) {
         return netconfOps.getConfigRunningData(new NetconfRpcFutureCallback("Data read", id),
             Optional.ofNullable(path));
     }
 
     @Override
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfig(final YangInstanceIdentifier path,
+    public ListenableFuture<Optional<NormalizedNode>> getConfig(final YangInstanceIdentifier path,
             final List<YangInstanceIdentifier> fields) {
         return netconfOps.getConfigRunningData(new NetconfRpcFutureCallback("Data read", id),
             Optional.ofNullable(path), fields);
@@ -281,7 +280,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> merge(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         checkEditable(store);
         return editConfig(
@@ -291,7 +290,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> replace(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         checkEditable(store);
         return editConfig(
@@ -301,7 +300,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> create(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
+            final YangInstanceIdentifier path, final NormalizedNode data,
             final Optional<ModifyAction> defaultOperation) {
         checkEditable(store);
         return editConfig(
@@ -337,7 +336,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         this.isLockAllowed = isLockAllowedOrig;
     }
 
-    abstract ListenableFuture<? extends DOMRpcResult> editConfig(DataContainerChild<?, ?> editStructure,
+    abstract ListenableFuture<? extends DOMRpcResult> editConfig(DataContainerChild editStructure,
         @Nullable ModifyAction defaultOperation);
 
     private static void checkEditable(final LogicalDatastoreType store) {
