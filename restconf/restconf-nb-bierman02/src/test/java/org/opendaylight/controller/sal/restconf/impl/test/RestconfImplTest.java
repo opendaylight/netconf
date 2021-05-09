@@ -66,8 +66,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -189,19 +189,19 @@ public class RestconfImplTest {
                 "2014-01-14", "create-notification-stream")).when(schemaNode).getQName();
         doReturn(null).when(iiCtx).getMountPoint();
 
-        final Set<DataContainerChild<?, ?>> children = new HashSet<>();
-        final DataContainerChild<?, ?> child = mock(DataContainerChild.class,
+        final Set<DataContainerChild> children = new HashSet<>();
+        final DataContainerChild child = mock(DataContainerChild.class,
                 Mockito.withSettings().extraInterfaces(LeafSetNode.class));
 
         final LeafSetEntryNode entryNode = mock(LeafSetEntryNode.class);
-        when(entryNode.getValue()).thenReturn("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)toastDone");
-        when(((LeafSetNode) child).getValue()).thenReturn(Sets.newHashSet(entryNode));
+        when(entryNode.body()).thenReturn("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)toastDone");
+        when(((LeafSetNode) child).body()).thenReturn(Sets.newHashSet(entryNode));
         children.add(child);
 
-        final NormalizedNode<?, ?> normalizedNode = mock(NormalizedNode.class,
+        final NormalizedNode normalizedNode = mock(NormalizedNode.class,
                 Mockito.withSettings().extraInterfaces(ContainerNode.class));
         doReturn(normalizedNode).when(payload).getData();
-        doReturn(children).when(normalizedNode).getValue();
+        doReturn(children).when(normalizedNode).body();
 
         // register notification
         final NormalizedNodeContext context = this.restconfImpl
