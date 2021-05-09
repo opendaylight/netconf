@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.concepts.SemVer;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.UnqualifiedQName;
@@ -31,7 +32,7 @@ import org.opendaylight.yangtools.yang.model.api.UsesNode;
 import org.opendaylight.yangtools.yang.model.api.YangStmtMapping;
 import org.opendaylight.yangtools.yang.model.api.meta.IdentifierNamespace;
 import org.opendaylight.yangtools.yang.model.api.meta.StatementDefinition;
-import org.opendaylight.yangtools.yang.model.api.meta.StatementSource;
+import org.opendaylight.yangtools.yang.model.api.meta.StatementOrigin;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleStatement;
 
@@ -47,8 +48,8 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final StatementSource getStatementSource() {
-        return StatementSource.CONTEXT;
+    public final StatementOrigin statementOrigin() {
+        return StatementOrigin.CONTEXT;
     }
 
     @Override
@@ -73,7 +74,7 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final Collection<? extends ModuleImport> getImports() {
+    public final Collection<? extends @NonNull ModuleImport> getImports() {
         // Yeah, not accurate, but this should not be needed
         return Collections.emptySet();
     }
@@ -129,37 +130,37 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final Collection<? extends Submodule> getSubmodules() {
+    public final Collection<? extends @NonNull Submodule> getSubmodules() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Collection<? extends FeatureDefinition> getFeatures() {
+    public final Collection<? extends @NonNull FeatureDefinition> getFeatures() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Collection<? extends AugmentationSchemaNode> getAugmentations() {
+    public final Collection<? extends @NonNull AugmentationSchemaNode> getAugmentations() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Collection<? extends RpcDefinition> getRpcs() {
+    public final Collection<? extends @NonNull RpcDefinition> getRpcs() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Collection<? extends Deviation> getDeviations() {
+    public final Collection<? extends @NonNull Deviation> getDeviations() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Collection<? extends IdentitySchemaNode> getIdentities() {
+    public final Collection<? extends @NonNull IdentitySchemaNode> getIdentities() {
         return Collections.emptySet();
     }
 
     @Override
-    public final Collection<? extends ExtensionDefinition> getExtensionSchemaNodes() {
+    public final Collection<? extends @NonNull ExtensionDefinition> getExtensionSchemaNodes() {
         return Collections.emptyList();
     }
 

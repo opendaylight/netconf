@@ -38,7 +38,7 @@ public class FieldsAwareReadOnlyTxTest {
     @Mock
     private DOMRpcService rpc;
     @Mock
-    private NormalizedNode<?, ?> mockedNode;
+    private NormalizedNode mockedNode;
 
     @Test
     public void testReadWithFields() {

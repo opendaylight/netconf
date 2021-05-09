@@ -32,7 +32,7 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
                 + "      </mainroot>\n"
                 + "    </filter>\n"
                 + "  </get-config>"));
-        NormalizedNode<?, ?> input = Builders.anyXmlBuilder()
+        AnyxmlNode<?> input = Builders.anyXmlBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(qName))
                 .withValue(src)
                 .build();

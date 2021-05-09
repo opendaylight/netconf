@@ -10,8 +10,6 @@ package org.opendaylight.netconf.mdsal.connector.ops.get;
 import static org.opendaylight.yangtools.yang.data.util.ParserStreamUtils.findSchemaNodeByNameAndNamespace;
 
 import com.google.common.base.Preconditions;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +25,7 @@ import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
@@ -65,15 +64,19 @@ public class FilterContentValidator {
      * @throws DocumentedException if filter content validation failed
      */
     public YangInstanceIdentifier validate(final XmlElement filterContent) throws DocumentedException {
+        final XMLNamespace namespace;
         try {
-            final URI namespace = new URI(filterContent.getNamespace());
+            namespace = XMLNamespace.of(filterContent.getNamespace());
+        } catch (final IllegalArgumentException e) {
+            throw new RuntimeException("Wrong namespace in element + " + filterContent.toString(), e);
+        }
+
+        try {
             final Module module = schemaContext.getCurrentContext().findModules(namespace).iterator().next();
             final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
             final FilterTree filterTree = validateNode(
                     filterContent, schema, new FilterTree(schema.getQName(), Type.OTHER, schema));
             return getFilterDataRoot(filterTree, filterContent, YangInstanceIdentifier.builder());
-        } catch (final URISyntaxException e) {
-            throw new RuntimeException("Wrong namespace in element + " + filterContent.toString(), e);
         } catch (final ValidationException e) {
             LOG.debug("Filter content isn't valid", e);
             throw new DocumentedException("Validation failed. Cause: " + e.getMessage(), e,
@@ -92,7 +95,7 @@ public class FilterContentValidator {
      * @return child data node schema
      * @throws DocumentedException if child with given name is not present
      */
-    private DataSchemaNode getRootDataSchemaNode(final Module module, final URI nameSpace, final String name)
+    private DataSchemaNode getRootDataSchemaNode(final Module module, final XMLNamespace nameSpace, final String name)
             throws DocumentedException {
         for (final DataSchemaNode childNode : module.getChildNodes()) {
             final QName qName = childNode.getQName();
@@ -122,7 +125,7 @@ public class FilterContentValidator {
         for (final XmlElement childElement : childElements) {
             try {
                 final Deque<DataSchemaNode> path = findSchemaNodeByNameAndNamespace(parentNodeSchema,
-                        childElement.getName(), new URI(childElement.getNamespace()));
+                        childElement.getName(), XMLNamespace.of(childElement.getNamespace()));
                 if (path.isEmpty()) {
                     throw new ValidationException(element, childElement);
                 }
@@ -132,7 +135,7 @@ public class FilterContentValidator {
                 }
                 final DataSchemaNode childSchema = path.getLast();
                 validateNode(childElement, childSchema, subtree);
-            } catch (URISyntaxException | MissingNameSpaceException e) {
+            } catch (IllegalArgumentException | MissingNameSpaceException e) {
                 throw new RuntimeException("Wrong namespace in element + " + childElement.toString(), e);
             }
         }
@@ -216,7 +219,8 @@ public class FilterContentValidator {
                         final XmlCodecFactory xmlCodecFactory =
                                 XmlCodecFactory.create(schemaContext.getCurrentContext());
                         final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> typeCodec =
-                                xmlCodecFactory.codecFor(listKey);
+                                // FIXME: initialize SchemaInferenceStack for use here
+                                xmlCodecFactory.codecFor(listKey, null);
                         final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue.get());
                         keys.put(qualifiedName, deserializedKeyValue);
                     } else {

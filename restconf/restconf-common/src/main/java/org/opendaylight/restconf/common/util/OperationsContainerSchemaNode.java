@@ -13,7 +13,6 @@ import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -31,7 +30,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatemen
 
 final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNode implements ContainerSchemaNode {
     // There is no need to intern this nor add a revision, as we are providing the corresponding context anyway
-    private static final @NonNull QName QNAME = QName.create(OperationsRestconfModule.NAMESPACE, "operations");
+    static final @NonNull QName QNAME = QName.create(OperationsRestconfModule.NAMESPACE, "operations");
     static final @NonNull SchemaPath PATH = SchemaPath.create(true, QNAME);
 
     private final Map<QName, OperationsLeafSchemaNode> children;
@@ -58,8 +57,8 @@ final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNod
     }
 
     @Override
-    public Optional<DataSchemaNode> findDataChildByName(final QName name) {
-        return Optional.ofNullable(children.get(requireNonNull(name)));
+    public DataSchemaNode dataChildByName(final QName name) {
+        return children.get(requireNonNull(name));
     }
 
     @Override
@@ -93,7 +92,7 @@ final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNod
     }
 
     @Override
-    public Collection<MustDefinition> getMustConstraints() {
+    public Collection<@NonNull MustDefinition> getMustConstraints() {
         return Collections.emptySet();
     }
 
