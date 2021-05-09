@@ -70,10 +70,10 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     }
 
     @Override
-    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode<?, ?> input) {
-        final DOMSource payload = (DOMSource) input.getValue();
+    public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode input) {
+        final DOMSource payload = (DOMSource) input.body();
         wrapPayload((Document) payload.getNode());
-        return new NetconfMessage((Document) ((DOMSourceAnyxmlNode) input).getValue().getNode());
+        return new NetconfMessage((Document) ((DOMSourceAnyxmlNode) input).body().getNode());
     }
 
     /**

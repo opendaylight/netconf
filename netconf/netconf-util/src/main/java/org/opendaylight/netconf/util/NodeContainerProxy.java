@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
@@ -31,7 +32,10 @@ import org.opendaylight.yangtools.yang.xpath.api.YangXPathExpression.QualifiedBo
 
 /**
  * Simple proxy for container like schema nodes, where user provides a collection of children schema nodes.
+ *
+ * @deprecated This class is no longer used anywhere and is scheduled for removal.
  */
+@Deprecated(since = "2.0.0", forRemoval = true)
 public final class NodeContainerProxy implements ContainerSchemaNode {
 
     private final Map<QName, ? extends DataSchemaNode> childNodes;
@@ -74,8 +78,8 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public Optional<DataSchemaNode> findDataChildByName(final QName name) {
-        return Optional.ofNullable(childNodes.get(name));
+    public DataSchemaNode dataChildByName(final QName name) {
+        return childNodes.get(name);
     }
 
     @Override
@@ -106,7 +110,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public boolean isConfiguration() {
+    public Optional<Boolean> effectiveConfig() {
         throw new UnsupportedOperationException();
     }
 
@@ -152,7 +156,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public Collection<? extends MustDefinition> getMustConstraints() {
+    public Collection<? extends @NonNull MustDefinition> getMustConstraints() {
         return Collections.emptySet();
     }
 

@@ -66,8 +66,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -189,19 +189,19 @@ public class RestconfImplTest {
                 "2014-01-14", "create-notification-stream")).when(schemaNode).getQName();
         doReturn(null).when(iiCtx).getMountPoint();
 
-        final Set<DataContainerChild<?, ?>> children = new HashSet<>();
-        final DataContainerChild<?, ?> child = mock(DataContainerChild.class,
+        final Set<DataContainerChild> children = new HashSet<>();
+        final DataContainerChild child = mock(DataContainerChild.class,
                 Mockito.withSettings().extraInterfaces(LeafSetNode.class));
 
         final LeafSetEntryNode entryNode = mock(LeafSetEntryNode.class);
-        when(entryNode.getValue()).thenReturn("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)toastDone");
-        when(((LeafSetNode) child).getValue()).thenReturn(Sets.newHashSet(entryNode));
+        when(entryNode.body()).thenReturn("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)toastDone");
+        when(((LeafSetNode) child).body()).thenReturn(Sets.newHashSet(entryNode));
         children.add(child);
 
-        final NormalizedNode<?, ?> normalizedNode = mock(NormalizedNode.class,
+        final NormalizedNode normalizedNode = mock(NormalizedNode.class,
                 Mockito.withSettings().extraInterfaces(ContainerNode.class));
         doReturn(normalizedNode).when(payload).getData();
-        doReturn(children).when(normalizedNode).getValue();
+        doReturn(children).when(normalizedNode).body();
 
         // register notification
         final NormalizedNodeContext context = this.restconfImpl
@@ -219,35 +219,37 @@ public class RestconfImplTest {
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.STREAM_LIST_SCHEMA_NODE);
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) streamSchemaNode;
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeValues =
-                Builders.mapEntryBuilder(listStreamSchemaNode);
+            SchemaAwareBuilders.mapEntryBuilder(listStreamSchemaNode);
         List<DataSchemaNode> instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "name");
         final DataSchemaNode nameSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue("").build());
+        streamNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) nameSchemaNode)
+            .withValue("")
+            .build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "description");
         final DataSchemaNode descriptionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
-        streamNodeValues.withChild(
-                Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue("DESCRIPTION_PLACEHOLDER").build());
+        streamNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) nameSchemaNode)
+            .withValue("DESCRIPTION_PLACEHOLDER")
+            .build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-support");
         final DataSchemaNode replaySupportSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         streamNodeValues.withChild(
-                Builders.leafBuilder((LeafSchemaNode) replaySupportSchemaNode).withValue(Boolean.TRUE).build());
+            SchemaAwareBuilders.leafBuilder((LeafSchemaNode) replaySupportSchemaNode).withValue(Boolean.TRUE).build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-log-creation-time");
         final DataSchemaNode replayLogCreationTimeSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         streamNodeValues.withChild(
-                Builders.leafBuilder((LeafSchemaNode) replayLogCreationTimeSchemaNode).withValue("").build());
+            SchemaAwareBuilders.leafBuilder((LeafSchemaNode) replayLogCreationTimeSchemaNode).withValue("").build());
         instanceDataChildrenByName = ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "events");
         final DataSchemaNode eventsSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         streamNodeValues.withChild(
-                Builders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue(Empty.getInstance()).build());
+            SchemaAwareBuilders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue(Empty.getInstance()).build());
         assertNotNull(streamNodeValues.build());
-
     }
 
     /**

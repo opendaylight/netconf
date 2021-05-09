@@ -77,8 +77,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableIt
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.model.parser.api.YangParserException;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
+import org.opendaylight.yangtools.yang.parser.api.YangParserException;
+import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfTopologyImplTest {
@@ -282,7 +282,7 @@ public class NetconfTopologyImplTest {
 
         static {
             try {
-                BASE_SCHEMAS = new DefaultBaseNetconfSchemas(new YangParserFactoryImpl());
+                BASE_SCHEMAS = new DefaultBaseNetconfSchemas(new DefaultYangParserFactory());
             } catch (YangParserException e) {
                 throw new ExceptionInInitializerError(e);
             }

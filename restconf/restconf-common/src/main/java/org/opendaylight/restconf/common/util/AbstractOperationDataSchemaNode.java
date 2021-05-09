@@ -19,18 +19,16 @@ abstract class AbstractOperationDataSchemaNode implements DataSchemaNode {
     }
 
     @Override
-    public final boolean isConfiguration() {
-        return false;
+    public final Optional<Boolean> effectiveConfig() {
+        return Optional.empty();
     }
 
     @Override
-    @Deprecated
     public final boolean isAugmenting() {
         return false;
     }
 
     @Override
-    @Deprecated
     public final boolean isAddedByUses() {
         return false;
     }

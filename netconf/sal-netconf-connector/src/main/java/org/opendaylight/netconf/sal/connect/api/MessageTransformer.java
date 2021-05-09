@@ -19,7 +19,7 @@ public interface MessageTransformer<M> {
 
     DOMNotification toNotification(M message);
 
-    M toRpcRequest(QName rpc, NormalizedNode<?, ?> node);
+    M toRpcRequest(QName rpc, NormalizedNode node);
 
     DOMRpcResult toRpcResult(M message, QName rpc);
 
@@ -32,7 +32,7 @@ public interface MessageTransformer<M> {
      * @return message
      */
     default M toActionRequest(final Absolute action, final DOMDataTreeIdentifier domDataTreeIdentifier,
-            final NormalizedNode<?, ?> payload) {
+            final NormalizedNode payload) {
         throw new UnsupportedOperationException();
     }
 

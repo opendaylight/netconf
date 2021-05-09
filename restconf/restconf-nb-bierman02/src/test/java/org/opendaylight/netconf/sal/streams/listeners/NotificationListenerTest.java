@@ -9,19 +9,14 @@ package org.opendaylight.netconf.sal.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Lists;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,27 +27,28 @@ import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
-import org.opendaylight.yangtools.util.SingletonSet;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NotificationListenerTest {
-    private static final QNameModule MODULE = QNameModule.create(URI.create("notifi:mod"), Revision.of("2016-11-23"));
+    private static final QNameModule MODULE = QNameModule.create(XMLNamespace.of("notifi:mod"),
+        Revision.of("2016-11-23"));
 
     private static EffectiveModelContext schemaContext;
 
@@ -69,7 +65,7 @@ public class NotificationListenerTest {
     }
 
     @Test
-    public void notifi_leafTest() throws Exception {
+    public void notifi_leafTest() {
         final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-leaf"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
@@ -89,7 +85,7 @@ public class NotificationListenerTest {
     }
 
     @Test
-    public void notifi_cont_leafTest() throws Exception {
+    public void notifi_cont_leafTest() {
         final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-cont"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
@@ -111,17 +107,15 @@ public class NotificationListenerTest {
     }
 
     @Test
-    public void notifi_list_Test() throws Exception {
+    public void notifi_list_Test() {
         final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-list"));
 
+        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), ImmutableNodes.mapNodeBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(QName.create(MODULE, "lst")))
+            .withChild(mockMapEntry(QName.create(MODULE, "lst"), mockLeaf(QName.create(MODULE, "lf"))))
+            .build());
+
         final DOMNotification notificationData = mock(DOMNotification.class);
-
-        final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
-        final MapEntryNode entry = mockMapEntry(QName.create(MODULE, "lst"), leaf);
-        final MapNode list = mockList(QName.create(MODULE, "lst"), entry);
-        final ContainerNode cont = mockCont(QName.create(MODULE, "cont"), list);
-        final ContainerNode notifiBody = mockCont(schemaPathNotifi.lastNodeIdentifier(), cont);
-
         when(notificationData.getType()).thenReturn(schemaPathNotifi);
         when(notificationData.getBody()).thenReturn(notifiBody);
 
@@ -135,7 +129,7 @@ public class NotificationListenerTest {
     }
 
     @Test
-    public void notifi_grpTest() throws Exception {
+    public void notifi_grpTest() {
         final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-grp"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
@@ -154,7 +148,7 @@ public class NotificationListenerTest {
     }
 
     @Test
-    public void notifi_augmTest() throws Exception {
+    public void notifi_augmTest() {
         final Absolute schemaPathNotifi = Absolute.of(QName.create(MODULE, "notifi-augm"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
@@ -175,59 +169,36 @@ public class NotificationListenerTest {
 
     private static AugmentationNode mockAugm(final LeafNode<String> leaf) {
         final AugmentationNode augm = mock(AugmentationNode.class);
-        final AugmentationIdentifier augmId = new AugmentationIdentifier(SingletonSet.of(leaf.getNodeType()));
+        final AugmentationIdentifier augmId = new AugmentationIdentifier(Set.of(leaf.getIdentifier().getNodeType()));
         when(augm.getIdentifier()).thenReturn(augmId);
 
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
+        final Collection<DataContainerChild> childs = new ArrayList<>();
         childs.add(leaf);
 
-        when(augm.getValue()).thenReturn(childs);
+        when(augm.body()).thenReturn(childs);
         return augm;
     }
 
     private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode<String> leaf) {
-        final MapEntryNode entry = mock(MapEntryNode.class);
-        final Map<QName, Object> keyValues = new HashMap<>();
-        keyValues.put(leaf.getNodeType(), "value");
-        final NodeIdentifierWithPredicates nodeId = NodeIdentifierWithPredicates.of(leaf.getNodeType(), keyValues);
-        when(entry.getIdentifier()).thenReturn(nodeId);
-        when(entry.getChild(any())).thenReturn(Optional.of(leaf));
-
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
-        childs.add(leaf);
-
-        when(entry.getValue()).thenReturn(childs);
-        return entry;
+        return Builders.mapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(entryQName, leaf.getIdentifier().getNodeType(),
+                leaf.body()))
+            .withChild(leaf)
+            .build();
     }
 
-    private static MapNode mockList(final QName listQName, final MapEntryNode... entries) {
-        final MapNode list = mock(MapNode.class);
-        when(list.getIdentifier()).thenReturn(NodeIdentifier.create(listQName));
-        when(list.getValue()).thenReturn(Lists.newArrayList(entries));
-        return list;
-    }
-
-    private static ContainerNode mockCont(final QName contQName,
-                                          final DataContainerChild<? extends PathArgument, ?> child) {
-        final ContainerNode cont = mock(ContainerNode.class);
-        when(cont.getIdentifier()).thenReturn(NodeIdentifier.create(contQName));
-
-        final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
-        childs.add(child);
-        when(cont.getValue()).thenReturn(childs);
-        return cont;
+    private static ContainerNode mockCont(final QName contQName, final DataContainerChild child) {
+        return Builders.containerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(contQName))
+            .withChild(child)
+            .build();
     }
 
     private static LeafNode<String> mockLeaf(final QName leafQName) {
-        final LeafNode<String> child = mock(LeafNode.class);
-        when(child.getNodeType()).thenReturn(leafQName);
-        when(child.getIdentifier()).thenReturn(NodeIdentifier.create(leafQName));
-        when(child.getValue()).thenReturn("value");
-        return child;
+        return ImmutableNodes.leafNode(leafQName, "value");
     }
 
-    private String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi)
-            throws Exception {
+    private String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi) {
         final List<SchemaPath> paths = new ArrayList<>();
         paths.add(schemaPathNotifi.asSchemaPath());
         final List<NotificationListenerAdapter> listNotifi =

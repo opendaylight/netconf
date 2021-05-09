@@ -17,8 +17,8 @@ import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 
 public class SwaggerObjectTest {
@@ -27,7 +27,7 @@ public class SwaggerObjectTest {
     private static final String STRING_DATE = "2014-05-28";
     private static final Date REVISION = Date.valueOf(STRING_DATE);
     private DocGenTestHelper helper;
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
 
     @Before
     public void setUp() throws Exception {
