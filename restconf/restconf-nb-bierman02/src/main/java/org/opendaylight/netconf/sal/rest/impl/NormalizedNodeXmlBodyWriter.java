@@ -103,14 +103,14 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-        final NormalizedNode<?, ?> data = context.getData();
+        final NormalizedNode data = context.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
         writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().getDepth());
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
-            final InstanceIdentifierContext<?> pathContext, NormalizedNode<?, ?> data, final @Nullable Integer depth)
+            final InstanceIdentifierContext<?> pathContext, NormalizedNode data, final @Nullable Integer depth)
             throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();
@@ -120,7 +120,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
                 try {
                     writeElements(xmlWriter, nnWriter,
                             (ContainerNode) NetconfUtil.transformDOMSourceToNormalizedNode(schemaCtx,
-                                    ((DOMSourceAnyxmlNode)data).getValue()).getResult());
+                                    ((DOMSourceAnyxmlNode)data).body()).getResult());
                 } catch (XMLStreamException | URISyntaxException | SAXException e) {
                     throw new IOException("Cannot write anyxml", e);
                 }
@@ -161,7 +161,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, name.getLocalName(),
                     name.getNamespace().toString());
             xmlWriter.writeDefaultNamespace(name.getNamespace().toString());
-            for (final NormalizedNode<?,?> child : data.getValue()) {
+            for (final NormalizedNode child : data.body()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();

@@ -9,6 +9,7 @@ package org.opendaylight.restconf.common.util;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.MustDefinition;
@@ -16,7 +17,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.LeafEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
+import org.opendaylight.yangtools.yang.model.ri.type.BaseTypes;
 
 final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode implements LeafSchemaNode {
     private final QName qname;
@@ -48,7 +49,7 @@ final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode imp
     }
 
     @Override
-    public Collection<MustDefinition> getMustConstraints() {
+    public Collection<@NonNull MustDefinition> getMustConstraints() {
         return Collections.emptySet();
     }
 
