@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -23,7 +22,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
-import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -51,7 +50,7 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
         final DOMNotification domNotification = messageTransformer.toNotification(notificationMessage);
         final ContainerNode root = domNotification.getBody();
         assertNotNull(root);
-        assertEquals(1, Iterables.size(root.getValue()));
+        assertEquals(1, root.body().size());
         assertEquals("interface-enabled", root.getNodeType().getLocalName());
         assertEquals(NetconfNotification.RFC3339_DATE_PARSER.apply("2008-07-08T00:01:00Z").toInstant(),
                 ((DOMEvent) domNotification).getEventInstant());

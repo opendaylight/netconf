@@ -38,14 +38,13 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public Optional<NormalizedNode<?, ?>> selectFromDataStructure(
-            final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data,
+    public Optional<NormalizedNode> selectFromDataStructure(final DataContainerChild data,
             final YangInstanceIdentifier path) {
         if (data instanceof DOMSourceAnyxmlNode) {
             final NormalizedNodeResult node;
             try {
                 node = NetconfUtil.transformDOMSourceToNormalizedNode(mountContext,
-                    ((DOMSourceAnyxmlNode)data).getValue());
+                    ((DOMSourceAnyxmlNode)data).body());
                 return NormalizedNodes.findNode(node.getResult(), path.getPathArguments());
             } catch (final XMLStreamException | URISyntaxException | IOException | SAXException e) {
                 LOG.error("Cannot parse anyxml.", e);
@@ -57,7 +56,7 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode<?, ?>> data,
+    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode> data,
                                                          final YangInstanceIdentifier dataPath,
                                                          final Optional<ModifyAction> operation) {
         // FIXME: propagate MountPointContext
@@ -66,13 +65,13 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier path) {
+    public DataContainerChild toFilterStructure(final YangInstanceIdentifier path) {
         // FIXME: propagate MountPointContext
         return NetconfMessageTransformUtil.toFilterStructure(path, mountContext.getEffectiveModelContext());
     }
 
     @Override
-    public DataContainerChild<?, ?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
+    public DataContainerChild toFilterStructure(final List<FieldsFilter> fieldsFilters) {
         // FIXME: propagate MountPointContext
         return NetconfMessageTransformUtil.toFilterStructure(fieldsFilters, mountContext.getEffectiveModelContext());
     }

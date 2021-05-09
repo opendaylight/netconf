@@ -400,7 +400,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     @Override
     public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final QName rpc) {
-        final NormalizedNode<?, ?> normalizedNode;
+        final NormalizedNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
             normalizedNode = Builders.containerBuilder()
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
@@ -443,8 +443,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         }
     }
 
-    private NormalizedNode<?, ?> parseResult(final NetconfMessage message,
-            final OperationDefinition operationDefinition) {
+    private NormalizedNode parseResult(final NetconfMessage message, final OperationDefinition operationDefinition) {
         final Optional<XmlElement> okResponseElement = XmlElement.fromDomDocument(message.getDocument())
                 .getOnlyChildElementWithSameNamespaceOptionally("ok");
         if (operationDefinition.getOutput().getChildNodes().isEmpty()) {

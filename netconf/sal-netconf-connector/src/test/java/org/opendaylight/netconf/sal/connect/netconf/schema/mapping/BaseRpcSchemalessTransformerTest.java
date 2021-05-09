@@ -7,12 +7,15 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -29,7 +32,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -90,7 +92,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
                         new YangInstanceIdentifier.NodeIdentifier(Candidate.QNAME))
                     .withValue(Empty.getInstance()).build())
                 .build();
-        final DataContainerChild<?, ?> target = Builders.containerBuilder()
+        final ContainerNode target = Builders.containerBuilder()
                 .withNodeIdentifier(
                         new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_TARGET_QNAME))
                 .withChild(candidate)
@@ -104,7 +106,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         final NetconfMessage msg = transformer.toRpcRequest(
                 NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME, editConfig);
         final Diff diff = XMLUnit.compareXML(EXP_RPC, XmlUtil.toString(msg.getDocument()));
-        Assert.assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.toString(), diff.similar());
     }
 
     @Test
@@ -117,14 +119,13 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
         doc.getDocumentElement().appendChild(element);
         final NetconfMessage msg = new NetconfMessage(doc);
         final DOMRpcResult result = transformer.toRpcResult(msg, NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
-        Assert.assertNotNull(result.getResult());
+        assertNotNull(result.getResult());
         final ContainerNode rpcReply = (ContainerNode) result.getResult();
-        Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getNodeType());
-        final Optional<?> dataOpt = rpcReply.getChild(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
-        Assert.assertTrue(dataOpt.isPresent());
+        assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getNodeType());
+        final Optional<?> dataOpt = rpcReply.findChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
+        assertTrue(dataOpt.isPresent());
         final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) dataOpt.get();
         final Diff diff = XMLUnit.compareXML(dataElement.getOwnerDocument(), (Document) data.getValue().getNode());
-        Assert.assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.toString(), diff.similar());
     }
-
 }
