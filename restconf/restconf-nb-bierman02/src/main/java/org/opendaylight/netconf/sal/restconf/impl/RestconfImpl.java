@@ -101,13 +101,13 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -399,7 +399,7 @@ public final class RestconfImpl implements RestconfService {
         final SchemaNode schema = payload.getInstanceIdentifierContext().getSchemaNode();
         final ListenableFuture<? extends DOMRpcResult> response;
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final NormalizedNode<?, ?> input =  nonnullInput(schema, payload.getData());
+        final NormalizedNode input =  nonnullInput(schema, payload.getData());
         final EffectiveModelContext schemaContext;
 
         if (mountPoint != null) {
@@ -431,7 +431,7 @@ public final class RestconfImpl implements RestconfService {
         final DOMRpcResult result = checkRpcResponse(response);
 
         RpcDefinition resultNodeSchema = null;
-        final NormalizedNode<?, ?> resultData;
+        final NormalizedNode resultData;
         if (result != null && result.getResult() != null) {
             resultData = result.getResult();
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
@@ -506,7 +506,7 @@ public final class RestconfImpl implements RestconfService {
             response = this.broker.invokeRpc(rpc.getQName(), input);
         }
 
-        final NormalizedNode<?, ?> result = checkRpcResponse(response).getResult();
+        final NormalizedNode result = checkRpcResponse(response).getResult();
         if (result != null && ((ContainerNode) result).getValue().isEmpty()) {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
@@ -522,7 +522,7 @@ public final class RestconfImpl implements RestconfService {
             QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
-    private static @NonNull NormalizedNode<?, ?> nonnullInput(final SchemaNode rpc, final NormalizedNode<?, ?> input) {
+    private static @NonNull NormalizedNode nonnullInput(final SchemaNode rpc, final NormalizedNode input) {
         return input != null ? input : defaultInput(rpc.getQName());
     }
 
@@ -585,10 +585,10 @@ public final class RestconfImpl implements RestconfService {
     private ListenableFuture<DOMRpcResult> invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
         final ContainerNode value = (ContainerNode) payload.getData();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(
+        final Optional<DataContainerChild> path = value.getChild(
             new NodeIdentifier(QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(),
                 "path")));
-        final Object pathValue = path.isPresent() ? path.get().getValue() : null;
+        final Object pathValue = path.isPresent() ? path.get().body() : null;
 
         if (!(pathValue instanceof YangInstanceIdentifier)) {
             LOG.debug("Instance identifier {} was not normalized correctly", rpcQName);
@@ -690,7 +690,7 @@ public final class RestconfImpl implements RestconfService {
 
         final InstanceIdentifierContext<?> iiWithData = this.controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
-        NormalizedNode<?, ?> data = null;
+        NormalizedNode data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
         if (mountPoint != null) {
             data = this.broker.readConfigurationData(mountPoint, normalizedII, withDefa);
@@ -708,7 +708,7 @@ public final class RestconfImpl implements RestconfService {
     public NormalizedNodeContext readOperationalData(final String identifier, final UriInfo uriInfo) {
         final InstanceIdentifierContext<?> iiWithData = this.controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
-        NormalizedNode<?, ?> data = null;
+        NormalizedNode data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
         if (mountPoint != null) {
             data = this.broker.readOperationalData(mountPoint, normalizedII);
@@ -1495,11 +1495,11 @@ public final class RestconfImpl implements RestconfService {
         final ContainerNode data = (ContainerNode) payload.getData();
         LeafSetNode leafSet = null;
         String outputType = "XML";
-        for (final DataContainerChild<? extends PathArgument, ?> dataChild : data.getValue()) {
+        for (final DataContainerChild dataChild : data.body()) {
             if (dataChild instanceof LeafSetNode) {
                 leafSet = (LeafSetNode) dataChild;
             } else if (dataChild instanceof AugmentationNode) {
-                outputType = (String) ((AugmentationNode) dataChild).getValue().iterator().next().getValue();
+                outputType = (String) ((AugmentationNode) dataChild).body().iterator().next().getValue();
             }
         }
 

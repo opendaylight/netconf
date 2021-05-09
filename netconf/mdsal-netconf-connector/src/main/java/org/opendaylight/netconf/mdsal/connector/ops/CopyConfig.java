@@ -112,7 +112,7 @@ public final class CopyConfig extends AbstractEdit {
             final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element);
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             parseIntoNormalizedNode(schemaNode, element, ImmutableNormalizedNodeStreamWriter.from(resultHolder));
-            final NormalizedNode<?, ?> data = resultHolder.getResult();
+            final NormalizedNode data = resultHolder.getResult();
             final YangInstanceIdentifier path = YangInstanceIdentifier.create(data.getIdentifier());
             // Doing merge instead of put to support top-level list:
             rwTx.merge(LogicalDatastoreType.CONFIGURATION, path, data);
@@ -171,7 +171,7 @@ public final class CopyConfig extends AbstractEdit {
         final DOMDataTreeReadWriteTransaction rwTx = getTransaction(sourceDatastore);
         final YangInstanceIdentifier dataRoot = YangInstanceIdentifier.empty();
         try {
-            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
+            final Optional<NormalizedNode> normalizedNodeOptional = rwTx.read(
                 LogicalDatastoreType.CONFIGURATION, dataRoot).get();
             if (sourceDatastore == Datastore.running) {
                 transactionProvider.abortRunningTransaction(rwTx);
@@ -212,7 +212,7 @@ public final class CopyConfig extends AbstractEdit {
                 schemaContext.getCurrentContext(), SchemaPath.ROOT);
 
             final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true);
-            for (DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> child : data.getValue()) {
+            for (DataContainerChild child : data.body()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();

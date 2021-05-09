@@ -21,7 +21,7 @@
     <reference id="codecFactory"
                interface="org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory"/>
     <reference id="parserFactory"
-               interface="org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory"/>
+               interface="org.opendaylight.yangtools.yang.parser.api.YangParserFactory"/>
 
     <!--This is the MD-SAL netconf server notification blueprint xml file-->
     <bean id="transformUtil"
