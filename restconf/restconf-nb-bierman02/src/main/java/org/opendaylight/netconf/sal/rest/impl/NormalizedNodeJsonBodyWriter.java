@@ -31,7 +31,6 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -88,7 +87,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 httpHeaders.add(entry.getKey(), entry.getValue());
             }
         }
-        NormalizedNode<?, ?> data = context.getData();
+        NormalizedNode data = context.getData();
         if (data == null) {
             return;
         }
@@ -153,7 +152,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
 
     private static void writeChildren(final RestconfNormalizedNodeWriter nnWriter, final ContainerNode data)
             throws IOException {
-        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+        for (final DataContainerChild child : data.body()) {
             nnWriter.write(child);
         }
     }
