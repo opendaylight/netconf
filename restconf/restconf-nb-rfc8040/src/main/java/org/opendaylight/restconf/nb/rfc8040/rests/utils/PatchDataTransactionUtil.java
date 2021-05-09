@@ -153,7 +153,7 @@ public final class PatchDataTransactionUtil {
      * @param transaction   A handle to a set of DS operations
      */
     private static void createDataWithinTransaction(final YangInstanceIdentifier path,
-                                                    final NormalizedNode<?, ?> payload,
+                                                    final NormalizedNode payload,
                                                     final EffectiveModelContext schemaContext,
                                                     final RestconfTransaction transaction) {
         LOG.trace("POST {} within Restconf Patch: {} with payload {}", LogicalDatastoreType.CONFIGURATION.name(),
@@ -181,7 +181,7 @@ public final class PatchDataTransactionUtil {
      * @param transaction   A handle to a set of DS operations
      */
     private static void mergeDataWithinTransaction(final YangInstanceIdentifier path,
-                                                   final NormalizedNode<?, ?> payload,
+                                                   final NormalizedNode payload,
                                                    final EffectiveModelContext schemaContext,
                                                    final RestconfTransaction transaction) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", LogicalDatastoreType.CONFIGURATION.name(),
@@ -210,7 +210,7 @@ public final class PatchDataTransactionUtil {
      * @param transaction   A handle to a set of DS operations
      */
     private static void replaceDataWithinTransaction(final YangInstanceIdentifier path,
-                                                     final NormalizedNode<?, ?> payload,
+                                                     final NormalizedNode payload,
                                                      final EffectiveModelContext schemaContext,
                                                      final RestconfTransaction transaction) {
         LOG.trace("PUT {} within Restconf Patch: {} with payload {}",

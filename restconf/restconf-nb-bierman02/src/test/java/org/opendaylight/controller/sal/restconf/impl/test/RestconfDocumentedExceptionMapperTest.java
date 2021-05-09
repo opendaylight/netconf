@@ -113,7 +113,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapperTest.class);
-    private static final String IETF_RESTCONF = "ietf-restconf";
+
     static RestconfService mockRestConf = mock(RestconfService.class);
 
     static XPath XPATH = XPathFactory.newInstance().newXPath();
@@ -133,7 +133,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
         final NamespaceContext nsContext = new NamespaceContext() {
             @Override
             public Iterator<String> getPrefixes(final String namespaceURI) {
-                return Iterators.singletonIterator(IETF_RESTCONF);
+                return Iterators.singletonIterator(Draft02.RestConfModule.NAME);
             }
 
             @Override
@@ -143,7 +143,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
             @Override
             public String getNamespaceURI(final String prefix) {
-                return IETF_RESTCONF.equals(prefix) ? Draft02.RestConfModule.NAMESPACE : null;
+                return Draft02.RestConfModule.NAME.equals(prefix) ? Draft02.RestConfModule.NAMESPACE.toString() : null;
             }
         };
 

@@ -21,8 +21,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
-
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
+
     private static EffectiveModelContext schemaContext;
 
     public JsonLeafrefToNnTest() {
@@ -37,19 +37,15 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
 
     @Test
     public void jsonIdentityrefToNormalizeNode() throws Exception {
-
         final String uri = "leafref-module:cont";
         mockBodyReader(uri, this.jsonBodyReader, false);
-        final InputStream inputStream = this.getClass().getResourceAsStream(
-                "/json-to-nn/leafref/json/data.json");
+        final InputStream inputStream = this.getClass().getResourceAsStream("/json-to-nn/leafref/json/data.json");
 
         final NormalizedNodeContext normalizedNodeContext = this.jsonBodyReader.readFrom(
                 null, null, null, this.mediaType, null, inputStream);
 
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("lf2 121"));
     }
 
@@ -57,5 +53,4 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
     protected MediaType getMediaType() {
         return null;
     }
-
 }

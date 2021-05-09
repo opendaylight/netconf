@@ -61,12 +61,12 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     private NodeIdentifier mapNodeIdentifier;
     private NodeIdentifierWithPredicates mapEntryNodeIdentifier;
     private NodeIdentifier leafSetNodeIdentifier;
-    private NodeWithValue<?> leafSetEntryNodeIdentifier;
+    private NodeWithValue<String> leafSetEntryNodeIdentifier;
     private NodeIdentifier keyLeafNodeIdentifier;
 
-    private Collection<DataContainerChild<?, ?>> containerNodeValue;
+    private Collection<DataContainerChild> containerNodeValue;
     private Collection<MapEntryNode> mapNodeValue;
-    private Collection<DataContainerChild<?, ?>> mapEntryNodeValue;
+    private Collection<DataContainerChild> mapEntryNodeValue;
     private Collection<LeafSetEntryNode<String>> leafSetNodeValue;
     private String leafSetEntryNodeValue;
     private String keyLeafNodeValue;
@@ -97,26 +97,26 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
         mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
                 QName.create("namespace", "list-entry"), mapEntryNodeKey, keyLeafNodeValue);
         Mockito.when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
-        Mockito.when(mapEntryNodeData.getChild(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
+        Mockito.when(mapEntryNodeData.findChildByArg(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
 
-        Mockito.when(keyLeafNodeData.getValue()).thenReturn(keyLeafNodeValue);
+        Mockito.when(keyLeafNodeData.body()).thenReturn(keyLeafNodeValue);
         Mockito.when(keyLeafNodeData.getIdentifier()).thenReturn(keyLeafNodeIdentifier);
         Mockito.when(keyLeafNodeData.getNodeType()).thenReturn(keyLeafNodeIdentifier.getNodeType());
 
         // values
-        Mockito.when(leafSetEntryNodeData.getValue()).thenReturn(leafSetEntryNodeValue);
+        Mockito.when(leafSetEntryNodeData.body()).thenReturn(leafSetEntryNodeValue);
 
         leafSetNodeValue = Collections.singletonList(leafSetEntryNodeData);
-        Mockito.when(leafSetNodeData.getValue()).thenReturn(leafSetNodeValue);
+        Mockito.when(leafSetNodeData.body()).thenReturn(leafSetNodeValue);
 
         containerNodeValue = Collections.singleton(leafSetNodeData);
-        Mockito.when(containerNodeData.getValue()).thenReturn(containerNodeValue);
+        Mockito.when(containerNodeData.body()).thenReturn(containerNodeValue);
 
         mapEntryNodeValue = Sets.newHashSet(keyLeafNodeData);
-        Mockito.when(mapEntryNodeData.getValue()).thenReturn(mapEntryNodeValue);
+        Mockito.when(mapEntryNodeData.body()).thenReturn(mapEntryNodeValue);
 
         mapNodeValue = Collections.singleton(mapEntryNodeData);
-        Mockito.when(mapNodeData.getValue()).thenReturn(mapNodeValue);
+        Mockito.when(mapNodeData.body()).thenReturn(mapNodeValue);
     }
 
     /**

@@ -8,10 +8,10 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.collect.ImmutableSet;
-import java.net.URI;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 
 /**
@@ -20,11 +20,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.Augmentat
 public final class RestconfStreamsConstants {
 
     public static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(
-            URI.create("urn:sal:restconf:event:subscription"),
-            Revision.of("2014-07-08"));
+            XMLNamespace.of("urn:sal:restconf:event:subscription"), Revision.of("2014-07-08"));
     public static final QNameModule SUBSCRIBE_TO_NOTIFICATION = QNameModule.create(
-            URI.create("subscribe:to:notification"),
-            Revision.of("2016-10-28"));
+            XMLNamespace.of("subscribe:to:notification"), Revision.of("2016-10-28"));
 
     public static final QName SAL_REMOTE_NAMESPACE = QName.create(
             "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",

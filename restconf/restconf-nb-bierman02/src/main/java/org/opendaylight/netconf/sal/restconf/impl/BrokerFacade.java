@@ -76,16 +76,16 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
-import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UserLeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
@@ -138,24 +138,21 @@ public class BrokerFacade implements Closeable {
     /**
      * Read config data by path.
      *
-     * @param path
-     *            path of data
+     * @param path path of data
      * @return read date
      */
-    public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path) {
+    public NormalizedNode readConfigurationData(final YangInstanceIdentifier path) {
         return readConfigurationData(path, null);
     }
 
     /**
      * Read config data by path.
      *
-     * @param path
-     *            path of data
-     * @param withDefa
-     *            value of with-defaults parameter
+     * @param path path of data
+     * @param withDefa value of with-defaults parameter
      * @return read date
      */
-    public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
+    public NormalizedNode readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
         try (DOMDataTreeReadTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
         }
@@ -164,29 +161,23 @@ public class BrokerFacade implements Closeable {
     /**
      * Read config data from mount point by path.
      *
-     * @param mountPoint
-     *            mount point for reading data
-     * @param path
-     *            path of data
+     * @param mountPoint mount point for reading data
+     * @param path path of data
      * @return read data
      */
-    public NormalizedNode<?, ?> readConfigurationData(final DOMMountPoint mountPoint,
-            final YangInstanceIdentifier path) {
+    public NormalizedNode readConfigurationData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         return readConfigurationData(mountPoint, path, null);
     }
 
     /**
      * Read config data from mount point by path.
      *
-     * @param mountPoint
-     *            mount point for reading data
-     * @param path
-     *            path of data
-     * @param withDefa
-     *            value of with-defaults parameter
+     * @param mountPoint mount point for reading data
+     * @param path path of data
+     * @param withDefa value of with-defaults parameter
      * @return read data
      */
-    public NormalizedNode<?, ?> readConfigurationData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path,
+    public NormalizedNode readConfigurationData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path,
             final String withDefa) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
@@ -200,11 +191,10 @@ public class BrokerFacade implements Closeable {
     /**
      * Read operational data by path.
      *
-     * @param path
-     *            path of data
+     * @param path path of data
      * @return read data
      */
-    public NormalizedNode<?, ?> readOperationalData(final YangInstanceIdentifier path) {
+    public NormalizedNode readOperationalData(final YangInstanceIdentifier path) {
         try (DOMDataTreeReadTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, OPERATIONAL, path);
         }
@@ -213,13 +203,11 @@ public class BrokerFacade implements Closeable {
     /**
      * Read operational data from mount point by path.
      *
-     * @param mountPoint
-     *            mount point for reading data
-     * @param path
-     *            path of data
+     * @param mountPoint mount point for reading data
+     * @param path path of data
      * @return read data
      */
-    public NormalizedNode<?, ?> readOperationalData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
+    public NormalizedNode readOperationalData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             try (DOMDataTreeReadTransaction tx = domDataBrokerService.get().newReadOnlyTransaction()) {
@@ -236,21 +224,15 @@ public class BrokerFacade implements Closeable {
      * Prepare result(status) for PUT operation and PUT data via transaction.
      * Return wrapped status and future from PUT.
      *
-     * @param globalSchema
-     *            used by merge parents (if contains list)
-     * @param path
-     *            path of node
-     * @param payload
-     *            input data
-     * @param point
-     *            point
-     * @param insert
-     *            insert
+     * @param globalSchema used by merge parents (if contains list)
+     * @param path path of node
+     * @param payload input data
+     * @param point point
+     * @param insert insert
      * @return wrapper of status and future of PUT
      */
-    public PutResult commitConfigurationDataPut(
-            final EffectiveModelContext globalSchema, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> payload, final String insert, final String point) {
+    public PutResult commitConfigurationDataPut(final EffectiveModelContext globalSchema,
+            final YangInstanceIdentifier path, final NormalizedNode payload, final String insert, final String point) {
         requireNonNull(globalSchema);
         requireNonNull(path);
         requireNonNull(payload);
@@ -285,9 +267,8 @@ public class BrokerFacade implements Closeable {
      *            insert
      * @return wrapper of status and future of PUT
      */
-    public PutResult commitMountPointDataPut(
-            final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
-            final String insert, final String point) {
+    public PutResult commitMountPointDataPut(final DOMMountPoint mountPoint, final YangInstanceIdentifier path,
+            final NormalizedNode payload, final String insert, final String point) {
         requireNonNull(mountPoint);
         requireNonNull(path);
         requireNonNull(payload);
@@ -465,9 +446,8 @@ public class BrokerFacade implements Closeable {
     }
 
     // POST configuration
-    public FluentFuture<? extends CommitInfo> commitConfigurationDataPost(
-            final EffectiveModelContext globalSchema, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> payload, final String insert, final String point) {
+    public FluentFuture<? extends CommitInfo> commitConfigurationDataPost(final EffectiveModelContext globalSchema,
+            final YangInstanceIdentifier path, final NormalizedNode payload, final String insert, final String point) {
         isMounted.set(false);
         FluentFuture<? extends CommitInfo> future =
                 postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
@@ -476,9 +456,8 @@ public class BrokerFacade implements Closeable {
         return future;
     }
 
-    public FluentFuture<? extends CommitInfo> commitConfigurationDataPost(
-            final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
-            final String insert, final String point) {
+    public FluentFuture<? extends CommitInfo> commitConfigurationDataPost(final DOMMountPoint mountPoint,
+            final YangInstanceIdentifier path, final NormalizedNode payload, final String insert, final String point) {
         isMounted.set(true);
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
@@ -508,7 +487,7 @@ public class BrokerFacade implements Closeable {
 
     // RPC
     public ListenableFuture<? extends DOMRpcResult> invokeRpc(final @NonNull QName type,
-            final @NonNull NormalizedNode<?, ?> input) {
+            final @NonNull NormalizedNode input) {
         if (this.rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
@@ -535,17 +514,17 @@ public class BrokerFacade implements Closeable {
         listener.setRegistration(registration);
     }
 
-    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataTreeReadOperations transaction,
+    private NormalizedNode readDataViaTransaction(final DOMDataTreeReadOperations transaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         return readDataViaTransaction(transaction, datastore, path, null);
     }
 
-    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataTreeReadOperations transaction,
+    private NormalizedNode readDataViaTransaction(final DOMDataTreeReadOperations transaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final String withDefa) {
         LOG.trace("Read {} via Restconf: {}", datastore.name(), path);
 
         try {
-            final Optional<NormalizedNode<?, ?>> optional = transaction.read(datastore, path).get();
+            final Optional<NormalizedNode> optional = transaction.read(datastore, path).get();
             return optional.map(normalizedNode -> withDefa == null ? normalizedNode :
                 prepareDataByParamWithDef(normalizedNode, path, withDefa)).orElse(null);
         } catch (InterruptedException e) {
@@ -558,7 +537,7 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
+    private NormalizedNode prepareDataByParamWithDef(final NormalizedNode result,
             final YangInstanceIdentifier path, final String withDefa) {
         boolean trim;
         switch (withDefa) {
@@ -572,12 +551,12 @@ public class BrokerFacade implements Closeable {
                 throw new RestconfDocumentedException("Bad value used with with-defaults parameter : " + withDefa);
         }
 
-        final EffectiveModelContext ctx = controllerContext.getGlobalSchema();
-        final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
+        final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(controllerContext.getGlobalSchema());
         final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
         if (result instanceof ContainerNode) {
-            final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder =
-                    Builders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
+            final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder = Builders.containerBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(baseSchemaNode.getQName()));
+
             buildCont(builder, (ContainerNode) result, baseSchemaCtxTree, path, trim);
             return builder.build();
         }
@@ -593,37 +572,39 @@ public class BrokerFacade implements Closeable {
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
             final MapEntryNode result, final DataSchemaContextTree baseSchemaCtxTree,
             final YangInstanceIdentifier actualPath, final boolean trim, final List<QName> keys) {
-        for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
+        for (final DataContainerChild child : result.body()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> childBuilder =
-                        Builders.containerBuilder((ContainerSchemaNode) childSchema);
+                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> childBuilder = Builders.containerBuilder()
+                        .withNodeIdentifier(NodeIdentifier.create(childSchema.getQName()));
                 buildCont(childBuilder, (ContainerNode) child, baseSchemaCtxTree, path, trim);
                 builder.withChild(childBuilder.build());
             } else if (child instanceof MapNode) {
-                final CollectionNodeBuilder<MapEntryNode, MapNode> childBuilder =
-                        Builders.mapBuilder((ListSchemaNode) childSchema);
+                final CollectionNodeBuilder<MapEntryNode, SystemMapNode> childBuilder = Builders.mapBuilder()
+                    .withNodeIdentifier(NodeIdentifier.create(childSchema.getQName()));
+
                 buildList(childBuilder, (MapNode) child, baseSchemaCtxTree, path, trim,
                         ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = child.getValue();
+                final Object nodeVal = child.body();
                 final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
-                        Builders.leafBuilder((LeafSchemaNode) childSchema);
-                if (keys.contains(child.getNodeType())) {
-                    leafBuilder.withValue(child.getValue());
+                    Builders.leafBuilder()
+                        .withNodeIdentifier(NodeIdentifier.create(childSchema.getQName()));
+                if (keys.contains(child.getIdentifier().getNodeType())) {
+                    leafBuilder.withValue(child.body());
                     builder.withChild(leafBuilder.build());
                 } else {
                     if (trim) {
                         if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(child.getValue());
+                            leafBuilder.withValue(child.body());
                             builder.withChild(leafBuilder.build());
                         }
                     } else {
                         if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(child.getValue());
+                            leafBuilder.withValue(child.body());
                             builder.withChild(leafBuilder.build());
                         }
                     }
@@ -632,10 +613,10 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private void buildList(final CollectionNodeBuilder<MapEntryNode, MapNode> builder, final MapNode result,
+    private void buildList(final CollectionNodeBuilder<MapEntryNode, SystemMapNode> builder, final MapNode result,
             final DataSchemaContextTree baseSchemaCtxTree, final YangInstanceIdentifier path, final boolean trim,
             final List<QName> keys) {
-        for (final MapEntryNode mapEntryNode : result.getValue()) {
+        for (final MapEntryNode mapEntryNode : result.body()) {
             final YangInstanceIdentifier actualNode = path.node(mapEntryNode.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(actualNode).orElseThrow()
                     .getDataSchemaNode();
@@ -649,33 +630,33 @@ public class BrokerFacade implements Closeable {
     private void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
             final ContainerNode result, final DataSchemaContextTree baseSchemaCtxTree,
             final YangInstanceIdentifier actualPath, final boolean trim) {
-        for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
+        for (final DataContainerChild child : result.body()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.findChild(path).orElseThrow().getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builderChild =
-                        Builders.containerBuilder((ContainerSchemaNode) childSchema);
+                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builderChild = Builders.containerBuilder()
+                        .withNodeIdentifier(NodeIdentifier.create(childSchema.getQName()));
                 buildCont(builderChild, result, baseSchemaCtxTree, actualPath, trim);
                 builder.withChild(builderChild.build());
             } else if (child instanceof MapNode) {
-                final CollectionNodeBuilder<MapEntryNode, MapNode> childBuilder =
-                        Builders.mapBuilder((ListSchemaNode) childSchema);
+                final CollectionNodeBuilder<MapEntryNode, SystemMapNode> childBuilder = Builders.mapBuilder()
+                        .withNodeIdentifier(NodeIdentifier.create(childSchema.getQName()));
                 buildList(childBuilder, (MapNode) child, baseSchemaCtxTree, path, trim,
                         ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = child.getValue();
+                final Object nodeVal = child.body();
                 final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(child.getValue());
+                        leafBuilder.withValue(child.body());
                         builder.withChild(leafBuilder.build());
                     }
                 } else {
                     if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(child.getValue());
+                        leafBuilder.withValue(child.body());
                         builder.withChild(leafBuilder.build());
                     }
                 }
@@ -688,7 +669,7 @@ public class BrokerFacade implements Closeable {
      */
     private FluentFuture<? extends CommitInfo> postDataViaTransaction(
             final DOMDataTreeReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final YangInstanceIdentifier path, final NormalizedNode payload,
             final EffectiveModelContext schemaContext, final String insert, final String point) {
         LOG.trace("POST {} via Restconf: {} with payload {}", datastore.name(), path, payload);
         postData(rwTransaction, datastore, path, payload, schemaContext, insert, point);
@@ -700,14 +681,14 @@ public class BrokerFacade implements Closeable {
      */
     private void postDataWithinTransaction(
             final DOMDataTreeReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final YangInstanceIdentifier path, final NormalizedNode payload,
             final EffectiveModelContext schemaContext) {
         LOG.trace("POST {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
         postData(rwTransaction, datastore, path, payload, schemaContext, null, null);
     }
 
     private void postData(final DOMDataTreeReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
-                          final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+                          final YangInstanceIdentifier path, final NormalizedNode payload,
                           final EffectiveModelContext schemaContext, final String insert, final String point) {
         if (insert == null) {
             makeNormalPost(rwTransaction, datastore, path, payload, schemaContext);
@@ -719,9 +700,8 @@ public class BrokerFacade implements Closeable {
         switch (insert) {
             case "first":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final OrderedMapNode readList =
-                            (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
-                    if (readList == null || readList.getValue().isEmpty()) {
+                    final UserMapNode readList = (UserMapNode) this.readConfigurationData(path.getParent().getParent());
+                    if (readList == null || readList.isEmpty()) {
                         simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
                         rwTransaction.delete(datastore, path.getParent().getParent());
@@ -730,9 +710,9 @@ public class BrokerFacade implements Closeable {
                             schemaContext);
                     }
                 } else {
-                    final OrderedLeafSetNode<?> readLeafList =
-                            (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                    final UserLeafSetNode<?> readLeafList =
+                            (UserLeafSetNode<?>) readConfigurationData(path.getParent());
+                    if (readLeafList == null || readLeafList.body().isEmpty()) {
                         simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
                         rwTransaction.delete(datastore, path.getParent());
@@ -747,9 +727,8 @@ public class BrokerFacade implements Closeable {
                 break;
             case "before":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final OrderedMapNode readList =
-                            (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
-                    if (readList == null || readList.getValue().isEmpty()) {
+                    final UserMapNode readList = (UserMapNode) this.readConfigurationData(path.getParent().getParent());
+                    if (readList == null || readList.body().isEmpty()) {
                         simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
                         insertWithPointListPost(rwTransaction, datastore, path, payload, schemaContext, point,
@@ -757,9 +736,9 @@ public class BrokerFacade implements Closeable {
                             true);
                     }
                 } else {
-                    final OrderedLeafSetNode<?> readLeafList =
-                            (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                    final UserLeafSetNode<?> readLeafList =
+                            (UserLeafSetNode<?>) readConfigurationData(path.getParent());
+                    if (readLeafList == null || readLeafList.isEmpty()) {
                         simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
                         insertWithPointLeafListPost(rwTransaction, datastore, path, payload, schemaContext, point,
@@ -769,9 +748,8 @@ public class BrokerFacade implements Closeable {
                 break;
             case "after":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final OrderedMapNode readList =
-                            (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
-                    if (readList == null || readList.getValue().isEmpty()) {
+                    final UserMapNode readList = (UserMapNode) this.readConfigurationData(path.getParent().getParent());
+                    if (readList == null || readList.body().isEmpty()) {
                         simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
                         insertWithPointListPost(rwTransaction, datastore, path, payload, schemaContext, point,
@@ -779,9 +757,9 @@ public class BrokerFacade implements Closeable {
                             false);
                     }
                 } else {
-                    final OrderedLeafSetNode<?> readLeafList =
-                            (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                    final UserLeafSetNode<?> readLeafList =
+                            (UserLeafSetNode<?>) readConfigurationData(path.getParent());
+                    if (readLeafList == null || readLeafList.isEmpty()) {
                         simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
                         insertWithPointLeafListPost(rwTransaction, datastore, path, payload, schemaContext, point,
@@ -797,13 +775,13 @@ public class BrokerFacade implements Closeable {
     }
 
     private void insertWithPointLeafListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
-            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
-            final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
+            final SchemaContext schemaContext, final String point, final UserLeafSetNode<?> readLeafList,
             final boolean before) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext.toInstanceIdentifier(point);
         int lastItemPosition = 0;
-        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+        for (final LeafSetEntryNode<?> nodeChild : readLeafList.body()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
@@ -813,10 +791,9 @@ public class BrokerFacade implements Closeable {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final NormalizedNode<?, ?> emptySubtree =
-                ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
+        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
         rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+        for (final LeafSetEntryNode<?> nodeChild : readLeafList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 checkItemDoesNotExists(rwTransaction, datastore, path);
                 simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
@@ -829,13 +806,12 @@ public class BrokerFacade implements Closeable {
     }
 
     private void insertWithPointListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
-            final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
-            final String point, final MapNode readList, final boolean before) {
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
+            final SchemaContext schemaContext, final String point, final MapNode readList, final boolean before) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext.toInstanceIdentifier(point);
         int lastItemPosition = 0;
-        for (final MapEntryNode mapEntryNode : readList.getValue()) {
+        for (final MapEntryNode mapEntryNode : readList.body()) {
             if (mapEntryNode.getIdentifier()
                     .equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
@@ -846,10 +822,9 @@ public class BrokerFacade implements Closeable {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final NormalizedNode<?, ?> emptySubtree =
-                ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
+        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
         rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        for (final MapEntryNode mapEntryNode : readList.getValue()) {
+        for (final MapEntryNode mapEntryNode : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 checkItemDoesNotExists(rwTransaction, datastore, path);
                 simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
@@ -884,22 +859,21 @@ public class BrokerFacade implements Closeable {
     }
 
     private void makeNormalPost(final DOMDataTreeReadWriteTransaction rwTransaction,
-            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
             final SchemaContext schemaContext) {
-        final Collection<? extends NormalizedNode<?, ?>> children;
+        final Collection<? extends NormalizedNode> children;
         if (payload instanceof MapNode) {
-            children = ((MapNode) payload).getValue();
+            children = ((MapNode) payload).body();
         } else if (payload instanceof LeafSetNode) {
-            children = ((LeafSetNode<?>) payload).getValue();
+            children = ((LeafSetNode<?>) payload).body();
         } else {
             simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
             return;
         }
 
-        final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
+        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         if (children.isEmpty()) {
             if (isMounted != null && !isMounted.get()) {
-
                 rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()),
                                     emptySubtree);
                 ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
@@ -917,7 +891,7 @@ public class BrokerFacade implements Closeable {
             rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
             ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
         }
-        for (final NormalizedNode<?, ?> child : children) {
+        for (final NormalizedNode child : children) {
             // FIXME: we really want a create(YangInstanceIdentifier, NormalizedNode) method in the transaction,
             //        as that would allow us to skip the existence checks
             rwTransaction.put(datastore, path.node(child.getIdentifier()), child);
@@ -946,7 +920,7 @@ public class BrokerFacade implements Closeable {
     }
 
     private void simplePostPut(final DOMDataTreeReadWriteTransaction rwTransaction,
-            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
             final SchemaContext schemaContext) {
         checkItemDoesNotExists(rwTransaction, datastore, path);
         if (isMounted != null && !isMounted.get()) {
@@ -1011,7 +985,7 @@ public class BrokerFacade implements Closeable {
      */
     private FluentFuture<? extends CommitInfo> putDataViaTransaction(
             final DOMDataTreeReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final YangInstanceIdentifier path, final NormalizedNode payload,
             final EffectiveModelContext schemaContext, final String insert, final String point) {
         LOG.trace("Put {} via Restconf: {} with payload {}", datastore.name(), path, payload);
         putData(readWriteTransaction, datastore, path, payload, schemaContext, insert, point);
@@ -1023,7 +997,7 @@ public class BrokerFacade implements Closeable {
      */
     private void putDataWithinTransaction(
             final DOMDataTreeReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final YangInstanceIdentifier path, final NormalizedNode payload,
             final EffectiveModelContext schemaContext) {
         LOG.trace("Put {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
         putData(writeTransaction, datastore, path, payload, schemaContext, null, null);
@@ -1031,7 +1005,7 @@ public class BrokerFacade implements Closeable {
 
     // FIXME: This is doing correct put for container and list children, not sure if this will work for choice case
     private void putData(final DOMDataTreeReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final YangInstanceIdentifier path, final NormalizedNode payload,
             final EffectiveModelContext schemaContext, final String insert, final String point) {
         if (insert == null) {
             makePut(rwTransaction, datastore, path, payload, schemaContext);
@@ -1043,9 +1017,9 @@ public class BrokerFacade implements Closeable {
         switch (insert) {
             case "first":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final OrderedMapNode readList =
-                            (OrderedMapNode) this.readConfigurationData(path.getParent());
-                    if (readList == null || readList.getValue().isEmpty()) {
+                    final UserMapNode readList =
+                            (UserMapNode) this.readConfigurationData(path.getParent());
+                    if (readList == null || readList.isEmpty()) {
                         simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
                         rwTransaction.delete(datastore, path.getParent());
@@ -1053,9 +1027,9 @@ public class BrokerFacade implements Closeable {
                         makePut(rwTransaction, datastore, path.getParent(), readList, schemaContext);
                     }
                 } else {
-                    final OrderedLeafSetNode<?> readLeafList =
-                            (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                    final UserLeafSetNode<?> readLeafList =
+                            (UserLeafSetNode<?>) readConfigurationData(path.getParent());
+                    if (readLeafList == null || readLeafList.isEmpty()) {
                         simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
                         rwTransaction.delete(datastore, path.getParent());
@@ -1070,18 +1044,18 @@ public class BrokerFacade implements Closeable {
                 break;
             case "before":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final OrderedMapNode readList =
-                            (OrderedMapNode) this.readConfigurationData(path.getParent());
-                    if (readList == null || readList.getValue().isEmpty()) {
+                    final UserMapNode readList =
+                            (UserMapNode) this.readConfigurationData(path.getParent());
+                    if (readList == null || readList.isEmpty()) {
                         simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
                         insertWithPointListPut(rwTransaction, datastore, path, payload, schemaContext, point,
                             readList, true);
                     }
                 } else {
-                    final OrderedLeafSetNode<?> readLeafList =
-                            (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                    final UserLeafSetNode<?> readLeafList =
+                            (UserLeafSetNode<?>) readConfigurationData(path.getParent());
+                    if (readLeafList == null || readLeafList.isEmpty()) {
                         simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
                         insertWithPointLeafListPut(rwTransaction, datastore, path, payload, schemaContext, point,
@@ -1091,18 +1065,18 @@ public class BrokerFacade implements Closeable {
                 break;
             case "after":
                 if (schemaNode instanceof ListSchemaNode) {
-                    final OrderedMapNode readList =
-                            (OrderedMapNode) this.readConfigurationData(path.getParent());
-                    if (readList == null || readList.getValue().isEmpty()) {
+                    final UserMapNode readList =
+                            (UserMapNode) this.readConfigurationData(path.getParent());
+                    if (readList == null || readList.isEmpty()) {
                         simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
                         insertWithPointListPut(rwTransaction, datastore, path, payload, schemaContext, point,
                             readList, false);
                     }
                 } else {
-                    final OrderedLeafSetNode<?> readLeafList =
-                            (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                    final UserLeafSetNode<?> readLeafList =
+                            (UserLeafSetNode<?>) readConfigurationData(path.getParent());
+                    if (readLeafList == null || readLeafList.isEmpty()) {
                         simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
                         insertWithPointLeafListPut(rwTransaction, datastore, path, payload, schemaContext, point,
@@ -1118,13 +1092,13 @@ public class BrokerFacade implements Closeable {
     }
 
     private void insertWithPointLeafListPut(final DOMDataTreeWriteTransaction tx,
-            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
-            final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
+            final SchemaContext schemaContext, final String point, final UserLeafSetNode<?> readLeafList,
             final boolean before) {
         tx.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext.toInstanceIdentifier(point);
         int index1 = 0;
-        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+        for (final LeafSetEntryNode<?> nodeChild : readLeafList.body()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
@@ -1134,10 +1108,9 @@ public class BrokerFacade implements Closeable {
             index1++;
         }
         int index2 = 0;
-        final NormalizedNode<?, ?> emptySubtree =
-                ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
+        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
         tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+        for (final LeafSetEntryNode<?> nodeChild : readLeafList.body()) {
             if (index2 == index1) {
                 simplePut(datastore, path, tx, schemaContext, payload);
             }
@@ -1148,12 +1121,12 @@ public class BrokerFacade implements Closeable {
     }
 
     private void insertWithPointListPut(final DOMDataTreeWriteTransaction tx, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
-            final String point, final OrderedMapNode readList, final boolean before) {
+            final YangInstanceIdentifier path, final NormalizedNode payload, final SchemaContext schemaContext,
+            final String point, final UserMapNode readList, final boolean before) {
         tx.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext.toInstanceIdentifier(point);
         int index1 = 0;
-        for (final MapEntryNode mapEntryNode : readList.getValue()) {
+        for (final MapEntryNode mapEntryNode : readList.body()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
@@ -1163,10 +1136,9 @@ public class BrokerFacade implements Closeable {
             index1++;
         }
         int index2 = 0;
-        final NormalizedNode<?, ?> emptySubtree =
-                ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
+        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
         tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        for (final MapEntryNode mapEntryNode : readList.getValue()) {
+        for (final MapEntryNode mapEntryNode : readList.body()) {
             if (index2 == index1) {
                 simplePut(datastore, path, tx, schemaContext, payload);
             }
@@ -1177,14 +1149,14 @@ public class BrokerFacade implements Closeable {
     }
 
     private void makePut(final DOMDataTreeWriteTransaction tx, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+            final YangInstanceIdentifier path, final NormalizedNode payload, final SchemaContext schemaContext) {
         if (payload instanceof MapNode) {
-            final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             if (isMounted != null && !isMounted.get()) {
                 tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
                 ensureParentsByMerge(datastore, path, tx, schemaContext);
             }
-            for (final MapEntryNode child : ((MapNode) payload).getValue()) {
+            for (final MapEntryNode child : ((MapNode) payload).body()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 tx.put(datastore, childPath, child);
             }
@@ -1194,8 +1166,7 @@ public class BrokerFacade implements Closeable {
     }
 
     private void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-            final DOMDataTreeWriteTransaction tx, final SchemaContext schemaContext,
-            final NormalizedNode<?, ?> payload) {
+            final DOMDataTreeWriteTransaction tx, final SchemaContext schemaContext, final NormalizedNode payload) {
         if (isMounted != null && !isMounted.get()) {
             ensureParentsByMerge(datastore, path, tx, schemaContext);
         }
@@ -1218,7 +1189,7 @@ public class BrokerFacade implements Closeable {
     }
 
     private static void mergeDataWithinTransaction(final DOMDataTreeWriteTransaction tx,
-            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
             final SchemaContext schemaContext) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
         ensureParentsByMerge(datastore, path, tx, schemaContext);
@@ -1265,9 +1236,8 @@ public class BrokerFacade implements Closeable {
 
         checkArgument(rootNormalizedPath != null, "Empty path received");
 
-        final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
-                YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
-        tx.merge(store, rootNormalizedPath, parentStructure);
+        tx.merge(store, rootNormalizedPath, ImmutableNodes.fromInstanceId(schemaContext,
+            YangInstanceIdentifier.create(normalizedPathWithoutChildArgs)));
     }
 
     private static RestconfDocumentedException dataBrokerUnavailable(final YangInstanceIdentifier path) {

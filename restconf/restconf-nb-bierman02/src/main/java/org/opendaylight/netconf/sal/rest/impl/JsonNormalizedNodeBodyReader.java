@@ -64,7 +64,7 @@ public class JsonNormalizedNodeBodyReader
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
 
-    public JsonNormalizedNodeBodyReader(ControllerContext controllerContext) {
+    public JsonNormalizedNodeBodyReader(final ControllerContext controllerContext) {
         super(controllerContext);
     }
 
@@ -114,15 +114,12 @@ public class JsonNormalizedNodeBodyReader
         if (isPost) {
             // FIXME: We need dispatch for RPC.
             parentSchema = path.getSchemaNode();
-        } else if (path.getSchemaNode() instanceof SchemaContext) {
+        } else if (path.getSchemaNode() instanceof SchemaContext
+                    || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
             parentSchema = path.getSchemaContext();
         } else {
-            if (SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
-                parentSchema = path.getSchemaContext();
-            } else {
-                parentSchema = SchemaContextUtil
-                        .findDataSchemaNode(path.getSchemaContext(), path.getSchemaNode().getPath().getParent());
-            }
+            parentSchema = SchemaContextUtil
+                    .findDataSchemaNode(path.getSchemaContext(), path.getSchemaNode().getPath().getParent());
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
@@ -131,28 +128,28 @@ public class JsonNormalizedNodeBodyReader
                 StandardCharsets.UTF_8));
         jsonParser.parse(reader);
 
-        NormalizedNode<?, ?> result = resultHolder.getResult();
+        NormalizedNode result = resultHolder.getResult();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> newIIContext;
 
         while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
-            final Object childNode = ((DataContainerNode<?>) result).getValue().iterator().next();
+            final Object childNode = ((DataContainerNode) result).body().iterator().next();
             if (isPost) {
                 iiToDataList.add(result.getIdentifier());
             }
-            result = (NormalizedNode<?, ?>) childNode;
+            result = (NormalizedNode) childNode;
         }
 
         if (isPost) {
             if (result instanceof MapEntryNode) {
-                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getNodeType()));
+                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getIdentifier().getNodeType()));
                 iiToDataList.add(result.getIdentifier());
             } else {
                 iiToDataList.add(result.getIdentifier());
             }
         } else {
             if (result instanceof MapNode) {
-                result = Iterables.getOnlyElement(((MapNode) result).getValue());
+                result = Iterables.getOnlyElement(((MapNode) result).body());
             }
         }
 

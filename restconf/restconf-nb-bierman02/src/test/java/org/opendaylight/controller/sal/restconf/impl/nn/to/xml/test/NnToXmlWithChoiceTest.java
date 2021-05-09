@@ -24,9 +24,8 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -35,13 +34,12 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 
 public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
-
-    private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
     private static EffectiveModelContext schemaContext;
+
+    private final NormalizedNodeXmlBodyWriter xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
 
     public NnToXmlWithChoiceTest() {
         super(schemaContext, null);
-        xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
     @BeforeClass
@@ -51,54 +49,44 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
 
     @Test
     public void cnSnToXmlWithYangChoice() throws Exception {
-        NormalizedNodeContext normalizedNodeContext = prepareNNC("lf1",
-                "String data1");
+        NormalizedNodeContext normalizedNodeContext = prepareNNC("lf1", "String data1");
         OutputStream output = new ByteArrayOutputStream();
-        xmlBodyWriter.writeTo(normalizedNodeContext, null, null, null,
-                    mediaType, null, output);
+        xmlBodyWriter.writeTo(normalizedNodeContext, null, null, null, mediaType, null, output);
         assertTrue(output.toString().contains("<lf1>String data1</lf1>"));
 
         normalizedNodeContext = prepareNNC("lf2", "String data2");
         output = new ByteArrayOutputStream();
 
-        xmlBodyWriter.writeTo(normalizedNodeContext, null, null, null,
-                    mediaType, null, output);
+        xmlBodyWriter.writeTo(normalizedNodeContext, null, null, null, mediaType, null, output);
         assertTrue(output.toString().contains("<lf2>String data2</lf2>"));
     }
 
     private static NormalizedNodeContext prepareNNC(final String name, final Object value) {
-
-        final QName contQname = QName.create("module:with:choice", "2013-12-18",
-                "cont");
+        final QName contQname = QName.create("module:with:choice", "2013-12-18", "cont");
         final QName lf = QName.create("module:with:choice", "2013-12-18", name);
         final QName choA = QName.create("module:with:choice", "2013-12-18", "choA");
 
-        final DataSchemaNode contSchemaNode = schemaContext
-                .getDataChildByName(contQname);
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataContainerNodeAttrBuilder = Builders
-                .containerBuilder((ContainerSchemaNode) contSchemaNode);
+        final DataSchemaNode contSchemaNode = schemaContext.getDataChildByName(contQname);
 
-        final DataSchemaNode choiceSchemaNode = ((ContainerSchemaNode) contSchemaNode)
-                .getDataChildByName(choA);
+        final DataSchemaNode choiceSchemaNode = ((ContainerSchemaNode) contSchemaNode).getDataChildByName(choA);
         assertTrue(choiceSchemaNode instanceof ChoiceSchemaNode);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ChoiceNode> dataChoice = Builders
-                .choiceBuilder((ChoiceSchemaNode) choiceSchemaNode);
+        final DataContainerNodeBuilder<NodeIdentifier, ChoiceNode> dataChoice = Builders.choiceBuilder()
+                .withNodeIdentifier(new NodeIdentifier(choA));
 
-        final List<DataSchemaNode> instanceLf = ControllerContext
-                .findInstanceDataChildrenByName(
+        final List<DataSchemaNode> instanceLf = ControllerContext.findInstanceDataChildrenByName(
                         (DataNodeContainer) contSchemaNode, lf.getLocalName());
         final DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
 
-        dataChoice.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf)
-                .withValue(value).build());
+        dataChoice.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue(value).build());
 
-        dataContainerNodeAttrBuilder.withChild(dataChoice.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null,
-                        contSchemaNode, null, schemaContext),
-                dataContainerNodeAttrBuilder.build());
+            new InstanceIdentifierContext<>(null, contSchemaNode, null, schemaContext),
+            Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(contQname))
+                .withChild(dataChoice.build())
+                .build());
 
         return testNormalizedNodeContext;
     }

@@ -9,7 +9,6 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -35,24 +34,18 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class URIParametersParsing {
@@ -121,58 +114,37 @@ public class URIParametersParsing {
         ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcSalRemoteModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
+                rpcInputSchemaNode = rpc.getInput();
                 break;
             }
         }
         assertNotNull("RPC ContainerSchemaNode was not found!", rpcInputSchemaNode);
 
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> container =
-                Builders.containerBuilder(rpcInputSchemaNode);
-
-        final QName pathQName =
-                QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "path");
-        final DataSchemaNode pathSchemaNode = rpcInputSchemaNode.getDataChildByName(pathQName);
-        assertTrue(pathSchemaNode instanceof LeafSchemaNode);
-        final LeafNode<Object> pathNode = Builders.leafBuilder((LeafSchemaNode) pathSchemaNode)
-                .withValue(YangInstanceIdentifier.builder()
-                        .node(QName.create("urn:opendaylight:inventory", "2013-08-19", "nodes")).build()).build();
-        container.withChild(pathNode);
-
         final AugmentationSchemaNode augmentationSchema = requireNonNull(rpcInputSchemaNode.getAvailableAugmentations()
                 .iterator().next());
-        final DataContainerNodeBuilder<AugmentationIdentifier, AugmentationNode> augmentationBuilder =
-                Builders.augmentationBuilder(augmentationSchema);
-
-        final QName dataStoreQName = QName.create("urn:sal:restconf:event:subscription", "2014-07-08", "datastore");
-        final DataSchemaNode dsSchemaNode = augmentationSchema.getDataChildByName(dataStoreQName);
-        assertTrue(dsSchemaNode instanceof LeafSchemaNode);
-        final LeafNode<Object> dsNode = Builders.leafBuilder((LeafSchemaNode) dsSchemaNode)
-                .withValue(datastore).build();
-        augmentationBuilder.withChild(dsNode);
-
-        final QName scopeQName = QName.create("urn:sal:restconf:event:subscription", "2014-07-08", "scope");
-        final DataSchemaNode scopeSchemaNode = augmentationSchema.getDataChildByName(scopeQName);
-        assertTrue(scopeSchemaNode instanceof LeafSchemaNode);
-        final LeafNode<Object> scopeNode = Builders.leafBuilder((LeafSchemaNode) scopeSchemaNode)
-                .withValue(scope).build();
-        augmentationBuilder.withChild(scopeNode);
-
-        final QName outputQName =
-                QName.create("urn:sal:restconf:event:subscription", "2014-07-08", "notification-output-type");
-        final DataSchemaNode outputSchemaNode = augmentationSchema.getDataChildByName(outputQName);
-        assertTrue(outputSchemaNode instanceof LeafSchemaNode);
-        final LeafNode<Object> outputNode =
-                Builders.leafBuilder((LeafSchemaNode) outputSchemaNode).withValue("XML").build();
-        augmentationBuilder.withChild(outputNode);
-
-        container.withChild(augmentationBuilder.build());
 
         when(rpcDef.getInput()).thenReturn((InputSchemaNode) rpcInputSchemaNode);
         when(rpcDef.getPath()).thenReturn(SchemaPath.create(true, rpcQName));
         when(rpcDef.getQName()).thenReturn(rpcQName);
 
         return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcDef, null, schema),
-                container.build());
+            Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(rpcInputSchemaNode.getQName()))
+                .withChild(ImmutableNodes.leafNode(
+                    QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "path"),
+                    YangInstanceIdentifier.of(QName.create("urn:opendaylight:inventory", "2013-08-19", "nodes"))))
+                .withChild(Builders.augmentationBuilder()
+                    .withNodeIdentifier(DataSchemaContextNode.augmentationIdentifierFrom(augmentationSchema))
+                    .withChild(ImmutableNodes.leafNode(
+                        QName.create("urn:sal:restconf:event:subscription", "2014-07-08", "datastore"),
+                        datastore))
+                    .withChild(ImmutableNodes.leafNode(
+                        QName.create("urn:sal:restconf:event:subscription", "2014-07-08", "scope"),
+                        scope))
+                    .withChild(ImmutableNodes.leafNode(
+                        QName.create("urn:sal:restconf:event:subscription", "2014-07-08", "notification-output-type"),
+                        "XML"))
+                    .build())
+                .build());
     }
 }

@@ -40,32 +40,24 @@ public class JsonIdentityrefToNnTest extends AbstractBodyReaderTest {
 
         final String uri = "identityref-module:cont";
         mockBodyReader(uri, this.jsonBodyReader, false);
-        final InputStream inputStream = this.getClass().getResourceAsStream(
-                "/json-to-nn/identityref/json/data.json");
+        final InputStream inputStream = this.getClass().getResourceAsStream("/json-to-nn/identityref/json/data.json");
 
         final NormalizedNodeContext normalizedNodeContext = this.jsonBodyReader.readFrom(
                 null, null, null, this.mediaType, null, inputStream);
 
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
 
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
 
         assertTrue(dataTree.contains("cont1"));
-        assertTrue(dataTree
-                .contains("lf11 (identity:module?revision=2013-12-02)iden"));
-        assertTrue(dataTree
-                .contains("lf12 (identityref:module?revision=2013-12-02)iden_local"));
-        assertTrue(dataTree
-                .contains("lf13 (identityref:module?revision=2013-12-02)iden_local"));
-        assertTrue(dataTree
-                .contains("lf14 (identity:module?revision=2013-12-02)iden"));
+        assertTrue(dataTree.contains("lf11 (identity:module?revision=2013-12-02)iden"));
+        assertTrue(dataTree.contains("lf12 (identityref:module?revision=2013-12-02)iden_local"));
+        assertTrue(dataTree.contains("lf13 (identityref:module?revision=2013-12-02)iden_local"));
+        assertTrue(dataTree.contains("lf14 (identity:module?revision=2013-12-02)iden"));
     }
 
     @Override
     protected MediaType getMediaType() {
         return null;
     }
-
 }

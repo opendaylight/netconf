@@ -13,7 +13,6 @@ import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
@@ -26,8 +25,8 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
@@ -42,7 +41,7 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
     private static EffectiveModelContext schemaContext;
 
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
-        URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
+        XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
 
     public TestJsonBodyReaderMountPoint() throws NoSuchFieldException, SecurityException {
         super(schemaContext, mock(DOMMountPoint.class));
@@ -115,16 +114,16 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
         checkNormalizedNodeContext(returnValue);
         final ContainerNode inputNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName
-                .create(inputNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNode = inputNode
-                .getChild(yangCont.getLastPathArgument());
+                .create(inputNode.getIdentifier().getNodeType(), "cont"));
+        final Optional<DataContainerChild> contDataNode = inputNode.findChildByArg(yangCont.getLastPathArgument());
         assertTrue(contDataNode.isPresent());
         assertTrue(contDataNode.get() instanceof ContainerNode);
-        final YangInstanceIdentifier yangleaf = YangInstanceIdentifier.of(QName.create(inputNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode =
-                ((ContainerNode) contDataNode.get()).getChild(yangleaf.getLastPathArgument());
+        final YangInstanceIdentifier yangleaf =
+                YangInstanceIdentifier.of(QName.create(inputNode.getIdentifier().getNodeType(), "lf"));
+        final Optional<DataContainerChild> leafDataNode =
+                ((ContainerNode) contDataNode.get()).findChildByArg(yangleaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
-        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
+        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().body().toString()));
     }
 
     private void checkExpectValueNormalizeNodeContext(

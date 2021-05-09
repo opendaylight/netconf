@@ -17,9 +17,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWrit
  * This class just delegates all of the functionality to Yangtools normalized node writer.
  */
 public final class RestconfDelegatingNormalizedNodeWriter implements RestconfNormalizedNodeWriter {
-    private NormalizedNodeWriter delegNNWriter;
+    private final NormalizedNodeWriter delegNNWriter;
 
-    private RestconfDelegatingNormalizedNodeWriter(NormalizedNodeStreamWriter streamWriter, final boolean
+    private RestconfDelegatingNormalizedNodeWriter(final NormalizedNodeStreamWriter streamWriter, final boolean
             orderKeyLeaves) {
         this.delegNNWriter = NormalizedNodeWriter.forStreamWriter(streamWriter, orderKeyLeaves);
     }
@@ -33,7 +33,8 @@ public final class RestconfDelegatingNormalizedNodeWriter implements RestconfNor
         return new RestconfDelegatingNormalizedNodeWriter(writer, orderKeyLeaves);
     }
 
-    public RestconfDelegatingNormalizedNodeWriter write(final NormalizedNode<?, ?> node) throws IOException {
+    @Override
+    public RestconfDelegatingNormalizedNodeWriter write(final NormalizedNode node) throws IOException {
         delegNNWriter.write(node);
         return this;
     }

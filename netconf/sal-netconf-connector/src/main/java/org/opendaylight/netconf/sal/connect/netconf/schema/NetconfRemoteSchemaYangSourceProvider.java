@@ -34,9 +34,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
@@ -80,17 +80,17 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         return builder.build();
     }
 
-    private static Optional<String> getSchemaFromRpc(final RemoteDeviceId id, final NormalizedNode<?, ?> result) {
+    private static Optional<String> getSchemaFromRpc(final RemoteDeviceId id, final NormalizedNode result) {
         if (result == null) {
             return Optional.empty();
         }
 
-        final Optional<DataContainerChild<?, ?>> child = ((ContainerNode) result).getChild(NETCONF_DATA_PATHARG);
+        final Optional<DataContainerChild> child = ((ContainerNode) result).findChildByArg(NETCONF_DATA_PATHARG);
         checkState(child.isPresent() && child.get() instanceof DOMSourceAnyxmlNode,
                 "%s Unexpected response to get-schema, expected response with one child %s, but was %s", id,
                 NETCONF_DATA, result);
 
-        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child.get()).getValue();
+        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child.get()).body();
         final Element dataNode = (Element) requireNonNull(wrappedNode.getNode());
 
         return Optional.of(dataNode.getTextContent().trim());
@@ -112,7 +112,8 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
                         "%s: Unexpected response to get-schema, schema not present in message for: %s", id,
                         sourceIdentifier);
                     LOG.debug("{}: YANG Schema successfully retrieved for {}:{}", id, moduleName, revision);
-                    return new NetconfYangTextSchemaSource(id, sourceIdentifier, schemaString);
+                    return new NetconfYangTextSchemaSource(id, sourceIdentifier, moduleName,
+                        schemaString.get().getBytes(StandardCharsets.UTF_8));
                 }
 
                 LOG.warn("{}: YANG schema was not successfully retrieved for {}. Errors: {}", id, sourceIdentifier,
@@ -125,13 +126,15 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
 
     static class NetconfYangTextSchemaSource extends YangTextSchemaSource {
         private final RemoteDeviceId id;
-        private final Optional<String> schemaString;
+        private final byte[] schemaBytes;
+        private final String symbolicName;
 
         NetconfYangTextSchemaSource(final RemoteDeviceId id, final SourceIdentifier sourceIdentifier,
-                final Optional<String> schemaString) {
+                final String symbolicName, final byte[] schemaBytes) {
             super(sourceIdentifier);
+            this.symbolicName = requireNonNull(symbolicName);
             this.id = id;
-            this.schemaString = schemaString;
+            this.schemaBytes = schemaBytes.clone();
         }
 
         @Override
@@ -141,7 +144,12 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
 
         @Override
         public InputStream openStream() {
-            return new ByteArrayInputStream(schemaString.get().getBytes(StandardCharsets.UTF_8));
+            return new ByteArrayInputStream(schemaBytes);
+        }
+
+        @Override
+        public Optional<String> getSymbolicName() {
+            return Optional.of(symbolicName);
         }
     }
 }

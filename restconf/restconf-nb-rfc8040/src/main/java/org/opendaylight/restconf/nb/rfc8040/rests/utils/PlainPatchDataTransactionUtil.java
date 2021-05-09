@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
  * Util class for plain patch data to DS.
  */
 public final class PlainPatchDataTransactionUtil {
-
     private static final Logger LOG = LoggerFactory.getLogger(PlainPatchDataTransactionUtil.class);
 
     private PlainPatchDataTransactionUtil() {
+        // Hidden on purpose
     }
 
     /**
@@ -49,7 +49,7 @@ public final class PlainPatchDataTransactionUtil {
 
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-        NormalizedNode<?, ?> data = payload.getData();
+        NormalizedNode data = payload.getData();
 
         try {
             LOG.trace("Merge CONFIGURATION within Restconf Patch: {} with payload {}", path, data);

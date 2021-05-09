@@ -144,7 +144,7 @@ public class PostDataTransactionUtilTest {
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             this.iid2);
         final NodeIdentifier identifier =
-                ((ContainerNode) ((Collection<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
+                ((ContainerNode) ((Collection<?>) payload.getData().body()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());
@@ -175,7 +175,7 @@ public class PostDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildList);
 
         final MapNode data = (MapNode) payload.getData();
-        final MapEntryNode entryNode = data.getValue().iterator().next();
+        final MapEntryNode entryNode = data.body().iterator().next();
         final NodeIdentifierWithPredicates identifier = entryNode.getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
@@ -214,7 +214,7 @@ public class PostDataTransactionUtilTest {
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             this.iid2);
         final NodeIdentifier identifier =
-                ((ContainerNode) ((Collection<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
+                ((ContainerNode) ((Collection<?>) payload.getData().body()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node.getParent(), payload.getData());

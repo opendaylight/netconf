@@ -120,7 +120,7 @@ abstract class AbstractNotificationsData {
      *            schema path of data
      * @return {@link DOMResult}
      */
-    protected DOMResult writeNormalizedNode(final NormalizedNode<?, ?> normalized, final EffectiveModelContext context,
+    protected DOMResult writeNormalizedNode(final NormalizedNode normalized, final EffectiveModelContext context,
             final SchemaPath schemaPath) throws IOException, XMLStreamException {
         final Document doc = UntrustedXML.newDocumentBuilder().newDocument();
         final DOMResult result = new DOMResult(doc);

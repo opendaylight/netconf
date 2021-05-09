@@ -19,11 +19,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public final class DataTreeChange {
-    private final NormalizedNode<?, ?> changeRoot;
+    private final NormalizedNode changeRoot;
     private final YangInstanceIdentifier path;
     private final ModifyAction action;
 
-    DataTreeChange(final NormalizedNode<?, ?> changeRoot, final ModifyAction action, final Deque<PathArgument> path) {
+    DataTreeChange(final NormalizedNode changeRoot, final ModifyAction action, final Deque<PathArgument> path) {
         this.changeRoot = requireNonNull(changeRoot);
         this.action = requireNonNull(action);
 
@@ -32,7 +32,7 @@ public final class DataTreeChange {
         this.path = YangInstanceIdentifier.create(builder.build());
     }
 
-    public NormalizedNode<?, ?> getChangeRoot() {
+    public NormalizedNode getChangeRoot() {
         return changeRoot;
     }
 

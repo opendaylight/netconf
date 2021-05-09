@@ -86,6 +86,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -101,13 +102,13 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -143,7 +144,8 @@ public final class RestconfImpl implements RestconfService {
 
     private static final LogicalDatastoreType DEFAULT_DATASTORE = LogicalDatastoreType.CONFIGURATION;
 
-    private static final URI NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT = URI.create("urn:sal:restconf:event:subscription");
+    private static final XMLNamespace NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT =
+        XMLNamespace.of("urn:sal:restconf:event:subscription");
 
     private static final String DATASTORE_PARAM_NAME = "datastore";
 
@@ -155,7 +157,7 @@ public final class RestconfImpl implements RestconfService {
 
     private static final String NETCONF_BASE_PAYLOAD_NAME = "data";
 
-    private static final QName NETCONF_BASE_QNAME = QName.create(QNameModule.create(URI.create(NETCONF_BASE)),
+    private static final QName NETCONF_BASE_QNAME = QName.create(QNameModule.create(XMLNamespace.of(NETCONF_BASE)),
         NETCONF_BASE_PAYLOAD_NAME).intern();
 
     private static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
@@ -399,7 +401,7 @@ public final class RestconfImpl implements RestconfService {
         final SchemaNode schema = payload.getInstanceIdentifierContext().getSchemaNode();
         final ListenableFuture<? extends DOMRpcResult> response;
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final NormalizedNode<?, ?> input =  nonnullInput(schema, payload.getData());
+        final NormalizedNode input =  nonnullInput(schema, payload.getData());
         final EffectiveModelContext schemaContext;
 
         if (mountPoint != null) {
@@ -411,7 +413,7 @@ public final class RestconfImpl implements RestconfService {
             schemaContext = modelContext(mountPoint);
             response = mountRpcServices.get().invokeRpc(schema.getQName(), input);
         } else {
-            final URI namespace = schema.getQName().getNamespace();
+            final XMLNamespace namespace = schema.getQName().getNamespace();
             if (namespace.toString().equals(SAL_REMOTE_NAMESPACE)) {
                 if (identifier.contains(CREATE_DATA_SUBSCR)) {
                     response = invokeSalRemoteRpcSubscribeRPC(payload);
@@ -431,7 +433,7 @@ public final class RestconfImpl implements RestconfService {
         final DOMRpcResult result = checkRpcResponse(response);
 
         RpcDefinition resultNodeSchema = null;
-        final NormalizedNode<?, ?> resultData;
+        final NormalizedNode resultData;
         if (result != null && result.getResult() != null) {
             resultData = result.getResult();
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
@@ -439,7 +441,7 @@ public final class RestconfImpl implements RestconfService {
             resultData = null;
         }
 
-        if (resultData != null && ((ContainerNode) resultData).getValue().isEmpty()) {
+        if (resultData != null && ((ContainerNode) resultData).isEmpty()) {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         } else {
             return new NormalizedNodeContext(
@@ -506,8 +508,8 @@ public final class RestconfImpl implements RestconfService {
             response = this.broker.invokeRpc(rpc.getQName(), input);
         }
 
-        final NormalizedNode<?, ?> result = checkRpcResponse(response).getResult();
-        if (result != null && ((ContainerNode) result).getValue().isEmpty()) {
+        final NormalizedNode result = checkRpcResponse(response).getResult();
+        if (result != null && ((ContainerNode) result).isEmpty()) {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
 
@@ -522,7 +524,7 @@ public final class RestconfImpl implements RestconfService {
             QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
-    private static @NonNull NormalizedNode<?, ?> nonnullInput(final SchemaNode rpc, final NormalizedNode<?, ?> input) {
+    private static @NonNull NormalizedNode nonnullInput(final SchemaNode rpc, final NormalizedNode input) {
         return input != null ? input : defaultInput(rpc.getQName());
     }
 
@@ -585,10 +587,10 @@ public final class RestconfImpl implements RestconfService {
     private ListenableFuture<DOMRpcResult> invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
         final ContainerNode value = (ContainerNode) payload.getData();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(
+        final Optional<DataContainerChild> path = value.findChildByArg(
             new NodeIdentifier(QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(),
                 "path")));
-        final Object pathValue = path.isPresent() ? path.get().getValue() : null;
+        final Object pathValue = path.isPresent() ? path.get().body() : null;
 
         if (!(pathValue instanceof YangInstanceIdentifier)) {
             LOG.debug("Instance identifier {} was not normalized correctly", rpcQName);
@@ -690,7 +692,7 @@ public final class RestconfImpl implements RestconfService {
 
         final InstanceIdentifierContext<?> iiWithData = this.controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
-        NormalizedNode<?, ?> data = null;
+        NormalizedNode data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
         if (mountPoint != null) {
             data = this.broker.readConfigurationData(mountPoint, normalizedII, withDefa);
@@ -708,7 +710,7 @@ public final class RestconfImpl implements RestconfService {
     public NormalizedNodeContext readOperationalData(final String identifier, final UriInfo uriInfo) {
         final InstanceIdentifierContext<?> iiWithData = this.controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
-        NormalizedNode<?, ?> data = null;
+        NormalizedNode data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
         if (mountPoint != null) {
             data = this.broker.readOperationalData(mountPoint, normalizedII);
@@ -835,12 +837,12 @@ public final class RestconfImpl implements RestconfService {
     private static void validateTopLevelNodeName(final NormalizedNodeContext node,
             final YangInstanceIdentifier identifier) {
 
-        final String payloadName = node.getData().getNodeType().getLocalName();
+        final String payloadName = node.getData().getIdentifier().getNodeType().getLocalName();
 
         // no arguments
         if (identifier.isEmpty()) {
             // no "data" payload
-            if (!node.getData().getNodeType().equals(NETCONF_BASE_QNAME)) {
+            if (!node.getData().getIdentifier().getNodeType().equals(NETCONF_BASE_QNAME)) {
                 throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
                         ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
@@ -868,7 +870,7 @@ public final class RestconfImpl implements RestconfService {
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
         final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
         final SchemaNode schemaNode = iiWithData.getSchemaNode();
-        final NormalizedNode<?, ?> data = payload.getData();
+        final NormalizedNode data = payload.getData();
         if (schemaNode instanceof ListSchemaNode) {
             final List<QName> keyDefinitions = ((ListSchemaNode) schemaNode).getKeyDefinition();
             if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
@@ -1319,21 +1321,20 @@ public final class RestconfImpl implements RestconfService {
      */
     private static <T> T parseEnumTypeParameter(final ContainerNode value, final Class<T> classDescriptor,
             final String paramName) {
-        final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
-            SAL_REMOTE_AUG_IDENTIFIER);
+        final Optional<DataContainerChild> optAugNode = value.findChildByArg(SAL_REMOTE_AUG_IDENTIFIER);
         if (optAugNode.isEmpty()) {
             return null;
         }
-        final DataContainerChild<? extends PathArgument, ?> augNode = optAugNode.get();
+        final DataContainerChild augNode = optAugNode.get();
         if (!(augNode instanceof AugmentationNode)) {
             return null;
         }
-        final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
+        final Optional<DataContainerChild> enumNode = ((AugmentationNode) augNode).findChildByArg(
                 new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
         if (enumNode.isEmpty()) {
             return null;
         }
-        final Object rawValue = enumNode.get().getValue();
+        final Object rawValue = enumNode.get().body();
         if (!(rawValue instanceof String)) {
             return null;
         }
@@ -1495,23 +1496,23 @@ public final class RestconfImpl implements RestconfService {
         final ContainerNode data = (ContainerNode) payload.getData();
         LeafSetNode leafSet = null;
         String outputType = "XML";
-        for (final DataContainerChild<? extends PathArgument, ?> dataChild : data.getValue()) {
+        for (final DataContainerChild dataChild : data.body()) {
             if (dataChild instanceof LeafSetNode) {
                 leafSet = (LeafSetNode) dataChild;
             } else if (dataChild instanceof AugmentationNode) {
-                outputType = (String) ((AugmentationNode) dataChild).getValue().iterator().next().getValue();
+                outputType = (String) ((AugmentationNode) dataChild).body().iterator().next().body();
             }
         }
 
-        final Collection<LeafSetEntryNode> entryNodes = leafSet.getValue();
+        final Collection<LeafSetEntryNode> entryNodes = leafSet.body();
         final List<SchemaPath> paths = new ArrayList<>();
         String streamName = CREATE_NOTIFICATION_STREAM + "/";
 
         StringBuilder streamNameBuilder = new StringBuilder(streamName);
         final Iterator<LeafSetEntryNode> iterator = entryNodes.iterator();
         while (iterator.hasNext()) {
-            final QName valueQName = QName.create((String) iterator.next().getValue());
-            final URI namespace = valueQName.getModule().getNamespace();
+            final QName valueQName = QName.create((String) iterator.next().body());
+            final XMLNamespace namespace = valueQName.getModule().getNamespace();
             final Module module = controllerContext.findModuleByNamespace(namespace);
             checkNotNull(module, "Module for namespace %s does not exist", namespace);
             NotificationDefinition notifiDef = null;

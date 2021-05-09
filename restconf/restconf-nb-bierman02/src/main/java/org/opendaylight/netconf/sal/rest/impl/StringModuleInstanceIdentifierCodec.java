@@ -9,8 +9,8 @@ package org.opendaylight.netconf.sal.rest.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -56,7 +56,7 @@ public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStr
     }
 
     @Override
-    protected String prefixForNamespace(final URI namespace) {
+    protected String prefixForNamespace(final XMLNamespace namespace) {
         return this.context.findModules(namespace).stream().findFirst().map(Module::getName).orElse(null);
     }
 }

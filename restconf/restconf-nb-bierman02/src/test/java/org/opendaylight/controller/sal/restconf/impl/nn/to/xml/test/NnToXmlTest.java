@@ -29,21 +29,20 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition;
-import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
-import org.opendaylight.yangtools.yang.model.util.type.BitsTypeBuilder;
-import org.opendaylight.yangtools.yang.model.util.type.EnumerationTypeBuilder;
-import org.opendaylight.yangtools.yang.model.util.type.UnionTypeBuilder;
+import org.opendaylight.yangtools.yang.model.ri.type.BaseTypes;
+import org.opendaylight.yangtools.yang.model.ri.type.BitsTypeBuilder;
+import org.opendaylight.yangtools.yang.model.ri.type.UnionTypeBuilder;
 
 public class NnToXmlTest extends AbstractBodyReaderTest {
 
@@ -197,13 +196,11 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final BitsTypeDefinition.Bit mockBit2 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit2.getName()).thenReturn("two");
         Mockito.when(mockBit2.getPosition()).thenReturn(Uint32.TWO);
-        final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(Mockito.mock(SchemaPath.class));
-        bitsTypeBuilder.addBit(mockBit1);
-        bitsTypeBuilder.addBit(mockBit2);
 
         final String elName = "lfBits";
-        final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(bitsTypeBuilder.build()).deserialize("one two"), elName);
+        final NormalizedNodeContext normalizedNodeContext = prepareNNC(TypeDefinitionAwareCodec.from(
+            BaseTypes.bitsTypeBuilder(QName.create("foo", "foo")).addBit(mockBit1).addBit(mockBit2).build())
+            .deserialize("one two"), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">one two</" + elName + ">");
     }
 
@@ -212,13 +209,10 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final EnumTypeDefinition.EnumPair mockEnum = Mockito.mock(EnumTypeDefinition.EnumPair.class);
         Mockito.when(mockEnum.getName()).thenReturn("enum2");
 
-        final EnumerationTypeBuilder enumerationTypeBuilder = BaseTypes
-                .enumerationTypeBuilder(Mockito.mock(SchemaPath.class));
-        enumerationTypeBuilder.addEnum(mockEnum);
-
         final String elName = "lfEnumeration";
-        final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(enumerationTypeBuilder.build()).deserialize("enum2"), elName);
+        final NormalizedNodeContext normalizedNodeContext = prepareNNC(TypeDefinitionAwareCodec.from(
+            BaseTypes.enumerationTypeBuilder(QName.create("foo", "foo")).addEnum(mockEnum).build())
+            .deserialize("enum2"), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">enum2</" + elName + ">");
     }
 
@@ -251,11 +245,11 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         Mockito.when(mockBit2.getName()).thenReturn("second");
         Mockito.when(mockBit2.getPosition()).thenReturn(Uint32.TWO);
 
-        final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(Mockito.mock(SchemaPath.class));
+        final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(QName.create("foo", "foo"));
         bitsTypeBuilder.addBit(mockBit1);
         bitsTypeBuilder.addBit(mockBit2);
 
-        final UnionTypeBuilder unionTypeBuilder = BaseTypes.unionTypeBuilder(Mockito.mock(SchemaPath.class));
+        final UnionTypeBuilder unionTypeBuilder = BaseTypes.unionTypeBuilder(QName.create("foo", "foo"));
         unionTypeBuilder.addType(BaseTypes.int8Type());
         unionTypeBuilder.addType(bitsTypeBuilder.build());
         unionTypeBuilder.addType(BaseTypes.booleanType());
@@ -321,64 +315,32 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
     private static NormalizedNodeContext prepareLeafrefData() {
         final QName cont = QName.create("basic:module", "2013-12-02", "cont");
-        final QName lfBoolean = QName.create("basic:module", "2013-12-02", "lfBoolean");
-        final QName lfLfref = QName.create("basic:module", "2013-12-02", "lfLfref");
 
-        final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
-
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = Builders
-                .containerBuilder((ContainerSchemaNode) contSchema);
-
-        List<DataSchemaNode> instanceLf = ControllerContext
-                .findInstanceDataChildrenByName((DataNodeContainer) contSchema, lfBoolean.getLocalName());
-        DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
-
-        contData.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue(Boolean.TRUE).build());
-
-        instanceLf = ControllerContext.findInstanceDataChildrenByName((DataNodeContainer) contSchema,
-                lfLfref.getLocalName());
-        schemaLf = Iterables.getFirst(instanceLf, null);
-
-        contData.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue("true").build());
-
-        final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
-
-        return testNormalizedNodeContext;
+        return new NormalizedNodeContext(
+            new InstanceIdentifierContext<>(null, schemaContext.getDataChildByName(cont), null, schemaContext),
+            Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(cont))
+                .withChild(
+                    ImmutableNodes.leafNode(QName.create("basic:module", "2013-12-02", "lfBoolean"), Boolean.TRUE))
+                .withChild(
+                    ImmutableNodes.leafNode(QName.create("basic:module", "2013-12-02", "lfLfref"), "true"))
+                .build());
     }
 
     private static NormalizedNodeContext prepareLeafrefNegativeData() {
         final QName cont = QName.create("basic:module", "2013-12-02", "cont");
-        final QName lfLfref = QName.create("basic:module", "2013-12-02", "lfLfrefNegative");
-
-        final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = Builders
-                .containerBuilder((ContainerSchemaNode) contSchema);
-
-        final List<DataSchemaNode> instanceLf = ControllerContext.findInstanceDataChildrenByName((DataNodeContainer)
-                contSchema, lfLfref.getLocalName());
-        final DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
-
-        contData.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue("value").build());
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+            new InstanceIdentifierContext<>(null, schemaContext.getDataChildByName(cont), null, schemaContext),
+            Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(cont))
+                .withChild(ImmutableNodes.leafNode(
+                    QName.create("basic:module", "2013-12-02", "lfLfrefNegative"), "value"))
+                .build());
     }
 
     private static NormalizedNodeContext prepareIdrefData(final String prefix, final boolean valueAsQName) {
         final QName cont = QName.create("basic:module", "2013-12-02", "cont");
-        final QName cont1 = QName.create("basic:module", "2013-12-02", "cont1");
-        final QName lf11 = QName.create("basic:module", "2013-12-02", "lf11");
-
-        final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
-
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = Builders
-                .containerBuilder((ContainerSchemaNode) contSchema);
-
-        final DataSchemaNode cont1Schema = ((ContainerSchemaNode) contSchema).getDataChildByName(cont1);
-
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> cont1Data = Builders
-                .containerBuilder((ContainerSchemaNode) cont1Schema);
 
         Object value = null;
         if (valueAsQName) {
@@ -387,17 +349,15 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
             value = "no qname value";
         }
 
-        final List<DataSchemaNode> instanceLf = ControllerContext
-                .findInstanceDataChildrenByName((DataNodeContainer) cont1Schema, lf11.getLocalName());
-        final DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
-
-        cont1Data.withChild(Builders.leafBuilder((LeafSchemaNode) schemaLf).withValue(value).build());
-
-        contData.withChild(cont1Data.build());
-
-        final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
-        return testNormalizedNodeContext;
+        return new NormalizedNodeContext(
+            new InstanceIdentifierContext<>(null, schemaContext.getDataChildByName(cont), null, schemaContext),
+            Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(cont))
+                .withChild(Builders.containerBuilder()
+                    .withNodeIdentifier(new NodeIdentifier(QName.create("basic:module", "2013-12-02", "cont1")))
+                    .withChild(ImmutableNodes.leafNode(QName.create("basic:module", "2013-12-02", "lf11"), value))
+                    .build())
+                .build());
     }
 
     @Override

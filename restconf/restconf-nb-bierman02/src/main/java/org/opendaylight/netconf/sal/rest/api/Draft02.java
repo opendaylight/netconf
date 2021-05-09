@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.sal.rest.api;
 
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 
 /**
  * Base Draft for Restconf project.
@@ -27,11 +29,11 @@ public class Draft02 {
     }
 
     public interface RestConfModule {
-        String REVISION = "2013-10-19";
+        Revision REVISION = Revision.of("2013-10-19");
 
         String NAME = "ietf-restconf";
 
-        String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf";
+        XMLNamespace NAMESPACE = XMLNamespace.of("urn:ietf:params:xml:ns:yang:ietf-restconf");
 
         String RESTCONF_GROUPING_SCHEMA_NODE = "restconf";
 
@@ -53,8 +55,7 @@ public class Draft02 {
 
         String ERROR_LIST_SCHEMA_NODE = "error";
 
-        QName IETF_RESTCONF_QNAME = QName.create(Draft02.RestConfModule.NAMESPACE, Draft02.RestConfModule.REVISION,
-                Draft02.RestConfModule.NAME);
+        QName IETF_RESTCONF_QNAME = QName.create(NAMESPACE, REVISION, NAME);
 
         QName ERRORS_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE);
 

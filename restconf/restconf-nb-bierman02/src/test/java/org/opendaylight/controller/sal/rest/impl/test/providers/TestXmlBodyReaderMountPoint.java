@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
@@ -30,8 +29,8 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
@@ -45,7 +44,7 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
     private static EffectiveModelContext schemaContext;
 
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
-        URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
+        XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
 
     public TestXmlBodyReaderMountPoint() {
         super(schemaContext, mock(DOMMountPoint.class));
@@ -117,17 +116,18 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
                 null, null, this.mediaType, null, inputStream);
         checkNormalizedNodeContext(returnValue);
         final ContainerNode contNode = (ContainerNode) returnValue.getData();
-        final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName.create(contNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode
-                .getChild(yangCont.getLastPathArgument());
+        final YangInstanceIdentifier yangCont =
+                YangInstanceIdentifier.of(QName.create(contNode.getIdentifier().getNodeType(), "cont"));
+        final Optional<DataContainerChild> contDataNodePotential = contNode
+                .findChildByArg(yangCont.getLastPathArgument());
         assertTrue(contDataNodePotential.isPresent());
         final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
         final YangInstanceIdentifier yangLeaf =
-                YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
+                YangInstanceIdentifier.of(QName.create(contDataNode.getIdentifier().getNodeType(), "lf"));
+        final Optional<DataContainerChild> leafDataNode = contDataNode.findChildByArg(
             yangLeaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
-        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
+        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().body().toString()));
     }
 
     private void checkExpectValueNormalizeNodeContext(
@@ -170,9 +170,9 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         checkMountPointNormalizedNodeContext(returnValue);
         // check if container was found both according to its name and namespace
         assertEquals("Not correct container found, name was ignored",
-                "foo-bar-container", returnValue.getData().getNodeType().getLocalName());
+                "foo-bar-container", returnValue.getData().getIdentifier().getNodeType().getLocalName());
         assertEquals("Not correct container found, namespace was ignored",
-                "foo:module", returnValue.getData().getNodeType().getNamespace().toString());
+                "foo:module", returnValue.getData().getIdentifier().getNodeType().getNamespace().toString());
     }
 
     /**
@@ -192,9 +192,9 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         checkMountPointNormalizedNodeContext(returnValue);
         // check if container was found both according to its name and namespace
         assertEquals("Not correct container found, name was ignored",
-                "foo-bar-container", returnValue.getData().getNodeType().getLocalName());
+                "foo-bar-container", returnValue.getData().getIdentifier().getNodeType().getLocalName());
         assertEquals("Not correct container found, namespace was ignored",
-                "bar:module", returnValue.getData().getNodeType().getNamespace().toString());
+                "bar:module", returnValue.getData().getIdentifier().getNodeType().getNamespace().toString());
     }
 
     /**

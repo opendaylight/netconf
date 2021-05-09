@@ -18,7 +18,6 @@ import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +51,7 @@ import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
@@ -242,13 +242,13 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return mountPointSchema.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
-    public Module findModuleByNamespace(final URI namespace) {
+    public Module findModuleByNamespace(final XMLNamespace namespace) {
         checkPreconditions();
         checkArgument(namespace != null);
         return this.globalSchema.findModules(namespace).stream().findFirst().orElse(null);
     }
 
-    public Module findModuleByNamespace(final DOMMountPoint mountPoint, final URI namespace) {
+    public Module findModuleByNamespace(final DOMMountPoint mountPoint, final XMLNamespace namespace) {
         checkArgument(namespace != null && mountPoint != null);
 
         final SchemaContext mountPointSchema = getModelContext(mountPoint);
@@ -327,24 +327,24 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return builder.toString();
     }
 
-    public String findModuleNameByNamespace(final URI namespace) {
+    public String findModuleNameByNamespace(final XMLNamespace namespace) {
         checkPreconditions();
 
         final Module module = this.findModuleByNamespace(namespace);
         return module == null ? null : module.getName();
     }
 
-    public String findModuleNameByNamespace(final DOMMountPoint mountPoint, final URI namespace) {
+    public String findModuleNameByNamespace(final DOMMountPoint mountPoint, final XMLNamespace namespace) {
         final Module module = this.findModuleByNamespace(mountPoint, namespace);
         return module == null ? null : module.getName();
     }
 
-    public URI findNamespaceByModuleName(final String moduleName) {
+    public XMLNamespace findNamespaceByModuleName(final String moduleName) {
         final Module module = this.findModuleByName(moduleName);
         return module == null ? null : module.getNamespace();
     }
 
-    public URI findNamespaceByModuleName(final DOMMountPoint mountPoint, final String moduleName) {
+    public XMLNamespace findNamespaceByModuleName(final DOMMountPoint mountPoint, final String moduleName) {
         final Module module = this.findModuleByName(mountPoint, moduleName);
         return module == null ? null : module.getNamespace();
     }
@@ -393,7 +393,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     public Module getRestconfModule() {
-        return findModuleByNameAndRevision(Draft02.RestConfModule.NAME, Revision.of(Draft02.RestConfModule.REVISION));
+        return findModuleByNameAndRevision(Draft02.RestConfModule.NAME, Draft02.RestConfModule.REVISION);
     }
 
     public DataSchemaNode getRestconfModuleErrorsSchemaNode() {
@@ -743,7 +743,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
-            final String name, final URI namespace) {
+            final String name, final XMLNamespace namespace) {
         requireNonNull(namespace);
 
         final Iterable<DataSchemaNode> result = Iterables.filter(findInstanceDataChildrenByName(container, name),

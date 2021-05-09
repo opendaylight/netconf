@@ -124,7 +124,7 @@ public class JSONRestconfServiceImplTest {
         final EffectiveModelContext mountPointSchemaContext = TestUtils.loadSchemaContext("/full-versions/test-module");
         final ControllerContext controllerContext =
                 TestRestconfUtils.newControllerContext(schemaContext, mockMountPoint);
-        doReturn(java.util.Optional.of(FixedDOMSchemaService.of(() -> mountPointSchemaContext))).when(mockMountPoint)
+        doReturn(Optional.of(FixedDOMSchemaService.of(() -> mountPointSchemaContext))).when(mockMountPoint)
                 .getService(eq(DOMSchemaService.class));
 
         service = new JSONRestconfServiceImpl(controllerContext,
@@ -161,7 +161,7 @@ public class JSONRestconfServiceImplTest {
         assertTrue("Expected MapEntryNode. Actual " + capturedNode.getValue().getClass(),
                 capturedNode.getValue() instanceof MapEntryNode);
         final MapEntryNode actualNode = (MapEntryNode) capturedNode.getValue();
-        assertEquals("MapEntryNode node type", INTERFACE_QNAME, actualNode.getNodeType());
+        assertEquals("MapEntryNode node type", INTERFACE_QNAME, actualNode.getIdentifier().getNodeType());
         verifyLeafNode(actualNode, NAME_QNAME, "eth0");
         verifyLeafNode(actualNode, TYPE_QNAME, "ethernetCsmacd");
         verifyLeafNode(actualNode, ENABLED_QNAME, Boolean.FALSE);
@@ -192,7 +192,7 @@ public class JSONRestconfServiceImplTest {
 
         assertTrue("Expected ContainerNode", capturedNode.getValue() instanceof ContainerNode);
         final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
-        assertEquals("ContainerNode node type", TEST_CONT1_QNAME, actualNode.getNodeType());
+        assertEquals("ContainerNode node type", TEST_CONT1_QNAME, actualNode.getIdentifier().getNodeType());
         verifyLeafNode(actualNode, TEST_LF11_QNAME, "lf11 data");
         verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
     }
@@ -237,9 +237,9 @@ public class JSONRestconfServiceImplTest {
 
         assertTrue("Expected ContainerNode", capturedNode.getValue() instanceof ContainerNode);
         final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
-        assertEquals("ContainerNode node type", INTERFACES_QNAME, actualNode.getNodeType());
+        assertEquals("ContainerNode node type", INTERFACES_QNAME, actualNode.getIdentifier().getNodeType());
 
-        final java.util.Optional<DataContainerChild<?, ?>> mapChild = actualNode.getChild(
+        final Optional<DataContainerChild> mapChild = actualNode.findChildByArg(
             new NodeIdentifier(INTERFACE_QNAME));
         assertEquals(INTERFACE_QNAME.toString() + " present", true, mapChild.isPresent());
         assertTrue("Expected MapNode. Actual " + mapChild.get().getClass(), mapChild.get() instanceof MapNode);
@@ -247,7 +247,7 @@ public class JSONRestconfServiceImplTest {
 
         final NodeIdentifierWithPredicates entryNodeID = NodeIdentifierWithPredicates.of(
                 INTERFACE_QNAME, NAME_QNAME, "eth0");
-        final java.util.Optional<MapEntryNode> entryChild = mapNode.getChild(entryNodeID);
+        final Optional<MapEntryNode> entryChild = mapNode.findChildByArg(entryNodeID);
         assertEquals(entryNodeID.toString() + " present", true, entryChild.isPresent());
         final MapEntryNode entryNode = entryChild.get();
         verifyLeafNode(entryNode, NAME_QNAME, "eth0");
@@ -278,7 +278,7 @@ public class JSONRestconfServiceImplTest {
 
         assertTrue("Expected ContainerNode", capturedNode.getValue() instanceof ContainerNode);
         final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
-        assertEquals("ContainerNode node type", TEST_CONT1_QNAME, actualNode.getNodeType());
+        assertEquals("ContainerNode node type", TEST_CONT1_QNAME, actualNode.getIdentifier().getNodeType());
         verifyLeafNode(actualNode, TEST_LF11_QNAME, "lf11 data");
         verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
     }
@@ -417,7 +417,7 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testInvokeRpcWithInput() throws Exception {
-        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
+        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode)null);
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(MAKE_TOAST_QNAME),
             any(NormalizedNode.class));
 
@@ -440,7 +440,7 @@ public class JSONRestconfServiceImplTest {
 
     @Test
     public void testInvokeRpcWithNoInput() throws Exception {
-        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
+        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode)null);
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(any(QName.class), any());
 
         final String uriPath = "toaster:cancel-toast";
@@ -454,7 +454,7 @@ public class JSONRestconfServiceImplTest {
 
     @Test
     public void testInvokeRpcWithOutput() throws Exception {
-        final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
+        final ContainerNode outputNode = ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_OUTPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
@@ -521,10 +521,10 @@ public class JSONRestconfServiceImplTest {
                 new Object[]{INTERFACE_QNAME, NAME_QNAME, "eth0"});
     }
 
-    void verifyLeafNode(final DataContainerNode<?> parent, final QName leafType, final Object leafValue) {
-        final java.util.Optional<DataContainerChild<?, ?>> leafChild = parent.getChild(new NodeIdentifier(leafType));
+    void verifyLeafNode(final DataContainerNode parent, final QName leafType, final Object leafValue) {
+        final java.util.Optional<DataContainerChild> leafChild = parent.findChildByArg(new NodeIdentifier(leafType));
         assertTrue(leafType.toString() + " present", leafChild.isPresent());
-        assertEquals(leafType.toString() + " value", leafValue, leafChild.get().getValue());
+        assertEquals(leafType.toString() + " value", leafValue, leafChild.get().body());
     }
 
     void verifyPath(final YangInstanceIdentifier path, final Object... expArgs) {

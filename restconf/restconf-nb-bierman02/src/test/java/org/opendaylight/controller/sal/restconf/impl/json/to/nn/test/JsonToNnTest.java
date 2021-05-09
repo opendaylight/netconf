@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JsonToNnTest extends AbstractBodyReaderTest {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractBodyReaderTest.class);
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
@@ -56,25 +55,21 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
 
     @Test
     public void simpleListTest() throws Exception {
-        simpleTest("/json-to-nn/simple-list.json",
-                "lst", "simple-list-yang1");
+        simpleTest("/json-to-nn/simple-list.json", "lst", "simple-list-yang1");
     }
 
     @Test
     public void simpleContainerTest() throws Exception {
-        simpleTest("/json-to-nn/simple-container.json",
-                "cont", "simple-container-yang");
+        simpleTest("/json-to-nn/simple-container.json", "cont", "simple-container-yang");
     }
 
     @Test
     public void multipleItemsInLeafListTest() throws Exception {
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                "/json-to-nn/multiple-leaflist-items.json",
-                "simple-list-yang1:lst");
+                "/json-to-nn/multiple-leaflist-items.json", "simple-list-yang1:lst");
         assertNotNull(normalizedNodeContext);
 
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("45"));
         assertTrue(dataTree.contains("55"));
         assertTrue(dataTree.contains("66"));
@@ -83,12 +78,10 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
     @Test
     public void multipleItemsInListTest() throws Exception {
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                "/json-to-nn/multiple-items-in-list.json",
-                "multiple-items-yang:lst");
+                "/json-to-nn/multiple-items-in-list.json", "multiple-items-yang:lst");
         assertNotNull(normalizedNodeContext);
 
-        assertEquals("lst", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
+        assertEquals("lst", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
 
         verityMultipleItemsInList(normalizedNodeContext);
     }
@@ -99,11 +92,9 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
                 "/json-to-nn/array-with-null.json", "array-with-null-yang:cont");
         assertNotNull(normalizedNodeContext);
 
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
 
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("lf"));
         assertTrue(dataTree.contains("empty"));
     }
@@ -112,15 +103,13 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
     public void incorrectTopLevelElementsTest() throws Exception {
         mockBodyReader("simple-list-yang1:lst", this.jsonBodyReader, false);
 
-        InputStream inputStream = this.getClass().getResourceAsStream(
-                "/json-to-nn/wrong-top-level1.json");
+        InputStream inputStream = this.getClass().getResourceAsStream("/json-to-nn/wrong-top-level1.json");
 
         int countExceptions = 0;
         RestconfDocumentedException exception = null;
 
         try {
-            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
-                    inputStream);
+            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
         } catch (final RestconfDocumentedException e) {
             exception = e;
             countExceptions++;
@@ -131,12 +120,10 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
                         + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
                 exception.getErrors().get(0).getErrorMessage());
 
-        inputStream = this.getClass().getResourceAsStream(
-                "/json-to-nn/wrong-top-level2.json");
+        inputStream = this.getClass().getResourceAsStream("/json-to-nn/wrong-top-level2.json");
         exception = null;
         try {
-            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
-                    inputStream);
+            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
         } catch (final RestconfDocumentedException e) {
             exception = e;
             countExceptions++;
@@ -147,12 +134,10 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
                         + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
                 exception.getErrors().get(0).getErrorMessage());
 
-        inputStream = this.getClass().getResourceAsStream(
-                "/json-to-nn/wrong-top-level3.json");
+        inputStream = this.getClass().getResourceAsStream("/json-to-nn/wrong-top-level3.json");
         exception = null;
         try {
-            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
-                    inputStream);
+            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
         } catch (final RestconfDocumentedException e) {
             exception = e;
             countExceptions++;
@@ -171,11 +156,9 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
                 "/json-to-nn/empty-data.json", "array-with-null-yang:cont");
         assertNotNull(normalizedNodeContext);
 
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
 
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
 
         assertTrue(dataTree.contains("lflst1"));
 
@@ -183,12 +166,10 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
 
         RestconfDocumentedException exception = null;
         mockBodyReader("array-with-null-yang:cont", this.jsonBodyReader, false);
-        final InputStream inputStream = this.getClass().getResourceAsStream(
-                "/json-to-nn/empty-data.json1");
+        final InputStream inputStream = this.getClass().getResourceAsStream("/json-to-nn/empty-data.json1");
 
         try {
-            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
-                    inputStream);
+            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
         } catch (final RestconfDocumentedException e) {
             exception = e;
         }
@@ -199,8 +180,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
 
     @Test
     public void testJsonBlankInput() throws Exception {
-        final NormalizedNodeContext normalizedNodeContext = prepareNNC("",
-                "array-with-null-yang:cont");
+        final NormalizedNodeContext normalizedNodeContext = prepareNNC("", "array-with-null-yang:cont");
         assertNull(normalizedNodeContext);
     }
 
@@ -208,19 +188,16 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
     public void notSupplyNamespaceIfAlreadySupplied()throws Exception {
         final String uri = "simple-list-yang1" + ":" + "lst";
 
-        final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                "/json-to-nn/simple-list.json", uri);
+        final NormalizedNodeContext normalizedNodeContext = prepareNNC( "/json-to-nn/simple-list.json", uri);
         assertNotNull(normalizedNodeContext);
 
         verifyNormaluizedNodeContext(normalizedNodeContext, "lst");
 
         mockBodyReader("simple-list-yang2:lst", this.jsonBodyReader, false);
-        final InputStream inputStream = this.getClass().getResourceAsStream(
-                "/json-to-nn/simple-list.json");
+        final InputStream inputStream = this.getClass().getResourceAsStream("/json-to-nn/simple-list.json");
 
         try {
-            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
-                    inputStream);
+            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
             fail("NormalizedNodeContext should not be create because of different namespace");
         } catch (final RestconfDocumentedException e) {
             LOG.warn("Read from InputStream failed. Message: {}. Status: {}", e.getMessage(), e.getStatus());
@@ -231,32 +208,26 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
 
     @Test
     public void dataAugmentedTest() throws Exception {
-        NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                "/common/augment/json/dataa.json", "main:cont");
+        NormalizedNodeContext normalizedNodeContext = prepareNNC("/common/augment/json/dataa.json", "main:cont");
 
         assertNotNull(normalizedNodeContext);
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
 
-        String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("cont1"));
         assertTrue(dataTree.contains("lf11 lf11 value from a"));
 
-        normalizedNodeContext = prepareNNC("/common/augment/json/datab.json",
-                "main:cont");
+        normalizedNodeContext = prepareNNC("/common/augment/json/datab.json", "main:cont");
 
         assertNotNull(normalizedNodeContext);
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
-        dataTree = NormalizedNodes
-                .toStringTree(normalizedNodeContext.getData());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
+        dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("cont1"));
         assertTrue(dataTree.contains("lf11 lf11 value from b"));
     }
 
-    private void simpleTest(final String jsonPath, final String topLevelElementName,
-            final String moduleName) throws Exception {
+    private void simpleTest(final String jsonPath, final String topLevelElementName, final String moduleName)
+            throws Exception {
         final String uri = moduleName + ":" + topLevelElementName;
 
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(jsonPath, uri);
@@ -288,11 +259,9 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
 
     private static void verifyNormaluizedNodeContext(final NormalizedNodeContext normalizedNodeContext,
             final String topLevelElementName) {
-        assertEquals(topLevelElementName, normalizedNodeContext.getData()
-                .getNodeType().getLocalName());
+        assertEquals(topLevelElementName, normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
 
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("cont1"));
         assertTrue(dataTree.contains("lst1"));
         assertTrue(dataTree.contains("lflst1"));
@@ -302,9 +271,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
     }
 
     private static void verityMultipleItemsInList(final NormalizedNodeContext normalizedNodeContext) {
-
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("lf11"));
         assertTrue(dataTree.contains("lf11_1"));
         assertTrue(dataTree.contains("lflst11"));
@@ -317,21 +284,18 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
     public void unsupportedDataFormatTest() throws Exception {
         mockBodyReader("simple-list-yang1:lst", this.jsonBodyReader, false);
 
-        final InputStream inputStream = this.getClass().getResourceAsStream(
-                "/json-to-nn/unsupported-json-format.json");
+        final InputStream inputStream = this.getClass().getResourceAsStream("/json-to-nn/unsupported-json-format.json");
 
         RestconfDocumentedException exception = null;
 
         try {
-            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
-                    inputStream);
+            this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
         } catch (final RestconfDocumentedException e) {
             exception = e;
         }
         LOG.info(exception.getErrors().get(0).getErrorMessage());
 
-        assertTrue(exception.getErrors().get(0).getErrorMessage()
-                .contains("is not a simple type"));
+        assertTrue(exception.getErrors().get(0).getErrorMessage().contains("is not a simple type"));
     }
 
     @Test
@@ -345,11 +309,9 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
                 null, null, null, this.mediaType, null, inputStream);
         assertNotNull(normalizedNodeContext);
 
-        assertEquals("cont", normalizedNodeContext.getData().getNodeType()
-                .getLocalName());
+        assertEquals("cont", normalizedNodeContext.getData().getIdentifier().getNodeType().getLocalName());
 
-        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
-                .getData());
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext.getData());
         assertTrue(dataTree.contains("lf1 module<Name:value lf1"));
         assertTrue(dataTree.contains("lf2 module>Name:value lf2"));
     }
@@ -358,5 +320,4 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
     protected MediaType getMediaType() {
         return null;
     }
-
 }
