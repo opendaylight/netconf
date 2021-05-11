@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5e2fa5f2_17da82a5",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-05-11T18:29:50Z",
+      "side": 1,
+      "message": "this should be a dedicated static method, with NODE_ID_TEMPLATE inlined",
+      "range": {
+        "startLine": 392,
+        "startChar": 37,
+        "endLine": 392,
+        "endChar": 74
+      },
+      "revId": "c8b5483cfea311a24d6f8a9d9eb474ae04b12001",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
