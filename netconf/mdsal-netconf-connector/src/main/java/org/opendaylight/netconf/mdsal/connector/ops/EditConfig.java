@@ -105,7 +105,7 @@ public final class EditConfig extends AbstractEdit {
                 break;
             case CREATE:
                 try {
-                    if (rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get().isPresent()) {
+                    if (rwtx.exists(LogicalDatastoreType.CONFIGURATION, path).get()) {
                         throw new DocumentedException("Data already exists, cannot execute CREATE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
                     }
@@ -121,7 +121,7 @@ public final class EditConfig extends AbstractEdit {
                 break;
             case DELETE:
                 try {
-                    if (!rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get().isPresent()) {
+                    if (!rwtx.exists(LogicalDatastoreType.CONFIGURATION, path).get()) {
                         throw new DocumentedException("Data is missing, cannot execute DELETE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
                     }
