@@ -22,11 +22,4 @@
     <version>1.13.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>${project.artifactId}</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc6991</artifactId>
-        </dependency>
-    </dependencies>
 </project>
