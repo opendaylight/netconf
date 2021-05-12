@@ -39,7 +39,7 @@
       <dependency>
         <groupId>org.opendaylight.infrautils</groupId>
         <artifactId>infrautils-artifacts</artifactId>
-        <version>1.9.5</version>
+        <version>1.9.8</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
