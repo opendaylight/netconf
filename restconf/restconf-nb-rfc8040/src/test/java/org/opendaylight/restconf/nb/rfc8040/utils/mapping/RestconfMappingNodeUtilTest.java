@@ -40,7 +40,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -76,7 +75,6 @@ public class RestconfMappingNodeUtilTest {
     @Test
     public void restconfMappingNodeTest() {
         // write modules into list module in Restconf
-        final Module ietfYangLibMod = schemaContext.findModule(IetfYangLibrary.MODULE_QNAME).get();
         final ContainerNode mods = RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(
             RestconfMappingNodeUtilTest.modules, schemaContext, "1");
 
@@ -117,16 +115,13 @@ public class RestconfMappingNodeUtilTest {
         final String outputType = "XML";
         final URI uri = new URI("uri");
         final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
-        final boolean exist = true;
 
-        final Map<QName, Object> map =
-                prepareMap(path.getLastPathArgument().getNodeType().getLocalName(), uri, start, outputType);
+        final Map<QName, Object> map = prepareMap(path.getLastPathArgument().getNodeType().getLocalName(), uri, start,
+            outputType);
 
-        final NormalizedNode<?, ?> mappedData =
-                RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-                        path, start, outputType, uri, monitoringModule, exist, schemaContextMonitoring);
-        assertNotNull(mappedData);
-        testData(map, mappedData);
+        final MapEntryNode mappedData = RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
+            path, start, outputType, uri, monitoringModule, schemaContextMonitoring);
+        assertMappedData(map, mappedData);
     }
 
     @Test
@@ -135,17 +130,14 @@ public class RestconfMappingNodeUtilTest {
         final String outputType = "JSON";
         final URI uri = new URI("uri");
         final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
-        final boolean exist = true;
 
         final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
         map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
 
         final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
-        final NormalizedNode<?, ?> mappedData =
-                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(notifiQName,
-                    schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule, exist);
-        assertNotNull(mappedData);
-        testData(map, mappedData);
+        final MapEntryNode mappedData = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+            notifiQName, schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule);
+        assertMappedData(map, mappedData);
     }
 
     private static Map<QName, Object> prepareMap(final String name, final URI uri, final Instant start,
@@ -160,8 +152,9 @@ public class RestconfMappingNodeUtilTest {
         return map;
     }
 
-    private static void testData(final Map<QName, Object> map, final NormalizedNode<?, ?> mappedData) {
-        for (final DataContainerChild<? extends PathArgument, ?> child : ((MapEntryNode) mappedData).getValue()) {
+    private static void assertMappedData(final Map<QName, Object> map, final MapEntryNode mappedData) {
+        assertNotNull(mappedData);
+        for (final DataContainerChild<?, ?> child : mappedData.getValue()) {
             if (child instanceof LeafNode) {
                 final LeafNode<?> leaf = (LeafNode<?>) child;
                 assertTrue(map.containsKey(leaf.getNodeType()));

@@ -12,7 +12,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.io.FileNotFoundException;
@@ -88,7 +87,6 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
         when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
         final DOMDataTreeReadWriteTransaction rwTx = mock(DOMDataTreeReadWriteTransaction.class);
-        when(rwTx.exists(any(), any())).thenReturn(immediateTrueFluentFuture());
         doReturn(CommitInfo.emptyFluentFuture()).when(rwTx).commit();
         when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
