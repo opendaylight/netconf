@@ -21,7 +21,6 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -42,7 +41,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -145,7 +144,6 @@ abstract class SubscribeToStreamUtil {
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
-        final boolean exist = checkExist(schemaContext, writeTransaction);
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         registerToListenNotification(
@@ -157,14 +155,13 @@ abstract class SubscribeToStreamUtil {
                 false, notificationQueryParams.isSkipNotificationData());
         notificationListenerAdapter.get().setCloseVars(
                 handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
-        final NormalizedNode<?, ?> mapToStreams =
-                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+        final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                     notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
-                    notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext), exist);
+                    notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext));
         writeDataToDS(schemaContext,
-                notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
-                exist, mapToStreams);
+            notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
+            mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
@@ -217,14 +214,13 @@ abstract class SubscribeToStreamUtil {
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
-        final boolean exist = checkExist(schemaContext, writeTransaction);
 
-        final NormalizedNode<?, ?> mapToStreams = RestconfMappingNodeUtil
-                .mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
-                        notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
-                        getMonitoringModule(schemaContext), exist, schemaContext);
+        final MapEntryNode mapToStreams =
+            RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
+                notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
+                getMonitoringModule(schemaContext), schemaContext);
         writeDataToDS(schemaContext, listener.get().getPath().getLastPathArgument().getNodeType().getLocalName(),
-                writeTransaction, exist, mapToStreams);
+                writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
@@ -235,16 +231,11 @@ abstract class SubscribeToStreamUtil {
     }
 
     private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
-            final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
-            final NormalizedNode<?, ?> mapToStreams) {
-        String pathId;
-        if (exist) {
-            pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
-        } else {
-            pathId = MonitoringModule.PATH_TO_STREAMS;
-        }
+            final DOMDataTreeReadWriteTransaction readWriteTransaction, final MapEntryNode mapToStreams) {
         readWriteTransaction.merge(LogicalDatastoreType.OPERATIONAL,
-                IdentifierCodec.deserialize(pathId, schemaContext), mapToStreams);
+            // FIXME: do not use IdentifierCodec here
+            IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name, schemaContext),
+            mapToStreams);
     }
 
     private static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
@@ -295,16 +286,6 @@ abstract class SubscribeToStreamUtil {
         final ListenerRegistration<ListenerAdapter> registration =
                 changeService.registerDataTreeChangeListener(root, listener);
         listener.setRegistration(registration);
-    }
-
-    private static boolean checkExist(final EffectiveModelContext schemaContext,
-                              final DOMDataTreeReadOperations readWriteTransaction) {
-        try {
-            return readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
-                    IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
-        } catch (final InterruptedException | ExecutionException exception) {
-            throw new RestconfDocumentedException("Problem while checking data if exists", exception);
-        }
     }
 
     private static void registerToListenNotification(final NotificationListenerAdapter listener,
