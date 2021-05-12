@@ -83,21 +83,14 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
     public void onModelContextUpdated(final EffectiveModelContext context) {
         schemaContext = requireNonNull(context);
 
-        final Module ietfYangLibraryModule =
-                context.findModule(IetfYangLibrary.MODULE_QNAME).orElse(null);
-        if (ietfYangLibraryModule != null) {
-            NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
-                    RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), ietfYangLibraryModule,
-                            context, String.valueOf(this.moduleSetId.incrementAndGet()));
-            putData(normNode);
+        if (context.findModule(IetfYangLibrary.MODULE_QNAME).isPresent()) {
+            putData(RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), context,
+                String.valueOf(this.moduleSetId.incrementAndGet())));
         }
 
-        final Module monitoringModule =
-                schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
+        final Module monitoringModule = schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         if (monitoringModule != null) {
-            NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
-                    RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
-            putData(normNode);
+            putData(RestconfMappingNodeUtil.mapCapabilites(monitoringModule));
         }
     }
 
