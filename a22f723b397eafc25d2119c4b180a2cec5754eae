@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7e0541e7_a20c2e11",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-05-12T15:55:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "034f366f_8388a003",
+      "range": {
+        "startLine": 462,
+        "startChar": 65,
+        "endLine": 462,
+        "endChar": 100
+      },
+      "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5cec1678_d937b6b0",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
         "patchSetId": 12
@@ -45,6 +69,30 @@
       "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06fdc717_a4e14749",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-05-12T15:55:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cec1678_d937b6b0",
+      "range": {
+        "startLine": 465,
+        "startChar": 8,
+        "endLine": 465,
+        "endChar": 36
+      },
+      "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "27dfabe7_09fd65c0",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-05-12T15:55:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c534ba46_b7174782",
+      "range": {
+        "startLine": 391,
+        "startChar": 12,
+        "endLine": 391,
+        "endChar": 80
+      },
+      "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ded30ab1_219fb7fd",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
         "patchSetId": 12
@@ -91,6 +163,30 @@
       "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d835a9c2_dab390a6",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-05-12T15:55:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ded30ab1_219fb7fd",
+      "range": {
+        "startLine": 400,
+        "startChar": 44,
+        "endLine": 400,
+        "endChar": 67
+      },
+      "revId": "a22f723b397eafc25d2119c4b180a2cec5754eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
