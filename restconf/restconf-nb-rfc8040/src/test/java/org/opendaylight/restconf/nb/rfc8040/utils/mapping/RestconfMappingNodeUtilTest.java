@@ -32,7 +32,6 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -77,28 +76,25 @@ public class RestconfMappingNodeUtilTest {
     public void restconfMappingNodeTest() {
         // write modules into list module in Restconf
         final Module ietfYangLibMod = schemaContext.findModule(IetfYangLibrary.MODULE_QNAME).get();
-        final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> mods =
-                RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(RestconfMappingNodeUtilTest.modules,
-                        ietfYangLibMod, schemaContext, "1");
+        final ContainerNode mods = RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(
+            RestconfMappingNodeUtilTest.modules, schemaContext, "1");
 
         // verify loaded modules
-        verifyLoadedModules((ContainerNode) mods);
+        verifyLoadedModules(mods);
         // verify deviations
-        verifyDeviations((ContainerNode) mods);
+        verifyDeviations(mods);
     }
 
     @Test
     public void restconfStateCapabilitesTest() {
         final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).get();
-        final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
-                RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
+        final ContainerNode normNode = RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
         assertNotNull(normNode);
         final List<Object> listOfValues = new ArrayList<>();
 
-        for (final DataContainerChild<? extends PathArgument, ?> child : normNode.getValue()) {
+        for (final DataContainerChild<?, ?> child : normNode.getValue()) {
             if (child.getNodeType().equals(MonitoringModule.CONT_CAPABILITES_QNAME)) {
-                for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : ((ContainerNode) child)
-                        .getValue()) {
+                for (final DataContainerChild<?, ?> dataContainerChild : ((ContainerNode) child).getValue()) {
                     for (final Object entry : ((LeafSetNode<?>) dataContainerChild).getValue()) {
                         listOfValues.add(((LeafSetEntryNode<?>) entry).getValue());
                     }

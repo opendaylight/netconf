@@ -419,7 +419,7 @@ public final class RestCodec {
         final Iterable<ChoiceSchemaNode> choiceNodes =
                 Iterables.filter(container.getChildNodes(), ChoiceSchemaNode.class);
         final Iterable<Collection<? extends CaseSchemaNode>> map = Iterables.transform(choiceNodes,
-            choice -> choice.getCases());
+            ChoiceSchemaNode::getCases);
         for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
