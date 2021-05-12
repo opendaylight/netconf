@@ -16,6 +16,9 @@ import org.opendaylight.aaa.api.Claim;
 import org.opendaylight.aaa.api.PasswordCredentialAuth;
 import org.opendaylight.aaa.api.PasswordCredentials;
 import org.opendaylight.netconf.auth.AuthProvider;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +26,15 @@ import org.slf4j.LoggerFactory;
  * AuthProvider implementation delegating to a {@link PasswordCredentialAuth} instance.
  */
 @Singleton
+@Component(immediate = true, property = "type=netconf-auth-provider")
 public final class CredentialServiceAuthProvider implements AuthProvider {
     private static final Logger LOG = LoggerFactory.getLogger(CredentialServiceAuthProvider.class);
 
     private final PasswordCredentialAuth credService;
 
     @Inject
-    public CredentialServiceAuthProvider(final PasswordCredentialAuth credService) {
+    @Activate
+    public CredentialServiceAuthProvider(final @Reference PasswordCredentialAuth credService) {
         this.credService = requireNonNull(credService);
     }
 
