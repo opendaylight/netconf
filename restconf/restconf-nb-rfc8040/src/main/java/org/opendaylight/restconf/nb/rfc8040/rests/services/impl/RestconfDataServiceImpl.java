@@ -74,6 +74,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -237,12 +238,19 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final UriInfo uriInfo, final RestconfTransaction transaction, final boolean exist,
             final NotificationListenerAdapter listener) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
-        final NormalizedNode<?, ?> mapToStreams =
-            RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+        final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
-                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
-        writeDataToDS(schemaContext,
-            listener.getSchemaPath().lastNodeIdentifier().getLocalName(), transaction, exist, mapToStreams);
+                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext));
+
+        final String name = listener.getSchemaPath().lastNodeIdentifier().getLocalName();
+        final String pathId;
+        if (exist) {
+            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
+        } else {
+            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
+        }
+        transaction.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
+            mapToStreams);
     }
 
     private static boolean checkExist(final EffectiveModelContext schemaContext, final RestconfStrategy strategy) {
@@ -252,19 +260,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         } catch (final InterruptedException | ExecutionException exception) {
             throw new RestconfDocumentedException("Problem while checking data if exists", exception);
         }
-    }
-
-    private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
-                                      final RestconfTransaction transaction, final boolean exist,
-                                      final NormalizedNode<?, ?> mapToStreams) {
-        final String pathId;
-        if (exist) {
-            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
-        } else {
-            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
-        }
-        transaction.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
-            mapToStreams);
     }
 
     @Override

@@ -321,9 +321,9 @@ public final class RestconfMappingNodeUtil {
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    public static NormalizedNode<?, ?> mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
+    public static MapEntryNode mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
             final Collection<? extends NotificationDefinition> notifications, final Instant start,
-            final String outputType, final URI uri, final Module monitoringModule, final boolean existParent) {
+            final String outputType, final URI uri, final Module monitoringModule) {
         for (final NotificationDefinition notificationDefinition : notifications) {
             if (notificationDefinition.getQName().equals(notifiQName)) {
                 final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
@@ -355,14 +355,6 @@ public final class RestconfMappingNodeUtil {
                         (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME),
                         outputType, uri);
 
-                if (!existParent) {
-                    final DataSchemaNode contStreamsSchema = ((ContainerSchemaNode) monitoringModule
-                            .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
-                                    .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME);
-                    return Builders.containerBuilder((ContainerSchemaNode) contStreamsSchema).withChild(Builders
-                            .mapBuilder((ListSchemaNode) streamListSchema).withChild(streamEntry.build()).build())
-                            .build();
-                }
                 return streamEntry.build();
             }
         }
@@ -421,9 +413,9 @@ public final class RestconfMappingNodeUtil {
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    public static NormalizedNode<?, ?> mapDataChangeNotificationStreamByIetfRestconfMonitoring(
+    public static MapEntryNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
             final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
-            final Module monitoringModule, final boolean existParent, final EffectiveModelContext schemaContext) {
+            final Module monitoringModule, final EffectiveModelContext schemaContext) {
         final SchemaNode schemaNode = ParserIdentifier
                 .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
                         schemaContext, Optional.empty())
@@ -454,15 +446,6 @@ public final class RestconfMappingNodeUtil {
                 (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME), outputType,
                 uri);
 
-        if (!existParent) {
-            final DataSchemaNode contStreamsSchema = ((ContainerSchemaNode) monitoringModule
-                    .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
-                            .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME);
-            return Builders
-                    .containerBuilder((ContainerSchemaNode) contStreamsSchema).withChild(Builders
-                            .mapBuilder((ListSchemaNode) streamListSchema).withChild(streamEntry.build()).build())
-                    .build();
-        }
         return streamEntry.build();
     }
 }
