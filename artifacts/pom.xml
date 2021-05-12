@@ -20,7 +20,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-artifacts</artifactId>
-    <version>1.13.2-SNAPSHOT</version>
+    <version>1.13.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
