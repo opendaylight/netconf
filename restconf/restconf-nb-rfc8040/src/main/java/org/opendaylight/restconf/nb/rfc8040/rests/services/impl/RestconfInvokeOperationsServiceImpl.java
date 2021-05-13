@@ -17,13 +17,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
@@ -40,12 +40,12 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  */
 @Path("/")
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
-    private final RpcServiceHandler rpcServiceHandler;
+    private final DOMRpcService rpcService;
     private final SchemaContextHandler schemaContextHandler;
 
-    public RestconfInvokeOperationsServiceImpl(final RpcServiceHandler rpcServiceHandler,
+    public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
             final SchemaContextHandler schemaContextHandler) {
-        this.rpcServiceHandler = requireNonNull(rpcServiceHandler);
+        this.rpcService = requireNonNull(rpcService);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
     }
 
@@ -68,8 +68,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                             ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
             } else {
-                response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath,
-                        this.rpcServiceHandler);
+                response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath, this.rpcService);
             }
             schemaContextRef = this.schemaContextHandler.get();
         } else {

@@ -11,11 +11,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
@@ -43,14 +43,14 @@ public class Rfc8040RestConfWiring {
     public Rfc8040RestConfWiring(final SchemaContextHandler schemaCtxHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler,
             final TransactionChainHandler transactionChainHandler,
-            final DOMDataBrokerHandler domDataBrokerHandler, final RpcServiceHandler rpcServiceHandler,
+            final DOMDataBrokerHandler domDataBrokerHandler, @Reference final DOMRpcService rpcService,
             @Reference final DOMActionService actionService,
             final NotificationServiceHandler notificationServiceHandler,
             final SSEInitializer sseInit,
             final Configuration configuration,
             @Reference final DOMSchemaService domSchemaService) {
         servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, domMountPointServiceHandler,
-            transactionChainHandler, domDataBrokerHandler, rpcServiceHandler, actionService,
+            transactionChainHandler, domDataBrokerHandler, rpcService, actionService,
             notificationServiceHandler, domSchemaService, configuration);
         servicesNotifWrapper = ServicesNotifWrapper.newInstance(sseInit);
     }

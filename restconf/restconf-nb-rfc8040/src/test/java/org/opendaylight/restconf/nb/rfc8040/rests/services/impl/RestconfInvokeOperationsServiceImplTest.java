@@ -32,7 +32,6 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -51,9 +50,6 @@ public class RestconfInvokeOperationsServiceImplTest {
     private RestconfInvokeOperationsServiceImpl invokeOperationsService;
 
     @Mock
-    private RpcServiceHandler rpcServiceHandler;
-
-    @Mock
     private DOMRpcService rpcService;
 
     @Before
@@ -70,8 +66,7 @@ public class RestconfInvokeOperationsServiceImplTest {
             mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(contextRef);
         this.invokeOperationsService =
-                new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
-        when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);
+                new RestconfInvokeOperationsServiceImpl(this.rpcService, schemaContextHandler);
     }
 
     @Test
