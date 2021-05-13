@@ -18,7 +18,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
@@ -29,8 +28,7 @@ import org.opendaylight.restconf.nb.rfc8040.web.WebInitializer;
  * Standalone wiring for RESTCONF.
  *
  * <p>This wiring alone is not sufficient; there are a few other singletons which
- * need to be bound as well, incl. {@link RestconfApplication},
- * {@link JSONRestconfServiceRfc8040Impl} &amp; {@link WebInitializer}; see the
+ * need to be bound as well, incl. {@link RestconfApplication}, &amp; {@link WebInitializer}; see the
  * Rfc8040RestConfWiringTest for how to do this e.g. for Guice (this class can
  * be used with another DI framework but needs the equivalent).
  *

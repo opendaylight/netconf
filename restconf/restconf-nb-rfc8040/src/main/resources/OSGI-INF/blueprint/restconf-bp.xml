@@ -63,7 +63,4 @@
 
   <bean id="servicesNotifWrapper" factory-ref="rfc8040RestConfWiring" factory-method="getServicesNotifWrapper" />
 
-  <service ref="jSONRestconfServiceRfc8040Impl" odl:type="rfc8040"
-      interface="org.opendaylight.restconf.nb.rfc8040.rests.services.api.JSONRestconfService" />
-
 </blueprint>
