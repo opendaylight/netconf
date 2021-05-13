@@ -23,13 +23,13 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
-import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ResolveEnumUtil;
@@ -281,15 +281,16 @@ abstract class SubscribeToStreamUtil {
         listener.setRegistration(registration);
     }
 
+    // FIXME: this method should be in NotificationListenerAdapter
     private static void registerToListenNotification(final NotificationListenerAdapter listener,
-            final NotificationServiceHandler notificationServiceHandler) {
+            final DOMNotificationService notificationService) {
         if (listener.isListening()) {
             return;
         }
 
         final Absolute path = listener.getSchemaPath();
         final ListenerRegistration<DOMNotificationListener> registration =
-                notificationServiceHandler.get().registerNotificationListener(listener, path);
+                notificationService.registerNotificationListener(listener, path);
         listener.setRegistration(registration);
     }
 
