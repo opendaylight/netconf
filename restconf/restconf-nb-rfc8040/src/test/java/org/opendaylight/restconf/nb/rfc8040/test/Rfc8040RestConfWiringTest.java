@@ -30,7 +30,6 @@ import org.opendaylight.infrautils.inject.guice.testutils.GuiceRule;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040RestConfWiring;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.test.incubate.InMemoryMdsalModule;
@@ -54,7 +53,6 @@ public class Rfc8040RestConfWiringTest {
         protected void configure() {
             bind(Rfc8040RestConfWiring.class).asEagerSingleton();
             bind(RestconfApplication.class).asEagerSingleton();
-            bind(JSONRestconfServiceRfc8040Impl.class).asEagerSingleton();
             bind(WebInitializer.class).asEagerSingleton();
             bind(CustomFilterAdapterConfiguration.class).toInstance(listener -> { });
             bind(Configuration.class).toInstance(SAMPLE_SSE_CONFIGURATION);
