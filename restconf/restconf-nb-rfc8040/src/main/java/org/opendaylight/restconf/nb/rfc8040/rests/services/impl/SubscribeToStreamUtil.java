@@ -206,7 +206,7 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
         listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
-        registration(datastoreType, listener.get(), handlersHolder.getDomDataBrokerHandler().get());
+        registration(datastoreType, listener.get(), handlersHolder.getDataBroker());
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
