@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
@@ -17,8 +18,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -30,7 +29,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.yangtools.yang.common.RpcError;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -38,23 +36,17 @@ public class RestconfInvokeOperationsUtilTest {
 
     private static final TestData DATA = new TestData();
 
-    private RpcServiceHandler serviceHandler;
     @Mock
     private DOMRpcService rpcService;
     @Mock
     private DOMMountPoint moutPoint;
 
-    @Before
-    public void setUp() {
-        serviceHandler = new RpcServiceHandler(rpcService);
-    }
-
     @Test
     public void invokeRpcTest() {
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, serviceHandler);
-        Assert.assertTrue(rpcResult.getErrors().isEmpty());
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, rpcService);
+        assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(DATA.output, rpcResult.getResult());
     }
 
@@ -64,7 +56,7 @@ public class RestconfInvokeOperationsUtilTest {
                 "No implementation of RPC " + DATA.errorRpc.toString() + " available.");
         doReturn(immediateFailedFluentFuture(exception)).when(rpcService).invokeRpc(DATA.errorRpc, DATA.input);
         final DOMRpcResult rpcResult =
-                RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.errorRpc, serviceHandler);
+                RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.errorRpc, rpcService);
         assertNull(rpcResult.getResult());
         final Collection<? extends RpcError> errorList = rpcResult.getErrors();
         assertEquals(1, errorList.size());
@@ -82,7 +74,7 @@ public class RestconfInvokeOperationsUtilTest {
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
         final DOMRpcResult rpcResult =
                 RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(moutPoint, DATA.input, DATA.rpc);
-        Assert.assertTrue(rpcResult.getErrors().isEmpty());
+        assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(DATA.output, rpcResult.getResult());
     }
 
@@ -98,8 +90,8 @@ public class RestconfInvokeOperationsUtilTest {
     public void checkResponseTest() {
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, serviceHandler);
-        Assert.assertTrue(rpcResult.getErrors().isEmpty());
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, rpcService);
+        assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(DATA.output, rpcResult.getResult());
         assertNotNull(RestconfInvokeOperationsUtil.checkResponse(rpcResult));
     }

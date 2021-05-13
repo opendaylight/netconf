@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
-import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -22,7 +21,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -72,17 +70,12 @@ public final class RestconfInvokeOperationsUtil {
      *             input data
      * @param rpc
      *             RPC type
-     * @param rpcServiceHandler
-     *             rpc service handler to invoke rpc
+     * @param rpcService
+     *             rpc service to invoke rpc
      * @return {@link DOMRpcResult}
      */
     public static DOMRpcResult invokeRpc(final NormalizedNode<?, ?> data, final QName rpc,
-            final RpcServiceHandler rpcServiceHandler) {
-        final DOMRpcService rpcService = rpcServiceHandler.get();
-        if (rpcService == null) {
-            throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
-        }
-
+            final DOMRpcService rpcService) {
         return prepareResult(rpcService.invokeRpc(rpc, nonnullInput(rpc, data)));
     }
 

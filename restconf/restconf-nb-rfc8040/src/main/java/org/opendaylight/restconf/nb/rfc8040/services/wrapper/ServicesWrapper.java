@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -20,7 +21,6 @@ import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
@@ -72,7 +72,7 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
     public static ServicesWrapper newInstance(final SchemaContextHandler schemaCtxHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler,
             final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
-            final RpcServiceHandler rpcServiceHandler, final DOMActionService actionService,
+            final DOMRpcService rpcService, final DOMActionService actionService,
             final NotificationServiceHandler notificationServiceHandler, final DOMSchemaService domSchemaService,
             final Configuration configuration) {
         RestconfOperationsService restconfOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler,
@@ -86,8 +86,8 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
             configuration);
         RestconfDataService restconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler,
             domMountPointServiceHandler, restconfSubscrService, actionService, configuration);
-        RestconfInvokeOperationsService restconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(
-            rpcServiceHandler, schemaCtxHandler);
+        RestconfInvokeOperationsService restconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(rpcService,
+            schemaCtxHandler);
         RestconfService restconfService = new RestconfImpl(schemaCtxHandler);
         return new ServicesWrapper(restconfDataService, restconfInvokeOpsService, restconfSubscrService,
             restconfOpsService, restconfSchemaService, restconfService);
