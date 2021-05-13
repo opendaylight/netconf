@@ -47,7 +47,6 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
@@ -67,7 +66,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
             + "toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
 
     @Mock
-    private DOMDataBrokerHandler dataBrokerHandler;
+    private DOMDataBroker dataBroker;
     @Mock
     private UriInfo uriInfo;
     @Mock
@@ -90,7 +89,6 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
-        final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         doReturn(domTx).when(dataBroker).createTransactionChain(any());
 
         transactionHandler = new TransactionChainHandler(dataBroker);
@@ -102,8 +100,6 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
         doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, dataTreeChangeService))
                 .when(dataBroker).getExtensions();
-
-        doReturn(dataBroker).when(this.dataBrokerHandler).get();
 
         final MultivaluedMap<String, String> map = mock(MultivaluedMap.class);
         final Set<Entry<String, List<String>>> set = new HashSet<>();
@@ -150,13 +146,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStreamSSE() {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         ListenersBroker.getInstance().registerDataChangeListener(
                 IdentifierCodec.deserialize("toaster:toaster/toasterStatus", this.schemaHandler.get()),
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 NotificationOutputType.XML);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
-                new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationService,
+                new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
                         this.schemaHandler, this.transactionHandler, configurationSse);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
@@ -170,13 +165,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStreamWS() {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         ListenersBroker.getInstance().registerDataChangeListener(
                 IdentifierCodec.deserialize("toaster:toaster/toasterStatus", this.schemaHandler.get()),
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 NotificationOutputType.XML);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
-                new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationService,
+                new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
                         this.schemaHandler, this.transactionHandler, configurationWs);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
@@ -190,7 +184,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     @Test(expected = RestconfDocumentedException.class)
     public void testSubscribeToStreamMissingDatastoreInPath() {
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
-                new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationService,
+                new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
                         this.schemaHandler, this.transactionHandler, configurationWs);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
@@ -198,7 +192,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     @Test(expected = RestconfDocumentedException.class)
     public void testSubscribeToStreamMissingScopeInPath() {
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
-                new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationService,
+                new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
                         this.schemaHandler, this.transactionHandler, configurationWs);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 this.uriInfo);
