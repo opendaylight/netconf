@@ -11,10 +11,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -43,14 +43,17 @@ public class Rfc8040RestConfWiring {
     public Rfc8040RestConfWiring(final SchemaContextHandler schemaCtxHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler,
             final TransactionChainHandler transactionChainHandler,
-            final DOMDataBrokerHandler domDataBrokerHandler, @Reference final DOMRpcService rpcService,
+            // Note: DOMDataBroker is not @Reference, because there is funkiness in the hand-written
+            //       blueprint container.
+            final DOMDataBroker dataBroker,
+            @Reference final DOMRpcService rpcService,
             @Reference final DOMActionService actionService,
             @Reference final DOMNotificationService notificationService,
             final SSEInitializer sseInit,
             final Configuration configuration,
             @Reference final DOMSchemaService domSchemaService) {
         servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, domMountPointServiceHandler,
-            transactionChainHandler, domDataBrokerHandler, rpcService, actionService, notificationService,
+            transactionChainHandler, dataBroker, rpcService, actionService, notificationService,
             domSchemaService, configuration);
         servicesNotifWrapper = ServicesNotifWrapper.newInstance(sseInit);
     }
