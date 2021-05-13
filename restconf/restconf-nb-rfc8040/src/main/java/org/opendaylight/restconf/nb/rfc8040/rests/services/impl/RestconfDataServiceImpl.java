@@ -215,7 +215,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private void createAllYangNotificationStreams(final RestconfStrategy strategy,
             final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
-        final boolean exist = checkExist(schemaContext, strategy);
 
         for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
             final NotificationListenerAdapter notifiStreamXML =
@@ -224,8 +223,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final NotificationListenerAdapter notifiStreamJSON =
                 CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
                     NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction, exist, notifiStreamJSON);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction, notifiStreamXML);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction, notifiStreamJSON);
         }
         try {
             transaction.commit().get();
@@ -235,31 +234,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo, final RestconfTransaction transaction, final boolean exist,
-            final NotificationListenerAdapter listener) {
+            final UriInfo uriInfo, final RestconfTransaction transaction, final NotificationListenerAdapter listener) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext));
 
         final String name = listener.getSchemaPath().lastNodeIdentifier().getLocalName();
-        final String pathId;
-        if (exist) {
-            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
-        } else {
-            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
-        }
-        transaction.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
+        transaction.merge(LogicalDatastoreType.OPERATIONAL,
+            IdentifierCodec.deserialize(Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name, schemaContext),
             mapToStreams);
-    }
-
-    private static boolean checkExist(final EffectiveModelContext schemaContext, final RestconfStrategy strategy) {
-        try {
-            return strategy.exists(LogicalDatastoreType.OPERATIONAL,
-                IdentifierCodec.deserialize(Rfc8040.MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
-        } catch (final InterruptedException | ExecutionException exception) {
-            throw new RestconfDocumentedException("Problem while checking data if exists", exception);
-        }
     }
 
     @Override
