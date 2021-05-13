@@ -114,12 +114,11 @@ public class RestconfMappingNodeUtilTest {
         final Instant start = Instant.now();
         final String outputType = "XML";
         final URI uri = new URI("uri");
-        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         final String streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
         final Map<QName, Object> map = prepareMap(streamName, uri, start, outputType);
         final MapEntryNode mappedData = RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-            path, start, outputType, uri, monitoringModule, schemaContextMonitoring, streamName);
+            path, start, outputType, uri, schemaContextMonitoring, streamName);
         assertMappedData(map, mappedData);
     }
 
@@ -128,14 +127,13 @@ public class RestconfMappingNodeUtilTest {
         final Instant start = Instant.now();
         final String outputType = "JSON";
         final URI uri = new URI("uri");
-        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
 
         final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
         map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
 
         final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
         final MapEntryNode mappedData = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-            notifiQName, schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule);
+            notifiQName, schemaContextMonitoring.getNotifications(), start, outputType, uri);
         assertMappedData(map, mappedData);
     }
 
