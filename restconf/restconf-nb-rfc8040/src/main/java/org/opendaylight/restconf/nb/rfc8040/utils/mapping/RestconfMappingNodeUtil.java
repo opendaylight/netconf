@@ -46,7 +46,6 @@ import org.opendaylight.yangtools.yang.model.api.Deviation;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
@@ -328,62 +327,41 @@ public final class RestconfMappingNodeUtil {
                                 .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME))
                                         .getDataChildByName(MonitoringModule.LIST_STREAM_QNAME);
                 final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
-                        Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
+                        Builders.mapEntryBuilder((ListSchemaNode) streamListSchema)
+                        .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_NAME_STREAM_QNAME,
+                            notificationDefinition.getQName().getLocalName()));
 
-                final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
-                prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
-                        notificationDefinition.getQName().getLocalName());
-
-                final Optional<String> optDesc = notificationDefinition.getDescription();
-                if (optDesc.isPresent()) {
-                    prepareLeafAndFillEntryBuilder(streamEntry,
-                            listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME), optDesc.get());
-                }
-                prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
+                notificationDefinition.getDescription().ifPresent(
+                    desc -> streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_DESCR_STREAM_QNAME,
+                        desc)));
+                streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME,
+                    Boolean.TRUE));
                 if (start != null) {
-                    prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
+                    streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_START_TIME_STREAM_QNAME,
                         DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,
-                            ZoneId.systemDefault())));
+                            ZoneId.systemDefault()))));
                 }
-                prepareListAndFillEntryBuilder(streamEntry,
-                        (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME),
-                        outputType, uri);
 
-                return streamEntry.build();
+                return streamEntry
+                    .withChild(createAccessList(outputType, uri))
+                    .build();
             }
         }
 
         throw new RestconfDocumentedException(notifiQName + " doesn't exist in any modul");
     }
 
-    private static void prepareListAndFillEntryBuilder(
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
-            final ListSchemaNode listSchemaNode, final String outputType, final URI uriToWebsocketServer) {
-        final CollectionNodeBuilder<MapEntryNode, MapNode> accessListBuilder = Builders.mapBuilder(listSchemaNode);
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> entryAccessList =
-                Builders.mapEntryBuilder(listSchemaNode);
-        prepareLeafAndFillEntryBuilder(entryAccessList,
-                listSchemaNode.getDataChildByName(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME), outputType);
-        prepareLeafAndFillEntryBuilder(entryAccessList,
-                listSchemaNode.getDataChildByName(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME),
-                uriToWebsocketServer.toString());
-        streamEntry.withChild(accessListBuilder.withChild(entryAccessList.build()).build());
-    }
-
-    /**
-     * Prepare leaf and fill entry builder.
-     *
-     * @param streamEntry   Stream entry
-     * @param leafSchema    Leaf schema
-     * @param value         Value
-     */
-    private static void prepareLeafAndFillEntryBuilder(
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
-            final DataSchemaNode leafSchema, final Object value) {
-        streamEntry.withChild(Builders.leafBuilder((LeafSchemaNode) leafSchema).withValue(value).build());
+    private static MapNode createAccessList(final String outputType, final URI uriToWebsocketServer) {
+        return Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(MonitoringModule.LIST_ACCESS_STREAM_QNAME))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(MonitoringModule.LIST_ACCESS_STREAM_QNAME,
+                    MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME,
+                    uriToWebsocketServer.toString()))
+                .build())
+            .build();
     }
 
     /**
@@ -422,23 +400,16 @@ public final class RestconfMappingNodeUtil {
                 Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
 
         final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME), streamName);
+        streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_NAME_STREAM_QNAME, streamName));
 
-        final Optional<String> optDesc = schemaNode.getDescription();
-        if (optDesc.isPresent()) {
-            prepareLeafAndFillEntryBuilder(streamEntry,
-                    listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME), optDesc.get());
-        }
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
-                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
-        prepareListAndFillEntryBuilder(streamEntry,
-                (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME), outputType,
-                uri);
+        schemaNode.getDescription().ifPresent(desc ->
+            streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_DESCR_STREAM_QNAME, desc)));
 
-        return streamEntry.build();
+        return streamEntry
+            .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, Boolean.TRUE))
+            .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_START_TIME_STREAM_QNAME,
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault()))))
+            .withChild(createAccessList(outputType, uri))
+            .build();
     }
 }
