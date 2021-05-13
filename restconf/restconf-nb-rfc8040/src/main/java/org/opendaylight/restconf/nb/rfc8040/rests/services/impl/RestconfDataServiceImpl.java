@@ -238,7 +238,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
-                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext));
+                listener.getOutputType(), uri);
 
         final String name = listener.getSchemaPath().lastNodeIdentifier().getLocalName();
         transaction.merge(LogicalDatastoreType.OPERATIONAL,

@@ -43,7 +43,6 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,7 +156,7 @@ abstract class SubscribeToStreamUtil {
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                     notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
-                    notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext));
+                    notificationListenerAdapter.get().getOutputType(), uri);
         writeDataToDS(schemaContext,
             notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
             mapToStreams);
@@ -217,16 +216,11 @@ abstract class SubscribeToStreamUtil {
 
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
-                notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
-                getMonitoringModule(schemaContext), schemaContext, serializedPath);
+                notificationQueryParams.getStart(), listener.get().getOutputType(), uri, schemaContext, serializedPath);
         writeDataToDS(schemaContext, serializedPath, writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
-    }
-
-    static Module getMonitoringModule(final EffectiveModelContext schemaContext) {
-        return schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
     }
 
     private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
