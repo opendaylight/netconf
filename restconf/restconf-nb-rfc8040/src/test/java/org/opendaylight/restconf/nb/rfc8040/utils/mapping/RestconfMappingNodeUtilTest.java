@@ -128,14 +128,13 @@ public class RestconfMappingNodeUtilTest {
         final Instant start = Instant.now();
         final String outputType = "JSON";
         final URI uri = new URI("uri");
-        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
 
         final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
         map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
 
         final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
         final MapEntryNode mappedData = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-            notifiQName, schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule);
+            notifiQName, schemaContextMonitoring.getNotifications(), start, outputType, uri);
         assertMappedData(map, mappedData);
     }
 
