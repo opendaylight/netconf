@@ -214,7 +214,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private void createAllYangNotificationStreams(final RestconfStrategy strategy,
             final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
         strategy.prepareReadWriteExecution();
-        final boolean exist = checkExist(schemaContext, strategy);
 
         for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
             final NotificationListenerAdapter notifiStreamXML =
@@ -223,8 +222,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final NotificationListenerAdapter notifiStreamJSON =
                 CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
                     NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamJSON);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, notifiStreamXML);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, notifiStreamJSON);
         }
         try {
             strategy.commit().get();
@@ -234,31 +233,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo, final RestconfStrategy strategy, final boolean exist,
-            final NotificationListenerAdapter listener) {
+            final UriInfo uriInfo, final RestconfStrategy strategy, final NotificationListenerAdapter listener) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext));
 
         final String name = listener.getSchemaPath().getLastComponent().getLocalName();
-        final String pathId;
-        if (exist) {
-            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
-        } else {
-            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
-        }
-        strategy.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
+        strategy.merge(LogicalDatastoreType.OPERATIONAL,
+            IdentifierCodec.deserialize(Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name, schemaContext),
             mapToStreams);
-    }
-
-    private static boolean checkExist(final EffectiveModelContext schemaContext, final RestconfStrategy strategy) {
-        try {
-            return strategy.exists(LogicalDatastoreType.OPERATIONAL,
-                IdentifierCodec.deserialize(Rfc8040.MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
-        } catch (final InterruptedException | ExecutionException exception) {
-            throw new RestconfDocumentedException("Problem while checking data if exists", exception);
-        }
     }
 
     @Override
