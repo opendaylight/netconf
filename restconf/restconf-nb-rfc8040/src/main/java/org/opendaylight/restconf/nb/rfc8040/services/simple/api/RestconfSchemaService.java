@@ -16,16 +16,13 @@ import org.opendaylight.yangtools.yang.common.YangConstants;
 
 /**
  * Retrieval of the YANG modules which server supports.
- *
  */
 @Path("/")
-public interface RestconfSchemaService extends UpdateHandlers {
-
+public interface RestconfSchemaService {
     /**
      * Get schema of specific module.
      *
-     * @param identifier
-     *             path parameter
+     * @param identifier path parameter
      * @return {@link SchemaExportContext}
      */
     @GET

@@ -25,7 +25,6 @@ import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.api.UpdateHandlers;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 
 /**
@@ -33,8 +32,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
  * is a collection of configuration data and state data nodes.
  *
  */
-public interface RestconfDataService extends UpdateHandlers {
-
+public interface RestconfDataService {
     /**
      * Get target data resource.
      *

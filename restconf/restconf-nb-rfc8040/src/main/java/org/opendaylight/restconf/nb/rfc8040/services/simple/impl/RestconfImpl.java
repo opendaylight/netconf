@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import javax.ws.rs.Path;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -26,11 +28,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 @Path("/")
 public class RestconfImpl implements RestconfService {
-
-    private volatile SchemaContextHandler schemaContextHandler;
+    private final SchemaContextHandler schemaContextHandler;
 
     public RestconfImpl(final SchemaContextHandler schemaContextHandler) {
-        this.schemaContextHandler = schemaContextHandler;
+        this.schemaContextHandler = requireNonNull(schemaContextHandler);
     }
 
     @Override
@@ -52,14 +53,5 @@ public class RestconfImpl implements RestconfService {
         final NormalizedNode<?, ?> data = Builders.leafBuilder((LeafSchemaNode) schemaNode)
                 .withValue(IetfYangLibrary.REVISION.toString()).build();
         return new NormalizedNodeContext(iid, data);
-    }
-
-    @Override
-    public synchronized void updateHandlers(final Object... handlers) {
-        for (final Object object : handlers) {
-            if (object instanceof SchemaContextHandler) {
-                schemaContextHandler = (SchemaContextHandler) object;
-            }
-        }
     }
 }

@@ -18,24 +18,19 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.api.UpdateHandlers;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 
 /**
- * An operation resource represents a protocol operation defined with the YANG
- * "rpc" statement. It is invoked using a POST method on the operation resource.
+ * An operation resource represents a protocol operation defined with the YANG {@code rpc} statement. It is invoked
+ * using a POST method on the operation resource.
  */
-public interface RestconfInvokeOperationsService extends UpdateHandlers {
+public interface RestconfInvokeOperationsService {
     /**
      * Invoke RPC operation.
      *
-     * @param identifier
-     *             module name and rpc identifier string for the desired
-     *            operation
-     * @param payload
-     *             {@link NormalizedNodeContext} - the body of the operation
-     * @param uriInfo
-     *             URI info
+     * @param identifier module name and rpc identifier string for the desired operation
+     * @param payload {@link NormalizedNodeContext} - the body of the operation
+     * @param uriInfo URI info
      * @return {@link NormalizedNodeContext}
      */
     @POST

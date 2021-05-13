@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.net.URI;
 import java.util.Optional;
 import javax.ws.rs.Path;
@@ -38,25 +40,13 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  */
 @Path("/")
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
-
-    private volatile RpcServiceHandler rpcServiceHandler;
-    private volatile SchemaContextHandler schemaContextHandler;
+    private final RpcServiceHandler rpcServiceHandler;
+    private final SchemaContextHandler schemaContextHandler;
 
     public RestconfInvokeOperationsServiceImpl(final RpcServiceHandler rpcServiceHandler,
             final SchemaContextHandler schemaContextHandler) {
-        this.rpcServiceHandler = rpcServiceHandler;
-        this.schemaContextHandler = schemaContextHandler;
-    }
-
-    @Override
-    public synchronized void updateHandlers(final Object... handlers) {
-        for (final Object object : handlers) {
-            if (object instanceof SchemaContextHandler) {
-                schemaContextHandler = (SchemaContextHandler) object;
-            } else if (object instanceof RpcServiceHandler) {
-                rpcServiceHandler = (RpcServiceHandler) object;
-            }
-        }
+        this.rpcServiceHandler = requireNonNull(rpcServiceHandler);
+        this.schemaContextHandler = requireNonNull(schemaContextHandler);
     }
 
     @Override

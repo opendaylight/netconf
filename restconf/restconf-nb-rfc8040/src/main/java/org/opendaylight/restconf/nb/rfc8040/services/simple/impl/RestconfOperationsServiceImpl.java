@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
@@ -30,39 +32,24 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link RestconfOperationsService}.
- *
  */
 @Path("/")
 public class RestconfOperationsServiceImpl implements RestconfOperationsService {
-
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);
 
-    private volatile SchemaContextHandler schemaContextHandler;
-    private volatile DOMMountPointServiceHandler domMountPointServiceHandler;
+    private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointServiceHandler domMountPointServiceHandler;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
      *
-     * @param schemaContextHandler
-     *             handling schema context
-     * @param domMountPointServiceHandler
-     *             handling dom mount point service
+     * @param schemaContextHandler handling schema context
+     * @param domMountPointServiceHandler handling dom mount point service
      */
     public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler) {
-        this.schemaContextHandler = schemaContextHandler;
-        this.domMountPointServiceHandler = domMountPointServiceHandler;
-    }
-
-    @Override
-    public synchronized void updateHandlers(final Object... handlers) {
-        for (final Object object : handlers) {
-            if (object instanceof SchemaContextHandler) {
-                schemaContextHandler = (SchemaContextHandler) object;
-            } else if (object instanceof DOMMountPointServiceHandler) {
-                domMountPointServiceHandler = (DOMMountPointServiceHandler) object;
-            }
-        }
+        this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.domMountPointServiceHandler = requireNonNull(domMountPointServiceHandler);
     }
 
     @Override
