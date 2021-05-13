@@ -21,18 +21,6 @@
     <description>Simple NETCONF topology</description>
     <packaging>bundle</packaging>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>netconf-artifacts</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

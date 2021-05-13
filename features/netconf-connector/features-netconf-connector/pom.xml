@@ -27,46 +27,52 @@
     <skip.karaf.featureTest>true</skip.karaf.featureTest>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>netconf-artifacts</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-clustered-topology</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-connector</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-connector-all</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-callhome-ssh</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-console</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-topology</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
