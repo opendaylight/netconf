@@ -12,10 +12,10 @@ import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
@@ -41,7 +41,7 @@ public class Rfc8040RestConfWiring {
 
     @Inject
     public Rfc8040RestConfWiring(final SchemaContextHandler schemaCtxHandler,
-            final DOMMountPointServiceHandler domMountPointServiceHandler,
+            @Reference final DOMMountPointService mountPointService,
             final TransactionChainHandler transactionChainHandler,
             // Note: DOMDataBroker is not @Reference, because there is funkiness in the hand-written
             //       blueprint container.
@@ -52,7 +52,7 @@ public class Rfc8040RestConfWiring {
             final SSEInitializer sseInit,
             final Configuration configuration,
             @Reference final DOMSchemaService domSchemaService) {
-        servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, domMountPointServiceHandler,
+        servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, mountPointService,
             transactionChainHandler, dataBroker, rpcService, actionService, notificationService,
             domSchemaService, configuration);
         servicesNotifWrapper = ServicesNotifWrapper.newInstance(sseInit);

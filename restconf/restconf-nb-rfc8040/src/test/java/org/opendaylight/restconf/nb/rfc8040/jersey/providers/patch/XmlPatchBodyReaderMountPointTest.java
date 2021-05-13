@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static org.junit.Assert.assertEquals;
@@ -22,14 +21,15 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderT
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
+    private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount/";
+
+    private static EffectiveModelContext schemaContext;
 
     private final XmlToPatchBodyReader xmlToPatchBodyReader;
-    private static EffectiveModelContext schemaContext;
-    private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount/";
 
     public XmlPatchBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        xmlToPatchBodyReader = new XmlToPatchBodyReader(schemaContextHandler, mountPointServiceHandler);
+        xmlToPatchBodyReader = new XmlToPatchBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override

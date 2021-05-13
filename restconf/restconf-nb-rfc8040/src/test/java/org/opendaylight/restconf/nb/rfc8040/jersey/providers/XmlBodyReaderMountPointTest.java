@@ -41,15 +41,16 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
-    private final XmlNormalizedNodeBodyReader xmlBodyReader;
-    private static EffectiveModelContext schemaContext;
-
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME =  QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
+    private static EffectiveModelContext schemaContext;
+
+    private final XmlNormalizedNodeBodyReader xmlBodyReader;
+
     public XmlBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler);
+        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override

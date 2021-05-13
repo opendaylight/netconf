@@ -13,6 +13,7 @@ import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -20,7 +21,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.OperationsResourceUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -38,18 +38,18 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);
 
     private final SchemaContextHandler schemaContextHandler;
-    private final DOMMountPointServiceHandler domMountPointServiceHandler;
+    private final DOMMountPointService mountPointService;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
      *
      * @param schemaContextHandler handling schema context
-     * @param domMountPointServiceHandler handling dom mount point service
+     * @param mountPointService handling dom mount point service
      */
     public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler domMountPointServiceHandler) {
+            final DOMMountPointService mountPointService) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
-        this.domMountPointServiceHandler = requireNonNull(domMountPointServiceHandler);
+        this.mountPointService = requireNonNull(mountPointService);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         }
 
         final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-            schemaContextHandler.get(), Optional.of(this.domMountPointServiceHandler.get()));
+            schemaContextHandler.get(), Optional.of(mountPointService));
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         return OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
     }

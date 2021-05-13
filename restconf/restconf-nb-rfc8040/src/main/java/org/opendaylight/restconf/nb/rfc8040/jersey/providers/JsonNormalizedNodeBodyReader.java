@@ -18,13 +18,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -54,9 +54,9 @@ import org.slf4j.LoggerFactory;
 public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
 
-    public JsonNormalizedNodeBodyReader(SchemaContextHandler schemaContextHandler,
-            DOMMountPointServiceHandler mountPointServiceHandler) {
-        super(schemaContextHandler, mountPointServiceHandler);
+    public JsonNormalizedNodeBodyReader(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointService mountPointService) {
+        super(schemaContextHandler, mountPointService);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -79,15 +79,12 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final SchemaNode parentSchema;
         if (isPost) {
             parentSchema = path.getSchemaNode();
-        } else if (path.getSchemaNode() instanceof SchemaContext) {
+        } else if (path.getSchemaNode() instanceof SchemaContext
+            || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
             parentSchema = path.getSchemaContext();
         } else {
-            if (SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
-                parentSchema = path.getSchemaContext();
-            } else {
-                parentSchema = SchemaContextUtil
-                        .findDataSchemaNode(path.getSchemaContext(), path.getSchemaNode().getPath().getParent());
-            }
+            parentSchema = SchemaContextUtil
+                    .findDataSchemaNode(path.getSchemaContext(), path.getSchemaNode().getPath().getParent());
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,

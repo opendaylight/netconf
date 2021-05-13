@@ -9,7 +9,8 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
+import org.apache.aries.blueprint.annotation.service.Reference;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
 
@@ -20,8 +21,8 @@ import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrappe
 public class RestconfNotifApplication extends AbstractRestconfApplication<ServicesNotifWrapper> {
     @Inject
     public RestconfNotifApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler mountPointServiceHandler,
+            @Reference final DOMMountPointService mountPointService,
             final ServicesNotifWrapper servicesNotifWrapper) {
-        super(schemaContextHandler, mountPointServiceHandler, servicesNotifWrapper);
+        super(schemaContextHandler, mountPointService, servicesNotifWrapper);
     }
 }

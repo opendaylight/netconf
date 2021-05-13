@@ -40,16 +40,16 @@ import org.opendaylight.yangtools.yang.parser.spi.source.SourceException;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class JsonBodyReaderTest extends AbstractBodyReaderTest {
-
-    private final JsonNormalizedNodeBodyReader jsonBodyReader;
-    private static EffectiveModelContext schemaContext;
-
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
+    private static EffectiveModelContext schemaContext;
+
+    private final JsonNormalizedNodeBodyReader jsonBodyReader;
+
     public JsonBodyReaderTest() throws Exception {
         super(schemaContext);
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler);
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override
