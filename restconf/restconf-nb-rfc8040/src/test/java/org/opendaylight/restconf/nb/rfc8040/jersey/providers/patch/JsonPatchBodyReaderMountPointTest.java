@@ -23,14 +23,14 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReader
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
-
     private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount/";
     private static EffectiveModelContext schemaContext;
+
     private final JsonToPatchBodyReader jsonToPatchBodyReader;
 
     public JsonPatchBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler);
+        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override

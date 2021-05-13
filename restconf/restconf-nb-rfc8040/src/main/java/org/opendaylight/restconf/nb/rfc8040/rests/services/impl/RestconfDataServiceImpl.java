@@ -35,6 +35,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -46,7 +47,6 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
@@ -108,19 +108,19 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private final SchemaContextHandler schemaContextHandler;
     private final TransactionChainHandler transactionChainHandler;
-    private final DOMMountPointServiceHandler mountPointServiceHandler;
+    private final DOMMountPointService mountPointService;
     private final DOMActionService actionService;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
             final TransactionChainHandler transactionChainHandler,
-            final DOMMountPointServiceHandler mountPointServiceHandler,
+            final DOMMountPointService  mountPointService,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final DOMActionService actionService,
             final Configuration configuration) {
         this.actionService = requireNonNull(actionService);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
-        this.mountPointServiceHandler = requireNonNull(mountPointServiceHandler);
+        this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
@@ -135,7 +135,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response readData(final String identifier, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContextRef = this.schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextRef, Optional.of(this.mountPointServiceHandler.get()));
+                identifier, schemaContextRef, Optional.of(mountPointService));
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
@@ -328,7 +328,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response deleteData(final String identifier) {
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, this.schemaContextHandler.get(), Optional.of(this.mountPointServiceHandler.get()));
+                identifier, this.schemaContextHandler.get(), Optional.of(mountPointService));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);

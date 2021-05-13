@@ -61,7 +61,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -212,7 +211,7 @@ public class RestconfDataServiceImplTest {
 
         schemaContextHandler.onModelContextUpdated(this.contextRef);
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
-                new DOMMountPointServiceHandler(mountPointService), this.delegRestconfSubscrService,
+                mountPointService, this.delegRestconfSubscrService,
                 this.actionService, configuration);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));

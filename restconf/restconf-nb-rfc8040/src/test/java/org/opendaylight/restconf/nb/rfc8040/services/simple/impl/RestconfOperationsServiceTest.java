@@ -23,7 +23,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -45,7 +44,6 @@ public class RestconfOperationsServiceTest {
 
     private EffectiveModelContext schemaContext;
     private SchemaContextHandler schemaContextHandler;
-    private DOMMountPointServiceHandler domMountPointServiceHandler;
 
     private Set<QName> listOfRpcsNames;
 
@@ -53,8 +51,6 @@ public class RestconfOperationsServiceTest {
     public void init() throws Exception {
         this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
         this.schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
-
-        this.domMountPointServiceHandler = new DOMMountPointServiceHandler(this.domMountPointService);
 
         final QNameModule module1 = QNameModule.create(URI.create("module:1"));
         final QNameModule module2 = QNameModule.create(URI.create("module:2"));
@@ -67,7 +63,7 @@ public class RestconfOperationsServiceTest {
     @Test
     public void getOperationsTest() {
         final RestconfOperationsServiceImpl oper =
-                new RestconfOperationsServiceImpl(this.schemaContextHandler, this.domMountPointServiceHandler);
+                new RestconfOperationsServiceImpl(this.schemaContextHandler, this.domMountPointService);
         final NormalizedNodeContext operations = oper.getOperations(this.uriInfo);
         final ContainerNode data = (ContainerNode) operations.getData();
         assertEquals("urn:ietf:params:xml:ns:yang:ietf-restconf", data.getNodeType().getNamespace().toString());

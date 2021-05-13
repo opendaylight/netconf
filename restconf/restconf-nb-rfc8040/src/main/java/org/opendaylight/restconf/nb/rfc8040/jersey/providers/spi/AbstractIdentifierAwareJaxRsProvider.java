@@ -23,7 +23,6 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -38,12 +37,12 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     private Request request;
 
     private final SchemaContextHandler schemaContextHandler;
-    private final DOMMountPointServiceHandler mountPointServiceHandler;
+    private final DOMMountPointService mountPointService;
 
     protected AbstractIdentifierAwareJaxRsProvider(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler mountPointServiceHandler) {
+            final DOMMountPointService mountPointService) {
         this.schemaContextHandler = schemaContextHandler;
-        this.mountPointServiceHandler = mountPointServiceHandler;
+        this.mountPointService = mountPointService;
     }
 
     @Override
@@ -101,7 +100,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     }
 
     protected DOMMountPointService getMountPointService() {
-        return mountPointServiceHandler.get();
+        return mountPointService;
     }
 
     protected boolean isPost() {

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,15 +43,16 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class XmlBodyReaderTest extends AbstractBodyReaderTest {
-
-    private final XmlNormalizedNodeBodyReader xmlBodyReader;
-    private static EffectiveModelContext schemaContext;
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
+    private static EffectiveModelContext schemaContext;
+
+    private final XmlNormalizedNodeBodyReader xmlBodyReader;
+
     public XmlBodyReaderTest() throws Exception {
         super(schemaContext);
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler);
+        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override

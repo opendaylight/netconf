@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -33,7 +34,6 @@ import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
@@ -67,9 +67,9 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
-    public XmlToPatchBodyReader(SchemaContextHandler schemaContextHandler,
-            DOMMountPointServiceHandler mountPointServiceHandler) {
-        super(schemaContextHandler, mountPointServiceHandler);
+    public XmlToPatchBodyReader(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointService mountPointService) {
+        super(schemaContextHandler, mountPointService);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")

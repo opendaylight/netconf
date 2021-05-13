@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
@@ -34,13 +34,13 @@ import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
  */
 public abstract class AbstractRestconfApplication<T> extends Application {
     private final SchemaContextHandler schemaContextHandler;
-    private final DOMMountPointServiceHandler mountPointServiceHandler;
+    private final DOMMountPointService mountPointService;
     private final T servicesWrapper;
 
     public AbstractRestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler mountPointServiceHandler, final T servicesNotifWrapper) {
+            final DOMMountPointService mountPointService, final T servicesNotifWrapper) {
         this.schemaContextHandler = schemaContextHandler;
-        this.mountPointServiceHandler = mountPointServiceHandler;
+        this.mountPointService = mountPointService;
         this.servicesWrapper = servicesNotifWrapper;
     }
 
@@ -57,10 +57,10 @@ public abstract class AbstractRestconfApplication<T> extends Application {
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
         singletons.add(servicesWrapper);
-        singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
-        singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
-        singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
-        singletons.add(new XmlToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService));
+        singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointService));
+        singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService));
+        singletons.add(new XmlToPatchBodyReader(schemaContextHandler, mountPointService));
         singletons.add(new RestconfDocumentedExceptionMapper(schemaContextHandler));
         return singletons;
     }

@@ -28,7 +28,6 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -36,10 +35,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractBodyReaderTest {
-
     protected final MediaType mediaType;
     protected final SchemaContextHandler schemaContextHandler;
-    protected final DOMMountPointServiceHandler mountPointServiceHandler;
+    protected final DOMMountPointService mountPointService;
 
     protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) throws NoSuchFieldException,
             IllegalAccessException {
@@ -47,13 +45,11 @@ public abstract class AbstractBodyReaderTest {
 
         schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
 
-        final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
+        mountPointService = mock(DOMMountPointService.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(schemaContext))).when(mountPoint)
             .getService(DOMSchemaService.class);
-
-        mountPointServiceHandler = new DOMMountPointServiceHandler(mountPointService);
     }
 
     protected abstract MediaType getMediaType();

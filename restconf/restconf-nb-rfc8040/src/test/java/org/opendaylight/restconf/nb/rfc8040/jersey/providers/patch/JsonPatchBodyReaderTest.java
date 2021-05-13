@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -29,7 +28,7 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
     public JsonPatchBodyReaderTest() throws Exception {
         super(schemaContext);
-        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler);
+        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override
