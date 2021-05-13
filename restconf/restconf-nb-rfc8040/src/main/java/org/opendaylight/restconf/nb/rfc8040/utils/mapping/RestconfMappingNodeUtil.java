@@ -28,7 +28,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -45,8 +44,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Deviation;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
-import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
@@ -196,15 +193,10 @@ public final class RestconfMappingNodeUtil {
     private static void addFeatureLeafList(
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Collection<? extends FeatureDefinition> features) {
-        final ListNodeBuilder<Object, LeafSetEntryNode<Object>> leafSetBuilder = Builders.leafSetBuilder()
+        final ListNodeBuilder<String, LeafSetEntryNode<String>> leafSetBuilder = Builders.<String>leafSetBuilder()
                 .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.SPECIFIC_MODULE_FEATURE_LEAF_LIST_QNAME));
         for (final FeatureDefinition feature : features) {
-            final String featureName = feature.getQName().getLocalName();
-            leafSetBuilder.withChild(Builders.leafSetEntryBuilder()
-                .withNodeIdentifier(
-                    new NodeWithValue<>(IetfYangLibrary.SPECIFIC_MODULE_FEATURE_LEAF_LIST_QNAME, featureName))
-                .withValue(featureName)
-                .build());
+            leafSetBuilder.withChildValue(feature.getQName().getLocalName());
         }
         mapEntryBuilder.withChild(leafSetBuilder.build());
     }
@@ -224,82 +216,28 @@ public final class RestconfMappingNodeUtil {
     /**
      * Map capabilites by ietf-restconf-monitoring.
      *
-     * @param monitoringModule
-     *             ietf-restconf-monitoring module
+     * @param monitoringModule ietf-restconf-monitoring module
      * @return mapped capabilites
      */
     public static ContainerNode mapCapabilites(final Module monitoringModule) {
-        final DataSchemaNode restconfState =
-                monitoringModule.getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME);
-        final DataSchemaNode capabilitesContSchema =
-                getChildOfCont((ContainerSchemaNode) restconfState, MonitoringModule.CONT_CAPABILITES_QNAME);
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> capabilitesContBuilder =
-                Builders.containerBuilder((ContainerSchemaNode) capabilitesContSchema);
-        final DataSchemaNode leafListCapa = getChildOfCont((ContainerSchemaNode) capabilitesContSchema,
-                MonitoringModule.LEAF_LIST_CAPABILITY_QNAME);
-        final ListNodeBuilder<Object, LeafSetEntryNode<Object>> leafListCapaBuilder =
-                Builders.orderedLeafSetBuilder((LeafListSchemaNode) leafListCapa);
-        fillLeafListCapa(leafListCapaBuilder, (LeafListSchemaNode) leafListCapa);
-
         return Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
-            .withChild(capabilitesContBuilder.withChild(leafListCapaBuilder.build()).build())
+            .withChild(Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(MonitoringModule.CONT_CAPABILITES_QNAME))
+                .withChild(Builders.<String>orderedLeafSetBuilder()
+                    .withNodeIdentifier(new NodeIdentifier(MonitoringModule.LEAF_LIST_CAPABILITY_QNAME))
+                    .withChildValue(QueryParams.DEPTH)
+                    .withChildValue(QueryParams.FIELDS)
+                    .withChildValue(QueryParams.FILTER)
+                    .withChildValue(QueryParams.REPLAY)
+                    .withChildValue(QueryParams.WITH_DEFAULTS)
+                    .build())
+                .build())
             .build();
     }
 
     /**
-     * Map data to leaf-list.
-     *
-     * @param builder
-     *             builder of parent for children
-     * @param leafListSchema
-     *             leaf list schema
-     */
-    private static void fillLeafListCapa(final ListNodeBuilder<Object, LeafSetEntryNode<Object>> builder,
-            final LeafListSchemaNode leafListSchema) {
-        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.DEPTH));
-        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.FIELDS));
-        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.FILTER));
-        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.REPLAY));
-        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.WITH_DEFAULTS));
-    }
-
-    /**
-     * Map value to leaf list entry node.
-     *
-     * @param leafListSchema
-     *             leaf list schema of leaf list entry
-     * @param value
-     *             value of leaf entry
-     * @return entry node
-     */
-    private static LeafSetEntryNode<Object> leafListEntryBuild(final LeafListSchemaNode leafListSchema,
-            final String value) {
-        return Builders.leafSetEntryBuilder(leafListSchema).withValue(value).build();
-    }
-
-    /**
-     * Find specific schema node by qname in parent {@link ContainerSchemaNode}.
-     *
-     * @param parent
-     *             schemaNode
-     * @param childQName
-     *             specific qname of child
-     * @return schema node of child by qname
-     */
-    private static DataSchemaNode getChildOfCont(final ContainerSchemaNode parent, final QName childQName) {
-        for (final DataSchemaNode child : parent.getChildNodes()) {
-            if (child.getQName().equals(childQName)) {
-                return child;
-            }
-        }
-        throw new RestconfDocumentedException(
-                childQName.getLocalName() + " doesn't exist in container " + MonitoringModule.CONT_RESTCONF_STATE_NAME);
-    }
-
-    /**
-     * Map data of yang notification to normalized node according to
-     * ietf-restconf-monitoring.
+     * Map data of yang notification to normalized node according to ietf-restconf-monitoring.
      *
      * @param notifiQName
      *             qname of notification from listener
@@ -328,62 +266,41 @@ public final class RestconfMappingNodeUtil {
                                 .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME))
                                         .getDataChildByName(MonitoringModule.LIST_STREAM_QNAME);
                 final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
-                        Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
+                        Builders.mapEntryBuilder((ListSchemaNode) streamListSchema)
+                        .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_NAME_STREAM_QNAME,
+                            notificationDefinition.getQName().getLocalName()));
 
-                final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
-                prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
-                        notificationDefinition.getQName().getLocalName());
-
-                final Optional<String> optDesc = notificationDefinition.getDescription();
-                if (optDesc.isPresent()) {
-                    prepareLeafAndFillEntryBuilder(streamEntry,
-                            listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME), optDesc.get());
-                }
-                prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
+                notificationDefinition.getDescription().ifPresent(
+                    desc -> streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_DESCR_STREAM_QNAME,
+                        desc)));
+                streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME,
+                    Boolean.TRUE));
                 if (start != null) {
-                    prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
+                    streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_START_TIME_STREAM_QNAME,
                         DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,
-                            ZoneId.systemDefault())));
+                            ZoneId.systemDefault()))));
                 }
-                prepareListAndFillEntryBuilder(streamEntry,
-                        (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME),
-                        outputType, uri);
 
-                return streamEntry.build();
+                return streamEntry
+                    .withChild(createAccessList(outputType, uri))
+                    .build();
             }
         }
 
         throw new RestconfDocumentedException(notifiQName + " doesn't exist in any modul");
     }
 
-    private static void prepareListAndFillEntryBuilder(
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
-            final ListSchemaNode listSchemaNode, final String outputType, final URI uriToWebsocketServer) {
-        final CollectionNodeBuilder<MapEntryNode, MapNode> accessListBuilder = Builders.mapBuilder(listSchemaNode);
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> entryAccessList =
-                Builders.mapEntryBuilder(listSchemaNode);
-        prepareLeafAndFillEntryBuilder(entryAccessList,
-                listSchemaNode.getDataChildByName(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME), outputType);
-        prepareLeafAndFillEntryBuilder(entryAccessList,
-                listSchemaNode.getDataChildByName(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME),
-                uriToWebsocketServer.toString());
-        streamEntry.withChild(accessListBuilder.withChild(entryAccessList.build()).build());
-    }
-
-    /**
-     * Prepare leaf and fill entry builder.
-     *
-     * @param streamEntry   Stream entry
-     * @param leafSchema    Leaf schema
-     * @param value         Value
-     */
-    private static void prepareLeafAndFillEntryBuilder(
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
-            final DataSchemaNode leafSchema, final Object value) {
-        streamEntry.withChild(Builders.leafBuilder((LeafSchemaNode) leafSchema).withValue(value).build());
+    private static MapNode createAccessList(final String outputType, final URI uriToWebsocketServer) {
+        return Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(MonitoringModule.LIST_ACCESS_STREAM_QNAME))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(MonitoringModule.LIST_ACCESS_STREAM_QNAME,
+                    MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME,
+                    uriToWebsocketServer.toString()))
+                .build())
+            .build();
     }
 
     /**
@@ -421,24 +338,16 @@ public final class RestconfMappingNodeUtil {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
                 Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
 
-        final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME), streamName);
+        streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_NAME_STREAM_QNAME, streamName));
 
-        final Optional<String> optDesc = schemaNode.getDescription();
-        if (optDesc.isPresent()) {
-            prepareLeafAndFillEntryBuilder(streamEntry,
-                    listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME), optDesc.get());
-        }
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
-                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
-        prepareListAndFillEntryBuilder(streamEntry,
-                (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME), outputType,
-                uri);
+        schemaNode.getDescription().ifPresent(desc ->
+            streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_DESCR_STREAM_QNAME, desc)));
 
-        return streamEntry.build();
+        return streamEntry
+            .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, Boolean.TRUE))
+            .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_START_TIME_STREAM_QNAME,
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault()))))
+            .withChild(createAccessList(outputType, uri))
+            .build();
     }
 }
