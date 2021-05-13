@@ -18,8 +18,9 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 /**
  * Implementation of {@link ActionServiceHandler}.
  */
+// FIXME: remove this class
 @Singleton
-public class ActionServiceHandler implements Handler<DOMActionService> {
+public class ActionServiceHandler {
     private final @NonNull DOMActionService actionService;
 
     /**
@@ -33,7 +34,6 @@ public class ActionServiceHandler implements Handler<DOMActionService> {
         this.actionService = requireNonNull(actionService);
     }
 
-    @Override
     public @NonNull DOMActionService get() {
         return this.actionService;
     }

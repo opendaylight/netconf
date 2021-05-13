@@ -7,25 +7,27 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
+import static java.util.Objects.requireNonNull;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 
 /**
  * Implementation of {@link DOMDataBrokerHandler}.
  */
+// FIXME: remove this class
 @Singleton
-public class DOMDataBrokerHandler implements Handler<DOMDataBroker> {
-
+public class DOMDataBrokerHandler {
     private final DOMDataBroker broker;
 
     @Inject
     public DOMDataBrokerHandler(final DOMDataBroker broker) {
-        this.broker = broker;
+        this.broker = requireNonNull(broker);
     }
 
-    @Override
-    public DOMDataBroker get() {
-        return this.broker;
+    public @NonNull DOMDataBroker get() {
+        return broker;
     }
 }

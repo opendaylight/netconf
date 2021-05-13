@@ -12,13 +12,15 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 
 /**
  * Implementation of {@link DOMMountPointServiceHandler}.
  */
+// FIXME: remove this class
 @Singleton
-public final class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
+public final class DOMMountPointServiceHandler {
     private final DOMMountPointService domMountPointService;
 
     /**
@@ -32,8 +34,7 @@ public final class DOMMountPointServiceHandler implements Handler<DOMMountPointS
         this.domMountPointService = requireNonNull(domMountPointService);
     }
 
-    @Override
-    public DOMMountPointService get() {
+    public @NonNull DOMMountPointService get() {
         return this.domMountPointService;
     }
 }

@@ -12,9 +12,9 @@ import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 
+// FIXME: remove this class
 @Singleton
-public class NotificationServiceHandler implements Handler<DOMNotificationService> {
-
+public class NotificationServiceHandler {
     private final DOMNotificationService notificationService;
 
     /**
@@ -28,7 +28,6 @@ public class NotificationServiceHandler implements Handler<DOMNotificationServic
         this.notificationService = notificationService;
     }
 
-    @Override
     public DOMNotificationService get() {
         return this.notificationService;
     }

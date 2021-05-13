@@ -35,6 +35,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +43,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@link SchemaContextHandler}.
  */
+// FIXME: this really is a service which is maintaining ietf-yang-library contents inside the datastore. It really
+//        should live in MD-SAL and be a dynamic store fragment. As a first step we should be turning this into a
+//        completely standalone application.
 @Singleton
-public class SchemaContextHandler implements SchemaContextListenerHandler, AutoCloseable {
+public class SchemaContextHandler implements EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
     private final AtomicInteger moduleSetId = new AtomicInteger(0);
@@ -94,7 +98,6 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
         }
     }
 
-    @Override
     public EffectiveModelContext get() {
         return schemaContext;
     }

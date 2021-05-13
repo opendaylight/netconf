@@ -24,8 +24,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@link TransactionChainHandler}.
  */
+// FIXME: untangle this class, what good is it, really?!
 @Singleton
-public class TransactionChainHandler implements Handler<DOMTransactionChain>, AutoCloseable {
+public class TransactionChainHandler implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(TransactionChainHandler.class);
 
     private final DOMTransactionChainListener transactionChainListener = new DOMTransactionChainListener() {
@@ -61,7 +62,6 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
      * After use, is important to close transactionChain by method {@link DOMTransactionChain#close()}.
      * @return new instance of object {@link DOMTransactionChain}
      */
-    @Override
     public DOMTransactionChain get() {
         final DOMTransactionChain transactionChain = dataBroker.createTransactionChain(transactionChainListener);
         this.transactionChainList.add(transactionChain);
@@ -72,7 +72,7 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
     @Override
     @PreDestroy
     public synchronized void close() {
-        for (DOMTransactionChain transactionChain: this.transactionChainList) {
+        for (DOMTransactionChain transactionChain : this.transactionChainList) {
             transactionChain.close();
             LOG.trace("Closed TransactionChain({})", transactionChain);
         }

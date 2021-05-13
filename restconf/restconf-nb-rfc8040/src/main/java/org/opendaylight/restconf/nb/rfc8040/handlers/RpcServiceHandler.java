@@ -15,8 +15,9 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 /**
  * Implementation of {@link RpcServiceHandler}.
  */
+// FIXME: remove this class
 @Singleton
-public class RpcServiceHandler implements Handler<DOMRpcService> {
+public class RpcServiceHandler {
     private final DOMRpcService rpcService;
 
     @Inject
@@ -24,7 +25,6 @@ public class RpcServiceHandler implements Handler<DOMRpcService> {
         this.rpcService = rpcService;
     }
 
-    @Override
     public DOMRpcService get() {
         return this.rpcService;
     }
