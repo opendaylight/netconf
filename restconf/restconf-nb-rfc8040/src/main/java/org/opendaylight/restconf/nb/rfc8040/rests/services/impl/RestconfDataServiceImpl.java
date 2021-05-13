@@ -106,11 +106,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
     private final SubscribeToStreamUtil streamUtils;
 
-    // FIXME: evaluate thread-safety of updates (synchronized) vs. access (mostly unsynchronized) here
-    private SchemaContextHandler schemaContextHandler;
-    private TransactionChainHandler transactionChainHandler;
-    private DOMMountPointServiceHandler mountPointServiceHandler;
-    private volatile ActionServiceHandler actionServiceHandler;
+    private final SchemaContextHandler schemaContextHandler;
+    private final TransactionChainHandler transactionChainHandler;
+    private final DOMMountPointServiceHandler mountPointServiceHandler;
+    private final ActionServiceHandler actionServiceHandler;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
             final TransactionChainHandler transactionChainHandler,
@@ -125,21 +124,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
-    }
-
-    @Override
-    public synchronized void updateHandlers(final Object... handlers) {
-        for (final Object object : handlers) {
-            if (object instanceof SchemaContextHandler) {
-                schemaContextHandler = (SchemaContextHandler) object;
-            } else if (object instanceof ActionServiceHandler) {
-                actionServiceHandler = (ActionServiceHandler) object;
-            } else if (object instanceof DOMMountPointServiceHandler) {
-                mountPointServiceHandler = (DOMMountPointServiceHandler) object;
-            } else if (object instanceof TransactionChainHandler) {
-                transactionChainHandler = (TransactionChainHandler) object;
-            }
-        }
     }
 
     @Override

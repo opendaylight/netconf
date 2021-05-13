@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import javax.ws.rs.Path;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
@@ -21,44 +23,28 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 @Path("/")
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
-
-    private volatile SchemaContextHandler schemaContextHandler;
-    private volatile DOMMountPointServiceHandler domMountPointServiceHandler;
-    private volatile DOMYangTextSourceProvider sourceProvider;
+    private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointServiceHandler domMountPointServiceHandler;
+    private final DOMYangTextSourceProvider sourceProvider;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}
      * .
      *
-     * @param schemaContextHandler
-     *             handling schema context
-     * @param domMountPointServiceHandler
-     *             handling dom mount point service
+     * @param schemaContextHandler handling schema context
+     * @param domMountPointServiceHandler handling dom mount point service
      */
     public RestconfSchemaServiceImpl(final SchemaContextHandler schemaContextHandler,
                                      final DOMMountPointServiceHandler domMountPointServiceHandler,
                                      final DOMYangTextSourceProvider sourceProvider) {
-        this.schemaContextHandler = schemaContextHandler;
-        this.domMountPointServiceHandler = domMountPointServiceHandler;
-        this.sourceProvider = sourceProvider;
+        this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.domMountPointServiceHandler = requireNonNull(domMountPointServiceHandler);
+        this.sourceProvider = requireNonNull(sourceProvider);
     }
 
     @Override
     public SchemaExportContext getSchema(final String identifier) {
         return ParserIdentifier.toSchemaExportContextFromIdentifier(this.schemaContextHandler.get(), identifier,
                 this.domMountPointServiceHandler.get(), sourceProvider);
-    }
-
-    @Override
-    public synchronized void updateHandlers(final Object... handlers) {
-        for (final Object object : handlers) {
-            if (object instanceof SchemaContextHandler) {
-                schemaContextHandler = (SchemaContextHandler) object;
-            } else if (object instanceof DOMMountPointServiceHandler) {
-                domMountPointServiceHandler = (DOMMountPointServiceHandler) object;
-            } else if (object instanceof DOMYangTextSourceProvider) {
-                sourceProvider = (DOMYangTextSourceProvider) object;
-            }
-        }
     }
 }

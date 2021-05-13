@@ -60,8 +60,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
 
     private final SubscribeToStreamUtil streamUtils;
-
-    private HandlersHolder handlersHolder;
+    private final HandlersHolder handlersHolder;
 
     /**
      * Initialize holder of handlers with holders as parameters.
@@ -84,15 +83,6 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                 transactionChainHandler, schemaHandler);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
-    }
-
-    @Override
-    public synchronized void updateHandlers(final Object... handlers) {
-        for (final Object object : handlers) {
-            if (object instanceof HandlersHolder) {
-                handlersHolder = (HandlersHolder) object;
-            }
-        }
     }
 
     @Override

@@ -10,10 +10,10 @@ package org.opendaylight.restconf.nb.rfc8040.services.simple.api;
 /**
  * Wrapper for all base services.
  * <ul>
- * <li>{@link RestconfOperationsService}
- * <li>{@link RestconfSchemaService}
+ *   <li>{@link RestconfOperationsService}</li>
+ *   <li>{@link RestconfSchemaService}</li>
  * </ul>
- *
  */
 public interface BaseServicesWrapper extends RestconfOperationsService, RestconfSchemaService, RestconfService {
+
 }

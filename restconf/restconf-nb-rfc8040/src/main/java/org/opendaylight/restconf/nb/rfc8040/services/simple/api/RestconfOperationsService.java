@@ -21,12 +21,11 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 /**
  * Container that provides access to the data-model specific operations supported by the server.
  */
-public interface RestconfOperationsService extends UpdateHandlers {
+public interface RestconfOperationsService {
     /**
      * List of rpc or action operations supported by the server.
      *
-     * @param uriInfo
-     *             URI information
+     * @param uriInfo URI information
      * @return {@link NormalizedNodeContext}
      */
     @GET
@@ -43,10 +42,8 @@ public interface RestconfOperationsService extends UpdateHandlers {
     /**
      * Valid for mount points. List of operations supported by the server.
      *
-     * @param identifier
-     *             path parameter
-     * @param uriInfo
-     *             URI information
+     * @param identifier path parameter
+     * @param uriInfo URI information
      * @return {@link NormalizedNodeContext}
      */
     @GET
