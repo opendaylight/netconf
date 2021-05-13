@@ -34,6 +34,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -48,7 +49,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -107,19 +107,17 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final SubscribeToStreamUtil streamUtils;
 
     private final SchemaContextHandler schemaContextHandler;
-    private final TransactionChainHandler transactionChainHandler;
     private final DOMMountPointService mountPointService;
     private final DOMActionService actionService;
+    private final DOMDataBroker dataBroker;
 
-    public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
-            final TransactionChainHandler transactionChainHandler,
-            final DOMMountPointService  mountPointService,
-            final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final DOMActionService actionService,
+    public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler, final DOMDataBroker dataBroker,
+            final DOMMountPointService mountPointService,
+            final RestconfStreamsSubscriptionService delegRestconfSubscrService, final DOMActionService actionService,
             final Configuration configuration) {
         this.actionService = requireNonNull(actionService);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
-        this.transactionChainHandler = requireNonNull(transactionChainHandler);
+        this.dataBroker = requireNonNull(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
@@ -373,7 +371,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     // FIXME: why is this synchronized?
     public synchronized RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
         if (mountPoint == null) {
-            return new MdsalRestconfStrategy(transactionChainHandler);
+            return new MdsalRestconfStrategy(dataBroker);
         }
 
         return RestconfStrategy.forMountPoint(mountPoint).orElseThrow(() -> {

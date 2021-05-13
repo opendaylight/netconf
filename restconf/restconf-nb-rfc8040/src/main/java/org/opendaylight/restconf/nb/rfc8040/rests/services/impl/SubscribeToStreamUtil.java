@@ -24,7 +24,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -139,8 +138,8 @@ abstract class SubscribeToStreamUtil {
                     ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
-        final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction writeTransaction = handlersHolder.getDataBroker()
+            .newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
@@ -151,8 +150,7 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
-        notificationListenerAdapter.get().setCloseVars(
-                handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+        notificationListenerAdapter.get().setCloseVars(handlersHolder.getSchemaHandler());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                     notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
@@ -161,7 +159,6 @@ abstract class SubscribeToStreamUtil {
             notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
             mapToStreams);
         submitData(writeTransaction);
-        transactionChain.close();
         return uri;
     }
 
@@ -205,12 +202,12 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
-        listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+        listener.get().setCloseVars(handlersHolder.getSchemaHandler());
         registration(datastoreType, listener.get(), handlersHolder.getDataBroker());
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
-        final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction writeTransaction = handlersHolder.getDataBroker()
+            .newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
         final String serializedPath = IdentifierCodec.serialize(listener.get().getPath(), schemaContext);
 
@@ -219,7 +216,6 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getStart(), listener.get().getOutputType(), uri, schemaContext, serializedPath);
         writeDataToDS(schemaContext, serializedPath, writeTransaction, mapToStreams);
         submitData(writeTransaction);
-        transactionChain.close();
         return uri;
     }
 

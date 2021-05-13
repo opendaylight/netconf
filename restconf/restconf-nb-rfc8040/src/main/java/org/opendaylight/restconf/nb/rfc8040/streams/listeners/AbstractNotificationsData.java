@@ -29,7 +29,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -53,7 +52,6 @@ abstract class AbstractNotificationsData {
     private static final TransformerFactory TF = TransformerFactory.newInstance();
     private static final XMLOutputFactory OF = XMLOutputFactory.newInstance();
 
-    private TransactionChainHandler transactionChainHandler;
     protected SchemaContextHandler schemaHandler;
     private String localName;
 
@@ -68,9 +66,7 @@ abstract class AbstractNotificationsData {
      *            {@link YangInstanceIdentifier}
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    public void setCloseVars(final TransactionChainHandler transactionChainHandler,
-            final SchemaContextHandler schemaHandler) {
-        this.transactionChainHandler = transactionChainHandler;
+    public void setCloseVars(final SchemaContextHandler schemaHandler) {
         this.schemaHandler = schemaHandler;
     }
 

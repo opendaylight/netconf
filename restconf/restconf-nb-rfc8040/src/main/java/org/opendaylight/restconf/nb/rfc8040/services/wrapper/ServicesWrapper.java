@@ -22,7 +22,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -70,8 +69,7 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
     }
 
     public static ServicesWrapper newInstance(final SchemaContextHandler schemaCtxHandler,
-            final DOMMountPointService mountPointService,
-            final TransactionChainHandler transactionChainHandler, final DOMDataBroker dataBroker,
+            final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
             final Configuration configuration) {
