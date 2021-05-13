@@ -22,7 +22,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -149,14 +148,14 @@ public final class RestconfInvokeOperationsUtil {
      *             input data
      * @param schemaPath
      *             schema path of data
-     * @param actionServiceHandler
-     *             action service handler to invoke action
+     * @param actionService
+     *             action service to invoke action
      * @return {@link DOMActionResult}
      */
+    // FIXME: eliminate this method
     public static DOMActionResult invokeAction(final ContainerNode data, final Absolute schemaPath,
-            final ActionServiceHandler actionServiceHandler, final YangInstanceIdentifier yangIId) {
-        return prepareActionResult(
-            actionServiceHandler.get().invokeAction(schemaPath, prepareDataTreeId(yangIId), data));
+            final DOMActionService actionService, final YangInstanceIdentifier yangIId) {
+        return prepareActionResult(actionService.invokeAction(schemaPath, prepareDataTreeId(yangIId), data));
     }
 
     /**

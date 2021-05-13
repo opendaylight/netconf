@@ -42,6 +42,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -60,7 +61,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -128,7 +128,7 @@ public class RestconfDataServiceImplTest {
     @Mock
     private NetconfDataTreeService netconfService;
     @Mock
-    private ActionServiceHandler actionServiceHandler;
+    private DOMActionService actionService;
     @Mock
     private DOMTransactionChain mountTransactionChain;
     @Mock
@@ -213,7 +213,7 @@ public class RestconfDataServiceImplTest {
         schemaContextHandler.onModelContextUpdated(this.contextRef);
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
                 new DOMMountPointServiceHandler(mountPointService), this.delegRestconfSubscrService,
-                this.actionServiceHandler, configuration);
+                this.actionService, configuration);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(this.contextRef))).when(this.mountPoint)
