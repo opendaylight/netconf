@@ -33,6 +33,7 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -45,7 +46,6 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -109,15 +109,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final SchemaContextHandler schemaContextHandler;
     private final TransactionChainHandler transactionChainHandler;
     private final DOMMountPointServiceHandler mountPointServiceHandler;
-    private final ActionServiceHandler actionServiceHandler;
+    private final DOMActionService actionService;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
             final TransactionChainHandler transactionChainHandler,
             final DOMMountPointServiceHandler mountPointServiceHandler,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final ActionServiceHandler actionServiceHandler,
+            final DOMActionService actionService,
             final Configuration configuration) {
-        this.actionServiceHandler = requireNonNull(actionServiceHandler);
+        this.actionService = requireNonNull(actionService);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.mountPointServiceHandler = requireNonNull(mountPointServiceHandler);
@@ -410,7 +410,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             schemaContextRef = modelContext(mountPoint);
         } else {
             response = RestconfInvokeOperationsUtil.invokeAction((ContainerNode) data, schemaPath,
-                this.actionServiceHandler, yangIIdContext);
+                this.actionService, yangIIdContext);
             schemaContextRef = this.schemaContextHandler.get();
         }
         final DOMActionResult result = RestconfInvokeOperationsUtil.checkActionResponse(response);
