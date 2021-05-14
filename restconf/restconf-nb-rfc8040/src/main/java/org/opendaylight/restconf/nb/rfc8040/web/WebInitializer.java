@@ -37,14 +37,14 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
  */
 @Singleton
 public class WebInitializer {
-
     private final WebContextRegistration registration;
 
     @Inject
-    public WebInitializer(@Reference WebServer webServer, @Reference WebContextSecurer webContextSecurer,
-            @Reference ServletSupport servletSupport, RestconfApplication webApp,RestconfNotifApplication webAppNotif,
-            @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig,
-            WebSocketInitializer webSocketServlet) throws ServletException {
+    public WebInitializer(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
+            @Reference final ServletSupport servletSupport, final RestconfApplication webApp,
+            final RestconfNotifApplication webAppNotif,
+            @Reference final CustomFilterAdapterConfiguration customFilterAdapterConfig,
+            final WebSocketInitializer webSocketServlet) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("/")
                 .supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
@@ -58,7 +58,7 @@ public class WebInitializer {
                         .build())
 
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(
-                            new RootFoundApplication()).build())
+                            new RootFoundApplication(RestconfConstants.BASE_URI_PATTERN)).build())
                         .addUrlPattern(".well-known/*").name("Rootfound").build())
 
                 // Allows user to add javax.servlet.Filter(s) in front of REST services
