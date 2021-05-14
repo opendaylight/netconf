@@ -219,7 +219,6 @@ public final class ReadDataTransactionUtil {
             case RestconfDataServiceConstant.ReadData.ALL:
                 return readAllData(strategy, path, withDefa, ctx);
             default:
-                strategy.close();
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
@@ -257,7 +256,6 @@ public final class ReadDataTransactionUtil {
             case RestconfDataServiceConstant.ReadData.ALL:
                 return readAllData(strategy, path, withDefa, ctx, fields);
             default:
-                strategy.close();
                 throw new RestconfDocumentedException(new RestconfError(RestconfError.ErrorType.PROTOCOL,
                         RestconfError.ErrorTag.INVALID_VALUE, "Invalid content parameter: " + valueOfContent, null,
                         "The content parameter value must be either config, nonconfig or all (default)"));

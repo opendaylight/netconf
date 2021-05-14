@@ -83,7 +83,7 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
             yangTextSourceProvider);
         RestconfStreamsSubscriptionService restconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(
             dataBroker, notificationService, schemaCtxHandler, transactionChainHandler, configuration);
-        RestconfDataService restconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler,
+        RestconfDataService restconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, dataBroker,
             mountPointService, restconfSubscrService, actionService, configuration);
         RestconfInvokeOperationsService restconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(rpcService,
             schemaCtxHandler);

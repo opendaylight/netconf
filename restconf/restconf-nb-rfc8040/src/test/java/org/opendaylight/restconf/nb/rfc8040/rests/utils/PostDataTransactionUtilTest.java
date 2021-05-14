@@ -31,21 +31,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -64,15 +60,10 @@ import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PostDataTransactionUtilTest {
-
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
 
     @Mock
-    private DOMTransactionChain transactionChain;
-    @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
-    @Mock
-    private DOMDataTreeReadTransaction read;
     @Mock
     private UriInfo uriInfo;
     @Mock
@@ -80,7 +71,6 @@ public class PostDataTransactionUtilTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private TransactionChainHandler transactionChainHandler;
     private ContainerNode buildBaseCont;
     private EffectiveModelContext schema;
     private YangInstanceIdentifier iid2;
@@ -139,12 +129,10 @@ public class PostDataTransactionUtilTest {
                 .build();
 
         doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/16/")).when(this.uriInfo).getBaseUriBuilder();
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
 
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
-        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
     }
 
     @Test
@@ -167,7 +155,7 @@ public class PostDataTransactionUtilTest {
                 payload.getData(), Optional.empty());
 
         Response response = PostDataTransactionUtil.postData(this.uriInfo, payload,
-                        new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
+                        new MdsalRestconfStrategy(mockDataBroker), this.schema, null, null);
         assertEquals(201, response.getStatus());
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -191,8 +179,7 @@ public class PostDataTransactionUtilTest {
         final NodeIdentifierWithPredicates identifier = entryNode.getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(read).when(this.transactionChain).newReadOnlyTransaction();
-        doReturn(immediateFalseFluentFuture()).when(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
@@ -202,11 +189,11 @@ public class PostDataTransactionUtilTest {
             LogicalDatastoreType.CONFIGURATION, node, entryNode, Optional.empty());
 
         Response response = PostDataTransactionUtil.postData(this.uriInfo, payload,
-                        new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
+                        new MdsalRestconfStrategy(mockDataBroker), this.schema, null, null);
         assertEquals(201, response.getStatus());
         assertThat(URLDecoder.decode(response.getLocation().toString(), StandardCharsets.UTF_8),
             containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
-        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION, node);
+        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
 
         response = PostDataTransactionUtil.postData(this.uriInfo, payload,
@@ -240,7 +227,7 @@ public class PostDataTransactionUtilTest {
 
         try {
             PostDataTransactionUtil.postData(this.uriInfo, payload,
-                    new MdsalRestconfStrategy(transactionChainHandler), this.schema, null, null);
+                    new MdsalRestconfStrategy(mockDataBroker), this.schema, null, null);
             fail("Expected RestconfDocumentedException");
         } catch (final RestconfDocumentedException e) {
             assertEquals(1, e.getErrors().size());

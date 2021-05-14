@@ -83,10 +83,6 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
                         MoreExecutors.directExecutor());
     }
 
-    @Override
-    public void close() {
-    }
-
     private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
         final SettableFuture<T> ret = SettableFuture.create();
         Futures.addCallback(input, new FutureCallback<T>() {

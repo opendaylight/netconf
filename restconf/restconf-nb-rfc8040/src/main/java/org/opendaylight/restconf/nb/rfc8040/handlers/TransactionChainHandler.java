@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.annotation.PreDestroy;
@@ -53,7 +54,7 @@ public class TransactionChainHandler implements AutoCloseable {
      */
     @Inject
     public TransactionChainHandler(final DOMDataBroker dataBroker) {
-        this.dataBroker = Objects.requireNonNull(dataBroker);
+        this.dataBroker = requireNonNull(dataBroker);
         this.transactionChainList = new ConcurrentLinkedQueue<>();
     }
 
@@ -83,7 +84,7 @@ public class TransactionChainHandler implements AutoCloseable {
      * @param transactionChain object to check.
      * @return true if object still exist in {@link TransactionChainHandler}.
      */
-    boolean verifyIfExistTransactionChain(DOMTransactionChain transactionChain) {
+    boolean verifyIfExistTransactionChain(final DOMTransactionChain transactionChain) {
         return this.transactionChainList.contains(transactionChain);
     }
 }

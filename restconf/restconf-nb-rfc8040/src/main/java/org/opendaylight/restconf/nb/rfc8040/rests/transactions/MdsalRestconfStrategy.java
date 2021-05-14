@@ -19,7 +19,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -30,25 +29,21 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  * @see DOMDataTreeReadWriteTransaction
  */
 public final class MdsalRestconfStrategy extends RestconfStrategy {
-    private final DOMTransactionChain transactionChain;
+    private final DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final DOMDataBroker dataBroker) {
-        this(new TransactionChainHandler(dataBroker));
-    }
-
-    public MdsalRestconfStrategy(final TransactionChainHandler transactionChainHandler) {
-        transactionChain = requireNonNull(transactionChainHandler).get();
+        this.dataBroker = requireNonNull(dataBroker);
     }
 
     @Override
     public RestconfTransaction prepareWriteExecution() {
-        return new MdsalRestconfTransaction(transactionChain);
+        return new MdsalRestconfTransaction(dataBroker);
     }
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
                                                                  final YangInstanceIdentifier path) {
-        try (DOMDataTreeReadTransaction tx = transactionChain.newReadOnlyTransaction()) {
+        try (DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction()) {
             return tx.read(store, path);
         }
     }
@@ -62,13 +57,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     @Override
     public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        try (DOMDataTreeReadTransaction tx = transactionChain.newReadOnlyTransaction()) {
+        try (DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction()) {
             return tx.exists(store, path);
         }
-    }
-
-    @Override
-    public void close() {
-        transactionChain.close();
     }
 }

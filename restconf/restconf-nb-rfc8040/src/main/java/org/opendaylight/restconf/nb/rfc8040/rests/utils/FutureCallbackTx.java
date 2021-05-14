@@ -75,9 +75,7 @@ final class FutureCallbackTx {
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
                                 final FutureDataFactory<? super T> dataFactory,
                                 @Nullable final RestconfStrategy strategy,
-                                final YangInstanceIdentifier path)
-        throws RestconfDocumentedException {
-
+                                final YangInstanceIdentifier path) throws RestconfDocumentedException {
         try {
             final T result = listenableFuture.get();
             dataFactory.setResult(result);
@@ -131,10 +129,6 @@ final class FutureCallbackTx {
                 throw new RestconfDocumentedException("Transaction(" + txType + ") not committed correctly", e);
             } else {
                 throw new RestconfDocumentedException("Transaction failed", e);
-            }
-        } finally {
-            if (strategy != null) {
-                strategy.close();
             }
         }
     }

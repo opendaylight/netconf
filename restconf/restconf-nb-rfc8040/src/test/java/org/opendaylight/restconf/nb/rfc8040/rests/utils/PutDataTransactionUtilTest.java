@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -28,14 +27,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -56,8 +53,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PutDataTransactionUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
-    @Mock
-    private DOMTransactionChain transactionChain;
+
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -69,7 +65,6 @@ public class PutDataTransactionUtilTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private TransactionChainHandler transactionChainHandler;
     private LeafNode<?> buildLeaf;
     private ContainerNode buildBaseCont;
     private ContainerNode buildBaseContWithList;
@@ -166,10 +161,8 @@ public class PutDataTransactionUtilTest {
                 .withChild(buildList)
                 .build();
 
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
-        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
     }
 
     @Test
@@ -222,16 +215,15 @@ public class PutDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
+        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
+        doReturn(this.read).when(this.mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
                 .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
-        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
-                null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
         verify(this.read).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -284,16 +276,15 @@ public class PutDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
 
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
+        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
+        doReturn(this.read).when(this.mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
                 .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
-        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
-                null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
         verify(this.read).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
@@ -345,15 +336,14 @@ public class PutDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
 
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
+        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
+        doReturn(this.read).when(this.mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
                 .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(transactionChainHandler),
-                null, null);
+        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
         verify(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());
     }

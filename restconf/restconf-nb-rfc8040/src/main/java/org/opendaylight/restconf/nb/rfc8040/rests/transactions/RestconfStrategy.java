@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-public abstract class RestconfStrategy implements AutoCloseable {
+public abstract class RestconfStrategy {
     RestconfStrategy() {
         // Hidden on purpose
     }
@@ -74,7 +74,7 @@ public abstract class RestconfStrategy implements AutoCloseable {
      * @param fields paths to selected fields relative to parent path
      * @return a ListenableFuture containing the result of the read
      */
-    public abstract  ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
+    public abstract ListenableFuture<Optional<NormalizedNode<?, ?>>> read(LogicalDatastoreType store,
             YangInstanceIdentifier path, List<YangInstanceIdentifier> fields);
 
     /**
@@ -85,7 +85,4 @@ public abstract class RestconfStrategy implements AutoCloseable {
      * @return a FluentFuture containing the result of the check
      */
     public abstract FluentFuture<Boolean> exists(LogicalDatastoreType store, YangInstanceIdentifier path);
-
-    @Override
-    public abstract void close();
 }

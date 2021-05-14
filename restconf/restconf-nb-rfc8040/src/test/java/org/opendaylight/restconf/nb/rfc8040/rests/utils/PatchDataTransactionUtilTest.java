@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -37,7 +36,6 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -49,7 +47,6 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -70,15 +67,12 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class PatchDataTransactionUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
     @Mock
-    private DOMTransactionChain transactionChain;
-    @Mock
     private DOMDataTreeReadWriteTransaction rwTransaction;
     @Mock
     private DOMDataBroker mockDataBroker;
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private TransactionChainHandler transactionChainHandler;
     private EffectiveModelContext refSchemaCtx;
     private YangInstanceIdentifier instanceIdContainer;
     private YangInstanceIdentifier instanceIdCreateAndDelete;
@@ -90,9 +84,6 @@ public class PatchDataTransactionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        doReturn(transactionChain).when(mockDataBroker).createTransactionChain(any());
-        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
-
         this.refSchemaCtx = YangParserTestUtils.parseYangFiles(
             TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
@@ -173,7 +164,7 @@ public class PatchDataTransactionUtilTest {
                 .build();
 
         /* Mocks */
-        doReturn(this.rwTransaction).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.rwTransaction).when(this.mockDataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
@@ -204,7 +195,7 @@ public class PatchDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
             .remove(LogicalDatastoreType.CONFIGURATION, targetNodeMerge);
 
-        patch(patchContext, new MdsalRestconfStrategy(transactionChainHandler), false);
+        patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), false);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
     }
 
@@ -232,7 +223,7 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
-        patch(patchContext, new MdsalRestconfStrategy(transactionChainHandler), true);
+        patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), true);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), true);
     }
 
@@ -247,7 +238,7 @@ public class PatchDataTransactionUtilTest {
         ret.setException(new TransactionCommitFailedException(
             String.format("Commit of transaction %s failed", this), exception));
 
-        Mockito.when(this.netconfService.commit()).thenAnswer(invocation -> ret);
+        doReturn(ret).when(this.netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
@@ -259,7 +250,7 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
-        deleteMdsal(patchContext, new MdsalRestconfStrategy(transactionChainHandler));
+        deleteMdsal(patchContext, new MdsalRestconfStrategy(mockDataBroker));
         deleteNetconf(patchContext, new NetconfRestconfStrategy(netconfService));
     }
 
@@ -274,7 +265,7 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
-        patch(patchContext, new MdsalRestconfStrategy(transactionChainHandler), false);
+        patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), false);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
     }
 
@@ -303,7 +294,7 @@ public class PatchDataTransactionUtilTest {
                 patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorTag());
     }
 
-    private void deleteNetconf(PatchContext patchContext, RestconfStrategy strategy) {
+    private void deleteNetconf(final PatchContext patchContext, final RestconfStrategy strategy) {
         final PatchStatusContext patchStatusContext =
             PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
 

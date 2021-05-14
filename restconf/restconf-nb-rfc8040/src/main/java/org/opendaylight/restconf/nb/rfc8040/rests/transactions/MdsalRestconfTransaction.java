@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static com.google.common.base.Verify.verifyNotNull;
-import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil.DELETE_TX_TYPE;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil.checkItemDoesNotExists;
 
@@ -19,8 +18,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
@@ -34,12 +33,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 final class MdsalRestconfTransaction extends RestconfTransaction {
-    private final DOMTransactionChain transactionChain;
     private DOMDataTreeReadWriteTransaction rwTx;
 
-    MdsalRestconfTransaction(DOMTransactionChain transactionChain) {
-        this.transactionChain = requireNonNull(transactionChain);
-        this.rwTx = transactionChain.newReadWriteTransaction();
+    MdsalRestconfTransaction(final DOMDataBroker dataBroker) {
+        this.rwTx = dataBroker.newReadWriteTransaction();
     }
 
     @Override
@@ -48,7 +45,6 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             rwTx.cancel();
             rwTx = null;
         }
-        transactionChain.close();
     }
 
     @Override
@@ -81,7 +77,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             final Collection<? extends NormalizedNode<?, ?>> children =
                 ((NormalizedNodeContainer<?, ?, ?>) data).getValue();
             final BatchedExistenceCheck check =
-                BatchedExistenceCheck.start(transactionChain, LogicalDatastoreType.CONFIGURATION, path, children);
+                BatchedExistenceCheck.start(verifyNotNull(rwTx), LogicalDatastoreType.CONFIGURATION, path, children);
 
             for (final NormalizedNode<?, ?> child : children) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());

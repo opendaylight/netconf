@@ -16,11 +16,11 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.ImmutableList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,12 +32,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -45,7 +43,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -76,8 +73,6 @@ public class ReadDataTransactionUtilTest {
     @Mock
     private NetconfDataTreeService netconfService;
     @Mock
-    private DOMTransactionChain transactionChain;
-    @Mock
     private InstanceIdentifierContext<ContainerSchemaNode> context;
     @Mock
     private DOMDataTreeReadTransaction read;
@@ -93,16 +88,15 @@ public class ReadDataTransactionUtilTest {
     public void setUp() {
         containerChildQName = QName.create("ns", "2016-02-28", "container-child");
 
-        when(transactionChain.newReadOnlyTransaction()).thenReturn(read);
         when(context.getSchemaContext()).thenReturn(schemaContext);
         when(context.getSchemaNode()).thenReturn(containerSchemaNode);
         when(containerSchemaNode.getQName()).thenReturn(NODE_IDENTIFIER.getNodeType());
         when(containerChildNode.getQName()).thenReturn(containerChildQName);
         when(containerSchemaNode.dataChildByName(containerChildQName)).thenReturn(containerChildNode);
 
-        DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
-        mdsalStrategy = new MdsalRestconfStrategy(new TransactionChainHandler(mockDataBroker));
+        DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
+        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        mdsalStrategy = new MdsalRestconfStrategy(mockDataBroker);
         netconfStrategy = new NetconfRestconfStrategy(this.netconfService);
     }
 
@@ -344,7 +338,7 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void parseUriParametersDefaultTest() {
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // no parameters, default values should be used
@@ -365,16 +359,16 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void parseUriParametersUserDefinedTest() {
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         final String content = "config";
         final String depth = "10";
         final String fields = containerChildQName.getLocalName();
 
-        parameters.put("content", Collections.singletonList(content));
-        parameters.put("depth", Collections.singletonList(depth));
-        parameters.put("fields", Collections.singletonList(fields));
+        parameters.put("content", List.of(content));
+        parameters.put("depth", List.of(depth));
+        parameters.put("fields", List.of(fields));
 
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
@@ -406,10 +400,10 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void parseUriParametersContentParameterNegativeTest() {
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
-        parameters.put("content", Collections.singletonList("not-allowed-parameter-value"));
+        parameters.put("content", List.of("not-allowed-parameter-value"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
@@ -428,11 +422,11 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void parseUriParametersDepthParameterNegativeTest() {
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is not allowed
-        parameters.put("depth", Collections.singletonList("bounded"));
+        parameters.put("depth", List.of("bounded"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
@@ -451,12 +445,12 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void parseUriParametersDepthMinimalParameterNegativeTest() {
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is too low
         parameters.put(
-                "depth", Collections.singletonList(String.valueOf(RestconfDataServiceConstant.ReadData.MIN_DEPTH - 1)));
+                "depth", List.of(String.valueOf(RestconfDataServiceConstant.ReadData.MIN_DEPTH - 1)));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
@@ -475,12 +469,12 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void parseUriParametersDepthMaximalParameterNegativeTest() {
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is too high
         parameters.put(
-                "depth", Collections.singletonList(String.valueOf(RestconfDataServiceConstant.ReadData.MAX_DEPTH + 1)));
+                "depth", List.of(String.valueOf(RestconfDataServiceConstant.ReadData.MAX_DEPTH + 1)));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
@@ -501,9 +495,9 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void parseUriParametersWithDefaultAndNonTaggedTest() {
         // preparation of input data
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, Collections.singletonList("explicit"));
+        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of("explicit"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -517,9 +511,9 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void parseUriParametersWithDefaultInvalidTest() {
         // preparation of input data
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, Collections.singletonList("invalid"));
+        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of("invalid"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -536,10 +530,10 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void parseUriParametersWithDefaultAndTaggedTest() {
         // preparation of input data
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                Collections.singletonList(ReadData.WithDefaults.REPORT_ALL_TAGGED.value()));
+                List.of(ReadData.WithDefaults.REPORT_ALL_TAGGED.value()));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -554,10 +548,10 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void parseUriParametersWithDefaultAndReportAllTest() {
         // preparation of input data
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                Collections.singletonList(ReadData.WithDefaults.REPORT_ALL.value()));
+                List.of(ReadData.WithDefaults.REPORT_ALL.value()));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);

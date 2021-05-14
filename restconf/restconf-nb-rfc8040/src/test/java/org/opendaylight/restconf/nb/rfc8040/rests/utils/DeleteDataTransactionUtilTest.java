@@ -9,6 +9,8 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
@@ -20,14 +22,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -36,7 +36,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -44,8 +43,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DeleteDataTransactionUtilTest {
-    @Mock
-    private DOMTransactionChain transactionChain;
     @Mock
     private InstanceIdentifierContext<?> context;
     @Mock
@@ -55,22 +52,17 @@ public class DeleteDataTransactionUtilTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private TransactionChainHandler transactionChainHandler;
-
     @Before
     public void init() {
-        Mockito.when(this.transactionChain.newReadWriteTransaction()).thenReturn(this.readWrite);
-        Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
-        Mockito.when(this.context.getInstanceIdentifier()).thenReturn(YangInstanceIdentifier.empty());
-
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
-        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
+        doReturn(YangInstanceIdentifier.empty()).when(this.context).getInstanceIdentifier();
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
     }
 
     /**
@@ -79,10 +71,10 @@ public class DeleteDataTransactionUtilTest {
     @Test
     public void deleteData() {
         // assert that data to delete exists
-        Mockito.when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
+        when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
             .thenReturn(immediateTrueFluentFuture());
         // test
-        delete(new MdsalRestconfStrategy(transactionChainHandler));
+        delete(new MdsalRestconfStrategy(mockDataBroker));
         delete(new NetconfRestconfStrategy(netconfService));
     }
 
@@ -92,7 +84,7 @@ public class DeleteDataTransactionUtilTest {
     @Test
     public void deleteDataNegativeTest() {
         // assert that data to delete does NOT exist
-        Mockito.when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
+        when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
             .thenReturn(immediateFalseFluentFuture());
         final NetconfDocumentedException exception = new NetconfDocumentedException("id",
             DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.from("data-missing"),
@@ -101,10 +93,10 @@ public class DeleteDataTransactionUtilTest {
         ret.setException(new TransactionCommitFailedException(
             String.format("Commit of transaction %s failed", this), exception));
 
-        Mockito.when(this.netconfService.commit()).thenAnswer(invocation -> ret);
+        doReturn(ret).when(this.netconfService).commit();
 
         // test and assert error
-        deleteFail(new MdsalRestconfStrategy(transactionChainHandler));
+        deleteFail(new MdsalRestconfStrategy(mockDataBroker));
         deleteFail(new NetconfRestconfStrategy(netconfService));
     }
 

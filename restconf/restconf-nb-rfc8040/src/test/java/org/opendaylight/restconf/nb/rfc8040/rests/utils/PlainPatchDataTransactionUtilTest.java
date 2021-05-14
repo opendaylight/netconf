@@ -18,7 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -26,13 +25,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -53,8 +50,6 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class PlainPatchDataTransactionUtilTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
     @Mock
-    private DOMTransactionChain transactionChain;
-    @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
     private DOMDataTreeReadTransaction read;
@@ -65,7 +60,6 @@ public class PlainPatchDataTransactionUtilTest {
     @Mock
     private NetconfDataTreeService netconfService;
 
-    private TransactionChainHandler transactionChainHandler;
     private LeafNode<?> leafGap;
     private ContainerNode jukeboxContainerWithPlayer;
     private ContainerNode jukeboxContainerWithPlaylist;
@@ -157,10 +151,8 @@ public class PlainPatchDataTransactionUtilTest {
                 .withChild(listBands)
                 .build();
 
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
-        Mockito.doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
-        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
     }
 
     @Test
@@ -169,14 +161,13 @@ public class PlainPatchDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iidJukebox, this.schemaNodeForJukebox, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.jukeboxContainerWithPlayer);
 
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .merge(any(), any(),any(),any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).merge(any(), any(),any(),
+                any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
-                this.schema);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), this.schema);
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
@@ -192,14 +183,13 @@ public class PlainPatchDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iidGap, this.schemaNodeForGap, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.leafGap);
 
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
             .merge(any(), any(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
-                this.schema);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), this.schema);
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
@@ -216,14 +206,13 @@ public class PlainPatchDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iidJukebox, this.schemaNodeForJukebox, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.jukeboxContainerWithPlaylist);
 
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
             .merge(any(), any(),any(),any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(transactionChainHandler),
-                this.schema);
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), this.schema);
         verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData());
 
         PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
