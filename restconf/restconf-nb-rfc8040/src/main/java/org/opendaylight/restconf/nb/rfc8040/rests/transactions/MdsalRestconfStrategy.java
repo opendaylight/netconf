@@ -42,7 +42,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     @Override
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
-                                                                 final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path) {
         try (DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction()) {
             return tx.read(store, path);
         }

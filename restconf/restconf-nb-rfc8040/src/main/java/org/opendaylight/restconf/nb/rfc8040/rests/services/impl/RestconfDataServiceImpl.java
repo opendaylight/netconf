@@ -104,19 +104,18 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    private final SubscribeToStreamUtil streamUtils;
-
     private final SchemaContextHandler schemaContextHandler;
+    private final MdsalRestconfStrategy restconfStrategy;
     private final DOMMountPointService mountPointService;
+    private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
-    private final DOMDataBroker dataBroker;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final DOMActionService actionService, final Configuration configuration) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
-        this.dataBroker = requireNonNull(dataBroker);
+        this.restconfStrategy = new MdsalRestconfStrategy(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
@@ -371,7 +370,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     // FIXME: why is this synchronized?
     public synchronized RestconfStrategy getRestconfStrategy(final DOMMountPoint mountPoint) {
         if (mountPoint == null) {
-            return new MdsalRestconfStrategy(dataBroker);
+            return restconfStrategy;
         }
 
         return RestconfStrategy.forMountPoint(mountPoint).orElseThrow(() -> {
