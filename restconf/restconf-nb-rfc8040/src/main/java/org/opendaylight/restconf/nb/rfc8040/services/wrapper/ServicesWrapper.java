@@ -29,14 +29,12 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfOperation
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.TransactionServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.api.BaseServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 
 /**
@@ -47,7 +45,8 @@ import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
  * </ul>
  */
 @Path("/")
-public final class ServicesWrapper implements BaseServicesWrapper, TransactionServicesWrapper {
+public final class ServicesWrapper implements RestconfOperationsService, RestconfSchemaService, RestconfService,
+        RestconfDataService, RestconfInvokeOperationsService, RestconfStreamsSubscriptionService {
 
     private final RestconfDataService delegRestconfDataService;
     private final RestconfInvokeOperationsService delegRestconfInvokeOpsService;
