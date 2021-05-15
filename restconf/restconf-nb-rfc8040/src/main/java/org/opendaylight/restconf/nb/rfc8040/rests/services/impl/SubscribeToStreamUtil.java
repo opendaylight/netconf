@@ -129,36 +129,32 @@ abstract class SubscribeToStreamUtil {
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
-        final Optional<NotificationListenerAdapter> notificationListenerAdapter =
-                ListenersBroker.getInstance().getNotificationListenerFor(streamName);
 
-        if (notificationListenerAdapter.isEmpty()) {
-            throw new RestconfDocumentedException(String.format(
-                    "Stream with name %s was not found.", streamName),
-                    ErrorType.PROTOCOL,
-                    ErrorTag.UNKNOWN_ELEMENT);
-        }
+        final NotificationListenerAdapter notificationListenerAdapter = ListenersBroker.getInstance()
+            .getNotificationListenerFor(streamName)
+            .orElseThrow(() -> new RestconfDocumentedException(
+                String.format("Stream with name %s was not found.", streamName),
+                ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT));
 
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        registerToListenNotification(
-                notificationListenerAdapter.get(), handlersHolder.getNotificationServiceHandler());
-        notificationListenerAdapter.get().setQueryParams(
+        registerToListenNotification(notificationListenerAdapter, handlersHolder.getNotificationServiceHandler());
+        notificationListenerAdapter.setQueryParams(
                 notificationQueryParams.getStart(),
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
-        notificationListenerAdapter.get().setCloseVars(
+        notificationListenerAdapter.setCloseVars(
                 handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                    notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier(),
+                    notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
-                    notificationListenerAdapter.get().getOutputType(), uri);
+                    notificationListenerAdapter.getOutputType(), uri);
         writeDataToDS(schemaContext,
-            notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
+            notificationListenerAdapter.getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
             mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
