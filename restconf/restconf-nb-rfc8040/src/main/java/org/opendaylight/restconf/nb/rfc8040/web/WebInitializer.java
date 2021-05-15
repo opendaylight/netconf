@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.web;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -45,25 +45,39 @@ public class WebInitializer {
             final RestconfNotifApplication webAppNotif,
             @Reference final CustomFilterAdapterConfiguration customFilterAdapterConfig,
             final WebSocketInitializer webSocketServlet) throws ServletException {
-        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("/")
-                .supportsSessions(false)
-                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
-                        .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/*").build())
-                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webAppNotif)
-                        .build()).asyncSupported(true).addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/notif/*")
-                        .name("notificationServlet").build())
-                .addServlet(ServletDetails.builder().servlet(webSocketServlet).addAllUrlPatterns(Lists.newArrayList(
-                        RestconfConstants.BASE_URI_PATTERN + RestconfStreamsConstants.DATA_CHANGE_EVENT_STREAM_PATTERN,
-                        RestconfConstants.BASE_URI_PATTERN + RestconfStreamsConstants.YANG_NOTIFICATION_STREAM_PATTERN))
-                        .build())
+        WebContextBuilder webContextBuilder = WebContext.builder()
+            .contextPath("/")
+            .supportsSessions(false)
+            .addServlet(ServletDetails.builder()
+                .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/*")
+                .servlet(servletSupport.createHttpServletBuilder(webApp).build())
+                .build())
+            .addServlet(ServletDetails.builder()
+                .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/notif/*")
+                .servlet(servletSupport.createHttpServletBuilder(webAppNotif).build())
+                .name("notificationServlet")
+                .asyncSupported(true)
+                .build())
+            .addServlet(ServletDetails.builder()
+                .addAllUrlPatterns(List.of(
+                    RestconfConstants.BASE_URI_PATTERN + RestconfStreamsConstants.DATA_CHANGE_EVENT_STREAM_PATTERN,
+                    RestconfConstants.BASE_URI_PATTERN + RestconfStreamsConstants.YANG_NOTIFICATION_STREAM_PATTERN))
+                .servlet(webSocketServlet)
+                .build())
+            .addServlet(ServletDetails.builder()
+                .addUrlPattern(".well-known/*")
+                .servlet(servletSupport.createHttpServletBuilder(
+                    new RootFoundApplication(RestconfConstants.BASE_URI_PATTERN))
+                    .build())
+                .name("Rootfound")
+                .build())
 
-                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(
-                            new RootFoundApplication(RestconfConstants.BASE_URI_PATTERN)).build())
-                        .addUrlPattern(".well-known/*").name("Rootfound").build())
-
-                // Allows user to add javax.servlet.Filter(s) in front of REST services
-                .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
-                    .addUrlPattern("/*").asyncSupported(true).build());
+            // Allows user to add javax.servlet.Filter(s) in front of REST services
+            .addFilter(FilterDetails.builder()
+                .addUrlPattern("/*")
+                .filter(new CustomFilterAdapter(customFilterAdapterConfig))
+                .asyncSupported(true)
+                .build());
 
         webContextSecurer.requireAuthentication(webContextBuilder, true, RestconfConstants.BASE_URI_PATTERN + "/*");
 
