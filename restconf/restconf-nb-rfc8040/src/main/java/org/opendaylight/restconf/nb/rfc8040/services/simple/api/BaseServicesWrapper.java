@@ -7,6 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.api;
 
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfOperationsService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
+
 /**
  * Wrapper for all base services.
  * <ul>

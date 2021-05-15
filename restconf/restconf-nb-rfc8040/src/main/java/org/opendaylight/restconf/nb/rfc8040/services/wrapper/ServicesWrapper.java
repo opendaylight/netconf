@@ -25,18 +25,18 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfOperationsService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.TransactionServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOperationsServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperationsServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.api.BaseServicesWrapper;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfOperationsService;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfService;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfImpl;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfOperationsServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 
 /**

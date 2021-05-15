@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.services.simple.api;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
