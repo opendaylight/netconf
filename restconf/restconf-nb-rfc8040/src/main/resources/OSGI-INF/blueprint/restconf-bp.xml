@@ -59,8 +59,4 @@
     <argument value="${use-sse}" />
   </bean>
 
-  <bean id="servicesWrapper" factory-ref="rfc8040RestConfWiring" factory-method="getServicesWrapper" />
-
-  <bean id="servicesNotifWrapper" factory-ref="rfc8040RestConfWiring" factory-method="getServicesNotifWrapper" />
-
 </blueprint>

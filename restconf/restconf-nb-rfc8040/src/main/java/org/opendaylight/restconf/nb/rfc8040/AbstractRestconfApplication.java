@@ -7,8 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableSet;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -24,44 +26,39 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchXmlBodyW
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlToPatchBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYinBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
-import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 
 /**
  * Abstract Restconf Application.
- *
- * @param <T> {@link ServicesWrapper} or {@link ServicesNotifWrapper} implementation
  */
-public abstract class AbstractRestconfApplication<T> extends Application {
+abstract class AbstractRestconfApplication extends Application {
     private final SchemaContextHandler schemaContextHandler;
     private final DOMMountPointService mountPointService;
-    private final T servicesWrapper;
+    private final List<Object> services;
 
-    public AbstractRestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService, final T servicesNotifWrapper) {
-        this.schemaContextHandler = schemaContextHandler;
-        this.mountPointService = mountPointService;
-        this.servicesWrapper = servicesNotifWrapper;
+    AbstractRestconfApplication(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointService mountPointService, final List<Object> services) {
+        this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.mountPointService = requireNonNull(mountPointService);
+        this.services = requireNonNull(services);
     }
 
     @Override
-    public Set<Class<?>> getClasses() {
-        return ImmutableSet.<Class<?>>builder()
-                .add(NormalizedNodeJsonBodyWriter.class).add(NormalizedNodeXmlBodyWriter.class)
-                .add(SchemaExportContentYinBodyWriter.class).add(SchemaExportContentYangBodyWriter.class)
-                .add(PatchJsonBodyWriter.class).add(PatchXmlBodyWriter.class)
-                .build();
+    public final Set<Class<?>> getClasses() {
+        return Set.of(
+            NormalizedNodeJsonBodyWriter.class, NormalizedNodeXmlBodyWriter.class,
+            SchemaExportContentYinBodyWriter.class, SchemaExportContentYangBodyWriter.class,
+            PatchJsonBodyWriter.class, PatchXmlBodyWriter.class);
     }
 
     @Override
-    public Set<Object> getSingletons() {
-        final Set<Object> singletons = new HashSet<>();
-        singletons.add(servicesWrapper);
-        singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService));
-        singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointService));
-        singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService));
-        singletons.add(new XmlToPatchBodyReader(schemaContextHandler, mountPointService));
-        singletons.add(new RestconfDocumentedExceptionMapper(schemaContextHandler));
-        return singletons;
+    public final Set<Object> getSingletons() {
+        return ImmutableSet.<Object>builderWithExpectedSize(services.size() + 5)
+            .addAll(services)
+            .add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService))
+            .add(new JsonToPatchBodyReader(schemaContextHandler, mountPointService))
+            .add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService))
+            .add(new XmlToPatchBodyReader(schemaContextHandler, mountPointService))
+            .add(new RestconfDocumentedExceptionMapper(schemaContextHandler))
+            .build();
     }
 }

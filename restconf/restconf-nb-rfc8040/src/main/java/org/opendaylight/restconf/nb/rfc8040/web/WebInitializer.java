@@ -23,8 +23,8 @@ import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.restconf.nb.rfc8040.DataStreamApplication;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
-import org.opendaylight.restconf.nb.rfc8040.RestconfNotifApplication;
 import org.opendaylight.restconf.nb.rfc8040.RootFoundApplication;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketInitializer;
@@ -42,7 +42,7 @@ public class WebInitializer {
     @Inject
     public WebInitializer(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
             @Reference final ServletSupport servletSupport, final RestconfApplication webApp,
-            final RestconfNotifApplication webAppNotif,
+            final DataStreamApplication webAppNotif,
             @Reference final CustomFilterAdapterConfiguration customFilterAdapterConfig,
             final WebSocketInitializer webSocketServlet) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder()
