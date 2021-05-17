@@ -13,9 +13,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.media.sse.EventOutput;
-import org.glassfish.jersey.media.sse.SseFeature;
 
 public interface RestconfDataStreamService {
     /**
@@ -29,7 +29,7 @@ public interface RestconfDataStreamService {
      */
     @GET
     @Path("/{identifier:.+}")
-    @Produces(SseFeature.SERVER_SENT_EVENTS)
+    @Produces(MediaType.SERVER_SENT_EVENTS)
     EventOutput getSSE(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
 }
