@@ -49,6 +49,7 @@ public final class ListenersBroker {
      *
      * @return Reusable instance of {@link ListenersBroker}.
      */
+    // FIXME: remove this global singleton
     public static synchronized ListenersBroker getInstance() {
         if (listenersBroker == null) {
             listenersBroker = new ListenersBroker();
@@ -303,7 +304,7 @@ public final class ListenersBroker {
     }
 
     @SuppressWarnings({"checkstyle:IllegalCatch"})
-    private void removeAndCloseNotificationListenerTemplate(NotificationListenerAdapter listener) {
+    private void removeAndCloseNotificationListenerTemplate(final NotificationListenerAdapter listener) {
         try {
             requireNonNull(listener).close();
             if (notificationListeners.inverse().remove(listener) == null) {
