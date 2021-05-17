@@ -47,6 +47,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         c.getProperties().put(CoreModuleProperties.AUTH_TIMEOUT.getName(), "0");
         c.getProperties().put(CoreModuleProperties.IDLE_TIMEOUT.getName(), "0");
         c.getProperties().put(CoreModuleProperties.NIO2_READ_TIMEOUT.getName(), "0");
+        c.getProperties().put(CoreModuleProperties.TCP_NODELAY.getName(), true);
 
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);

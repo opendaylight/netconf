@@ -103,6 +103,7 @@ public class SshProxyServer implements AutoCloseable {
         }
         sshServer.getProperties().put(CoreModuleProperties.NIO2_READ_TIMEOUT.getName(), nioReadTimeout);
         sshServer.getProperties().put(CoreModuleProperties.AUTH_TIMEOUT.getName(), String.valueOf(idleTimeout));
+        sshServer.getProperties().put(CoreModuleProperties.TCP_NODELAY.getName(), true);
 
         final RemoteNetconfCommand.NetconfCommandFactory netconfCommandFactory =
                 new RemoteNetconfCommand.NetconfCommandFactory(clientGroup,
