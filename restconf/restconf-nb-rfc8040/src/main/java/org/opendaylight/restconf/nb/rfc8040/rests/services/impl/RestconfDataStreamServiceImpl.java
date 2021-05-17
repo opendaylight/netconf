@@ -11,7 +11,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriInfo;
-import org.glassfish.jersey.media.sse.EventOutput;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -45,7 +46,7 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
     }
 
     @Override
-    public EventOutput getSSE(final String identifier, final UriInfo uriInfo) {
+    public void getSSE(final String identifier, final UriInfo uriInfo, final SseEventSink sink, final Sse sse) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         final BaseListenerInterface listener = listenersBroker.getListenerFor(streamName)
             .orElseThrow(() -> {
@@ -54,10 +55,11 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
             });
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
-        final EventOutput eventOutput = new EventOutput();
-        final SSESessionHandler handler = new SSESessionHandler(executorService, eventOutput, listener,
+
+        // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
+        //        handler.init()/handler.close()
+        final SSESessionHandler handler = new SSESessionHandler(executorService, sink, sse, listener,
             maximumFragmentLength, heartbeatInterval);
         handler.init();
-        return eventOutput;
     }
 }

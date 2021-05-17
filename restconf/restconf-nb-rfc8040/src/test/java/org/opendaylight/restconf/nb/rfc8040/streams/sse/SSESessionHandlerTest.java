@@ -12,6 +12,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -22,7 +24,8 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.glassfish.jersey.media.sse.EventOutput;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,10 +43,15 @@ public class SSESessionHandlerTest {
     @Mock
     private ScheduledFuture<?> pingFuture;
     @Mock
-    private EventOutput eventOutput;
+    private SseEventSink eventSink;
+    @Mock
+    private Sse sse;
 
     private SSESessionHandler setup(final int maxFragmentSize, final int heartbeatInterval) {
-        final SSESessionHandler sseSessionHandler = new SSESessionHandler(executorService, eventOutput, listener,
+        doCallRealMethod().when(sse).newEvent(any());
+        doAnswer(inv -> new OutboundEvent.Builder()).when(sse).newEventBuilder();
+
+        final SSESessionHandler sseSessionHandler = new SSESessionHandler(executorService, eventSink, sse, listener,
             maxFragmentSize, heartbeatInterval);
         doReturn(pingFuture).when(executorService)
             .scheduleWithFixedDelay(any(Runnable.class), eq((long) heartbeatInterval), eq((long) heartbeatInterval),
@@ -119,13 +127,13 @@ public class SSESessionHandlerTest {
     @Test
     public void sendDataMessageWithDisabledFragmentation() throws IOException {
         final SSESessionHandler sseSessionHandler = setup(0, 0);
-        doReturn(false).when(eventOutput).isClosed();
+        doReturn(false).when(eventSink).isClosed();
         sseSessionHandler.init();
         final String testMessage = generateRandomStringOfLength(100);
         sseSessionHandler.sendDataMessage(testMessage);
 
         ArgumentCaptor<OutboundEvent> cap = ArgumentCaptor.forClass(OutboundEvent.class);
-        verify(eventOutput, times(1)).write(cap.capture());
+        verify(eventSink, times(1)).send(cap.capture());
         OutboundEvent event = cap.getAllValues().get(0);
         assertNotNull(event);
         assertEquals(event.getData(), testMessage);
@@ -134,19 +142,19 @@ public class SSESessionHandlerTest {
     @Test
     public void sendDataMessageWithDisabledFragAndDeadSession() throws IOException {
         final SSESessionHandler sseSessionHandler = setup(0, 0);
-        doReturn(true).when(eventOutput).isClosed();
+        doReturn(true).when(eventSink).isClosed();
         sseSessionHandler.init();
 
         final String testMessage = generateRandomStringOfLength(11);
         sseSessionHandler.sendDataMessage(testMessage);
         ArgumentCaptor<OutboundEvent> cap = ArgumentCaptor.forClass(OutboundEvent.class);
-        verify(eventOutput, times(0)).write(cap.capture());
+        verify(eventSink, times(0)).send(cap.capture());
     }
 
     @Test
     public void sendDataMessageWithEnabledFragAndSmallMessage() throws IOException {
         final SSESessionHandler sseSessionHandler = setup(100, 0);
-        doReturn(false).when(eventOutput).isClosed();
+        doReturn(false).when(eventSink).isClosed();
         sseSessionHandler.init();
 
         // in both cases, fragmentation should not be applied
@@ -157,7 +165,7 @@ public class SSESessionHandlerTest {
 
         ArgumentCaptor<OutboundEvent> cap = ArgumentCaptor.forClass(OutboundEvent.class);
         // without fragmentation there will be 2 write calls
-        verify(eventOutput, times(2)).write(cap.capture());
+        verify(eventSink, times(2)).send(cap.capture());
         OutboundEvent event1 = cap.getAllValues().get(0);
         OutboundEvent event2 = cap.getAllValues().get(1);
         assertNotNull(event1);
@@ -176,13 +184,13 @@ public class SSESessionHandlerTest {
         sseSessionHandler.init();
 
         sseSessionHandler.sendDataMessage("");
-        verifyNoMoreInteractions(eventOutput);
+        verifyNoMoreInteractions(eventSink);
     }
 
     @Test
     public void sendDataMessageWithEnabledFragAndLargeMessage1() throws IOException {
         final SSESessionHandler sseSessionHandler = setup(100, 0);
-        doReturn(false).when(eventOutput).isClosed();
+        doReturn(false).when(eventSink).isClosed();
         sseSessionHandler.init();
 
         // there should be 10 fragments of length 100 characters
@@ -191,7 +199,7 @@ public class SSESessionHandlerTest {
         ArgumentCaptor<OutboundEvent> cap = ArgumentCaptor.forClass(OutboundEvent.class);
         // SSE automatically send fragmented packet ended with new line character due to eventOutput
         // have only 1 write call
-        verify(eventOutput, times(1)).write(cap.capture());
+        verify(eventSink, times(1)).send(cap.capture());
         OutboundEvent event = cap.getAllValues().get(0);
         assertNotNull(event);
         String[] lines = ((String) event.getData()).split("\r\n|\r|\n");
