@@ -9,12 +9,11 @@ package org.opendaylight.restconf.nb.rfc8040.streams.sse;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
-import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.glassfish.jersey.media.sse.EventOutput;
-import org.glassfish.jersey.media.sse.OutboundEvent;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.restconf.nb.rfc8040.streams.SessionHandlerInterface;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.slf4j.Logger;
@@ -34,7 +33,9 @@ public class SSESessionHandler implements SessionHandlerInterface {
     private final BaseListenerInterface listener;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
-    private final EventOutput output;
+    private final SseEventSink sink;
+    private final Sse sse;
+
     private ScheduledFuture<?> pingProcess;
 
     /**
@@ -53,10 +54,11 @@ public class SSESessionHandler implements SessionHandlerInterface {
      * @param heartbeatInterval Interval in milliseconds of sending of ping control frames to remote endpoint to keep
      *            session up. Ping control frames are disabled if this parameter is set to 0.
      */
-    public SSESessionHandler(final ScheduledExecutorService executorService, final EventOutput output,
+    public SSESessionHandler(final ScheduledExecutorService executorService, final SseEventSink sink, final Sse sse,
             final BaseListenerInterface listener, final int maximumFragmentLength, final int heartbeatInterval) {
         this.executorService = executorService;
-        this.output = output;
+        this.sse = sse;
+        this.sink = sink;
         this.listener = listener;
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatInterval = heartbeatInterval;
@@ -83,11 +85,10 @@ public class SSESessionHandler implements SessionHandlerInterface {
     }
 
     /**
-     * Sending of string message to outbound Server-Sent Events channel
-     * {@link org.glassfish.jersey.media.sse.EventOutput}. SSE is automatically split to fragments with new line
-     * character. If the maximum fragment length is set to non-zero positive value and input message exceeds this
-     * value, message is manually fragmented to multiple message fragments which are send individually. Previous
-     * fragmentation is removed.
+     * Sending of string message to outbound Server-Sent Events channel {@link SseEventSink}. SSE is automatically split
+     * to fragments with new line character. If the maximum fragment length is set to non-zero positive value and input
+     * message exceeds this value, message is manually fragmented to multiple message fragments which are send
+     * individually. Previous fragmentation is removed.
      *
      * @param message Message data to be send over web-socket session.
      */
@@ -97,32 +98,12 @@ public class SSESessionHandler implements SessionHandlerInterface {
             // FIXME: should this be tolerated?
             return;
         }
-        if (output.isClosed()) {
-            close();
-            return;
-        }
-        if (maximumFragmentLength != 0 && message.length() > maximumFragmentLength) {
-            sendMessage(splitMessageToFragments(message));
+        if (!sink.isClosed()) {
+            final String toSend = maximumFragmentLength != 0 && message.length() > maximumFragmentLength
+                ? splitMessageToFragments(message) : message;
+            sink.send(sse.newEvent(toSend));
         } else {
-            sendMessage(message);
-        }
-    }
-
-    private void sendMessage(final String message) {
-        try {
-            output.write(new OutboundEvent.Builder().data(String.class, message).build());
-        } catch (IOException e) {
-            LOG.warn("Connection from client {} is closed", this);
-            LOG.debug("Connection from client is closed:", e);
-        }
-    }
-
-    private void sendComment(final String message) {
-        try {
-            output.write(new OutboundEvent.Builder().comment(message).build());
-        } catch (IOException e) {
-            LOG.warn("Connection from client {} is closed", this);
-            LOG.debug("Connection from client is closed:", e);
+            close();
         }
     }
 
@@ -144,12 +125,12 @@ public class SSESessionHandler implements SessionHandlerInterface {
     }
 
     private synchronized void sendPingMessage() {
-        if (output.isClosed()) {
+        if (!sink.isClosed()) {
+            LOG.debug("sending PING:{}", PING_PAYLOAD);
+            sink.send(sse.newEventBuilder().comment(PING_PAYLOAD).build());
+        } else {
             close();
-            return;
         }
-        LOG.debug("sending PING:{}", PING_PAYLOAD);
-        sendComment(PING_PAYLOAD);
     }
 
     private void stopPingProcess() {
@@ -160,12 +141,12 @@ public class SSESessionHandler implements SessionHandlerInterface {
 
     @Override
     public synchronized boolean isConnected() {
-        return !output.isClosed();
+        return !sink.isClosed();
     }
 
     // TODO:return some type of identification of connection
     @Override
     public String toString() {
-        return output.toString();
+        return sink.toString();
     }
 }

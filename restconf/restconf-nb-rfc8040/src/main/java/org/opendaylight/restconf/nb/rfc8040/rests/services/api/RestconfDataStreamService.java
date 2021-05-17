@@ -15,21 +15,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import org.glassfish.jersey.media.sse.EventOutput;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 
 public interface RestconfDataStreamService {
     /**
      * Get target data resource.
      *
-     * @param identifier
-     *            path to target
-     * @param uriInfo
-     *            URI info
-     * @return {@link EventOutput}
+     * @param identifier path to target
+     * @param uriInfo URI info
      */
     @GET
     @Path("/{identifier:.+}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    EventOutput getSSE(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
-
+    void getSSE(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo,
+        @Context SseEventSink sink, @Context Sse sse);
 }

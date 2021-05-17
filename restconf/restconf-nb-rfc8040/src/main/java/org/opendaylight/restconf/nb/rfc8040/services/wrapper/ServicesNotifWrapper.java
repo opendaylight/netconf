@@ -9,7 +9,8 @@ package org.opendaylight.restconf.nb.rfc8040.services.wrapper;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
-import org.glassfish.jersey.media.sse.EventOutput;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStreamService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSEInitializer;
@@ -25,17 +26,17 @@ public final class ServicesNotifWrapper implements RestconfDataStreamService {
 
     private final RestconfDataStreamService delegRestStream;
 
-    private ServicesNotifWrapper(RestconfDataStreamService delegRestStream) {
+    private ServicesNotifWrapper(final RestconfDataStreamService delegRestStream) {
         this.delegRestStream = delegRestStream;
     }
 
-    public static ServicesNotifWrapper newInstance(SSEInitializer configuration) {
+    public static ServicesNotifWrapper newInstance(final SSEInitializer configuration) {
         RestconfDataStreamService delegRestStream = new RestconfDataStreamServiceImpl(configuration);
         return new ServicesNotifWrapper(delegRestStream);
     }
 
     @Override
-    public EventOutput getSSE(String identifier, UriInfo uriInfo) {
-        return this.delegRestStream.getSSE(identifier, uriInfo);
+    public void getSSE(final String identifier, final UriInfo uriInfo, final SseEventSink sink, final Sse sse) {
+        this.delegRestStream.getSSE(identifier, uriInfo, sink, sse);
     }
 }
