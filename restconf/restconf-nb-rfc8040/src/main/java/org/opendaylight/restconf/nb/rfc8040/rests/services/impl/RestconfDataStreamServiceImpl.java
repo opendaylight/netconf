@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -46,16 +45,15 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
     @Override
     public EventOutput getSSE(final String identifier, final UriInfo uriInfo) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final Optional<BaseListenerInterface> listener = listenersBroker.getListenerFor(streamName);
-
-        if (listener.isEmpty()) {
-            LOG.debug("Listener for stream with name {} was not found.", streamName);
-            throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-        }
+        final BaseListenerInterface listener = listenersBroker.getListenerFor(streamName)
+            .orElseThrow(() -> {
+                LOG.debug("Listener for stream with name {} was not found.", streamName);
+                throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+            });
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
         final EventOutput eventOutput = new EventOutput();
-        final SSESessionHandler handler = new SSESessionHandler(executorService, eventOutput, listener.get(),
+        final SSESessionHandler handler = new SSESessionHandler(executorService, eventOutput, listener,
             maximumFragmentLength, heartbeatInterval);
         handler.init();
         return eventOutput;
