@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
-import org.opendaylight.restconf.nb.rfc8040.streams.SessionHandlerInterface;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * SSE session handler that is responsible for controlling of session, managing subscription to data-change-event or
  * notification listener, and sending of data over established SSE session.
  */
-public class SSESessionHandler implements SessionHandlerInterface {
+public class SSESessionHandler implements StreamSessionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(SSESessionHandler.class);
     private static final String PING_PAYLOAD = "ping";
 

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.streams.websockets;
 
 import com.google.common.base.Strings;
@@ -26,7 +25,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.opendaylight.restconf.nb.rfc8040.streams.SessionHandlerInterface;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +35,7 @@ import org.slf4j.LoggerFactory;
  * to data-change-event or notification listener, and sending of data over established web-socket session.
  */
 @WebSocket
-public class WebSocketSessionHandler implements SessionHandlerInterface {
-
+public class WebSocketSessionHandler implements StreamSessionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketSessionHandler.class);
     private static final byte[] PING_PAYLOAD = "ping".getBytes(Charset.defaultCharset());
 
@@ -149,6 +147,7 @@ public class WebSocketSessionHandler implements SessionHandlerInterface {
      *
      * @param message Message data to be send over web-socket session.
      */
+    @Override
     public synchronized void sendDataMessage(final String message) {
         if (Strings.isNullOrEmpty(message)) {
             // FIXME: should this be tolerated?

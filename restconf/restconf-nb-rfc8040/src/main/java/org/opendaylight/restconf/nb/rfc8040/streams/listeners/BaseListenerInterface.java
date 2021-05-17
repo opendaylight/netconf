@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import java.util.Set;
-import org.opendaylight.restconf.nb.rfc8040.streams.SessionHandlerInterface;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 /**
@@ -21,12 +21,12 @@ public interface BaseListenerInterface extends AutoCloseable {
      *
      * @return Set of all subscribers.
      */
-    Set<SessionHandlerInterface> getSubscribers();
+    Set<StreamSessionHandler> getSubscribers();
 
     /**
-     * Checks if exists at least one {@link SessionHandlerInterface} subscriber.
+     * Checks if exists at least one {@link StreamSessionHandler} subscriber.
      *
-     * @return {@code true} if exist at least one {@link SessionHandlerInterface} subscriber, {@code false} otherwise.
+     * @return {@code true} if exist at least one {@link StreamSessionHandler} subscriber, {@code false} otherwise.
      */
     boolean hasSubscribers();
 
@@ -45,18 +45,18 @@ public interface BaseListenerInterface extends AutoCloseable {
     String getOutputType();
 
     /**
-     * Registers {@link SessionHandlerInterface} subscriber.
+     * Registers {@link StreamSessionHandler} subscriber.
      *
      * @param subscriber SSE or WS session handler.
      */
-    void addSubscriber(SessionHandlerInterface subscriber);
+    void addSubscriber(StreamSessionHandler subscriber);
 
     /**
-     * Removes {@link SessionHandlerInterface} subscriber.
+     * Removes {@link StreamSessionHandler} subscriber.
      *
      * @param subscriber SSE or WS session handler.
      */
-    void removeSubscriber(SessionHandlerInterface subscriber);
+    void removeSubscriber(StreamSessionHandler subscriber);
 
     /**
      * Sets {@link ListenerRegistration} registration.

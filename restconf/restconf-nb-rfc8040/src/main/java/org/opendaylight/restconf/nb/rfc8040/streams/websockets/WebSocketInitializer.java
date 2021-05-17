@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.streams.websockets;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -21,11 +20,15 @@ import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
  * Web-socket servlet listening on ws or wss schemas for created data-change-event or notification streams.
  */
 @Singleton
-@SuppressFBWarnings({"SE_NO_SERIALVERSIONID", "SE_BAD_FIELD"})
 public class WebSocketInitializer extends WebSocketServlet {
+    private static final long serialVersionUID = 1L;
 
+    @SuppressFBWarnings(value = "SE_BAD_FIELD",
+        justification = "Servlet/WebSocket bridge, we need this service for heartbeats")
     private final ScheduledExecutorService executorService;
-    private final Configuration configuration;
+    private final int maximumFragmentLength;
+    private final int heartbeatInterval;
+    private final int idleTimeoutMillis;
 
     /**
      * Creation of the web-socket initializer.
@@ -34,10 +37,11 @@ public class WebSocketInitializer extends WebSocketServlet {
      * @param configuration          Web-socket configuration holder.
      */
     @Inject
-    public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool,
-            final Configuration configuration) {
+    public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool, final Configuration configuration) {
         this.executorService = scheduledThreadPool.getExecutor();
-        this.configuration = configuration;
+        this.maximumFragmentLength = configuration.getMaximumFragmentLength();
+        this.heartbeatInterval = configuration.getHeartbeatInterval();
+        this.idleTimeoutMillis = configuration.getIdleTimeout();
     }
 
     /**
@@ -47,8 +51,7 @@ public class WebSocketInitializer extends WebSocketServlet {
      */
     @Override
     public void configure(final WebSocketServletFactory factory) {
-        factory.getPolicy().setIdleTimeout(configuration.getIdleTimeout());
-        factory.setCreator(new WebSocketFactory(executorService, configuration.getMaximumFragmentLength(),
-                configuration.getHeartbeatInterval()));
+        factory.getPolicy().setIdleTimeout(idleTimeoutMillis);
+        factory.setCreator(new WebSocketFactory(executorService, maximumFragmentLength, heartbeatInterval));
     }
 }

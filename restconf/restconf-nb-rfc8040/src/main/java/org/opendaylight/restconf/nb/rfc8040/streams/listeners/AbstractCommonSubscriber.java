@@ -11,7 +11,7 @@ import com.google.common.base.Preconditions;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import org.opendaylight.restconf.nb.rfc8040.streams.SessionHandlerInterface;
+import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
-    private final Set<SessionHandlerInterface> subscribers = new HashSet<>();
+    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
     private volatile ListenerRegistration<?> registration;
 
     @Override
@@ -32,7 +32,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public final synchronized Set<SessionHandlerInterface> getSubscribers() {
+    public final synchronized Set<StreamSessionHandler> getSubscribers() {
         return new HashSet<>(this.subscribers);
     }
 
@@ -47,7 +47,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public synchronized void addSubscriber(final SessionHandlerInterface subscriber) {
+    public synchronized void addSubscriber(final StreamSessionHandler subscriber) {
         final boolean isConnected = subscriber.isConnected();
         Preconditions.checkState(isConnected);
         LOG.debug("Subscriber {} is added.", subscriber);
@@ -55,7 +55,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public synchronized void removeSubscriber(final SessionHandlerInterface subscriber) {
+    public synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
         final boolean isConnected = subscriber.isConnected();
         Preconditions.checkState(isConnected);
         LOG.debug("Subscriber {} is removed", subscriber);
@@ -81,9 +81,9 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
      * @param data Data of incoming notifications.
      */
     synchronized void post(final String data) {
-        final Iterator<SessionHandlerInterface> iterator = subscribers.iterator();
+        final Iterator<StreamSessionHandler> iterator = subscribers.iterator();
         while (iterator.hasNext()) {
-            final SessionHandlerInterface subscriber = iterator.next();
+            final StreamSessionHandler subscriber = iterator.next();
             final boolean isConnected = subscriber.isConnected();
             if (isConnected) {
                 subscriber.sendDataMessage(data);

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.streams.websockets;
 
 import java.util.Optional;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
  * Factory that is used for creation of new web-sockets based on HTTP/HTTPS upgrade request.
  */
 class WebSocketFactory implements WebSocketCreator {
-
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketFactory.class);
 
     private final ScheduledExecutorService executorService;
