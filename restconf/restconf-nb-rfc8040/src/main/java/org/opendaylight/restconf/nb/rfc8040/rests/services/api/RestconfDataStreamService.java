@@ -21,15 +21,12 @@ public interface RestconfDataStreamService {
     /**
      * Get target data resource.
      *
-     * @param identifier
-     *            path to target
-     * @param uriInfo
-     *            URI info
+     * @param identifier path to target
+     * @param uriInfo URI info
      * @return {@link EventOutput}
      */
     @GET
     @Path("/{identifier:.+}")
     @Produces(SseFeature.SERVER_SENT_EVENTS)
     EventOutput getSSE(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
-
 }

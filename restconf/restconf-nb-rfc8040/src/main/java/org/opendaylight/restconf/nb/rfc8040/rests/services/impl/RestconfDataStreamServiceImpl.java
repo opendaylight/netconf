@@ -12,13 +12,14 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.media.sse.EventOutput;
+import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStreamService;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
-import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSEInitializer;
 import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSESessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,9 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
     private final int heartbeatInterval;
 
     @Inject
-    public RestconfDataStreamServiceImpl(final SSEInitializer configuration) {
-        executorService = configuration.getExecutorService();
+    public RestconfDataStreamServiceImpl(final ScheduledThreadPool scheduledThreadPool,
+            final Configuration configuration) {
+        executorService = scheduledThreadPool.getExecutor();
         heartbeatInterval = configuration.getHeartbeatInterval();
         maximumFragmentLength = configuration.getMaximumFragmentLength();
     }
