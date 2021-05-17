@@ -7,25 +7,8 @@
  and is available at http://www.eclipse.org/legal/epl-v10.html
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.4.0"
-           odl:use-default-for-reference-types="true">
-
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
   <!-- Restconf providers -->
-  <!--
-    This cfg file defines the type of the DOMDataBroker service to use. 'default' indicates to use
-    the default DOMDataBroker provided by MD-SAL. This setting is useful for providing a custom
-    DOMDataBroker implementation that does, e.g., validation or additional security checking on
-    top of the default DOMDataBroker.
-  -->
-  <cm:property-placeholder persistent-id="org.opendaylight.restconf.databroker"
-        placeholder-prefix = "@{" placeholder-suffix = "}" update-strategy="reload">
-    <cm:default-properties>
-      <cm:property name="databroker-service-type" value="default"/>
-    </cm:default-properties>
-  </cm:property-placeholder>
-
   <cm:property-placeholder persistent-id="org.opendaylight.restconf.nb.rfc8040">
     <cm:default-properties>
       <cm:property name="maximum-fragment-length" value="0"/>
@@ -36,9 +19,6 @@
       <cm:property name="use-sse" value="true"/>
     </cm:default-properties>
   </cm:property-placeholder>
-
-  <reference id="dOMDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"
-          ext:filter="(type=@{databroker-service-type})"/>
 
   <bean id="threadPoolFactory"
         class="org.opendaylight.controller.config.threadpool.util.NamingThreadPoolFactory">
@@ -58,5 +38,4 @@
     <argument value="${heartbeat-interval}"/>
     <argument value="${use-sse}" />
   </bean>
-
 </blueprint>

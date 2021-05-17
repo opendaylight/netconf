@@ -52,7 +52,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
     @Inject
     public RestconfApplication(final SchemaContextHandler schemaContextHandler,
             @Reference final DOMMountPointService mountPointService,
-            final TransactionChainHandler transactionChainHandler, final DOMDataBroker dataBroker,
+            final TransactionChainHandler transactionChainHandler, @Reference final DOMDataBroker dataBroker,
             @Reference final DOMRpcService rpcService, @Reference final DOMActionService actionService,
             @Reference final DOMNotificationService notificationService,
             @Reference final DOMSchemaService domSchemaService, final Configuration configuration) {

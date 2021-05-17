@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -53,7 +54,7 @@ public class TransactionChainHandler implements AutoCloseable {
      * Prepare transaction chain service for Restconf services.
      */
     @Inject
-    public TransactionChainHandler(final DOMDataBroker dataBroker) {
+    public TransactionChainHandler(@Reference final DOMDataBroker dataBroker) {
         this.dataBroker = requireNonNull(dataBroker);
         this.transactionChainList = new ConcurrentLinkedQueue<>();
     }

@@ -98,21 +98,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@SuppressWarnings("checkstyle:FinalClass")
 public class BrokerFacade implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
 
-    private volatile DOMRpcService rpcService;
-
-    private final DOMDataBroker domDataBroker;
+    private final ThreadLocal<Boolean> isMounted = new ThreadLocal<>();
     private final DOMNotificationService domNotification;
     private final ControllerContext controllerContext;
+    private final DOMDataBroker domDataBroker;
 
-    private final ThreadLocal<Boolean> isMounted = new ThreadLocal<>();
+    private volatile DOMRpcService rpcService;
 
     @Inject
-    public BrokerFacade(final @Reference DOMRpcService rpcService, final DOMDataBroker domDataBroker,
-            final @Reference DOMNotificationService domNotification, final ControllerContext controllerContext) {
+    public BrokerFacade(@Reference final DOMRpcService rpcService, @Reference final DOMDataBroker domDataBroker,
+            @Reference final DOMNotificationService domNotification, final ControllerContext controllerContext) {
         this.rpcService = requireNonNull(rpcService);
         this.domDataBroker = requireNonNull(domDataBroker);
         this.domNotification = requireNonNull(domNotification);
