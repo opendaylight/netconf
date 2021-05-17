@@ -138,7 +138,7 @@ public class SSESessionHandler implements StreamSessionHandler {
         String inputmessage = CR_OR_LF.removeFrom(message);
         int length = inputmessage.length();
         for (int i = 0; i < length; i += maximumFragmentLength) {
-            outputMessage.append(inputmessage.substring(i, Math.min(length, i + maximumFragmentLength))).append("\r\n");
+            outputMessage.append(inputmessage, i, Math.min(length, i + maximumFragmentLength)).append("\r\n");
         }
         return outputMessage.toString();
     }
