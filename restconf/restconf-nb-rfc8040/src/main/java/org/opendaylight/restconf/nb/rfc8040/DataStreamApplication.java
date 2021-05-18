@@ -8,9 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStreamService;
@@ -18,12 +15,9 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataStrea
 /**
  * Restconf Application extends {@link AbstractRestconfApplication}. Is used for sending SSE.
  */
-@Singleton
 public class DataStreamApplication extends AbstractRestconfApplication {
-    @Inject
     public DataStreamApplication(final SchemaContextHandler schemaContextHandler,
-            @Reference final DOMMountPointService mountPointService,
-            final RestconfDataStreamService dataStreamService) {
+            final DOMMountPointService mountPointService, final RestconfDataStreamService dataStreamService) {
         super(schemaContextHandler, mountPointService, List.of(dataStreamService));
     }
 }

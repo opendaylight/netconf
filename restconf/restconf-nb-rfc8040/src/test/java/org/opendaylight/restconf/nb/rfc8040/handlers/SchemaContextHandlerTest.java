@@ -82,8 +82,6 @@ public class SchemaContextHandlerTest {
         doReturn(mockListenerReg).when(mockDOMSchemaService)
             .registerSchemaContextListener(schemaContextHandler);
 
-        schemaContextHandler.init();
-
         verify(mockDOMSchemaService).registerSchemaContextListener(schemaContextHandler);
 
         schemaContextHandler.close();

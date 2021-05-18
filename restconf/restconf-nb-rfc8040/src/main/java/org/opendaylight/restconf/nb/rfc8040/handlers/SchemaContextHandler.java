@@ -13,11 +13,6 @@ import com.google.common.base.Throwables;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -46,15 +41,12 @@ import org.slf4j.LoggerFactory;
 // FIXME: this really is a service which is maintaining ietf-yang-library contents inside the datastore. It really
 //        should live in MD-SAL and be a dynamic store fragment. As a first step we should be turning this into a
 //        completely standalone application.
-@Singleton
 public class SchemaContextHandler implements EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
     private final AtomicInteger moduleSetId = new AtomicInteger(0);
-
     private final TransactionChainHandler transactionChainHandler;
-    private final DOMSchemaService domSchemaService;
-    private ListenerRegistration<?> listenerRegistration;
+    private final ListenerRegistration<?> listenerRegistration;
 
     private volatile EffectiveModelContext schemaContext;
 
@@ -63,24 +55,15 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
      *
      * @param transactionChainHandler Transaction chain handler
      */
-    @Inject
     public SchemaContextHandler(final TransactionChainHandler transactionChainHandler,
-            final @Reference DOMSchemaService domSchemaService) {
+            final DOMSchemaService domSchemaService) {
         this.transactionChainHandler = transactionChainHandler;
-        this.domSchemaService = domSchemaService;
-    }
-
-    @PostConstruct
-    public void init() {
         listenerRegistration = domSchemaService.registerSchemaContextListener(this);
     }
 
     @Override
-    @PreDestroy
     public void close() {
-        if (listenerRegistration != null) {
-            listenerRegistration.close();
-        }
+        listenerRegistration.close();
     }
 
     @Override

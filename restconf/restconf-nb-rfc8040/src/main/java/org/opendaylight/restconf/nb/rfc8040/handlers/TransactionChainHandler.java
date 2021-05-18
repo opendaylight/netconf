@@ -11,10 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -27,7 +23,6 @@ import org.slf4j.LoggerFactory;
  * Implementation of {@link TransactionChainHandler}.
  */
 // FIXME: untangle this class, what good is it, really?!
-@Singleton
 public class TransactionChainHandler implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(TransactionChainHandler.class);
 
@@ -47,16 +42,14 @@ public class TransactionChainHandler implements AutoCloseable {
         }
     };
 
+    private final Queue<DOMTransactionChain> transactionChainList = new ConcurrentLinkedQueue<>();
     private final DOMDataBroker dataBroker;
-    private final Queue<DOMTransactionChain> transactionChainList;
 
     /**
      * Prepare transaction chain service for Restconf services.
      */
-    @Inject
-    public TransactionChainHandler(@Reference final DOMDataBroker dataBroker) {
+    public TransactionChainHandler(final DOMDataBroker dataBroker) {
         this.dataBroker = requireNonNull(dataBroker);
-        this.transactionChainList = new ConcurrentLinkedQueue<>();
     }
 
     /**
@@ -72,7 +65,6 @@ public class TransactionChainHandler implements AutoCloseable {
     }
 
     @Override
-    @PreDestroy
     public synchronized void close() {
         for (DOMTransactionChain transactionChain : this.transactionChainList) {
             transactionChain.close();
