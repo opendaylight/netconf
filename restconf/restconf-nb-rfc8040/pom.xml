@@ -34,8 +34,8 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.apache.aries.blueprint</groupId>
-      <artifactId>blueprint-maven-plugin-annotation</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -207,16 +207,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.aries.blueprint</groupId>
-        <artifactId>blueprint-maven-plugin</artifactId>
-        <configuration>
-          <scanPaths>
-            <!-- FIXME: we *really* should be in org.opendaylight.netconf ! -->
-            <scanPath>org.opendaylight.restconf</scanPath>
-          </scanPaths>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
