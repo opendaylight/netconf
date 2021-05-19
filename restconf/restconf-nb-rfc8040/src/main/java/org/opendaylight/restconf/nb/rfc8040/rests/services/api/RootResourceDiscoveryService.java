@@ -10,9 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 
 /**
  * Controller for determining the {@code Root Resource} of the RESTCONF API. This interface serves up a
@@ -23,18 +23,22 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 //        integrate with that framework, so we co-exist with others.
 public interface RootResourceDiscoveryService {
     /**
-     * Root Resource Discovery. See: https://tools.ietf.org/html/rfc8040#section-3.1
+     * Root Resource Discovery as an XRD.
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc8040#section-3.1">RFC8040, section 3.1</a>
      */
     @GET
     @Path("/host-meta")
-    @Produces({Rfc8040.MediaTypes.XRD + RestconfConstants.XML})
+    @Produces(MediaTypes.APPLICATION_XRD_XML)
     Response readXrdData();
 
     /**
-     * Root Resource Discovery as a <a href="https://tools.ietf.org/html/rfc6415#appendix-A">JRD</a>.
+     * Root Resource Discovery as a JRD.
+     *
+     *  @see <a href="https://tools.ietf.org/html/rfc6415#appendix-A">RFC6415, appendix A</a>
      */
     @GET
     @Path("/host-meta.json")
-    @Produces({Rfc8040.MediaTypes.XRD + RestconfConstants.JSON})
+    @Produces(MediaType.APPLICATION_JSON)
     Response readJsonData();
 }

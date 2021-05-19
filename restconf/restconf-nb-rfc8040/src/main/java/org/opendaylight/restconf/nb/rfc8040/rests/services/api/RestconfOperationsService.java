@@ -15,8 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 
 /**
  * Container that provides access to the data-model specific operations supported by the server.
@@ -31,8 +30,8 @@ public interface RestconfOperationsService {
     @GET
     @Path("/operations")
     @Produces({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
@@ -49,8 +48,8 @@ public interface RestconfOperationsService {
     @GET
     @Path("/operations/{identifier:.+}")
     @Produces({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML

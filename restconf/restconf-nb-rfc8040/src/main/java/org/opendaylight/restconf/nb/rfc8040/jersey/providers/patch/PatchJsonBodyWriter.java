@@ -25,13 +25,11 @@ import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
-
 @Provider
-@Produces({ Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON })
+@Produces(MediaTypes.APPLICATION_YANG_DATA_JSON)
 public class PatchJsonBodyWriter implements MessageBodyWriter<PatchStatusContext> {
 
     @Override
