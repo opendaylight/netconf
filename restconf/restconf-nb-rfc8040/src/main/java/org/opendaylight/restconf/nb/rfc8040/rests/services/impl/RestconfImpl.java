@@ -16,7 +16,6 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.RestconfModule;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -46,8 +45,7 @@ public class RestconfImpl implements RestconfService {
                                 .getDataChildByName(RestconfModule.LIB_VER_LEAF_QNAME);
             }
         }
-        final YangInstanceIdentifier yangIId = YangInstanceIdentifier.of(
-                QName.create(RestconfModule.IETF_RESTCONF_QNAME, RestconfModule.LIB_VER_LEAF_SCHEMA_NODE));
+        final YangInstanceIdentifier yangIId = YangInstanceIdentifier.of(RestconfModule.LIB_VER_LEAF_QNAME);
         final InstanceIdentifierContext<? extends SchemaNode> iid =
                 new InstanceIdentifierContext<>(yangIId, schemaNode, null, context);
         final NormalizedNode<?, ?> data = Builders.leafBuilder((LeafSchemaNode) schemaNode)

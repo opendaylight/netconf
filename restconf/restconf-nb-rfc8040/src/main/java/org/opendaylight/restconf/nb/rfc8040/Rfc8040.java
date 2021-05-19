@@ -28,19 +28,16 @@ import org.opendaylight.yangtools.yang.common.Revision;
  * </ul>
  */
 public final class Rfc8040 {
-
     private Rfc8040() {
-        throw new UnsupportedOperationException("Util class");
+        // Hidden on purpose
     }
 
     /**
-     * Set of application specific media types to identify each of the available
-     * resource types.
+     * Set of application specific media types to identify each of the available resource types.
      */
     public static final class MediaTypes {
-
         private MediaTypes() {
-            throw new UnsupportedOperationException("Util class");
+            // Hidden on purpose
         }
 
         /**
@@ -55,7 +52,6 @@ public final class Rfc8040 {
 
     /**
      * Constants for restconf module.
-     *
      */
     public static final class RestconfModule {
         private RestconfModule() {
@@ -71,29 +67,15 @@ public final class Rfc8040 {
                 Rfc8040.RestconfModule.REVISION, Rfc8040.RestconfModule.NAME).intern();
 
         // RESTCONF
-        public static final String RESTCONF_GROUPING_SCHEMA_NODE = "restconf";
-        public static final String RESTCONF_CONTAINER_SCHEMA_NODE = "restconf";
-        public static final String OPERATIONS_CONTAINER_SCHEMA_NODE = "operations";
-        public static final String DATA_CONTAINER_SCHEMA_NODE = "data";
-        public static final String LIB_VER_LEAF_SCHEMA_NODE = "yang-library-version";
-
-        public static final QName RESTCONF_GROUPING_QNAME =
-                QName.create(IETF_RESTCONF_QNAME, RESTCONF_GROUPING_SCHEMA_NODE).intern();
-        public static final QName RESTCONF_CONTAINER_QNAME =
-                QName.create(IETF_RESTCONF_QNAME, RESTCONF_CONTAINER_SCHEMA_NODE).intern();
-        public static final QName LIB_VER_LEAF_QNAME = QName.create(IETF_RESTCONF_QNAME, LIB_VER_LEAF_SCHEMA_NODE)
+        public static final QName RESTCONF_GROUPING_QNAME = QName.create(IETF_RESTCONF_QNAME, "restconf").intern();
+        public static final QName RESTCONF_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, "restconf").intern();
+        public static final QName LIB_VER_LEAF_QNAME = QName.create(IETF_RESTCONF_QNAME, "yang-library-version")
                 .intern();
 
         // ERRORS
-        public static final String ERRORS_GROUPING_SCHEMA_NODE = "errors";
-        public static final String ERRORS_CONTAINER_SCHEMA_NODE = "errors";
-        public static final String ERROR_LIST_SCHEMA_NODE = "error";
-
-        public static final QName ERRORS_GROUPING_QNAME =
-                QName.create(IETF_RESTCONF_QNAME, ERRORS_GROUPING_SCHEMA_NODE).intern();
-        public static final QName ERRORS_CONTAINER_QNAME =
-                QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE).intern();
-        public static final QName ERROR_LIST_QNAME = QName.create(IETF_RESTCONF_QNAME, ERROR_LIST_SCHEMA_NODE).intern();
+        public static final QName ERRORS_GROUPING_QNAME = QName.create(IETF_RESTCONF_QNAME, "errors").intern();
+        public static final QName ERRORS_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, "errors").intern();
+        public static final QName ERROR_LIST_QNAME = QName.create(IETF_RESTCONF_QNAME, "error").intern();
         public static final QName ERROR_TYPE_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-type").intern();
         public static final QName ERROR_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-tag").intern();
         public static final QName ERROR_APP_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-app-tag").intern();
@@ -104,11 +86,10 @@ public final class Rfc8040 {
 
     /**
      * Constants for ietf-yang-library model.
-     *
      */
     public static final class IetfYangLibrary {
         private IetfYangLibrary() {
-            throw new UnsupportedOperationException("Util class");
+            // Hidden on purpose
         }
 
         public static final QNameModule MODULE_QNAME = $YangModuleInfoImpl.getInstance().getName().getModule();
@@ -144,12 +125,10 @@ public final class Rfc8040 {
 
     /**
      * Constants for ietf-restconf-monitoring module.
-     *
      */
     public static final class MonitoringModule {
-
         private MonitoringModule() {
-            throw new UnsupportedOperationException("Util class");
+            // Hidden on purpose
         }
 
         public static final String NAME = "ietf-restconf-monitoring";
@@ -157,62 +136,42 @@ public final class Rfc8040 {
         public static final Revision REVISION = Revision.of("2017-01-26");
         public static final String PATH_TO_STREAM_WITHOUT_KEY =
                 "ietf-restconf-monitoring:restconf-state/streams/stream=";
-        public static final String PATH_TO_STREAMS = "ietf-restconf-monitoring:restconf-state/streams";
 
         public static final URI URI_MODULE = URI.create(NAMESPACE);
 
         public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, REVISION).intern();
 
-        public static final String CONT_RESTCONF_STATE_NAME = "restconf-state";
-        public static final QName CONT_RESTCONF_STATE_QNAME = QName.create(MODULE_QNAME, CONT_RESTCONF_STATE_NAME)
-                .intern();
+        public static final QName CONT_RESTCONF_STATE_QNAME = QName.create(MODULE_QNAME, "restconf-state").intern();
 
-        public static final String CONT_CAPABILITIES_NAME = "capabilities";
-        public static final QName CONT_CAPABILITES_QNAME = QName.create(MODULE_QNAME, CONT_CAPABILITIES_NAME).intern();
+        public static final QName CONT_CAPABILITES_QNAME = QName.create(MODULE_QNAME, "capabilities").intern();
 
-        public static final String LEAF_LIST_CAPABILITY_NAME = "capability";
-        public static final QName LEAF_LIST_CAPABILITY_QNAME = QName.create(MODULE_QNAME, LEAF_LIST_CAPABILITY_NAME)
-                .intern();
+        public static final QName LEAF_LIST_CAPABILITY_QNAME = QName.create(MODULE_QNAME, "capability").intern();
 
-        public static final String CONT_STREAMS_NAME = "streams";
-        public static final QName CONT_STREAMS_QNAME = QName.create(MODULE_QNAME, CONT_STREAMS_NAME).intern();
+        public static final QName CONT_STREAMS_QNAME = QName.create(MODULE_QNAME, "streams").intern();
 
-        public static final String LIST_STREAM_NAME = "stream";
-        public static final QName LIST_STREAM_QNAME = QName.create(MODULE_QNAME, LIST_STREAM_NAME).intern();
+        public static final QName LIST_STREAM_QNAME = QName.create(MODULE_QNAME, "stream").intern();
 
-        public static final String LEAF_NAME_STREAM_NAME = "name";
-        public static final QName LEAF_NAME_STREAM_QNAME = QName.create(MODULE_QNAME, LEAF_NAME_STREAM_NAME).intern();
+        public static final QName LEAF_NAME_STREAM_QNAME = QName.create(MODULE_QNAME, "name").intern();
 
-        public static final String LEAF_DESCR_STREAM_NAME = "description";
-        public static final QName LEAF_DESCR_STREAM_QNAME = QName.create(MODULE_QNAME, LEAF_DESCR_STREAM_NAME).intern();
+        public static final QName LEAF_DESCR_STREAM_QNAME = QName.create(MODULE_QNAME, "description").intern();
 
-        public static final String LEAF_REPLAY_SUPP_STREAM_NAME = "replay-support";
-        public static final QName LEAF_REPLAY_SUPP_STREAM_QNAME =
-                QName.create(MODULE_QNAME, LEAF_REPLAY_SUPP_STREAM_NAME).intern();
+        public static final QName LEAF_REPLAY_SUPP_STREAM_QNAME = QName.create(MODULE_QNAME, "replay-support").intern();
 
-        public static final String LEAF_START_TIME_STREAM_NAME = "replay-log-creation-time";
-        public static final QName LEAF_START_TIME_STREAM_QNAME =
-                QName.create(MODULE_QNAME, LEAF_START_TIME_STREAM_NAME).intern();
+        public static final QName LEAF_START_TIME_STREAM_QNAME = QName.create(MODULE_QNAME, "replay-log-creation-time")
+            .intern();
 
-        public static final String LIST_ACCESS_STREAM_NAME = "access";
-        public static final QName LIST_ACCESS_STREAM_QNAME = QName.create(MODULE_QNAME, LIST_ACCESS_STREAM_NAME)
-                .intern();
+        public static final QName LIST_ACCESS_STREAM_QNAME = QName.create(MODULE_QNAME, "access").intern();
 
-        public static final String LEAF_ENCODING_ACCESS_NAME = "encoding";
-        public static final QName LEAF_ENCODING_ACCESS_QNAME = QName.create(MODULE_QNAME, LEAF_ENCODING_ACCESS_NAME)
-                .intern();
+        public static final QName LEAF_ENCODING_ACCESS_QNAME = QName.create(MODULE_QNAME, "encoding").intern();
 
-        public static final String LEAF_LOCATION_ACCESS_NAME = "location";
-        public static final QName LEAF_LOCATION_ACCESS_QNAME = QName.create(MODULE_QNAME, LEAF_LOCATION_ACCESS_NAME)
-                .intern();
+        public static final QName LEAF_LOCATION_ACCESS_QNAME = QName.create(MODULE_QNAME, "location").intern();
 
         /**
          * Constants for capabilities.
          */
         public static final class QueryParams {
-
             private QueryParams() {
-                throw new UnsupportedOperationException("Util class");
+                // Hidden on purpose
             }
 
             public static final String URI_BASE = "urn:ietf:params:restconf:capability:";
