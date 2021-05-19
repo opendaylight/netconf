@@ -8,12 +8,14 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.$YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -31,10 +33,11 @@ import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.RestconfModule;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -67,8 +70,15 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
     private static final Status DEFAULT_STATUS_CODE = Status.INTERNAL_SERVER_ERROR;
-    private static final SchemaPath ERRORS_GROUPING_PATH = SchemaPath.create(true,
-            RestconfModule.ERRORS_GROUPING_QNAME);
+    // Note: we are using container's QName reference to trim imports
+    private static final SchemaPath ERRORS_GROUPING_PATH = SchemaPath.create(true, Errors.QNAME);
+    private static final QName ERROR_TYPE_QNAME = qnameOf("error-type");
+    private static final QName ERROR_TAG_QNAME = qnameOf("error-tag");
+    private static final QName ERROR_APP_TAG_QNAME = qnameOf("error-app-tag");
+    private static final QName ERROR_MESSAGE_QNAME = qnameOf("error-message");
+    private static final QName ERROR_INFO_QNAME = qnameOf("error-info");
+    private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
+    private static final URI IETF_RESTCONF_URI = Errors.QNAME.getModule().getNamespace();
 
     @Context
     private HttpHeaders headers;
@@ -122,19 +132,16 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @param exception Thrown exception.
      * @return Built errors container.
      */
-    private ContainerNode buildErrorsContainer(final RestconfDocumentedException exception) {
-        final List<UnkeyedListEntryNode> errorEntries = exception.getErrors().stream()
-                .map(this::createErrorEntry)
-                .collect(Collectors.toList());
+    private static ContainerNode buildErrorsContainer(final RestconfDocumentedException exception) {
         return ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(
-                        RestconfModule.ERRORS_CONTAINER_QNAME))
-                .withChild(ImmutableUnkeyedListNodeBuilder.create()
-                        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(
-                                RestconfModule.ERROR_LIST_QNAME))
-                        .withValue(errorEntries)
-                        .build())
-                .build();
+            .withNodeIdentifier(NodeIdentifier.create(Errors.QNAME))
+            .withChild(ImmutableUnkeyedListNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
+                .withValue(exception.getErrors().stream()
+                    .map(RestconfDocumentedExceptionMapper::createErrorEntry)
+                    .collect(Collectors.toList()))
+                .build())
+            .build();
     }
 
     /**
@@ -143,36 +150,30 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @param restconfError Error details.
      * @return Built list entry.
      */
-    private UnkeyedListEntryNode createErrorEntry(final RestconfError restconfError) {
+    private static UnkeyedListEntryNode createErrorEntry(final RestconfError restconfError) {
         // filling in mandatory leafs
-        final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> entryBuilder
-                = ImmutableUnkeyedListEntryNodeBuilder.create()
-                .withNodeIdentifier(NodeIdentifier.create(RestconfModule.ERROR_LIST_QNAME))
-                .withChild(ImmutableNodes.leafNode(RestconfModule.ERROR_TYPE_QNAME,
-                        restconfError.getErrorType().getErrorTypeTag()))
-                .withChild(ImmutableNodes.leafNode(RestconfModule.ERROR_TAG_QNAME,
-                        restconfError.getErrorTag().getTagValue()));
+        final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> entryBuilder =
+            ImmutableUnkeyedListEntryNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
+                .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().getErrorTypeTag()))
+                .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().getTagValue()));
 
         // filling in optional fields
         if (restconfError.getErrorMessage() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(
-                    RestconfModule.ERROR_MESSAGE_QNAME, restconfError.getErrorMessage()));
+            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_MESSAGE_QNAME, restconfError.getErrorMessage()));
         }
         if (restconfError.getErrorAppTag() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(
-                    RestconfModule.ERROR_APP_TAG_QNAME, restconfError.getErrorAppTag()));
+            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_APP_TAG_QNAME, restconfError.getErrorAppTag()));
         }
         if (restconfError.getErrorInfo() != null) {
             // Oddly, error-info is defined as an empty container in the restconf yang. Apparently the
             // intention is for implementors to define their own data content so we'll just treat it as a leaf
             // with string data.
-            entryBuilder.withChild(ImmutableNodes.leafNode(
-                    RestconfModule.ERROR_INFO_QNAME, restconfError.getErrorInfo()));
+            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_INFO_QNAME, restconfError.getErrorInfo()));
         }
 
         if (restconfError.getErrorPath() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(
-                    RestconfModule.ERROR_PATH_QNAME, restconfError.getErrorPath()));
+            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_PATH_QNAME, restconfError.getErrorPath()));
         }
         return entryBuilder.build();
     }
@@ -188,8 +189,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
              OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
         ) {
             return writeNormalizedNode(errorsContainer, outputStream, new JsonStreamWriterWithDisabledValidation(
-                RestconfModule.ERROR_INFO_QNAME, streamStreamWriter, ERRORS_GROUPING_PATH,
-                RestconfModule.URI_MODULE, schemaContextHandler));
+                ERROR_INFO_QNAME, streamStreamWriter, ERRORS_GROUPING_PATH, IETF_RESTCONF_URI, schemaContextHandler));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }
@@ -204,7 +204,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private String serializeErrorsContainerToXml(final ContainerNode errorsContainer) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             return writeNormalizedNode(errorsContainer, outputStream, new XmlStreamWriterWithDisabledValidation(
-                RestconfModule.ERROR_INFO_QNAME, outputStream, ERRORS_GROUPING_PATH, schemaContextHandler));
+                ERROR_INFO_QNAME, outputStream, ERRORS_GROUPING_PATH, schemaContextHandler));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output XML writers", e);
         }
