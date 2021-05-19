@@ -275,7 +275,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         final Set<MediaType> acceptableAndSupportedMediaTypes = headers.getAcceptableMediaTypes().stream()
                 .filter(RestconfDocumentedExceptionMapper::isCompatibleMediaType)
                 .collect(Collectors.toSet());
-        if (acceptableAndSupportedMediaTypes.size() == 0) {
+        if (acceptableAndSupportedMediaTypes.isEmpty()) {
             // check content type of the request
             final MediaType requestMediaType = headers.getMediaType();
             return requestMediaType == null ? DEFAULT_MEDIA_TYPE
