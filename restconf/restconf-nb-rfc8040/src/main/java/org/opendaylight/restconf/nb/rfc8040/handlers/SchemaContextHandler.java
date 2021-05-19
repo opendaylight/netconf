@@ -25,8 +25,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -92,7 +92,7 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
                 String.valueOf(this.moduleSetId.incrementAndGet())));
         }
 
-        final Module monitoringModule = schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
+        final Module monitoringModule = schemaContext.findModule(RestconfState.QNAME.getModule()).orElse(null);
         if (monitoringModule != null) {
             putData(RestconfMappingNodeUtil.mapCapabilites(monitoringModule));
         }

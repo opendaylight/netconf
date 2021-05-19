@@ -23,12 +23,13 @@ import java.util.List;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.RestconfModule;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -86,13 +87,13 @@ public class RestconfMappingNodeUtilTest {
 
     @Test
     public void restconfStateCapabilitesTest() {
-        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).get();
+        final Module monitoringModule = schemaContextMonitoring.findModule(RestconfState.QNAME.getModule()).get();
         final ContainerNode normNode = RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
         assertNotNull(normNode);
         final List<Object> listOfValues = new ArrayList<>();
 
         for (final DataContainerChild<?, ?> child : normNode.getValue()) {
-            if (child.getNodeType().equals(MonitoringModule.CONT_CAPABILITES_QNAME)) {
+            if (child.getNodeType().equals(Capabilities.QNAME)) {
                 for (final DataContainerChild<?, ?> dataContainerChild : ((ContainerNode) child).getValue()) {
                     for (final Object entry : ((LeafSetNode<?>) dataContainerChild).getValue()) {
                         listOfValues.add(((LeafSetEntryNode<?>) entry).getValue());
@@ -100,11 +101,11 @@ public class RestconfMappingNodeUtilTest {
                 }
             }
         }
-        assertTrue(listOfValues.contains(QueryParams.DEPTH));
-        assertTrue(listOfValues.contains(QueryParams.FIELDS));
-        assertTrue(listOfValues.contains(QueryParams.FILTER));
-        assertTrue(listOfValues.contains(QueryParams.REPLAY));
-        assertTrue(listOfValues.contains(QueryParams.WITH_DEFAULTS));
+        assertTrue(listOfValues.contains(Rfc8040.Capabilities.DEPTH));
+        assertTrue(listOfValues.contains(Rfc8040.Capabilities.FIELDS));
+        assertTrue(listOfValues.contains(Rfc8040.Capabilities.FILTER));
+        assertTrue(listOfValues.contains(Rfc8040.Capabilities.REPLAY));
+        assertTrue(listOfValues.contains(Rfc8040.Capabilities.WITH_DEFAULTS));
     }
 
     @Test
@@ -129,7 +130,7 @@ public class RestconfMappingNodeUtilTest {
         final URI uri = new URI("uri");
 
         final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
-        map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
+        map.put(RestconfMappingNodeUtil.DESCRIPTION_QNAME, "Notifi");
 
         final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
         final MapEntryNode mappedData = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
@@ -140,12 +141,12 @@ public class RestconfMappingNodeUtilTest {
     private static Map<QName, Object> prepareMap(final String name, final URI uri, final Instant start,
             final String outputType) {
         final Map<QName, Object> map = new HashMap<>();
-        map.put(MonitoringModule.LEAF_NAME_STREAM_QNAME, name);
-        map.put(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME, uri.toString());
-        map.put(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, Boolean.TRUE);
-        map.put(MonitoringModule.LEAF_START_TIME_STREAM_QNAME, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
+        map.put(RestconfMappingNodeUtil.NAME_QNAME, name);
+        map.put(RestconfMappingNodeUtil.LOCATION_QNAME, uri.toString());
+        map.put(RestconfMappingNodeUtil.REPLAY_SUPPORT_QNAME, Boolean.TRUE);
+        map.put(RestconfMappingNodeUtil.REPLAY_LOG_CREATION_TIME, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
             OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
-        map.put(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType);
+        map.put(RestconfMappingNodeUtil.ENCODING_QNAME, outputType);
         return map;
     }
 
