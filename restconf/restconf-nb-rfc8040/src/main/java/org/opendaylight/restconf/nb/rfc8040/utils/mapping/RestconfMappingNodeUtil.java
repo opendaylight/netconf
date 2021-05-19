@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
 
+import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.$YangModuleInfoImpl.qnameOf;
+
+import com.google.common.annotations.VisibleForTesting;
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -17,10 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -51,9 +57,21 @@ import org.opendaylight.yangtools.yang.model.api.Submodule;
 
 /**
  * Util class for mapping nodes.
- *
  */
 public final class RestconfMappingNodeUtil {
+    private static final QName CAPABILITY_QNAME = qnameOf("capability");
+    @VisibleForTesting
+    static final QName DESCRIPTION_QNAME = qnameOf("description");
+    @VisibleForTesting
+    static final QName ENCODING_QNAME = qnameOf("encoding");
+    @VisibleForTesting
+    static final QName LOCATION_QNAME = qnameOf("location");
+    static final QName NAME_QNAME = qnameOf("name");
+    @VisibleForTesting
+    static final QName REPLAY_SUPPORT_QNAME = qnameOf("replay-support");
+    @VisibleForTesting
+    static final QName REPLAY_LOG_CREATION_TIME = qnameOf("replay-log-creation-time");
+
     private RestconfMappingNodeUtil() {
         // Hidden on purpose
     }
@@ -218,16 +236,16 @@ public final class RestconfMappingNodeUtil {
      */
     public static ContainerNode mapCapabilites(final Module monitoringModule) {
         return Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
+            .withNodeIdentifier(new NodeIdentifier(RestconfState.QNAME))
             .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(MonitoringModule.CONT_CAPABILITES_QNAME))
+                .withNodeIdentifier(new NodeIdentifier(Capabilities.QNAME))
                 .withChild(Builders.<String>orderedLeafSetBuilder()
-                    .withNodeIdentifier(new NodeIdentifier(MonitoringModule.LEAF_LIST_CAPABILITY_QNAME))
-                    .withChildValue(QueryParams.DEPTH)
-                    .withChildValue(QueryParams.FIELDS)
-                    .withChildValue(QueryParams.FILTER)
-                    .withChildValue(QueryParams.REPLAY)
-                    .withChildValue(QueryParams.WITH_DEFAULTS)
+                    .withNodeIdentifier(new NodeIdentifier(CAPABILITY_QNAME))
+                    .withChildValue(Rfc8040.DEPTH_CAPABILITY)
+                    .withChildValue(Rfc8040.FIELDS_CAPABILITY)
+                    .withChildValue(Rfc8040.FILTER_CAPABILITY)
+                    .withChildValue(Rfc8040.REPLAY_CAPABILITY)
+                    .withChildValue(Rfc8040.WITH_DEFAULTS_CAPABILITY)
                     .build())
                 .build())
             .build();
@@ -252,17 +270,14 @@ public final class RestconfMappingNodeUtil {
                 final String streamName = notifiQName.getLocalName();
                 final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
                     Builders.mapEntryBuilder()
-                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(MonitoringModule.LIST_STREAM_QNAME,
-                            MonitoringModule.LEAF_NAME_STREAM_QNAME, streamName))
-                        .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_NAME_STREAM_QNAME, streamName));
+                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
+                        .withChild(ImmutableNodes.leafNode(NAME_QNAME, streamName));
 
                 notificationDefinition.getDescription().ifPresent(
-                    desc -> streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_DESCR_STREAM_QNAME,
-                        desc)));
-                streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME,
-                    Boolean.TRUE));
+                    desc -> streamEntry.withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, desc)));
+                streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE));
                 if (start != null) {
-                    streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_START_TIME_STREAM_QNAME,
+                    streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_LOG_CREATION_TIME,
                         DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,
                             ZoneId.systemDefault()))));
                 }
@@ -278,13 +293,11 @@ public final class RestconfMappingNodeUtil {
 
     private static MapNode createAccessList(final String outputType, final URI uriToWebsocketServer) {
         return Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(MonitoringModule.LIST_ACCESS_STREAM_QNAME))
+            .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
             .withChild(Builders.mapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(MonitoringModule.LIST_ACCESS_STREAM_QNAME,
-                    MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType))
-                .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType))
-                .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME,
-                    uriToWebsocketServer.toString()))
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(LOCATION_QNAME, uriToWebsocketServer.toString()))
                 .build())
             .build();
     }
@@ -309,16 +322,15 @@ public final class RestconfMappingNodeUtil {
                 .getSchemaNode();
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
             Builders.mapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(MonitoringModule.LIST_STREAM_QNAME,
-                    MonitoringModule.LEAF_NAME_STREAM_QNAME, streamName))
-                .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_NAME_STREAM_QNAME, streamName));
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, streamName));
 
         schemaNode.getDescription().ifPresent(desc ->
-            streamEntry.withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_DESCR_STREAM_QNAME, desc)));
+            streamEntry.withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, desc)));
 
         return streamEntry
-            .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, Boolean.TRUE))
-            .withChild(ImmutableNodes.leafNode(MonitoringModule.LEAF_START_TIME_STREAM_QNAME,
+            .withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE))
+            .withChild(ImmutableNodes.leafNode(REPLAY_LOG_CREATION_TIME,
                 DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault()))))
             .withChild(createAccessList(outputType, uri))
             .build();

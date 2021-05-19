@@ -7,7 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import com.google.common.annotations.Beta;
 import java.net.URI;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
@@ -15,6 +19,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 
 /**
  * Base Draft for Restconf project.
@@ -23,13 +30,51 @@ import org.opendaylight.yangtools.yang.common.Revision;
  * <li>Constants for modules
  * <ul>
  * <li>{@link RestconfModule}
- * <li>{@link MonitoringModule}
  * </ul>
  * </ul>
  */
 public final class Rfc8040 {
+    /**
+     * Support for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.2">"depth" Query Parameter</a>.
+     */
+    public static final String DEPTH_CAPABILITY = "urn:ietf:params:restconf:capability:depth:1.0";
+    /**
+     * Support for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3">"fields" Query Parameter</a>.
+     */
+    public static final String FIELDS_CAPABILITY = "urn:ietf:params:restconf:capability:fields:1.0";
+    /**
+     * Support for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.4">"filter" Query Parameter</a>.
+     */
+    public static final String FILTER_CAPABILITY = "urn:ietf:params:restconf:capability:filter:1.0";
+    /**
+     * Support for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.7">"start-time"</a>
+     * and <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.7">"stop-time"</a> Query Parameters.
+     */
+    public static final String REPLAY_CAPABILITY = "urn:ietf:params:restconf:capability:replay:1.0";
+    /**
+     * Support for
+     * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.9">"with-defaults" Query Parameter</a>.
+     */
+    public static final String WITH_DEFAULTS_CAPABILITY = "urn:ietf:params:restconf:capability:with-defaults:1.0";
+
+    private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.create(
+        NodeIdentifier.create(RestconfState.QNAME), NodeIdentifier.create(Streams.QNAME));
+    private static final QName STREAM_QNAME = QName.create(Streams.QNAME, "stream").intern();
+
     private Rfc8040() {
         // Hidden on purpose
+    }
+
+    @Beta
+    // FIXME: move this method somewhere else
+    public static @NonNull YangInstanceIdentifier restconfStateStreamPath(final String streamName) {
+        return restconfStateStreamPath(NodeIdentifierWithPredicates.of(Streams.QNAME, STREAM_QNAME, streamName));
+    }
+
+    @Beta
+    // FIXME: move this method somewhere else
+    public static @NonNull YangInstanceIdentifier restconfStateStreamPath(final NodeIdentifierWithPredicates arg) {
+        return RESTCONF_STATE_STREAMS.node(arg);
     }
 
     /**
@@ -121,66 +166,5 @@ public final class Rfc8040 {
                 QName.create(MODULE_QNAME, "conformance-type").intern();
 
         public static final QName SPECIFIC_MODULE_SUBMODULE_LIST_QNAME = Submodule.QNAME;
-    }
-
-    /**
-     * Constants for ietf-restconf-monitoring module.
-     */
-    public static final class MonitoringModule {
-        private MonitoringModule() {
-            // Hidden on purpose
-        }
-
-        public static final String NAME = "ietf-restconf-monitoring";
-        public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring";
-        public static final Revision REVISION = Revision.of("2017-01-26");
-        public static final String PATH_TO_STREAM_WITHOUT_KEY =
-                "ietf-restconf-monitoring:restconf-state/streams/stream=";
-
-        public static final URI URI_MODULE = URI.create(NAMESPACE);
-
-        public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, REVISION).intern();
-
-        public static final QName CONT_RESTCONF_STATE_QNAME = QName.create(MODULE_QNAME, "restconf-state").intern();
-
-        public static final QName CONT_CAPABILITES_QNAME = QName.create(MODULE_QNAME, "capabilities").intern();
-
-        public static final QName LEAF_LIST_CAPABILITY_QNAME = QName.create(MODULE_QNAME, "capability").intern();
-
-        public static final QName CONT_STREAMS_QNAME = QName.create(MODULE_QNAME, "streams").intern();
-
-        public static final QName LIST_STREAM_QNAME = QName.create(MODULE_QNAME, "stream").intern();
-
-        public static final QName LEAF_NAME_STREAM_QNAME = QName.create(MODULE_QNAME, "name").intern();
-
-        public static final QName LEAF_DESCR_STREAM_QNAME = QName.create(MODULE_QNAME, "description").intern();
-
-        public static final QName LEAF_REPLAY_SUPP_STREAM_QNAME = QName.create(MODULE_QNAME, "replay-support").intern();
-
-        public static final QName LEAF_START_TIME_STREAM_QNAME = QName.create(MODULE_QNAME, "replay-log-creation-time")
-            .intern();
-
-        public static final QName LIST_ACCESS_STREAM_QNAME = QName.create(MODULE_QNAME, "access").intern();
-
-        public static final QName LEAF_ENCODING_ACCESS_QNAME = QName.create(MODULE_QNAME, "encoding").intern();
-
-        public static final QName LEAF_LOCATION_ACCESS_QNAME = QName.create(MODULE_QNAME, "location").intern();
-
-        /**
-         * Constants for capabilities.
-         */
-        public static final class QueryParams {
-            private QueryParams() {
-                // Hidden on purpose
-            }
-
-            public static final String URI_BASE = "urn:ietf:params:restconf:capability:";
-
-            public static final String DEPTH = URI_BASE + "depth:1.0";
-            public static final String FIELDS = URI_BASE + "fields:1.0";
-            public static final String FILTER = URI_BASE + "filter:1.0";
-            public static final String REPLAY = URI_BASE + "replay:1.0";
-            public static final String WITH_DEFAULTS = URI_BASE + "with-defaults:1.0";
-        }
     }
 }

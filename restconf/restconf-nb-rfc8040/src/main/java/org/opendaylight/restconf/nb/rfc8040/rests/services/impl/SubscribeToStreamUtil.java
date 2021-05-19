@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -29,7 +30,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.DataChangeScope;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ResolveEnumUtil;
@@ -153,9 +154,7 @@ abstract class SubscribeToStreamUtil {
                     notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
                     notificationListenerAdapter.getOutputType(), uri);
-        writeDataToDS(schemaContext,
-            notificationListenerAdapter.getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
-            mapToStreams);
+        writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
@@ -213,17 +212,16 @@ abstract class SubscribeToStreamUtil {
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
                 notificationQueryParams.getStart(), listener.get().getOutputType(), uri, schemaContext, serializedPath);
-        writeDataToDS(schemaContext, serializedPath, writeTransaction, mapToStreams);
+        writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
     }
 
-    private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
-            final DOMDataTreeReadWriteTransaction readWriteTransaction, final MapEntryNode mapToStreams) {
-        readWriteTransaction.merge(LogicalDatastoreType.OPERATIONAL,
-            // FIXME: do not use IdentifierCodec here
-            IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name, schemaContext),
+    // FIXME: callers are utter duplicates, refactor them
+    private static void writeDataToDS(final DOMDataTreeWriteOperations tx, final MapEntryNode mapToStreams) {
+        // FIXME: use put() here
+        tx.merge(LogicalDatastoreType.OPERATIONAL, Rfc8040.restconfStateStreamPath(mapToStreams.getIdentifier()),
             mapToStreams);
     }
 
