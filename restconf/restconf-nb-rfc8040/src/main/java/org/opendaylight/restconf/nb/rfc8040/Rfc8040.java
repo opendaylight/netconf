@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import com.google.common.annotations.Beta;
-import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
@@ -24,14 +23,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 
 /**
- * Base Draft for Restconf project.
- * <ul>
- * <li>Supported {@link MediaTypes}
- * <li>Constants for modules
- * <ul>
- * <li>{@link RestconfModule}
- * </ul>
- * </ul>
+ * Common constants defined and relating to RFC8040.
  */
 public final class Rfc8040 {
     private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.create(
@@ -100,41 +92,6 @@ public final class Rfc8040 {
         public static final String YANG_PATCH_STATUS = "application/yang.patch-status";
 
         private MediaTypes() {
-            // Hidden on purpose
-        }
-    }
-
-    /**
-     * Constants for restconf module.
-     */
-    // FIXME: split this out
-    public static final class RestconfModule {
-        public static final Revision REVISION = Revision.of("2017-01-26");
-        public static final String NAME = "ietf-restconf";
-        public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf";
-        public static final URI URI_MODULE = URI.create(NAMESPACE);
-
-        public static final QName IETF_RESTCONF_QNAME = QName.create(URI_MODULE,
-                Rfc8040.RestconfModule.REVISION, Rfc8040.RestconfModule.NAME).intern();
-
-        // RESTCONF
-        public static final QName RESTCONF_GROUPING_QNAME = QName.create(IETF_RESTCONF_QNAME, "restconf").intern();
-        public static final QName RESTCONF_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, "restconf").intern();
-        public static final QName LIB_VER_LEAF_QNAME = QName.create(IETF_RESTCONF_QNAME, "yang-library-version")
-                .intern();
-
-        // ERRORS
-        public static final QName ERRORS_GROUPING_QNAME = QName.create(IETF_RESTCONF_QNAME, "errors").intern();
-        public static final QName ERRORS_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, "errors").intern();
-        public static final QName ERROR_LIST_QNAME = QName.create(IETF_RESTCONF_QNAME, "error").intern();
-        public static final QName ERROR_TYPE_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-type").intern();
-        public static final QName ERROR_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-tag").intern();
-        public static final QName ERROR_APP_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-app-tag").intern();
-        public static final QName ERROR_MESSAGE_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-message").intern();
-        public static final QName ERROR_INFO_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-info").intern();
-        public static final QName ERROR_PATH_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-path").intern();
-
-        private RestconfModule() {
             // Hidden on purpose
         }
     }
