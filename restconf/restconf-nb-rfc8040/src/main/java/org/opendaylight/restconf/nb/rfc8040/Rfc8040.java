@@ -79,24 +79,6 @@ public final class Rfc8040 {
     }
 
     /**
-     * Set of application specific media types to identify each of the available resource types.
-     */
-    public static final class MediaTypes {
-        /**
-         * See: <a href="https://tools.ietf.org/html/rfc6415">rfc6415</a>.
-         */
-        public static final String XRD = "application/xrd";
-
-        public static final String DATA = "application/yang-data";
-        public static final String YANG_PATCH = "application/yang.patch";
-        public static final String YANG_PATCH_STATUS = "application/yang.patch-status";
-
-        private MediaTypes() {
-            // Hidden on purpose
-        }
-    }
-
-    /**
      * Constants for ietf-yang-library model.
      */
     // FIXME: split this out

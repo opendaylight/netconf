@@ -30,10 +30,9 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractNormalizedNodeBodyReader;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -61,7 +60,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 @Provider
-@Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+@Consumes({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
 

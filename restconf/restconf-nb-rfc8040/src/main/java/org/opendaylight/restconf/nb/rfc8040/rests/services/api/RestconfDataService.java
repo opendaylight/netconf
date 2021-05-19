@@ -24,8 +24,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 
 /**
  * The "{+restconf}/data" subtree represents the datastore resource type, which
@@ -45,9 +44,8 @@ public interface RestconfDataService {
     @GET
     @Path("/data/{identifier:.+}")
     @Produces({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
@@ -64,9 +62,8 @@ public interface RestconfDataService {
     @GET
     @Path("/data")
     @Produces({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
@@ -85,9 +82,8 @@ public interface RestconfDataService {
     @PUT
     @Path("/data/{identifier:.+}")
     @Consumes({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
@@ -109,9 +105,8 @@ public interface RestconfDataService {
     @POST
     @Path("/data/{identifier:.+}")
     @Consumes({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
@@ -131,9 +126,8 @@ public interface RestconfDataService {
     @POST
     @Path("/data")
     @Consumes({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
@@ -166,12 +160,12 @@ public interface RestconfDataService {
     @Patch
     @Path("/data/{identifier:.+}")
     @Consumes({
-        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML
+        MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        MediaTypes.APPLICATION_YANG_PATCH_XML
     })
     @Produces({
-        Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
     })
     PatchStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PatchContext context,
                                  @Context UriInfo uriInfo);
@@ -188,12 +182,12 @@ public interface RestconfDataService {
     @Patch
     @Path("/data")
     @Consumes({
-        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML
+        MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        MediaTypes.APPLICATION_YANG_PATCH_XML
     })
     @Produces({
-        Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
     })
     PatchStatusContext patchData(PatchContext context, @Context UriInfo uriInfo);
 
@@ -210,9 +204,8 @@ public interface RestconfDataService {
     @Patch
     @Path("/data/{identifier:.+}")
     @Consumes({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML

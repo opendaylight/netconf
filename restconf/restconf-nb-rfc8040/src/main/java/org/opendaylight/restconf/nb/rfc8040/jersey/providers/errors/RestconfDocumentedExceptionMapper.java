@@ -32,9 +32,8 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -58,15 +57,6 @@ import org.slf4j.LoggerFactory;
  */
 @Provider
 public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<RestconfDocumentedException> {
-    @VisibleForTesting
-    static final MediaType YANG_DATA_JSON_TYPE = MediaType.valueOf(MediaTypes.DATA + RestconfConstants.JSON);
-    @VisibleForTesting
-    static final MediaType YANG_DATA_XML_TYPE = MediaType.valueOf(MediaTypes.DATA + RestconfConstants.XML);
-    @VisibleForTesting
-    static final MediaType YANG_PATCH_JSON_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH + RestconfConstants.JSON);
-    @VisibleForTesting
-    static final MediaType YANG_PATCH_XML_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH + RestconfConstants.XML);
-
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
     private static final Status DEFAULT_STATUS_CODE = Status.INTERNAL_SERVER_ERROR;
@@ -111,7 +101,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         final ContainerNode errorsContainer = buildErrorsContainer(exception);
         final String serializedResponseBody;
         final MediaType responseMediaType = transformToResponseMediaType(getSupportedMediaType());
-        if (YANG_DATA_JSON_TYPE.equals(responseMediaType)) {
+        if (MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE.equals(responseMediaType)) {
             serializedResponseBody = serializeErrorsContainerToJson(errorsContainer);
         } else {
             serializedResponseBody = serializeErrorsContainerToXml(errorsContainer);
@@ -344,9 +334,9 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      */
     private static MediaType transformToResponseMediaType(final MediaType mediaTypeBase) {
         if (isJsonCompatibleMediaType(mediaTypeBase)) {
-            return YANG_DATA_JSON_TYPE;
+            return MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE;
         } else if (isXmlCompatibleMediaType(mediaTypeBase)) {
-            return YANG_DATA_XML_TYPE;
+            return MediaTypes.APPLICATION_YANG_DATA_XML_TYPE;
         } else {
             throw new IllegalStateException(String.format("Unexpected input media-type %s "
                     + "- it should be JSON/XML compatible type.", mediaTypeBase));
@@ -359,12 +349,14 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
 
     private static boolean isJsonCompatibleMediaType(final MediaType mediaType) {
         return mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)
-                || mediaType.isCompatible(YANG_DATA_JSON_TYPE) || mediaType.isCompatible(YANG_PATCH_JSON_TYPE);
+                || mediaType.isCompatible(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
+                || mediaType.isCompatible(MediaTypes.APPLICATION_YANG_PATCH_JSON_TYPE);
     }
 
     private static boolean isXmlCompatibleMediaType(final MediaType mediaType) {
         return mediaType.isCompatible(MediaType.APPLICATION_XML_TYPE)
-                || mediaType.isCompatible(YANG_DATA_XML_TYPE) || mediaType.isCompatible(YANG_PATCH_XML_TYPE);
+                || mediaType.isCompatible(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
+                || mediaType.isCompatible(MediaTypes.APPLICATION_YANG_PATCH_XML_TYPE);
     }
 
     /**

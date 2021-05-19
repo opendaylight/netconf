@@ -12,8 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 
 /**
  * Service for getting yang library version.
@@ -27,8 +26,8 @@ public interface RestconfService {
     @GET
     @Path("/yang-library-version")
     @Produces({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA,
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML

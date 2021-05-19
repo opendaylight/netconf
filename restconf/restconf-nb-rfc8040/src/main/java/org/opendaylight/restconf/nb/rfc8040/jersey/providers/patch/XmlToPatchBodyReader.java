@@ -32,10 +32,9 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -62,7 +61,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 @Provider
-@Consumes({Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML})
+@Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
 public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');

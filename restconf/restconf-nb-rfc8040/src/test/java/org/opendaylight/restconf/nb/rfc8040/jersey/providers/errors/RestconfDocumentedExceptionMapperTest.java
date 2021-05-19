@@ -7,13 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.collect.Lists;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -22,7 +21,6 @@ import javax.ws.rs.core.Response.Status;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +31,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -47,7 +46,7 @@ public class RestconfDocumentedExceptionMapperTest {
 
     private static final String EMPTY_XML = "<errors xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"></errors>";
     private static final String EMPTY_JSON = "{}";
-    private static QNameModule MONITORING_MODULE_INFO = QNameModule.create(
+    private static final QNameModule MONITORING_MODULE_INFO = QNameModule.create(
             URI.create("instance:identifier:patch:module"), Revision.of("2015-11-21"));
 
     private static RestconfDocumentedExceptionMapper exceptionMapper;
@@ -72,38 +71,36 @@ public class RestconfDocumentedExceptionMapperTest {
      */
     @Parameters(name = "{index}: {0}: {1}")
     public static Iterable<Object[]> data() {
-        final RestconfDocumentedException sampleComplexError
-                = new RestconfDocumentedException("general message", new IllegalStateException("cause"),
-                Lists.newArrayList(
-                        new RestconfError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE,
-                                "message 1", "app tag #1"),
-                        new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-                                "message 2", "app tag #2", "my info"),
-                        new RestconfError(ErrorType.RPC, ErrorTag.DATA_MISSING,
-                                "message 3", " app tag #3", "my error info", YangInstanceIdentifier.builder()
-                                .node(QName.create(MONITORING_MODULE_INFO, "patch-cont"))
-                                .node(QName.create(MONITORING_MODULE_INFO, "my-list1"))
-                                .nodeWithKey(QName.create(MONITORING_MODULE_INFO, "my-list1"),
-                                        QName.create(MONITORING_MODULE_INFO, "name"), "sample")
-                                .node(QName.create(MONITORING_MODULE_INFO, "my-leaf12"))
-                                .build())));
+        final RestconfDocumentedException sampleComplexError =
+            new RestconfDocumentedException("general message", new IllegalStateException("cause"), List.of(
+                new RestconfError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, "message 1", "app tag #1"),
+                new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                    "message 2", "app tag #2", "my info"),
+                new RestconfError(ErrorType.RPC, ErrorTag.DATA_MISSING,
+                    "message 3", " app tag #3", "my error info", YangInstanceIdentifier.builder()
+                    .node(QName.create(MONITORING_MODULE_INFO, "patch-cont"))
+                    .node(QName.create(MONITORING_MODULE_INFO, "my-list1"))
+                    .nodeWithKey(QName.create(MONITORING_MODULE_INFO, "my-list1"),
+                        QName.create(MONITORING_MODULE_INFO, "name"), "sample")
+                    .node(QName.create(MONITORING_MODULE_INFO, "my-leaf12"))
+                    .build())));
 
-        return Arrays.asList(new Object[][]{
+        return Arrays.asList(new Object[][] {
             {
                 "Mapping of the exception without any errors and XML output derived from content type",
                 new RestconfDocumentedException(Status.BAD_REQUEST),
-                mockHttpHeaders(MediaType.APPLICATION_XML_TYPE, Collections.emptyList()),
+                mockHttpHeaders(MediaType.APPLICATION_XML_TYPE, List.of()),
                 Response.status(Status.BAD_REQUEST)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_XML_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
                         .entity(EMPTY_XML)
                         .build()
             },
             {
                 "Mapping of the exception without any errors and JSON output derived from unsupported content type",
                 new RestconfDocumentedException(Status.INTERNAL_SERVER_ERROR),
-                mockHttpHeaders(MediaType.APPLICATION_FORM_URLENCODED_TYPE, Collections.emptyList()),
+                mockHttpHeaders(MediaType.APPLICATION_FORM_URLENCODED_TYPE, List.of()),
                 Response.status(Status.INTERNAL_SERVER_ERROR)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_JSON_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
                         .entity(EMPTY_JSON)
                         .build()
             },
@@ -111,9 +108,9 @@ public class RestconfDocumentedExceptionMapperTest {
                 "Mapping of the exception without any errors and JSON output derived from missing content type "
                         + "and accepted media types",
                 new RestconfDocumentedException(Status.NOT_IMPLEMENTED),
-                mockHttpHeaders(null, Collections.emptyList()),
+                mockHttpHeaders(null, List.of()),
                 Response.status(Status.NOT_IMPLEMENTED)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_JSON_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
                         .entity(EMPTY_JSON)
                         .build()
             },
@@ -121,11 +118,11 @@ public class RestconfDocumentedExceptionMapperTest {
                 "Mapping of the exception without any errors and JSON output derived from expected types - both JSON"
                         + "and XML types are accepted, but server should prefer JSON format",
                 new RestconfDocumentedException(Status.INTERNAL_SERVER_ERROR),
-                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, Lists.newArrayList(
+                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(
                         MediaType.APPLICATION_FORM_URLENCODED_TYPE, MediaType.APPLICATION_XML_TYPE,
                         MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_OCTET_STREAM_TYPE)),
                 Response.status(Status.INTERNAL_SERVER_ERROR)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_JSON_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
                         .entity(EMPTY_JSON)
                         .build()
             },
@@ -133,9 +130,9 @@ public class RestconfDocumentedExceptionMapperTest {
                 "Mapping of the exception without any errors and JSON output derived from expected types - there"
                         + "is only a wildcard type that should be mapped to default type",
                 new RestconfDocumentedException(Status.NOT_FOUND),
-                mockHttpHeaders(null, Lists.newArrayList(MediaType.WILDCARD_TYPE)),
+                mockHttpHeaders(null, List.of(MediaType.WILDCARD_TYPE)),
                 Response.status(Status.NOT_FOUND)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_JSON_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
                         .entity(EMPTY_JSON)
                         .build()
             },
@@ -143,10 +140,10 @@ public class RestconfDocumentedExceptionMapperTest {
                 "Mapping of the exception without any errors and XML output derived from expected types - "
                         + "we should choose the most specific and supported type",
                 new RestconfDocumentedException(Status.NOT_FOUND),
-                mockHttpHeaders(null, Lists.newArrayList(MediaType.valueOf("*/yang-data+json"),
+                mockHttpHeaders(null, List.of(MediaType.valueOf("*/yang-data+json"),
                         MediaType.valueOf("application/yang-data+xml"), MediaType.WILDCARD_TYPE)),
                 Response.status(Status.NOT_FOUND)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_XML_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
                         .entity(EMPTY_XML)
                         .build()
             },
@@ -154,10 +151,10 @@ public class RestconfDocumentedExceptionMapperTest {
                 "Mapping of the exception without any errors and XML output derived from expected types - "
                         + "we should choose the most specific and supported type",
                 new RestconfDocumentedException(Status.NOT_FOUND),
-                mockHttpHeaders(null, Lists.newArrayList(MediaType.valueOf("*/unsupported"),
+                mockHttpHeaders(null, List.of(MediaType.valueOf("*/unsupported"),
                         MediaType.valueOf("application/*"), MediaType.WILDCARD_TYPE)),
                 Response.status(Status.NOT_FOUND)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_JSON_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
                         .entity(EMPTY_JSON)
                         .build()
             },
@@ -165,10 +162,9 @@ public class RestconfDocumentedExceptionMapperTest {
                 "Mapping of the exception with one error entry but null status code. This status code should"
                         + "be derived from single error entry; JSON output",
                 new RestconfDocumentedException("Sample error message"),
-                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, Collections.singletonList(
-                        RestconfDocumentedExceptionMapper.YANG_PATCH_JSON_TYPE)),
+                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(MediaTypes.APPLICATION_YANG_PATCH_JSON_TYPE)),
                 Response.status(Status.INTERNAL_SERVER_ERROR)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_JSON_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
                         .entity("{\n"
                                 + "  \"errors\": {\n"
                                 + "    \"error\": [\n"
@@ -185,14 +181,12 @@ public class RestconfDocumentedExceptionMapperTest {
             {
                 "Mapping of the exception with two error entries but null status code. This status code should"
                         + "be derived from the first error entry that is specified; XML output",
-                new RestconfDocumentedException("general message", new IllegalStateException("cause"),
-                        Lists.newArrayList(
+                new RestconfDocumentedException("general message", new IllegalStateException("cause"), List.of(
                                 new RestconfError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, "message 1"),
                                 new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "message 2"))),
-                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, Collections.singletonList(
-                        RestconfDocumentedExceptionMapper.YANG_PATCH_XML_TYPE)),
+                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(MediaTypes.APPLICATION_YANG_PATCH_XML_TYPE)),
                 Response.status(Status.BAD_REQUEST)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_XML_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
                         .entity("<errors xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\">\n"
                                 + "<error>\n"
                                 + "<error-message>message 1</error-message>\n"
@@ -210,10 +204,10 @@ public class RestconfDocumentedExceptionMapperTest {
             {
                 "Mapping of the exception with three entries and optional entries set: error app tag (the first error),"
                         + " error info (the second error), and error path (the last error); JSON output",
-                sampleComplexError, mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, Collections.singletonList(
+                sampleComplexError, mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(
                         MediaType.APPLICATION_JSON_TYPE)),
                 Response.status(Status.BAD_REQUEST)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_JSON_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
                         .entity("{\n"
                                 + "  \"errors\": {\n"
                                 + "    \"error\": [\n"
@@ -247,10 +241,10 @@ public class RestconfDocumentedExceptionMapperTest {
             {
                 "Mapping of the exception with three entries and optional entries set: error app tag (the first error),"
                         + " error info (the second error), and error path (the last error); XML output",
-                sampleComplexError, mockHttpHeaders(RestconfDocumentedExceptionMapper.YANG_PATCH_JSON_TYPE,
-                        Collections.singletonList(RestconfDocumentedExceptionMapper.YANG_DATA_XML_TYPE)),
+                sampleComplexError, mockHttpHeaders(MediaTypes.APPLICATION_YANG_PATCH_JSON_TYPE,
+                        List.of(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)),
                 Response.status(Status.BAD_REQUEST)
-                        .type(RestconfDocumentedExceptionMapper.YANG_DATA_XML_TYPE)
+                        .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
                         .entity("<errors xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\">\n"
                                 + "<error>\n"
                                 + "<error-type>application</error-type>\n"
@@ -306,9 +300,9 @@ public class RestconfDocumentedExceptionMapperTest {
             throws JSONException {
         final String errorMessage = String.format("Actual response %s doesn't equal to expected response %s",
                 actualResponse, expectedResponse);
-        Assert.assertEquals(errorMessage, expectedResponse.getStatus(), actualResponse.getStatus());
-        Assert.assertEquals(errorMessage, expectedResponse.getMediaType(), actualResponse.getMediaType());
-        if (RestconfDocumentedExceptionMapper.YANG_DATA_JSON_TYPE.equals(expectedResponse.getMediaType())) {
+        assertEquals(errorMessage, expectedResponse.getStatus(), actualResponse.getStatus());
+        assertEquals(errorMessage, expectedResponse.getMediaType(), actualResponse.getMediaType());
+        if (MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE.equals(expectedResponse.getMediaType())) {
             JSONAssert.assertEquals(expectedResponse.getEntity().toString(),
                     actualResponse.getEntity().toString(), true);
         } else {
