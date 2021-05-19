@@ -17,12 +17,10 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040.RestconfModule;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 @Path("/")
@@ -45,11 +43,8 @@ public class RestconfImpl implements RestconfService {
                                 .getDataChildByName(RestconfModule.LIB_VER_LEAF_QNAME);
             }
         }
-        final YangInstanceIdentifier yangIId = YangInstanceIdentifier.of(RestconfModule.LIB_VER_LEAF_QNAME);
-        final InstanceIdentifierContext<? extends SchemaNode> iid =
-                new InstanceIdentifierContext<>(yangIId, schemaNode, null, context);
-        final NormalizedNode<?, ?> data = Builders.leafBuilder((LeafSchemaNode) schemaNode)
-                .withValue(IetfYangLibrary.REVISION.toString()).build();
-        return new NormalizedNodeContext(iid, data);
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(
+            YangInstanceIdentifier.of(RestconfModule.LIB_VER_LEAF_QNAME), schemaNode, null, context),
+            ImmutableNodes.leafNode(RestconfModule.LIB_VER_LEAF_QNAME, IetfYangLibrary.REVISION.toString()));
     }
 }
