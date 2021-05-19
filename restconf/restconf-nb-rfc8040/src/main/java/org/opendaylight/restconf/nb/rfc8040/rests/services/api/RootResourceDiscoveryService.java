@@ -10,9 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MediaTypes;
 
 /**
  * Controller for determining the {@code Root Resource} of the RESTCONF API. This interface serves up a
@@ -27,7 +27,7 @@ public interface RootResourceDiscoveryService {
      */
     @GET
     @Path("/host-meta")
-    @Produces({Rfc8040.MediaTypes.XRD + RestconfConstants.XML})
+    @Produces(MediaTypes.XRD_XML)
     Response readXrdData();
 
     /**
@@ -35,6 +35,6 @@ public interface RootResourceDiscoveryService {
      */
     @GET
     @Path("/host-meta.json")
-    @Produces({Rfc8040.MediaTypes.XRD + RestconfConstants.JSON})
+    @Produces(MediaType.APPLICATION_JSON)
     Response readJsonData();
 }

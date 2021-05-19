@@ -26,11 +26,10 @@ import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MediaTypes;
 
 @Provider
-@Produces({ Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML })
+@Produces(MediaTypes.YANG_DATA_XML)
 public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext> {
 
     private static final XMLOutputFactory XML_FACTORY;

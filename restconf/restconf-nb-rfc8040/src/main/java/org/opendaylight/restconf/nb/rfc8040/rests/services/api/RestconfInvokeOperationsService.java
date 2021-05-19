@@ -17,8 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MediaTypes;
 
 /**
  * An operation resource represents a protocol operation defined with the YANG {@code rpc} statement. It is invoked
@@ -36,15 +35,15 @@ public interface RestconfInvokeOperationsService {
     @POST
     @Path("/operations/{identifier:.+}")
     @Produces({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        MediaTypes.YANG_DATA_JSON,
+        MediaTypes.YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
     @Consumes({
-        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        MediaTypes.YANG_DATA_JSON,
+        MediaTypes.YANG_DATA_XML,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML

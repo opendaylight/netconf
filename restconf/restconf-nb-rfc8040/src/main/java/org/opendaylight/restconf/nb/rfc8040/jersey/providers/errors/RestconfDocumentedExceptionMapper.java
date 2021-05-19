@@ -34,7 +34,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -59,13 +58,13 @@ import org.slf4j.LoggerFactory;
 @Provider
 public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<RestconfDocumentedException> {
     @VisibleForTesting
-    static final MediaType YANG_DATA_JSON_TYPE = MediaType.valueOf(MediaTypes.DATA + RestconfConstants.JSON);
+    static final MediaType YANG_DATA_JSON_TYPE = MediaType.valueOf(MediaTypes.YANG_DATA_JSON);
     @VisibleForTesting
-    static final MediaType YANG_DATA_XML_TYPE = MediaType.valueOf(MediaTypes.DATA + RestconfConstants.XML);
+    static final MediaType YANG_DATA_XML_TYPE = MediaType.valueOf(MediaTypes.YANG_DATA_XML);
     @VisibleForTesting
-    static final MediaType YANG_PATCH_JSON_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH + RestconfConstants.JSON);
+    static final MediaType YANG_PATCH_JSON_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH_JSON);
     @VisibleForTesting
-    static final MediaType YANG_PATCH_XML_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH + RestconfConstants.XML);
+    static final MediaType YANG_PATCH_XML_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH_XML);
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;

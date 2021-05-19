@@ -83,13 +83,30 @@ public final class Rfc8040 {
      */
     public static final class MediaTypes {
         /**
-         * See: <a href="https://tools.ietf.org/html/rfc6415">rfc6415</a>.
+         * Extensible Resource Descriptor (<a href="https://docs.oasis-open.org/xri/xrd/v1.0/xrd-1.0.html">XRD</a>
+         * in XML representation as per <a href="https://datatracker.ietf.org/doc/html/rfc6415#section-2">RFC6415</a>.
          */
-        public static final String XRD = "application/xrd";
-
-        public static final String DATA = "application/yang-data";
-        public static final String YANG_PATCH = "application/yang.patch";
-        public static final String YANG_PATCH_STATUS = "application/yang.patch-status";
+        public static final String XRD_XML = "application/xrd+xml";
+        /**
+         * YANG data in XML representation, as defined in
+         * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-11.3.1">RFC8040, section 11.3.1</a>.
+         */
+        public static final String YANG_DATA_XML = "application/yang-data+xml";
+        /**
+         * YANG data in JSON representation, as defined in
+         * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-11.3.2">RFC8040, section 11.3.2</a>.
+         */
+        public static final String YANG_DATA_JSON = "application/yang-data+json";
+        /**
+         * YANG patch in XML representation, as defined in
+         * <a href="https://datatracker.ietf.org/doc/html/rfc8072#section-4.2.1">RFC8072, section 4.2.1</a>.
+         */
+        public static final String YANG_PATCH_XML = "application/yang-patch+xml";
+        /**
+         * YANG patch in JSON representation, as defined in
+         * <a href="https://datatracker.ietf.org/doc/html/rfc8072#section-4.2.2">RFC8072, section 4.2.2</a>.
+         */
+        public static final String YANG_PATCH_JSON = "application/yang-patch+json";
 
         private MediaTypes() {
             // Hidden on purpose
