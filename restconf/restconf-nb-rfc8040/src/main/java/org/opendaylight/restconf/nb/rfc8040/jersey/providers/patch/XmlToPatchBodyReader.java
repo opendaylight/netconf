@@ -62,13 +62,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 @Provider
-@Consumes({Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML})
+@Consumes({
+    Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML,
+    Rfc8040.MediaTypes.YANG_PATCH_RFC8072 + RestconfConstants.XML
+})
 public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
-    public XmlToPatchBodyReader(SchemaContextHandler schemaContextHandler,
-            DOMMountPointServiceHandler mountPointServiceHandler) {
+    public XmlToPatchBodyReader(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointServiceHandler mountPointServiceHandler) {
         super(schemaContextHandler, mountPointServiceHandler);
     }
 

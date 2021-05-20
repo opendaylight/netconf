@@ -168,10 +168,14 @@ public interface RestconfDataService extends UpdateHandlers {
     @Patch
     @Path("/data/{identifier:.+}")
     @Consumes({
+        Rfc8040.MediaTypes.YANG_PATCH_RFC8072 + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.YANG_PATCH_RFC8072 + RestconfConstants.XML,
         Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
-        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML
+        Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML,
     })
     @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
         Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
         Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML
     })
@@ -190,15 +194,18 @@ public interface RestconfDataService extends UpdateHandlers {
     @Patch
     @Path("/data")
     @Consumes({
+        Rfc8040.MediaTypes.YANG_PATCH_RFC8072 + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.YANG_PATCH_RFC8072 + RestconfConstants.XML,
         Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
         Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML
     })
     @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
         Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON,
         Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML
     })
     PatchStatusContext patchData(PatchContext context, @Context UriInfo uriInfo);
-
 
     /**
      * Partially modify the target data resource.

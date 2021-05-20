@@ -55,7 +55,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Provider
-@Consumes({Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON})
+@Consumes({
+    Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.JSON,
+    Rfc8040.MediaTypes.YANG_PATCH_RFC8072 + RestconfConstants.JSON
+})
 public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
 

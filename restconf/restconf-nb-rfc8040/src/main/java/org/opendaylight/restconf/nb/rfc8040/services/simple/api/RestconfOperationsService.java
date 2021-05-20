@@ -33,6 +33,7 @@ public interface RestconfOperationsService extends UpdateHandlers {
     @Path("/operations")
     @Produces({
         Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
         Rfc8040.MediaTypes.DATA,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
@@ -53,6 +54,7 @@ public interface RestconfOperationsService extends UpdateHandlers {
     @Path("/operations/{identifier:.+}")
     @Produces({
         Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
         Rfc8040.MediaTypes.DATA,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_XML,
