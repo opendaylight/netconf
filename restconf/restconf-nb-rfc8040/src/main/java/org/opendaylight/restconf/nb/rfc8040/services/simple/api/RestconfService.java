@@ -28,7 +28,13 @@ public interface RestconfService extends UpdateHandlers {
      */
     @GET
     @Path("/yang-library-version")
-    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({
+        Rfc8040.MediaTypes.DATA + RestconfConstants.JSON,
+        Rfc8040.MediaTypes.DATA + RestconfConstants.XML,
+        Rfc8040.MediaTypes.DATA,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
     NormalizedNodeContext getLibraryVersion();
 }

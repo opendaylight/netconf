@@ -49,8 +49,12 @@ public final class Rfc8040 {
         public static final String XRD = "application/xrd";
 
         public static final String DATA = "application/yang-data";
+        // up to and including draft-ietf-netconf-yang-patch-08
         public static final String YANG_PATCH = "application/yang.patch";
         public static final String YANG_PATCH_STATUS = "application/yang.patch-status";
+
+        // since draft-ietf-netconf-yang-patch-09
+        public static final String YANG_PATCH_RFC8072 = "application/yang-patch";
     }
 
     /**

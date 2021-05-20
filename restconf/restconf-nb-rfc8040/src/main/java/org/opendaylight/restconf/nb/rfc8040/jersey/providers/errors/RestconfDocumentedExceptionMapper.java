@@ -64,6 +64,10 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     static final MediaType YANG_PATCH_JSON_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH + RestconfConstants.JSON);
     @VisibleForTesting
     static final MediaType YANG_PATCH_XML_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH + RestconfConstants.XML);
+    private static final MediaType YANG_PATCH_RFC8072_JSON_TYPE =
+        MediaType.valueOf(MediaTypes.YANG_PATCH_RFC8072 + RestconfConstants.JSON);
+    private static final MediaType YANG_PATCH_RFC8072_XML_TYPE =
+        MediaType.valueOf(MediaTypes.YANG_PATCH_RFC8072 + RestconfConstants.XML);
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
@@ -364,12 +368,16 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
 
     private static boolean isJsonCompatibleMediaType(final MediaType mediaType) {
         return mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)
-                || mediaType.isCompatible(YANG_DATA_JSON_TYPE) || mediaType.isCompatible(YANG_PATCH_JSON_TYPE);
+                || mediaType.isCompatible(YANG_DATA_JSON_TYPE)
+                || mediaType.isCompatible(YANG_PATCH_RFC8072_JSON_TYPE)
+                || mediaType.isCompatible(YANG_PATCH_JSON_TYPE);
     }
 
     private static boolean isXmlCompatibleMediaType(final MediaType mediaType) {
         return mediaType.isCompatible(MediaType.APPLICATION_XML_TYPE)
-                || mediaType.isCompatible(YANG_DATA_XML_TYPE) || mediaType.isCompatible(YANG_PATCH_XML_TYPE);
+                || mediaType.isCompatible(YANG_DATA_XML_TYPE)
+                || mediaType.isCompatible(YANG_PATCH_RFC8072_XML_TYPE)
+                || mediaType.isCompatible(YANG_PATCH_XML_TYPE);
     }
 
     /**
