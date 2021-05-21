@@ -8,19 +8,11 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.StringWriter;
 import java.net.URI;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
@@ -33,15 +25,11 @@ import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfMDSalMappingTest.class);
-
     private static final String TARGET_KEY = "target";
     private static final String FILTER_NODE = "filter";
     private static final String GET_CONFIG = "get-config";
@@ -76,49 +64,37 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
 
     @Test
     public void testIncorrectGet() throws Exception {
-        try {
-            executeOperation(new GetConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
-                    getTransactionProvider()), "messages/mapping/bad_getConfig.xml");
-            fail("Should have failed, this is an incorrect request");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-        }
+        DocumentedException ex = assertThrows(DocumentedException.class,
+            () -> executeOperation(new GetConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
+                    getTransactionProvider()), "messages/mapping/bad_getConfig.xml"));
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.OPERATION_FAILED, ex.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, ex.getErrorType());
 
-        try {
-            executeOperation(new GetConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
-                    getTransactionProvider()), "messages/mapping/bad_namespace_getConfig.xml");
-            fail("Should have failed, this is an incorrect request");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-        }
+        ex = assertThrows(DocumentedException.class,
+            () -> executeOperation(new GetConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
+                    getTransactionProvider()), "messages/mapping/bad_namespace_getConfig.xml"));
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.OPERATION_FAILED, ex.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, ex.getErrorType());
     }
 
     @Test
     public void testConfigMissing() throws Exception {
-        try {
-            edit("messages/mapping/editConfigs/editConfig_no_config.xml");
-            fail("Should have failed - neither <config> nor <url> element is present");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.MISSING_ELEMENT);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+        final DocumentedException ex = assertThrows(DocumentedException.class,
+            () -> edit("messages/mapping/editConfigs/editConfig_no_config.xml"));
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.MISSING_ELEMENT, ex.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrorType());
     }
 
     @Test
     public void testEditRunning() throws Exception {
-        try {
-            edit("messages/mapping/editConfigs/editConfig_running.xml");
-            fail("Should have failed - edit config on running datastore is not supported");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+        final DocumentedException ex = assertThrows(DocumentedException.class,
+            () -> edit("messages/mapping/editConfigs/editConfig_running.xml"));
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, ex.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrorType());
     }
 
     @Test
@@ -169,7 +145,6 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
 
         deleteDatastore();
     }
-
 
     @Test
     public void testMultipleEditsWithMerge() throws Exception {
@@ -230,7 +205,6 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
         verifyResponse(commit(), RPC_REPLY_OK);
 
         deleteDatastore();
-
     }
 
     @Test
@@ -245,7 +219,6 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
         verifyResponse(commit(), RPC_REPLY_OK);
 
         deleteDatastore();
-
     }
 
     @Test
@@ -278,46 +251,30 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     public void testLock() throws Exception {
         verifyResponse(lockCandidate(), RPC_REPLY_OK);
 
-        try {
-            lock();
-            fail("Should have failed - locking of running datastore is not supported");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-        }
+        DocumentedException ex = assertThrows(DocumentedException.class, NetconfMDSalMappingTest::lock);
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, ex.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, ex.getErrorType());
 
-        try {
-            lockWithoutTarget();
-            fail("Should have failed, target is missing");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.INVALID_VALUE);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-        }
+        ex = assertThrows(DocumentedException.class, NetconfMDSalMappingTest::lockWithoutTarget);
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, ex.getErrorType());
     }
 
     @Test
     public void testUnlock() throws Exception {
         verifyResponse(unlockCandidate(), RPC_REPLY_OK);
 
-        try {
-            unlock();
-            fail("Should have failed - unlocking of running datastore is not supported");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-        }
+        DocumentedException ex = assertThrows(DocumentedException.class, NetconfMDSalMappingTest::unlock);
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, ex.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, ex.getErrorType());
 
-        try {
-            unlockWithoutTarget();
-            fail("Should have failed, target is missing");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.INVALID_VALUE);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-        }
+        ex = assertThrows(DocumentedException.class, NetconfMDSalMappingTest::unlockWithoutTarget);
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrorTag());
+        assertEquals(ErrorType.APPLICATION, ex.getErrorType());
     }
 
     @Test
@@ -326,14 +283,11 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
                 "messages/mapping/editConfig_create_n1_control.xml"));
 
-        try {
-            edit("messages/mapping/editConfigs/editConfig_create.xml");
-            fail("Create should have failed - data already exists");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.DATA_EXISTS);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+        final DocumentedException ex = assertThrows(DocumentedException.class,
+            () -> edit("messages/mapping/editConfigs/editConfig_create.xml"));
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.DATA_EXISTS, ex.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrorType());
 
         verifyResponse(discardChanges(), RPC_REPLY_OK);
     }
@@ -343,14 +297,11 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
         assertEmptyDatastore(getConfigCandidate());
         assertEmptyDatastore(getConfigRunning());
 
-        try {
-            edit("messages/mapping/editConfigs/editConfig_delete-top.xml");
-            fail("Delete should have failed - data is missing");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.DATA_MISSING);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+        final DocumentedException ex = assertThrows(DocumentedException.class,
+            () -> edit("messages/mapping/editConfigs/editConfig_delete-top.xml"));
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.DATA_MISSING, ex.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrorType());
     }
 
     @Test
@@ -369,32 +320,15 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
         deleteDatastore();
     }
 
-    private static void printDocument(final Document doc) throws Exception {
-        final TransformerFactory tf = TransformerFactory.newInstance();
-        final Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
-        final StringWriter writer = new StringWriter();
-        transformer.transform(new DOMSource(doc),
-                new StreamResult(writer));
-        LOG.warn(writer.getBuffer().toString());
-    }
-
     @Test
     public void testEditConfigWithMultipleOperations() throws Exception {
         deleteDatastore();
 
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_setup.xml"),
                 RPC_REPLY_OK);
-        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_1.xml"),
-                RPC_REPLY_OK);
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_1.xml"), RPC_REPLY_OK);
 
-        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_2.xml"),
-                RPC_REPLY_OK);
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_2.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
                 "messages/mapping/editConfigs/editConfig_merge_multiple_operations_2_control.xml"));
 
@@ -410,35 +344,26 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_default-replace.xml"),
                 RPC_REPLY_OK);
 
-        try {
-            edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_create_existing.xml");
-            fail();
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.DATA_EXISTS);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+        DocumentedException ex = assertThrows(DocumentedException.class,
+            () -> edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_create_existing.xml"));
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.DATA_EXISTS, ex.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrorType());
 
         verifyResponse(edit(
-                "messages/mapping/editConfigs/"
-                        + "editConfig_merge_multiple_operations_4_delete_children_operations.xml"),
+                "messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_delete_children_operations.xml"),
                 RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
                 "messages/mapping/editConfigs/"
                         + "editConfig_merge_multiple_operations_4_delete_children_operations_control.xml"));
         verifyResponse(edit(
-                "messages/mapping/editConfigs/"
-                        + "editConfig_merge_multiple_operations_4_remove-non-existing.xml"),
+                "messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_remove-non-existing.xml"),
                 RPC_REPLY_OK);
-        try {
-            edit("messages/mapping/editConfigs/"
-                    + "editConfig_merge_multiple_operations_4_delete-non-existing.xml");
-            fail();
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.DATA_MISSING);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+        ex = assertThrows(DocumentedException.class,
+            () -> edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_delete-non-existing.xml"));
+        assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
+        assertEquals(ErrorTag.DATA_MISSING, ex.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrorType());
 
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_5_choice_setup.xml"),
                 RPC_REPLY_OK);
@@ -462,9 +387,6 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
 
     @Test
     public void testEditConfigGetElementByTagName() throws Exception {
-        EditConfig editConfig = new EditConfig("test_edit-config", Mockito.mock(CurrentSchemaContext.class),
-                Mockito.mock(TransactionProvider.class));
-
         String stringWithoutPrefix =
                 "<rpc xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"0\">\n"
                         + "  <edit-config>\n"
@@ -475,7 +397,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
                         + "</rpc>";
         XmlElement xe = getXmlElement(stringWithoutPrefix);
         NodeList nodeList = EditConfig.getElementsByTagName(xe, TARGET_KEY);
-        Assert.assertEquals(1, nodeList.getLength());
+        assertEquals(1, nodeList.getLength());
 
         String stringWithPrefix =
                 "<nc:rpc xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"0\">\n"
@@ -488,7 +410,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
 
         xe = getXmlElement(stringWithPrefix);
         nodeList = EditConfig.getElementsByTagName(xe, TARGET_KEY);
-        Assert.assertEquals(1, nodeList.getLength());
+        assertEquals(1, nodeList.getLength());
 
         String stringWithoutTarget =
                 "<nc:rpc xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"0\">\n"
@@ -499,14 +421,9 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
                         + "</nc:rpc>";
         xe = getXmlElement(stringWithoutTarget);
 
-        try {
-            nodeList = EditConfig.getElementsByTagName(xe, TARGET_KEY);
-            XmlElement.fromDomElement((Element) nodeList.item(0)).getOnlyChildElement();
-            Assert.fail("Not specified target, we should fail");
-        } catch (DocumentedException documentedException) {
-            // Ignore
-        }
-
+        final NodeList targetKey = EditConfig.getElementsByTagName(xe, TARGET_KEY);
+        assertThrows(DocumentedException.class,
+            () -> XmlElement.fromDomElement((Element) targetKey.item(0)).getOnlyChildElement());
     }
 
     private static XmlElement getXmlElement(final String elementAsString) throws Exception {
