@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -164,7 +163,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             return XmlUtil.createElement(document, XmlNetconfConstants.OK,
                 Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
         }
-        return (Element) transformNormalizedNode(document, result.getResult(), rpcDefinition.getOutput().getPath());
+        return transformNormalizedNode(document, result.getResult(), rpcDefinition.getOutput().getPath());
     }
 
     @Override
@@ -202,8 +201,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         return document;
     }
 
-    private Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data,
-                                         final SchemaPath rpcOutputPath) {
+    private Element transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data,
+                                            final SchemaPath rpcOutputPath) {
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.RPC_REPLY_KEY));
 
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
@@ -222,7 +221,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             LOG.warn("Error while closing streams", e);
         }
 
-        return result.getNode();
+        return (Element) result.getNode();
     }
 
     private static XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
@@ -267,5 +266,4 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
         return (ContainerNode) resultHolder.getResult();
     }
-
 }
