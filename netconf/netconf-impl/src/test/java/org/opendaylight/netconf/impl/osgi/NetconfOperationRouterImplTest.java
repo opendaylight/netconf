@@ -7,6 +7,10 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -16,7 +20,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -93,27 +96,24 @@ public class NetconfOperationRouterImplTest {
         //max priority message is first in chain
         verify(maxPrioMock).handle(any(Document.class), highPriorityChainEx.capture());
         final NetconfOperationChainedExecution chainedExecution = highPriorityChainEx.getValue();
-        Assert.assertFalse(chainedExecution.isExecutionTermination());
+        assertFalse(chainedExecution.isExecutionTermination());
 
         //execute next in chain
         final Document execute = chainedExecution.execute(XmlUtil.newDocument());
-        Assert.assertEquals(DEFAULT_PRIORITY_REPLY, XmlUtil.toString(execute).trim());
+        assertEquals(DEFAULT_PRIORITY_REPLY, XmlUtil.toString(execute).trim());
 
         //default priority message is second and last
         verify(defaultPrioMock).handle(any(Document.class), defaultPriorityChainEx.capture());
-        Assert.assertTrue(defaultPriorityChainEx.getValue().isExecutionTermination());
+        assertTrue(defaultPriorityChainEx.getValue().isExecutionTermination());
 
-        Assert.assertEquals(MAX_PRIORITY_REPLY, XmlUtil.toString(document).trim());
+        assertEquals(MAX_PRIORITY_REPLY, XmlUtil.toString(document).trim());
     }
 
     @Test
     public void testOnNetconfMessageFail() throws Exception {
-        try {
-            emptyOperationRouter.onNetconfMessage(TEST_RPC_DOC, null);
-            Assert.fail("Exception expected");
-        } catch (final DocumentedException e) {
-            Assert.assertEquals(e.getErrorTag(), DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED);
-        }
+        final DocumentedException ex =  assertThrows(DocumentedException.class,
+            () -> emptyOperationRouter.onNetconfMessage(TEST_RPC_DOC, null));
+        assertEquals(DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, ex.getErrorTag());
     }
 
     @Test

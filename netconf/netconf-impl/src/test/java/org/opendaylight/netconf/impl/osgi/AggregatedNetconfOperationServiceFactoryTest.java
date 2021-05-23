@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -15,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -102,7 +102,7 @@ public class AggregatedNetconfOperationServiceFactoryTest {
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory2);
         final Set<Capability> actual = aggregatedFactory.getCapabilities();
         Set<Capability> expected = Sets.union(factory1Caps, factory2Caps);
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -123,5 +123,4 @@ public class AggregatedNetconfOperationServiceFactoryTest {
         verify(autoCloseable1, times(2)).close();
         verify(autoCloseable2, times(2)).close();
     }
-
 }

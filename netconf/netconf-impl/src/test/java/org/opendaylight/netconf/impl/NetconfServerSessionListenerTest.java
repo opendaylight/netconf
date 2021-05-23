@@ -5,9 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
@@ -18,7 +19,6 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -102,7 +102,7 @@ public class NetconfServerSessionListenerTest {
         channel.runPendingTasks();
         final NetconfMessage sentMsg = channel.readOutbound();
         final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
-        Assert.assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.toString(), diff.similar());
     }
 
     @Test
@@ -112,12 +112,9 @@ public class NetconfServerSessionListenerTest {
                 XmlUtil.readXmlToDocument("<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                         + "<example/></rpc>");
         final NetconfMessage msg = new NetconfMessage(reply);
-        try {
-            listener.onMessage(session, msg);
-            Assert.fail("Expected exception " + IllegalStateException.class);
-        } catch (final IllegalStateException e) {
-            verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
-        }
+        final IllegalStateException ex = assertThrows(IllegalStateException.class,
+            () -> listener.onMessage(session, msg));
+        verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
     }
 
     @SuppressWarnings("checkstyle:RegexpSinglelineJava")
@@ -146,7 +143,7 @@ public class NetconfServerSessionListenerTest {
         System.out.println(XmlUtil.toString(sentMsg.getDocument()));
         System.out.println(XmlUtil.toString(reply));
         final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
-        Assert.assertTrue(diff.toString(), diff.similar());
+        assertTrue(diff.toString(), diff.similar());
     }
 
     @Test
