@@ -9,6 +9,7 @@ package org.opendaylight.netconf.mdsal.connector.ops.get;
 
 import static org.opendaylight.yangtools.yang.data.util.ParserStreamUtils.findSchemaNodeByNameAndNamespace;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -148,14 +149,16 @@ public class FilterContentValidator {
      * @param filterContent filter element
      * @param builder       builder  @return YangInstanceIdentifier
      */
-    private YangInstanceIdentifier getFilterDataRoot(FilterTree tree, final XmlElement filterContent,
+    private YangInstanceIdentifier getFilterDataRoot(final FilterTree tree, final XmlElement filterContent,
                                                      final InstanceIdentifierBuilder builder) {
         builder.node(tree.getName());
         final List<String> path = new ArrayList<>();
-        while (tree.getChildren().size() == 1) {
-            final FilterTree child = tree.getChildren().iterator().next();
+
+        FilterTree current = tree;
+        while (current.size() == 1) {
+            final FilterTree child = current.getChildren().iterator().next();
             if (child.getType() == Type.CHOICE_CASE) {
-                tree = child;
+                current = child;
                 continue;
             }
             builder.node(child.getName());
@@ -164,7 +167,7 @@ public class FilterContentValidator {
                 appendKeyIfPresent(child, filterContent, path, builder);
                 return builder.build();
             }
-            tree = child;
+            current = child;
         }
         return builder.build();
     }
@@ -235,7 +238,7 @@ public class FilterContentValidator {
     /**
      * Class represents tree of QNames as they are present in the filter.
      */
-    private static class FilterTree {
+    private static final class FilterTree {
         private final Map<QName, FilterTree> children = new HashMap<>();
         private final DataSchemaNode schemaNode;
         private final QName name;
@@ -279,6 +282,15 @@ public class FilterContentValidator {
 
         DataSchemaNode getSchemaNode() {
             return schemaNode;
+        }
+
+        int size() {
+            return children.size();
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this).add("name", name).add("type", type).add("size", size()).toString();
         }
     }
 
