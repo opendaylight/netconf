@@ -236,17 +236,15 @@ public class FilterContentValidator {
      * Class represents tree of QNames as they are present in the filter.
      */
     private static class FilterTree {
-
+        private final Map<QName, FilterTree> children = new HashMap<>();
+        private final DataSchemaNode schemaNode;
         private final QName name;
         private final Type type;
-        private final DataSchemaNode schemaNode;
-        private final Map<QName, FilterTree> children;
 
         FilterTree(final QName name, final Type type, final DataSchemaNode schemaNode) {
             this.name = name;
             this.type = type;
             this.schemaNode = schemaNode;
-            this.children = new HashMap<>();
         }
 
         FilterTree addChild(final DataSchemaNode data) {
