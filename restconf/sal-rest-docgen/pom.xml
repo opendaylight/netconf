@@ -12,7 +12,7 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
     <version>2.0.0-SNAPSHOT</version>
-    <relativePath>../../netconf-parent</relativePath>
+    <relativePath>../../parent</relativePath>
   </parent>
 
   <artifactId>sal-rest-docgen</artifactId>
