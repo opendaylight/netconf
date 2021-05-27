@@ -41,7 +41,7 @@ module notifi-module {
     notification notifi-augm {
     }
 
-    augment notifi-augm {
+    augment /notifi-augm {
         leaf lf-augm {
             type string;
         }
