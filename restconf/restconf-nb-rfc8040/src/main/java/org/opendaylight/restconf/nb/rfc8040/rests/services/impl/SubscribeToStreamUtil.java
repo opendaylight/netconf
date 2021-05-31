@@ -233,8 +233,7 @@ abstract class SubscribeToStreamUtil {
     private static void writeDataToDS(final SchemaContext schemaContext, final String name,
             final DOMDataTreeReadWriteTransaction readWriteTransaction, final MapEntryNode mapToStreams) {
         readWriteTransaction.merge(LogicalDatastoreType.OPERATIONAL,
-            // FIXME: do not use IdentifierCodec here
-            IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name, schemaContext),
+            MonitoringModule.restconfStateStreamPath(mapToStreams.getIdentifier()),
             mapToStreams);
     }
 
