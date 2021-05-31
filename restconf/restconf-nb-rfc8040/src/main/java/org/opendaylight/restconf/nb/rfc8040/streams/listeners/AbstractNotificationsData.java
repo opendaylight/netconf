@@ -30,7 +30,6 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -80,8 +79,7 @@ abstract class AbstractNotificationsData {
     protected void deleteDataInDS() throws Exception {
         final DOMTransactionChain transactionChain = this.transactionChainHandler.get();
         final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
-        wTx.delete(LogicalDatastoreType.OPERATIONAL, IdentifierCodec
-                .deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + this.localName, this.schemaHandler.get()));
+        wTx.delete(LogicalDatastoreType.OPERATIONAL, MonitoringModule.restconfStateStreamPath(this.localName));
         wTx.commit().get();
         transactionChain.close();
     }
