@@ -66,7 +66,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperations
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -242,10 +241,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri);
 
-        final String name = listener.getSchemaPath().lastNodeIdentifier().getLocalName();
         transaction.merge(LogicalDatastoreType.OPERATIONAL,
-            IdentifierCodec.deserialize(Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name, schemaContext),
-            mapToStreams);
+            Rfc8040.MonitoringModule.restconfStateStreamPath(mapToStreams.getIdentifier()), mapToStreams);
     }
 
     @Override

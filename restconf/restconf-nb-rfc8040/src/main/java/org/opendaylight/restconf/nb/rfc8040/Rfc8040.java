@@ -7,7 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import com.google.common.annotations.Beta;
 import java.net.URI;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
@@ -15,6 +17,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 
 /**
  * Base Draft for Restconf project.
@@ -209,6 +214,23 @@ public final class Rfc8040 {
         public static final String LEAF_LOCATION_ACCESS_NAME = "location";
         public static final QName LEAF_LOCATION_ACCESS_QNAME = QName.create(MODULE_QNAME, LEAF_LOCATION_ACCESS_NAME)
                 .intern();
+
+        private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.create(
+            NodeIdentifier.create(CONT_RESTCONF_STATE_QNAME), NodeIdentifier.create(CONT_STREAMS_QNAME),
+            NodeIdentifier.create(LIST_STREAM_QNAME));
+
+        @Beta
+        // FIXME: move this method somewhere else
+        public static @NonNull YangInstanceIdentifier restconfStateStreamPath(final String streamName) {
+            return restconfStateStreamPath(NodeIdentifierWithPredicates.of(LIST_STREAM_QNAME, LEAF_NAME_STREAM_QNAME,
+                streamName));
+        }
+
+        @Beta
+        // FIXME: move this method somewhere else
+        public static @NonNull YangInstanceIdentifier restconfStateStreamPath(final NodeIdentifierWithPredicates arg) {
+            return RESTCONF_STATE_STREAMS.node(arg);
+        }
 
         /**
          * Constants for capabilities.

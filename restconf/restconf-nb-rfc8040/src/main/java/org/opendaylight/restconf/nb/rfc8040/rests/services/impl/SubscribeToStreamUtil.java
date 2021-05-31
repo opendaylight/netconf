@@ -158,9 +158,7 @@ abstract class SubscribeToStreamUtil {
                     notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
                     notificationListenerAdapter.get().getOutputType(), uri);
-        writeDataToDS(schemaContext,
-            notificationListenerAdapter.get().getSchemaPath().lastNodeIdentifier().getLocalName(), writeTransaction,
-            mapToStreams);
+        writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
@@ -213,23 +211,21 @@ abstract class SubscribeToStreamUtil {
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
-        final String serializedPath = IdentifierCodec.serialize(listener.get().getPath(), schemaContext);
 
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
-                notificationQueryParams.getStart(), listener.get().getOutputType(), uri, schemaContext, serializedPath);
-        writeDataToDS(schemaContext, serializedPath, writeTransaction, mapToStreams);
+                notificationQueryParams.getStart(), listener.get().getOutputType(), uri, schemaContext,
+                IdentifierCodec.serialize(listener.get().getPath(), schemaContext));
+        writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
     }
 
-    private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
-            final DOMDataTreeReadWriteTransaction readWriteTransaction, final MapEntryNode mapToStreams) {
+    private static void writeDataToDS(final DOMDataTreeReadWriteTransaction readWriteTransaction,
+            final MapEntryNode mapToStreams) {
         readWriteTransaction.merge(LogicalDatastoreType.OPERATIONAL,
-            // FIXME: do not use IdentifierCodec here
-            IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name, schemaContext),
-            mapToStreams);
+            MonitoringModule.restconfStateStreamPath(mapToStreams.getIdentifier()), mapToStreams);
     }
 
     private static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
