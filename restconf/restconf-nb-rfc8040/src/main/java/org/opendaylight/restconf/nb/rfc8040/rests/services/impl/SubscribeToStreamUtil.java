@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -159,9 +160,7 @@ abstract class SubscribeToStreamUtil {
                     notificationListenerAdapter.get().getSchemaPath().getLastComponent(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
                     notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext));
-        writeDataToDS(schemaContext,
-            notificationListenerAdapter.get().getSchemaPath().getLastComponent().getLocalName(), writeTransaction,
-            mapToStreams);
+        writeDataToDS(schemaContext, writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
@@ -214,13 +213,13 @@ abstract class SubscribeToStreamUtil {
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
-        final String serializedPath = IdentifierCodec.serialize(listener.get().getPath(), schemaContext);
 
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
                 notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
-                getMonitoringModule(schemaContext), schemaContext, serializedPath);
-        writeDataToDS(schemaContext, serializedPath, writeTransaction, mapToStreams);
+                getMonitoringModule(schemaContext), schemaContext,
+                IdentifierCodec.serialize(listener.get().getPath(), schemaContext));
+        writeDataToDS(schemaContext, writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
@@ -230,12 +229,10 @@ abstract class SubscribeToStreamUtil {
         return schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
     }
 
-    private static void writeDataToDS(final SchemaContext schemaContext, final String name,
-            final DOMDataTreeReadWriteTransaction readWriteTransaction, final MapEntryNode mapToStreams) {
+    private static void writeDataToDS(final SchemaContext schemaContext,
+            final DOMDataTreeWriteOperations readWriteTransaction, final MapEntryNode mapToStreams) {
         readWriteTransaction.merge(LogicalDatastoreType.OPERATIONAL,
-            // FIXME: do not use IdentifierCodec here
-            IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name, schemaContext),
-            mapToStreams);
+            MonitoringModule.restconfStateStreamPath(mapToStreams.getIdentifier()), mapToStreams);
     }
 
     private static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
