@@ -18,8 +18,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -36,35 +35,33 @@ final class BatchedExistenceCheck {
         this.outstanding = total;
     }
 
-    static BatchedExistenceCheck start(final DOMTransactionChain transactionChain,
+    static BatchedExistenceCheck start(final DOMDataTreeReadOperations tx,
                                        final LogicalDatastoreType datastore, final YangInstanceIdentifier parentPath,
                                        final Collection<? extends NormalizedNode<?, ?>> children) {
         final BatchedExistenceCheck ret = new BatchedExistenceCheck(children.size());
-        try (DOMDataTreeReadTransaction tx = transactionChain.newReadOnlyTransaction()) {
-            for (NormalizedNode<?, ?> child : children) {
-                final YangInstanceIdentifier path = parentPath.node(child.getIdentifier());
-                tx.exists(datastore, path).addCallback(new FutureCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(final Boolean result) {
-                        ret.complete(path, result);
+        for (NormalizedNode<?, ?> child : children) {
+            final YangInstanceIdentifier path = parentPath.node(child.getIdentifier());
+            tx.exists(datastore, path).addCallback(new FutureCallback<Boolean>() {
+                @Override
+                public void onSuccess(final Boolean result) {
+                    ret.complete(path, result);
+                }
+
+                @Override
+                @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
+                public void onFailure(final Throwable throwable) {
+                    final Exception e;
+                    if (throwable instanceof Exception) {
+                        e = (Exception) throwable;
+                    } else {
+                        e = new ExecutionException(throwable);
                     }
 
-                    @Override
-                    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
-                    public void onFailure(final Throwable throwable) {
-                        final Exception e;
-                        if (throwable instanceof Exception) {
-                            e = (Exception) throwable;
-                        } else {
-                            e = new ExecutionException(throwable);
-                        }
-
-                        ret.complete(path, ReadFailedException.MAPPER.apply(e));
-                    }
-                }, MoreExecutors.directExecutor());
-            }
-            return ret;
+                    ret.complete(path, ReadFailedException.MAPPER.apply(e));
+                }
+            }, MoreExecutors.directExecutor());
         }
+        return ret;
     }
 
     Entry<YangInstanceIdentifier, ReadFailedException> getFailure() throws InterruptedException {

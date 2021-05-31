@@ -37,7 +37,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     private final DOMTransactionChain transactionChain;
     private DOMDataTreeReadWriteTransaction rwTx;
 
-    MdsalRestconfTransaction(DOMTransactionChain transactionChain) {
+    MdsalRestconfTransaction(final DOMTransactionChain transactionChain) {
         this.transactionChain = requireNonNull(transactionChain);
         this.rwTx = transactionChain.newReadWriteTransaction();
     }
@@ -81,7 +81,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             final Collection<? extends NormalizedNode<?, ?>> children =
                 ((NormalizedNodeContainer<?, ?, ?>) data).getValue();
             final BatchedExistenceCheck check =
-                BatchedExistenceCheck.start(transactionChain, LogicalDatastoreType.CONFIGURATION, path, children);
+                BatchedExistenceCheck.start(verifyNotNull(rwTx), LogicalDatastoreType.CONFIGURATION, path, children);
 
             for (final NormalizedNode<?, ?> child : children) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
