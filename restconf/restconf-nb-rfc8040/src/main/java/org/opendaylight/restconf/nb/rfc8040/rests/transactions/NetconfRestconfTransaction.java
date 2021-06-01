@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -131,7 +132,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                 final Collection<? extends RpcError> errors = result.getErrors();
                 if (!allWarnings(errors)) {
                     Futures.whenAllComplete(discardAndUnlock()).run(
-                        () -> commitResult.setException(mapRpcErrorsToNetconfDocException(errors)),
+                        () -> commitResult.setException(toCommitFailedException(errors)),
                         MoreExecutors.directExecutor());
                     return;
                 }
@@ -152,7 +153,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                                 MoreExecutors.directExecutor());
                         } else {
                             Futures.whenAllComplete(discardAndUnlock()).run(
-                                () -> commitResult.setException(mapRpcErrorsToNetconfDocException(errors)),
+                                () -> commitResult.setException(toCommitFailedException(errors)),
                                 MoreExecutors.directExecutor());
                         }
                     }
@@ -244,6 +245,12 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             }
             return new DefaultDOMRpcResult(null, builder.build());
         }, MoreExecutors.directExecutor());
+    }
+
+    private static TransactionCommitFailedException toCommitFailedException(
+            final Collection<? extends RpcError> errors) {
+        return new TransactionCommitFailedException("Netconf transaction commit failed",
+                mapRpcErrorsToNetconfDocException(errors));
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
