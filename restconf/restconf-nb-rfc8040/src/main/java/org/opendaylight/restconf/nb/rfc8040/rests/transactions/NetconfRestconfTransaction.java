@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -131,7 +132,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                 final Collection<? extends RpcError> errors = result.getErrors();
                 if (!allWarnings(errors)) {
                     Futures.whenAllComplete(discardAndUnlock()).run(
-                        () -> commitResult.setException(mapRpcErrorsToNetconfDocException(errors)),
+                        () -> commitResult.setException(toCommitFailedException(errors)),
                         MoreExecutors.directExecutor());
                     return;
                 }
@@ -152,7 +153,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                                 MoreExecutors.directExecutor());
                         } else {
                             Futures.whenAllComplete(discardAndUnlock()).run(
-                                () -> commitResult.setException(mapRpcErrorsToNetconfDocException(errors)),
+                                () -> commitResult.setException(toCommitFailedException(errors)),
                                 MoreExecutors.directExecutor());
                         }
                     }
@@ -247,16 +248,15 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
-    private static NetconfDocumentedException mapRpcErrorsToNetconfDocException(
-        final Collection<? extends RpcError> errors) {
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
+    private static TransactionCommitFailedException toCommitFailedException(
+            final Collection<? extends RpcError> errors) {
         DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
         DocumentedException.ErrorSeverity errSeverity = DocumentedException.ErrorSeverity.ERROR;
         StringJoiner msgBuilder = new StringJoiner(" ");
         String errorTag = "operation-failed";
         for (final RpcError error : errors) {
-            final RpcError.ErrorType errorType = error.getErrorType();
-            switch (errorType) {
+            switch (error.getErrorType()) {
                 case RPC:
                     errType = DocumentedException.ErrorType.RPC;
                     break;
@@ -271,8 +271,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                     errType = DocumentedException.ErrorType.APPLICATION;
                     break;
             }
-            final RpcError.ErrorSeverity severity = error.getSeverity();
-            switch (severity) {
+            switch (error.getSeverity()) {
                 case WARNING:
                     errSeverity = DocumentedException.ErrorSeverity.WARNING;
                     break;
@@ -285,8 +284,10 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             msgBuilder.add(error.getInfo());
             errorTag = error.getTag();
         }
-        return new NetconfDocumentedException("RPC during tx failed. " + msgBuilder.toString(), errType,
-            DocumentedException.ErrorTag.from(errorTag), errSeverity);
+
+        return new TransactionCommitFailedException("Netconf transaction commit failed",
+            new NetconfDocumentedException("RPC during tx failed. " + msgBuilder.toString(), errType,
+                DocumentedException.ErrorTag.from(errorTag), errSeverity));
     }
 
     private static void executeWithLogging(final Supplier<ListenableFuture<? extends DOMRpcResult>> operation) {
