@@ -597,8 +597,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
 
                 if (returnJustMountPoint || strings.size() == 1) {
-                    final YangInstanceIdentifier instance = YangInstanceIdentifier.builder().build();
-                    return new InstanceIdentifierContext<>(instance, mountPointSchema, mount, mountPointSchema);
+                    return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), mountPointSchema, mount,
+                        mountPointSchema);
                 }
 
                 final String moduleNameBehindMountPoint = toModuleName(strings.get(1));
