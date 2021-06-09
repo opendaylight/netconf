@@ -365,6 +365,7 @@ module netconf-node-topology {
         ext:augment-identifier "netconf-node";
 
         uses netconf-node-fields;
+        ext:mount;
     }
 
 }
