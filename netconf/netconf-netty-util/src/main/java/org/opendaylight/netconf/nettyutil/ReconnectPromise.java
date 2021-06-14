@@ -111,6 +111,13 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
                 return;
             }
 
+            // Stop reconnecting if the promise has completed and is failure state
+            // to avoid keep working after device unregistered
+            if (promise.isDone() && !promise.isSuccess()) {
+                LOG.debug("Promise {} failed, stop reconnecting", promise);
+                return;
+            }
+
             if (promise.isInitialConnectFinished() == false) {
                 LOG.debug("Connection to {} was dropped during negotiation, reattempting", promise.address);
             }
