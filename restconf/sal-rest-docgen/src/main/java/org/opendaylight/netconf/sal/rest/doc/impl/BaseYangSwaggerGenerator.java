@@ -537,9 +537,9 @@ public abstract class BaseYangSwaggerGenerator {
         path.append(localName);
 
         if (schemaNode instanceof ListSchemaNode) {
+            final ListPathBuilder keyBuilder = newListPathBuilder();
             final List<QName> listKeys = ((ListSchemaNode) schemaNode).getKeyDefinition();
             for (final QName listKey : listKeys) {
-                final ListPathBuilder keyBuilder = newListPathBuilder();
                 final String paramName = createUniquePathParamName(listKey.getLocalName(), pathParams);
                 final String pathParamIdentifier = keyBuilder.nextParamIdentifier(paramName);
 
