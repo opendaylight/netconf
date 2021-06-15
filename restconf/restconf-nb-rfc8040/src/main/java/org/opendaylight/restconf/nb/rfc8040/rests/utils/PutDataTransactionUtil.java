@@ -146,7 +146,8 @@ public final class PutDataTransactionUtil {
         transaction.remove(path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
             // FIXME: Point should be able to give us this method
-            ParserIdentifier.toInstanceIdentifier(point.value(), schemaContext, Optional.empty());
+            ParserIdentifier.toInstanceIdentifier(point.value(), schemaContext, Optional.empty(),
+                    Optional.empty());
         int lastItemPosition = 0;
         for (final NormalizedNode nodeChild : readList.body()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {

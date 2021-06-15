@@ -44,6 +44,6 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
     @Override
     public SchemaExportContext getSchema(final String identifier) {
         return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextHandler.get(), identifier,
-            mountPointService, sourceProvider);
+            mountPointService, sourceProvider, schemaContextHandler.getDataBroker());
     }
 }

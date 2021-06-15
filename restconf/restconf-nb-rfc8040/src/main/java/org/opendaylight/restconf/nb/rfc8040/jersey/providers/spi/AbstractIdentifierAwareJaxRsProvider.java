@@ -21,6 +21,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -87,7 +88,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
 
     private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
         return ParserIdentifier.toInstanceIdentifier(getIdentifier(), getSchemaContext(),
-                Optional.ofNullable(getMountPointService()));
+                Optional.ofNullable(getMountPointService()), Optional.of(getDataBroker()));
     }
 
     protected UriInfo getUriInfo() {
@@ -100,6 +101,10 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
 
     protected DOMMountPointService getMountPointService() {
         return mountPointService;
+    }
+
+    protected DOMDataBroker getDataBroker() {
+        return schemaContextHandler.getDataBroker();
     }
 
     protected boolean isPost() {
