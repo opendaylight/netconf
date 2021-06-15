@@ -21,7 +21,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -84,8 +88,11 @@ public final class ParserIdentifier {
     //
     //        @NonNull InstanceIdentifierContext forUrl(identifier, schemaContexxt, mountPointService)
     //
-    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
-            final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
+    public static InstanceIdentifierContext<?> toInstanceIdentifier(
+            final String identifier,
+            final EffectiveModelContext schemaContext,
+            final Optional<DOMMountPointService> mountPointService,
+            final Optional<DOMDataBroker> dataBroker) {
         if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
             return createIIdContext(schemaContext, identifier, null);
         }
@@ -96,13 +103,48 @@ public final class ParserIdentifier {
         final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
         final String mountPointId = pathsIt.next();
         final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
-        final DOMMountPoint mountPoint = mountPointService.get().getMountPoint(mountPath)
-                .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
-                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
-
+        DOMMountPoint mountPoint;
+        // If we have dataBroker available provide more detailed info during exception handling,
+        // else fallback to more general case.
+        if (dataBroker.isPresent()) {
+            mountPoint = mountPointService.get().getMountPoint(mountPath)
+                    .orElseThrow(() -> createMissingMountpointException(mountPath, schemaContext, dataBroker.get()));
+        } else {
+            mountPoint = mountPointService.get().getMountPoint(mountPath)
+                    .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
+                            ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+        }
         final EffectiveModelContext mountSchemaContext = coerceModelContext(mountPoint);
         final String pathId = pathsIt.next().replaceFirst("/", "");
         return createIIdContext(mountSchemaContext, pathId, mountPoint);
+    }
+
+    private static RestconfDocumentedException createMissingMountpointException(
+            final YangInstanceIdentifier mountPath,
+            final EffectiveModelContext schemaContext,
+            final DOMDataBroker domDataBroker) {
+        final boolean mountExists;
+        try (DOMDataTreeReadTransaction roTx = domDataBroker.newReadOnlyTransaction()) {
+            mountExists = roTx.exists(LogicalDatastoreType.CONFIGURATION, mountPath).get();
+        } catch (ExecutionException e) {
+            LOG.warn("Failed to read mountpoint from CONFIG datastore: {}", mountPath, e);
+            return new RestconfDocumentedException("Failed to read mountpoint from CONFIG datastore: {}"
+                    + mountPath, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+        } catch (InterruptedException e) {
+            LOG.warn("Reading mountpoint from CONFIG datastore was interrupted: {}", mountPath, e);
+            return new RestconfDocumentedException("Reading mountpoint from CONFIG datastore was interrupted: "
+                    + mountPath, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+        }
+
+        if (mountExists) {
+            return new RestconfDocumentedException("Mount point does not exist: node was installed in CONFIG datastore "
+                    + "but mountpoint hasn't been created yet or it was lost",
+                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+        }
+        return new RestconfDocumentedException(
+                "Mount point does not exist: node is not installed in CONFIG datastore on path: "
+                        + IdentifierCodec.serialize(mountPath, schemaContext),
+                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
     }
 
     /**
@@ -179,9 +221,9 @@ public final class ParserIdentifier {
     static Entry<String, Revision> makeQNameFromIdentifier(final String identifier) {
         // check if more than one slash is not used as path separator
         if (identifier.contains("//")) {
-            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
+            LOG.debug("URI has bad format. It should be 'moduleName/yyyy-MM-dd' {}", identifier);
             throw new RestconfDocumentedException(
-                    "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
+                    "URI has bad format. End of URI should be in format 'moduleName/yyyy-MM-dd'", ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
         }
 
@@ -198,7 +240,7 @@ public final class ParserIdentifier {
         if (pathArgs.size() != 2) {
             LOG.debug("URI has bad format '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
             throw new RestconfDocumentedException(
-                    "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
+                    "URI has bad format. End of URI should be in format 'moduleName/yyyy-MM-dd'", ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
         }
 
@@ -207,7 +249,7 @@ public final class ParserIdentifier {
             moduleRevision = Revision.of(pathArgs.get(1));
         } catch (final DateTimeParseException e) {
             LOG.debug("URI has bad format: '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
-            throw new RestconfDocumentedException("URI has bad format. It should be \'moduleName/yyyy-MM-dd\'",
+            throw new RestconfDocumentedException("URI has bad format. It should be 'moduleName/yyyy-MM-dd'",
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
 
@@ -223,12 +265,14 @@ public final class ParserIdentifier {
      *             {@link EffectiveModelContext}
      * @param identifier
      *             path parameter
-     * @param domMountPointService
+     * @param mountPointService
      *             {@link DOMMountPointService}
      * @return {@link SchemaExportContext}
      */
-    public static SchemaExportContext toSchemaExportContextFromIdentifier(final EffectiveModelContext schemaContext,
-            final String identifier, final DOMMountPointService domMountPointService,
+    public static SchemaExportContext toSchemaExportContextFromIdentifier(
+            final EffectiveModelContext schemaContext,
+            final String identifier,
+            final DOMMountPointService mountPointService,
             final DOMYangTextSourceProvider sourceProvider) {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
@@ -254,7 +298,7 @@ public final class ParserIdentifier {
                 pathBuilder.append(current);
             }
             final InstanceIdentifierContext<?> point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
-                Optional.of(domMountPointService));
+                Optional.of(mountPointService), Optional.empty());
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
@@ -274,7 +318,8 @@ public final class ParserIdentifier {
             targetUrl = IdentifierCodec.serialize(urlPath, schemaContext) + target;
         }
 
-        return toInstanceIdentifier(targetUrl, schemaContext, Optional.empty()).getInstanceIdentifier();
+        return toInstanceIdentifier(targetUrl, schemaContext, Optional.empty(),
+                Optional.empty()).getInstanceIdentifier();
     }
 
     /**

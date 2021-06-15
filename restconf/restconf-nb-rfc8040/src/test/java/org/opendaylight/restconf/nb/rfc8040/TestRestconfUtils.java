@@ -72,7 +72,8 @@ public final class TestRestconfUtils {
     public static NormalizedNodePayload loadNormalizedContextFromXmlFile(final String pathToInputFile,
             final String uri, final EffectiveModelContext schemaContext) {
         final InstanceIdentifierContext<?> iiContext =
-                ParserIdentifier.toInstanceIdentifier(uri, schemaContext, Optional.empty());
+                ParserIdentifier.toInstanceIdentifier(uri, schemaContext, Optional.empty(),
+                        Optional.empty());
         final InputStream inputStream = TestRestconfUtils.class.getResourceAsStream(pathToInputFile);
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);

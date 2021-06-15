@@ -74,7 +74,8 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         }
 
         final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-            schemaContextHandler.get(), Optional.of(mountPointService));
+            schemaContextHandler.get(), Optional.of(mountPointService),
+                Optional.of(schemaContextHandler.getDataBroker()));
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final var entry = OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
         return NormalizedNodePayload.of(entry.getKey(), entry.getValue());

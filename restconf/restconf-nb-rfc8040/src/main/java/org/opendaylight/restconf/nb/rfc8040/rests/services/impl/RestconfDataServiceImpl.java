@@ -135,7 +135,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final EffectiveModelContext schemaContextRef = schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextRef, Optional.of(mountPointService));
+                identifier, schemaContextRef, Optional.of(mountPointService), Optional.of(dataBroker));
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
 
         // FIXME: this looks quite crazy, why do we even have it?
@@ -255,7 +255,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response deleteData(final String identifier) {
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextHandler.get(), Optional.of(mountPointService));
+                identifier, schemaContextHandler.get(), Optional.of(mountPointService), Optional.of(dataBroker));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);

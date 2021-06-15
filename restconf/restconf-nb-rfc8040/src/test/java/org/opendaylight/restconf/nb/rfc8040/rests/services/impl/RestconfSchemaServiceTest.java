@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
@@ -70,6 +71,8 @@ public class RestconfSchemaServiceTest {
     private DOMYangTextSourceProvider sourceProvider;
     // mount point service
     private DOMMountPointService mountPointService;
+    @Mock
+    private DOMDataBroker mockDataBroker;
 
     @BeforeClass
     public static void beforeClass() throws FileNotFoundException {
@@ -100,6 +103,14 @@ public class RestconfSchemaServiceTest {
                 .register();
 
         this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler, mountPointService, sourceProvider);
+    }
+
+    /**
+     * Test if service was successfully created.
+     */
+    @Test
+    public void schemaServiceImplInitTest() {
+        assertNotNull("Schema service should be initialized and not null", this.schemaService);
     }
 
     /**
