@@ -122,7 +122,8 @@ public final class RestconfMappingNodeUtil {
             final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
             final EffectiveModelContext schemaContext, final String streamName) {
         final SchemaNode schemaNode = ParserIdentifier.toInstanceIdentifier(
-            IdentifierCodec.serialize(path, schemaContext), schemaContext, Optional.empty()).getSchemaNode();
+            IdentifierCodec.serialize(path, schemaContext), schemaContext, Optional.empty(),
+                Optional.empty()).getSchemaNode();
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
             Builders.mapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
