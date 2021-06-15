@@ -335,4 +335,8 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
             .withChild(ImmutableNodes.leafNode(MODULE_NAME_NODEID, name))
             .withChild(ImmutableNodes.leafNode(MODULE_REVISION_NODEID, revision));
     }
+
+    public DOMDataBroker getDataBroker() {
+        return domDataBroker;
+    }
 }
