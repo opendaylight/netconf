@@ -94,7 +94,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
         try {
             return readFrom(
                     ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(),
-                            Optional.ofNullable(getMountPointService())), entityStream);
+                            Optional.ofNullable(getMountPointService()), Optional.of(getDataBroker())), entityStream);
         } catch (final Exception e) {
             throw propagateExceptionAs(e);
         }
