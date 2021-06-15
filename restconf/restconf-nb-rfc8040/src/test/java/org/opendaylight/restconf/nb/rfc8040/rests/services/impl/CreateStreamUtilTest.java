@@ -10,6 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.function.Function;
@@ -17,11 +19,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -43,18 +49,24 @@ public class CreateStreamUtilTest {
 
     private NormalizedNodeContext payload;
     private EffectiveModelContext refSchemaCtx;
+    private ParserIdentifier parserIdentifier;
 
     @Before
     public void setUp() throws Exception {
         this.refSchemaCtx =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+
+        final SchemaContextHandler schemaContextHandler = mock(SchemaContextHandler.class);
+        when(schemaContextHandler.get()).thenReturn(refSchemaCtx);
+        parserIdentifier = new ParserIdentifier(mock(DOMMountPointService.class),
+                schemaContextHandler, mock(DOMYangTextSourceProvider.class));
     }
 
     @Test
     public void createStreamTest() {
         this.payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster",
             "path");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
+        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.parserIdentifier);
         assertEquals(result.getErrors(), Collections.emptyList());
         final NormalizedNode testedNn = result.getResult();
         assertNotNull(testedNn);
@@ -68,7 +80,7 @@ public class CreateStreamUtilTest {
     public void createStreamWrongValueTest() {
         this.payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput,
             "String value", "path");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
+        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.parserIdentifier);
         assertEquals(result.getErrors(), Collections.emptyList());
     }
 
@@ -76,7 +88,7 @@ public class CreateStreamUtilTest {
     public void createStreamWrongInputRpcTest() {
         this.payload = prepareDomPayload("create-data-change-event-subscription2", RpcDefinition::getInput, "toaster",
             "path2");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
+        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.parserIdentifier);
         assertEquals(result.getErrors(), Collections.emptyList());
     }
 

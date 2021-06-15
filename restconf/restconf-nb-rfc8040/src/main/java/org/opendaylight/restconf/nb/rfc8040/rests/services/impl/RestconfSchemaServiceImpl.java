@@ -10,8 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import javax.ws.rs.Path;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
@@ -23,27 +21,19 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 @Path("/")
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
-    private final SchemaContextHandler schemaContextHandler;
-    private final DOMMountPointService mountPointService;
-    private final DOMYangTextSourceProvider sourceProvider;
+    private final ParserIdentifier parserIdentifier;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
      *
-     * @param schemaContextHandler handling schema context
-     * @param mountPointService dom mount point service
+     * @param parserIdentifier RESTCONF path parser
      */
-    public RestconfSchemaServiceImpl(final SchemaContextHandler schemaContextHandler,
-                                     final DOMMountPointService mountPointService,
-                                     final DOMYangTextSourceProvider sourceProvider) {
-        this.schemaContextHandler = requireNonNull(schemaContextHandler);
-        this.mountPointService = requireNonNull(mountPointService);
-        this.sourceProvider = requireNonNull(sourceProvider);
+    public RestconfSchemaServiceImpl(final ParserIdentifier parserIdentifier) {
+        this.parserIdentifier = requireNonNull(parserIdentifier);
     }
 
     @Override
     public SchemaExportContext getSchema(final String identifier) {
-        return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextHandler.get(), identifier,
-            mountPointService, sourceProvider);
+        return parserIdentifier.toSchemaExportContextFromIdentifier(identifier);
     }
 }

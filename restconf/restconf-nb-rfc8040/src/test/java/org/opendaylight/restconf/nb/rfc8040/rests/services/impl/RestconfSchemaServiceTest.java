@@ -33,6 +33,7 @@ import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -68,8 +69,6 @@ public class RestconfSchemaServiceTest {
     private SchemaContextHandler mockContextHandler;
     @Mock
     private DOMYangTextSourceProvider sourceProvider;
-    // mount point service
-    private DOMMountPointService mountPointService;
 
     @BeforeClass
     public static void beforeClass() throws FileNotFoundException {
@@ -89,7 +88,8 @@ public class RestconfSchemaServiceTest {
 
     @Before
     public void setup() throws Exception {
-        this.mountPointService = new DOMMountPointServiceImpl();
+        // mount point service
+        final DOMMountPointService mountPointService = new DOMMountPointServiceImpl();
         // create and register mount points
         mountPointService
                 .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:1", "2016-01-01", "cont")))
@@ -99,7 +99,9 @@ public class RestconfSchemaServiceTest {
                 .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont")))
                 .register();
 
-        this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler, mountPointService, sourceProvider);
+        final ParserIdentifier parserIdentifier = new ParserIdentifier(mountPointService, mockContextHandler,
+                sourceProvider);
+        this.schemaService = new RestconfSchemaServiceImpl(parserIdentifier);
     }
 
     /**
@@ -236,9 +238,6 @@ public class RestconfSchemaServiceTest {
      */
     @Test
     public void getSchemaWithNullIdentifierTest() {
-        // prepare conditions - return correct schema context
-        when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
-
         // make test
         assertThrows(NullPointerException.class, () -> this.schemaService.getSchema(null));
     }
@@ -249,9 +248,6 @@ public class RestconfSchemaServiceTest {
      */
     @Test
     public void getSchemaWithEmptyIdentifierTest() {
-        // prepare conditions - return correct schema context
-        when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
-
         // make test and verify
         try {
             this.schemaService.getSchema("");
@@ -290,9 +286,6 @@ public class RestconfSchemaServiceTest {
      */
     @Test
     public void getSchemaWithNotParsableIdentifierTest() {
-        // prepare conditions - return correct schema context without mount points
-        when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
-
         // make test and verify
         try {
             this.schemaService.getSchema("01_module/2016-01-01");
@@ -334,9 +327,6 @@ public class RestconfSchemaServiceTest {
      */
     @Test
     public void getSchemaWrongIdentifierTest() {
-        // prepare conditions - return correct schema context without mount points
-        when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
-
         // make test and verify
         try {
             this.schemaService.getSchema("2014-01-01");
@@ -379,9 +369,6 @@ public class RestconfSchemaServiceTest {
      */
     @Test
     public void getSchemaWithoutRevisionTest() {
-        // prepare conditions - return correct schema context without mount points
-        when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
-
         // make test and verify
         try {
             this.schemaService.getSchema("module");

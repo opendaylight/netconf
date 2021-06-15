@@ -27,6 +27,7 @@ import org.junit.function.ThrowingRunnable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -38,12 +39,14 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractBodyReaderTest {
     protected final MediaType mediaType;
     protected final SchemaContextHandler schemaContextHandler;
+    protected final ParserIdentifier parserIdentifier;
     protected final DOMMountPointService mountPointService;
 
     protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) throws NoSuchFieldException,
@@ -57,6 +60,8 @@ public abstract class AbstractBodyReaderTest {
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(schemaContext))).when(mountPoint)
             .getService(DOMSchemaService.class);
+        parserIdentifier = new ParserIdentifier(mountPointService, schemaContextHandler,
+                mock(DOMYangTextSourceProvider.class));
     }
 
     protected abstract MediaType getMediaType();

@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
@@ -47,7 +46,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.Deviation;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
@@ -311,17 +309,15 @@ public final class RestconfMappingNodeUtil {
      * @param start start-time query parameter of notification
      * @param outputType output type of notification
      * @param uri location of registered listener for sending data of notification
-     * @param schemaContext schemaContext for parsing instance identifier to get schema node of data
+     * @param parserIdentifier RESTCONF path parser
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
     public static MapEntryNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
             final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
-            final EffectiveModelContext schemaContext, final String streamName) {
-        final SchemaNode schemaNode = ParserIdentifier
-                .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
-                        schemaContext, Optional.empty())
-                .getSchemaNode();
+            final String streamName, final ParserIdentifier parserIdentifier) {
+        final SchemaNode schemaNode = parserIdentifier.toInstanceIdentifier(
+                parserIdentifier.stringFromYangInstanceIdentifier(path)).getSchemaNode();
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
             Builders.mapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))

@@ -10,14 +10,12 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -26,7 +24,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -149,11 +147,10 @@ public final class PostDataTransactionUtil {
                                             final RestconfTransaction transaction) {
         final YangInstanceIdentifier parent = path.getParent().getParent();
         transaction.remove(parent);
-        final InstanceIdentifierContext<?> instanceIdentifier =
-            ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
+        final YangInstanceIdentifier pointPath = IdentifierCodec.deserialize(point, schemaContext);
         int lastItemPosition = 0;
         for (final NormalizedNode nodeChild : readList.body()) {
-            if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+            if (nodeChild.getIdentifier().equals(pointPath.getLastPathArgument())) {
                 break;
             }
             lastItemPosition++;
@@ -209,7 +206,7 @@ public final class PostDataTransactionUtil {
 
         return uriInfo.getBaseUriBuilder()
                 .path("data")
-                .path(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext))
+                .path(IdentifierCodec.serialize(path, schemaContext))
                 .build();
     }
 

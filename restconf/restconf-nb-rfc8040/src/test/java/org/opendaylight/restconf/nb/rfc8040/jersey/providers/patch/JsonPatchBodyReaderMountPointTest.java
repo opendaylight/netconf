@@ -30,7 +30,7 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     public JsonPatchBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        jsonToPatchBodyReader = new JsonPatchBodyReader(schemaContextHandler, mountPointService);
+        jsonToPatchBodyReader = new JsonPatchBodyReader(parserIdentifier);
     }
 
     @Override

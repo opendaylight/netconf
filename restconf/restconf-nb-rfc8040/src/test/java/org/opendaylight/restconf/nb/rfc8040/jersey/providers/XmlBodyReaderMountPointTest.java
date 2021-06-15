@@ -49,7 +49,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     public XmlBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
+        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(parserIdentifier);
     }
 
     @Override

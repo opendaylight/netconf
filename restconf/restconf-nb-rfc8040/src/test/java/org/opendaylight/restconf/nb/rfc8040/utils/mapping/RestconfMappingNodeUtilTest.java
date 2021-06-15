@@ -10,6 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.time.Instant;
@@ -23,9 +25,13 @@ import java.util.List;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
@@ -55,6 +61,7 @@ public class RestconfMappingNodeUtilTest {
     private static EffectiveModelContext schemaContext;
     private static EffectiveModelContext schemaContextMonitoring;
     private static Collection<? extends Module> modulesRest;
+    private static ParserIdentifier parserIdentifier;
 
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
@@ -65,6 +72,10 @@ public class RestconfMappingNodeUtilTest {
         modules = schemaContextMonitoring.getModules();
         modulesRest = YangParserTestUtils
                 .parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
+        final SchemaContextHandler schemaContextHandler = mock(SchemaContextHandler.class);
+        when(schemaContextHandler.get()).thenReturn(schemaContextMonitoring);
+        parserIdentifier = new ParserIdentifier(mock(DOMMountPointService.class),
+                schemaContextHandler, mock(DOMYangTextSourceProvider.class));
     }
 
     /**
@@ -108,8 +119,8 @@ public class RestconfMappingNodeUtilTest {
 
     @Test
     public void toStreamEntryNodeTest() throws Exception {
-        final YangInstanceIdentifier path = ParserIdentifier.toInstanceIdentifier(
-                "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
+        final YangInstanceIdentifier path = IdentifierCodec.deserialize("nested-module:depth1-cont/depth2-leaf1",
+                schemaContextMonitoring);
         final Instant start = Instant.now();
         final String outputType = "XML";
         final URI uri = new URI("uri");
@@ -117,7 +128,7 @@ public class RestconfMappingNodeUtilTest {
 
         final Map<QName, Object> map = prepareMap(streamName, uri, start, outputType);
         final MapEntryNode mappedData = RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-            path, start, outputType, uri, schemaContextMonitoring, streamName);
+            path, start, outputType, uri, streamName, parserIdentifier);
         assertMappedData(map, mappedData);
     }
 

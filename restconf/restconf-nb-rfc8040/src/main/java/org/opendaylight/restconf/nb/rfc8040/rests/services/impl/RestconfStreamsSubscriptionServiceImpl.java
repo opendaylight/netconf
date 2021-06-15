@@ -33,6 +33,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -61,21 +62,22 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     private final SubscribeToStreamUtil streamUtils;
     private final HandlersHolder handlersHolder;
+    private final ParserIdentifier parserIdentifier;
 
     /**
-     * Initialize holder of handlers with holders as parameters.
+     * Initialization of {@link RestconfStreamsSubscriptionServiceImpl}.
      *
      * @param dataBroker {@link DOMDataBroker}
      * @param notificationService {@link DOMNotificationService}
-     * @param schemaHandler
-     *             handler of {@link SchemaContext}
-     * @param configuration
-     *             configuration for restconf {@link Configuration}}
+     * @param schemaHandler handler of {@link SchemaContext}
+     * @param configuration configuration for restconf {@link Configuration}}
+     * @param parserIdentifier RESTCONF path parser
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
             final DOMNotificationService notificationService, final SchemaContextHandler schemaHandler,
-            final Configuration configuration) {
+            final Configuration configuration, final ParserIdentifier parserIdentifier) {
         this.handlersHolder = new HandlersHolder(dataBroker, notificationService, schemaHandler);
+        this.parserIdentifier = parserIdentifier;
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
     }
@@ -86,7 +88,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         final URI response;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = streamUtils.subscribeToDataStream(identifier, uriInfo, notificationQueryParams, handlersHolder);
+            response = streamUtils.subscribeToDataStream(identifier, uriInfo, notificationQueryParams, handlersHolder,
+                    parserIdentifier);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             response = streamUtils.subscribeToYangStream(identifier, uriInfo, notificationQueryParams, handlersHolder);
         } else {

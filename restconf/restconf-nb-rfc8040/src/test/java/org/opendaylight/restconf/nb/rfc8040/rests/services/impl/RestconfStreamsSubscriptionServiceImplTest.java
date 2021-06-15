@@ -33,8 +33,10 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
@@ -45,6 +47,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -67,6 +70,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private Configuration configurationSse;
 
     private SchemaContextHandler schemaHandler;
+    private ParserIdentifier parserIdentifier;
 
     @Before
     public void setUp() throws FileNotFoundException, URISyntaxException {
@@ -90,6 +94,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
             YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
         configurationWs = new Configuration(0, 100, 10, false);
         configurationSse = new Configuration(0, 100, 10, true);
+        parserIdentifier = new ParserIdentifier(mock(DOMMountPointService.class),
+                schemaHandler, mock(DOMYangTextSourceProvider.class));
     }
 
     private static class LocalUriInfo extends SimpleUriInfo {
@@ -129,7 +135,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 NotificationOutputType.XML);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
-                        this.schemaHandler, this.configurationSse);
+                        this.schemaHandler, this.configurationSse, parserIdentifier);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -148,7 +154,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 NotificationOutputType.XML);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
-                        this.schemaHandler, this.configurationWs);
+                        this.schemaHandler, this.configurationWs, parserIdentifier);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -162,7 +168,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     public void testSubscribeToStreamMissingDatastoreInPath() {
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
-                        this.schemaHandler, this.configurationWs);
+                        this.schemaHandler, this.configurationWs, parserIdentifier);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
 
@@ -170,7 +176,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     public void testSubscribeToStreamMissingScopeInPath() {
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
-                        this.schemaHandler, this.configurationWs);
+                        this.schemaHandler, this.configurationWs, parserIdentifier);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 this.uriInfo);
     }

@@ -27,6 +27,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -45,17 +46,18 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
 
     private final DOMRpcService rpcService;
     private final SchemaContextHandler schemaContextHandler;
+    private final ParserIdentifier parserIdentifier;
 
     public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
-            final SchemaContextHandler schemaContextHandler) {
+            final SchemaContextHandler schemaContextHandler, final ParserIdentifier parserIdentifier) {
         this.rpcService = requireNonNull(rpcService);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.parserIdentifier = requireNonNull(parserIdentifier);
     }
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
-        final EffectiveModelContext refSchemaCtx = this.schemaContextHandler.get();
         final QName schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final XMLNamespace namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
@@ -65,7 +67,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         if (mountPoint == null) {
             if (SAL_REMOTE_NAMESPACE.equals(namespace)) {
                 if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCRIPTION)) {
-                    response = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx);
+                    response = CreateStreamUtil.createDataChangeNotifiStream(payload, parserIdentifier);
                 } else {
                     throw new RestconfDocumentedException("Not supported operation", ErrorType.RPC,
                             ErrorTag.OPERATION_NOT_SUPPORTED);

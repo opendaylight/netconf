@@ -85,7 +85,7 @@ final class CreateStreamUtil {
      *                         }
      *                     }
      *                     </pre>
-     * @param refSchemaCtx Reference to {@link EffectiveModelContext}.
+     * @param parserIdentifier RESTCONF path parser
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON:
      *     <pre>
      *     {@code
@@ -98,7 +98,7 @@ final class CreateStreamUtil {
      *     </pre>
      */
     static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodeContext payload,
-            final EffectiveModelContext refSchemaCtx) {
+            final ParserIdentifier parserIdentifier) {
         // parsing out of container with settings and path
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
         final QName qname = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
@@ -106,7 +106,7 @@ final class CreateStreamUtil {
 
         // building of stream name
         final StringBuilder streamNameBuilder = new StringBuilder(
-                prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx), data));
+                prepareDataChangeNotifiStreamName(path, requireNonNull(parserIdentifier), data));
         final NotificationOutputType outputType = prepareOutputType(data);
         if (outputType.equals(NotificationOutputType.JSON)) {
             streamNameBuilder.append('/').append(outputType.getName());
@@ -140,13 +140,13 @@ final class CreateStreamUtil {
     /**
      * Prepare stream name.
      *
-     * @param path          Path of element from which data-change-event notifications are going to be generated.
-     * @param schemaContext Schema context.
-     * @param data          Container with stream settings (RPC create-stream).
+     * @param path             Path of element from which data-change-event notifications are going to be generated.
+     * @param parserIdentifier RESTCONF path parser.
+     * @param data             Container with stream settings (RPC create-stream).
      * @return Parsed stream name.
      */
     private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path,
-            final EffectiveModelContext schemaContext, final ContainerNode data) {
+            final ParserIdentifier parserIdentifier, final ContainerNode data) {
         final String datastoreName = extractStringLeaf(data, DATASTORE_NODEID);
         final LogicalDatastoreType datastoreType = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
             : LogicalDatastoreType.CONFIGURATION;
@@ -158,7 +158,7 @@ final class CreateStreamUtil {
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
                 + "/"
                 + ListenersBroker.createStreamNameFromUri(
-                ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext)
+                parserIdentifier.stringFromYangInstanceIdentifier(path)
                         + RestconfStreamsConstants.DS_URI
                         + datastoreType
                         + RestconfStreamsConstants.SCOPE_URI

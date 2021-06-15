@@ -13,11 +13,8 @@ import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
@@ -27,35 +24,35 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperatio
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {
     private RestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService, final RestconfStreamsSubscriptionService streamSubscription,
-            final DOMDataBroker dataBroker, final DOMRpcService rpcService, final DOMActionService actionService,
-            final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
-            final Configuration configuration) {
-        super(schemaContextHandler, mountPointService, List.of(
+            final RestconfStreamsSubscriptionService streamSubscription, final DOMDataBroker dataBroker,
+            final DOMRpcService rpcService, final DOMActionService actionService, final Configuration configuration,
+            final ParserIdentifier parserIdentifier) {
+        super(schemaContextHandler, parserIdentifier, List.of(
             streamSubscription,
-            new RestconfDataServiceImpl(schemaContextHandler, dataBroker, mountPointService, streamSubscription,
+            new RestconfDataServiceImpl(schemaContextHandler, dataBroker, parserIdentifier, streamSubscription,
                 actionService, configuration),
-            new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler),
-            new RestconfOperationsServiceImpl(schemaContextHandler, mountPointService),
-            new RestconfSchemaServiceImpl(schemaContextHandler, mountPointService,
-                domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class)),
+            new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler, parserIdentifier),
+            new RestconfOperationsServiceImpl(schemaContextHandler, parserIdentifier),
+            new RestconfSchemaServiceImpl(parserIdentifier),
             new RestconfImpl(schemaContextHandler)));
-
     }
 
     @Inject
     public RestconfApplication(final SchemaContextHandler schemaContextHandler,
-            @Reference final DOMMountPointService mountPointService, @Reference final DOMDataBroker dataBroker,
+            @Reference final DOMDataBroker dataBroker,
             @Reference final DOMRpcService rpcService, @Reference final DOMActionService actionService,
             @Reference final DOMNotificationService notificationService,
-            @Reference final DOMSchemaService domSchemaService, final Configuration configuration) {
-        this(schemaContextHandler, mountPointService,
-            new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, schemaContextHandler,
-                configuration),
-            dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration);
+            final Configuration configuration,
+            final ParserIdentifier parserIdentifier) {
+        this(schemaContextHandler,
+                new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, schemaContextHandler,
+                configuration, parserIdentifier),
+            dataBroker, rpcService, actionService, configuration,
+            parserIdentifier);
     }
 }

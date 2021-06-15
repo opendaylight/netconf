@@ -50,6 +50,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -65,6 +66,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -198,9 +200,11 @@ public class RestconfDataServiceImplTest {
 
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
                 mockDataBroker, mock(DOMSchemaService.class));
+        final ParserIdentifier parserIdentifier = new ParserIdentifier(mountPointService, schemaContextHandler,
+                mock(DOMYangTextSourceProvider.class));
 
         schemaContextHandler.onModelContextUpdated(this.contextRef);
-        this.dataService = new RestconfDataServiceImpl(schemaContextHandler, mockDataBroker, mountPointService,
+        this.dataService = new RestconfDataServiceImpl(schemaContextHandler, mockDataBroker, parserIdentifier,
                 this.delegRestconfSubscrService, this.actionService, configuration);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));

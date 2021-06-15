@@ -51,7 +51,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     public JsonBodyReaderTest() throws Exception {
         super(schemaContext);
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(parserIdentifier);
     }
 
     @Override

@@ -9,19 +9,17 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 
 /**
  * Common superclass for readers producing {@link NormalizedNodeContext}.
  */
 abstract class AbstractNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider<NormalizedNodeContext> {
-    AbstractNormalizedNodeBodyReader(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService) {
-        super(schemaContextHandler, mountPointService);
+    AbstractNormalizedNodeBodyReader(final ParserIdentifier parserIdentifier) {
+        super(parserIdentifier);
     }
 
     public final void injectParams(final UriInfo uriInfo, final Request request) {

@@ -34,6 +34,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -161,7 +162,8 @@ abstract class SubscribeToStreamUtil {
      * @return Location for listening.
      */
     final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final ParserIdentifier parserIdentifier) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
 
         final String datastoreParam = mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME);
@@ -201,7 +203,7 @@ abstract class SubscribeToStreamUtil {
 
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.getPath(),
-                notificationQueryParams.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
+                notificationQueryParams.getStart(), listener.getOutputType(), uri, serializedPath, parserIdentifier);
         final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);

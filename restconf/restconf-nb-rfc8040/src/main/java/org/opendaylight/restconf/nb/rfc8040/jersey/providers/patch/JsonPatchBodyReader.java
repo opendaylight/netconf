@@ -23,13 +23,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -39,7 +37,6 @@ import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -61,9 +58,8 @@ import org.slf4j.LoggerFactory;
 public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(JsonPatchBodyReader.class);
 
-    public JsonPatchBodyReader(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService) {
-        super(schemaContextHandler, mountPointService);
+    public JsonPatchBodyReader(final ParserIdentifier parserIdentifier) {
+        super(parserIdentifier);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -91,9 +87,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     public PatchContext readFrom(final String uriPath, final InputStream entityStream) throws
             RestconfDocumentedException {
         try {
-            return readFrom(
-                    ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(),
-                            Optional.ofNullable(getMountPointService())), entityStream);
+            return readFrom(parserIdentifier.toInstanceIdentifier(uriPath), entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op

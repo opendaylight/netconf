@@ -8,13 +8,11 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
-import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -22,7 +20,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
@@ -144,11 +142,10 @@ public final class PutDataTransactionUtil {
                                            final EffectiveModelContext schemaContext, final String point,
                                            final NormalizedNodeContainer<?> readList, final boolean before) {
         transaction.remove(path.getParent());
-        final InstanceIdentifierContext<?> instanceIdentifier =
-            ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
+        final YangInstanceIdentifier pointPath = IdentifierCodec.deserialize(point, schemaContext);
         int lastItemPosition = 0;
         for (final NormalizedNode nodeChild : readList.body()) {
-            if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+            if (nodeChild.getIdentifier().equals(pointPath.getLastPathArgument())) {
                 break;
             }
             lastItemPosition++;

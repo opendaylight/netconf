@@ -13,7 +13,6 @@ import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -38,18 +37,18 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);
 
     private final SchemaContextHandler schemaContextHandler;
-    private final DOMMountPointService mountPointService;
+    private final ParserIdentifier parserIdentifier;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
      *
      * @param schemaContextHandler handling schema context
-     * @param mountPointService handling dom mount point service
+     * @param parserIdentifier     RESTCONF path parser
      */
     public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService) {
+                                         final ParserIdentifier parserIdentifier) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
-        this.mountPointService = requireNonNull(mountPointService);
+        this.parserIdentifier = requireNonNull(parserIdentifier);
     }
 
     @Override
@@ -67,8 +66,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
                     ErrorTag.INVALID_VALUE);
         }
 
-        final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-            schemaContextHandler.get(), Optional.of(mountPointService));
+        final InstanceIdentifierContext<?> mountPointIdentifier = parserIdentifier.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         return OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
     }

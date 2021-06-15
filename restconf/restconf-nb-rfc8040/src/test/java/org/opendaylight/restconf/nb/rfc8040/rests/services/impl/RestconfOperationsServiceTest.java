@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
@@ -19,10 +20,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -41,15 +44,18 @@ public class RestconfOperationsServiceTest {
     @Mock
     private UriInfo uriInfo;
 
-    private EffectiveModelContext schemaContext;
     private SchemaContextHandler schemaContextHandler;
-
     private Set<QName> listOfRpcsNames;
+    private ParserIdentifier parserIdentifier;
 
     @Before
     public void init() throws Exception {
-        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
+        final EffectiveModelContext schemaContext = YangParserTestUtils.parseYangFiles(
+                TestRestconfUtils.loadFiles("/modules"));
         this.schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
+
+        this.parserIdentifier = new ParserIdentifier(this.domMountPointService, schemaContextHandler,
+                mock(DOMYangTextSourceProvider.class));
 
         final QNameModule module1 = QNameModule.create(XMLNamespace.of("module:1"));
         final QNameModule module2 = QNameModule.create(XMLNamespace.of("module:2"));
@@ -61,8 +67,8 @@ public class RestconfOperationsServiceTest {
 
     @Test
     public void getOperationsTest() {
-        final RestconfOperationsServiceImpl oper =
-                new RestconfOperationsServiceImpl(this.schemaContextHandler, this.domMountPointService);
+        final RestconfOperationsServiceImpl oper = new RestconfOperationsServiceImpl(this.schemaContextHandler,
+                this.parserIdentifier);
         final NormalizedNodeContext operations = oper.getOperations(this.uriInfo);
         final ContainerNode data = (ContainerNode) operations.getData();
         assertEquals("urn:ietf:params:xml:ns:yang:ietf-restconf",

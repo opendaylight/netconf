@@ -41,7 +41,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -112,19 +111,19 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
     private final SchemaContextHandler schemaContextHandler;
     private final MdsalRestconfStrategy restconfStrategy;
-    private final DOMMountPointService mountPointService;
+    private final ParserIdentifier parserIdentifier;
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final DOMDataBroker dataBroker;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
-            final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
+            final DOMDataBroker dataBroker, final ParserIdentifier  parserIdentifier,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final DOMActionService actionService, final Configuration configuration) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.dataBroker = requireNonNull(dataBroker);
         this.restconfStrategy = new MdsalRestconfStrategy(dataBroker);
-        this.mountPointService = requireNonNull(mountPointService);
+        this.parserIdentifier = requireNonNull(parserIdentifier);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
@@ -139,8 +138,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response readData(final String identifier, final UriInfo uriInfo) {
         final EffectiveModelContext schemaContextRef = this.schemaContextHandler.get();
-        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextRef, Optional.of(mountPointService));
+        final InstanceIdentifierContext<?> instanceIdentifier = parserIdentifier.toInstanceIdentifier(identifier);
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
@@ -314,8 +312,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response deleteData(final String identifier) {
-        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, this.schemaContextHandler.get(), Optional.of(mountPointService));
+        final InstanceIdentifierContext<?> instanceIdentifier = parserIdentifier.toInstanceIdentifier(identifier);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);

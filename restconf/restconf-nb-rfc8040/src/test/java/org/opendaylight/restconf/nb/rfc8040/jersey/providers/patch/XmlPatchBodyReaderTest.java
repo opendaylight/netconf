@@ -27,7 +27,7 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
 
     public XmlPatchBodyReaderTest() throws Exception {
         super(schemaContext);
-        xmlToPatchBodyReader = new XmlPatchBodyReader(schemaContextHandler, mountPointService);
+        xmlToPatchBodyReader = new XmlPatchBodyReader(parserIdentifier);
     }
 
     @Override

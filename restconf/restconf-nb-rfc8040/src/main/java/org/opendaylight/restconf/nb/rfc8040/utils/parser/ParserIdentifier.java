@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Verify.verifyNotNull;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -31,6 +34,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -49,15 +53,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class for parsing identifier.
+ * Service used for parsing RESTCONF identifiers.
  */
+@Singleton
 public final class ParserIdentifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
     private static final Splitter MP_SPLITTER = Splitter.on("/" + RestconfConstants.MOUNT);
 
-    private ParserIdentifier() {
-        throw new UnsupportedOperationException("Util class.");
+    private final DOMMountPointService domMountPointService;
+    private final SchemaContextHandler schemaContextHandler;
+    private final DOMYangTextSourceProvider sourceProvider;
+
+    @Inject
+    public ParserIdentifier(@Reference final DOMMountPointService domMountPointService,
+                            final SchemaContextHandler schemaContextHandler,
+                            @Reference final DOMSchemaService domSchemaService) {
+        this.domMountPointService = domMountPointService;
+        this.schemaContextHandler = schemaContextHandler;
+        this.sourceProvider = domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+    }
+
+    @VisibleForTesting
+    public ParserIdentifier(final DOMMountPointService domMountPointService,
+                            final SchemaContextHandler schemaContextHandler,
+                            final DOMYangTextSourceProvider sourceProvider) {
+        this.domMountPointService = domMountPointService;
+        this.schemaContextHandler = schemaContextHandler;
+        this.sourceProvider = sourceProvider;
     }
 
     /**
@@ -71,27 +94,18 @@ public final class ParserIdentifier {
      * {@link InstanceIdentifierContext} is prepared with reference of {@link DOMMountPoint} and its
      * own {@link SchemaContext}.
      *
-     * @param identifier
-     *           - path identifier
-     * @param schemaContext
-     *           - controller schema context
-     * @param mountPointService
-     *           - mount point service
+     * @param identifier path identifier
      * @return {@link InstanceIdentifierContext}
      */
-    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
-            final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
+    public InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier) {
         if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
-            return createIIdContext(schemaContext, identifier, null);
-        }
-        if (mountPointService.isEmpty()) {
-            throw new RestconfDocumentedException("Mount point service is not available");
+            return createIIdContext(schemaContextHandler.get(), identifier, null);
         }
 
         final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
         final String mountPointId = pathsIt.next();
-        final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
-        final DOMMountPoint mountPoint = mountPointService.get().getMountPoint(mountPath)
+        final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContextHandler.get());
+        final DOMMountPoint mountPoint = domMountPointService.getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
                     ErrorType.PROTOCOL, ErrorTag.RESOURCE_DENIED_TRANSPORT));
 
@@ -126,7 +140,7 @@ public final class ParserIdentifier {
 
         // Peel the last component and locate the parent data node, empty path resolves to SchemaContext
         final DataSchemaContextNode<?> parent = DataSchemaContextTree.from(schemaContext)
-                .findChild(verifyNotNull(urlPath.getParent()))
+                .findChild(requireNonNull(urlPath.getParent()))
                 .orElseThrow(
                     // Parent data node is not present, this is not a valid location.
                     () -> new RestconfDocumentedException("Parent of " + urlPath + " not found",
@@ -166,28 +180,25 @@ public final class ParserIdentifier {
     /**
      * Make {@link String} from {@link YangInstanceIdentifier}.
      *
-     * @param instanceIdentifier    Instance identifier
-     * @param schemaContext         Schema context
-     * @return                      Yang instance identifier serialized to String
+     * @param instanceIdentifier instance identifier
+     * @return yang instance identifier serialized to String
      */
-    public static String stringFromYangInstanceIdentifier(final YangInstanceIdentifier instanceIdentifier,
-            final EffectiveModelContext schemaContext) {
-        return IdentifierCodec.serialize(instanceIdentifier, schemaContext);
+    public String stringFromYangInstanceIdentifier(final YangInstanceIdentifier instanceIdentifier) {
+        return IdentifierCodec.serialize(instanceIdentifier, schemaContextHandler.get());
     }
 
     /**
      * Make a moduleName/Revision pair from identifier.
      *
-     * @param identifier
-     *             path parameter
+     * @param identifier path parameter
      * @return {@link QName}
      */
-    public static Entry<String, Revision> makeQNameFromIdentifier(final String identifier) {
+    public Entry<String, Revision> makeQNameFromIdentifier(final String identifier) {
         // check if more than one slash is not used as path separator
         if (identifier.contains("//")) {
-            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
+            LOG.debug("URI has bad format. It should be 'moduleName/yyyy-MM-dd' {}", identifier);
             throw new RestconfDocumentedException(
-                    "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
+                    "URI has bad format. End of URI should be in format 'moduleName/yyyy-MM-dd'", ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
         }
 
@@ -204,7 +215,7 @@ public final class ParserIdentifier {
         if (pathArgs.size() != 2) {
             LOG.debug("URI has bad format '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
             throw new RestconfDocumentedException(
-                    "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
+                    "URI has bad format. End of URI should be in format 'moduleName/yyyy-MM-dd'", ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
         }
 
@@ -213,7 +224,7 @@ public final class ParserIdentifier {
             moduleRevision = Revision.of(pathArgs.get(1));
         } catch (final DateTimeParseException e) {
             LOG.debug("URI has bad format: '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
-            throw new RestconfDocumentedException("URI has bad format. It should be \'moduleName/yyyy-MM-dd\'",
+            throw new RestconfDocumentedException("URI has bad format. It should be 'moduleName/yyyy-MM-dd'",
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
 
@@ -225,22 +236,16 @@ public final class ParserIdentifier {
      * {@link Date} revision and from the parsed module create
      * {@link SchemaExportContext}.
      *
-     * @param schemaContext
-     *             {@link EffectiveModelContext}
-     * @param identifier
-     *             path parameter
-     * @param domMountPointService
-     *             {@link DOMMountPointService}
+     * @param identifier path parameter
      * @return {@link SchemaExportContext}
      */
-    public static SchemaExportContext toSchemaExportContextFromIdentifier(final EffectiveModelContext schemaContext,
-            final String identifier, final DOMMountPointService domMountPointService,
-            final DOMYangTextSourceProvider sourceProvider) {
+    public SchemaExportContext toSchemaExportContextFromIdentifier(final String identifier) {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
+            final EffectiveModelContext schemaContext = schemaContextHandler.get();
             final Module module = schemaContext.findModule(moduleName, revision).orElse(null);
             return new SchemaExportContext(schemaContext, module, sourceProvider);
         } else {
@@ -259,8 +264,7 @@ public final class ParserIdentifier {
 
                 pathBuilder.append(current);
             }
-            final InstanceIdentifierContext<?> point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
-                Optional.of(domMountPointService));
+            final InstanceIdentifierContext<?> point = toInstanceIdentifier(pathBuilder.toString());
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
