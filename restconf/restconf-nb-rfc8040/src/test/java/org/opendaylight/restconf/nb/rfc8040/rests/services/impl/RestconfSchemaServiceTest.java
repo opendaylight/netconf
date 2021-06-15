@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
@@ -22,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
@@ -100,7 +102,7 @@ public class RestconfSchemaServiceTest {
                 .register();
 
         final ParserIdentifier parserIdentifier = new ParserIdentifier(mountPointService, mockContextHandler,
-                sourceProvider);
+                mock(DOMDataBroker.class), sourceProvider);
         this.schemaService = new RestconfSchemaServiceImpl(parserIdentifier);
     }
 

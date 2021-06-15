@@ -201,7 +201,7 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
                 mockDataBroker, mock(DOMSchemaService.class));
         final ParserIdentifier parserIdentifier = new ParserIdentifier(mountPointService, schemaContextHandler,
-                mock(DOMYangTextSourceProvider.class));
+                mock(DOMDataBroker.class), mock(DOMYangTextSourceProvider.class));
 
         schemaContextHandler.onModelContextUpdated(this.contextRef);
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, mockDataBroker, parserIdentifier,

@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
@@ -59,7 +60,7 @@ public class CreateStreamUtilTest {
         final SchemaContextHandler schemaContextHandler = mock(SchemaContextHandler.class);
         when(schemaContextHandler.get()).thenReturn(refSchemaCtx);
         parserIdentifier = new ParserIdentifier(mock(DOMMountPointService.class),
-                schemaContextHandler, mock(DOMYangTextSourceProvider.class));
+                schemaContextHandler, mock(DOMDataBroker.class), mock(DOMYangTextSourceProvider.class));
     }
 
     @Test

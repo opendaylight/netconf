@@ -67,7 +67,7 @@ public class RestconfInvokeOperationsServiceImplTest {
             mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(contextRef);
         final ParserIdentifier parserIdentifier = new ParserIdentifier(mock(DOMMountPointService.class),
-            schemaContextHandler, mock(DOMYangTextSourceProvider.class));
+            schemaContextHandler, mock(DOMDataBroker.class), mock(DOMYangTextSourceProvider.class));
         this.invokeOperationsService = new RestconfInvokeOperationsServiceImpl(this.rpcService, schemaContextHandler,
             parserIdentifier);
     }

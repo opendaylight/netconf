@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -55,7 +56,7 @@ public class RestconfOperationsServiceTest {
         this.schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
 
         this.parserIdentifier = new ParserIdentifier(this.domMountPointService, schemaContextHandler,
-                mock(DOMYangTextSourceProvider.class));
+                mock(DOMDataBroker.class), mock(DOMYangTextSourceProvider.class));
 
         final QNameModule module1 = QNameModule.create(XMLNamespace.of("module:1"));
         final QNameModule module2 = QNameModule.create(XMLNamespace.of("module:2"));

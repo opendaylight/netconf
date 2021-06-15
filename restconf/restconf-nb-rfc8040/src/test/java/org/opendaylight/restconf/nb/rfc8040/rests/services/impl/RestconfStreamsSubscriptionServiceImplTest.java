@@ -95,7 +95,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         configurationWs = new Configuration(0, 100, 10, false);
         configurationSse = new Configuration(0, 100, 10, true);
         parserIdentifier = new ParserIdentifier(mock(DOMMountPointService.class),
-                schemaHandler, mock(DOMYangTextSourceProvider.class));
+                schemaHandler, mock(DOMDataBroker.class), mock(DOMYangTextSourceProvider.class));
     }
 
     private static class LocalUriInfo extends SimpleUriInfo {

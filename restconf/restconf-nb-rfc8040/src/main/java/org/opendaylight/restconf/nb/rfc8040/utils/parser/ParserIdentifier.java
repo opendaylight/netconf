@@ -21,10 +21,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -64,22 +68,25 @@ public final class ParserIdentifier {
     private final DOMMountPointService domMountPointService;
     private final SchemaContextHandler schemaContextHandler;
     private final DOMYangTextSourceProvider sourceProvider;
+    private final DOMDataBroker domDataBroker;
 
     @Inject
     public ParserIdentifier(@Reference final DOMMountPointService domMountPointService,
-                            final SchemaContextHandler schemaContextHandler,
-                            @Reference final DOMSchemaService domSchemaService) {
+            final SchemaContextHandler schemaContextHandler, @Reference final DOMSchemaService domSchemaService,
+            @Reference final DOMDataBroker domDataBroker) {
         this.domMountPointService = domMountPointService;
         this.schemaContextHandler = schemaContextHandler;
         this.sourceProvider = domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+        this.domDataBroker = domDataBroker;
     }
 
     @VisibleForTesting
     public ParserIdentifier(final DOMMountPointService domMountPointService,
-                            final SchemaContextHandler schemaContextHandler,
-                            final DOMYangTextSourceProvider sourceProvider) {
+            final SchemaContextHandler schemaContextHandler, final DOMDataBroker domDataBroker,
+            final DOMYangTextSourceProvider sourceProvider) {
         this.domMountPointService = domMountPointService;
         this.schemaContextHandler = schemaContextHandler;
+        this.domDataBroker = domDataBroker;
         this.sourceProvider = sourceProvider;
     }
 
@@ -106,12 +113,36 @@ public final class ParserIdentifier {
         final String mountPointId = pathsIt.next();
         final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContextHandler.get());
         final DOMMountPoint mountPoint = domMountPointService.getMountPoint(mountPath)
-                .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
-                    ErrorType.PROTOCOL, ErrorTag.RESOURCE_DENIED_TRANSPORT));
+                .orElseThrow(() -> createMissingMountpointException(mountPath));
 
         final EffectiveModelContext mountSchemaContext = coerceModelContext(mountPoint);
         final String pathId = pathsIt.next().replaceFirst("/", "");
         return createIIdContext(mountSchemaContext, pathId, mountPoint);
+    }
+
+    private RestconfDocumentedException createMissingMountpointException(final YangInstanceIdentifier mountPath) {
+        final boolean mountExists;
+        try (DOMDataTreeReadTransaction roTx = domDataBroker.newReadOnlyTransaction()) {
+            mountExists = roTx.exists(LogicalDatastoreType.CONFIGURATION, mountPath).get();
+        } catch (ExecutionException e) {
+            LOG.warn("Failed to read mountpoint from CONFIG datastore: {}", mountPath, e);
+            return new RestconfDocumentedException("Failed to read mountpoint from CONFIG datastore: {}"
+                    + mountPath, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+        } catch (InterruptedException e) {
+            LOG.warn("Reading mountpoint from CONFIG datastore was interrupted: {}", mountPath, e);
+            return new RestconfDocumentedException("Reading mountpoint from CONFIG datastore was interrupted: "
+                    + mountPath, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+        }
+
+        if (mountExists) {
+            return new RestconfDocumentedException("Mount point does not exist: node was installed in CONFIG datastore "
+                    + "but mountpoint hasn't been created yet or it was lost",
+                    ErrorType.PROTOCOL, ErrorTag.RESOURCE_DENIED_TRANSPORT);
+        }
+        return new RestconfDocumentedException(
+                "Mount point does not exist: node is not installed in CONFIG datastore on path: "
+                        + stringFromYangInstanceIdentifier(mountPath),
+                ErrorType.PROTOCOL, ErrorTag.RESOURCE_DENIED_TRANSPORT);
     }
 
     /**

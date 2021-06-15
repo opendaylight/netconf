@@ -25,6 +25,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -37,6 +40,7 @@ import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -102,6 +106,9 @@ public class ParserIdentifierTest {
     private DOMYangTextSourceProvider sourceProvider;
     @Mock
     private DOMSchemaService mockMountPointSchemaService;
+    @Mock
+    private DOMDataBroker domDataBroker;
+
     private SchemaContextHandler schemaContextHandler;
 
     @BeforeClass
@@ -132,7 +139,8 @@ public class ParserIdentifierTest {
 
         schemaContextHandler = mock(SchemaContextHandler.class);
         when(schemaContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
-        parserIdentifier = new ParserIdentifier(mockMountPointService, schemaContextHandler, sourceProvider);
+        parserIdentifier = new ParserIdentifier(mockMountPointService, schemaContextHandler, domDataBroker,
+                sourceProvider);
     }
 
     /*
@@ -235,7 +243,12 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toInstanceIdentifierMissingMountPointNegativeTest() {
+        final DOMDataTreeReadTransaction roTx = mock(DOMDataTreeReadTransaction.class);
+        when(roTx.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty()))
+                .thenReturn(FluentFutures.immediateFluentFuture(true));
+        when(domDataBroker.newReadOnlyTransaction()).thenReturn(roTx);
         when(mockMountPointService.getMountPoint(any())).thenReturn(Optional.empty());
+
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> parserIdentifier.toInstanceIdentifier("/yang-ext:mount" + RestconfConstants.MOUNT));
         assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());

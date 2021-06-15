@@ -24,6 +24,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.junit.function.ThrowingRunnable;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -61,7 +62,7 @@ public abstract class AbstractBodyReaderTest {
         doReturn(Optional.of(FixedDOMSchemaService.of(schemaContext))).when(mountPoint)
             .getService(DOMSchemaService.class);
         parserIdentifier = new ParserIdentifier(mountPointService, schemaContextHandler,
-                mock(DOMYangTextSourceProvider.class));
+                mock(DOMDataBroker.class), mock(DOMYangTextSourceProvider.class));
     }
 
     protected abstract MediaType getMediaType();

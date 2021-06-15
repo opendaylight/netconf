@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
@@ -75,7 +76,7 @@ public class RestconfMappingNodeUtilTest {
         final SchemaContextHandler schemaContextHandler = mock(SchemaContextHandler.class);
         when(schemaContextHandler.get()).thenReturn(schemaContextMonitoring);
         parserIdentifier = new ParserIdentifier(mock(DOMMountPointService.class),
-                schemaContextHandler, mock(DOMYangTextSourceProvider.class));
+                schemaContextHandler, mock(DOMDataBroker.class), mock(DOMYangTextSourceProvider.class));
     }
 
     /**
