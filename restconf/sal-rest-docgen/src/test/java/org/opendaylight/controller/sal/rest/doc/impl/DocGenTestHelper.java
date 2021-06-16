@@ -7,11 +7,16 @@
  */
 package org.opendaylight.controller.sal.rest.doc.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
@@ -22,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
@@ -128,4 +134,38 @@ public class DocGenTestHelper {
         return info;
     }
 
+    static Module findModule(final String namespace, final String revisionDate,
+            final Collection<? extends Module> modules) {
+        assertFalse("No modules found", modules == null || modules.isEmpty());
+        final Optional<? extends Module> module = modules.stream()
+                .filter(modulesFilter(namespace, revisionDate))
+                .findAny();
+        assertTrue("Desired module not found", module.isPresent());
+        return module.get();
+    }
+
+    private static Predicate<Module> modulesFilter(final String namespace, final String revision) {
+        return m -> namespace.equals(m.getQNameModule().getNamespace().toString())
+                && m.getQNameModule().getRevision().isPresent()
+                && revision.equals(m.getQNameModule().getRevision().get().toString());
+    }
+
+    /**
+     * Checks whether object {@code mainObject} contains in properties/items key $ref with concrete value.
+     */
+    static void containsReferences(final JsonNode mainObject, final String childObject, final String expectedRef) {
+        final JsonNode properties = mainObject.get("properties");
+        assertNotNull(properties);
+
+        final JsonNode childNode = properties.get(childObject);
+        assertNotNull(childNode);
+
+        //list case
+        JsonNode refWrapper = childNode.get("items");
+        if (refWrapper == null) {
+            //container case
+            refWrapper = childNode;
+        }
+        assertEquals(expectedRef, refWrapper.get("$ref").asText());
+    }
 }
