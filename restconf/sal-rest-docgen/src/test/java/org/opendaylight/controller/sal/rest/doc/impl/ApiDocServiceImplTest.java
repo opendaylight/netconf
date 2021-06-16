@@ -10,7 +10,6 @@ package org.opendaylight.controller.sal.rest.doc.impl;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import javax.ws.rs.core.UriInfo;
@@ -30,25 +29,21 @@ import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorRFC8
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public class ApiDocServiceImplTest {
+public final class ApiDocServiceImplTest {
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
-    private DocGenTestHelper helper;
+
     private ApiDocService apiDocService;
 
-
-    @SuppressWarnings("resource")
     @Before
-    public void setUp() throws Exception {
-        this.helper = new DocGenTestHelper();
-        this.helper.setUp();
-
-        final EffectiveModelContext context = this.helper.createMockSchemaContext();
-        final DOMSchemaService schemaService = this.helper.createMockSchemaService(context);
+    public void setUp() {
+        final EffectiveModelContext context = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        final DOMSchemaService schemaService = DocGenTestHelper.createMockSchemaService(context);
 
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
@@ -64,17 +59,16 @@ public class ApiDocServiceImplTest {
         mountPointDraft02.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
         final AllModulesDocGenerator allModulesDocGenerator = new AllModulesDocGenerator(apiDocGeneratorDraftO2,
                 apiDocGeneratorRFC8040);
-        this.apiDocService = new ApiDocServiceImpl(mountPointDraft02, mountPointRFC8040, apiDocGeneratorDraftO2,
+        apiDocService = new ApiDocServiceImpl(mountPointDraft02, mountPointRFC8040, apiDocGeneratorDraftO2,
                 apiDocGeneratorRFC8040, allModulesDocGenerator);
     }
 
     @Test
-    public void getListOfMounts() throws java.net.URISyntaxException, JsonProcessingException {
-        final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
+    public void getListOfMounts() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         // simulate the behavior of JacksonJaxbJsonProvider
         final ObjectMapper mapper = new ObjectMapper();
-        final String result = mapper.writer().writeValueAsString(
-                apiDocService.getListOfMounts(mockInfo).getEntity());
+        final String result = mapper.writer().writeValueAsString(apiDocService.getListOfMounts(mockInfo).getEntity());
         Assert.assertEquals("[{\"instance\":\"/nodes/node/123/\",\"id\":1}]", result);
     }
 }

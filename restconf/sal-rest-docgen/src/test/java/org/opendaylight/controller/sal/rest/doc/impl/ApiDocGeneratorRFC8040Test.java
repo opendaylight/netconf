@@ -25,6 +25,7 @@ import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public final class ApiDocGeneratorRFC8040Test {
     private static final String NAMESPACE = "http://netconfcentral.org/ns/toaster2";
@@ -32,16 +33,13 @@ public final class ApiDocGeneratorRFC8040Test {
     private static final String NAMESPACE_2 = "http://netconfcentral.org/ns/toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
 
-    private DocGenTestHelper helper;
-    private EffectiveModelContext schemaContext;
+    private EffectiveModelContext context;
     private ApiDocGeneratorRFC8040 generator;
 
     @Before
-    public void setUp() throws Exception {
-        this.helper = new DocGenTestHelper();
-        this.helper.setUp();
-        this.schemaContext = this.helper.getSchemaContext();
-        this.generator = new ApiDocGeneratorRFC8040(this.helper.createMockSchemaService(this.schemaContext));
+    public void setUp() {
+        context = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        generator = new ApiDocGeneratorRFC8040(DocGenTestHelper.createMockSchemaService(context));
     }
 
     /**
@@ -62,9 +60,9 @@ public final class ApiDocGeneratorRFC8040Test {
                 "/rests/operations/toaster2:cancel-toast",
                 "/rests/operations/toaster2:restock-toaster");
 
-        final Module module = DocGenTestHelper.findModule(NAMESPACE, REVISION_DATE, helper.getModules());
-        final SwaggerObject doc = this.generator.getSwaggerDocSpec(module, "http","localhost:8181",
-                "/", "", schemaContext, URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
+        final Module module = DocGenTestHelper.findModule(NAMESPACE, REVISION_DATE, context.getModules());
+        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http","localhost:8181",
+                "/", "", context, URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
         final List<String> actualPaths = new ArrayList<>();
         doc.getPaths().fieldNames().forEachRemaining(actualPaths::add);
 
@@ -82,9 +80,9 @@ public final class ApiDocGeneratorRFC8040Test {
                 "/rests/data/toaster2:lst/cont1/lst11",
                 "/rests/data/toaster2:lst/lst1={key1},{key2}");
 
-        final Module module = DocGenTestHelper.findModule(NAMESPACE, REVISION_DATE, helper.getModules());
-        final SwaggerObject doc = this.generator.getSwaggerDocSpec(module, "http","localhost:8181",
-                "/", "", schemaContext, URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
+        final Module module = DocGenTestHelper.findModule(NAMESPACE, REVISION_DATE, context.getModules());
+        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http","localhost:8181",
+                "/", "", context, URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
 
         for (final String path : configPaths) {
             final JsonNode node = doc.getPaths().get(path);
@@ -100,9 +98,9 @@ public final class ApiDocGeneratorRFC8040Test {
      */
     @Test
     public void testDefinitions() {
-        final Module module = DocGenTestHelper.findModule(NAMESPACE, REVISION_DATE, helper.getModules());
-        final SwaggerObject doc = this.generator.getSwaggerDocSpec(module, "http","localhost:8181",
-                "/", "", schemaContext, URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
+        final Module module = DocGenTestHelper.findModule(NAMESPACE, REVISION_DATE, context.getModules());
+        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http","localhost:8181",
+                "/", "", context, URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
 
         final ObjectNode definitions = doc.getDefinitions();
         assertNotNull(definitions);
@@ -161,9 +159,9 @@ public final class ApiDocGeneratorRFC8040Test {
      */
     @Test
     public void testRPC() {
-        final Module module = DocGenTestHelper.findModule(NAMESPACE_2, REVISION_DATE_2, helper.getModules());
-        final SwaggerObject doc = this.generator.getSwaggerDocSpec(module, "http","localhost:8181",
-                "/", "", schemaContext, URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
+        final Module module = DocGenTestHelper.findModule(NAMESPACE_2, REVISION_DATE_2, context.getModules());
+        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http","localhost:8181",
+                "/", "", context, URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
         assertNotNull(doc);
 
         final ObjectNode definitions = doc.getDefinitions();
