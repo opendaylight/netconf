@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.rest.doc.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -35,29 +34,25 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public class MountPointSwaggerTest {
-
+public final class MountPointSwaggerTest {
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
     private static final String INSTANCE_URL = "/nodes/node/123/";
+
     private MountPointSwagger swagger;
-    private DocGenTestHelper helper;
 
-    @SuppressWarnings("resource")
     @Before
-    public void setUp() throws Exception {
-        this.helper = new DocGenTestHelper();
-        this.helper.setUp();
-
+    public void setUp() {
         // We are sharing the global schema service and the mount schema service
         // in our test.
         // OK for testing - real thing would have separate instances.
-        final EffectiveModelContext context = this.helper.createMockSchemaContext();
-        final DOMSchemaService schemaService = this.helper.createMockSchemaService(context);
+        final EffectiveModelContext context = YangParserTestUtils.parseYangResourceDirectory("/yang");
+        final DOMSchemaService schemaService = DocGenTestHelper.createMockSchemaService(context);
 
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
@@ -68,28 +63,28 @@ public class MountPointSwaggerTest {
         final MountPointSwaggerGeneratorDraft02 generator =
                 new MountPointSwaggerGeneratorDraft02(schemaService, service);
 
-        this.swagger = generator.getMountPointSwagger();
+        swagger = generator.getMountPointSwagger();
     }
 
     @Test()
-    public void getInstanceIdentifiers() throws Exception {
-        assertEquals(0, this.swagger.getInstanceIdentifiers().size());
-        this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
-        assertEquals(1, this.swagger.getInstanceIdentifiers().size());
-        assertEquals((Long) 1L, this.swagger.getInstanceIdentifiers().entrySet().iterator().next()
+    public void getInstanceIdentifiers() {
+        assertEquals(0, swagger.getInstanceIdentifiers().size());
+        swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
+        assertEquals(1, swagger.getInstanceIdentifiers().size());
+        assertEquals((Long) 1L, swagger.getInstanceIdentifiers().entrySet().iterator().next()
                 .getValue());
-        assertEquals(INSTANCE_URL, this.swagger.getInstanceIdentifiers().entrySet().iterator().next()
+        assertEquals(INSTANCE_URL, swagger.getInstanceIdentifiers().entrySet().iterator().next()
                 .getKey());
-        this.swagger.onMountPointRemoved(INSTANCE_ID); // remove ID from list of mount points
-        assertEquals(0, this.swagger.getInstanceIdentifiers().size());
+        swagger.onMountPointRemoved(INSTANCE_ID); // remove ID from list of mount points
+        assertEquals(0, swagger.getInstanceIdentifiers().size());
     }
 
     @Test
     public void testGetDataStoreApi() throws Exception {
-        final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
-        this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
-        final SwaggerObject mountPointApi = (SwaggerObject) this.swagger.getMountPointApi(mockInfo, 1L, "Datastores",
+        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores",
                 "-", URIType.DRAFT02, OAversion.V2_0);
         assertNotNull("failed to find Datastore API", mountPointApi);
 
