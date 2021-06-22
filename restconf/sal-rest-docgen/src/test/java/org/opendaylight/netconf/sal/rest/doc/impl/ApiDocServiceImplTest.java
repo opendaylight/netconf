@@ -43,8 +43,7 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
                 new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service);
         final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
         mountPointRFC8040.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
-        final AllModulesDocGenerator allModulesDocGenerator = new AllModulesDocGenerator(apiDocGeneratorRFC8040);
-        apiDocService = new ApiDocServiceImpl(mountPointRFC8040, apiDocGeneratorRFC8040, allModulesDocGenerator);
+        apiDocService = new ApiDocServiceImpl(mountPointRFC8040, apiDocGeneratorRFC8040);
     }
 
     @Test
