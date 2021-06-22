@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.sal.rest.doc.impl;
+package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -20,10 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
-import org.opendaylight.netconf.sal.rest.doc.impl.AllModulesDocGenerator;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorRFC8040;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
-import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorRFC8040;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -47,8 +43,7 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
                 new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service);
         final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
         mountPointRFC8040.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
-        final AllModulesDocGenerator allModulesDocGenerator = new AllModulesDocGenerator(apiDocGeneratorRFC8040);
-        apiDocService = new ApiDocServiceImpl(mountPointRFC8040, apiDocGeneratorRFC8040, allModulesDocGenerator);
+        apiDocService = new ApiDocServiceImpl(mountPointRFC8040, apiDocGeneratorRFC8040);
     }
 
     @Test
