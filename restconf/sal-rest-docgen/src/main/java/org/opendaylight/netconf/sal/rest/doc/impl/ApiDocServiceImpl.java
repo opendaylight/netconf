@@ -9,15 +9,24 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 
 /**
@@ -33,9 +42,12 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
  * to work around this limitation, but given that this API is a dev only tool
  * and not dependent UI, this was the fastest work around.
  */
-public class ApiDocServiceImpl implements ApiDocService {
-
+@Component
+@Singleton
+public final class ApiDocServiceImpl implements ApiDocService {
+    // FIXME: make this configurable
     public static final int DEFAULT_PAGESIZE = 20;
+
     // Query parameter
     private static final String PAGE_NUM = "pageNum";
 
@@ -43,20 +55,29 @@ public class ApiDocServiceImpl implements ApiDocService {
 
     private final MountPointSwagger mountPointSwaggerRFC8040;
     private final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040;
-    private final AllModulesDocGenerator allModulesDocGenerator;
 
-    public ApiDocServiceImpl(final MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
-                             final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040,
-                             final AllModulesDocGenerator allModulesDocGenerator) {
-        mountPointSwaggerRFC8040 =
-                requireNonNull(mountPointSwaggerGeneratorRFC8040).getMountPointSwagger();
+    @Inject
+    @Activate
+    public ApiDocServiceImpl(final @Reference DOMSchemaService schemaService,
+                             final @Reference DOMMountPointService mountPointService) {
+        this(new MountPointSwaggerGeneratorRFC8040(schemaService, mountPointService),
+            new ApiDocGeneratorRFC8040(schemaService));
+    }
+
+    @VisibleForTesting
+    ApiDocServiceImpl(final MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
+                      final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
+        mountPointSwaggerRFC8040 = requireNonNull(mountPointSwaggerGeneratorRFC8040).getMountPointSwagger();
         this.apiDocGeneratorRFC8040 = requireNonNull(apiDocGeneratorRFC8040);
-        this.allModulesDocGenerator = requireNonNull(allModulesDocGenerator);
     }
 
     @Override
     public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
-        return Response.ok(allModulesDocGenerator.getAllModulesDoc(uriInfo, identifyOpenApiVersion(uriInfo))).build();
+        final OAversion oaversion = identifyOpenApiVersion(uriInfo);
+        final DefinitionNames definitionNames = new DefinitionNames();
+        final SwaggerObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames, oaversion);
+
+        return Response.ok(BaseYangSwaggerGenerator.getAppropriateDoc(doc, oaversion)).build();
     }
 
     /**
