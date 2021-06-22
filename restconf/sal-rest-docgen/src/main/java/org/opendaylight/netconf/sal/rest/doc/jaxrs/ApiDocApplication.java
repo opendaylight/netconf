@@ -10,13 +10,20 @@ package org.opendaylight.netconf.sal.rest.doc.jaxrs;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
+@Component(immediate = true, service = ApiDocApplication.class)
 public class ApiDocApplication extends Application {
     private final ApiDocService apiDocService;
 
-    public ApiDocApplication(ApiDocService apiDocService) {
+    @Inject
+    @Activate
+    public ApiDocApplication(final @Reference ApiDocService apiDocService) {
         this.apiDocService = apiDocService;
     }
 
