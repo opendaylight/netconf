@@ -14,7 +14,8 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 
-public class ApiDocApplication extends Application {
+// FIXME: hide this class
+public final class ApiDocApplication extends Application {
     private final ApiDocService apiDocService;
 
     public ApiDocApplication(final ApiDocService apiDocService) {
