@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * MountPoint generator implementation for RFC 8040.
@@ -21,7 +22,7 @@ public class MountPointSwaggerGeneratorRFC8040 extends BaseYangSwaggerGeneratorR
     private final MountPointSwagger mountPointSwagger;
 
     public MountPointSwaggerGeneratorRFC8040(final DOMSchemaService schemaService,
-            final DOMMountPointService mountService) {
+            final @Reference DOMMountPointService mountService) {
         super(Optional.of(schemaService));
         mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
         mountPointSwagger.init();

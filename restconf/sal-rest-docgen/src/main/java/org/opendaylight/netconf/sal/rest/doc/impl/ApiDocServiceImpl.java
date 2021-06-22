@@ -17,6 +17,7 @@ import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
+import org.osgi.service.component.annotations.Reference;
 
 
 /**
@@ -48,11 +49,11 @@ public class ApiDocServiceImpl implements ApiDocService {
     private final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040;
     private final AllModulesDocGenerator allModulesDocGenerator;
 
-    public ApiDocServiceImpl(final MountPointSwaggerGeneratorDraft02 mountPointSwaggerGeneratorDraft02,
-                             final MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
-                             final ApiDocGeneratorDraftO2 apiDocGeneratorDraft02,
-                             final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040,
-                             final AllModulesDocGenerator allModulesDocGenerator) {
+    public ApiDocServiceImpl(final @Reference MountPointSwaggerGeneratorDraft02 mountPointSwaggerGeneratorDraft02,
+                             final @Reference MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
+                             final @Reference ApiDocGeneratorDraftO2 apiDocGeneratorDraft02,
+                             final @Reference ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040,
+                             final @Reference AllModulesDocGenerator allModulesDocGenerator) {
         this.mountPointSwaggerDraft02 =
                 Objects.requireNonNull(mountPointSwaggerGeneratorDraft02).getMountPointSwagger();
         this.mountPointSwaggerRFC8040 =
