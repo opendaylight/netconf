@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.jaxrs;
 
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.web.ResourceDetails;
@@ -16,17 +19,25 @@ import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Initializes the wep app.
  *
  * @author Thomas Pantelis
  */
+@Singleton
+@Component(immediate = true)
 public final class WebInitializer implements AutoCloseable {
     private final Registration registration;
 
-    public WebInitializer(final WebServer webServer, final WebContextSecurer webContextSecurer,
-            final ServletSupport servletSupport, final Application webApp) throws ServletException {
+    @Inject
+    @Activate
+    public WebInitializer(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
+            @Reference final ServletSupport servletSupport, final Application webApp) throws ServletException {
         var webContextBuilder = WebContext.builder()
             .contextPath("apidoc")
             .supportsSessions(true)
@@ -43,6 +54,8 @@ public final class WebInitializer implements AutoCloseable {
     }
 
     @Override
+    @Deactivate
+    @PreDestroy
     public void close() {
         registration.close();
     }
