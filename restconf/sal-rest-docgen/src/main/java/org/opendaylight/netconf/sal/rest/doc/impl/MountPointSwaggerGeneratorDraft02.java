@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * MountPoint generator implementation for bierman draft02.
@@ -22,7 +23,7 @@ public class MountPointSwaggerGeneratorDraft02 extends BaseYangSwaggerGeneratorD
     private final MountPointSwagger mountPointSwagger;
 
     public MountPointSwaggerGeneratorDraft02(final DOMSchemaService schemaService,
-            final DOMMountPointService mountService) {
+            final @Reference DOMMountPointService mountService) {
         super(Optional.of(schemaService));
         mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
         mountPointSwagger.init();
