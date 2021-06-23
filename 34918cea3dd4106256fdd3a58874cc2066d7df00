@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bcdf584a_9b41f6f8",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-06-23T08:37:58Z",
+      "side": 1,
+      "message": "Can we get rid of these FIXMEs?",
+      "revId": "34918cea3dd4106256fdd3a58874cc2066d7df00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
