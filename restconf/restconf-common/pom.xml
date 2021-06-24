@@ -41,25 +41,20 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-model-util</artifactId>
+      <artifactId>yang-model-ri</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-parser-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-test-util</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.opendaylight.mdsal</groupId>
       <artifactId>mdsal-dom-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-test-util</artifactId>
     </dependency>
   </dependencies>
 </project>
