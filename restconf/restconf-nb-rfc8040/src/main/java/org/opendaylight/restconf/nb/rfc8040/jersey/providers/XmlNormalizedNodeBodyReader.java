@@ -81,7 +81,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             throw e;
         } catch (final Exception e) {
             LOG.debug("Error parsing xml input", e);
-
+            RestconfDocumentedException.throwIfYangError(e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
