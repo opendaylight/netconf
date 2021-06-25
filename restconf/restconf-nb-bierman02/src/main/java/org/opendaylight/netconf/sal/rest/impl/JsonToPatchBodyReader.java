@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.rest.impl;
 
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -122,15 +123,14 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     }
 
     private static RuntimeException propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {
-        if (exception instanceof RestconfDocumentedException) {
-            throw (RestconfDocumentedException)exception;
-        }
+        Throwables.throwIfInstanceOf(exception, RestconfDocumentedException.class);
+        LOG.debug("Error parsing json input", exception);
 
         if (exception instanceof ResultAlreadySetException) {
-            LOG.debug("Error parsing json input:", exception);
             throw new RestconfDocumentedException("Error parsing json input: Failed to create new parse result data. ");
         }
 
+        RestconfDocumentedException.throwIfYangError(exception);
         throw new RestconfDocumentedException("Error parsing json input: " + exception.getMessage(), ErrorType.PROTOCOL,
                 ErrorTag.MALFORMED_MESSAGE, exception);
     }

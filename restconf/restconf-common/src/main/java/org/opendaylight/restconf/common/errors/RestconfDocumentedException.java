@@ -21,7 +21,9 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.common.YangError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.codec.YangInvalidValueException;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -227,6 +229,21 @@ public class RestconfDocumentedException extends WebApplicationException {
             throw new RestconfDocumentedException(String.format(format, args), errorType, errorTag);
         }
         return obj;
+    }
+
+    /**
+     * Throw an instance of this exception if the specified exception has a {@link YangError} attachment.
+     *
+     * @param cause Proposed cause of a RestconfDocumented exception
+     */
+    public static void throwIfYangError(final Throwable cause) {
+        if (cause instanceof YangError) {
+            final YangError error = (YangError) cause;
+            throw new RestconfDocumentedException(cause, new RestconfError(ErrorType.valueOf(error.getErrorType()),
+                // FIXME: this is a special-case until we have YangError.getTag()
+                cause instanceof YangInvalidValueException ? ErrorTag.INVALID_VALUE : ErrorTag.MALFORMED_MESSAGE,
+                    error.getErrorMessage().orElse(null), error.getErrorAppTag().orElse(null)));
+        }
     }
 
     private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
