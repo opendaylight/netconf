@@ -13,8 +13,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.google.common.collect.Sets;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
@@ -281,6 +283,16 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
             Assert.assertEquals(RestconfError.ErrorType.PROTOCOL, restconfError.getErrorType());
             Assert.assertEquals(RestconfError.ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
         }
+    }
+
+    @Test
+    public void testRangeViolation() throws Exception {
+        mockBodyReader("netconf786:foo", this.xmlBodyReader, false);
+
+        final InputStream inputStream = new ByteArrayInputStream(
+            "<foo xmlns=\"netconf786\"><bar>100</bar></foo>".getBytes(StandardCharsets.UTF_8));
+
+        assertRangeViolation(() -> xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream));
     }
 
 }

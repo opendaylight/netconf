@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class RestconfError implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfError.class);
     private static final long serialVersionUID = 1L;
 
+    // FIXME: remove this enum in favor of RpcError.ErrorType (or its equivalent)
     public enum ErrorType {
         /**
          * Errors relating to the transport layer.
@@ -57,6 +59,20 @@ public class RestconfError implements Serializable {
                 return ErrorType.valueOf(ErrorType.class, value.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 return APPLICATION;
+            }
+        }
+
+        public static @NonNull ErrorType valueOf(final RpcError.ErrorType errorType) {
+            switch (errorType) {
+                case PROTOCOL:
+                    return PROTOCOL;
+                case RPC:
+                    return RPC;
+                case TRANSPORT:
+                    return TRANSPORT;
+                case APPLICATION:
+                default:
+                    return APPLICATION;
             }
         }
     }
