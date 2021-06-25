@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-binding-generator-impl</artifactId>
+            <artifactId>mdsal-binding-generator</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

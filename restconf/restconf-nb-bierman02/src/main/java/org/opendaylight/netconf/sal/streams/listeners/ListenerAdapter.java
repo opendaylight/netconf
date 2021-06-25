@@ -80,6 +80,11 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     @Override
+    public void onInitialData() {
+        // No-op
+    }
+
+    @Override
     public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
         final Instant now = Instant.now();
         if (!checkStartStop(now, this)) {
