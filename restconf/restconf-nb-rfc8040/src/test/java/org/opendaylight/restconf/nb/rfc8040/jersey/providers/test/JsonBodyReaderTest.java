@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,10 +12,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
@@ -174,6 +175,19 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
                 inputStream);
         checkNormalizedNodeContext(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue, dataII);
+    }
+
+    @Test
+    public void testRangeViolation() throws Exception {
+        mockBodyReader("netconf786:foo", this.jsonBodyReader, false);
+
+        final InputStream inputStream = new ByteArrayInputStream(("{\n"
+            + "  \"netconf786:foo\": {\n"
+            + "    \"bar\": 100\n"
+            + "  }\n"
+            + "}").getBytes(StandardCharsets.UTF_8));
+
+        assertRangeViolation(() -> jsonBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream));
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,

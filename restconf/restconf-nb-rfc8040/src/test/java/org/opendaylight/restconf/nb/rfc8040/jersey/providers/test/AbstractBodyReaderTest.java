@@ -7,24 +7,33 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import org.junit.function.ThrowingRunnable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
@@ -123,4 +132,17 @@ public abstract class AbstractBodyReaderTest {
             .orElse(null);
     }
 
+    protected static void assertRangeViolation(final ThrowingRunnable runnable) {
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class, runnable);
+        assertEquals(Status.BAD_REQUEST, ex.getResponse().getStatusInfo());
+
+        final List<RestconfError> errors = ex.getErrors();
+        assertEquals(1, errors.size());
+
+        final RestconfError error = errors.get(0);
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals("bar error app tag", error.getErrorAppTag());
+        assertEquals("bar error message", error.getErrorMessage());
+    }
 }
