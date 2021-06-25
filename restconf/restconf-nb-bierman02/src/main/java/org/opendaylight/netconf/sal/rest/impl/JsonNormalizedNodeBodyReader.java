@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.impl;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonReader;
 import java.io.IOException;
@@ -164,19 +165,15 @@ public class JsonNormalizedNodeBodyReader
     }
 
     private static void propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {
-        if (exception instanceof RestconfDocumentedException) {
-            throw (RestconfDocumentedException)exception;
-        }
+        Throwables.throwIfInstanceOf(exception, RestconfDocumentedException.class);
+        LOG.debug("Error parsing json input", exception);
 
         if (exception instanceof ResultAlreadySetException) {
-            LOG.debug("Error parsing json input:", exception);
-
             throw new RestconfDocumentedException("Error parsing json input: Failed to create new parse result data. "
                     + "Are you creating multiple resources/subresources in POST request?", exception);
         }
 
-        LOG.debug("Error parsing json input", exception);
-
+        RestconfDocumentedException.throwIfYangError(exception);
         throw new RestconfDocumentedException("Error parsing input: " + exception.getMessage(), ErrorType.PROTOCOL,
                 ErrorTag.MALFORMED_MESSAGE, exception);
     }
