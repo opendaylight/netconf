@@ -30,6 +30,10 @@ import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRSchemaSource;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.RequireServiceComponentRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +44,8 @@ import org.slf4j.LoggerFactory;
  */
 @Beta
 @Singleton
+@Component(immediate = true)
+@RequireServiceComponentRuntime
 public final class DefaultSchemaResourceManager implements SchemaResourceManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSchemaResourceManager.class);
 
@@ -50,8 +56,9 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     private final String defaultSubdirectory;
     private final String rootDirectory;
 
+    @Activate
     @Inject
-    public DefaultSchemaResourceManager(final YangParserFactory parserFactory) {
+    public DefaultSchemaResourceManager(@Reference final YangParserFactory parserFactory) {
         this(parserFactory, "cache", "schema");
     }
 
