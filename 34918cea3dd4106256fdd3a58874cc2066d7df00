@@ -16,6 +16,24 @@
       "revId": "34918cea3dd4106256fdd3a58874cc2066d7df00",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bd4df30c_4f7f547d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-07-02T20:02:56Z",
+      "side": 1,
+      "message": "They are pre-existing, so let\u0027s move this in",
+      "parentUuid": "bcdf584a_9b41f6f8",
+      "revId": "34918cea3dd4106256fdd3a58874cc2066d7df00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
