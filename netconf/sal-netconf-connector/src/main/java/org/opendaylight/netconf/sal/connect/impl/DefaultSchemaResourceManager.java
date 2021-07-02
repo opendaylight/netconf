@@ -68,6 +68,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         this.rootDirectory = requireNonNull(rootDirectory);
         this.defaultSubdirectory = requireNonNull(defaultSubdirectory);
         this.defaultResources = createResources(defaultSubdirectory);
+        LOG.info("Schema Resource Manager instantiated on {}/{}", rootDirectory, defaultSubdirectory);
     }
 
     @Override
