@@ -8,8 +8,8 @@
 package org.opendaylight.restconf.common.util;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
@@ -105,7 +105,7 @@ public class SimpleUriInfo implements UriInfo {
 
     @Override
     public List<String> getMatchedURIs() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override
@@ -115,7 +115,7 @@ public class SimpleUriInfo implements UriInfo {
 
     @Override
     public List<Object> getMatchedResources() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

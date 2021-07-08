@@ -20,8 +20,11 @@ import javax.ws.rs.core.MultivaluedMap;
 /**
  * A hash table based implementation of {@link MultivaluedMap} interface.
  *
+ * @deprecated Use {@link javax.ws.rs.core.MultivaluedHashMap} instead.
  * @author Thomas Pantelis
  */
+@Deprecated(since = "2.0.1", forRemoval = true)
+// FIXME: 3.0.0: remove this class
 public class MultivaluedHashMap<K, V> implements MultivaluedMap<K, V> {
     private final Map<K, List<V>> store = new HashMap<>();
 
