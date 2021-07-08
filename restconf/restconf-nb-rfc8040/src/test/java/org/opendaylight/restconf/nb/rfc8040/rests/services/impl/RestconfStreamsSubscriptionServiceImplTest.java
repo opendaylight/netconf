@@ -40,7 +40,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
@@ -67,7 +66,6 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private Configuration configurationWs;
     private Configuration configurationSse;
 
-    private TransactionChainHandler transactionHandler;
     private SchemaContextHandler schemaHandler;
 
     @Before
@@ -131,7 +129,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 NotificationOutputType.XML);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
-                        this.schemaHandler, this.transactionHandler, configurationSse);
+                        this.schemaHandler, this.configurationSse);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -150,7 +148,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 NotificationOutputType.XML);
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.configurationWs);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -164,7 +162,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     public void testSubscribeToStreamMissingDatastoreInPath() {
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.configurationWs);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
 
@@ -172,7 +170,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     public void testSubscribeToStreamMissingScopeInPath() {
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBroker, this.notificationService,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.configurationWs);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 this.uriInfo);
     }
