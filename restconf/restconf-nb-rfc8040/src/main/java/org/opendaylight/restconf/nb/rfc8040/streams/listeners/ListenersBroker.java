@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
@@ -32,9 +31,14 @@ import org.slf4j.LoggerFactory;
  * This singleton class is responsible for creation, removal and searching for {@link ListenerAdapter} or
  * {@link NotificationListenerAdapter} listeners.
  */
+// FIXME: this should be a component
 public final class ListenersBroker {
+    private static final class Holder {
+        // FIXME: remove this global singleton
+        static final ListenersBroker INSTANCE = new ListenersBroker();
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
-    private static ListenersBroker listenersBroker;
 
     private final StampedLock dataChangeListenersLock = new StampedLock();
     private final StampedLock notificationListenersLock = new StampedLock();
@@ -42,6 +46,7 @@ public final class ListenersBroker {
     private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
 
     private ListenersBroker() {
+
     }
 
     /**
@@ -49,12 +54,8 @@ public final class ListenersBroker {
      *
      * @return Reusable instance of {@link ListenersBroker}.
      */
-    // FIXME: remove this global singleton
-    public static synchronized ListenersBroker getInstance() {
-        if (listenersBroker == null) {
-            listenersBroker = new ListenersBroker();
-        }
-        return listenersBroker;
+    public static ListenersBroker getInstance() {
+        return Holder.INSTANCE;
     }
 
     /**
@@ -91,8 +92,7 @@ public final class ListenersBroker {
     public Optional<ListenerAdapter> getDataChangeListenerFor(final String streamName) {
         final long stamp = dataChangeListenersLock.readLock();
         try {
-            final ListenerAdapter listenerAdapter = dataChangeListeners.get(requireNonNull(streamName));
-            return Optional.ofNullable(listenerAdapter);
+            return Optional.ofNullable(dataChangeListeners.get(requireNonNull(streamName)));
         } finally {
             dataChangeListenersLock.unlockRead(stamp);
         }
@@ -108,8 +108,7 @@ public final class ListenersBroker {
     public Optional<NotificationListenerAdapter> getNotificationListenerFor(final String streamName) {
         final long stamp = notificationListenersLock.readLock();
         try {
-            final NotificationListenerAdapter listenerAdapter = notificationListeners.get(requireNonNull(streamName));
-            return Optional.ofNullable(listenerAdapter);
+            return Optional.ofNullable(notificationListeners.get(requireNonNull(streamName)));
         } finally {
             notificationListenersLock.unlockRead(stamp);
         }
@@ -149,8 +148,8 @@ public final class ListenersBroker {
 
         final long stamp = dataChangeListenersLock.writeLock();
         try {
-            return dataChangeListeners.computeIfAbsent(streamName, stream -> new ListenerAdapter(
-                    path, stream, outputType));
+            return dataChangeListeners.computeIfAbsent(streamName,
+                stream -> new ListenerAdapter(path, stream, outputType));
         } finally {
             dataChangeListenersLock.unlockWrite(stamp);
         }
@@ -173,8 +172,8 @@ public final class ListenersBroker {
 
         final long stamp = notificationListenersLock.writeLock();
         try {
-            return notificationListeners.computeIfAbsent(streamName, stream -> new NotificationListenerAdapter(
-                    schemaPath, stream, outputType.getName()));
+            return notificationListeners.computeIfAbsent(streamName,
+                stream -> new NotificationListenerAdapter(schemaPath, stream, outputType.getName()));
         } finally {
             notificationListenersLock.unlockWrite(stamp);
         }
