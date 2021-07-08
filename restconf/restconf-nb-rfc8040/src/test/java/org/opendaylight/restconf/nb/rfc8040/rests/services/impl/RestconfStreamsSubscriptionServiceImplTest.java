@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.io.FileNotFoundException;
@@ -19,12 +18,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.AfterClass;
@@ -33,12 +28,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -78,15 +71,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private TransactionChainHandler transactionHandler;
     private SchemaContextHandler schemaHandler;
 
-    @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws FileNotFoundException, URISyntaxException {
         final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final DOMDataTreeReadWriteTransaction rwTx = mock(DOMDataTreeReadWriteTransaction.class);
-        doReturn(CommitInfo.emptyFluentFuture()).when(rwTx).commit();
-        when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
+        doReturn(wTx).when(domTx).newWriteOnlyTransaction();
+        doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
         doReturn(domTx).when(dataBroker).createTransactionChain(any());
@@ -101,16 +91,11 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, dataTreeChangeService))
                 .when(dataBroker).getExtensions();
 
-        final MultivaluedMap<String, String> map = mock(MultivaluedMap.class);
-        final Set<Entry<String, List<String>>> set = new HashSet<>();
-        when(map.entrySet()).thenReturn(set);
-        when(this.uriInfo.getQueryParameters()).thenReturn(map);
-        final UriBuilder baseUriBuilder = new LocalUriInfo().getBaseUriBuilder();
-        when(uriInfo.getBaseUriBuilder()).thenReturn(baseUriBuilder);
-        final URI uri = new URI("http://127.0.0.1/" + URI);
-        when(uriInfo.getAbsolutePath()).thenReturn(uri);
-        this.schemaHandler.onModelContextUpdated(
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
+        doReturn(new LocalUriInfo().getBaseUriBuilder()).when(uriInfo).getBaseUriBuilder();
+        doReturn(new URI("http://127.0.0.1/" + URI)).when(uriInfo).getAbsolutePath();
+        schemaHandler.onModelContextUpdated(
+            YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
         configurationWs = new Configuration(0, 100, 10, false);
         configurationSse = new Configuration(0, 100, 10, true);
     }
@@ -131,8 +116,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final Map<String, ListenerAdapter> listenersByStreamNameSetter = new HashMap<>();
         final ListenerAdapter adapter = mock(ListenerAdapter.class);
         final YangInstanceIdentifier yiid = mock(YangInstanceIdentifier.class);
-        Mockito.when(adapter.getPath()).thenReturn(yiid);
-        Mockito.when(adapter.getOutputType()).thenReturn("JSON");
+        doReturn(yiid).when(adapter).getPath();
+        doReturn("JSON").when(adapter).getOutputType();
         listenersByStreamNameSetter.put(
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 adapter);
