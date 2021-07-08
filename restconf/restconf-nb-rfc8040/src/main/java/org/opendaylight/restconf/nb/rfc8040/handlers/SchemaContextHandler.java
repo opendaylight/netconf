@@ -19,9 +19,9 @@ import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
@@ -49,22 +49,17 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
 
     private final AtomicInteger moduleSetId = new AtomicInteger(0);
 
-    private final TransactionChainHandler transactionChainHandler;
+    private final DOMDataBroker domDataBroker;
     private final DOMSchemaService domSchemaService;
     private ListenerRegistration<?> listenerRegistration;
 
     private volatile EffectiveModelContext schemaContext;
 
-    /**
-     * Constructor.
-     *
-     * @param transactionChainHandler Transaction chain handler
-     */
     @Inject
-    public SchemaContextHandler(final TransactionChainHandler transactionChainHandler,
-            final @Reference DOMSchemaService domSchemaService) {
-        this.transactionChainHandler = transactionChainHandler;
-        this.domSchemaService = domSchemaService;
+    public SchemaContextHandler(@Reference final DOMDataBroker domDataBroker,
+            @Reference final DOMSchemaService domSchemaService) {
+        this.domDataBroker = requireNonNull(domDataBroker);
+        this.domSchemaService = requireNonNull(domSchemaService);
     }
 
     @PostConstruct
@@ -100,8 +95,7 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
     }
 
     private void putData(final ContainerNode normNode) {
-        final DOMTransactionChain transactionChain = this.transactionChainHandler.get();
-        final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
+        final DOMDataTreeWriteTransaction wTx = domDataBroker.newWriteOnlyTransaction();
         wTx.put(LogicalDatastoreType.OPERATIONAL,
                 YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getIdentifier().getNodeType())), normNode);
         try {
@@ -123,8 +117,6 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
             } else {
                 throw new RestconfDocumentedException("Problem occurred while putting data to DS.", failure);
             }
-        } finally {
-            transactionChain.close();
         }
     }
 }
