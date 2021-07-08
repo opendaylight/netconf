@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
 import org.junit.AfterClass;
@@ -23,9 +22,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -61,14 +60,12 @@ public class SchemaContextHandlerTest {
 
     @Before
     public void setup() throws Exception {
-        final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
-        when(txHandler.get()).thenReturn(domTx);
+        final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
-        this.schemaContextHandler = new SchemaContextHandler(txHandler, mockDOMSchemaService);
+        this.schemaContextHandler = new SchemaContextHandler(dataBroker, mockDOMSchemaService);
 
         this.schemaContextHandler.onModelContextUpdated(SchemaContextHandlerTest.SCHEMA_CONTEXT);
     }
