@@ -11,7 +11,6 @@ import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsPara
 import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsPaths;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
@@ -84,9 +83,14 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  * </ul>
  */
 public final class ReadDataTransactionUtil {
-    private static final String READ_TYPE_TX = "READ";
+    private static final Set<String> ALLOWED_PARAMETERS = Set.of(
+        RestconfDataServiceConstant.ReadData.CONTENT,
+        RestconfDataServiceConstant.ReadData.DEPTH,
+        RestconfDataServiceConstant.ReadData.FIELDS,
+        RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
     private static final List<String> DEFAULT_CONTENT = List.of(RestconfDataServiceConstant.ReadData.ALL);
     private static final List<String> DEFAULT_DEPTH = List.of(RestconfDataServiceConstant.ReadData.UNBOUNDED);
+    private static final String READ_TYPE_TX = "READ";
 
     private ReadDataTransactionUtil() {
         // Hidden on purpose
@@ -108,10 +112,7 @@ public final class ReadDataTransactionUtil {
 
         // check only allowed parameters
         final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        checkParametersTypes(queryParams.keySet(),
-                RestconfDataServiceConstant.ReadData.CONTENT,
-                RestconfDataServiceConstant.ReadData.DEPTH,
-                RestconfDataServiceConstant.ReadData.FIELDS, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
+        checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);
 
         // read parameters from URI or set default values
         final List<String> content = queryParams.getOrDefault(
@@ -285,16 +286,14 @@ public final class ReadDataTransactionUtil {
      */
     @VisibleForTesting
     static void checkParametersTypes(final @NonNull Set<String> usedParameters,
-                                     final @NonNull String... allowedParameters) {
-        // FIXME: there should be a speedier way to do this
-        final Set<String> notAllowedParameters = Sets.newHashSet(usedParameters);
-        notAllowedParameters.removeAll(Sets.newHashSet(allowedParameters));
-
-        if (!notAllowedParameters.isEmpty()) {
+                                     final @NonNull Set<String> allowedParameters) {
+        if (!allowedParameters.containsAll(usedParameters)) {
+            final Set<String> notAllowedParameters = usedParameters.stream()
+                .filter(param -> !allowedParameters.contains(param))
+                .collect(Collectors.toSet());
             throw new RestconfDocumentedException(
-                    "Not allowed parameters for " + READ_TYPE_TX + " operation: " + notAllowedParameters,
-                    RestconfError.ErrorType.PROTOCOL,
-                    RestconfError.ErrorTag.INVALID_VALUE);
+                "Not allowed parameters for " + READ_TYPE_TX + " operation: " + notAllowedParameters,
+                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE);
         }
     }
 

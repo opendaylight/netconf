@@ -50,6 +50,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConst
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -65,8 +66,8 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 public class ReadDataTransactionUtilTest {
 
     private static final TestData DATA = new TestData();
-    private static final YangInstanceIdentifier.NodeIdentifier NODE_IDENTIFIER = new YangInstanceIdentifier
-            .NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
+    private static final NodeIdentifier NODE_IDENTIFIER =
+        new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
 
     private RestconfStrategy mdsalStrategy;
     private RestconfStrategy netconfStrategy;
@@ -212,7 +213,7 @@ public class ReadDataTransactionUtilTest {
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final MapNode checkingData = Builders
                 .mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
                 .withChild(DATA.checkData)
                 .build();
         NormalizedNode normalizedNode = readData(valueOfContent, DATA.path3, mdsalStrategy);
@@ -232,7 +233,8 @@ public class ReadDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode2))).when(this.netconfService)
                 .getConfig(DATA.path3);
         final MapNode expectedData = Builders.orderedMapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(DATA.listQname)).withChild(DATA.checkData)
+                .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
+                .withChild(DATA.checkData)
                 .build();
         NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.path3,
                 mdsalStrategy);
@@ -252,9 +254,9 @@ public class ReadDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode2))).when(this.netconfService)
                 .getConfig(DATA.path3);
         final UnkeyedListNode expectedData = Builders.unkeyedListBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(DATA.listQname))
-                .withChild(Builders.unkeyedListEntryBuilder().withNodeIdentifier(
-                        new YangInstanceIdentifier.NodeIdentifier(DATA.listQname))
+                .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
+                .withChild(Builders.unkeyedListEntryBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
                         .withChild(DATA.unkeyedListEntryNode1.body().iterator().next())
                         .withChild(DATA.unkeyedListEntryNode2.body().iterator().next()).build()).build();
         NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.path3, mdsalStrategy);
@@ -274,10 +276,13 @@ public class ReadDataTransactionUtilTest {
                 .get(DATA.leafSetNodePath);
         doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode2))).when(this.netconfService)
                 .getConfig(DATA.leafSetNodePath);
-        final LeafSetNode<String> expectedData = Builders.<String>leafSetBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(DATA.leafListQname)).withValue(
-                        ImmutableList.<LeafSetEntryNode<String>>builder().addAll(DATA.leafSetNode1.body())
-                        .addAll(DATA.leafSetNode2.body()).build()).build();
+        final LeafSetNode<String> expectedData = Builders.<String>leafSetBuilder()
+                .withNodeIdentifier(new NodeIdentifier(DATA.leafListQname))
+                .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
+                        .addAll(DATA.leafSetNode1.body())
+                        .addAll(DATA.leafSetNode2.body())
+                        .build())
+                .build();
         NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.leafSetNodePath,
                 mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
@@ -296,10 +301,13 @@ public class ReadDataTransactionUtilTest {
                 .get(DATA.leafSetNodePath);
         doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode2))).when(this.netconfService)
                 .getConfig(DATA.leafSetNodePath);
-        final LeafSetNode<String> expectedData = Builders.<String>orderedLeafSetBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(DATA.leafListQname)).withValue(
-                        ImmutableList.<LeafSetEntryNode<String>>builder().addAll(DATA.orderedLeafSetNode1.body())
-                        .addAll(DATA.orderedLeafSetNode2.body()).build()).build();
+        final LeafSetNode<String> expectedData = Builders.<String>orderedLeafSetBuilder()
+                .withNodeIdentifier(new NodeIdentifier(DATA.leafListQname))
+                .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
+                        .addAll(DATA.orderedLeafSetNode1.body())
+                        .addAll(DATA.orderedLeafSetNode2.body())
+                        .build())
+                .build();
         NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.leafSetNodePath,
                 mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
@@ -573,9 +581,13 @@ public class ReadDataTransactionUtilTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ReadDataTransactionUtil.checkParameterCount(List.of("config", "nonconfig", "all"),
                     RestconfDataServiceConstant.ReadData.CONTENT));
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
-        assertEquals("Error status code is not correct", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
+        final List<RestconfError> errors = ex.getErrors();
+        assertEquals(1, errors.size());
+
+        final RestconfError error = errors.get(0);
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals("Error status code is not correct", 400, error.getErrorTag().getStatusCode());
     }
 
 
@@ -585,7 +597,7 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void checkParametersTypesTest() {
         ReadDataTransactionUtil.checkParametersTypes(Set.of("content"),
-                RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH);
+            Set.of(RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH));
     }
 
     /**
@@ -595,10 +607,14 @@ public class ReadDataTransactionUtilTest {
     public void checkParametersTypesNegativeTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ReadDataTransactionUtil.checkParametersTypes(Set.of("not-allowed-parameter"),
-                    RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH));
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
-        assertEquals("Error status code is not correct", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
+                Set.of(RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH)));
+        final List<RestconfError> errors = ex.getErrors();
+        assertEquals(1, errors.size());
+
+        final RestconfError error = errors.get(0);
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals("Error status code is not correct", 400, error.getErrorTag().getStatusCode());
     }
 
     /**
