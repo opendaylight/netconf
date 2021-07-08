@@ -128,7 +128,7 @@ public final class ReadDataTransactionUtil {
         checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
         checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
         checkParameterCount(fields, RestconfDataServiceConstant.ReadData.FIELDS);
-        checkParameterCount(fields, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
+        checkParameterCount(withDefaults, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
 
         // check and set content
         final String contentValue = content.get(0);
