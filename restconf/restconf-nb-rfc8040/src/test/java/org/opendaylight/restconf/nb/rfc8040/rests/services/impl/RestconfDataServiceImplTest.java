@@ -60,7 +60,6 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -192,15 +191,13 @@ public class RestconfDataServiceImplTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(this.write).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
 
-        doReturn(this.write).when(domTransactionChain).newWriteOnlyTransaction();
-
         DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
         doReturn(this.read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(this.readWrite).when(mockDataBroker).newReadWriteTransaction();
-        doReturn(domTransactionChain).when(mockDataBroker).createTransactionChain(any());
+        doReturn(this.write).when(mockDataBroker).newWriteOnlyTransaction();
 
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
-                new TransactionChainHandler(mockDataBroker), mock(DOMSchemaService.class));
+                mockDataBroker, mock(DOMSchemaService.class));
 
         schemaContextHandler.onModelContextUpdated(this.contextRef);
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, mockDataBroker, mountPointService,

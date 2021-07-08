@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.slf4j.Logger;
@@ -37,12 +38,12 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public final synchronized void close() throws Exception {
+    public final synchronized void close() throws InterruptedException, ExecutionException {
         if (this.registration != null) {
             this.registration.close();
             this.registration = null;
         }
-        deleteDataInDS();
+        deleteDataInDS().get();
         this.subscribers.clear();
     }
 
