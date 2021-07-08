@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +16,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +36,9 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -56,6 +54,12 @@ import org.slf4j.LoggerFactory;
 @Path("/")
 public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSubscriptionService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
+    private static final QName LOCATION_QNAME =
+        QName.create("subscribe:to:notification", "2016-10-28", "location").intern();
+    private static final NodeIdentifier LOCATION_NODEID = NodeIdentifier.create(LOCATION_QNAME);
+    private static final QName NOTIFI_QNAME = QName.create(LOCATION_QNAME, "notifi").intern();
+    private static final YangInstanceIdentifier LOCATION_PATH =
+        YangInstanceIdentifier.create(NodeIdentifier.create(NOTIFI_QNAME), LOCATION_NODEID);
 
     private final SubscribeToStreamUtil streamUtils;
     private final HandlersHolder handlersHolder;
@@ -87,28 +91,25 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         final URI response;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = streamUtils.subscribeToDataStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+            response = streamUtils.subscribeToDataStream(identifier, uriInfo, notificationQueryParams, handlersHolder);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            response = streamUtils.subscribeToYangStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+            response = streamUtils.subscribeToYangStream(identifier, uriInfo, notificationQueryParams, handlersHolder);
         } else {
             final String msg = "Bad type of notification of sal-remote";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg);
         }
 
-        // prepare node with value of location
-        final InstanceIdentifierContext<?> iid = prepareIIDSubsStreamOutput(this.handlersHolder.getSchemaHandler());
-        final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
-                ImmutableLeafNodeBuilder.create().withValue(response.toString());
-        builder.withNodeIdentifier(NodeIdentifier.create(RestconfStreamsConstants.LOCATION_QNAME));
-
         // prepare new header with location
         final Map<String, Object> headers = new HashMap<>();
         headers.put("Location", response);
 
-        return new NormalizedNodeContext(iid, builder.build(), headers);
+        // prepare node with value of location
+        return new NormalizedNodeContext(prepareIIDSubsStreamOutput(handlersHolder.getSchemaHandler()),
+            ImmutableLeafNodeBuilder.create()
+                .withNodeIdentifier(LOCATION_NODEID)
+                .withValue(response.toString())
+                .build(), headers);
     }
 
     /**
@@ -118,21 +119,14 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @return InstanceIdentifier of Location leaf.
      */
     private static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
-        final Optional<Module> module = schemaHandler.get()
-                .findModule(RestconfStreamsConstants.NOTIFI_QNAME.getModule());
-        Preconditions.checkState(module.isPresent());
-        final Optional<DataSchemaNode> notify = module.get()
-                .findDataChildByName(RestconfStreamsConstants.NOTIFI_QNAME);
-        Preconditions.checkState(notify.isPresent());
-        final Optional<DataSchemaNode> location = ((ContainerSchemaNode) notify.get())
-                .findDataChildByName(RestconfStreamsConstants.LOCATION_QNAME);
-        Preconditions.checkState(location.isPresent());
+        final Optional<Module> module = schemaHandler.get().findModule(NOTIFI_QNAME.getModule());
+        checkState(module.isPresent());
+        final DataSchemaNode notify = module.get().dataChildByName(NOTIFI_QNAME);
+        checkState(notify instanceof ContainerSchemaNode, "Unexpected non-container %s", notify);
+        final DataSchemaNode location = ((ContainerSchemaNode) notify).dataChildByName(LOCATION_QNAME);
+        checkState(location != null, "Missing location");
 
-        final List<PathArgument> path = new ArrayList<>();
-        path.add(NodeIdentifier.create(RestconfStreamsConstants.NOTIFI_QNAME));
-        path.add(NodeIdentifier.create(RestconfStreamsConstants.LOCATION_QNAME));
-        return new InstanceIdentifierContext<SchemaNode>(YangInstanceIdentifier.create(path), location.get(),
-                null, schemaHandler.get());
+        return new InstanceIdentifierContext<SchemaNode>(LOCATION_PATH, location, null, schemaHandler.get());
     }
 
     /**

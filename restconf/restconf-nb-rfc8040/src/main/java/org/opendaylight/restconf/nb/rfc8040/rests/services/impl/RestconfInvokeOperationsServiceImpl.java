@@ -40,6 +40,9 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  */
 @Path("/")
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
+    private static final XMLNamespace SAL_REMOTE_NAMESPACE =
+        XMLNamespace.of("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote");
+
     private final DOMRpcService rpcService;
     private final SchemaContextHandler schemaContextHandler;
 
@@ -60,7 +63,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final DOMRpcResult response;
         final EffectiveModelContext schemaContextRef;
         if (mountPoint == null) {
-            if (namespace.equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE.getNamespace())) {
+            if (SAL_REMOTE_NAMESPACE.equals(namespace)) {
                 if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCRIPTION)) {
                     response = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx);
                 } else {
