@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import static java.time.Instant.EPOCH;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.IOException;
@@ -26,7 +27,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
@@ -44,6 +44,7 @@ import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.p
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -83,7 +84,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             "/listener-adapter-test/notif-without-data-delete.xml";
 
     private static final YangInstanceIdentifier PATCH_CONT_YIID =
-            YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(PatchCont.QNAME));
+            YangInstanceIdentifier.create(new NodeIdentifier(PatchCont.QNAME));
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
@@ -109,7 +110,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         domDataBroker = getDomBroker();
 
         transactionChainHandler = new TransactionChainHandler(domDataBroker);
-        schemaContextHandler = new SchemaContextHandler(transactionChainHandler, Mockito.mock(DOMSchemaService.class));
+        schemaContextHandler = new SchemaContextHandler(domDataBroker, mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(SCHEMA_CONTEXT);
     }
 

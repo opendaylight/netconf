@@ -25,16 +25,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -57,13 +56,11 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void setup() throws Exception {
         final EffectiveModelContext contextRef =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
-        final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
-        when(txHandler.get()).thenReturn(domTx);
+        final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        when(dataBroker.newWriteOnlyTransaction()).thenReturn(wTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler,
+        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(dataBroker,
             mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(contextRef);
         this.invokeOperationsService =
