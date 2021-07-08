@@ -132,17 +132,19 @@ public final class ReadDataTransactionUtil {
 
         // check and set content
         final String contentValue = content.get(0);
-        if (!contentValue.equals(RestconfDataServiceConstant.ReadData.ALL)) {
-            if (!contentValue.equals(RestconfDataServiceConstant.ReadData.CONFIG)
-                    && !contentValue.equals(RestconfDataServiceConstant.ReadData.NONCONFIG)) {
+        switch (contentValue) {
+            case RestconfDataServiceConstant.ReadData.ALL:
+            case RestconfDataServiceConstant.ReadData.CONFIG:
+            case RestconfDataServiceConstant.ReadData.NONCONFIG:
+                // FIXME: we really want to have a proper enumeration for this field
+                builder.setContent(contentValue);
+                break;
+            default:
                 throw new RestconfDocumentedException(
-                        new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
-                                "Invalid content parameter: " + contentValue, null,
-                                "The content parameter value must be either config, nonconfig or all (default)"));
-            }
+                    new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                        "Invalid content parameter: " + contentValue, null,
+                        "The content parameter value must be either config, nonconfig or all (default)"));
         }
-
-        builder.setContent(content.get(0));
 
         // check and set depth
         if (!depth.get(0).equals(RestconfDataServiceConstant.ReadData.UNBOUNDED)) {
