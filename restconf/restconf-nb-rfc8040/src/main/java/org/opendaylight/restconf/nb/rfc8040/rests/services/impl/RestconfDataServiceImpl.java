@@ -144,6 +144,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             node = readData(identifier, parameters.getContent(), instanceIdentifier.getInstanceIdentifier(), strategy,
                     parameters.getWithDefault(), schemaContextRef, uriInfo);
         }
+        // FIXME: this is utter craziness, refactor it properly!
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.body();

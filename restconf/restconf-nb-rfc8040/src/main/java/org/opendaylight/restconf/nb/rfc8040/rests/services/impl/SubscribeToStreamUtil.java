@@ -8,8 +8,8 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
-import com.google.common.base.Strings;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,11 +30,9 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.NotificationQueryParams;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.ResolveEnumUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
@@ -128,7 +126,7 @@ abstract class SubscribeToStreamUtil {
     final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        if (Strings.isNullOrEmpty(streamName)) {
+        if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
@@ -174,20 +172,17 @@ abstract class SubscribeToStreamUtil {
     final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
-        final LogicalDatastoreType datastoreType = parseURIEnum(
-                LogicalDatastoreType.class,
-                mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME));
-        if (datastoreType == null) {
-            final String message = "Stream name doesn't contain datastore value (pattern /datastore=)";
+
+        final String datastoreParam = mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME);
+        if (isNullOrEmpty(datastoreParam)) {
+            final String message = "Stream name does not contain datastore value (pattern /datastore=)";
             LOG.debug(message);
             throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
 
-        final DataChangeScope scope = parseURIEnum(
-                DataChangeScope.class,
-                mapOfValues.get(RestconfStreamsConstants.SCOPE_PARAM_NAME));
-        if (scope == null) {
-            final String message = "Stream name doesn't contains datastore value (pattern /scope=)";
+        // FIXME: this is kept only for compatibility, we are not using this parameter
+        if (isNullOrEmpty(mapOfValues.get(RestconfStreamsConstants.SCOPE_PARAM_NAME))) {
+            final String message = "Stream name does not contain scope value (pattern /scope=)";
             LOG.warn(message);
             throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
@@ -202,6 +197,8 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
         listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+
+        final LogicalDatastoreType datastoreType = LogicalDatastoreType.valueOf(datastoreParam);
         registration(datastoreType, listener.get(), handlersHolder.getDataBroker());
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
@@ -287,19 +284,5 @@ abstract class SubscribeToStreamUtil {
         final ListenerRegistration<DOMNotificationListener> registration =
                 notificationService.registerNotificationListener(listener, path);
         listener.setRegistration(registration);
-    }
-
-    /**
-     * Parse out enumeration from URI.
-     *
-     * @param clazz Target enumeration type.
-     * @param value String representation of enumeration value.
-     * @return Parsed enumeration type.
-     */
-    private static <T> T parseURIEnum(final Class<T> clazz, final String value) {
-        if (value == null || value.equals("")) {
-            return null;
-        }
-        return ResolveEnumUtil.resolveEnum(clazz, value);
     }
 }
