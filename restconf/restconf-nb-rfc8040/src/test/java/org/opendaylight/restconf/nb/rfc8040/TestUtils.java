@@ -37,7 +37,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.mockito.Mockito;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -277,7 +276,7 @@ public final class TestUtils {
 
         doReturn(mockChain).when(mockDataBroker).createTransactionChain(any());
         SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
-                new TransactionChainHandler(mockDataBroker), Mockito.mock(DOMSchemaService.class));
+                new TransactionChainHandler(mockDataBroker), mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(schemaContext);
         return schemaContextHandler;
     }

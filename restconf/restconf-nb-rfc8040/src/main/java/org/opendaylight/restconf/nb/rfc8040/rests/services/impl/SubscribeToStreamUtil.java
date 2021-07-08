@@ -20,11 +20,10 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -134,10 +133,7 @@ abstract class SubscribeToStreamUtil {
                 String.format("Stream with name %s was not found.", streamName),
                 ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT));
 
-        final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
-        final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
-
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         registerToListenNotification(notificationListenerAdapter, handlersHolder.getNotificationServiceHandler());
         notificationListenerAdapter.setQueryParams(
@@ -151,9 +147,10 @@ abstract class SubscribeToStreamUtil {
                     notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
                     notificationListenerAdapter.getOutputType(), uri);
+
+        final DOMDataTreeWriteTransaction writeTransaction = handlersHolder.getDataBroker().newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
-        transactionChain.close();
         return uri;
     }
 
@@ -199,20 +196,19 @@ abstract class SubscribeToStreamUtil {
         listener.setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
 
         final LogicalDatastoreType datastoreType = LogicalDatastoreType.valueOf(datastoreParam);
-        registration(datastoreType, listener, handlersHolder.getDataBroker());
+        final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
+        registration(datastoreType, listener, dataBroker);
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
-        final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
         final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.getPath(),
                 notificationQueryParams.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
+        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
-        transactionChain.close();
         return uri;
     }
 
@@ -223,7 +219,7 @@ abstract class SubscribeToStreamUtil {
             mapToStreams);
     }
 
-    private static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
+    private static void submitData(final DOMDataTreeWriteTransaction readWriteTransaction) {
         try {
             readWriteTransaction.commit().get();
         } catch (final InterruptedException | ExecutionException e) {
