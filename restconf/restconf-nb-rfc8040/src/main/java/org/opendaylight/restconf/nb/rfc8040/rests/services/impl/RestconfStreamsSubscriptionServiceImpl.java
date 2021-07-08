@@ -26,12 +26,10 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
@@ -71,16 +69,13 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @param notificationService {@link DOMNotificationService}
      * @param schemaHandler
      *             handler of {@link SchemaContext}
-     * @param transactionChainHandler
-     *             handler of {@link DOMTransactionChain}
      * @param configuration
      *             configuration for restconf {@link Configuration}}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
             final DOMNotificationService notificationService, final SchemaContextHandler schemaHandler,
-            final TransactionChainHandler transactionChainHandler, final Configuration configuration) {
-        this.handlersHolder = new HandlersHolder(dataBroker, notificationService,
-                transactionChainHandler, schemaHandler);
+            final Configuration configuration) {
+        this.handlersHolder = new HandlersHolder(dataBroker, notificationService, schemaHandler);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
     }
@@ -136,14 +131,12 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     public static final class HandlersHolder {
         private final DOMDataBroker dataBroker;
         private final DOMNotificationService notificationService;
-        private final TransactionChainHandler transactionChainHandler;
         private final SchemaContextHandler schemaHandler;
 
         private HandlersHolder(final DOMDataBroker dataBroker, final DOMNotificationService notificationService,
-                final TransactionChainHandler transactionChainHandler, final SchemaContextHandler schemaHandler) {
+                final SchemaContextHandler schemaHandler) {
             this.dataBroker = dataBroker;
             this.notificationService = notificationService;
-            this.transactionChainHandler = transactionChainHandler;
             this.schemaHandler = schemaHandler;
         }
 
@@ -163,15 +156,6 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          */
         public DOMNotificationService getNotificationServiceHandler() {
             return this.notificationService;
-        }
-
-        /**
-         * Get {@link TransactionChainHandler}.
-         *
-         * @return the transactionChainHandler
-         */
-        public TransactionChainHandler getTransactionChainHandler() {
-            return this.transactionChainHandler;
         }
 
         /**

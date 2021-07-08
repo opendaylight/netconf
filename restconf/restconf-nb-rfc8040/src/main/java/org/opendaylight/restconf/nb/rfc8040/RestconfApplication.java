@@ -19,7 +19,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
@@ -33,8 +32,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 public class RestconfApplication extends AbstractRestconfApplication {
     private RestconfApplication(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointService mountPointService, final RestconfStreamsSubscriptionService streamSubscription,
-            final TransactionChainHandler transactionChainHandler, final DOMDataBroker dataBroker,
-            final DOMRpcService rpcService, final DOMActionService actionService,
+            final DOMDataBroker dataBroker, final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
             final Configuration configuration) {
         super(schemaContextHandler, mountPointService, List.of(
@@ -51,15 +49,13 @@ public class RestconfApplication extends AbstractRestconfApplication {
 
     @Inject
     public RestconfApplication(final SchemaContextHandler schemaContextHandler,
-            @Reference final DOMMountPointService mountPointService,
-            final TransactionChainHandler transactionChainHandler, @Reference final DOMDataBroker dataBroker,
+            @Reference final DOMMountPointService mountPointService, @Reference final DOMDataBroker dataBroker,
             @Reference final DOMRpcService rpcService, @Reference final DOMActionService actionService,
             @Reference final DOMNotificationService notificationService,
             @Reference final DOMSchemaService domSchemaService, final Configuration configuration) {
         this(schemaContextHandler, mountPointService,
             new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, schemaContextHandler,
-                transactionChainHandler, configuration),
-            transactionChainHandler, dataBroker, rpcService, actionService, notificationService, domSchemaService,
-            configuration);
+                configuration),
+            dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration);
     }
 }
