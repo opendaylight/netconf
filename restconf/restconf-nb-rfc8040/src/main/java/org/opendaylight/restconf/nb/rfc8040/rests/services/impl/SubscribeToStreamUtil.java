@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Strings;
 import java.net.URI;
 import java.util.HashMap;
@@ -198,7 +199,7 @@ abstract class SubscribeToStreamUtil {
 
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         final Optional<ListenerAdapter> listener = ListenersBroker.getInstance().getDataChangeListenerFor(streamName);
-        Preconditions.checkArgument(listener.isPresent(), "Listener doesn't exist : " + streamName);
+        checkArgument(listener.isPresent(), "Listener does not exist : %s", streamName);
 
         listener.get().setQueryParams(
                 notificationQueryParams.getStart(),
