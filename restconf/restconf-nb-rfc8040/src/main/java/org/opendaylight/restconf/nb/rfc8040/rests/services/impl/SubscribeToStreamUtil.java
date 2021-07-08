@@ -7,13 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -188,28 +186,30 @@ abstract class SubscribeToStreamUtil {
         }
 
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final Optional<ListenerAdapter> listener = ListenersBroker.getInstance().getDataChangeListenerFor(streamName);
-        checkArgument(listener.isPresent(), "Listener does not exist : %s", streamName);
 
-        listener.get().setQueryParams(
+        final ListenerAdapter listener = ListenersBroker.getInstance()
+            .getDataChangeListenerFor(streamName)
+            .orElseThrow(() -> new IllegalArgumentException("Listener does not exist : " + streamName));
+
+        listener.setQueryParams(
                 notificationQueryParams.getStart(),
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
-        listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+        listener.setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
 
         final LogicalDatastoreType datastoreType = LogicalDatastoreType.valueOf(datastoreParam);
-        registration(datastoreType, listener.get(), handlersHolder.getDataBroker());
+        registration(datastoreType, listener, handlersHolder.getDataBroker());
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
-        final String serializedPath = IdentifierCodec.serialize(listener.get().getPath(), schemaContext);
+        final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
         final MapEntryNode mapToStreams =
-            RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
-                notificationQueryParams.getStart(), listener.get().getOutputType(), uri, schemaContext, serializedPath);
+            RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.getPath(),
+                notificationQueryParams.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
