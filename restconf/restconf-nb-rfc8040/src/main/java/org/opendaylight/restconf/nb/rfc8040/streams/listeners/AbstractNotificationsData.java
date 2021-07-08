@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutionException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -25,11 +27,10 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -51,7 +52,7 @@ abstract class AbstractNotificationsData {
     private static final TransformerFactory TF = TransformerFactory.newInstance();
     private static final XMLOutputFactory OF = XMLOutputFactory.newInstance();
 
-    private TransactionChainHandler transactionChainHandler;
+    private DOMDataBroker dataBroker;
     protected SchemaContextHandler schemaHandler;
     private String localName;
 
@@ -62,21 +63,24 @@ abstract class AbstractNotificationsData {
      * @param schemaHandler for formatting notifications
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    public void setCloseVars(final TransactionChainHandler transactionChainHandler,
-            final SchemaContextHandler schemaHandler) {
-        this.transactionChainHandler = transactionChainHandler;
+    // FIXME: this is pure lifecycle nightmare just because ...
+    public void setCloseVars(final DOMDataBroker dataBroker, final SchemaContextHandler schemaHandler) {
+        this.dataBroker = dataBroker;
         this.schemaHandler = schemaHandler;
     }
 
     /**
      * Delete data in DS.
+     *
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    protected void deleteDataInDS() throws Exception {
-        final DOMTransactionChain transactionChain = this.transactionChainHandler.get();
-        final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
-        wTx.delete(LogicalDatastoreType.OPERATIONAL, Rfc8040.restconfStateStreamPath(this.localName));
-        wTx.commit().get();
-        transactionChain.close();
+    // FIXME: here we touch datastore, which probably should be done by whoever instantiated us or created the resource,
+    //        or they should be giving us the transaction
+    protected ListenableFuture<?> deleteDataInDS() {
+        final DOMDataTreeWriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
+        wTx.delete(LogicalDatastoreType.OPERATIONAL, Rfc8040.restconfStateStreamPath(localName));
+        return wTx.commit();
     }
 
     /**
