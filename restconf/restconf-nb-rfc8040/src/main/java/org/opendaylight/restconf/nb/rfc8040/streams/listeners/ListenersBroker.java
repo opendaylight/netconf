@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
@@ -270,14 +271,13 @@ public final class ListenersBroker {
      *
      * @param listener Listener to be closed and removed.
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
     private void removeAndCloseDataChangeListenerTemplate(final ListenerAdapter listener) {
         try {
             requireNonNull(listener).close();
             if (dataChangeListeners.inverse().remove(listener) == null) {
                 LOG.warn("There isn't any data-change event stream that would match listener adapter {}.", listener);
             }
-        } catch (final Exception exception) {
+        } catch (final InterruptedException | ExecutionException exception) {
             LOG.error("Data-change listener {} cannot be closed.", listener, exception);
             throw new IllegalStateException(String.format(
                     "Data-change listener %s cannot be closed.",
@@ -302,14 +302,13 @@ public final class ListenersBroker {
         }
     }
 
-    @SuppressWarnings({"checkstyle:IllegalCatch"})
     private void removeAndCloseNotificationListenerTemplate(final NotificationListenerAdapter listener) {
         try {
             requireNonNull(listener).close();
             if (notificationListeners.inverse().remove(listener) == null) {
                 LOG.warn("There isn't any notification stream that would match listener adapter {}.", listener);
             }
-        } catch (final Exception exception) {
+        } catch (final InterruptedException | ExecutionException exception) {
             LOG.error("Notification listener {} cannot be closed.", listener, exception);
             throw new IllegalStateException(String.format(
                     "Notification listener %s cannot be closed.", listener),

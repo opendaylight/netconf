@@ -35,7 +35,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
@@ -73,16 +72,11 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Before
     public void setUp() throws FileNotFoundException, URISyntaxException {
-        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        doReturn(wTx).when(domTx).newWriteOnlyTransaction();
         doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
-        doReturn(domTx).when(dataBroker).createTransactionChain(any());
-
-        transactionHandler = new TransactionChainHandler(dataBroker);
-        schemaHandler = new SchemaContextHandler(transactionHandler, mock(DOMSchemaService.class));
+        schemaHandler = new SchemaContextHandler(dataBroker, mock(DOMSchemaService.class));
 
         DOMDataTreeChangeService dataTreeChangeService = mock(DOMDataTreeChangeService.class);
         doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)

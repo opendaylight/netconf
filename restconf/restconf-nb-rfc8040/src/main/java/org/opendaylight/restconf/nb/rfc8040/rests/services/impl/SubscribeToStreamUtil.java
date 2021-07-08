@@ -28,6 +28,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
@@ -141,14 +142,15 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
-        notificationListenerAdapter.setCloseVars(
-                handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+        final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
+        notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getSchemaHandler());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                     notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
                     schemaContext.getNotifications(), notificationQueryParams.getStart(),
                     notificationListenerAdapter.getOutputType(), uri);
 
-        final DOMDataTreeWriteTransaction writeTransaction = handlersHolder.getDataBroker().newWriteOnlyTransaction();
+        // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
+        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
         return uri;
@@ -193,14 +195,16 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
-        listener.setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+
+        final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
+        final SchemaContextHandler schemaHandler = handlersHolder.getSchemaHandler();
+        listener.setCloseVars(dataBroker, schemaHandler);
 
         final LogicalDatastoreType datastoreType = LogicalDatastoreType.valueOf(datastoreParam);
-        final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         registration(datastoreType, listener, dataBroker);
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
+        final EffectiveModelContext schemaContext = schemaHandler.get();
         final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
         final MapEntryNode mapToStreams =
