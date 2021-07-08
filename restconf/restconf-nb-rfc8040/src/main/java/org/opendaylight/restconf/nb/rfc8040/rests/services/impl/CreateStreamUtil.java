@@ -10,7 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -19,18 +21,22 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.DataChangeScope;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.ResolveEnumUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -45,6 +51,20 @@ import org.slf4j.LoggerFactory;
  */
 final class CreateStreamUtil {
     private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
+    private static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(
+        XMLNamespace.of("urn:sal:restconf:event:subscription"), Revision.of("2014-07-08"));
+    private static final QName DATASTORE_QNAME =
+        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.DATASTORE_PARAM_NAME).intern();
+    private static final QName SCOPE_QNAME =
+        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.SCOPE_PARAM_NAME).intern();
+    private static final QName OUTPUT_TYPE_QNAME =
+        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.OUTPUT_TYPE_PARAM_NAME).intern();
+    private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(DATASTORE_QNAME);
+    private static final NodeIdentifier SCOPE_NODEID = NodeIdentifier.create(SCOPE_QNAME);
+    private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
+
+    private static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER = new AugmentationIdentifier(
+        ImmutableSet.of(SCOPE_QNAME, DATASTORE_QNAME, OUTPUT_TYPE_QNAME));
 
     private CreateStreamUtil() {
         throw new UnsupportedOperationException("Utility class");
@@ -113,9 +133,8 @@ final class CreateStreamUtil {
      * @return Parsed {@link NotificationOutputType}.
      */
     private static NotificationOutputType prepareOutputType(final ContainerNode data) {
-        NotificationOutputType outputType = parseEnum(
-                data, NotificationOutputType.class, RestconfStreamsConstants.OUTPUT_TYPE_PARAM_NAME);
-        return outputType == null ? NotificationOutputType.XML : outputType;
+        final String outputName = extractStringLeaf(data, OUTPUT_TYPE_NODEID);
+        return outputName != null ? NotificationOutputType.valueOf(outputName) : NotificationOutputType.XML;
     }
 
     /**
@@ -128,12 +147,13 @@ final class CreateStreamUtil {
      */
     private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path,
             final EffectiveModelContext schemaContext, final ContainerNode data) {
-        LogicalDatastoreType datastoreType = parseEnum(
-                data, LogicalDatastoreType.class, RestconfStreamsConstants.DATASTORE_PARAM_NAME);
-        datastoreType = datastoreType == null ? LogicalDatastoreType.CONFIGURATION : datastoreType;
+        final String datastoreName = extractStringLeaf(data, DATASTORE_NODEID);
+        final LogicalDatastoreType datastoreType = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
+            : LogicalDatastoreType.CONFIGURATION;
 
-        DataChangeScope scope = parseEnum(data, DataChangeScope.class, RestconfStreamsConstants.SCOPE_PARAM_NAME);
-        scope = scope == null ? DataChangeScope.BASE : scope;
+        final String scopeName = extractStringLeaf(data, SCOPE_NODEID);
+        // FIXME: this is not really used
+        final DataChangeScope scope = scopeName != null ? DataChangeScope.valueOf(scopeName) : DataChangeScope.BASE;
 
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
                 + "/"
@@ -170,35 +190,18 @@ final class CreateStreamUtil {
         return (YangInstanceIdentifier) pathValue;
     }
 
-    /**
-     * Parsing out of enumeration from RPC create-stream body.
-     *
-     * @param data      Container with stream settings (RPC create-stream).
-     * @param clazz     Enum type to be parsed out from input container.
-     * @param paramName Local name of the enum element.
-     * @return Parsed enumeration.
-     */
-    private static <T> T parseEnum(final ContainerNode data, final Class<T> clazz, final String paramName) {
-        final Optional<DataContainerChild> optAugNode = data.findChildByArg(
-                RestconfStreamsConstants.SAL_REMOTE_AUG_IDENTIFIER);
-        if (optAugNode.isEmpty()) {
-            return null;
+    private static @Nullable String extractStringLeaf(final ContainerNode data, final NodeIdentifier childName) {
+        final DataContainerChild augNode = data.childByArg(SAL_REMOTE_AUG_IDENTIFIER);
+        if (augNode instanceof AugmentationNode) {
+            final DataContainerChild enumNode = ((AugmentationNode) augNode).childByArg(childName);
+            if (enumNode instanceof LeafNode) {
+                final Object value = enumNode.body();
+                if (value instanceof String) {
+                    return (String) value;
+                }
+            }
         }
-        final DataContainerChild augNode = optAugNode.get();
-        if (!(augNode instanceof AugmentationNode)) {
-            return null;
-        }
-        final Optional<DataContainerChild> enumNode = ((AugmentationNode) augNode).findChildByArg(
-                new NodeIdentifier(QName.create(RestconfStreamsConstants.SAL_REMOTE_AUGMENT, paramName)));
-        if (enumNode.isEmpty()) {
-            return null;
-        }
-        final Object value = enumNode.get().body();
-        if (!(value instanceof String)) {
-            return null;
-        }
-
-        return ResolveEnumUtil.resolveEnum(clazz, (String) value);
+        return null;
     }
 
     /**
