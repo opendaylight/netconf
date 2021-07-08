@@ -15,13 +15,13 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -85,9 +85,11 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  */
 public final class ReadDataTransactionUtil {
     private static final String READ_TYPE_TX = "READ";
+    private static final List<String> DEFAULT_CONTENT = List.of(RestconfDataServiceConstant.ReadData.ALL);
+    private static final List<String> DEFAULT_DEPTH = List.of(RestconfDataServiceConstant.ReadData.UNBOUNDED);
 
     private ReadDataTransactionUtil() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 
     /**
@@ -100,31 +102,26 @@ public final class ReadDataTransactionUtil {
     public static WriterParameters parseUriParameters(final InstanceIdentifierContext<?> identifier,
                                                       final UriInfo uriInfo) {
         final WriterParametersBuilder builder = new WriterParametersBuilder();
-
         if (uriInfo == null) {
             return builder.build();
         }
 
         // check only allowed parameters
-        checkParametersTypes(uriInfo.getQueryParameters().keySet(),
+        final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+        checkParametersTypes(queryParams.keySet(),
                 RestconfDataServiceConstant.ReadData.CONTENT,
                 RestconfDataServiceConstant.ReadData.DEPTH,
                 RestconfDataServiceConstant.ReadData.FIELDS, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
 
         // read parameters from URI or set default values
-        final List<String> content = uriInfo.getQueryParameters().getOrDefault(
-                RestconfDataServiceConstant.ReadData.CONTENT,
-                Collections.singletonList(RestconfDataServiceConstant.ReadData.ALL));
-        final List<String> depth = uriInfo.getQueryParameters().getOrDefault(
-                RestconfDataServiceConstant.ReadData.DEPTH,
-                Collections.singletonList(RestconfDataServiceConstant.ReadData.UNBOUNDED));
-        final List<String> withDefaults = uriInfo.getQueryParameters().getOrDefault(
-                RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                Collections.emptyList());
+        final List<String> content = queryParams.getOrDefault(
+                RestconfDataServiceConstant.ReadData.CONTENT, DEFAULT_CONTENT);
+        final List<String> depth = queryParams.getOrDefault(
+                RestconfDataServiceConstant.ReadData.DEPTH, DEFAULT_DEPTH);
+        final List<String> withDefaults = queryParams.getOrDefault(
+                RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of());
         // fields
-        final List<String> fields = uriInfo.getQueryParameters().getOrDefault(
-                RestconfDataServiceConstant.ReadData.FIELDS,
-                Collections.emptyList());
+        final List<String> fields = queryParams.getOrDefault(RestconfDataServiceConstant.ReadData.FIELDS, List.of());
 
         // parameter can be in URI at most once
         checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
