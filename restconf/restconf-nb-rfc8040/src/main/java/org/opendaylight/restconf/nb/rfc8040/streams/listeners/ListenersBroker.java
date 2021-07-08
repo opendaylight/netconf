@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
@@ -32,9 +31,14 @@ import org.slf4j.LoggerFactory;
  * This singleton class is responsible for creation, removal and searching for {@link ListenerAdapter} or
  * {@link NotificationListenerAdapter} listeners.
  */
+// FIXME: this should be a component
 public final class ListenersBroker {
+    private static final class Holder {
+        // FIXME: remove this global singleton
+        static final ListenersBroker INSTANCE = new ListenersBroker();
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
-    private static ListenersBroker listenersBroker;
 
     private final StampedLock dataChangeListenersLock = new StampedLock();
     private final StampedLock notificationListenersLock = new StampedLock();
@@ -42,6 +46,7 @@ public final class ListenersBroker {
     private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
 
     private ListenersBroker() {
+
     }
 
     /**
@@ -49,12 +54,8 @@ public final class ListenersBroker {
      *
      * @return Reusable instance of {@link ListenersBroker}.
      */
-    // FIXME: remove this global singleton
-    public static synchronized ListenersBroker getInstance() {
-        if (listenersBroker == null) {
-            listenersBroker = new ListenersBroker();
-        }
-        return listenersBroker;
+    public static ListenersBroker getInstance() {
+        return Holder.INSTANCE;
     }
 
     /**
