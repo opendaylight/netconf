@@ -18,12 +18,8 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
-import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -38,10 +34,8 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,7 +130,7 @@ abstract class SubscribeToStreamUtil {
 
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        registerToListenNotification(notificationListenerAdapter, handlersHolder.getNotificationServiceHandler());
+        notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
         notificationListenerAdapter.setQueryParams(
                 notificationQueryParams.getStart(),
                 notificationQueryParams.getStop().orElse(null),
@@ -199,9 +193,7 @@ abstract class SubscribeToStreamUtil {
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         final SchemaContextHandler schemaHandler = handlersHolder.getSchemaHandler();
         listener.setCloseVars(dataBroker, schemaHandler);
-
-        final LogicalDatastoreType datastoreType = LogicalDatastoreType.valueOf(datastoreParam);
-        registration(datastoreType, listener, dataBroker);
+        listener.listen(dataBroker, LogicalDatastoreType.valueOf(datastoreParam));
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         final EffectiveModelContext schemaContext = schemaHandler.get();
@@ -246,43 +238,5 @@ abstract class SubscribeToStreamUtil {
             }
         }
         return result;
-    }
-
-    /**
-     * Register data change listener in DOM data broker and set it to listener on stream.
-     *
-     * @param datastore     {@link LogicalDatastoreType}
-     * @param listener      listener on specific stream
-     * @param domDataBroker data broker for register data change listener
-     */
-    private static void registration(final LogicalDatastoreType datastore, final ListenerAdapter listener,
-            final DOMDataBroker domDataBroker) {
-        if (listener.isListening()) {
-            return;
-        }
-
-        final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
-        if (changeService == null) {
-            throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
-        }
-
-        final DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(datastore, listener.getPath());
-        final ListenerRegistration<ListenerAdapter> registration =
-                changeService.registerDataTreeChangeListener(root, listener);
-        listener.setRegistration(registration);
-    }
-
-    // FIXME: this method should be in NotificationListenerAdapter
-    private static void registerToListenNotification(final NotificationListenerAdapter listener,
-            final DOMNotificationService notificationService) {
-        if (listener.isListening()) {
-            return;
-        }
-
-        final Absolute path = listener.getSchemaPath();
-        final ListenerRegistration<DOMNotificationListener> registration =
-                notificationService.registerNotificationListener(listener, path);
-        listener.setRegistration(registration);
     }
 }

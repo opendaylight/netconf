@@ -7,11 +7,15 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Preconditions;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.slf4j.Logger;
@@ -21,11 +25,12 @@ import org.slf4j.LoggerFactory;
  * Features of subscribing part of both notifications.
  */
 abstract class AbstractCommonSubscriber extends AbstractQueryParams implements BaseListenerInterface {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
+    @GuardedBy("this")
     private final Set<StreamSessionHandler> subscribers = new HashSet<>();
-    private volatile ListenerRegistration<?> registration;
+    @GuardedBy("this")
+    private ListenerRegistration<?> registration;
 
     @Override
     public final synchronized boolean hasSubscribers() {
@@ -66,14 +71,14 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
         }
     }
 
-    @Override
-    public void setRegistration(final ListenerRegistration<?> registration) {
-        this.registration = registration;
+    @Holding("this")
+    final void setRegistration(final ListenerRegistration<?> registration) {
+        this.registration = requireNonNull(registration);
     }
 
-    @Override
-    public boolean isListening() {
-        return this.registration != null;
+    @Holding("this")
+    final boolean isListening() {
+        return registration != null;
     }
 
     /**
