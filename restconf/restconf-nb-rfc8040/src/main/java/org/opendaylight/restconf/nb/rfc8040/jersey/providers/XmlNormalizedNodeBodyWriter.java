@@ -20,7 +20,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.XMLConstants;
 import javax.xml.stream.FactoryConfigurationError;
@@ -45,20 +44,12 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
+public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     private static final XMLOutputFactory XML_FACTORY;
 
     static {
         XML_FACTORY = XMLOutputFactory.newFactory();
         XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-    }
-
-    @Override
-    public boolean isWriteable(final Class<?> type,
-                               final Type genericType,
-                               final Annotation[] annotations,
-                               final MediaType mediaType) {
-        return type.equals(NormalizedNodeContext.class);
     }
 
     @Override
