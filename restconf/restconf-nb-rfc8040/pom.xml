@@ -62,6 +62,10 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>ietf-yang-patch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-api</artifactId>
     </dependency>
     <dependency>

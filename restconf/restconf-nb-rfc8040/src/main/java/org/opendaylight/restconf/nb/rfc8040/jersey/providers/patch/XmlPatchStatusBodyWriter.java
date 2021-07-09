@@ -24,10 +24,12 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_XML)
 public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
+    private static final String XML_NAMESPACE = YangPatchStatus.QNAME.getNamespace().toString();
     private static final XMLOutputFactory XML_FACTORY;
 
     static {
@@ -51,7 +53,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
     private static void writeDocument(final XMLStreamWriter writer, final PatchStatusContext context)
             throws XMLStreamException {
-        writer.writeStartElement("", "yang-patch-status", "urn:ietf:params:xml:ns:yang:ietf-yang-patch");
+        writer.writeStartElement("", "yang-patch-status", XML_NAMESPACE);
         writer.writeStartElement("patch-id");
         writer.writeCharacters(context.getPatchId());
         writer.writeEndElement();
