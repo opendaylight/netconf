@@ -33,6 +33,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -170,7 +171,7 @@ public class PutDataTransactionUtilTest {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
-        PutDataTransactionUtil.validInputData(iidContext.getSchemaNode(), payload);
+        RestconfDataServiceImpl.validInputData(iidContext.getSchemaNode(), payload);
     }
 
     @Test
@@ -178,11 +179,11 @@ public class PutDataTransactionUtilTest {
         InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
-        PutDataTransactionUtil.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
+        RestconfDataServiceImpl.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
 
         iidContext = new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
         payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
-        PutDataTransactionUtil.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
+        RestconfDataServiceImpl.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
     }
 
     @Test(expected = RestconfDocumentedException.class)
@@ -190,7 +191,7 @@ public class PutDataTransactionUtilTest {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
-        PutDataTransactionUtil.validTopLevelNodeName(YangInstanceIdentifier.empty(), payload);
+        RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.empty(), payload);
     }
 
     @Test(expected = RestconfDocumentedException.class)
@@ -198,7 +199,7 @@ public class PutDataTransactionUtilTest {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
-        PutDataTransactionUtil.validTopLevelNodeName(this.iid.getAncestor(1), payload);
+        RestconfDataServiceImpl.validTopLevelNodeName(this.iid.getAncestor(1), payload);
     }
 
     @Test
@@ -206,7 +207,7 @@ public class PutDataTransactionUtilTest {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid3, this.schemaNode3, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildListEntry);
-        PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
+        RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
 
     @Test

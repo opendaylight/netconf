@@ -8,9 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -22,16 +19,11 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -42,7 +34,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
  * Util class for put data to DS.
@@ -52,84 +43,6 @@ public final class PutDataTransactionUtil {
     private static final String PUT_TX_TYPE = "PUT";
 
     private PutDataTransactionUtil() {
-    }
-
-    /**
-     * Valid input data with {@link SchemaNode}.
-     *
-     * @param schemaNode {@link SchemaNode}
-     * @param payload    input data
-     */
-    public static void validInputData(final SchemaNode schemaNode, final NormalizedNodeContext payload) {
-        if (schemaNode != null && payload.getData() == null) {
-            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-        } else if (schemaNode == null && payload.getData() != null) {
-            throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-        }
-    }
-
-    /**
-     * Valid top level node name.
-     *
-     * @param path    path of node
-     * @param payload data
-     */
-    public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodeContext payload) {
-        final String payloadName = payload.getData().getIdentifier().getNodeType().getLocalName();
-
-        if (path.isEmpty()) {
-            if (!payload.getData().getIdentifier().getNodeType().equals(
-                RestconfDataServiceConstant.NETCONF_BASE_QNAME)) {
-                throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
-                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-            }
-        } else {
-            final String identifierName = path.getLastPathArgument().getNodeType().getLocalName();
-            if (!payloadName.equals(identifierName)) {
-                throw new RestconfDocumentedException(
-                        "Payload name (" + payloadName + ") is different from identifier name (" + identifierName + ")",
-                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-            }
-        }
-    }
-
-    /**
-     * Validates whether keys in {@code payload} are equal to values of keys in
-     * {@code iiWithData} for list schema node.
-     *
-     * @throws RestconfDocumentedException if key values or key count in payload and URI isn't equal
-     */
-    public static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodeContext payload) {
-        final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
-        final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
-        final SchemaNode schemaNode = iiWithData.getSchemaNode();
-        final NormalizedNode data = payload.getData();
-        if (schemaNode instanceof ListSchemaNode) {
-            final List<QName> keyDefinitions = ((ListSchemaNode) schemaNode).getKeyDefinition();
-            if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
-                final Map<QName, Object> uriKeyValues = ((NodeIdentifierWithPredicates) lastPathArgument).asMap();
-                isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions);
-            }
-        }
-    }
-
-    private static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
-                                                      final List<QName> keyDefinitions) {
-        final Map<QName, Object> mutableCopyUriKeyValues = new HashMap<>(uriKeyValues);
-        for (final QName keyDefinition : keyDefinitions) {
-            final Object uriKeyValue = RestconfDocumentedException.throwIfNull(
-                    mutableCopyUriKeyValues.remove(keyDefinition), ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                    "Missing key %s in URI.", keyDefinition);
-
-            final Object dataKeyValue = payload.getIdentifier().getValue(keyDefinition);
-
-            if (!uriKeyValue.equals(dataKeyValue)) {
-                final String errMsg = "The value '" + uriKeyValue + "' for key '" + keyDefinition.getLocalName()
-                        + "' specified in the URI doesn't match the value '" + dataKeyValue
-                        + "' specified in the message body. ";
-                throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-            }
-        }
     }
 
     /**
