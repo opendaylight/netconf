@@ -25,11 +25,11 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     private static EffectiveModelContext schemaContext;
 
-    private final XmlToPatchBodyReader xmlToPatchBodyReader;
+    private final XmlPatchBodyReader xmlToPatchBodyReader;
 
     public XmlPatchBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        xmlToPatchBodyReader = new XmlToPatchBodyReader(schemaContextHandler, mountPointService);
+        xmlToPatchBodyReader = new XmlPatchBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override

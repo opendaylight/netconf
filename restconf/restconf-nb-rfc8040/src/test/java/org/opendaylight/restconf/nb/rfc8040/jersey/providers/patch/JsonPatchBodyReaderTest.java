@@ -23,12 +23,12 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
-    private final JsonToPatchBodyReader jsonToPatchBodyReader;
+    private final JsonPatchBodyReader jsonToPatchBodyReader;
     private static EffectiveModelContext schemaContext;
 
     public JsonPatchBodyReaderTest() throws Exception {
         super(schemaContext);
-        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler, mountPointService);
+        jsonToPatchBodyReader = new JsonPatchBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override

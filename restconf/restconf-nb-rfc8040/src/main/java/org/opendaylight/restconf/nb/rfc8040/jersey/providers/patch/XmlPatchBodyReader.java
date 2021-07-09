@@ -66,11 +66,11 @@ import org.xml.sax.SAXException;
 
 @Provider
 @Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
-public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
-    private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
+public class XmlPatchBodyReader extends AbstractPatchBodyReader {
+    private static final Logger LOG = LoggerFactory.getLogger(XmlPatchBodyReader.class);
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
-    public XmlToPatchBodyReader(final SchemaContextHandler schemaContextHandler,
+    public XmlPatchBodyReader(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointService mountPointService) {
         super(schemaContextHandler, mountPointService);
     }

@@ -58,10 +58,10 @@ import org.slf4j.LoggerFactory;
 
 @Provider
 @Consumes(MediaTypes.APPLICATION_YANG_PATCH_JSON)
-public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
-    private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
+public class JsonPatchBodyReader extends AbstractPatchBodyReader {
+    private static final Logger LOG = LoggerFactory.getLogger(JsonPatchBodyReader.class);
 
-    public JsonToPatchBodyReader(final SchemaContextHandler schemaContextHandler,
+    public JsonPatchBodyReader(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointService mountPointService) {
         super(schemaContextHandler, mountPointService);
     }
@@ -118,7 +118,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
                 path.getSchemaContext());
-        final JsonToPatchBodyReader.PatchEdit edit = new JsonToPatchBodyReader.PatchEdit();
+        final JsonPatchBodyReader.PatchEdit edit = new JsonPatchBodyReader.PatchEdit();
 
         while (in.hasNext()) {
             switch (in.peek()) {

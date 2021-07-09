@@ -23,11 +23,11 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     private static EffectiveModelContext schemaContext;
 
-    private final XmlToPatchBodyReader xmlToPatchBodyReader;
+    private final XmlPatchBodyReader xmlToPatchBodyReader;
 
     public XmlPatchBodyReaderTest() throws Exception {
         super(schemaContext);
-        xmlToPatchBodyReader = new XmlToPatchBodyReader(schemaContextHandler, mountPointService);
+        xmlToPatchBodyReader = new XmlPatchBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override

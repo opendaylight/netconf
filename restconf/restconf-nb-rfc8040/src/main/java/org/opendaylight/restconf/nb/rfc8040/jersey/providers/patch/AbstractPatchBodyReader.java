@@ -18,8 +18,8 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentif
  *
  * @author Robert Varga
  */
-abstract class AbstractToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider<PatchContext> {
-    protected AbstractToPatchBodyReader(final SchemaContextHandler schemaContextHandler,
+abstract class AbstractPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider<PatchContext> {
+    protected AbstractPatchBodyReader(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointService mountPointService) {
         super(schemaContextHandler, mountPointService);
     }

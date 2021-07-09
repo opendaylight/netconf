@@ -26,11 +26,11 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
     private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount/";
     private static EffectiveModelContext schemaContext;
 
-    private final JsonToPatchBodyReader jsonToPatchBodyReader;
+    private final JsonPatchBodyReader jsonToPatchBodyReader;
 
     public JsonPatchBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler, mountPointService);
+        jsonToPatchBodyReader = new JsonPatchBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override
