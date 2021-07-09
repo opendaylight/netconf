@@ -16,9 +16,9 @@ import javax.ws.rs.core.Application;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeXmlBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
@@ -45,7 +45,7 @@ abstract class AbstractRestconfApplication extends Application {
     @Override
     public final Set<Class<?>> getClasses() {
         return Set.of(
-            NormalizedNodeJsonBodyWriter.class, NormalizedNodeXmlBodyWriter.class,
+            JsonNormalizedNodeBodyWriter.class, XmlNormalizedNodeBodyWriter.class,
             YinSchemaExportBodyWriter.class, YangSchemaExportBodyWriter.class,
             PatchJsonBodyWriter.class, PatchXmlBodyWriter.class);
     }

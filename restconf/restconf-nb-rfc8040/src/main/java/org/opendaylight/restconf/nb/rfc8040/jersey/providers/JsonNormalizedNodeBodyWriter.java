@@ -21,7 +21,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -47,17 +46,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
-
+public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
-
-    @Override
-    public boolean isWriteable(final Class<?> type,
-                               final Type genericType,
-                               final Annotation[] annotations,
-                               final MediaType mediaType) {
-        return type.equals(NormalizedNodeContext.class);
-    }
 
     @Override
     public void writeTo(final NormalizedNodeContext context,
