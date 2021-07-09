@@ -157,7 +157,7 @@ public final class PatchDataTransactionUtil {
                                                     final RestconfTransaction transaction) {
         LOG.trace("POST {} within Restconf Patch: {} with payload {}", LogicalDatastoreType.CONFIGURATION.name(),
             path, payload);
-        transaction.create(LogicalDatastoreType.CONFIGURATION, path, payload, schemaContext);
+        transaction.create(path, payload, schemaContext);
     }
 
     /**
@@ -169,7 +169,7 @@ public final class PatchDataTransactionUtil {
     private static void deleteDataWithinTransaction(final YangInstanceIdentifier path,
                                                     final RestconfTransaction transaction) {
         LOG.trace("Delete {} within Restconf Patch: {}", LogicalDatastoreType.CONFIGURATION.name(), path);
-        transaction.delete(LogicalDatastoreType.CONFIGURATION, path);
+        transaction.delete(path);
     }
 
     /**
@@ -185,7 +185,7 @@ public final class PatchDataTransactionUtil {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", LogicalDatastoreType.CONFIGURATION.name(),
             path, payload);
         TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
-        transaction.merge(LogicalDatastoreType.CONFIGURATION, path, payload);
+        transaction.merge(path, payload);
     }
 
     /**
@@ -197,7 +197,7 @@ public final class PatchDataTransactionUtil {
     private static void removeDataWithinTransaction(final YangInstanceIdentifier path,
                                                     final RestconfTransaction transaction) {
         LOG.trace("Remove {} within Restconf Patch: {}", LogicalDatastoreType.CONFIGURATION.name(), path);
-        transaction.remove(LogicalDatastoreType.CONFIGURATION, path);
+        transaction.remove(path);
     }
 
     /**
@@ -212,6 +212,6 @@ public final class PatchDataTransactionUtil {
                                                      final RestconfTransaction transaction) {
         LOG.trace("PUT {} within Restconf Patch: {} with payload {}",
             LogicalDatastoreType.CONFIGURATION.name(), path, payload);
-        transaction.replace(LogicalDatastoreType.CONFIGURATION, path, payload, schemaContext);
+        transaction.replace(path, payload, schemaContext);
     }
 }

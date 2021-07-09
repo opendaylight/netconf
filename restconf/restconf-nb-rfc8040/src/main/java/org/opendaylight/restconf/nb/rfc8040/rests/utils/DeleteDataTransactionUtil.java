@@ -11,7 +11,6 @@ import com.google.common.util.concurrent.FluentFuture;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -41,7 +40,7 @@ public final class DeleteDataTransactionUtil {
     public static Response deleteData(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         try {
-            transaction.delete(LogicalDatastoreType.CONFIGURATION, path);
+            transaction.delete(path);
         } catch (RestconfDocumentedException e) {
             // close transaction if any and pass exception further
             transaction.cancel();
