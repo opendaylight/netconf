@@ -12,7 +12,6 @@ import com.google.common.util.concurrent.FluentFuture;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -54,7 +53,7 @@ public final class PlainPatchDataTransactionUtil {
         try {
             LOG.trace("Merge CONFIGURATION within Restconf Patch: {} with payload {}", path, data);
             TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
-            transaction.merge(LogicalDatastoreType.CONFIGURATION, path, data);
+            transaction.merge(path, data);
         } catch (final RestconfDocumentedException e) {
             transaction.cancel();
             throw new IllegalArgumentException(e);

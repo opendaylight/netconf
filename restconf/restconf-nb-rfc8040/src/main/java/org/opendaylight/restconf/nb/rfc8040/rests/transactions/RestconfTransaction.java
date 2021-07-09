@@ -11,7 +11,6 @@ import com.google.common.annotations.Beta;
 import com.google.common.util.concurrent.FluentFuture;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -43,47 +42,40 @@ public abstract class RestconfTransaction {
     /**
      * Delete data from the datastore.
      *
-     * @param store the logical data store which should be modified
      * @param path the data object path
      */
-    public abstract void delete(LogicalDatastoreType store, YangInstanceIdentifier path);
+    public abstract void delete(YangInstanceIdentifier path);
 
     /**
      * Remove data from the datastore.
      *
-     * @param store the logical data store which should be modified
      * @param path  the data object path
      */
-    public abstract void remove(LogicalDatastoreType store, YangInstanceIdentifier path);
+    public abstract void remove(YangInstanceIdentifier path);
 
     /**
      * Merges a piece of data with the existing data at a specified path.
      *
-     * @param store the logical data store which should be modified
      * @param path the data object path
      * @param data the data object to be merged to the specified path
      */
-    public abstract void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode data);
+    public abstract void merge(YangInstanceIdentifier path, NormalizedNode data);
 
     /**
      * Stores a piece of data at the specified path.
      *
-     * @param store         the logical data store which should be modified
      * @param path          the data object path
      * @param data          the data object to be merged to the specified path
      * @param schemaContext static view of compiled yang files
      */
-    public abstract void create(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode data,
-                                SchemaContext schemaContext);
+    public abstract void create(YangInstanceIdentifier path, NormalizedNode data, SchemaContext schemaContext);
 
     /**
      * Replace a piece of data at the specified path.
      *
-     * @param store         the logical data store which should be modified
      * @param path          the data object path
      * @param data          the data object to be merged to the specified path
      * @param schemaContext static view of compiled yang files
      */
-    public abstract void replace(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode data,
-                                 SchemaContext schemaContext);
+    public abstract void replace(YangInstanceIdentifier path, NormalizedNode data, SchemaContext schemaContext);
 }

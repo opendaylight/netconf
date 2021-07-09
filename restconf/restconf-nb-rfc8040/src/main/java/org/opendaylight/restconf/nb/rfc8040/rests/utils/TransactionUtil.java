@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -59,6 +58,6 @@ public final class TransactionUtil {
 
         final NormalizedNode parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
-        transaction.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
+        transaction.merge(rootNormalizedPath, parentStructure);
     }
 }
