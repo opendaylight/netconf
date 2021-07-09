@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import com.google.gson.stream.JsonWriter;
@@ -58,15 +57,6 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                                final Annotation[] annotations,
                                final MediaType mediaType) {
         return type.equals(NormalizedNodeContext.class);
-    }
-
-    @Override
-    public long getSize(final NormalizedNodeContext context,
-                        final Class<?> type,
-                        final Type genericType,
-                        final Annotation[] annotations,
-                        final MediaType mediaType) {
-        return -1;
     }
 
     @Override

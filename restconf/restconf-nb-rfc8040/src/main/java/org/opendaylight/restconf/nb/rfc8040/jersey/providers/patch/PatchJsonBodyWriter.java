@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import com.google.gson.stream.JsonWriter;
@@ -36,12 +35,6 @@ public class PatchJsonBodyWriter implements MessageBodyWriter<PatchStatusContext
     public boolean isWriteable(final Class<?> type, final Type genericType,
                                final Annotation[] annotations, final MediaType mediaType) {
         return type.equals(PatchStatusContext.class);
-    }
-
-    @Override
-    public long getSize(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
-                        final Annotation[] annotations, final MediaType mediaType) {
-        return -1;
     }
 
     @Override
