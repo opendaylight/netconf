@@ -16,10 +16,8 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -29,19 +27,12 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_JSON)
-public class PatchJsonBodyWriter implements MessageBodyWriter<PatchStatusContext> {
-
-    @Override
-    public boolean isWriteable(final Class<?> type, final Type genericType,
-                               final Annotation[] annotations, final MediaType mediaType) {
-        return type.equals(PatchStatusContext.class);
-    }
-
+public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
     @Override
     public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
-            throws IOException, WebApplicationException {
+            throws IOException {
 
         final JsonWriter jsonWriter = createJsonWriter(entityStream);
         jsonWriter.beginObject().name("ietf-yang-patch:yang-patch-status");
