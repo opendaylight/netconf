@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,7 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -24,20 +23,12 @@ import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 
 @Provider
-@Produces({ YangConstants.RFC6020_YANG_MEDIA_TYPE })
-public class SchemaExportContentYangBodyWriter implements MessageBodyWriter<SchemaExportContext> {
-
-    @Override
-    public boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations,
-            final MediaType mediaType) {
-        return type.equals(SchemaExportContext.class);
-    }
-
+@Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
+public class YangSchemaExportBodyWriter extends AbstractSchemaExportBodyWriter {
     @Override
     public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
-            final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
-            WebApplicationException {
+            final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException {
         final RevisionSourceIdentifier sourceId = RevisionSourceIdentifier.create(context.getModule().getName(),
                 context.getModule().getQNameModule().getRevision());
         final YangTextSchemaSource yangTextSchemaSource;
