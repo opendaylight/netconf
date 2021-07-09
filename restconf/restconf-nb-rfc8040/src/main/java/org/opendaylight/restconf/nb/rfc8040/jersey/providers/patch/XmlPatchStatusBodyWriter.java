@@ -7,18 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -29,8 +27,7 @@ import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_XML)
-public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext> {
-
+public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
     private static final XMLOutputFactory XML_FACTORY;
 
     static {
@@ -39,23 +36,16 @@ public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext>
     }
 
     @Override
-    public boolean isWriteable(final Class<?> type, final Type genericType,
-                               final Annotation[] annotations, final MediaType mediaType) {
-        return type.equals(PatchStatusContext.class);
-    }
-
-    @Override
     public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
-            throws WebApplicationException {
-
+            throws IOException {
         try {
             final XMLStreamWriter xmlWriter =
                     XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
             writeDocument(xmlWriter, patchStatusContext);
-        } catch (final XMLStreamException | FactoryConfigurationError e) {
-            throw new IllegalStateException(e);
+        } catch (final XMLStreamException e) {
+            throw new IOException("Failed to write body", e);
         }
     }
 

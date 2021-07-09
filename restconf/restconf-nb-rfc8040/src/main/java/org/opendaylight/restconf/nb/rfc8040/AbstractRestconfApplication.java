@@ -23,8 +23,8 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBod
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonToPatchBodyReader;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchJsonBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchXmlBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonPatchStatusBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlPatchStatusBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlToPatchBodyReader;
 
 /**
@@ -47,7 +47,7 @@ abstract class AbstractRestconfApplication extends Application {
         return Set.of(
             JsonNormalizedNodeBodyWriter.class, XmlNormalizedNodeBodyWriter.class,
             YinSchemaExportBodyWriter.class, YangSchemaExportBodyWriter.class,
-            PatchJsonBodyWriter.class, PatchXmlBodyWriter.class);
+            JsonPatchStatusBodyWriter.class, XmlPatchStatusBodyWriter.class);
     }
 
     @Override
