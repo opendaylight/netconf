@@ -15,7 +15,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
@@ -39,7 +38,6 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -76,7 +74,7 @@ public abstract class AbstractBodyReaderTest {
         final MultivaluedMap<String, String> pathParm = new MultivaluedHashMap<>(1);
 
         if (!identifier.isEmpty()) {
-            pathParm.put(RestconfConstants.IDENTIFIER, Collections.singletonList(identifier));
+            pathParm.put("identifier", List.of(identifier));
         }
 
         when(uriInfoMock.getPathParameters()).thenReturn(pathParm);

@@ -24,7 +24,6 @@ import javax.ws.rs.ext.MessageBodyReader;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -83,7 +82,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
 
 
     private String getIdentifier() {
-        return this.uriInfo.getPathParameters(false).getFirst(RestconfConstants.IDENTIFIER);
+        return this.uriInfo.getPathParameters(false).getFirst("identifier");
     }
 
     private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
