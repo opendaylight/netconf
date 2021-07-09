@@ -105,14 +105,13 @@ public final class PostDataTransactionUtil {
             case FIRST:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
-                    transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                    transaction.replace(path, data, schemaContext);
                     return transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-                transaction.remove(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
-                transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-                transaction.replace(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent(), readData,
-                    schemaContext);
+                transaction.remove(path.getParent().getParent());
+                transaction.replace(path, data, schemaContext);
+                transaction.replace(path.getParent().getParent(), readData, schemaContext);
                 return transaction.commit();
             case LAST:
                 makePost(path, data, schemaContext, transaction);
@@ -120,7 +119,7 @@ public final class PostDataTransactionUtil {
             case BEFORE:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
-                    transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                    transaction.replace(path, data, schemaContext);
                     return transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
@@ -130,7 +129,7 @@ public final class PostDataTransactionUtil {
             case AFTER:
                 readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
-                    transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                    transaction.replace(path, data, schemaContext);
                     return transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
@@ -149,7 +148,7 @@ public final class PostDataTransactionUtil {
                                             final NormalizedNodeContainer<?> readList, final boolean before,
                                             final RestconfTransaction transaction) {
         final YangInstanceIdentifier parent = path.getParent().getParent();
-        transaction.remove(LogicalDatastoreType.CONFIGURATION, parent);
+        transaction.remove(parent);
         final InstanceIdentifierContext<?> instanceIdentifier =
             ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
@@ -164,14 +163,13 @@ public final class PostDataTransactionUtil {
         }
         int lastInsertedPosition = 0;
         final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
-        transaction.merge(LogicalDatastoreType.CONFIGURATION,
-            YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        transaction.merge(YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final NormalizedNode nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
-                transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                transaction.replace(path, data, schemaContext);
             }
             final YangInstanceIdentifier childPath = parent.node(nodeChild.getIdentifier());
-            transaction.replace(LogicalDatastoreType.CONFIGURATION, childPath, nodeChild, schemaContext);
+            transaction.replace(childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
     }
@@ -179,7 +177,7 @@ public final class PostDataTransactionUtil {
     private static void makePost(final YangInstanceIdentifier path, final NormalizedNode data,
                                  final SchemaContext schemaContext, final RestconfTransaction transaction) {
         try {
-            transaction.create(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+            transaction.create(path, data, schemaContext);
         } catch (RestconfDocumentedException e) {
             // close transaction if any and pass exception further
             transaction.cancel();

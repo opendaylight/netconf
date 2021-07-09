@@ -38,6 +38,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -56,7 +58,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataServi
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
@@ -114,12 +115,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
+    private final DOMDataBroker dataBroker;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final DOMActionService actionService, final Configuration configuration) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.dataBroker = requireNonNull(dataBroker);
         this.restconfStrategy = new MdsalRestconfStrategy(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
@@ -141,15 +144,23 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
+
+        // FIXME: this looks quite crazy, why do we even have it?
+        if (mountPoint == null && identifier != null && identifier.contains(STREAMS_PATH)
+            && !identifier.contains(STREAM_PATH_PART)) {
+            createAllYangNotificationStreams(schemaContextRef, uriInfo);
+        }
+
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         final NormalizedNode node;
         if (parameters.getFieldPaths() != null && !parameters.getFieldPaths().isEmpty()) {
             node = ReadDataTransactionUtil.readData(parameters.getContent(), instanceIdentifier.getInstanceIdentifier(),
                     strategy, parameters.getWithDefault(), schemaContextRef, parameters.getFieldPaths());
         } else {
-            node = readData(identifier, parameters.getContent(), instanceIdentifier.getInstanceIdentifier(), strategy,
-                    parameters.getWithDefault(), schemaContextRef, uriInfo);
+            node = ReadDataTransactionUtil.readData(parameters.getContent(), instanceIdentifier.getInstanceIdentifier(),
+                    strategy, parameters.getWithDefault(), schemaContextRef);
         }
+
         // FIXME: this is utter craziness, refactor it properly!
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
@@ -178,40 +189,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node, parameters)).build();
     }
 
-    /**
-     * Read specific type of data from data store via transaction and if identifier read data from
-     * streams then put streams from actual schema context to datastore.
-     *
-     * @param identifier    identifier of data to read
-     * @param content       type of data to read (config, state, all)
-     * @param strategy      {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa      value of with-defaults parameter
-     * @param schemaContext schema context
-     * @param uriInfo       uri info
-     * @return {@link NormalizedNode}
-     */
-    private NormalizedNode readData(final String identifier, final String content,
-            final YangInstanceIdentifier path, final RestconfStrategy strategy, final String withDefa,
-            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
-        if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
-        }
-        return ReadDataTransactionUtil.readData(content, path, strategy, withDefa, schemaContext);
-    }
-
-    private void createAllYangNotificationStreams(final RestconfStrategy strategy,
-            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
-        final RestconfTransaction transaction = strategy.prepareWriteExecution();
-
+    private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
+        final DOMDataTreeWriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
         for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
-            final NotificationListenerAdapter notifiStreamXML =
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
                 CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.XML);
-            final NotificationListenerAdapter notifiStreamJSON =
+                    NotificationOutputType.XML));
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction,
                 CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, transaction, notifiStreamJSON);
+                    NotificationOutputType.JSON));
         }
         try {
             transaction.commit().get();
@@ -221,13 +207,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo, final RestconfTransaction transaction, final NotificationListenerAdapter listener) {
+            final UriInfo uriInfo, final DOMDataTreeWriteOperations tx, final NotificationListenerAdapter listener) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri);
 
-        transaction.merge(LogicalDatastoreType.OPERATIONAL,
+        tx.merge(LogicalDatastoreType.OPERATIONAL,
             Rfc8040.restconfStateStreamPath(mapToStreams.getIdentifier()), mapToStreams);
     }
 

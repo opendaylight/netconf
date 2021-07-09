@@ -102,9 +102,9 @@ public final class PutDataTransactionUtil {
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     return makePut(path, schemaContext, transaction, data);
                 }
-                transaction.remove(LogicalDatastoreType.CONFIGURATION, path.getParent());
-                transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
-                transaction.replace(LogicalDatastoreType.CONFIGURATION, path.getParent(), readData, schemaContext);
+                transaction.remove(path.getParent());
+                transaction.replace(path, data, schemaContext);
+                transaction.replace(path.getParent(), readData, schemaContext);
                 return transaction.commit();
             case LAST:
                 return makePut(path, schemaContext, transaction, data);
@@ -143,7 +143,7 @@ public final class PutDataTransactionUtil {
                                            final NormalizedNode data,
                                            final EffectiveModelContext schemaContext, final String point,
                                            final NormalizedNodeContainer<?> readList, final boolean before) {
-        transaction.remove(LogicalDatastoreType.CONFIGURATION, path.getParent());
+        transaction.remove(path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
             ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
@@ -158,15 +158,13 @@ public final class PutDataTransactionUtil {
         }
         int lastInsertedPosition = 0;
         final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
-        transaction.merge(LogicalDatastoreType.CONFIGURATION,
-            YangInstanceIdentifier.create(emptySubtree.getIdentifier()),
-            emptySubtree);
+        transaction.merge(YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final NormalizedNode nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
-                transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+                transaction.replace(path, data, schemaContext);
             }
             final YangInstanceIdentifier childPath = path.getParent().node(nodeChild.getIdentifier());
-            transaction.replace(LogicalDatastoreType.CONFIGURATION, childPath, nodeChild, schemaContext);
+            transaction.replace(childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
     }
@@ -175,7 +173,7 @@ public final class PutDataTransactionUtil {
                                                               final SchemaContext schemaContext,
                                                               final RestconfTransaction transaction,
                                                               final NormalizedNode data) {
-        transaction.replace(LogicalDatastoreType.CONFIGURATION, path, data, schemaContext);
+        transaction.replace(path, data, schemaContext);
         return transaction.commit();
     }
 
