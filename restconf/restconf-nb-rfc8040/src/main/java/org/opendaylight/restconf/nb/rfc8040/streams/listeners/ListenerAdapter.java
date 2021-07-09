@@ -17,7 +17,11 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.restconf.common.formatters.DataTreeCandidateFormatter;
 import org.opendaylight.restconf.common.formatters.DataTreeCandidateFormatterFactory;
 import org.opendaylight.restconf.common.formatters.JSONDataTreeCandidateFormatter;
@@ -140,6 +144,25 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     public YangInstanceIdentifier getPath() {
         return this.path;
+    }
+
+    /**
+     * Register data change listener in DOM data broker and set it to listener on stream.
+     *
+     * @param domDataBroker data broker for register data change listener
+     * @param datastore     {@link LogicalDatastoreType}
+     */
+    public synchronized final void listen(final DOMDataBroker domDataBroker, final LogicalDatastoreType datastore) {
+        if (!isListening()) {
+            final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
+            if (changeService == null) {
+                throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
+            }
+
+            setRegistration(changeService.registerDataTreeChangeListener(
+                new DOMDataTreeIdentifier(datastore, getPath()), this));
+        }
     }
 
     @Override

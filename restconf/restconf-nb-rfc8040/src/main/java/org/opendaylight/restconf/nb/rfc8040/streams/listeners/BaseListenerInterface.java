@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import java.util.Set;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 /**
  * Base interface for both listeners({@link ListenerAdapter}, {@link NotificationListenerAdapter}).
@@ -57,18 +56,4 @@ public interface BaseListenerInterface extends AutoCloseable {
      * @param subscriber SSE or WS session handler.
      */
     void removeSubscriber(StreamSessionHandler subscriber);
-
-    /**
-     * Sets {@link ListenerRegistration} registration.
-     *
-     * @param registration DOMDataChangeListener registration.
-     */
-    void setRegistration(ListenerRegistration<?> registration);
-
-    /**
-     * Checks if {@link ListenerRegistration} registration exists.
-     *
-     * @return {@code true} if exists, {@code false} otherwise.
-     */
-    boolean isListening();
 }
