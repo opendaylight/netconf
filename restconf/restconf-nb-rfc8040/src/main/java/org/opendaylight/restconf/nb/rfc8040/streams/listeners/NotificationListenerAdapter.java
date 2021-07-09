@@ -17,6 +17,7 @@ import java.util.Optional;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.formatters.JSONNotificationFormatter;
 import org.opendaylight.restconf.common.formatters.NotificationFormatter;
 import org.opendaylight.restconf.common.formatters.NotificationFormatterFactory;
@@ -137,6 +138,12 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     public Absolute getSchemaPath() {
         return this.path;
+    }
+
+    public final synchronized void listen(final DOMNotificationService notificationService) {
+        if (!isListening()) {
+            setRegistration(notificationService.registerNotificationListener(this, getSchemaPath()));
+        }
     }
 
     @Override
