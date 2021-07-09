@@ -17,12 +17,15 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -72,11 +75,14 @@ import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -233,9 +239,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
 
-        PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
-        PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
-        PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
+        validInputData(iid.getSchemaNode(), payload);
+        validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
+        validateListKeysEqualityInPayloadAndUri(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final EffectiveModelContext ref = mountPoint == null
@@ -349,9 +355,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload
                 .getInstanceIdentifierContext();
 
-        PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
-        PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
-        PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
+        validInputData(iid.getSchemaNode(), payload);
+        validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
+        validateListKeysEqualityInPayloadAndUri(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final EffectiveModelContext ref = mountPoint == null
@@ -427,6 +433,88 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         return Response.status(200).entity(new NormalizedNodeContext(new InstanceIdentifierContext<>(yangIIdContext,
                 resultNodeSchema, mountPoint, schemaContextRef), resultData)).build();
+    }
+
+    /**
+     * Valid input data with {@link SchemaNode}.
+     *
+     * @param schemaNode {@link SchemaNode}
+     * @param payload    input data
+     */
+    @VisibleForTesting
+    public static void validInputData(final SchemaNode schemaNode, final NormalizedNodeContext payload) {
+        if (schemaNode != null && payload.getData() == null) {
+            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        } else if (schemaNode == null && payload.getData() != null) {
+            throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        }
+    }
+
+    /**
+     * Valid top level node name.
+     *
+     * @param path    path of node
+     * @param payload data
+     */
+    @VisibleForTesting
+    public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodeContext payload) {
+        final String payloadName = payload.getData().getIdentifier().getNodeType().getLocalName();
+
+        if (path.isEmpty()) {
+            if (!payload.getData().getIdentifier().getNodeType().equals(
+                RestconfDataServiceConstant.NETCONF_BASE_QNAME)) {
+                throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
+                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            }
+        } else {
+            final String identifierName = path.getLastPathArgument().getNodeType().getLocalName();
+            if (!payloadName.equals(identifierName)) {
+                throw new RestconfDocumentedException(
+                        "Payload name (" + payloadName + ") is different from identifier name (" + identifierName + ")",
+                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            }
+        }
+    }
+
+
+    /**
+     * Validates whether keys in {@code payload} are equal to values of keys in
+     * {@code iiWithData} for list schema node.
+     *
+     * @throws RestconfDocumentedException if key values or key count in payload and URI isn't equal
+     */
+    @VisibleForTesting
+    public static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodeContext payload) {
+        final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
+        final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
+        final SchemaNode schemaNode = iiWithData.getSchemaNode();
+        final NormalizedNode data = payload.getData();
+        if (schemaNode instanceof ListSchemaNode) {
+            final List<QName> keyDefinitions = ((ListSchemaNode) schemaNode).getKeyDefinition();
+            if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
+                final Map<QName, Object> uriKeyValues = ((NodeIdentifierWithPredicates) lastPathArgument).asMap();
+                isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions);
+            }
+        }
+    }
+
+    private static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
+            final List<QName> keyDefinitions) {
+        final Map<QName, Object> mutableCopyUriKeyValues = new HashMap<>(uriKeyValues);
+        for (final QName keyDefinition : keyDefinitions) {
+            final Object uriKeyValue = RestconfDocumentedException.throwIfNull(
+                    mutableCopyUriKeyValues.remove(keyDefinition), ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                    "Missing key %s in URI.", keyDefinition);
+
+            final Object dataKeyValue = payload.getIdentifier().getValue(keyDefinition);
+
+            if (!uriKeyValue.equals(dataKeyValue)) {
+                final String errMsg = "The value '" + uriKeyValue + "' for key '" + keyDefinition.getLocalName()
+                        + "' specified in the URI doesn't match the value '" + dataKeyValue
+                        + "' specified in the message body. ";
+                throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            }
+        }
     }
 
     private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
