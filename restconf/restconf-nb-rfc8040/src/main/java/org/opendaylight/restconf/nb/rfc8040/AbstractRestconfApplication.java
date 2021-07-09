@@ -19,13 +19,13 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeB
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonToPatchBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchXmlBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlToPatchBodyReader;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYangBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYinBodyWriter;
 
 /**
  * Abstract Restconf Application.
@@ -46,7 +46,7 @@ abstract class AbstractRestconfApplication extends Application {
     public final Set<Class<?>> getClasses() {
         return Set.of(
             NormalizedNodeJsonBodyWriter.class, NormalizedNodeXmlBodyWriter.class,
-            SchemaExportContentYinBodyWriter.class, SchemaExportContentYangBodyWriter.class,
+            YinSchemaExportBodyWriter.class, YangSchemaExportBodyWriter.class,
             PatchJsonBodyWriter.class, PatchXmlBodyWriter.class);
     }
 
