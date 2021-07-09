@@ -15,7 +15,6 @@ import com.google.common.base.Splitter;
  */
 public final class RestconfConstants {
     public static final String MOUNT = "yang-ext:mount";
-    public static final String IDENTIFIER = "identifier";
     public static final Splitter SLASH_SPLITTER = Splitter.on('/');
     public static final String BASE_URI_PATTERN = "rests";
     public static final String NOTIF = "notif";
