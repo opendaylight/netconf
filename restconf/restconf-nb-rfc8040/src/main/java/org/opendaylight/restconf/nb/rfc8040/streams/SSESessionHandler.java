@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams.sse;
+package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
@@ -14,7 +14,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
-import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * SSE session handler that is responsible for controlling of session, managing subscription to data-change-event or
  * notification listener, and sending of data over established SSE session.
  */
-public class SSESessionHandler implements StreamSessionHandler {
+public final class SSESessionHandler implements StreamSessionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(SSESessionHandler.class);
     private static final String PING_PAYLOAD = "ping";
 

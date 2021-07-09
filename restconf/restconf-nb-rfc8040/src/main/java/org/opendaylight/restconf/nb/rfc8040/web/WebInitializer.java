@@ -27,7 +27,7 @@ import org.opendaylight.restconf.nb.rfc8040.DataStreamApplication;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
 import org.opendaylight.restconf.nb.rfc8040.RootFoundApplication;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
-import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketInitializer;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 
 /**

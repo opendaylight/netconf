@@ -5,17 +5,22 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+package org.opendaylight.restconf.nb.rfc8040.streams;
 
-package org.opendaylight.restconf.nb.rfc8040.streams.websockets;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer.WebSocketFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -29,7 +34,7 @@ public class WebSocketFactoryTest {
             .node(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))
             .build();
 
-    private final WebSocketFactory webSocketFactory = new WebSocketFactory(Mockito.mock(ScheduledExecutorService.class),
+    private final WebSocketFactory webSocketFactory = new WebSocketFactory(mock(ScheduledExecutorService.class),
             5000, 2000);
 
     @BeforeClass
@@ -40,26 +45,26 @@ public class WebSocketFactoryTest {
 
     @Test
     public void createWebSocketSuccessfully() {
-        final ServletUpgradeRequest upgradeRequest = Mockito.mock(ServletUpgradeRequest.class);
-        final ServletUpgradeResponse upgradeResponse = Mockito.mock(ServletUpgradeResponse.class);
-        Mockito.when(upgradeRequest.getRequestURI()).thenReturn(URI.create('/' + REGISTERED_STREAM_NAME + '/'));
+        final ServletUpgradeRequest upgradeRequest = mock(ServletUpgradeRequest.class);
+        final ServletUpgradeResponse upgradeResponse = mock(ServletUpgradeResponse.class);
+        doReturn(URI.create('/' + REGISTERED_STREAM_NAME + '/')).when(upgradeRequest).getRequestURI();
 
         final Object webSocket = webSocketFactory.createWebSocket(upgradeRequest, upgradeResponse);
-        Assert.assertTrue(webSocket instanceof WebSocketSessionHandler);
-        Mockito.verify(upgradeResponse).setSuccess(true);
-        Mockito.verify(upgradeResponse).setStatusCode(101);
+        assertThat(webSocket, instanceOf(WebSocketSessionHandler.class));
+        verify(upgradeResponse).setSuccess(true);
+        verify(upgradeResponse).setStatusCode(101);
     }
 
     @Test
     public void createWebSocketUnsuccessfully() {
-        final ServletUpgradeRequest upgradeRequest = Mockito.mock(ServletUpgradeRequest.class);
-        final ServletUpgradeResponse upgradeResponse = Mockito.mock(ServletUpgradeResponse.class);
-        Mockito.when(upgradeRequest.getRequestURI()).thenReturn(URI.create('/' + REGISTERED_STREAM_NAME + '/'
-                + "toasterStatus"));
+        final ServletUpgradeRequest upgradeRequest = mock(ServletUpgradeRequest.class);
+        final ServletUpgradeResponse upgradeResponse = mock(ServletUpgradeResponse.class);
+        doReturn(URI.create('/' + REGISTERED_STREAM_NAME + '/' + "toasterStatus"))
+            .when(upgradeRequest).getRequestURI();
 
         final Object webSocket = webSocketFactory.createWebSocket(upgradeRequest, upgradeResponse);
-        Assert.assertNull(webSocket);
-        Mockito.verify(upgradeResponse).setSuccess(false);
-        Mockito.verify(upgradeResponse).setStatusCode(404);
+        assertNull(webSocket);
+        verify(upgradeResponse).setSuccess(false);
+        verify(upgradeResponse).setStatusCode(404);
     }
 }
