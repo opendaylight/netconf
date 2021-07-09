@@ -407,12 +407,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final DOMActionResult response;
         final EffectiveModelContext schemaContextRef;
         if (mountPoint != null) {
-            response = RestconfInvokeOperationsUtil.invokeActionViaMountPoint(mountPoint, (ContainerNode) data,
-                schemaPath, yangIIdContext);
+            response = RestconfInvokeOperationsUtil.invokeAction((ContainerNode) data, schemaPath, yangIIdContext,
+                mountPoint);
             schemaContextRef = modelContext(mountPoint);
         } else {
-            response = RestconfInvokeOperationsUtil.invokeAction((ContainerNode) data, schemaPath,
-                this.actionService, yangIIdContext);
+            response = RestconfInvokeOperationsUtil.invokeAction((ContainerNode) data, schemaPath, yangIIdContext,
+                actionService);
             schemaContextRef = this.schemaContextHandler.get();
         }
         final DOMActionResult result = RestconfInvokeOperationsUtil.checkActionResponse(response);

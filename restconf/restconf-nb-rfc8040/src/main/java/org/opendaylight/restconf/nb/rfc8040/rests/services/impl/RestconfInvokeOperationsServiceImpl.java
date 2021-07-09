@@ -75,7 +75,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             }
             schemaContextRef = this.schemaContextHandler.get();
         } else {
-            response = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(mountPoint, payload.getData(), schemaPath);
+            response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath, mountPoint);
             schemaContextRef = modelContext(mountPoint);
         }
 

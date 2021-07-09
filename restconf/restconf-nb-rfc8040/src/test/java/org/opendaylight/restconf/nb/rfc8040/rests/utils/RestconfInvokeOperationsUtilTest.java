@@ -16,7 +16,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ public class RestconfInvokeOperationsUtilTest {
 
     @Test
     public void invokeRpcTest() {
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
+        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
         final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, rpcService);
         assertTrue(rpcResult.getErrors().isEmpty());
@@ -70,10 +70,9 @@ public class RestconfInvokeOperationsUtilTest {
     @Test
     public void invokeRpcViaMountPointTest() {
         doReturn(Optional.ofNullable(rpcService)).when(moutPoint).getService(DOMRpcService.class);
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
+        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
-        final DOMRpcResult rpcResult =
-                RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(moutPoint, DATA.input, DATA.rpc);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, moutPoint);
         assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(DATA.output, rpcResult.getResult());
     }
@@ -81,14 +80,13 @@ public class RestconfInvokeOperationsUtilTest {
     @Test(expected = RestconfDocumentedException.class)
     public void invokeRpcMissingMountPointServiceTest() {
         doReturn(Optional.empty()).when(moutPoint).getService(DOMRpcService.class);
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
-        final DOMRpcResult rpcResult =
-                RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(moutPoint, DATA.input, DATA.rpc);
+        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, List.of());
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, moutPoint);
     }
 
     @Test
     public void checkResponseTest() {
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
+        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
         final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, rpcService);
         assertTrue(rpcResult.getErrors().isEmpty());

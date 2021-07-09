@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -48,19 +47,16 @@ public final class RestconfInvokeOperationsUtil {
      *             mount point
      * @param data
      *             input data
-     * @param schemaPath
-     *             schema path of data
+     * @param rpc
+     *             RPC type
      * @return {@link DOMRpcResult}
      */
-    public static DOMRpcResult invokeRpcViaMountPoint(final DOMMountPoint mountPoint, final NormalizedNode data,
-            final QName schemaPath) {
-        final Optional<DOMRpcService> mountPointService = mountPoint.getService(DOMRpcService.class);
-        if (mountPointService.isPresent()) {
-            return prepareResult(mountPointService.get().invokeRpc(schemaPath, nonnullInput(schemaPath, data)));
-        }
-        final String errmsg = "RPC service is missing.";
-        LOG.debug(errmsg);
-        throw new RestconfDocumentedException(errmsg);
+    public static DOMRpcResult invokeRpc(final NormalizedNode data, final QName rpc, final DOMMountPoint mountPoint) {
+        return invokeRpc(data, rpc, mountPoint.getService(DOMRpcService.class).orElseThrow(() -> {
+            final String errmsg = "RPC service is missing.";
+            LOG.debug(errmsg);
+            return new RestconfDocumentedException(errmsg);
+        }));
     }
 
     /**
@@ -75,7 +71,10 @@ public final class RestconfInvokeOperationsUtil {
      * @return {@link DOMRpcResult}
      */
     public static DOMRpcResult invokeRpc(final NormalizedNode data, final QName rpc, final DOMRpcService rpcService) {
-        return prepareResult(rpcService.invokeRpc(rpc, nonnullInput(rpc, data)));
+        final ListenableFuture<? extends DOMRpcResult> future = rpcService.invokeRpc(rpc, nonnullInput(rpc, data));
+        final RpcResultFactory dataFactory = new RpcResultFactory();
+        FutureCallbackTx.addCallback(future, PostDataTransactionUtil.POST_TX_TYPE, dataFactory);
+        return dataFactory.build();
     }
 
     private static @NonNull NormalizedNode nonnullInput(final QName type, final NormalizedNode input) {
@@ -107,12 +106,6 @@ public final class RestconfInvokeOperationsUtil {
         }
     }
 
-    private static DOMRpcResult prepareResult(final ListenableFuture<? extends DOMRpcResult> rpc) {
-        final RpcResultFactory dataFactory = new RpcResultFactory();
-        FutureCallbackTx.addCallback(rpc, PostDataTransactionUtil.POST_TX_TYPE, dataFactory);
-        return dataFactory.build();
-    }
-
     /**
      * Invoking Action via mount point.
      *
@@ -124,13 +117,10 @@ public final class RestconfInvokeOperationsUtil {
      *             schema path of data
      * @return {@link DOMActionResult}
      */
-    public static DOMActionResult invokeActionViaMountPoint(final DOMMountPoint mountPoint, final ContainerNode data,
-            final Absolute schemaPath, final YangInstanceIdentifier yangIId) {
-        final Optional<DOMActionService> mountPointService = mountPoint.getService(DOMActionService.class);
-        if (mountPointService.isEmpty()) {
-            throw new RestconfDocumentedException("DomAction service is missing.");
-        }
-        return prepareActionResult(mountPointService.get().invokeAction(schemaPath, prepareDataTreeId(yangIId), data));
+    public static DOMActionResult invokeAction(final ContainerNode data,
+            final Absolute schemaPath, final YangInstanceIdentifier yangIId, final DOMMountPoint mountPoint) {
+        return invokeAction(data, schemaPath, yangIId, mountPoint.getService(DOMActionService.class)
+            .orElseThrow(() -> new RestconfDocumentedException("DomAction service is missing.")));
     }
 
     /**
@@ -144,10 +134,13 @@ public final class RestconfInvokeOperationsUtil {
      *             action service to invoke action
      * @return {@link DOMActionResult}
      */
-    // FIXME: eliminate this method
     public static DOMActionResult invokeAction(final ContainerNode data, final Absolute schemaPath,
-            final DOMActionService actionService, final YangInstanceIdentifier yangIId) {
-        return prepareActionResult(actionService.invokeAction(schemaPath, prepareDataTreeId(yangIId), data));
+            final YangInstanceIdentifier yangIId, final DOMActionService actionService) {
+        final ListenableFuture<? extends DOMActionResult> future = actionService.invokeAction(schemaPath,
+            new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent()), data);
+        final ActionResultFactory dataFactory = new ActionResultFactory();
+        FutureCallbackTx.addCallback(future, PostDataTransactionUtil.POST_TX_TYPE, dataFactory);
+        return dataFactory.build();
     }
 
     /**
@@ -172,28 +165,5 @@ public final class RestconfInvokeOperationsUtil {
             }
         }
         return null;
-    }
-
-    /**
-     * Prepare Action Result.
-     *
-     * @param actionResult
-     *            {@link DOMActionResult} - action result
-     * @return {@link DOMActionResult} result
-     */
-    private static DOMActionResult prepareActionResult(final ListenableFuture<? extends DOMActionResult> actionResult) {
-        final ActionResultFactory dataFactory = new ActionResultFactory();
-        FutureCallbackTx.addCallback(actionResult, PostDataTransactionUtil.POST_TX_TYPE, dataFactory);
-        return dataFactory.build();
-    }
-
-    /**
-     * Prepare DOMDataTree Identifier.
-     *
-     * @param yangIId {@link YangInstanceIdentifier}
-     * @return {@link DOMDataTreeIdentifier} domDataTreeIdentifier
-     */
-    private static DOMDataTreeIdentifier prepareDataTreeId(final YangInstanceIdentifier yangIId) {
-        return new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent());
     }
 }
