@@ -32,12 +32,6 @@ public class SchemaExportContentYinBodyWriter implements MessageBodyWriter<Schem
     }
 
     @Override
-    public long getSize(final SchemaExportContext context, final Class<?> type, final Type genericType,
-            final Annotation[] annotations, final MediaType mediaType) {
-        return -1;
-    }
-
-    @Override
     public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws

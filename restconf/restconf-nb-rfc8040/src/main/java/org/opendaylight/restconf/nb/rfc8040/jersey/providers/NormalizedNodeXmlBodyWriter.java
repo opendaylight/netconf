@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import java.io.IOException;
@@ -47,7 +46,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
-
     private static final XMLOutputFactory XML_FACTORY;
 
     static {
@@ -61,15 +59,6 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
                                final Annotation[] annotations,
                                final MediaType mediaType) {
         return type.equals(NormalizedNodeContext.class);
-    }
-
-    @Override
-    public long getSize(final NormalizedNodeContext context,
-                        final Class<?> type,
-                        final Type genericType,
-                        final Annotation[] annotations,
-                        final MediaType mediaType) {
-        return -1;
     }
 
     @Override
