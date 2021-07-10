@@ -50,12 +50,10 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ParserIdentifierTest {
     // mount point identifier
-    private static final String MOUNT_POINT_IDENT =
-            "mount-point:mount-container/point-number" + "/" + RestconfConstants.MOUNT;
+    private static final String MOUNT_POINT_IDENT = "mount-point:mount-container/point-number/yang-ext:mount";
 
     // invalid mount point identifier
-    private static final String INVALID_MOUNT_POINT_IDENT =
-            "mount-point:point-number" + "/" + RestconfConstants.MOUNT;
+    private static final String INVALID_MOUNT_POINT_IDENT = "mount-point:point-number/yang-ext:mount";
 
     // test identifier + expected result
     private static final String TEST_IDENT =
@@ -249,7 +247,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierMissingMountPointNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toInstanceIdentifier("" + "/" + RestconfConstants.MOUNT, SCHEMA_CONTEXT,
+            () -> ParserIdentifier.toInstanceIdentifier("/yang-ext:mount", SCHEMA_CONTEXT,
                 Optional.of(this.mountPointService)));
         assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", ErrorTag.RESOURCE_DENIED_TRANSPORT, ex.getErrors().get(0).getErrorTag());
@@ -263,7 +261,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierMissingMountPointServiceNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toInstanceIdentifier(RestconfConstants.MOUNT, SCHEMA_CONTEXT, Optional.empty()));
+            () -> ParserIdentifier.toInstanceIdentifier("yang-ext:mount", SCHEMA_CONTEXT, Optional.empty()));
         assertEquals("Not expected error type", ErrorType.APPLICATION, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", ErrorTag.OPERATION_FAILED, ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 500, ex.getErrors().get(0).getErrorTag().getStatusCode());
@@ -565,7 +563,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierNullSchemaContextBehindMountPointNegativeTest() {
         assertThrows(IllegalStateException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
-                SCHEMA_CONTEXT, "/" + RestconfConstants.MOUNT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
+                SCHEMA_CONTEXT, "/yang-ext:mount/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
                 this.mockMountPointService, sourceProvider));
     }
 

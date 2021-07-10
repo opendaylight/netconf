@@ -249,13 +249,12 @@ public final class ParserIdentifier {
                 final String current = componentIter.next();
 
                 if (RestconfConstants.MOUNT.equals(current)) {
-                    pathBuilder.append("/");
-                    pathBuilder.append(RestconfConstants.MOUNT);
+                    pathBuilder.append('/').append(RestconfConstants.MOUNT);
                     break;
                 }
 
                 if (pathBuilder.length() != 0) {
-                    pathBuilder.append("/");
+                    pathBuilder.append('/');
                 }
 
                 pathBuilder.append(current);

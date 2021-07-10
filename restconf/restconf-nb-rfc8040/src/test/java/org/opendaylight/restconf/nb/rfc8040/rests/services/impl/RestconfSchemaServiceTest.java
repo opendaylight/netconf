@@ -33,7 +33,6 @@ import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -46,9 +45,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
  */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfSchemaServiceTest {
-    private static final String MOUNT_POINT = "mount-point-1:cont" + "/" + RestconfConstants.MOUNT + "/";
-    private static final String NULL_MOUNT_POINT = "mount-point-2:cont" + "/" + RestconfConstants.MOUNT + "/";
-    private static final String NOT_EXISTING_MOUNT_POINT = "mount-point-3:cont" + "/" + RestconfConstants.MOUNT + "/";
+    private static final String MOUNT_POINT = "mount-point-1:cont/yang-ext:mount/";
+    private static final String NULL_MOUNT_POINT = "mount-point-2:cont/yang-ext:mount/";
+    private static final String NOT_EXISTING_MOUNT_POINT = "mount-point-3:cont/yang-ext:mount/";
 
     private static final String TEST_MODULE = "module1/2014-01-01";
     private static final String TEST_MODULE_BEHIND_MOUNT_POINT = "module1-behind-mount-point/2014-02-03";
