@@ -172,7 +172,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     }
 
     /**
-     * Parser and holder of query paramteres from uriInfo for notifications.
+     * Parser and holder of query parameters from uriInfo for notifications.
      */
     public static final class NotificationQueryParams {
         private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
@@ -189,13 +189,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         private final Instant stop;
         private final String filter;
         private final boolean skipNotificationData;
+        private final boolean leafNodesOnly;
 
         private NotificationQueryParams(final Instant start, final Instant stop, final String filter,
-                final boolean skipNotificationData) {
+                final boolean skipNotificationData, final boolean leafNodesOnly) {
             this.start = start == null ? Instant.now() : start;
             this.stop = stop;
             this.filter = filter;
             this.skipNotificationData = skipNotificationData;
+            this.leafNodesOnly = leafNodesOnly;
         }
 
         static NotificationQueryParams fromUriInfo(final UriInfo uriInfo) {
@@ -207,6 +209,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
             boolean filterUsed = false;
             boolean skipNotificationDataUsed = false;
             boolean skipNotificationData = false;
+            boolean leafNodesOnlyUsed = false;
+            boolean leafNodesOnly = false;
 
             for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
                 switch (entry.getKey()) {
@@ -241,6 +245,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                                     "Odl-skip-notification-data parameter can be used only once.");
                         }
                         break;
+                    case "odl-leaf-nodes-only":
+                        if (!leafNodesOnlyUsed) {
+                            leafNodesOnlyUsed = true;
+                            leafNodesOnly = Boolean.parseBoolean(entry.getValue().iterator().next());
+                        } else {
+                            throw new RestconfDocumentedException(
+                                    "Odl-leaf-nodes-only parameter can be used only once.");
+                        }
+                        break;
                     default:
                         throw new RestconfDocumentedException(
                                 "Bad parameter used with notifications: " + entry.getKey());
@@ -250,7 +263,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                 throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
             }
 
-            return new NotificationQueryParams(start, stop, filter, skipNotificationData);
+            return new NotificationQueryParams(start, stop, filter, skipNotificationData, leafNodesOnly);
         }
 
 
@@ -307,6 +320,16 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          */
         public boolean isSkipNotificationData() {
             return skipNotificationData;
+        }
+
+        /**
+         * Get value of 'odl-leaf-nodes-only' value. If it is set to {@code true}, only updated leaf nodes
+         * are notified to subscriber.
+         *
+         * @return odl-leaf-nodes-only flag
+         */
+        public boolean isLeafNodesOnly() {
+            return leafNodesOnly;
         }
     }
 }
