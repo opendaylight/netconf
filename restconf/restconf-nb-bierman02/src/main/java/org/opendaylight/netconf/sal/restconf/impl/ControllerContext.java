@@ -463,7 +463,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     private static DataSchemaNode childByQName(final CaseSchemaNode container, final QName name) {
-        return container.getDataChildByName(name);
+        return container.dataChildByName(name);
     }
 
     private static DataSchemaNode childByQName(final ContainerSchemaNode container, final QName name) {
@@ -503,7 +503,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     private static DataSchemaNode dataNodeChildByQName(final DataNodeContainer container, final QName name) {
-        final DataSchemaNode ret = container.getDataChildByName(name);
+        final DataSchemaNode ret = container.dataChildByName(name);
         if (ret == null) {
             for (final DataSchemaNode node : container.getChildNodes()) {
                 if (node instanceof ChoiceSchemaNode) {
