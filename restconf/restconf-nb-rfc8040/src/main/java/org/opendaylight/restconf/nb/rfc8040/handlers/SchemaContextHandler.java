@@ -32,6 +32,8 @@ import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUti
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Submodule;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -50,14 +52,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.Deviation;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.Submodule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +70,18 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class SchemaContextHandler implements EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
+    private static final NodeIdentifier MODULE_CONFORMANCE_NODEID =
+        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "conformance-type").intern());
+    private static final NodeIdentifier MODULE_FEATURE_NODEID =
+        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "feature").intern());
+    private static final NodeIdentifier MODULE_NAME_NODEID =
+        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "name").intern());
+    private static final NodeIdentifier MODULE_NAMESPACE_NODEID =
+        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "namespace").intern());
+    private static final NodeIdentifier MODULE_REVISION_NODEID =
+        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "revision").intern());
+    private static final NodeIdentifier MODULE_SCHEMA_NODEID =
+        NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "schema").intern());
 
     private final AtomicInteger moduleSetId = new AtomicInteger(0);
 
@@ -182,13 +194,13 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
             newCommonLeafsMapEntryBuilder(mapQName, module);
 
-        mapEntryBuilder.withChild(ImmutableNodes.leafNode(IetfYangLibrary.SPECIFIC_MODULE_SCHEMA_LEAF_QNAME,
-            IetfYangLibrary.BASE_URI_OF_SCHEMA + module.getName() + "/"
+        mapEntryBuilder.withChild(ImmutableNodes.leafNode(MODULE_SCHEMA_NODEID,
+            "/modules/" + module.getName() + "/"
             // FIXME: orElse(null) does not seem appropriate here
             + module.getQNameModule().getRevision().map(Revision::toString).orElse(null)));
 
         if (!isSubmodule) {
-            mapEntryBuilder.withChild(ImmutableNodes.leafNode(IetfYangLibrary.SPECIFIC_MODULE_NAMESPACE_LEAF_QNAME,
+            mapEntryBuilder.withChild(ImmutableNodes.leafNode(MODULE_NAMESPACE_NODEID,
                 module.getNamespace().toString()));
 
             // features - not mandatory
@@ -204,7 +216,7 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
                 conformance = ConformanceType.Import;
             }
             mapEntryBuilder.withChild(
-                ImmutableNodes.leafNode(IetfYangLibrary.SPECIFIC_MODULE_CONFORMANCE_LEAF_QNAME, conformance.getName()));
+                ImmutableNodes.leafNode(MODULE_CONFORMANCE_NODEID, conformance.getName()));
 
             // submodules - not mandatory
             if (module.getSubmodules() != null && !module.getSubmodules().isEmpty()) {
@@ -226,11 +238,10 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final SchemaContext context) {
         final CollectionNodeBuilder<MapEntryNode, UserMapNode> mapBuilder = Builders.orderedMapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.SPECIFIC_MODULE_SUBMODULE_LIST_QNAME));
+            .withNodeIdentifier(new NodeIdentifier(Submodule.QNAME));
 
-        for (final Submodule submodule : module.getSubmodules()) {
-            fillMapByModules(mapBuilder, IetfYangLibrary.SPECIFIC_MODULE_SUBMODULE_LIST_QNAME, true, submodule,
-                context);
+        for (final var submodule : module.getSubmodules()) {
+            fillMapByModules(mapBuilder, Submodule.QNAME, true, submodule, context);
         }
         mapEntryBuilder.withChild(mapBuilder.build());
     }
@@ -249,12 +260,12 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final SchemaContext context) {
         final CollectionNodeBuilder<MapEntryNode, SystemMapNode> deviations = Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.SPECIFIC_MODULE_DEVIATION_LIST_QNAME));
-        for (final Deviation deviation : module.getDeviations()) {
+            .withNodeIdentifier(new NodeIdentifier(Deviation.QNAME));
+        for (final var deviation : module.getDeviations()) {
             final List<QName> ids = deviation.getTargetPath().getNodeIdentifiers();
             final QName lastComponent = ids.get(ids.size() - 1);
 
-            deviations.withChild(newCommonLeafsMapEntryBuilder(IetfYangLibrary.SPECIFIC_MODULE_DEVIATION_LIST_QNAME,
+            deviations.withChild(newCommonLeafsMapEntryBuilder(Deviation.QNAME,
                 context.findModule(lastComponent.getModule()).get())
                 .build());
         }
@@ -271,7 +282,7 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Collection<? extends FeatureDefinition> features) {
         final ListNodeBuilder<String, SystemLeafSetNode<String>> leafSetBuilder = Builders.<String>leafSetBuilder()
-                .withNodeIdentifier(new NodeIdentifier(IetfYangLibrary.SPECIFIC_MODULE_FEATURE_LEAF_LIST_QNAME));
+                .withNodeIdentifier(MODULE_FEATURE_NODEID);
         for (final FeatureDefinition feature : features) {
             leafSetBuilder.withChildValue(feature.getQName().getLocalName());
         }
@@ -283,10 +294,9 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
         final var name = module.getName();
         final var revision = module.getQNameModule().getRevision().map(Revision::toString).orElse("");
         return Builders.mapEntryBuilder()
-            .withNodeIdentifier(NodeIdentifierWithPredicates.of(qname, Map.of(
-                IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, name,
-                IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME, revision)))
-            .withChild(ImmutableNodes.leafNode(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, name))
-            .withChild(ImmutableNodes.leafNode(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME, revision));
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(qname,
+                Map.of(MODULE_NAME_NODEID.getNodeType(), name, MODULE_REVISION_NODEID.getNodeType(), revision)))
+            .withChild(ImmutableNodes.leafNode(MODULE_NAME_NODEID, name))
+            .withChild(ImmutableNodes.leafNode(MODULE_REVISION_NODEID, revision));
     }
 }

@@ -30,6 +30,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -172,8 +173,7 @@ public class RestconfMappingNodeUtilTest {
             if (child instanceof MapNode) {
                 for (final MapEntryNode mapEntryNode : ((MapNode) child).body()) {
                     for (final DataContainerChild dataContainerChild : mapEntryNode.body()) {
-                        if (dataContainerChild.getIdentifier().getNodeType()
-                                .equals(IetfYangLibrary.SPECIFIC_MODULE_DEVIATION_LIST_QNAME)) {
+                        if (dataContainerChild.getIdentifier().getNodeType().equals(Deviation.QNAME)) {
                             deviationsFound++;
                         }
                     }
@@ -203,10 +203,10 @@ public class RestconfMappingNodeUtilTest {
                     String revision = "";
                     for (final DataContainerChild dataContainerChild : mapEntryNode.body()) {
                         switch (dataContainerChild.getIdentifier().getNodeType().getLocalName()) {
-                            case IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF:
+                            case "name":
                                 name = String.valueOf(dataContainerChild.body());
                                 break;
-                            case IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF:
+                            case "revision":
                                 revision = String.valueOf(dataContainerChild.body());
                                 break;
                             default :
