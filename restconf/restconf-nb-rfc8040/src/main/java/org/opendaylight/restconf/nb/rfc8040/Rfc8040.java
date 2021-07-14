@@ -14,8 +14,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.mo
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Submodule;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -91,29 +89,6 @@ public final class Rfc8040 {
         public static final QName MODULE_SET_ID_LEAF_QNAME = QName.create(MODULE_QNAME, "module-set-id").intern();
 
         public static final QName MODULE_QNAME_LIST = Module.QNAME;
-
-        public static final String SPECIFIC_MODULE_NAME_LEAF = "name";
-        public static final QName SPECIFIC_MODULE_NAME_LEAF_QNAME =
-                QName.create(MODULE_QNAME, SPECIFIC_MODULE_NAME_LEAF).intern();
-
-        public static final String SPECIFIC_MODULE_REVISION_LEAF = "revision";
-        public static final QName SPECIFIC_MODULE_REVISION_LEAF_QNAME =
-                QName.create(MODULE_QNAME, SPECIFIC_MODULE_REVISION_LEAF).intern();
-
-        public static final String BASE_URI_OF_SCHEMA = "/modules/";
-        public static final QName SPECIFIC_MODULE_SCHEMA_LEAF_QNAME = QName.create(MODULE_QNAME, "schema").intern();
-        public static final QName SPECIFIC_MODULE_NAMESPACE_LEAF_QNAME =
-                QName.create(MODULE_QNAME, "namespace").intern();
-
-        public static final QName SPECIFIC_MODULE_FEATURE_LEAF_LIST_QNAME =
-                QName.create(MODULE_QNAME, "feature").intern();
-
-        public static final QName SPECIFIC_MODULE_DEVIATION_LIST_QNAME = Deviation.QNAME;
-
-        public static final QName SPECIFIC_MODULE_CONFORMANCE_LEAF_QNAME =
-                QName.create(MODULE_QNAME, "conformance-type").intern();
-
-        public static final QName SPECIFIC_MODULE_SUBMODULE_LIST_QNAME = Submodule.QNAME;
 
         private IetfYangLibrary() {
             // Hidden on purpose
