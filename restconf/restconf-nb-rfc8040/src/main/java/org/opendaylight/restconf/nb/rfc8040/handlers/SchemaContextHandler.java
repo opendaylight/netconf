@@ -20,7 +20,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -92,8 +91,7 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
     private volatile EffectiveModelContext schemaContext;
 
     @Inject
-    public SchemaContextHandler(@Reference final DOMDataBroker domDataBroker,
-            @Reference final DOMSchemaService domSchemaService) {
+    public SchemaContextHandler(final DOMDataBroker domDataBroker, final DOMSchemaService domSchemaService) {
         this.domDataBroker = requireNonNull(domDataBroker);
         this.domSchemaService = requireNonNull(domSchemaService);
     }

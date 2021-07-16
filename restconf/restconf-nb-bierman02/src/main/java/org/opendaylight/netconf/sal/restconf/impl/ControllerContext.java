@@ -35,7 +35,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response.Status;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -103,8 +102,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     private volatile DataNormalizer dataNormalizer;
 
     @Inject
-    public ControllerContext(final @Reference DOMSchemaService schemaService,
-            final @Reference DOMMountPointService mountService, final @Reference DOMSchemaService domSchemaService) {
+    public ControllerContext(final DOMSchemaService schemaService, final DOMMountPointService mountService,
+            final DOMSchemaService domSchemaService) {
         this.mountService = mountService;
         this.yangTextSourceProvider = domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
 

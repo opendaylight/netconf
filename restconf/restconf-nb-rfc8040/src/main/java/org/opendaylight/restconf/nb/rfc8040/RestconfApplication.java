@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -49,10 +48,10 @@ public class RestconfApplication extends AbstractRestconfApplication {
 
     @Inject
     public RestconfApplication(final SchemaContextHandler schemaContextHandler,
-            @Reference final DOMMountPointService mountPointService, @Reference final DOMDataBroker dataBroker,
-            @Reference final DOMRpcService rpcService, @Reference final DOMActionService actionService,
-            @Reference final DOMNotificationService notificationService,
-            @Reference final DOMSchemaService domSchemaService, final Configuration configuration) {
+            final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
+            final DOMRpcService rpcService, final DOMActionService actionService,
+            final DOMNotificationService notificationService,
+            final DOMSchemaService domSchemaService, final Configuration configuration) {
         this(schemaContextHandler, mountPointService,
             new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, schemaContextHandler,
                 configuration),

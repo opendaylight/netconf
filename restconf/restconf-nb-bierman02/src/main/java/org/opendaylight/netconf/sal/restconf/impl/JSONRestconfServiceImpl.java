@@ -24,7 +24,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
-import org.apache.aries.blueprint.annotation.service.Service;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
@@ -54,7 +53,6 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Deprecated
-@Service(classes = JSONRestconfService.class)
 public class JSONRestconfServiceImpl implements JSONRestconfService {
     private static final Logger LOG = LoggerFactory.getLogger(JSONRestconfServiceImpl.class);
 
