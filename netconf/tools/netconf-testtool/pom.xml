@@ -96,6 +96,11 @@
             <artifactId>netconf-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.guicedee.services</groupId>
+            <artifactId>javax.inject</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc6991</artifactId>
         </dependency>

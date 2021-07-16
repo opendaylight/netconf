@@ -27,7 +27,6 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
-import java.io.Closeable;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.api.NetconfSession;
@@ -40,9 +39,7 @@ import org.slf4j.LoggerFactory;
  * start method that will handle sockets in different thread.
  */
 @Deprecated
-public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L extends NetconfSessionListener<? super S>>
-        implements Closeable {
-
+public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L extends NetconfSessionListener<? super S>> {
     protected interface ChannelPipelineInitializer<C extends Channel, S extends NetconfSession> {
         /**
          * Initializes channel by specifying the handlers in its pipeline. Handlers are protocol specific, therefore
@@ -58,7 +55,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
         extends ChannelPipelineInitializer<SocketChannel, S> {
 
     }
-
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfDispatcher.class);
 
@@ -251,10 +247,5 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
         if (bootstrap.group() == null) {
             bootstrap.group(workerGroup);
         }
-    }
-
-    @Deprecated
-    @Override
-    public void close() {
     }
 }
