@@ -10,11 +10,8 @@ package org.opendaylight.netconf.console.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -93,35 +90,30 @@ public class NetconfCommandsImpl implements NetconfCommands {
     @Override
     public Map<String, Map<String, List<String>>> showDevice(final String deviceIp, final String devicePort) {
         final Map<String, Map<String, List<String>>> device = new HashMap<>();
-        List<Node> nodeList = new ArrayList<>();
+        final Node node;
         if (devicePort != null) {
-            nodeList.add(NetconfConsoleUtils.getNetconfNodeFromIpAndPort(deviceIp, devicePort, dataBroker));
+            node = NetconfConsoleUtils.getNetconfNodeFromIpAndPort(deviceIp, devicePort, dataBroker);
         } else {
-            nodeList = NetconfConsoleUtils.getNetconfNodeFromId(deviceIp, dataBroker);
+            node = NetconfConsoleUtils.getNetconfNodeFromId(deviceIp, dataBroker);
         }
-        if (nodeList != null) {
-            for (final Node node : nodeList) {
-                if (node != null) {
-                    final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
-                    final Map<String, List<String>> attributes = new HashMap<>();
-                    attributes.put(NetconfConsoleConstants.NETCONF_ID, ImmutableList.of(node.getNodeId().getValue()));
-                    attributes.put(NetconfConsoleConstants.NETCONF_IP,
-                            ImmutableList.of(netconfNode.getHost().getIpAddress().getIpv4Address().getValue()));
-                    attributes.put(NetconfConsoleConstants.NETCONF_PORT,
-                            ImmutableList.of(netconfNode.getPort().getValue().toString()));
-                    attributes.put(NetconfConsoleConstants.STATUS,
-                            ImmutableList.of(netconfNode.getConnectionStatus().name()));
-                    if (netconfNode.getConnectionStatus().equals(
-                            NetconfNodeConnectionStatus.ConnectionStatus.Connected)) {
-                        attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES,
-                                netconfNode.getAvailableCapabilities().getAvailableCapability().stream()
-                                        .map(AvailableCapability::getCapability).collect(Collectors.toList()));
-                    } else {
-                        attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, Collections.singletonList(""));
-                    }
-                    device.put(node.getNodeId().getValue(), attributes);
-                }
+        if (node != null) {
+            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
+            final Map<String, List<String>> attributes = new HashMap<>();
+            attributes.put(NetconfConsoleConstants.NETCONF_ID, List.of(node.getNodeId().getValue()));
+            attributes.put(NetconfConsoleConstants.NETCONF_IP,
+                List.of(netconfNode.getHost().getIpAddress().getIpv4Address().getValue()));
+            attributes.put(NetconfConsoleConstants.NETCONF_PORT, List.of(netconfNode.getPort().getValue().toString()));
+            attributes.put(NetconfConsoleConstants.STATUS, List.of(netconfNode.getConnectionStatus().name()));
+            if (netconfNode.getConnectionStatus().equals(
+                NetconfNodeConnectionStatus.ConnectionStatus.Connected)) {
+                attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, netconfNode.getAvailableCapabilities()
+                    .getAvailableCapability().stream()
+                        .map(AvailableCapability::getCapability)
+                        .collect(Collectors.toList()));
+            } else {
+                attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, List.of(""));
             }
+            device.put(node.getNodeId().getValue(), attributes);
         }
         return device;
     }
@@ -129,27 +121,23 @@ public class NetconfCommandsImpl implements NetconfCommands {
     @Override
     public Map<String, Map<String, List<String>>> showDevice(final String deviceId) {
         final Map<String, Map<String, List<String>>> device = new HashMap<>();
-        final List<Node> nodeList = NetconfConsoleUtils.getNetconfNodeFromId(deviceId, dataBroker);
-        if (nodeList != null && nodeList.size() > 0) {
-            for (final Node node : nodeList) {
-                final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
-                final Map<String, List<String>> attributes = new HashMap<>();
-                attributes.put(NetconfConsoleConstants.NETCONF_ID, ImmutableList.of(node.getNodeId().getValue()));
-                attributes.put(NetconfConsoleConstants.NETCONF_IP,
-                        ImmutableList.of(netconfNode.getHost().getIpAddress().getIpv4Address().getValue()));
-                attributes.put(NetconfConsoleConstants.NETCONF_PORT,
-                        ImmutableList.of(netconfNode.getPort().getValue().toString()));
-                attributes.put(NetconfConsoleConstants.STATUS,
-                        ImmutableList.of(netconfNode.getConnectionStatus().name()));
-                if (netconfNode.getConnectionStatus().equals(NetconfNodeConnectionStatus.ConnectionStatus.Connected)) {
-                    attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES,
-                            netconfNode.getAvailableCapabilities().getAvailableCapability().stream()
-                                    .map(AvailableCapability::getCapability).collect(Collectors.toList()));
-                } else {
-                    attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, Collections.singletonList(""));
-                }
-                device.put(node.getNodeId().getValue(), attributes);
+        final Node node = NetconfConsoleUtils.getNetconfNodeFromId(deviceId, dataBroker);
+        if (node != null) {
+            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
+            final Map<String, List<String>> attributes = new HashMap<>();
+            attributes.put(NetconfConsoleConstants.NETCONF_ID, List.of(node.getNodeId().getValue()));
+            attributes.put(NetconfConsoleConstants.NETCONF_IP,
+                List.of(netconfNode.getHost().getIpAddress().getIpv4Address().getValue()));
+            attributes.put(NetconfConsoleConstants.NETCONF_PORT, List.of(netconfNode.getPort().getValue().toString()));
+            attributes.put(NetconfConsoleConstants.STATUS, List.of(netconfNode.getConnectionStatus().name()));
+            if (netconfNode.getConnectionStatus().equals(NetconfNodeConnectionStatus.ConnectionStatus.Connected)) {
+                attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, netconfNode.getAvailableCapabilities()
+                    .getAvailableCapability().stream()
+                        .map(AvailableCapability::getCapability).collect(Collectors.toList()));
+            } else {
+                attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, List.of(""));
             }
+            device.put(node.getNodeId().getValue(), attributes);
         }
         return device;
     }
