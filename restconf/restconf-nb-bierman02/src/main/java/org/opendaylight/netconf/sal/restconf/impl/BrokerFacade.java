@@ -31,7 +31,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response.Status;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -110,8 +109,8 @@ public class BrokerFacade implements Closeable {
     private volatile DOMRpcService rpcService;
 
     @Inject
-    public BrokerFacade(@Reference final DOMRpcService rpcService, @Reference final DOMDataBroker domDataBroker,
-            @Reference final DOMNotificationService domNotification, final ControllerContext controllerContext) {
+    public BrokerFacade(final DOMRpcService rpcService, final DOMDataBroker domDataBroker,
+            final DOMNotificationService domNotification, final ControllerContext controllerContext) {
         this.rpcService = requireNonNull(rpcService);
         this.domDataBroker = requireNonNull(domDataBroker);
         this.domNotification = requireNonNull(domNotification);

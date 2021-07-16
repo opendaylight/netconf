@@ -11,7 +11,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
-import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
 import org.opendaylight.aaa.web.FilterDetails;
@@ -35,9 +34,9 @@ public class WebInitializer {
     private final WebContextRegistration registration;
 
     @Inject
-    public WebInitializer(final @Reference WebServer webServer, final @Reference WebContextSecurer webContextSecurer,
-            final @Reference ServletSupport servletSupport, final RestconfApplication webApp,
-            final @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
+    public WebInitializer(final WebServer webServer, final WebContextSecurer webContextSecurer,
+            final ServletSupport servletSupport, final RestconfApplication webApp,
+            final CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
 
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("restconf").supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
