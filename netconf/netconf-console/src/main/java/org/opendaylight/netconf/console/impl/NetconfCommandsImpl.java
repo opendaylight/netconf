@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.console.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
@@ -20,6 +22,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -44,18 +48,24 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
+@Component(immediate = true)
 public class NetconfCommandsImpl implements NetconfCommands {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCommandsImpl.class);
 
     private final DataBroker dataBroker;
 
-    public NetconfCommandsImpl(final DataBroker db) {
+    @Inject
+    @Activate
+    public NetconfCommandsImpl(@Reference final DataBroker db) {
+        this.dataBroker = requireNonNull(db);
         LOG.debug("NetconfConsoleProviderImpl initialized");
-        this.dataBroker = db;
     }
 
     @Override
@@ -192,16 +202,16 @@ public class NetconfCommandsImpl implements NetconfCommands {
 
     @Override
     public boolean disconnectDevice(final String deviceIp, final String devicePort) {
-        final String netconfNodeId = NetconfConsoleUtils
-                .getNetconfNodeFromIpAndPort(deviceIp, devicePort, dataBroker).getNodeId().getValue();
+        final String netconfNodeId = NetconfConsoleUtils.getNetconfNodeFromIpAndPort(deviceIp, devicePort, dataBroker)
+            .getNodeId().getValue();
         return disconnectDevice(netconfNodeId);
     }
 
     @Override
     public String updateDevice(final String netconfNodeId, final String username, final String password,
                                final Map<String, String> updated) {
-        final Node node = NetconfConsoleUtils
-                .read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.netconfNodeIid(netconfNodeId), dataBroker);
+        final Node node = NetconfConsoleUtils.read(LogicalDatastoreType.OPERATIONAL,
+            NetconfIidFactory.netconfNodeIid(netconfNodeId), dataBroker);
 
         if (node != null && node.augmentation(NetconfNode.class) != null) {
             final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
