@@ -7,10 +7,7 @@
  */
 package org.opendaylight.netconf.console.utils;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -21,12 +18,12 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class NetconfConsoleUtils {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConsoleUtils.class);
 
     private NetconfConsoleUtils() {
@@ -34,36 +31,13 @@ public final class NetconfConsoleUtils {
     }
 
     /**
-     * Returns a list of NETCONF nodes for the IP.
-     * @param deviceIp :IP address of NETCONF device
-     * @param db :An instance of the {@link DataBroker}
-     * @return :list on NETCONF nodes
-     */
-    public static List<Node> getNetconfNodeFromIp(final String deviceIp, final DataBroker db) {
-        final Topology topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
-        List<Node> nodes = new ArrayList<>();
-        for (Node node : netconfNodes(topology)) {
-            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
-            if (netconfNode != null
-                    && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)) {
-                nodes.add(node);
-            }
-        }
-        return nodes.isEmpty() ? null : nodes;
-    }
-
-    /**
      * Returns the NETCONF node associated with the given nodeId.
      * @param nodeId :Id of the NETCONF device
      * @param db :An instance of the {@link DataBroker}
-     * @return :list on NETCONF nodes
+     * @return A node, or null if it is not present
      */
-    public static List<Node> getNetconfNodeFromId(final String nodeId, final DataBroker db) {
-        final Node node = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.netconfNodeIid(nodeId), db);
-        if (node != null) {
-            return Arrays.asList(node);
-        }
-        return null;
+    public static Node getNetconfNodeFromId(final String nodeId, final DataBroker db) {
+        return read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.netconfNodeIid(nodeId), db);
     }
 
     /**
@@ -92,7 +66,7 @@ public final class NetconfConsoleUtils {
      * @return :<code>true</code> if not empty, else, <code>false</code>
      */
     private static Collection<Node> netconfNodes(final Topology topology) {
-        return topology == null ? ImmutableList.of() : topology.nonnullNode().values();
+        return topology == null ? List.of() : topology.nonnullNode().values();
     }
 
     /**
@@ -102,8 +76,8 @@ public final class NetconfConsoleUtils {
      * @param db :An instance of the {@link DataBroker}
      * @return :data read from path
      */
-    public static <D extends org.opendaylight.yangtools.yang.binding.DataObject> D read(
-            final LogicalDatastoreType store, final InstanceIdentifier<D> path, final DataBroker db) {
+    public static <D extends DataObject> D read(final LogicalDatastoreType store, final InstanceIdentifier<D> path,
+            final DataBroker db) {
         final ListenableFuture<Optional<D>> future;
         try (ReadTransaction transaction = db.newReadOnlyTransaction()) {
             future = transaction.read(store, path);
@@ -121,7 +95,9 @@ public final class NetconfConsoleUtils {
             return optionalData.get();
         }
 
-        LOG.debug("{}: Failed to read {}", Thread.currentThread().getStackTrace()[1], path);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("{}: Failed to read {}", Thread.currentThread().getStackTrace()[1], path);
+        }
         return null;
     }
 }

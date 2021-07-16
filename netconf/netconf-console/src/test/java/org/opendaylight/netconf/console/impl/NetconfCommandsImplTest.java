@@ -8,10 +8,8 @@
 package org.opendaylight.netconf.console.impl;
 
 import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -200,16 +198,6 @@ public class NetconfCommandsImplTest {
             assertEquals("7.7.7.7", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
             return true;
         });
-    }
-
-    @Test
-    public void testNetconfNodeFromIp() throws TimeoutException, InterruptedException, ExecutionException {
-        final List<Node> nodesNotExist = NetconfConsoleUtils.getNetconfNodeFromIp(IP, dataBroker);
-        assertNull(nodesNotExist);
-        createTopology(LogicalDatastoreType.OPERATIONAL);
-        final List<Node> nodes = NetconfConsoleUtils.getNetconfNodeFromIp(IP, dataBroker);
-        assertNotNull(nodes);
-        assertEquals(1, nodes.size());
     }
 
     private void createTopology(final LogicalDatastoreType dataStoreType)
