@@ -80,9 +80,8 @@ public class NetconfClientDispatcherImpl
                 new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration),
                 currentConfiguration.getSessionListener());
 
-        return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration
-                .getConnectStrategyFactory(),
-                currentConfiguration.getReconnectStrategy(), init::initialize);
+        return super.createReconnectingClient(currentConfiguration.getAddress(),
+                currentConfiguration.getConnectStrategyFactory(), init::initialize);
     }
 
     private Future<NetconfClientSession> createSshClient(final NetconfClientConfiguration currentConfiguration) {
@@ -100,9 +99,8 @@ public class NetconfClientDispatcherImpl
                 getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
                 currentConfiguration.getSshClient());
 
-        return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration
-                .getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
-                init::initialize);
+        return super.createReconnectingClient(currentConfiguration.getAddress(),
+                currentConfiguration.getConnectStrategyFactory(), init::initialize);
     }
 
     private Future<NetconfClientSession> createTlsClient(final NetconfClientConfiguration currentConfiguration) {
@@ -120,9 +118,8 @@ public class NetconfClientDispatcherImpl
                 currentConfiguration.getSslHandlerFactory(), getNegotiatorFactory(currentConfiguration),
                 currentConfiguration.getSessionListener());
 
-        return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration
-                .getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
-                init::initialize);
+        return super.createReconnectingClient(currentConfiguration.getAddress(),
+                currentConfiguration.getConnectStrategyFactory(), init::initialize);
     }
 
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {

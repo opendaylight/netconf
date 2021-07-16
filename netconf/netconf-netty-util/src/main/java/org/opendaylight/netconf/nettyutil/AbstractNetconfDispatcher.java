@@ -213,25 +213,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
     }
 
     /**
-     * Creates a client.
-     *
-     * @param address remote address
-     * @param connectStrategyFactory Factory for creating reconnection strategy to be used when initial connection fails
-     * @param reestablishStrategy Reconnection strategy to be used when the already-established session fails
-     * @return Future representing the reconnection task. It will report completion based on reestablishStrategy, e.g.
-     *         success if it indicates no further attempts should be made and failure if it reports an error
-     * @deprecated Use
-     *             {@link #createReconnectingClient(InetSocketAddress, ReconnectStrategyFactory, PipelineInitializer)}
-     *             instead.
-     */
-    @Deprecated
-    protected Future<Void> createReconnectingClient(final InetSocketAddress address,
-            final ReconnectStrategyFactory connectStrategyFactory, final ReconnectStrategy reestablishStrategy,
-            final PipelineInitializer<S> initializer) {
-        return createReconnectingClient(address, connectStrategyFactory, initializer);
-    }
-
-    /**
      * Creates a reconnecting client.
      *
      * @param address remote address

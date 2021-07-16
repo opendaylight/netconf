@@ -79,6 +79,7 @@ public class NetconfClientConfiguration {
         return sessionListener;
     }
 
+    @Deprecated(forRemoval = true)
     public final ReconnectStrategy getReconnectStrategy() {
         return reconnectStrategy;
     }
