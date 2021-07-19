@@ -69,7 +69,6 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         this.networkTopologyPath = InstanceIdentifier.builder(NetworkTopology.class).build();
         this.topologyListPath = networkTopologyPath
                 .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
-
         initDeviceData();
     }
 
