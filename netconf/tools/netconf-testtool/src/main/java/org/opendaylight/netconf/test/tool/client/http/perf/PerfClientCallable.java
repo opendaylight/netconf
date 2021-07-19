@@ -8,29 +8,26 @@
 
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
+import java.io.IOException;
 import java.util.concurrent.Callable;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.opendaylight.netconf.test.tool.client.http.perf.RestPerfClient.RequestData;
 import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PerfClientCallable implements Callable<Void> {
-    private static final Logger LOG = LoggerFactory.getLogger(PerfClientCallable.class);
-
     private final Parameters params;
     private final AsyncHttpClient asyncHttpClient;
-    private ExecutionStrategy executionStrategy;
-    private RequestData payloads;
+    private final ExecutionStrategy executionStrategy;
+    private final RequestData payloads;
 
-    public PerfClientCallable(Parameters params, RequestData payloads) {
+    public PerfClientCallable(final Parameters params, final RequestData payloads) {
         this.params = params;
         this.payloads = payloads;
-        this.asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder()
+        this.asyncHttpClient = new DefaultAsyncHttpClient(new DefaultAsyncHttpClientConfig.Builder()
                 .setConnectTimeout(Integer.MAX_VALUE)
                 .setRequestTimeout(Integer.MAX_VALUE)
-                .setAllowPoolingConnections(true)
                 .build());
         executionStrategy = getExecutionStrategy();
     }
@@ -42,9 +39,9 @@ public class PerfClientCallable implements Callable<Void> {
     }
 
     @Override
-    public Void call() {
+    public Void call() throws IOException {
         executionStrategy.invoke();
-        asyncHttpClient.closeAsynchronously();
+        asyncHttpClient.close();
         return null;
     }
 }

@@ -9,11 +9,10 @@ package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import static org.opendaylight.netconf.test.tool.client.http.perf.RequestMessageUtils.formRequest;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Request;
+import org.asynchttpclient.Response;
 import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,7 @@ public class SyncExecutionStrategy implements ExecutionStrategy {
                     LOG.warn("url: {}", request.getUrl());
                     LOG.warn("body: {}", response.getResponseBody());
                 }
-            } catch (InterruptedException | ExecutionException | IOException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 LOG.warn("Failed to execute request", e);
             }
         }

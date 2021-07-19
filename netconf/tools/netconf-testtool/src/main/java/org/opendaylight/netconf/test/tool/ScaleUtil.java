@@ -11,16 +11,11 @@ package org.opendaylight.netconf.test.tool;
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.CharStreams;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig.Builder;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -31,6 +26,12 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.BoundRequestBuilder;
+import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClientConfig.Builder;
+import org.asynchttpclient.Request;
+import org.asynchttpclient.Response;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
@@ -190,10 +191,9 @@ public final class ScaleUtil {
                 + "network-topology:network-topology/topology/topology-netconf/";
         private static final Pattern PATTERN = Pattern.compile("connected");
 
-        private final AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new Builder()
+        private final AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient(new Builder()
                 .setConnectTimeout(Integer.MAX_VALUE)
                 .setRequestTimeout(Integer.MAX_VALUE)
-                .setAllowPoolingConnections(true)
                 .build());
         private final NetconfDeviceSimulator simulator;
         private final int deviceCount;
@@ -203,7 +203,7 @@ public final class ScaleUtil {
             LOG.info("New callable created");
             this.simulator = simulator;
             this.deviceCount = deviceCount;
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.prepareGet(RESTCONF_URL)
+            BoundRequestBuilder requestBuilder = asyncHttpClient.prepareGet(RESTCONF_URL)
                     .addHeader("content-type", "application/xml")
                     .addHeader("Accept", "application/xml")
                     .setRequestTimeout(Integer.MAX_VALUE);
@@ -236,7 +236,7 @@ public final class ScaleUtil {
                         SEMAPHORE.release();
                     }
                 }
-            } catch (ConnectException | ExecutionException e) {
+            } catch (ExecutionException e) {
                 LOG.warn("Failed to connect to Restconf, is the controller running?", e);
                 EXECUTOR.schedule(new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
             }

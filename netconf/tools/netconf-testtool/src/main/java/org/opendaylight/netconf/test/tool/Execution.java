@@ -7,18 +7,19 @@
  */
 package org.opendaylight.netconf.test.tool;
 
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.HttpResponseStatus;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
+import org.asynchttpclient.AsyncCompletionHandler;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.BoundRequestBuilder;
+import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClientConfig;
+import org.asynchttpclient.HttpResponseStatus;
+import org.asynchttpclient.Realm;
+import org.asynchttpclient.Request;
+import org.asynchttpclient.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,24 +60,21 @@ public class Execution implements Callable<Void> {
         }
         this.semaphore = new Semaphore(this.throttle);
 
-        this.asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder()
+        this.asyncHttpClient = new DefaultAsyncHttpClient(new DefaultAsyncHttpClientConfig.Builder()
                 .setConnectTimeout(Integer.MAX_VALUE)
                 .setRequestTimeout(Integer.MAX_VALUE)
-                .setAllowPoolingConnections(true)
                 .build());
 
         this.payloads = new ArrayList<>();
         for (DestToPayload payload : payloads) {
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
+            BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Accept", "application/json")
                     .setBody(payload.getPayload())
                     .setRequestTimeout(Integer.MAX_VALUE);
 
-            requestBuilder.setRealm(new Realm.RealmBuilder()
+            requestBuilder.setRealm(new Realm.Builder(params.controllerAuthUsername, params.controllerAuthPassword)
                     .setScheme(Realm.AuthScheme.BASIC)
-                    .setPrincipal(params.controllerAuthUsername)
-                    .setPassword(params.controllerAuthPassword)
                     .setMethodName("POST")
                     .setUsePreemptiveAuth(true)
                     .build());
@@ -100,7 +98,7 @@ public class Execution implements Callable<Void> {
                         LOG.warn("body: {}", response.getResponseBody());
                     }
                 }
-            } catch (InterruptedException | ExecutionException | IOException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 LOG.warn("Failed to execute request", e);
             }
         }
@@ -118,7 +116,7 @@ public class Execution implements Callable<Void> {
             }
             asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
                 @Override
-                public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
+                public State onStatusReceived(final HttpResponseStatus status) throws Exception {
                     super.onStatusReceived(status);
                     if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
                         if (status.getStatusCode() == 409) {
@@ -130,7 +128,7 @@ public class Execution implements Callable<Void> {
                             LOG.warn("request: {}", request.toString());
                         }
                     }
-                    return STATE.CONTINUE;
+                    return State.CONTINUE;
                 }
 
                 @Override

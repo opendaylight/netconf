@@ -7,9 +7,10 @@
  */
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Request;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.BoundRequestBuilder;
+import org.asynchttpclient.Realm;
+import org.asynchttpclient.Request;
 import org.opendaylight.netconf.test.tool.TestToolUtils;
 
 public final class RequestMessageUtils {
@@ -63,8 +64,8 @@ public final class RequestMessageUtils {
         return messageBuilder.toString();
     }
 
-    public static RestPerfClient.RequestData formPayload(Parameters parameters, String editContentString,
-                                                         int threadId, int requests) {
+    public static RestPerfClient.RequestData formPayload(final Parameters parameters, final String editContentString,
+                                                         final int threadId, final int requests) {
         final int devicePort = parameters.sameDevice
                 ? parameters.devicePortRangeStart : parameters.devicePortRangeStart + threadId;
         final StringBuilder destBuilder = new StringBuilder(DEST);
@@ -90,23 +91,20 @@ public final class RequestMessageUtils {
                 threadId, devicePort, requests);
     }
 
-    public static Request formRequest(AsyncHttpClient asyncHttpClient, String url, Parameters params, String msg) {
-        AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(url)
+    public static Request formRequest(final AsyncHttpClient asyncHttpClient, final String url, final Parameters params,
+            final String msg) {
+        BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(url)
                 .addHeader("content-type", "application/json")
                 .addHeader("Accept", "application/xml")
                 .setBody(msg)
                 .setRequestTimeout(Integer.MAX_VALUE);
 
         if (params.auth != null) {
-            requestBuilder.setRealm(new Realm.RealmBuilder()
+            requestBuilder.setRealm(new Realm.Builder(params.auth.get(0), params.auth.get(1))
                     .setScheme(Realm.AuthScheme.BASIC)
-                    .setPrincipal(params.auth.get(0))
-                    .setPassword(params.auth.get(1))
                     .setUsePreemptiveAuth(true)
                     .build());
         }
         return requestBuilder.build();
     }
-
-
 }

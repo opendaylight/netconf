@@ -10,12 +10,12 @@ package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import static org.opendaylight.netconf.test.tool.client.http.perf.RequestMessageUtils.formRequest;
 
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.HttpResponseStatus;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
 import java.util.concurrent.Semaphore;
+import org.asynchttpclient.AsyncCompletionHandler;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.HttpResponseStatus;
+import org.asynchttpclient.Request;
+import org.asynchttpclient.Response;
 import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,17 +52,17 @@ public class AsyncExecutionStrategy implements ExecutionStrategy {
             }
             asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
                 @Override
-                public STATE onStatusReceived(HttpResponseStatus status) throws Exception {
+                public State onStatusReceived(final HttpResponseStatus status) throws Exception {
                     super.onStatusReceived(status);
                     if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
                         LOG.warn("Request failed, status code: {}", status.getStatusCode() + status.getStatusText());
                         LOG.warn("request: {}", request.toString());
                     }
-                    return STATE.CONTINUE;
+                    return State.CONTINUE;
                 }
 
                 @Override
-                public Response onCompleted(Response response) {
+                public Response onCompleted(final Response response) {
                     semaphore.release();
                     return response;
                 }
