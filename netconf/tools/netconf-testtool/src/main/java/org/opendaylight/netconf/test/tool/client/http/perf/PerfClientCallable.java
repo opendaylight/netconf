@@ -5,46 +5,38 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Builder;
 import java.util.concurrent.Callable;
 import org.opendaylight.netconf.test.tool.client.http.perf.RestPerfClient.RequestData;
 import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PerfClientCallable implements Callable<Void> {
-    private static final Logger LOG = LoggerFactory.getLogger(PerfClientCallable.class);
+    private final ExecutionStrategy executionStrategy;
 
-    private final Parameters params;
-    private final AsyncHttpClient asyncHttpClient;
-    private ExecutionStrategy executionStrategy;
-    private RequestData payloads;
+    public PerfClientCallable(final Parameters params, final RequestData payloads) {
+        final Builder builder = HttpClient.newBuilder();
+        if (params.auth != null) {
+            builder.authenticator(new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(params.auth.get(0), params.auth.get(1).toCharArray());
+                }
+            });
+        }
 
-    public PerfClientCallable(Parameters params, RequestData payloads) {
-        this.params = params;
-        this.payloads = payloads;
-        this.asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder()
-                .setConnectTimeout(Integer.MAX_VALUE)
-                .setRequestTimeout(Integer.MAX_VALUE)
-                .setAllowPoolingConnections(true)
-                .build());
-        executionStrategy = getExecutionStrategy();
-    }
-
-    private ExecutionStrategy getExecutionStrategy() {
-        return params.async
-                ? new AsyncExecutionStrategy(params, asyncHttpClient, payloads)
-                : new SyncExecutionStrategy(params, asyncHttpClient, payloads);
+        this.executionStrategy = params.async
+            ? new AsyncExecutionStrategy(params, builder.build(), payloads)
+            : new SyncExecutionStrategy(builder.build(), payloads);
     }
 
     @Override
     public Void call() {
         executionStrategy.invoke();
-        asyncHttpClient.closeAsynchronously();
         return null;
     }
 }
