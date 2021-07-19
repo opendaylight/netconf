@@ -9,28 +9,22 @@ package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import static org.opendaylight.netconf.test.tool.client.http.perf.RequestMessageUtils.formRequest;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class SyncExecutionStrategy implements ExecutionStrategy {
-
     private static final Logger LOG = LoggerFactory.getLogger(SyncExecutionStrategy.class);
 
-    private final Parameters params;
+    private final HttpClient httpClient;
     private final RestPerfClient.RequestData payloads;
-    private final AsyncHttpClient asyncHttpClient;
 
-    SyncExecutionStrategy(final Parameters params, final AsyncHttpClient asyncHttpClient,
-                          final RestPerfClient.RequestData payloads) {
-        this.params = params;
-        this.asyncHttpClient = asyncHttpClient;
+    SyncExecutionStrategy(final HttpClient httpClient, final RestPerfClient.RequestData payloads) {
+        this.httpClient = httpClient;
         this.payloads = payloads;
     }
 
@@ -39,21 +33,22 @@ public class SyncExecutionStrategy implements ExecutionStrategy {
 
         LOG.info("Begin sending sync requests");
         for (int i = 0; i < payloads.getRequests(); i++) {
-            String message = RequestMessageUtils.prepareMessage(payloads.getThreadId(), i,
+            final String message = RequestMessageUtils.prepareMessage(payloads.getThreadId(), i,
                     payloads.getContentString(), payloads.getPort());
-            Request request = formRequest(asyncHttpClient, payloads.getDestination(), params, message);
+            final HttpResponse<String> response;
             try {
-                Response response = asyncHttpClient.executeRequest(request).get();
-                if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
-                    LOG.warn("Status code: {}", response.getStatusCode());
-                    LOG.warn("url: {}", request.getUrl());
-                    LOG.warn("body: {}", response.getResponseBody());
-                }
-            } catch (InterruptedException | ExecutionException | IOException e) {
+                response = httpClient.send(formRequest(payloads.getDestination(), message), BodyHandlers.ofString());
+            } catch (InterruptedException | IOException e) {
                 LOG.warn("Failed to execute request", e);
+                return;
+            }
+
+            if (response.statusCode() != 200 && response.statusCode() != 204) {
+                LOG.warn("Status code: {}", response.statusCode());
+                LOG.warn("url: {}", response.uri());
+                LOG.warn("body: {}", response.body());
             }
         }
         LOG.info("End sending sync requests");
-
     }
 }
