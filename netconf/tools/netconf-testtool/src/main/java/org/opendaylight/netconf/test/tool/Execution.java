@@ -7,25 +7,26 @@
  */
 package org.opendaylight.netconf.test.tool;
 
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.HttpResponseStatus;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Execution implements Callable<Void> {
 
-    private final ArrayList<Request> payloads;
-    private final AsyncHttpClient asyncHttpClient;
+    private final ArrayList<HttpRequest> payloads;
+    private final HttpClient httpClient;
     private static final Logger LOG = LoggerFactory.getLogger(Execution.class);
     private final boolean invokeAsync;
     private final Semaphore semaphore;
@@ -59,48 +60,44 @@ public class Execution implements Callable<Void> {
         }
         this.semaphore = new Semaphore(this.throttle);
 
-        this.asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder()
-                .setConnectTimeout(Integer.MAX_VALUE)
-                .setRequestTimeout(Integer.MAX_VALUE)
-                .setAllowPoolingConnections(true)
-                .build());
-
+        this.httpClient = HttpClient.newBuilder()
+                .authenticator(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(params.controllerAuthUsername,
+                                params.controllerAuthPassword.toCharArray());
+                    }
+                })
+                .build();
         this.payloads = new ArrayList<>();
         for (DestToPayload payload : payloads) {
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Accept", "application/json")
-                    .setBody(payload.getPayload())
-                    .setRequestTimeout(Integer.MAX_VALUE);
+            HttpRequest request = HttpRequest.newBuilder(URI.create(payload.getDestination()))
+                    .POST(BodyPublishers.ofString(payload.getPayload(), StandardCharsets.UTF_8))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .build();
 
-            requestBuilder.setRealm(new Realm.RealmBuilder()
-                    .setScheme(Realm.AuthScheme.BASIC)
-                    .setPrincipal(params.controllerAuthUsername)
-                    .setPassword(params.controllerAuthPassword)
-                    .setMethodName("POST")
-                    .setUsePreemptiveAuth(true)
-                    .build());
-
-            this.payloads.add(requestBuilder.build());
+            this.payloads.add(request);
         }
     }
 
     private void invokeSync() {
         LOG.info("Begin sending sync requests");
-        for (Request request : payloads) {
+        for (HttpRequest request : payloads) {
             try {
-                Response response = asyncHttpClient.executeRequest(request).get();
-                if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
-                    if (response.getStatusCode() == 409) {
+                HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+
+                if (response.statusCode() != 200 && response.statusCode() != 204) {
+                    if (response.statusCode() == 409) {
                         LOG.warn("Request failed, status code: {} - one or more of the devices"
-                                + " is already configured, skipping the whole batch", response.getStatusCode());
+                                + " is already configured, skipping the whole batch", response.statusCode());
                     } else {
-                        LOG.warn("Status code: {}", response.getStatusCode());
-                        LOG.warn("url: {}", request.getUrl());
-                        LOG.warn("body: {}", response.getResponseBody());
+                        LOG.warn("Status code: {}", response.statusCode());
+                        LOG.warn("url: {}", request.uri());
+                        LOG.warn("body: {}", response.body());
                     }
                 }
-            } catch (InterruptedException | ExecutionException | IOException e) {
+            } catch (InterruptedException | IOException e) {
                 LOG.warn("Failed to execute request", e);
             }
         }
@@ -110,34 +107,23 @@ public class Execution implements Callable<Void> {
     private void invokeAsync() {
         LOG.info("Begin sending async requests");
 
-        for (final Request request : payloads) {
+        for (final HttpRequest request : payloads) {
             try {
                 semaphore.acquire();
             } catch (InterruptedException e) {
                 LOG.warn("Semaphore acquire interrupted");
             }
-            asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
-                @Override
-                public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
-                    super.onStatusReceived(status);
-                    if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
-                        if (status.getStatusCode() == 409) {
-                            LOG.warn("Request failed, status code: {} - one or more of the devices"
-                                    + " is already configured, skipping the whole batch", status.getStatusCode());
-                        } else {
-                            LOG.warn("Request failed, status code: {}",
-                                status.getStatusCode() + status.getStatusText());
-                            LOG.warn("request: {}", request.toString());
-                        }
+            httpClient.sendAsync(request, BodyHandlers.ofString()).whenComplete((response, error) -> {
+                if (response.statusCode() != 200 && response.statusCode() != 204) {
+                    if (response.statusCode() == 409) {
+                        LOG.warn("Request failed, status code: {} - one or more of the devices"
+                                + " is already configured, skipping the whole batch", response.statusCode());
+                    } else {
+                        LOG.warn("Request failed, status code: {}", response.statusCode());
+                        LOG.warn("request: {}", request);
                     }
-                    return STATE.CONTINUE;
                 }
-
-                @Override
-                public Response onCompleted(final Response response) {
-                    semaphore.release();
-                    return response;
-                }
+                semaphore.release();
             });
         }
         LOG.info("Requests sent, waiting for responses");

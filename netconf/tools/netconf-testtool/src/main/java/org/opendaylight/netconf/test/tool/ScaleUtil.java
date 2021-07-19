@@ -11,19 +11,18 @@ package org.opendaylight.netconf.test.tool;
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.CharStreams;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig.Builder;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -190,36 +189,32 @@ public final class ScaleUtil {
                 + "network-topology:network-topology/topology/topology-netconf/";
         private static final Pattern PATTERN = Pattern.compile("connected");
 
-        private final AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new Builder()
-                .setConnectTimeout(Integer.MAX_VALUE)
-                .setRequestTimeout(Integer.MAX_VALUE)
-                .setAllowPoolingConnections(true)
-                .build());
+        private final HttpClient httpClient = HttpClient.newBuilder().build();
         private final NetconfDeviceSimulator simulator;
         private final int deviceCount;
-        private final Request request;
+        private final HttpRequest request;
 
         ScaleVerifyCallable(final NetconfDeviceSimulator simulator, final int deviceCount) {
             LOG.info("New callable created");
             this.simulator = simulator;
             this.deviceCount = deviceCount;
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.prepareGet(RESTCONF_URL)
-                    .addHeader("content-type", "application/xml")
-                    .addHeader("Accept", "application/xml")
-                    .setRequestTimeout(Integer.MAX_VALUE);
-            request = requestBuilder.build();
+            request = HttpRequest.newBuilder(URI.create(RESTCONF_URL))
+                    .GET()
+                    .header("Content-Type", "application/xml")
+                    .header("Accept", "application/xml")
+                    .build();
         }
 
         @Override
         public Void call() throws Exception {
             try {
-                final Response response = asyncHttpClient.executeRequest(request).get();
+                final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-                if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
-                    LOG.warn("Request failed, status code: {}", response.getStatusCode() + response.getStatusText());
+                if (response.statusCode() != 200 && response.statusCode() != 204) {
+                    LOG.warn("Request failed, status code: {}", response.statusCode());
                     EXECUTOR.schedule(new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
                 } else {
-                    final String body = response.getResponseBody();
+                    final String body = response.body();
                     final Matcher matcher = PATTERN.matcher(body);
                     int count = 0;
                     while (matcher.find()) {
@@ -236,7 +231,7 @@ public final class ScaleUtil {
                         SEMAPHORE.release();
                     }
                 }
-            } catch (ConnectException | ExecutionException e) {
+            } catch (ConnectException e) {
                 LOG.warn("Failed to connect to Restconf, is the controller running?", e);
                 EXECUTOR.schedule(new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
             }
