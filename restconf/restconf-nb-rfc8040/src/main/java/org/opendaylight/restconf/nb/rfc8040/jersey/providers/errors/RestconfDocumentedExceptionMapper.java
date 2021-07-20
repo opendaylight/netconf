@@ -96,10 +96,9 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         if (responseStatus != Response.Status.FORBIDDEN
                 && responseStatus.getFamily() == Response.Status.Family.CLIENT_ERROR
                 && exception.getErrors().isEmpty()) {
-            // there should be at least one error entry for 4xx errors except 409 according to the RFC 8040
-            // - creation of WARN log that something went wrong way on the server side
-            LOG.warn("Input exception has a family of 4xx but doesn't contain any descriptive errors: {}",
-                    exception.getMessage());
+            // There should be at least one error entry for 4xx errors except 409 according to RFC8040, but we do not
+            // have it. Issue a warning with the call trace so we can fix whoever was the originator.
+            LOG.warn("Input exception has a family of 4xx but does not contain any descriptive errors", exception);
         }
 
         final ContainerNode errorsContainer = buildErrorsContainer(exception);
