@@ -19,8 +19,8 @@ import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 @Beta
 public interface NettyAwareClientSession extends ClientSession {
     /**
-     * Allocate a channel to the specified subsystem subsystem. Incoming data on the channel will be routed to the
-     * specified ChannelHandlerContext.
+     * Allocate a channel to the specified subsystem. Incoming data on the channel will be routed to the
+     * specified {@link ChannelHandlerContext}.
      *
      * @param subsystem The subsystem name
      * @param ctx Context to which to route data to

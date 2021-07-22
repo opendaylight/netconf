@@ -15,13 +15,14 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
-import org.opendaylight.netconf.shaded.sshd.client.SshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientBuilder;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 
 public class NetconfCallHomeServerBuilder {
     private static final long DEFAULT_SESSION_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(5);
     private static final int DEFAULT_CALL_HOME_PORT = 4334;
 
-    private SshClient sshClient;
+    private NetconfSshClient sshClient;
     private EventLoopGroup nettyGroup;
     private NetconfClientSessionNegotiatorFactory negotiationFactory;
     private InetSocketAddress bindAddress;
@@ -43,11 +44,11 @@ public class NetconfCallHomeServerBuilder {
             bindAddress(), recorder);
     }
 
-    public SshClient getSshClient() {
+    public NetconfSshClient getSshClient() {
         return sshClient;
     }
 
-    public void setSshClient(final SshClient sshClient) {
+    public void setSshClient(final NetconfSshClient sshClient) {
         this.sshClient = sshClient;
     }
 
@@ -99,12 +100,12 @@ public class NetconfCallHomeServerBuilder {
         return authProvider;
     }
 
-    private SshClient sshClient() {
+    private NetconfSshClient sshClient() {
         return sshClient != null ? sshClient : defaultSshClient();
     }
 
-    private static SshClient defaultSshClient() {
-        return SshClient.setUpDefaultClient();
+    private static NetconfSshClient defaultSshClient() {
+        return new NetconfClientBuilder().build();
     }
 
     private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
