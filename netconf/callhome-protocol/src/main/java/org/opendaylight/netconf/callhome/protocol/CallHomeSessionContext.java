@@ -9,21 +9,24 @@ package org.opendaylight.netconf.callhome.protocol;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
-
-import com.google.common.annotations.VisibleForTesting;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.netty.channel.EventLoopGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import io.netty.util.concurrent.Promise;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import com.google.common.annotations.VisibleForTesting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.EventLoopGroup;
+import io.netty.util.concurrent.GlobalEventExecutor;
+import io.netty.util.concurrent.Promise;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWriter;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
@@ -118,7 +121,6 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         if (activated) {
             return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));
         }
-
         activated = true;
         LOG.info("Activating Netconf channel for {} with {}", getRemoteAddress(), listener);
         Promise<NetconfClientSession> activationPromise = newSessionPromise();
@@ -197,6 +199,25 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
         void remove(final CallHomeSessionContext session) {
             sessions.remove(session.getSessionId(), session);
+        }
+    }
+
+    static class SshWriteAsyncHandlerAdapter extends ChannelOutboundHandlerAdapter {
+        private final AsyncSshHandlerWriter sshWriteAsyncHandler;
+        private final ClientChannel sshChannel;
+
+        SshWriteAsyncHandlerAdapter(final ClientChannel sshChannel) {
+            this.sshChannel = sshChannel;
+            this.sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());
+        }
+
+        @Override
+        public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) {
+            sshWriteAsyncHandler.write(ctx, msg, promise);
+        }
+
+        public ClientChannel getSshChannel() {
+            return sshChannel;
         }
     }
 }

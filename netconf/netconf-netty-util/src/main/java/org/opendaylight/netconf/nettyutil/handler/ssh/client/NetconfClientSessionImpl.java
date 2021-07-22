@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
+import java.io.IOException;
 import com.google.common.annotations.Beta;
 import io.netty.channel.ChannelHandlerContext;
-import java.io.IOException;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
