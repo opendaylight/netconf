@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -24,6 +23,7 @@ import io.netty.channel.ChannelPromise;
 import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
+import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.SshWriteAsyncHandlerAdapter;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoInputStream;
@@ -59,16 +59,7 @@ public class MinaSshNettyChannelTest {
 
         doReturn(mockFuture).when(mockFuture).addListener(any());
 
-        instance = new MinaSshNettyChannel(mockContext, mockSession, mockChannel);
-    }
-
-    @Test
-    public void ourChannelHandlerShouldBeFirstInThePipeline() {
-        // given
-        ChannelHandler firstHandler = instance.pipeline().first();
-        String firstName = firstHandler.getClass().getName();
-        // expect
-        assertTrue(firstName.contains("callhome"));
+        instance = new MinaSshNettyChannel(mockContext, mockSession);
     }
 
     @Test
@@ -88,7 +79,8 @@ public class MinaSshNettyChannelTest {
         doReturn(null).when(promise).setFailure(any(Throwable.class));
 
         // Need to reconstruct instance to pick up null async in above
-        instance = new MinaSshNettyChannel(mockContext, mockSession, mockChannel);
+        instance = new MinaSshNettyChannel(mockContext, mockSession);
+        instance.pipeline().addFirst(new SshWriteAsyncHandlerAdapter(mockChannel));
 
         // when
         ChannelOutboundHandlerAdapter outadapter = (ChannelOutboundHandlerAdapter) instance.pipeline().first();
