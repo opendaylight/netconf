@@ -30,10 +30,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
-import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientSessionImpl;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyAwareChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.AttributeRepository.AttributeKey;
 import org.opendaylight.netconf.shaded.sshd.common.channel.StreamingChannel;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
@@ -45,7 +45,7 @@ import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchange;
 import org.opendaylight.netconf.shaded.sshd.common.util.buffer.Buffer;
 
 public class CallHomeSessionContextTest {
-    private ClientSessionImpl mockSession;
+    private NetconfClientSessionImpl mockSession;
     private CallHomeAuthorization mockAuth;
     private ClientChannel mockChannel;
     private InetSocketAddress address;
@@ -59,7 +59,7 @@ public class CallHomeSessionContextTest {
 
     @Before
     public void setup() {
-        mockSession = mock(ClientSessionImpl.class);
+        mockSession = mock(NetconfClientSessionImpl.class);
         mockAuth = mock(CallHomeAuthorization.class);
         mockChannel = mock(ClientChannel.class);
         address = mock(InetSocketAddress.class);
@@ -125,7 +125,7 @@ public class CallHomeSessionContextTest {
     public void creatingAChannelSuccessfullyShouldResultInAnAttachedListener() throws IOException {
         // given
         OpenFuture mockFuture = mock(OpenFuture.class);
-        ChannelSubsystem mockChannelSubsystem = mock(ChannelSubsystem.class);
+        NettyAwareChannelSubsystem mockChannelSubsystem = mock(NettyAwareChannelSubsystem.class);
         doReturn(mockFuture).when(mockChannelSubsystem).open();
         doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString());
 
@@ -163,8 +163,9 @@ public class CallHomeSessionContextTest {
         doReturn(true).when(mockFuture).isOpened();
 
         instance = spy(new CallHomeSessionContext(mockSession, mockAuth, mockFactory));
-        doReturn(mockMinaChannel).when(instance).newMinaSshNettyChannel(any());
+        doReturn(mockMinaChannel).when(instance).newMinaSshNettyChannel(mockChannel);
         SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel);
+
         // when
         listener.operationComplete(mockFuture);
         // then
