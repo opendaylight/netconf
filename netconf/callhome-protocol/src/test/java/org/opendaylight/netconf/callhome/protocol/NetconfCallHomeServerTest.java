@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.PublicKey;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -30,9 +28,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.netconf.shaded.sshd.client.SshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientBuilder;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyAwareClientSession;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoAcceptor;
@@ -53,7 +52,7 @@ public class NetconfCallHomeServerTest {
     @Mock
     private CallHomeSessionContext.Factory mockFactory;
     @Mock
-    private ClientSession mockSession;
+    private NettyAwareClientSession mockSession;
     @Mock
     private StatusRecorder mockStatusRecorder;
 
@@ -77,13 +76,11 @@ public class NetconfCallHomeServerTest {
         mockCallHomeAuthProv = mock(CallHomeAuthorizationProvider.class);
         mockAuth = mock(CallHomeAuthorization.class);
         mockFactory = mock(CallHomeSessionContext.Factory.class);
-        mockSession = mock(ClientSession.class);
+        mockSession = mock(NettyAwareClientSession.class);
         mockStatusRecorder = mock(StatusRecorder.class);
 
-        Map<String, String> props = new HashMap<>();
-        props.put("nio-workers", "1");
         doReturn(EVENT_LOOP_GROUP).when(mockFactory).getNettyGroup();
-        instance = new NetconfCallHomeServer(SshClient.setUpDefaultClient(), mockCallHomeAuthProv, mockFactory,
+        instance = new NetconfCallHomeServer(new NetconfClientBuilder().build(), mockCallHomeAuthProv, mockFactory,
             MOCK_ADDRESS, mockStatusRecorder);
     }
 
@@ -164,7 +161,7 @@ public class NetconfCallHomeServerTest {
         IoServiceFactory mockMinaFactory = mock(IoServiceFactory.class);
         doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
         doNothing().when(mockAcceptor).bind(any(SocketAddress.class));
-        SshClient mockClient = mock(SshClient.class);
+        NetconfSshClient mockClient = mock(NetconfSshClient.class);
         doNothing().when(mockClient).start();
         doNothing().when(mockClient).setServerKeyVerifier(any());
         doNothing().when(mockClient).addSessionListener(any());

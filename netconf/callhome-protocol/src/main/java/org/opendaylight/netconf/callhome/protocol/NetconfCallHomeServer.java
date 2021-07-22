@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
+import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -15,11 +16,12 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.PublicKey;
 import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.Factory;
-import org.opendaylight.netconf.shaded.sshd.client.SshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSessionFactory;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyAwareClientSession;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.keyverifier.ServerKeyVerifier;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoAcceptor;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactory;
@@ -38,16 +40,16 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
     private final StatusRecorder recorder;
     private final Factory sessionFactory;
     private final IoAcceptor acceptor;
-    private final SshClient client;
+    private final NetconfSshClient client;
 
-    NetconfCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
+    NetconfCallHomeServer(final NetconfSshClient sshClient, final CallHomeAuthorizationProvider authProvider,
             final Factory factory, final InetSocketAddress socketAddress, final StatusRecorder recorder) {
         this(sshClient, authProvider, factory, socketAddress, recorder,
             new NettyIoServiceFactory(sshClient, factory.getNettyGroup()));
     }
 
     @VisibleForTesting
-    NetconfCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
+    NetconfCallHomeServer(final NetconfSshClient sshClient, final CallHomeAuthorizationProvider authProvider,
             final Factory factory, final InetSocketAddress socketAddress, final StatusRecorder recorder,
             final IoServiceFactory serviceFactory) {
         client = requireNonNull(sshClient);
@@ -60,11 +62,11 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
         sshClient.setServerKeyVerifier(this);
         sshClient.addSessionListener(createSessionListener());
 
-        acceptor = serviceFactory.createAcceptor(new SessionFactory(sshClient));
+        acceptor = serviceFactory.createAcceptor(new NetconfSessionFactory(sshClient));
     }
 
     @VisibleForTesting
-    SshClient getClient() {
+    NetconfSshClient getClient() {
         return client;
     }
 
@@ -72,7 +74,8 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
         return new SessionListener() {
             @Override
             public void sessionEvent(final Session session, final Event event) {
-                ClientSession clientSession = (ClientSession) session;
+                verify(session instanceof NettyAwareClientSession, "Unexpected session %s", session);
+                final NettyAwareClientSession clientSession = (NettyAwareClientSession) session;
                 LOG.debug("SSH session {} event {}", session, event);
                 switch (event) {
                     case KeyEstablished:
@@ -96,7 +99,8 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
 
             @Override
             public void sessionClosed(final Session session) {
-                CallHomeSessionContext ctx = CallHomeSessionContext.getFrom((ClientSession) session);
+                verify(session instanceof NettyAwareClientSession, "Unexpected session %s", session);
+                final CallHomeSessionContext ctx = CallHomeSessionContext.getFrom((NettyAwareClientSession) session);
                 if (ctx != null) {
                     ctx.removeSelf();
                 }

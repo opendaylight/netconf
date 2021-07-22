@@ -377,7 +377,8 @@ public class AsyncSshHandlerTest {
         }, MoreExecutors.directExecutor());
         doReturn(closeFuture).when(sshSession).close(false);
 
-        doReturn(subsystemChannel).when(sshSession).createSubsystemChannel(eq("netconf"), any());
+        doReturn(subsystemChannel).when(sshSession).createSubsystemChannel(eq("netconf"),
+                any(ChannelHandlerContext.class));
 
         return sshSession;
     }
