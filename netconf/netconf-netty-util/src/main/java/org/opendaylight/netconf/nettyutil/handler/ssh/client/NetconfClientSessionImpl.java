@@ -9,6 +9,7 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import com.google.common.annotations.Beta;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import java.io.IOException;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
@@ -29,6 +30,18 @@ public class NetconfClientSessionImpl extends ClientSessionImpl implements Netty
     public NettyAwareChannelSubsystem createSubsystemChannel(final String subsystem, final ChannelHandlerContext ctx)
             throws IOException {
         final NettyAwareChannelSubsystem channel = new NettyAwareChannelSubsystem(subsystem, ctx);
+        final ConnectionService service = getConnectionService();
+        final long id = service.registerChannel(channel);
+        if (log.isDebugEnabled()) {
+            log.debug("createSubsystemChannel({})[{}] created id={}", this, channel.getSubsystem(), id);
+        }
+        return channel;
+    }
+
+    @Override
+    public NettyPipelineAwareChannelSubsystem createSubsystemChannel(final String subsystem,
+            final ChannelPipeline pipeline) throws IOException {
+        final NettyPipelineAwareChannelSubsystem channel = new NettyPipelineAwareChannelSubsystem(subsystem, pipeline);
         final ConnectionService service = getConnectionService();
         final long id = service.registerChannel(channel);
         if (log.isDebugEnabled()) {
