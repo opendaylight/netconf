@@ -31,9 +31,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.netconf.shaded.sshd.client.SshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientBuilder;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyAwareClientSession;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoAcceptor;
@@ -47,7 +48,7 @@ public class NetconfCallHomeServerTest {
     private static EventLoopGroup EVENT_LOOP_GROUP;
     private static InetSocketAddress MOCK_ADDRESS;
 
-    private SshClient mockSshClient;
+    private NetconfSshClient mockSshClient;
     @Mock
     private CallHomeAuthorizationProvider mockCallHomeAuthProv;
     @Mock
@@ -55,7 +56,7 @@ public class NetconfCallHomeServerTest {
     @Mock
     private CallHomeSessionContext.Factory mockFactory;
     @Mock
-    private ClientSession mockSession;
+    private NettyAwareClientSession mockSession;
     @Mock
     private StatusRecorder mockStatusRecorder;
 
@@ -76,11 +77,11 @@ public class NetconfCallHomeServerTest {
 
     @Before
     public void setup() {
-        mockSshClient = spy(SshClient.setUpDefaultClient());
+        mockSshClient = spy(new NetconfClientBuilder().build());
         mockCallHomeAuthProv = mock(CallHomeAuthorizationProvider.class);
         mockAuth = mock(CallHomeAuthorization.class);
         mockFactory = mock(CallHomeSessionContext.Factory.class);
-        mockSession = mock(ClientSession.class);
+        mockSession = mock(NettyAwareClientSession.class);
         mockStatusRecorder = mock(StatusRecorder.class);
 
         Map<String, String> props = new HashMap<>();
