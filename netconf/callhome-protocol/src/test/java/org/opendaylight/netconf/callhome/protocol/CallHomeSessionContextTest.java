@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.DefaultChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -30,10 +31,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
-import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientSessionImpl;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyPipelineAwareChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.AttributeRepository.AttributeKey;
 import org.opendaylight.netconf.shaded.sshd.common.channel.StreamingChannel;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
@@ -45,7 +46,7 @@ import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchange;
 import org.opendaylight.netconf.shaded.sshd.common.util.buffer.Buffer;
 
 public class CallHomeSessionContextTest {
-    private ClientSessionImpl mockSession;
+    private NetconfClientSessionImpl mockSession;
     private CallHomeAuthorization mockAuth;
     private ClientChannel mockChannel;
     private InetSocketAddress address;
@@ -59,7 +60,7 @@ public class CallHomeSessionContextTest {
 
     @Before
     public void setup() {
-        mockSession = mock(ClientSessionImpl.class);
+        mockSession = mock(NetconfClientSessionImpl.class);
         mockAuth = mock(CallHomeAuthorization.class);
         mockChannel = mock(ClientChannel.class);
         address = mock(InetSocketAddress.class);
@@ -125,9 +126,10 @@ public class CallHomeSessionContextTest {
     public void creatingAChannelSuccessfullyShouldResultInAnAttachedListener() throws IOException {
         // given
         OpenFuture mockFuture = mock(OpenFuture.class);
-        ChannelSubsystem mockChannelSubsystem = mock(ChannelSubsystem.class);
+        NettyPipelineAwareChannelSubsystem mockChannelSubsystem = mock(NettyPipelineAwareChannelSubsystem.class);
         doReturn(mockFuture).when(mockChannelSubsystem).open();
-        doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString());
+        doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString(),
+                any(DefaultChannelPipeline.class));
 
         doReturn(null).when(mockFuture).addListener(any(SshFutureListener.class));
         doNothing().when(mockChannelSubsystem).setStreaming(any(StreamingChannel.Streaming.class));
@@ -163,8 +165,9 @@ public class CallHomeSessionContextTest {
         doReturn(true).when(mockFuture).isOpened();
 
         instance = spy(new CallHomeSessionContext(mockSession, mockAuth, mockFactory));
-        doReturn(mockMinaChannel).when(instance).newMinaSshNettyChannel(any());
-        SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel);
+        doReturn(mockMinaChannel).when(instance).newMinaSshNettyChannel();
+        SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel, mockMinaChannel);
+
         // when
         listener.operationComplete(mockFuture);
         // then
@@ -183,7 +186,7 @@ public class CallHomeSessionContextTest {
         doReturn(null).when(mockSession).close(anyBoolean());
 
         // when
-        SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel);
+        SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel, null);
         listener.operationComplete(mockFuture);
         // then
         // You'll see an error message logged to the console - it is expected.
