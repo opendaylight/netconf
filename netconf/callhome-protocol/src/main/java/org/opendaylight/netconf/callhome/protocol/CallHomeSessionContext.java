@@ -12,6 +12,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
@@ -24,6 +27,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWriter;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
@@ -80,17 +84,17 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         try {
             final ClientChannel netconfChannel = sshSession.createSubsystemChannel(NETCONF);
             netconfChannel.setStreaming(ClientChannel.Streaming.Async);
-            netconfChannel.open().addListener(newSshFutureListener(netconfChannel));
+            netconfChannel.open().addListener(newSshFutureListener());
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    SshFutureListener<OpenFuture> newSshFutureListener(final ClientChannel netconfChannel) {
+    SshFutureListener<OpenFuture> newSshFutureListener() {
         return future -> {
             if (future.isOpened()) {
                 factory.getChannelOpenListener().onNetconfSubsystemOpened(this,
-                    listener -> doActivate(netconfChannel, listener));
+                    listener -> doActivate(listener));
             } else {
                 channelOpenFailed(future.getException());
             }
@@ -113,23 +117,21 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         sshSession.close(false);
     }
 
-    private synchronized Promise<NetconfClientSession> doActivate(final ClientChannel netconfChannel,
-            final NetconfClientSessionListener listener) {
+    private synchronized Promise<NetconfClientSession> doActivate(final NetconfClientSessionListener listener) {
         if (activated) {
             return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));
         }
-
         activated = true;
         LOG.info("Activating Netconf channel for {} with {}", getRemoteAddress(), listener);
         Promise<NetconfClientSession> activationPromise = newSessionPromise();
-        final MinaSshNettyChannel nettyChannel = newMinaSshNettyChannel(netconfChannel);
+        final MinaSshNettyChannel nettyChannel = newMinaSshNettyChannel();
         factory.getChannelInitializer(listener).initialize(nettyChannel, activationPromise);
         factory.getNettyGroup().register(nettyChannel).awaitUninterruptibly(500);
         return activationPromise;
     }
 
-    protected MinaSshNettyChannel newMinaSshNettyChannel(final ClientChannel netconfChannel) {
-        return new MinaSshNettyChannel(this, sshSession, netconfChannel);
+    protected MinaSshNettyChannel newMinaSshNettyChannel() {
+        return new MinaSshNettyChannel(this, sshSession);
     }
 
     private static Promise<NetconfClientSession> newSessionPromise() {
@@ -197,6 +199,25 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
         void remove(final CallHomeSessionContext session) {
             sessions.remove(session.getSessionId(), session);
+        }
+    }
+
+    static class SshWriteAsyncHandlerAdapter extends ChannelOutboundHandlerAdapter {
+        private final AsyncSshHandlerWriter sshWriteAsyncHandler;
+        private final ClientChannel sshChannel;
+
+        SshWriteAsyncHandlerAdapter(final ClientChannel sshChannel) {
+            this.sshChannel = sshChannel;
+            this.sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());
+        }
+
+        @Override
+        public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) {
+            sshWriteAsyncHandler.write(ctx, msg, promise);
+        }
+
+        public ClientChannel getSshChannel() {
+            return sshChannel;
         }
     }
 }
