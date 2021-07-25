@@ -134,7 +134,7 @@ public abstract class AbstractBodyReaderTest {
         assertEquals(1, errors.size());
 
         final RestconfError error = errors.get(0);
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorType.APPLICATION, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
         assertEquals("bar error app tag", error.getErrorAppTag());
         assertEquals("bar error message", error.getErrorMessage());
