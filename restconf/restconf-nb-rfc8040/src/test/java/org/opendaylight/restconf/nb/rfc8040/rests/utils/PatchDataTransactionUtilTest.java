@@ -37,7 +37,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -51,6 +50,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -234,7 +234,7 @@ public class PatchDataTransactionUtilTest {
         doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
             this.targetNodeForCreateAndDelete);
         final NetconfDocumentedException exception = new NetconfDocumentedException("id",
-            ErrorType.RPC, DocumentedException.ErrorTag.from("data-missing"), ErrorSeverity.ERROR);
+            ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
         final SettableFuture<? extends DOMRpcResult> ret = SettableFuture.create();
         ret.setException(new TransactionCommitFailedException(
             String.format("Commit of transaction %s failed", this), exception));

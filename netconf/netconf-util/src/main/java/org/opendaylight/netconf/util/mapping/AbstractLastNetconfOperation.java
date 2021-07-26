@@ -17,7 +17,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class AbstractLastNetconfOperation extends AbstractNetconfOperation {
-
     protected AbstractLastNetconfOperation(final String netconfSessionIdForReporting) {
         super(netconfSessionIdForReporting);
     }
@@ -28,7 +27,7 @@ public abstract class AbstractLastNetconfOperation extends AbstractNetconfOperat
         if (!subsequentOperation.isExecutionTermination()) {
             throw new DocumentedException(String.format(
                     "No netconf operation expected to be subsequent to %s, but is %s", this, subsequentOperation),
-                    ErrorType.APPLICATION, DocumentedException.ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
 
         return handleWithNoSubsequentOperations(document, operationElement);

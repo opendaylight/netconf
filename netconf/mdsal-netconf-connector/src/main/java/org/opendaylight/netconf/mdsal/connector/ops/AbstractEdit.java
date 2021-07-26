@@ -15,11 +15,11 @@ import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -62,7 +62,7 @@ abstract class AbstractEdit extends AbstractConfigOperation {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
         } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
             throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex, ErrorType.PROTOCOL,
-                ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
+                DocumentedException.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
     }
 

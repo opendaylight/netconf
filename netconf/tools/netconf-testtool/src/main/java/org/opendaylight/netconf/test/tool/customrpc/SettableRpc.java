@@ -17,6 +17,7 @@ import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.w3c.dom.Document;
 
@@ -52,7 +53,7 @@ class SettableRpc implements NetconfOperation {
             return document;
         } else if (subsequentOperation.isExecutionTermination()) {
             throw new DocumentedException("Mapping not found " + XmlUtil.toString(requestMessage),
-                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         } else {
             return subsequentOperation.execute(requestMessage);
         }

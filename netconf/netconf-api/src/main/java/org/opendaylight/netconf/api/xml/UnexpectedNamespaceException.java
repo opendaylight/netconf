@@ -10,10 +10,15 @@ package org.opendaylight.netconf.api.xml;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 public class UnexpectedNamespaceException extends DocumentedException {
     private static final long serialVersionUID = 1L;
+
+    public UnexpectedNamespaceException(final String format, final Object... args) {
+        this(String.format(format, args), ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+    }
 
     public UnexpectedNamespaceException(final String message, final ErrorType errorType, final ErrorTag errorTag,
             final ErrorSeverity errorSeverity) {

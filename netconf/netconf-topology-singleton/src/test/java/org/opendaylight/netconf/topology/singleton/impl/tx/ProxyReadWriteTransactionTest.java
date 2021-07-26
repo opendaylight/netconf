@@ -44,6 +44,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequ
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -403,7 +404,7 @@ public class ProxyReadWriteTransactionTest {
         assertTrue("Unexpected cause " + cause, cause instanceof DocumentedException);
         final DocumentedException de = (DocumentedException) cause;
         assertEquals(ErrorSeverity.WARNING, de.getErrorSeverity());
-        assertEquals(DocumentedException.ErrorTag.OPERATION_FAILED, de.getErrorTag());
+        assertEquals(ErrorTag.OPERATION_FAILED, de.getErrorTag());
         assertEquals(ErrorType.APPLICATION, de.getErrorType());
     }
 }

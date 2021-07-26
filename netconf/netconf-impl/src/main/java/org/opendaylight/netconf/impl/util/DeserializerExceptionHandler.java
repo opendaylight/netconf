@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class DeserializerExceptionHandler implements ChannelHandler {
-
     private static final Logger LOG = LoggerFactory.getLogger(DeserializerExceptionHandler.class);
 
     @Override
@@ -42,7 +41,7 @@ public final class DeserializerExceptionHandler implements ChannelHandler {
         final Map<String, String> info = new HashMap<>();
         info.put("cause", cause.getMessage());
         final DocumentedException ex = new DocumentedException(cause.getMessage(),
-                ErrorType.RPC, DocumentedException.ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR, info);
+                ErrorType.RPC, DocumentedException.MALFORMED_MESSAGE, ErrorSeverity.ERROR, info);
 
         SendErrorExceptionUtil.sendErrorMessage(ctx.channel(), ex);
     }
