@@ -7,21 +7,19 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import java.util.Collections;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 
 public class MissingNameSpaceException extends DocumentedException {
     private static final long serialVersionUID = 1L;
 
-    public MissingNameSpaceException(final String message, final DocumentedException.ErrorType errorType,
-            final DocumentedException.ErrorTag errorTag, final DocumentedException.ErrorSeverity errorSeverity) {
-        this(message, errorType, errorTag, errorSeverity, Collections.emptyMap());
+    public MissingNameSpaceException(final String message, final ErrorType errorType, final ErrorTag errorTag,
+            final ErrorSeverity errorSeverity) {
+        this(message, errorType, errorTag, errorSeverity, Map.of());
     }
 
-    public MissingNameSpaceException(final String message, final DocumentedException.ErrorType errorType,
-            final DocumentedException.ErrorTag errorTag, final DocumentedException.ErrorSeverity errorSeverity,
-            final Map<String, String> errorInfo) {
+    public MissingNameSpaceException(final String message, final ErrorType errorType, final ErrorTag errorTag,
+            final ErrorSeverity errorSeverity, final Map<String, String> errorInfo) {
         super(message, errorType, errorTag, errorSeverity, errorInfo);
     }
 }

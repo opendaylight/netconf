@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -157,18 +156,16 @@ public class DocumentedException extends Exception {
     private final Map<String, String> errorInfo;
 
     public DocumentedException(final String message) {
-        this(message, DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE,
-                DocumentedException.ErrorSeverity.ERROR);
+        this(message, ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
     }
 
     public DocumentedException(final String message, final Exception cause) {
-        this(message, cause, DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE,
-                DocumentedException.ErrorSeverity.ERROR);
+        this(message, cause, ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
     }
 
     public DocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
             final ErrorSeverity errorSeverity) {
-        this(message, errorType, errorTag, errorSeverity, Collections.emptyMap());
+        this(message, errorType, errorTag, errorSeverity, Map.of());
     }
 
     public DocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
@@ -182,7 +179,7 @@ public class DocumentedException extends Exception {
 
     public DocumentedException(final String message, final Exception cause, final ErrorType errorType,
             final ErrorTag errorTag, final ErrorSeverity errorSeverity) {
-        this(message, cause, errorType, errorTag, errorSeverity, Collections.emptyMap());
+        this(message, cause, errorType, errorTag, errorSeverity, Map.of());
     }
 
     public DocumentedException(final String message, final Exception cause, final ErrorType errorType,
