@@ -11,11 +11,10 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates a restconf error as defined in the ietf restconf draft.
@@ -28,78 +27,7 @@ import org.slf4j.LoggerFactory;
  *     See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  */
 public class RestconfError implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfError.class);
     private static final long serialVersionUID = 1L;
-
-    public enum ErrorTag {
-        IN_USE("in-use", 409 /* Conflict */),
-        INVALID_VALUE("invalid-value", 400 /* Bad Request */),
-        TOO_BIG("too-big", 413 /* Request Entity Too Large */),
-        MISSING_ATTRIBUTE("missing-attribute", 400 /* Bad Request */),
-        BAD_ATTRIBUTE("bad-attribute", 400 /* Bad Request */),
-        UNKNOWN_ATTRIBUTE("unknown-attribute", 400 /* Bad Request */),
-        MISSING_ELEMENT("missing-element", 400 /* Bad Request */),
-        BAD_ELEMENT("bad-element", 400 /* Bad Request */),
-        UNKNOWN_ELEMENT("unknown-element", 400 /* Bad Request */),
-        UNKNOWN_NAMESPACE("unknown-namespace", 400 /* Bad Request */),
-        ACCESS_DENIED("access-denied", 403 /* Forbidden */),
-        LOCK_DENIED("lock-denied", 409 /* Conflict */),
-        RESOURCE_DENIED("resource-denied", 409 /* Conflict */),
-        ROLLBACK_FAILED("rollback-failed", 500 /* INTERNAL_SERVER_ERROR */),
-        DATA_EXISTS("data-exists", 409 /* Conflict */),
-        DATA_MISSING("data-missing", dataMissingHttpStatus()),
-        OPERATION_NOT_SUPPORTED("operation-not-supported", 501 /* Not Implemented */),
-        OPERATION_FAILED("operation-failed", 500 /* INTERNAL_SERVER_ERROR */),
-        PARTIAL_OPERATION("partial-operation", 500 /* INTERNAL_SERVER_ERROR */),
-        MALFORMED_MESSAGE("malformed-message", 400 /* Bad Request */),
-        RESOURCE_DENIED_TRANSPORT("resource-denied-transport", 503 /* Service Unavailable */);
-
-        private final String tagValue;
-        private final int statusCode;
-
-        ErrorTag(final String tagValue, final int statusCode) {
-            this.tagValue = tagValue;
-            this.statusCode = statusCode;
-        }
-
-        public String getTagValue() {
-            return this.tagValue.toLowerCase(Locale.ROOT);
-        }
-
-        public static ErrorTag valueOfCaseInsensitive(final String value) {
-            try {
-                return ErrorTag.valueOf(ErrorTag.class, value.toUpperCase(Locale.ROOT).replaceAll("-", "_"));
-            } catch (IllegalArgumentException e) {
-                return OPERATION_FAILED;
-            }
-        }
-
-        public int getStatusCode() {
-            return statusCode;
-        }
-
-        private static int dataMissingHttpStatus() {
-            // Control over the HTTP status reported on "data-missing" conditions. This defaults to disabled,
-            // HTTP status 409 as specified by RFC8040 (and all previous drafts). See the discussion in:
-            // https://www.rfc-editor.org/errata/eid5565
-            // https://mailarchive.ietf.org/arch/msg/netconf/hkVDdHK4xA74NgvXzWP0zObMiyY/
-            final String propName = "org.opendaylight.restconf.eid5565";
-            final String propValue = System.getProperty(propName, "disabled");
-            switch (propValue) {
-                case "enabled":
-                    // RFC7231 interpretation: 404 Not Found
-                    LOG.info("RESTCONF data-missing condition is reported as HTTP status 404 (Errata 5565)");
-                    return 404;
-                case "disabled":
-                    break;
-                default:
-                    LOG.warn("Unhandled {} value \"{}\", assuming disabled", propName, propValue);
-            }
-
-            // RFC8040 specification: 409 Conflict
-            return 409;
-        }
-    }
 
     private final ErrorType errorType;
     private final ErrorTag errorTag;
@@ -208,8 +136,8 @@ public class RestconfError implements Serializable {
 
         this.errorType = rpcError.getErrorType().toNetconf();
 
-        this.errorTag = rpcError.getTag() == null ? ErrorTag.OPERATION_FAILED : ErrorTag
-                .valueOfCaseInsensitive(rpcError.getTag());
+        final String tag = rpcError.getTag();
+        this.errorTag = tag == null ? ErrorTag.OPERATION_FAILED : new ErrorTag(tag);
 
         this.errorMessage = rpcError.getMessage();
         this.errorAppTag = rpcError.getApplicationTag();
@@ -257,7 +185,7 @@ public class RestconfError implements Serializable {
     @Override
     public String toString() {
         return "RestconfError ["
-                + "error-type: " + errorType.elementBody() + ", error-tag: " + errorTag.getTagValue()
+                + "error-type: " + errorType.elementBody() + ", error-tag: " + errorTag.elementBody()
                 + (errorAppTag != null ? ", error-app-tag: " + errorAppTag : "")
                 + (errorMessage != null ? ", error-message: " + errorMessage : "")
                 + (errorInfo != null ? ", error-info: " + errorInfo : "")

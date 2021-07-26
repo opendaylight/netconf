@@ -213,7 +213,7 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         } catch (final RestconfDocumentedException exception) {
             final RestconfError restconfError = exception.getErrors().get(0);
             Assert.assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
-            Assert.assertEquals(RestconfError.ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+            Assert.assertEquals(RestconfDocumentedException.MALFORMED_MESSAGE, restconfError.getErrorTag());
         }
     }
 }
