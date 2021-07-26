@@ -16,11 +16,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
-import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -90,11 +90,8 @@ abstract class AbstractEdit extends AbstractConfigOperation {
                     element.getName()));
         if (schemaNode.isEmpty()) {
             throw new DocumentedException(
-                "Unable to find node " + elementName + " with namespace: " + namespace + "in module: "
-                    + module.toString(),
-                ErrorType.APPLICATION,
-                ErrorTag.UNKNOWN_NAMESPACE,
-                ErrorSeverity.ERROR);
+                "Unable to find node " + elementName + " with namespace: " + namespace + " in module: " + module,
+                ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
         }
 
         return schemaNode.get();

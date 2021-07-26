@@ -21,6 +21,7 @@ import java.util.Optional;
 import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -86,9 +87,7 @@ public final class XmlElement {
                 } else {
                     if (!attribKey.startsWith(XMLConstants.XMLNS_ATTRIBUTE + ":")) {
                         throw new DocumentedException("Attribute doesn't start with :",
-                                DocumentedException.ErrorType.APPLICATION,
-                                DocumentedException.ErrorTag.INVALID_VALUE,
-                                ErrorSeverity.ERROR);
+                                ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
                     }
                     prefix = attribKey.substring(XMLConstants.XMLNS_ATTRIBUTE.length() + 1);
                 }
@@ -111,33 +110,25 @@ public final class XmlElement {
         if (!getName().equals(expectedName)) {
             throw new UnexpectedElementException(String.format("Expected %s xml element but was %s", expectedName,
                     getName()),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 
     public void checkNamespaceAttribute(final String expectedNamespace)
             throws UnexpectedNamespaceException, MissingNameSpaceException {
         if (!getNamespaceAttribute().equals(expectedNamespace)) {
-            throw new UnexpectedNamespaceException(String.format("Unexpected namespace %s should be %s",
-                    getNamespaceAttribute(),
-                    expectedNamespace),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    ErrorSeverity.ERROR);
+            throw new UnexpectedNamespaceException(
+                    String.format("Unexpected namespace %s should be %s", getNamespaceAttribute(), expectedNamespace),
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 
     public void checkNamespace(final String expectedNamespace)
             throws UnexpectedNamespaceException, MissingNameSpaceException {
         if (!getNamespace().equals(expectedNamespace)) {
-            throw new UnexpectedNamespaceException(String.format("Unexpected namespace %s should be %s",
-                    getNamespace(),
-                    expectedNamespace),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    ErrorSeverity.ERROR);
+            throw new UnexpectedNamespaceException(
+                    String.format("Unexpected namespace %s should be %s", getNamespace(), expectedNamespace),
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 
@@ -298,9 +289,7 @@ public final class XmlElement {
         if (children.size() != 1) {
             throw new DocumentedException(String.format("One element %s:%s expected in %s but was %s", namespace,
                     childName, toString(), children.size()),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.INVALID_VALUE,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }
 
         return children.get(0);
@@ -310,9 +299,7 @@ public final class XmlElement {
         List<XmlElement> nameElements = getChildElements(childName);
         if (nameElements.size() != 1) {
             throw new DocumentedException("One element " + childName + " expected in " + toString(),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.INVALID_VALUE,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }
         return nameElements.get(0);
     }
@@ -322,9 +309,7 @@ public final class XmlElement {
         if (children.size() != 1) {
             throw new DocumentedException(String.format("One element expected in %s but was %s", toString(),
                     children.size()),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.INVALID_VALUE,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }
         return children.get(0);
     }
@@ -342,10 +327,7 @@ public final class XmlElement {
             }
         }
         throw new DocumentedException(getName() + " should contain text.",
-                DocumentedException.ErrorType.APPLICATION,
-                DocumentedException.ErrorTag.INVALID_VALUE,
-                ErrorSeverity.ERROR
-        );
+                ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
     }
 
     public Optional<String> getOnlyTextContentOptionally() {
@@ -362,11 +344,8 @@ public final class XmlElement {
     public String getNamespaceAttribute() throws MissingNameSpaceException {
         String attribute = element.getAttribute(XMLConstants.XMLNS_ATTRIBUTE);
         if (attribute.isEmpty() || attribute.equals(DEFAULT_NAMESPACE_PREFIX)) {
-            throw new MissingNameSpaceException(String.format("Element %s must specify namespace",
-                    toString()),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    ErrorSeverity.ERROR);
+            throw new MissingNameSpaceException(String.format("Element %s must specify namespace", toString()),
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
         return attribute;
     }
@@ -392,9 +371,7 @@ public final class XmlElement {
         Optional<String> namespaceURI = getNamespaceOptionally();
         if (namespaceURI.isEmpty()) {
             throw new MissingNameSpaceException(String.format("No namespace defined for %s", this),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
         return namespaceURI.get();
     }
@@ -461,9 +438,7 @@ public final class XmlElement {
         }
         if (!childElements.isEmpty()) {
             throw new DocumentedException(String.format("Unrecognised elements %s in %s", childElements, this),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.INVALID_VALUE,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }
     }
 

@@ -42,7 +42,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
-import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
@@ -51,6 +50,7 @@ import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -263,6 +263,7 @@ public class RuntimeRpcTest {
             rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
             fail("Should have failed, rpc has bad namespace");
         } catch (final DocumentedException e) {
+            // FIXME: use assertThrows() and assertEquals()
             assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
             assertTrue(e.getErrorTag() == ErrorTag.BAD_ELEMENT);
             assertTrue(e.getErrorType() == ErrorType.APPLICATION);

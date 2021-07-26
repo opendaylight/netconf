@@ -10,11 +10,11 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 import com.google.common.collect.ImmutableMap;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
-import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -39,9 +39,7 @@ public final class Validate extends AbstractConfigOperation {
         final Datastore targetDatastore = extractSourceParameter(operationElement, OPERATION_NAME);
         if (targetDatastore != Datastore.candidate) {
             throw new DocumentedException("<validate> is only supported on candidate datastore",
-                DocumentedException.ErrorType.PROTOCOL,
-                ErrorTag.OPERATION_NOT_SUPPORTED,
-                ErrorSeverity.ERROR);
+                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
 
         transactionProvider.validateTransaction();

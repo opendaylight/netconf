@@ -27,13 +27,13 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
-import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -80,18 +80,14 @@ public final class CopyConfig extends AbstractEdit {
         final String target = targetElement.getName();
         if (Datastore.running.toString().equals(target)) {
             throw new DocumentedException("edit-config on running datastore is not supported",
-                ErrorType.PROTOCOL,
-                ErrorTag.OPERATION_NOT_SUPPORTED,
-                ErrorSeverity.ERROR);
+                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         } else if (Datastore.candidate.toString().equals(target)) {
             copyToCandidate(operationElement);
         } else if (URL_KEY.equals(target)) {
             copyToUrl(targetElement, operationElement);
         } else {
             throw new DocumentedException("Unsupported target: " + target,
-                ErrorType.PROTOCOL,
-                ErrorTag.BAD_ELEMENT,
-                ErrorSeverity.ERROR);
+                ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
         }
         return document.createElement(XmlNetconfConstants.OK);
     }
@@ -123,9 +119,7 @@ public final class CopyConfig extends AbstractEdit {
         final Optional<XmlElement> sourceElement = parent.getOnlyChildElementOptionally(SOURCE_KEY);
         if (sourceElement.isEmpty()) {
             throw new DocumentedException("<source> element is missing",
-                DocumentedException.ErrorType.PROTOCOL,
-                DocumentedException.ErrorTag.MISSING_ELEMENT,
-                ErrorSeverity.ERROR);
+                ErrorType.PROTOCOL, DocumentedException.ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR);
         }
 
         return sourceElement.get();
@@ -135,9 +129,7 @@ public final class CopyConfig extends AbstractEdit {
         final String url = urlElement.getTextContent();
         if (!url.startsWith("file:")) {
             throw new DocumentedException("Unsupported <url> protocol: " + url,
-                ErrorType.PROTOCOL,
-                ErrorTag.OPERATION_NOT_SUPPORTED,
-                ErrorSeverity.ERROR);
+                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
 
         // Read data from datastore:
@@ -155,14 +147,10 @@ public final class CopyConfig extends AbstractEdit {
             Files.write(file, xml.getBytes(StandardCharsets.UTF_8));
         } catch (URISyntaxException | IllegalArgumentException e) {
             throw new DocumentedException("Invalid URI: " + url, e,
-                ErrorType.RPC,
-                ErrorTag.INVALID_VALUE,
-                ErrorSeverity.ERROR);
+                ErrorType.RPC, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         } catch (IOException e) {
             throw new DocumentedException("Failed to write : " + url, e,
-                ErrorType.APPLICATION,
-                ErrorTag.OPERATION_FAILED,
-                ErrorSeverity.ERROR);
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 
@@ -187,9 +175,7 @@ public final class CopyConfig extends AbstractEdit {
             return Datastore.valueOf(source.getName());
         } catch (IllegalArgumentException e) {
             throw new DocumentedException("Unsupported source for <url> target", e,
-                ErrorType.PROTOCOL,
-                ErrorTag.OPERATION_NOT_SUPPORTED,
-                ErrorSeverity.ERROR);
+                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
     }
 

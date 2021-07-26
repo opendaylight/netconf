@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -60,11 +61,8 @@ public class NetconfDocumentedExceptionTest {
     @Test
     public void testToAndFromXMLDocument() throws XPathExpressionException {
         final String errorMessage = "mock error message";
-        DocumentedException ex = new NetconfDocumentedException(errorMessage, null,
-                DocumentedException.ErrorType.PROTOCOL,
-                DocumentedException.ErrorTag.DATA_EXISTS,
-                ErrorSeverity.WARNING,
-                Map.of("foo", "bar"));
+        DocumentedException ex = new NetconfDocumentedException(errorMessage, null, ErrorType.PROTOCOL,
+                DocumentedException.ErrorTag.DATA_EXISTS, ErrorSeverity.WARNING, Map.of("foo", "bar"));
 
         final Document doc = ex.toXMLDocument();
         assertNotNull("Document is null", doc);
@@ -79,8 +77,7 @@ public class NetconfDocumentedExceptionTest {
 
         final Node errorTypeNode = getNode("netconf:error-type", rpcErrorNode);
         assertNotNull("error-type not found", errorTypeNode);
-        assertEquals("error-type", DocumentedException.ErrorType.PROTOCOL.getTypeValue(),
-                errorTypeNode.getTextContent());
+        assertEquals("error-type", ErrorType.PROTOCOL.elementBody(), errorTypeNode.getTextContent());
 
         final Node errorTagNode = getNode("netconf:error-tag", rpcErrorNode);
         assertNotNull("error-tag not found", errorTagNode);
@@ -106,7 +103,7 @@ public class NetconfDocumentedExceptionTest {
         assertNotNull("NetconfDocumentedException is null", ex);
         assertEquals("getErrorSeverity", ErrorSeverity.WARNING, ex.getErrorSeverity());
         assertEquals("getErrorTag", DocumentedException.ErrorTag.DATA_EXISTS, ex.getErrorTag());
-        assertEquals("getErrorType", DocumentedException.ErrorType.PROTOCOL, ex.getErrorType());
+        assertEquals("getErrorType", ErrorType.PROTOCOL, ex.getErrorType());
         assertEquals("getLocalizedMessage", errorMessage, ex.getLocalizedMessage());
         assertEquals("getErrorInfo", Map.of("foo", "bar"), ex.getErrorInfo());
     }

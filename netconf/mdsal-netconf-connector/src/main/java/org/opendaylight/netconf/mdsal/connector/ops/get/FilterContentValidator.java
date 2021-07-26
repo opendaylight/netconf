@@ -25,6 +25,7 @@ import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -83,9 +84,7 @@ public class FilterContentValidator {
         } catch (final ValidationException e) {
             LOG.debug("Filter content isn't valid", e);
             throw new DocumentedException("Validation failed. Cause: " + e.getMessage(), e,
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
         }
     }
 
@@ -106,11 +105,9 @@ public class FilterContentValidator {
                 return childNode;
             }
         }
-        throw new DocumentedException("Unable to find node with namespace: " + nameSpace
-                    + "in schema context: " + schemaContext.getCurrentContext().toString(),
-                DocumentedException.ErrorType.APPLICATION,
-                DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
-                ErrorSeverity.ERROR);
+        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + " in schema context: "
+                + schemaContext.getCurrentContext(),
+                ErrorType.APPLICATION, DocumentedException.ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
     }
 
     /**

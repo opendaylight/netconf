@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata.Builder;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -287,15 +288,9 @@ public final class NetconfMessageTransformUtil {
         final String outputMsgId = output.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
 
         if (!inputMsgId.equals(outputMsgId)) {
-            final Map<String, String> errorInfo = ImmutableMap.<String, String>builder()
-                    .put("actual-message-id", outputMsgId)
-                    .put("expected-message-id", inputMsgId)
-                    .build();
-
-            throw new NetconfDocumentedException("Response message contained unknown \"message-id\"",
-                    null, NetconfDocumentedException.ErrorType.PROTOCOL,
-                    NetconfDocumentedException.ErrorTag.BAD_ATTRIBUTE,
-                    ErrorSeverity.ERROR, errorInfo);
+            throw new NetconfDocumentedException("Response message contained unknown \"message-id\"", null,
+                    ErrorType.PROTOCOL, NetconfDocumentedException.ErrorTag.BAD_ATTRIBUTE, ErrorSeverity.ERROR,
+                    ImmutableMap.of("actual-message-id", outputMsgId, "expected-message-id", inputMsgId));
         }
     }
 
@@ -317,24 +312,11 @@ public final class NetconfMessageTransformUtil {
         }
 
         return ex.getErrorSeverity() == ErrorSeverity.ERROR
-                ? RpcResultBuilder.newError(toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
+                ? RpcResultBuilder.newError(ex.getErrorType().toLegacy(), ex.getErrorTag().getTagValue(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause())
                 : RpcResultBuilder.newWarning(
-                        toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
+                        ex.getErrorType().toLegacy(), ex.getErrorTag().getTagValue(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
-    }
-
-    private static RpcError.ErrorType toRpcErrorType(final NetconfDocumentedException.ErrorType type) {
-        switch (type) {
-            case PROTOCOL:
-                return RpcError.ErrorType.PROTOCOL;
-            case RPC:
-                return RpcError.ErrorType.RPC;
-            case TRANSPORT:
-                return RpcError.ErrorType.TRANSPORT;
-            default:
-                return RpcError.ErrorType.APPLICATION;
-        }
     }
 
     public static NodeIdentifier toId(final PathArgument qname) {
@@ -561,9 +543,7 @@ public final class NetconfMessageTransformUtil {
     public static RpcResult<NetconfMessage> toRpcResult(final FailedNetconfMessage message) {
         return RpcResultBuilder.<NetconfMessage>failed()
                 .withRpcError(toRpcError(new NetconfDocumentedException(message.getException().getMessage(),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.MALFORMED_MESSAGE,
-                    ErrorSeverity.ERROR)))
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
                 .build();
     }
 }
