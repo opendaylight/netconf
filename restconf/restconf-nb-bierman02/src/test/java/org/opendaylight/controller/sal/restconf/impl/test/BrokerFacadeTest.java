@@ -66,12 +66,12 @@ import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -168,7 +168,7 @@ public class BrokerFacadeTest {
     public void test503() throws Exception {
         final RpcError error = RpcResultBuilder.newError(
                 RpcError.ErrorType.TRANSPORT,
-                ErrorTag.RESOURCE_DENIED.getTagValue(),
+                ErrorTag.RESOURCE_DENIED.elementBody(),
                 "Master is down. Please try again.");
         doReturn(immediateFailedFluentFuture(new ReadFailedException("Read from transaction failed", error)))
                 .when(readTransaction).read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class));
@@ -176,7 +176,8 @@ public class BrokerFacadeTest {
             brokerFacade.readConfigurationData(this.instanceID, "explicit");
             fail("This test should fail.");
         } catch (final RestconfDocumentedException e) {
-            assertEquals("getErrorTag", ErrorTag.RESOURCE_DENIED_TRANSPORT, e.getErrors().get(0).getErrorTag());
+            assertEquals("getErrorTag", RestconfDocumentedException.RESOURCE_DENIED_TRANSPORT,
+                    e.getErrors().get(0).getErrorTag());
             assertEquals("getErrorType", ErrorType.TRANSPORT, e.getErrors().get(0).getErrorType());
             assertEquals("getErrorMessage", "Master is down. Please try again.",
                     e.getErrors().get(0).getErrorMessage());

@@ -176,7 +176,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final DataSchemaNode errTagSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
         checkState(errTagSchemaNode instanceof LeafSchemaNode);
         errNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) errTagSchemaNode)
-                .withValue(error.getErrorTag().getTagValue()).build());
+                .withValue(error.getErrorTag().elementBody()).build());
 
         if (error.getErrorAppTag() != null) {
             lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(

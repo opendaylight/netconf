@@ -19,7 +19,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -53,16 +53,6 @@ public class RestconfErrorTest {
     }
 
     @Test
-    public void testErrorTagValueOf() {
-        assertEquals(ErrorTag.IN_USE, ErrorTag.valueOfCaseInsensitive(ErrorTag.IN_USE.getTagValue()));
-    }
-
-    @Test
-    public void testErrorTagValueOfIsLowercase() {
-        assertEquals("in-use", ErrorTag.IN_USE.getTagValue());
-    }
-
-    @Test
     public void testErrorTagStatusCodes() {
         Map<String, Integer> lookUpMap = new HashMap<>();
 
@@ -89,8 +79,8 @@ public class RestconfErrorTest {
         lookUpMap.put("resource-denied-transport", 503);
 
         for (ErrorTag tag : ErrorTag.values()) {
-            Integer expectedStatusCode = lookUpMap.get(tag.getTagValue());
-            assertNotNull("Failed to find " + tag.getTagValue(), expectedStatusCode);
+            Integer expectedStatusCode = lookUpMap.get(tag.elementBody());
+            assertNotNull("Failed to find " + tag.elementBody(), expectedStatusCode);
             assertEquals("Status Code does not match", expectedStatusCode, Integer.valueOf(tag.getStatusCode()));
         }
     }
@@ -139,7 +129,7 @@ public class RestconfErrorTest {
 
         // All fields set
         RpcError rpcError = RpcResultBuilder.newError(
-                RpcError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE.getTagValue(), "mock error-message",
+                RpcError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE.elementBody(), "mock error-message",
                 "mock app-tag", "mock error-info", new Exception("mock cause"));
 
         validateRestConfError("mock error-message", ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, "mock app-tag",
@@ -147,7 +137,7 @@ public class RestconfErrorTest {
 
         // All fields set except 'info' - expect error-info set to 'cause'
         rpcError = RpcResultBuilder.newError(
-                RpcError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE.getTagValue(), "mock error-message",
+                RpcError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE.elementBody(), "mock error-message",
                 "mock app-tag", null, new Exception("mock cause"));
 
         validateRestConfError("mock error-message", ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, "mock app-tag",
@@ -155,7 +145,7 @@ public class RestconfErrorTest {
 
         // Some fields set - expect error-info set to ErrorSeverity
         rpcError = RpcResultBuilder.newError(
-                RpcError.ErrorType.RPC, ErrorTag.ACCESS_DENIED.getTagValue(), null, null, null, null);
+                RpcError.ErrorType.RPC, ErrorTag.ACCESS_DENIED.elementBody(), null, null, null, null);
 
         validateRestConfError(null, ErrorType.RPC, ErrorTag.ACCESS_DENIED, null, "<severity>error</severity>",
                 new RestconfError(rpcError));

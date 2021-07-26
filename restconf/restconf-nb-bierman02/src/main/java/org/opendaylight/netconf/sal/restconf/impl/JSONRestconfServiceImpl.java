@@ -34,10 +34,10 @@ import org.opendaylight.netconf.sal.restconf.api.JSONRestconfService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -283,7 +283,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         final RpcError[] to = new RpcError[from.size()];
         int index = 0;
         for (final RestconfError e: from) {
-            to[index++] = RpcResultBuilder.newError(e.getErrorType().toLegacy(), e.getErrorTag().getTagValue(),
+            to[index++] = RpcResultBuilder.newError(e.getErrorType().toLegacy(), e.getErrorTag().elementBody(),
                     e.getErrorMessage());
         }
 
