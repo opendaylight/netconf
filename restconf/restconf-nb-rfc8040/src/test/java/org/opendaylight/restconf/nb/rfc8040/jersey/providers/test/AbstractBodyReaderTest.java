@@ -31,12 +31,12 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -67,9 +67,7 @@ public abstract class AbstractBodyReaderTest {
     }
 
     protected static <T extends AbstractIdentifierAwareJaxRsProvider<?>> void mockBodyReader(
-            final String identifier, final T normalizedNodeProvider,
-            final boolean isPost) throws NoSuchFieldException,
-            SecurityException, IllegalArgumentException, IllegalAccessException {
+            final String identifier, final T normalizedNodeProvider, final boolean isPost) {
         final UriInfo uriInfoMock = mock(UriInfo.class);
         final MultivaluedMap<String, String> pathParm = new MultivaluedHashMap<>(1);
 

@@ -30,7 +30,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
@@ -90,7 +89,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             LOG.debug("Error parsing xml input", e);
 
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
+                    RestconfDocumentedException.MALFORMED_MESSAGE, e);
         }
     }
 
@@ -145,7 +144,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             if (targetNode == null) {
                 LOG.debug("Target node {} not found in path {} ", target, pathContext.getSchemaNode());
                 throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
-                        ErrorTag.MALFORMED_MESSAGE);
+                        RestconfDocumentedException.MALFORMED_MESSAGE);
             }
 
             if (oper.isWithValue()) {
@@ -189,12 +188,12 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
 
         if (operation.isWithValue() && valueNode == null) {
             throw new RestconfDocumentedException("Error parsing input",
-                    ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                    ErrorType.PROTOCOL, RestconfDocumentedException.MALFORMED_MESSAGE);
         }
 
         if (!operation.isWithValue() && valueNode != null) {
             throw new RestconfDocumentedException("Error parsing input",
-                    ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                    ErrorType.PROTOCOL, RestconfDocumentedException.MALFORMED_MESSAGE);
         }
 
         if (valueNode == null) {

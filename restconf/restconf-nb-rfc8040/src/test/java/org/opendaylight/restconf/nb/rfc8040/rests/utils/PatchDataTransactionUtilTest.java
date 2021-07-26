@@ -40,7 +40,6 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -291,7 +290,7 @@ public class PatchDataTransactionUtilTest {
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,
                 patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorType());
-        assertEquals(RestconfError.ErrorTag.DATA_MISSING,
+        assertEquals(ErrorTag.DATA_MISSING,
                 patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorTag());
     }
 
@@ -302,7 +301,7 @@ public class PatchDataTransactionUtilTest {
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,
             patchStatusContext.getGlobalErrors().get(0).getErrorType());
-        assertEquals(RestconfError.ErrorTag.DATA_MISSING,
+        assertEquals(ErrorTag.DATA_MISSING,
             patchStatusContext.getGlobalErrors().get(0).getErrorTag());
     }
 }

@@ -32,7 +32,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
@@ -110,7 +109,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
 
         RestconfDocumentedException.throwIfYangError(exception);
         throw new RestconfDocumentedException("Error parsing json input: " + exception.getMessage(), ErrorType.PROTOCOL,
-                ErrorTag.MALFORMED_MESSAGE, exception);
+                RestconfDocumentedException.MALFORMED_MESSAGE, exception);
     }
 
     private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path,
@@ -403,7 +402,8 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
             return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
         }
 
-        throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
+            RestconfDocumentedException.MALFORMED_MESSAGE);
     }
 
     /**
