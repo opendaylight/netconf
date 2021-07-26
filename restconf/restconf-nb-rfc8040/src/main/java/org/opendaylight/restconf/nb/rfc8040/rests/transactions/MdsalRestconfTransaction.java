@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.TransactionUtil;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -127,7 +128,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             final ReadFailedException e = failure.getValue();
             if (e == null) {
                 throw new RestconfDocumentedException("Data already exists",
-                    RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.DATA_EXISTS, failure.getKey());
+                    ErrorType.PROTOCOL, RestconfError.ErrorTag.DATA_EXISTS, failure.getKey());
             }
 
             throw new RestconfDocumentedException(

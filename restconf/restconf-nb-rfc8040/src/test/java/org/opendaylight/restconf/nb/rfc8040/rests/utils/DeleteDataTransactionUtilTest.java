@@ -34,7 +34,6 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -112,7 +111,7 @@ public class DeleteDataTransactionUtilTest {
             DeleteDataTransactionUtil.deleteData(strategy, context.getInstanceIdentifier());
             fail("Delete operation should fail due to missing data");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
         }
     }

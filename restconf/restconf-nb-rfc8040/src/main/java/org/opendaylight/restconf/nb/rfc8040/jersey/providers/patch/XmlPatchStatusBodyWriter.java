@@ -93,7 +93,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
         for (final RestconfError restconfError : errors) {
             writer.writeStartElement("error-type");
-            writer.writeCharacters(restconfError.getErrorType().getErrorTypeTag());
+            writer.writeCharacters(restconfError.getErrorType().elementBody());
             writer.writeEndElement();
 
             writer.writeStartElement("error-tag");

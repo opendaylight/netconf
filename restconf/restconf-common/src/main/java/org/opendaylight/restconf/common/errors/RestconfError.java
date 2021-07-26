@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
-import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
@@ -30,52 +30,6 @@ import org.slf4j.LoggerFactory;
 public class RestconfError implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfError.class);
     private static final long serialVersionUID = 1L;
-
-    // FIXME: remove this enum in favor of RpcError.ErrorType (or its equivalent)
-    public enum ErrorType {
-        /**
-         * Errors relating to the transport layer.
-         */
-        TRANSPORT,
-        /**
-         * Errors relating to the RPC or notification layer.
-         */
-        RPC,
-        /**
-         * Errors relating to the protocol operation layer.
-         */
-        PROTOCOL,
-        /**
-         * Errors relating to the server application layer.
-         */
-        APPLICATION;
-
-        public String getErrorTypeTag() {
-            return name().toLowerCase(Locale.ROOT);
-        }
-
-        public static ErrorType valueOfCaseInsensitive(final String value) {
-            try {
-                return ErrorType.valueOf(ErrorType.class, value.toUpperCase(Locale.ROOT));
-            } catch (IllegalArgumentException e) {
-                return APPLICATION;
-            }
-        }
-
-        public static @NonNull ErrorType valueOf(final RpcError.ErrorType errorType) {
-            switch (errorType) {
-                case PROTOCOL:
-                    return PROTOCOL;
-                case RPC:
-                    return RPC;
-                case TRANSPORT:
-                    return TRANSPORT;
-                case APPLICATION:
-                default:
-                    return APPLICATION;
-            }
-        }
-    }
 
     public enum ErrorTag {
         IN_USE("in-use", 409 /* Conflict */),
@@ -252,8 +206,7 @@ public class RestconfError implements Serializable {
      */
     public RestconfError(final RpcError rpcError) {
 
-        this.errorType = rpcError.getErrorType() == null ? ErrorType.APPLICATION : ErrorType
-                .valueOfCaseInsensitive(rpcError.getErrorType().name());
+        this.errorType = rpcError.getErrorType().toNetconf();
 
         this.errorTag = rpcError.getTag() == null ? ErrorTag.OPERATION_FAILED : ErrorTag
                 .valueOfCaseInsensitive(rpcError.getTag());
@@ -304,7 +257,7 @@ public class RestconfError implements Serializable {
     @Override
     public String toString() {
         return "RestconfError ["
-                + "error-type: " + errorType.getErrorTypeTag() + ", error-tag: " + errorTag.getTagValue()
+                + "error-type: " + errorType.elementBody() + ", error-tag: " + errorTag.getTagValue()
                 + (errorAppTag != null ? ", error-app-tag: " + errorAppTag : "")
                 + (errorMessage != null ? ", error-message: " + errorMessage : "")
                 + (errorInfo != null ? ", error-info: " + errorInfo : "")

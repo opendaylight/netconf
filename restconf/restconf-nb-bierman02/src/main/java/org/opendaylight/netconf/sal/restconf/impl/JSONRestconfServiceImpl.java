@@ -40,7 +40,6 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.common.RpcError.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -284,27 +283,10 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         final RpcError[] to = new RpcError[from.size()];
         int index = 0;
         for (final RestconfError e: from) {
-            to[index++] = RpcResultBuilder.newError(toRpcErrorType(e.getErrorType()), e.getErrorTag().getTagValue(),
+            to[index++] = RpcResultBuilder.newError(e.getErrorType().toLegacy(), e.getErrorTag().getTagValue(),
                     e.getErrorMessage());
         }
 
         return to;
-    }
-
-    private static ErrorType toRpcErrorType(final RestconfError.ErrorType errorType) {
-        switch (errorType) {
-            case TRANSPORT: {
-                return ErrorType.TRANSPORT;
-            }
-            case RPC: {
-                return ErrorType.RPC;
-            }
-            case PROTOCOL: {
-                return ErrorType.PROTOCOL;
-            }
-            default: {
-                return ErrorType.APPLICATION;
-            }
-        }
     }
 }

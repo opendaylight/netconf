@@ -32,9 +32,9 @@ import org.opendaylight.restconf.common.context.WriterParameters.WriterParameter
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -141,7 +141,7 @@ public final class ReadDataTransactionUtil {
                 break;
             default:
                 throw new RestconfDocumentedException(
-                    new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                    new RestconfError(ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                         "Invalid content parameter: " + contentValue, null,
                         "The content parameter value must be either config, nonconfig or all (default)"));
         }
@@ -153,7 +153,7 @@ public final class ReadDataTransactionUtil {
             if (value == null || value < RestconfDataServiceConstant.ReadData.MIN_DEPTH
                     || value > RestconfDataServiceConstant.ReadData.MAX_DEPTH) {
                 throw new RestconfDocumentedException(
-                        new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                        new RestconfError(ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid depth parameter: " + depth, null,
                                 "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
             } else {
@@ -175,7 +175,7 @@ public final class ReadDataTransactionUtil {
             final String str = withDefaults.get(0);
             final WithDefaults val = WithDefaults.forValue(str);
             if (val == null) {
-                throw new RestconfDocumentedException(new RestconfError(RestconfError.ErrorType.PROTOCOL,
+                throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL,
                     RestconfError.ErrorTag.INVALID_VALUE, "Invalid with-defaults parameter: " + str, null,
                     "The with-defaults parameter must be a string in " + WithDefaults.possibleValues()));
             }
@@ -223,7 +223,7 @@ public final class ReadDataTransactionUtil {
                 return readAllData(strategy, path, withDefa, ctx);
             default:
                 throw new RestconfDocumentedException(
-                        new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                        new RestconfError(ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
                                 "The content parameter value must be either config, nonconfig or all (default)"));
         }
@@ -259,7 +259,7 @@ public final class ReadDataTransactionUtil {
             case RestconfDataServiceConstant.ReadData.ALL:
                 return readAllData(strategy, path, withDefa, ctx, fields);
             default:
-                throw new RestconfDocumentedException(new RestconfError(RestconfError.ErrorType.PROTOCOL,
+                throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL,
                         RestconfError.ErrorTag.INVALID_VALUE, "Invalid content parameter: " + valueOfContent, null,
                         "The content parameter value must be either config, nonconfig or all (default)"));
         }
@@ -295,7 +295,7 @@ public final class ReadDataTransactionUtil {
                 .collect(Collectors.toSet());
             throw new RestconfDocumentedException(
                 "Not allowed parameters for " + READ_TYPE_TX + " operation: " + notAllowedParameters,
-                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE);
+                ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE);
         }
     }
 
