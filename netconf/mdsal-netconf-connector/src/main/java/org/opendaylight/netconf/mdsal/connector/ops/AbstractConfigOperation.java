@@ -24,6 +24,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -61,9 +62,7 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
         final Optional<XmlElement> urlElement = parent.getOnlyChildElementOptionally(URL_KEY);
         if (urlElement.isEmpty()) {
             throw new DocumentedException("Invalid RPC, neither <config> not <url> element is present",
-                DocumentedException.ErrorType.PROTOCOL,
-                DocumentedException.ErrorTag.MISSING_ELEMENT,
-                ErrorSeverity.ERROR);
+                ErrorType.PROTOCOL, DocumentedException.ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR);
         }
 
         final Document document = getDocumentFromUrl(urlElement.get().getTextContent());
@@ -85,19 +84,13 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
             return XmlUtil.readXmlToDocument(input);
         } catch (MalformedURLException e) {
             throw new DocumentedException(url + " URL is invalid or unsupported", e,
-                DocumentedException.ErrorType.APPLICATION,
-                DocumentedException.ErrorTag.INVALID_VALUE,
-                ErrorSeverity.ERROR);
+                ErrorType.APPLICATION, DocumentedException.ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         } catch (IOException e) {
             throw new DocumentedException("Could not open URL " + url, e,
-                DocumentedException.ErrorType.APPLICATION,
-                DocumentedException.ErrorTag.OPERATION_FAILED,
-                ErrorSeverity.ERROR);
+                ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         } catch (SAXException e) {
             throw new DocumentedException("Could not parse XML at" + url, e,
-                DocumentedException.ErrorType.APPLICATION,
-                DocumentedException.ErrorTag.OPERATION_FAILED,
-                ErrorSeverity.ERROR);
+                ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 

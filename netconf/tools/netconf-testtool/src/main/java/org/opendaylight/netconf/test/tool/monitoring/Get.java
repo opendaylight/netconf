@@ -16,6 +16,7 @@ import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -55,9 +56,7 @@ public class Get extends AbstractNetconfOperation {
             throws DocumentedException {
         if (subsequentOperation.isExecutionTermination()) {
             throw new DocumentedException(String.format("Subsequent netconf operation expected by %s", this),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
 
         try {
@@ -75,9 +74,8 @@ public class Get extends AbstractNetconfOperation {
             final String errorMessage = "Get operation for netconf-state subtree failed";
             LOG.warn(errorMessage, e);
 
-            throw new DocumentedException(errorMessage, e, DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    ErrorSeverity.ERROR,
+            throw new DocumentedException(errorMessage, e,
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
                     Map.of(ErrorSeverity.ERROR.toString(), e.getMessage()));
         }
     }

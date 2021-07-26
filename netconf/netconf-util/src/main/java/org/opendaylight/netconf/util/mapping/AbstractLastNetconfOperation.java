@@ -12,6 +12,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -27,9 +28,7 @@ public abstract class AbstractLastNetconfOperation extends AbstractNetconfOperat
         if (!subsequentOperation.isExecutionTermination()) {
             throw new DocumentedException(String.format(
                     "No netconf operation expected to be subsequent to %s, but is %s", this, subsequentOperation),
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.MALFORMED_MESSAGE,
-                    ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
 
         return handleWithNoSubsequentOperations(document, operationElement);

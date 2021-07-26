@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.api;
 
-import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
 
@@ -17,6 +16,7 @@ import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -59,30 +59,6 @@ public class DocumentedException extends Exception {
         BUILDER_FACTORY.setCoalescing(true);
         BUILDER_FACTORY.setIgnoringElementContentWhitespace(true);
         BUILDER_FACTORY.setIgnoringComments(true);
-    }
-
-    public enum ErrorType {
-        TRANSPORT("transport"), RPC("rpc"), PROTOCOL("protocol"), APPLICATION("application");
-
-        private final String typeValue;
-
-        ErrorType(final String typeValue) {
-            this.typeValue = requireNonNull(typeValue);
-        }
-
-        public String getTypeValue() {
-            return this.typeValue;
-        }
-
-        public static ErrorType from(final String text) {
-            for (ErrorType e : values()) {
-                if (e.getTypeValue().equalsIgnoreCase(text)) {
-                    return e;
-                }
-            }
-
-            return APPLICATION;
-        }
     }
 
     public enum ErrorTag {
@@ -202,7 +178,9 @@ public class DocumentedException extends Exception {
 
                     // FIXME: use a switch expression here
                     if (ERROR_TYPE.equals(rpcErrorChild.getLocalName())) {
-                        errorType = ErrorType.from(rpcErrorChild.getTextContent());
+                        final ErrorType type = ErrorType.forElementBody(rpcErrorChild.getTextContent());
+                        // FIXME: this should be a hard error
+                        errorType = type != null ? type : ErrorType.APPLICATION;
                     } else if (ERROR_TAG.equals(rpcErrorChild.getLocalName())) {
                         errorTag = ErrorTag.from(rpcErrorChild.getTextContent());
                     } else if (ERROR_SEVERITY.equals(rpcErrorChild.getLocalName())) {
@@ -269,7 +247,7 @@ public class DocumentedException extends Exception {
             Node rpcError = doc.createElementNS(URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, RPC_ERROR);
             rpcReply.appendChild(rpcError);
 
-            rpcError.appendChild(createTextNode(doc, ERROR_TYPE, getErrorType().getTypeValue()));
+            rpcError.appendChild(createTextNode(doc, ERROR_TYPE, getErrorType().elementBody()));
             rpcError.appendChild(createTextNode(doc, ERROR_TAG, getErrorTag().getTagValue()));
             rpcError.appendChild(createTextNode(doc, ERROR_SEVERITY, getErrorSeverity().elementBody()));
             rpcError.appendChild(createTextNode(doc, ERROR_MESSAGE, getLocalizedMessage()));

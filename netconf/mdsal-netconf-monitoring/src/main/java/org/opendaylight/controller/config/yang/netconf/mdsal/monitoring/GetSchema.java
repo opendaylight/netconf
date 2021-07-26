@@ -17,6 +17,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -59,7 +60,7 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
             final Map<String, String> errorInfo = new HashMap<>();
             errorInfo.put(DocumentedException.ErrorTag.OPERATION_FAILED.toString(), e.getMessage());
             LOG.warn("Rpc error: {}", DocumentedException.ErrorTag.OPERATION_FAILED, e);
-            throw new DocumentedException(e.getMessage(), e, DocumentedException.ErrorType.APPLICATION,
+            throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR, errorInfo);
         }
 
