@@ -18,7 +18,7 @@ import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangError;
@@ -50,7 +50,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            A string which provides a plain text string describing the error.
      */
     public RestconfDocumentedException(final String message) {
-        this(message, RestconfError.ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED);
+        this(message, ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED);
     }
 
     /**
@@ -67,8 +67,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      */
     public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
                                        final Throwable cause) {
-        this(cause, new RestconfError(errorType, errorTag, message, null,
-                cause.getMessage(), null));
+        this(cause, new RestconfError(errorType, errorTag, message, null, cause.getMessage(), null));
     }
 
     /**
@@ -112,7 +111,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            The underlying exception cause.
      */
     public RestconfDocumentedException(final String message, final Throwable cause) {
-        this(cause, new RestconfError(RestconfError.ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED,
+        this(cause, new RestconfError(ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED,
                 message, null, cause.getMessage(), null));
     }
 
@@ -133,7 +132,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         if (!errors.isEmpty()) {
             this.errors = ImmutableList.copyOf(errors);
         } else {
-            this.errors = ImmutableList.of(new RestconfError(RestconfError.ErrorType.APPLICATION,
+            this.errors = ImmutableList.of(new RestconfError(ErrorType.APPLICATION,
                     RestconfError.ErrorTag.OPERATION_FAILED, message));
         }
 
@@ -239,7 +238,7 @@ public class RestconfDocumentedException extends WebApplicationException {
     public static void throwIfYangError(final Throwable cause) {
         if (cause instanceof YangError) {
             final YangError error = (YangError) cause;
-            throw new RestconfDocumentedException(cause, new RestconfError(ErrorType.valueOf(error.getErrorType()),
+            throw new RestconfDocumentedException(cause, new RestconfError(error.getErrorType().toNetconf(),
                 // FIXME: this is a special-case until we have YangError.getTag()
                 cause instanceof YangInvalidValueException ? ErrorTag.INVALID_VALUE : ErrorTag.MALFORMED_MESSAGE,
                     error.getErrorMessage().orElse(null), error.getErrorAppTag().orElse(null)));
