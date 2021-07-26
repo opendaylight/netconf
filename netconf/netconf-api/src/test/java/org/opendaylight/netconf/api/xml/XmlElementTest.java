@@ -121,6 +121,8 @@ public class XmlElementTest {
 
         final DocumentedException e = assertThrows(DocumentedException.class,
             () -> xmlElement.checkUnrecognisedElements(xmlElement.getOnlyChildElement("inner")));
-        assertThat(e.getMessage(), both(containsString("innerNamespace")).and(containsString("innerNamespace")));
+        assertThat(e.getMessage(),
+            // FIXME: this looks very suspect
+            both(containsString("innerNamespace")).and(containsString("innerNamespace")));
     }
 }

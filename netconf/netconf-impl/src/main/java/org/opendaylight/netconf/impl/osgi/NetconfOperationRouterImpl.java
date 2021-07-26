@@ -31,6 +31,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,16 +70,31 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
             final String messageAsString = XmlUtil.toString(message);
             LOG.warn("Unable to handle rpc {} on session {}", messageAsString, session, e);
 
-            final DocumentedException.ErrorTag tag;
-            if (e instanceof IllegalArgumentException) {
-                tag = DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED;
-            } else {
-                tag = DocumentedException.ErrorTag.OPERATION_FAILED;
-            }
+            final ErrorTag tag = e instanceof IllegalArgumentException ? ErrorTag.OPERATION_NOT_SUPPORTED
+                : ErrorTag.OPERATION_FAILED;
 
             throw new DocumentedException(
-                    String.format("Unable to handle rpc %s on session %s", messageAsString, session),
-                    e, ErrorType.APPLICATION, tag, ErrorSeverity.ERROR, Map.of(tag.toString(), e.getMessage()));
+                    String.format("Unable to handle rpc %s on session %s", messageAsString, session), e,
+                    ErrorType.APPLICATION, tag, ErrorSeverity.ERROR,
+                    // FIXME: i.e. in what namespace are we providing these tags? why is this not just:
+                    //
+                    // <java-throwable xmlns="org.opendaylight.something">
+                    //   <message>e.getMessage()</message>
+                    // </java-throwable>
+                    //
+                    // for each place where we are mapping Exception.getMessage() ? We probably do not want to propagate
+                    // stack traces out, but suppressed exceptions and causal list might be interesting:
+                    //
+                    // <java-throwable xmlns="org.opendaylight.something">
+                    //   <message>reported exception</message>
+                    // </java-throwable>
+                    // <java-throwable xmlns="org.opendaylight.something">
+                    //   <message>cause of reported exception</message>
+                    // </java-throwable>
+                    // <java-throwable xmlns="org.opendaylight.something">
+                    //   <message>cause of cause of reported exception</message>
+                    // </java-throwable>
+                    Map.of(tag.elementBody(), e.getMessage()));
         } catch (final RuntimeException e) {
             throw handleUnexpectedEx("sort", e);
         }
@@ -98,8 +114,9 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
     private static DocumentedException handleUnexpectedEx(final String op, final Exception exception) {
         LOG.error("Unexpected exception during netconf operation {}", op, exception);
         return new DocumentedException("Unexpected error",
-                ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
-                Map.of(ErrorSeverity.ERROR.toString(), exception.toString()));
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
+                // FIXME: i.e. <error>exception.toString()</error>? That looks wrong on a few levels.
+                Map.of(ErrorSeverity.ERROR.elementBody(), exception.toString()));
     }
 
     private static Document executeOperationWithHighestPriority(final Document message,

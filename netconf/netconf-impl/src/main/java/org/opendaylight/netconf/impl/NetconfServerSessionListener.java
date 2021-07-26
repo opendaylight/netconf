@@ -23,6 +23,7 @@ import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
 import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,7 +139,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
              * unexpected element Description: An unexpected element is present.
              */
             throw new DocumentedException("Unknown tag " + rootNode.getNodeName() + " in message:\n" + netconfMessage,
-                    ErrorType.PROTOCOL, DocumentedException.ErrorTag.UNKNOWN_ELEMENT, ErrorSeverity.ERROR,
+                    ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT, ErrorSeverity.ERROR,
                     ImmutableMap.of("bad-element", rootNode.getNodeName()));
         }
     }
@@ -157,7 +158,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         }
 
         throw new DocumentedException("Missing attribute " + rootNode.getNodeName(),
-                ErrorType.RPC, DocumentedException.ErrorTag.MISSING_ATTRIBUTE, ErrorSeverity.ERROR, ImmutableMap.of(
+                ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE, ErrorSeverity.ERROR, ImmutableMap.of(
                     "bad-attribute", XmlNetconfConstants.MESSAGE_ID,
                     "bad-element", XmlNetconfConstants.RPC_KEY));
     }

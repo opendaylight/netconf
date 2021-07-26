@@ -16,6 +16,7 @@ import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,7 @@ public class Get extends AbstractNetconfOperation {
             throws DocumentedException {
         if (subsequentOperation.isExecutionTermination()) {
             throw new DocumentedException(String.format("Subsequent netconf operation expected by %s", this),
-                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
 
         try {
@@ -75,8 +76,9 @@ public class Get extends AbstractNetconfOperation {
             LOG.warn(errorMessage, e);
 
             throw new DocumentedException(errorMessage, e,
-                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
-                    Map.of(ErrorSeverity.ERROR.toString(), e.getMessage()));
+                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
+                    // FIXME: i.e. <error>e.getMessage()</error> ?
+                    Map.of(ErrorSeverity.ERROR.elementBody(), e.getMessage()));
         }
     }
 
