@@ -22,6 +22,7 @@ import javax.xml.xpath.XPathFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -63,7 +64,7 @@ public class NetconfDocumentedExceptionTest {
         DocumentedException ex = new NetconfDocumentedException(errorMessage, null,
                 DocumentedException.ErrorType.PROTOCOL,
                 DocumentedException.ErrorTag.DATA_EXISTS,
-                DocumentedException.ErrorSeverity.WARNING,
+                ErrorSeverity.WARNING,
                 ImmutableMap.of("foo", "bar"));
 
         final Document doc = ex.toXMLDocument();
@@ -89,8 +90,7 @@ public class NetconfDocumentedExceptionTest {
 
         final Node errorSeverityNode = getNode("netconf:error-severity", rpcErrorNode);
         assertNotNull("error-severity not found", errorSeverityNode);
-        assertEquals("error-severity", DocumentedException.ErrorSeverity.WARNING.getSeverityValue(),
-                errorSeverityNode.getTextContent());
+        assertEquals("error-severity", ErrorSeverity.WARNING.elementBody(), errorSeverityNode.getTextContent());
 
         final Node errorInfoNode = getNode("netconf:error-info/netconf:foo", rpcErrorNode);
         assertNotNull("foo not found", errorInfoNode);
@@ -105,7 +105,7 @@ public class NetconfDocumentedExceptionTest {
         ex = DocumentedException.fromXMLDocument(doc);
 
         assertNotNull("NetconfDocumentedException is null", ex);
-        assertEquals("getErrorSeverity", DocumentedException.ErrorSeverity.WARNING, ex.getErrorSeverity());
+        assertEquals("getErrorSeverity", ErrorSeverity.WARNING, ex.getErrorSeverity());
         assertEquals("getErrorTag", DocumentedException.ErrorTag.DATA_EXISTS, ex.getErrorTag());
         assertEquals("getErrorType", DocumentedException.ErrorType.PROTOCOL, ex.getErrorType());
         assertEquals("getLocalizedMessage", errorMessage, ex.getLocalizedMessage());

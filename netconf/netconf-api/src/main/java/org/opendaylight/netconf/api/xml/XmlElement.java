@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -87,7 +88,7 @@ public final class XmlElement {
                         throw new DocumentedException("Attribute doesn't start with :",
                                 DocumentedException.ErrorType.APPLICATION,
                                 DocumentedException.ErrorTag.INVALID_VALUE,
-                                DocumentedException.ErrorSeverity.ERROR);
+                                ErrorSeverity.ERROR);
                     }
                     prefix = attribKey.substring(XMLConstants.XMLNS_ATTRIBUTE.length() + 1);
                 }
@@ -112,7 +113,7 @@ public final class XmlElement {
                     getName()),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
     }
 
@@ -124,7 +125,7 @@ public final class XmlElement {
                     expectedNamespace),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
     }
 
@@ -136,7 +137,7 @@ public final class XmlElement {
                     expectedNamespace),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
     }
 
@@ -211,10 +212,7 @@ public final class XmlElement {
      * @return List of child elements
      */
     public List<XmlElement> getChildElements(final String tagName) {
-        return getChildElementsInternal(e -> {
-            // localName returns pure localName without prefix
-            return e.getLocalName().equals(tagName);
-        });
+        return getChildElementsInternal(e -> e.getLocalName().equals(tagName));
     }
 
     public List<XmlElement> getChildElementsWithinNamespace(final String childName, final String namespace) {
@@ -302,7 +300,7 @@ public final class XmlElement {
                     childName, toString(), children.size()),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.INVALID_VALUE,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
 
         return children.get(0);
@@ -314,7 +312,7 @@ public final class XmlElement {
             throw new DocumentedException("One element " + childName + " expected in " + toString(),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.INVALID_VALUE,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
         return nameElements.get(0);
     }
@@ -326,7 +324,7 @@ public final class XmlElement {
                     children.size()),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.INVALID_VALUE,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
         return children.get(0);
     }
@@ -346,7 +344,7 @@ public final class XmlElement {
         throw new DocumentedException(getName() + " should contain text.",
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.INVALID_VALUE,
-                DocumentedException.ErrorSeverity.ERROR
+                ErrorSeverity.ERROR
         );
     }
 
@@ -368,7 +366,7 @@ public final class XmlElement {
                     toString()),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
         return attribute;
     }
@@ -396,7 +394,7 @@ public final class XmlElement {
             throw new MissingNameSpaceException(String.format("No namespace defined for %s", this),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
         return namespaceURI.get();
     }
@@ -465,7 +463,7 @@ public final class XmlElement {
             throw new DocumentedException(String.format("Unrecognised elements %s in %s", childElements, this),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.INVALID_VALUE,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
     }
 

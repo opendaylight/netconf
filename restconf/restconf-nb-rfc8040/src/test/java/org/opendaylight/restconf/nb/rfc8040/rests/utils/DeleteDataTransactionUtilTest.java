@@ -39,6 +39,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -88,7 +89,7 @@ public class DeleteDataTransactionUtilTest {
             .thenReturn(immediateFalseFluentFuture());
         final NetconfDocumentedException exception = new NetconfDocumentedException("id",
             DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.from("data-missing"),
-            DocumentedException.ErrorSeverity.ERROR);
+            ErrorSeverity.ERROR);
         final SettableFuture<? extends CommitInfo> ret = SettableFuture.create();
         ret.setException(new TransactionCommitFailedException(
             String.format("Commit of transaction %s failed", this), exception));

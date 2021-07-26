@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public final class DeserializerExceptionHandler implements ChannelHandler {
         info.put("cause", cause.getMessage());
         final DocumentedException ex = new DocumentedException(cause.getMessage(),
                 DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.MALFORMED_MESSAGE,
-                DocumentedException.ErrorSeverity.ERROR, info);
+                ErrorSeverity.ERROR, info);
 
         SendErrorExceptionUtil.sendErrorMessage(ctx.channel(), ex);
     }

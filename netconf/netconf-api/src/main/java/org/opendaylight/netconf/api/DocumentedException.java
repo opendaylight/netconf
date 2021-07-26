@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -126,30 +127,6 @@ public class DocumentedException extends Exception {
         }
     }
 
-    public enum ErrorSeverity {
-        ERROR("error"), WARNING("warning");
-
-        private final String severityValue;
-
-        ErrorSeverity(final String severityValue) {
-            this.severityValue = requireNonNull(severityValue);
-        }
-
-        public String getSeverityValue() {
-            return this.severityValue;
-        }
-
-        public static ErrorSeverity from(final String text) {
-            for (ErrorSeverity e : values()) {
-                if (e.getSeverityValue().equalsIgnoreCase(text)) {
-                    return e;
-                }
-            }
-
-            return ERROR;
-        }
-    }
-
     private final ErrorType errorType;
     private final ErrorTag errorTag;
     private final ErrorSeverity errorSeverity;
@@ -222,12 +199,16 @@ public class DocumentedException extends Exception {
                 NodeList rpcErrorChildren = replyChild.getChildNodes();
                 for (int j = 0; j < rpcErrorChildren.getLength(); j++) {
                     Node rpcErrorChild = rpcErrorChildren.item(j);
+
+                    // FIXME: use a switch expression here
                     if (ERROR_TYPE.equals(rpcErrorChild.getLocalName())) {
                         errorType = ErrorType.from(rpcErrorChild.getTextContent());
                     } else if (ERROR_TAG.equals(rpcErrorChild.getLocalName())) {
                         errorTag = ErrorTag.from(rpcErrorChild.getTextContent());
                     } else if (ERROR_SEVERITY.equals(rpcErrorChild.getLocalName())) {
-                        errorSeverity = ErrorSeverity.from(rpcErrorChild.getTextContent());
+                        final ErrorSeverity sev = ErrorSeverity.forElementBody(rpcErrorChild.getTextContent());
+                        // FIXME: this should be a hard error
+                        errorSeverity = sev != null ? sev : ErrorSeverity.ERROR;
                     } else if (ERROR_MESSAGE.equals(rpcErrorChild.getLocalName())) {
                         errorMessage = rpcErrorChild.getTextContent();
                         allErrorMessages = allErrorMessages + errorMessage;
@@ -290,7 +271,7 @@ public class DocumentedException extends Exception {
 
             rpcError.appendChild(createTextNode(doc, ERROR_TYPE, getErrorType().getTypeValue()));
             rpcError.appendChild(createTextNode(doc, ERROR_TAG, getErrorTag().getTagValue()));
-            rpcError.appendChild(createTextNode(doc, ERROR_SEVERITY, getErrorSeverity().getSeverityValue()));
+            rpcError.appendChild(createTextNode(doc, ERROR_SEVERITY, getErrorSeverity().elementBody()));
             rpcError.appendChild(createTextNode(doc, ERROR_MESSAGE, getLocalizedMessage()));
 
             Map<String, String> errorInfoMap = getErrorInfo();

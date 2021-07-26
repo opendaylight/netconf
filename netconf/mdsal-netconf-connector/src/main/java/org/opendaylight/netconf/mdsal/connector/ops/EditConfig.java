@@ -7,14 +7,14 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.ModifyAction;
@@ -22,6 +22,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -146,7 +147,7 @@ public final class EditConfig extends AbstractEdit {
                 .getDataSchemaNode();
 
             // we should have the schema node that points to the parent list now, enforce it
-            Preconditions.checkState(schemaNode instanceof ListSchemaNode, "Schema node is not pointing to a list.");
+            checkState(schemaNode instanceof ListSchemaNode, "Schema node is not pointing to a list.");
 
             //merge empty ordered or unordered map
             if (((ListSchemaNode) schemaNode).isUserOrdered()) {

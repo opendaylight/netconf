@@ -46,6 +46,7 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditC
 import org.opendaylight.netconf.topology.singleton.messages.netconf.UnlockRequest;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -300,7 +301,7 @@ public class ProxyNetconfServiceTest {
     private static void verifyDocumentedException(final Throwable cause) {
         assertTrue("Unexpected cause " + cause, cause instanceof DocumentedException);
         final DocumentedException de = (DocumentedException) cause;
-        assertEquals(DocumentedException.ErrorSeverity.WARNING, de.getErrorSeverity());
+        assertEquals(ErrorSeverity.WARNING, de.getErrorSeverity());
         assertEquals(DocumentedException.ErrorTag.OPERATION_FAILED, de.getErrorTag());
         assertEquals(DocumentedException.ErrorType.APPLICATION, de.getErrorType());
     }

@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.test.tool.monitoring;
 
-import java.util.Collections;
+import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -15,6 +15,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -56,7 +57,7 @@ public class Get extends AbstractNetconfOperation {
             throw new DocumentedException(String.format("Subsequent netconf operation expected by %s", this),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
 
         try {
@@ -76,8 +77,8 @@ public class Get extends AbstractNetconfOperation {
 
             throw new DocumentedException(errorMessage, e, DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR,
-                    Collections.singletonMap(DocumentedException.ErrorSeverity.ERROR.toString(), e.getMessage()));
+                    ErrorSeverity.ERROR,
+                    Map.of(ErrorSeverity.ERROR.toString(), e.getMessage()));
         }
     }
 

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.rpchandler;
 
 import java.util.Optional;
@@ -16,6 +15,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.w3c.dom.Document;
 
 /**
@@ -51,7 +51,7 @@ class SettableRpc implements NetconfOperation {
         } else if (subsequentOperation.isExecutionTermination()) {
             throw new DocumentedException("Mapping not found " + XmlUtil.toString(requestMessage),
                     DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         } else {
             return subsequentOperation.execute(requestMessage);
         }
