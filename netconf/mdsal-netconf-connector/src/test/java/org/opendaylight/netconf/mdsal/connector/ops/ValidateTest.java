@@ -32,6 +32,7 @@ import org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator;
 import org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator.ValidationFailedException;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.w3c.dom.Document;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -59,7 +60,7 @@ public class ValidateTest {
         whenValidatorIsNotDefined();
         final DocumentedException e = assertThrows(DocumentedException.class,
             () -> validate("messages/mapping/validate/validate.xml"));
-        assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
+        assertEquals(ErrorSeverity.ERROR, e.getErrorSeverity());
         assertEquals(DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, e.getErrorTag());
         assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
     }
@@ -69,7 +70,7 @@ public class ValidateTest {
         whenUsingValidator(noopValidator);
         final DocumentedException e = assertThrows(DocumentedException.class,
             () -> validate("messages/mapping/validate/validate_no_source.xml"));
-        assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
+        assertEquals(ErrorSeverity.ERROR, e.getErrorSeverity());
         assertEquals(DocumentedException.ErrorTag.MISSING_ELEMENT, e.getErrorTag());
         assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
     }
@@ -79,7 +80,7 @@ public class ValidateTest {
         whenUsingValidator(noopValidator);
         final DocumentedException e = assertThrows(DocumentedException.class,
             () -> validate("messages/mapping/validate/validate_running.xml"));
-        assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
+        assertEquals(ErrorSeverity.ERROR, e.getErrorSeverity());
         assertEquals(DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, e.getErrorTag());
         assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
     }
@@ -105,7 +106,7 @@ public class ValidateTest {
         final TransactionProvider transactionProvider = initCandidateTransaction();
         final DocumentedException e = assertThrows(DocumentedException.class,
             () -> validate("messages/mapping/validate/validate.xml", transactionProvider));
-        assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
+        assertEquals(ErrorSeverity.ERROR, e.getErrorSeverity());
         assertEquals(DocumentedException.ErrorTag.OPERATION_FAILED, e.getErrorTag());
         assertEquals(DocumentedException.ErrorType.APPLICATION, e.getErrorType());
     }

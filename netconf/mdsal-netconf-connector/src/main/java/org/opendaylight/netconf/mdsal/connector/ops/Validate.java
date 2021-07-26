@@ -8,14 +8,13 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -55,10 +54,8 @@ public final class Validate extends AbstractConfigOperation {
         final NodeList elementsByTagName = getElementsByTagName(operationElement, SOURCE_KEY);
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
-            final Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", SOURCE_KEY, "bad-element",
-                operationName);
             throw new DocumentedException("Missing source element", ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT,
-                ErrorSeverity.ERROR, errorInfo);
+                ErrorSeverity.ERROR, ImmutableMap.of("bad-attribute", SOURCE_KEY, "bad-element", operationName));
         } else if (elementsByTagName.getLength() > 1) {
             throw new DocumentedException("Multiple source elements", ErrorType.RPC, ErrorTag.UNKNOWN_ATTRIBUTE,
                 ErrorSeverity.ERROR);

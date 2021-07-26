@@ -9,6 +9,7 @@ package org.opendaylight.netconf.api.xml;
 
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 
 public class UnexpectedElementException extends DocumentedException {
     private static final long serialVersionUID = 1L;

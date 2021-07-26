@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.impl.mapping.operations;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -38,7 +41,7 @@ public class DefaultCloseSessionTest {
         final EventLoop eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
-            invocation.<Runnable>getArgument(0).run();
+            invocation.getArgument(0, Runnable.class).run();
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
         doReturn(true).when(eventLoop).inEventLoop();
@@ -83,12 +86,17 @@ public class DefaultCloseSessionTest {
         verify(listener).onSessionTerminated(any(NetconfServerSession.class), any(NetconfTerminationReason.class));
     }
 
-    @Test(expected = DocumentedException.class)
+    @Test
     public void testDefaultCloseSession2() throws Exception {
-        AutoCloseable res = mock(AutoCloseable.class);
-        doThrow(NetconfDocumentedException.class).when(res).close();
-        DefaultCloseSession session = new DefaultCloseSession("", res);
+        final NetconfDocumentedException expectedCause = new NetconfDocumentedException("testMessage");
+        final AutoCloseable res = mock(AutoCloseable.class);
+        doThrow(expectedCause).when(res).close();
+        final DefaultCloseSession session = new DefaultCloseSession("testSession", res);
         XmlElement elem = XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"));
-        session.handleWithNoSubsequentOperations(XmlUtil.newDocument(), elem);
+
+        final DocumentedException ex = assertThrows(DocumentedException.class,
+            () -> session.handleWithNoSubsequentOperations(XmlUtil.newDocument(), elem));
+        assertEquals("Unable to properly close session testSession", ex.getMessage());
+        assertSame(expectedCause, ex.getCause());
     }
 }

@@ -23,6 +23,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -62,7 +63,7 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
             throw new DocumentedException("Invalid RPC, neither <config> not <url> element is present",
                 DocumentedException.ErrorType.PROTOCOL,
                 DocumentedException.ErrorTag.MISSING_ELEMENT,
-                DocumentedException.ErrorSeverity.ERROR);
+                ErrorSeverity.ERROR);
         }
 
         final Document document = getDocumentFromUrl(urlElement.get().getTextContent());
@@ -86,17 +87,17 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
             throw new DocumentedException(url + " URL is invalid or unsupported", e,
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.INVALID_VALUE,
-                DocumentedException.ErrorSeverity.ERROR);
+                ErrorSeverity.ERROR);
         } catch (IOException e) {
-            throw new DocumentedException("Could not open URL:" + url, e,
+            throw new DocumentedException("Could not open URL " + url, e,
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.OPERATION_FAILED,
-                DocumentedException.ErrorSeverity.ERROR);
+                ErrorSeverity.ERROR);
         } catch (SAXException e) {
             throw new DocumentedException("Could not parse XML at" + url, e,
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.OPERATION_FAILED,
-                DocumentedException.ErrorSeverity.ERROR);
+                ErrorSeverity.ERROR);
         }
     }
 

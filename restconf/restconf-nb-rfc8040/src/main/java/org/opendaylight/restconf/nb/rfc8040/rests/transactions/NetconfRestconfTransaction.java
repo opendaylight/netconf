@@ -34,6 +34,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -212,7 +213,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                         } else {
                             return Futures.immediateFailedFuture(new NetconfDocumentedException("Lock operation failed",
                                 DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.LOCK_DENIED,
-                                DocumentedException.ErrorSeverity.ERROR));
+                                ErrorSeverity.ERROR));
                         }
                     },
                     MoreExecutors.directExecutor());
@@ -249,7 +250,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     private static TransactionCommitFailedException toCommitFailedException(
             final Collection<? extends RpcError> errors) {
         DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
-        DocumentedException.ErrorSeverity errSeverity = DocumentedException.ErrorSeverity.ERROR;
+        ErrorSeverity errSeverity = ErrorSeverity.ERROR;
         StringJoiner msgBuilder = new StringJoiner(" ");
         String errorTag = "operation-failed";
         for (final RpcError error : errors) {
@@ -268,15 +269,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                     errType = DocumentedException.ErrorType.APPLICATION;
                     break;
             }
-            switch (error.getSeverity()) {
-                case WARNING:
-                    errSeverity = DocumentedException.ErrorSeverity.WARNING;
-                    break;
-                case ERROR:
-                default:
-                    errSeverity = DocumentedException.ErrorSeverity.ERROR;
-                    break;
-            }
+            errSeverity = error.getSeverity().toNetconf();
             msgBuilder.add(error.getMessage());
             msgBuilder.add(error.getInfo());
             errorTag = error.getTag();

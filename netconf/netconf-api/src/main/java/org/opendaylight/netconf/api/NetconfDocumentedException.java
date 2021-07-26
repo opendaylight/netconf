@@ -10,6 +10,7 @@ package org.opendaylight.netconf.api;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.w3c.dom.Document;
 
 /**

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
 import com.google.common.base.Preconditions;
@@ -23,6 +22,7 @@ import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
 import org.opendaylight.netconf.util.messages.SubtreeFilter;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -138,8 +138,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
              */
             throw new DocumentedException("Unknown tag " + rootNode.getNodeName() + " in message:\n" + netconfMessage,
                     DocumentedException.ErrorType.PROTOCOL, DocumentedException.ErrorTag.UNKNOWN_ELEMENT,
-                    DocumentedException.ErrorSeverity.ERROR, ImmutableMap.of("bad-element",
-                    rootNode.getNodeName()));
+                    ErrorSeverity.ERROR, ImmutableMap.of("bad-element", rootNode.getNodeName()));
         }
     }
 
@@ -158,7 +157,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
         throw new DocumentedException("Missing attribute " + rootNode.getNodeName(),
                 DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.MISSING_ATTRIBUTE,
-                DocumentedException.ErrorSeverity.ERROR,
+                ErrorSeverity.ERROR,
                 ImmutableMap.of("bad-attribute", XmlNetconfConstants.MESSAGE_ID,
                         "bad-element", XmlNetconfConstants.RPC_KEY));
     }

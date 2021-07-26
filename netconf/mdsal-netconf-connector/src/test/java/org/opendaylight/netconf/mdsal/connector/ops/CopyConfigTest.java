@@ -18,11 +18,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -36,6 +36,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
             copyConfig("messages/mapping/copyConfigs/copyConfig_no_target.xml");
             fail("Should have failed - <target> element is missing");
         } catch (final DocumentedException e) {
+            // FIXME: use assertThrows() and assertEquals()
             assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
             assertTrue(e.getErrorTag() == ErrorTag.MISSING_ATTRIBUTE);
             assertTrue(e.getErrorType() == ErrorType.PROTOCOL);

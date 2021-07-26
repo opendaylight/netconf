@@ -9,12 +9,13 @@ package org.opendaylight.netconf.impl.mapping.operations;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Collections;
+import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.NetconfServerSession;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -55,8 +56,7 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
             throw new DocumentedException("Unable to properly close session "
                     + getNetconfSessionIdForReporting(), e, DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR, Collections.singletonMap(
-                    DocumentedException.ErrorSeverity.ERROR.toString(), e.getMessage()));
+                    ErrorSeverity.ERROR, Map.of(ErrorSeverity.ERROR.toString(), e.getMessage()));
         }
         return document.createElement(XmlNetconfConstants.OK);
     }
