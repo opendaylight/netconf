@@ -9,7 +9,9 @@ package org.opendaylight.restconf.common.errors;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,13 +19,15 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.codec.YangInvalidValueException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -36,8 +40,41 @@ import org.opendaylight.yangtools.yang.data.api.codec.YangInvalidValueException;
  * @author Thomas Pantelis
  */
 public class RestconfDocumentedException extends WebApplicationException {
-
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedException.class);
     private static final long serialVersionUID = 1L;
+
+    // FIXME: This is an RFC6241 definition, remove it once we have yangtools-7.0.5
+    @Deprecated(forRemoval = true)
+    public static final ErrorTag MALFORMED_MESSAGE = new ErrorTag("malformed-message");
+
+    // FIXME: where is this defined? this is our internal thing, isn't it?
+    public static final ErrorTag RESOURCE_DENIED_TRANSPORT = new ErrorTag("resource-denied-transport");
+
+    private static final ImmutableMap<ErrorTag, Status> WELL_KNOWN_ERROR_TAGS = ImmutableMap.<ErrorTag, Status>builder()
+        .put(ErrorTag.IN_USE,                  Status.CONFLICT)
+        .put(ErrorTag.INVALID_VALUE,           Status.BAD_REQUEST)
+        .put(ErrorTag.TOO_BIG,                 Status.REQUEST_ENTITY_TOO_LARGE)
+        .put(ErrorTag.MISSING_ATTRIBUTE,       Status.BAD_REQUEST)
+        .put(ErrorTag.BAD_ATTRIBUTE,           Status.BAD_REQUEST)
+        .put(ErrorTag.UNKNOWN_ATTRIBUTE,       Status.BAD_REQUEST)
+        .put(ErrorTag.MISSING_ELEMENT,         Status.BAD_REQUEST)
+        .put(ErrorTag.BAD_ELEMENT,             Status.BAD_REQUEST)
+        .put(ErrorTag.UNKNOWN_ELEMENT,         Status.BAD_REQUEST)
+        .put(ErrorTag.UNKNOWN_NAMESPACE,       Status.BAD_REQUEST)
+
+        .put(ErrorTag.ACCESS_DENIED,           Status.FORBIDDEN)
+        .put(ErrorTag.LOCK_DENIED,             Status.CONFLICT)
+        .put(ErrorTag.RESOURCE_DENIED,         Status.CONFLICT)
+        .put(ErrorTag.ROLLBACK_FAILED,         Status.INTERNAL_SERVER_ERROR)
+        .put(ErrorTag.DATA_EXISTS,             Status.CONFLICT)
+        .put(ErrorTag.DATA_MISSING,            dataMissingHttpStatus())
+
+        .put(ErrorTag.OPERATION_NOT_SUPPORTED, Status.NOT_IMPLEMENTED)
+        .put(ErrorTag.OPERATION_FAILED,        Status.INTERNAL_SERVER_ERROR)
+        .put(ErrorTag.PARTIAL_OPERATION,       Status.INTERNAL_SERVER_ERROR)
+        .put(MALFORMED_MESSAGE,                Status.BAD_REQUEST)
+        .put(RESOURCE_DENIED_TRANSPORT,        Status.SERVICE_UNAVAILABLE)
+        .build();
 
     private final ImmutableList<RestconfError> errors;
     private final Status status;
@@ -50,7 +87,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            A string which provides a plain text string describing the error.
      */
     public RestconfDocumentedException(final String message) {
-        this(message, ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED);
+        this(message, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
     /**
@@ -111,8 +148,8 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            The underlying exception cause.
      */
     public RestconfDocumentedException(final String message, final Throwable cause) {
-        this(cause, new RestconfError(ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED,
-                message, null, cause.getMessage(), null));
+        this(cause, new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message, null,
+            cause.getMessage(), null));
     }
 
     /**
@@ -132,8 +169,8 @@ public class RestconfDocumentedException extends WebApplicationException {
         if (!errors.isEmpty()) {
             this.errors = ImmutableList.copyOf(errors);
         } else {
-            this.errors = ImmutableList.of(new RestconfError(ErrorType.APPLICATION,
-                    RestconfError.ErrorTag.OPERATION_FAILED, message));
+            this.errors = ImmutableList.of(
+                new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message));
         }
 
         status = null;
@@ -159,7 +196,7 @@ public class RestconfDocumentedException extends WebApplicationException {
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
-        super(cause, error.getErrorTag().getStatusCode());
+        super(cause, statusOf(error.getErrorTag()));
         errors = ImmutableList.of(error);
         status = null;
     }
@@ -168,9 +205,9 @@ public class RestconfDocumentedException extends WebApplicationException {
             final OperationFailedException cause) {
         for (final RpcError error : cause.getErrorList()) {
             if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
-                    && error.getTag().equals(ErrorTag.RESOURCE_DENIED.getTagValue())) {
+                    && error.getTag().equals(ErrorTag.RESOURCE_DENIED.elementBody())) {
                 throw new RestconfDocumentedException(error.getMessage(), ErrorType.TRANSPORT,
-                    ErrorTag.RESOURCE_DENIED_TRANSPORT, cause);
+                    RestconfDocumentedException.RESOURCE_DENIED_TRANSPORT, cause);
             }
         }
         throw new RestconfDocumentedException(message, cause, cause.getErrorList());
@@ -240,7 +277,7 @@ public class RestconfDocumentedException extends WebApplicationException {
             final YangError error = (YangError) cause;
             throw new RestconfDocumentedException(cause, new RestconfError(error.getErrorType().toNetconf(),
                 // FIXME: this is a special-case until we have YangError.getTag()
-                cause instanceof YangInvalidValueException ? ErrorTag.INVALID_VALUE : ErrorTag.MALFORMED_MESSAGE,
+                cause instanceof YangInvalidValueException ? ErrorTag.INVALID_VALUE : MALFORMED_MESSAGE,
                     error.getErrorMessage().orElse(null), error.getErrorAppTag().orElse(null)));
         }
     }
@@ -267,5 +304,34 @@ public class RestconfDocumentedException extends WebApplicationException {
     @Override
     public String getMessage() {
         return "errors: " + errors + (status != null ? ", status: " + status : "");
+    }
+
+    private static Status dataMissingHttpStatus() {
+        // Control over the HTTP status reported on "data-missing" conditions. This defaults to disabled,
+        // HTTP status 409 as specified by RFC8040 (and all previous drafts). See the discussion in:
+        // https://www.rfc-editor.org/errata/eid5565
+        // https://mailarchive.ietf.org/arch/msg/netconf/hkVDdHK4xA74NgvXzWP0zObMiyY/
+        final String propName = "org.opendaylight.restconf.eid5565";
+        final String propValue = System.getProperty(propName, "disabled");
+        switch (propValue) {
+            case "enabled":
+                // RFC7231 interpretation: 404 Not Found
+                LOG.info("RESTCONF data-missing condition is reported as HTTP status 404 (Errata 5565)");
+                return Status.NOT_FOUND;
+            case "disabled":
+                break;
+            default:
+                LOG.warn("Unhandled {} value \"{}\", assuming disabled", propName, propValue);
+        }
+
+        // RFC8040 specification: 409 Conflict
+        return Status.CONFLICT;
+    }
+
+    // FIXME: find a nicer place for this method
+    @Beta
+    public static Status statusOf(final ErrorTag tag) {
+        final Status known = WELL_KNOWN_ERROR_TAGS.get(requireNonNull(tag));
+        return known != null ? known : Status.INTERNAL_SERVER_ERROR;
     }
 }
