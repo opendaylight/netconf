@@ -17,13 +17,16 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.ErrorTags;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.codec.YangInvalidValueException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -36,7 +39,7 @@ import org.opendaylight.yangtools.yang.data.api.codec.YangInvalidValueException;
  * @author Thomas Pantelis
  */
 public class RestconfDocumentedException extends WebApplicationException {
-
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedException.class);
     private static final long serialVersionUID = 1L;
 
     private final ImmutableList<RestconfError> errors;
@@ -50,7 +53,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            A string which provides a plain text string describing the error.
      */
     public RestconfDocumentedException(final String message) {
-        this(message, ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED);
+        this(message, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
     /**
@@ -111,8 +114,8 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            The underlying exception cause.
      */
     public RestconfDocumentedException(final String message, final Throwable cause) {
-        this(cause, new RestconfError(ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED,
-                message, null, cause.getMessage(), null));
+        this(cause, new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message, null,
+            cause.getMessage(), null));
     }
 
     /**
@@ -132,8 +135,8 @@ public class RestconfDocumentedException extends WebApplicationException {
         if (!errors.isEmpty()) {
             this.errors = ImmutableList.copyOf(errors);
         } else {
-            this.errors = ImmutableList.of(new RestconfError(ErrorType.APPLICATION,
-                    RestconfError.ErrorTag.OPERATION_FAILED, message));
+            this.errors = ImmutableList.of(
+                new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message));
         }
 
         status = null;
@@ -159,7 +162,7 @@ public class RestconfDocumentedException extends WebApplicationException {
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
-        super(cause, error.getErrorTag().getStatusCode());
+        super(cause, ErrorTags.statusOf(error.getErrorTag()));
         errors = ImmutableList.of(error);
         status = null;
     }
@@ -168,9 +171,9 @@ public class RestconfDocumentedException extends WebApplicationException {
             final OperationFailedException cause) {
         for (final RpcError error : cause.getErrorList()) {
             if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
-                    && error.getTag().equals(ErrorTag.RESOURCE_DENIED.getTagValue())) {
+                    && error.getTag().equals(ErrorTag.RESOURCE_DENIED.elementBody())) {
                 throw new RestconfDocumentedException(error.getMessage(), ErrorType.TRANSPORT,
-                    ErrorTag.RESOURCE_DENIED_TRANSPORT, cause);
+                    ErrorTags.RESOURCE_DENIED_TRANSPORT, cause);
             }
         }
         throw new RestconfDocumentedException(message, cause, cause.getErrorList());

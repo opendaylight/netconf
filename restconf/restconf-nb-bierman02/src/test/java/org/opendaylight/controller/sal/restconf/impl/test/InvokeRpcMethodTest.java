@@ -42,11 +42,12 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
+import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -199,8 +200,13 @@ public class InvokeRpcMethodTest {
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
-        verifyRestconfDocumentedException(ex, 0, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, Optional.of("foo"),
-            Optional.empty());
+
+        // We are performing pass-through here of error-tag, hence the tag remains as specified, but we want to make
+        // sure the HTTP status remains the same as
+        final ErrorTag bogus = new ErrorTag("bogusTag");
+        verifyRestconfDocumentedException(ex, 0, ErrorType.TRANSPORT, bogus, Optional.of("foo"), Optional.empty());
+        assertEquals(ErrorTags.statusOf(ErrorTag.OPERATION_FAILED), ErrorTags.statusOf(bogus));
+
         verifyRestconfDocumentedException(ex, 1, ErrorType.RPC, ErrorTag.IN_USE, Optional.of("bar"),
             Optional.of("app-tag"));
     }

@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
@@ -28,11 +27,11 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -104,14 +103,6 @@ public class RestconfSchemaServiceTest {
     }
 
     /**
-     * Test if service was successfully created.
-     */
-    @Test
-    public void schemaServiceImplInitTest() {
-        assertNotNull("Schema service should be initialized and not null", this.schemaService);
-    }
-
-    /**
      * Get schema with identifier of existing module and check if correct module was found.
      */
     @Test
@@ -120,7 +111,7 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
 
         // make test
-        final SchemaExportContext exportContext = this.schemaService.getSchema(TEST_MODULE);
+        final SchemaExportContext exportContext = schemaService.getSchema(TEST_MODULE);
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
@@ -143,7 +134,7 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
 
         // make test
-        final SchemaExportContext exportContext = this.schemaService.getSchema(NOT_EXISTING_MODULE);
+        final SchemaExportContext exportContext = schemaService.getSchema(NOT_EXISTING_MODULE);
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
@@ -160,7 +151,7 @@ public class RestconfSchemaServiceTest {
 
         // make test
         final SchemaExportContext exportContext =
-                this.schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT);
+                schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT);
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
@@ -183,7 +174,7 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test
-        final SchemaExportContext exportContext = this.schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE);
+        final SchemaExportContext exportContext = schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE);
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
@@ -199,7 +190,7 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(null);
 
         // make test
-        assertThrows(NullPointerException.class, () -> this.schemaService.getSchema(TEST_MODULE));
+        assertThrows(NullPointerException.class, () -> schemaService.getSchema(TEST_MODULE));
     }
 
     /**
@@ -213,7 +204,7 @@ public class RestconfSchemaServiceTest {
 
         // make test
         assertThrows(NullPointerException.class,
-            () -> this.schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT));
+            () -> schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT));
     }
 
     /**
@@ -254,14 +245,10 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
 
         // make test and verify
-        try {
-            this.schemaService.getSchema("");
-            fail("Test should fail due to invalid identifier");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema(""));
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -275,14 +262,10 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test and verify
-        try {
-            this.schemaService.getSchema(MOUNT_POINT + "");
-            fail("Test should fail due to invalid identifier");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema(MOUNT_POINT + ""));
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -295,14 +278,10 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
 
         // make test and verify
-        try {
-            this.schemaService.getSchema("01_module/2016-01-01");
-            fail("Test should fail due to invalid identifier");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema("01_module/2016-01-01"));
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -316,14 +295,10 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test and verify
-        try {
-            this.schemaService.getSchema(MOUNT_POINT + "01_module/2016-01-01");
-            fail("Test should fail due to invalid identifier");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema(MOUNT_POINT + "01_module/2016-01-01"));
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -339,14 +314,10 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
 
         // make test and verify
-        try {
-            this.schemaService.getSchema("2014-01-01");
-            fail("Test should fail due to invalid identifier");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema("2014-01-01"));
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -363,14 +334,10 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test and verify
-        try {
-            this.schemaService.getSchema(MOUNT_POINT + "2014-01-01");
-            fail("Test should fail due to invalid identifier");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema(MOUNT_POINT + "2014-01-01"));
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -384,14 +351,10 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
 
         // make test and verify
-        try {
-            this.schemaService.getSchema("module");
-            fail("Test should fail due to invalid identifier");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema("module"));
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -405,14 +368,10 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test and verify
-        try {
-            this.schemaService.getSchema(MOUNT_POINT + "module");
-            fail("Test should fail due to invalid identifier");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema(MOUNT_POINT + "module"));
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -426,6 +385,6 @@ public class RestconfSchemaServiceTest {
 
         // make test
         assertThrows(RestconfDocumentedException.class,
-            () -> this.schemaService.getSchema(NOT_EXISTING_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT));
+            () -> schemaService.getSchema(NOT_EXISTING_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT));
     }
 }

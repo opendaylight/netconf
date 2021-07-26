@@ -23,6 +23,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.XMLConstants;
@@ -32,6 +33,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -118,11 +120,9 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             return Response.status(exception.getStatus()).type(MediaType.TEXT_PLAIN_TYPE).entity(" ").build();
         }
 
-        final int status = errors.iterator().next().getErrorTag().getStatusCode();
-
+        final Status status = ErrorTags.statusOf(errors.iterator().next().getErrorTag());
         final DataNodeContainer errorsSchemaNode =
                 (DataNodeContainer) controllerContext.getRestconfModuleErrorsSchemaNode();
-
         if (errorsSchemaNode == null) {
             return Response.status(status).type(MediaType.TEXT_PLAIN_TYPE).entity(exception.getMessage()).build();
         }
@@ -176,7 +176,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final DataSchemaNode errTagSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
         checkState(errTagSchemaNode instanceof LeafSchemaNode);
         errNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) errTagSchemaNode)
-                .withValue(error.getErrorTag().getTagValue()).build());
+                .withValue(error.getErrorTag().elementBody()).build());
 
         if (error.getErrorAppTag() != null) {
             lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(

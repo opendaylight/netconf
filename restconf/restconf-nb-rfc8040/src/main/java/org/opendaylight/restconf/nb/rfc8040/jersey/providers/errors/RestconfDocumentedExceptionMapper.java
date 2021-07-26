@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
@@ -145,7 +146,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
             ImmutableUnkeyedListEntryNodeBuilder.create()
                 .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
                 .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().elementBody()))
-                .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().getTagValue()));
+                .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().elementBody()));
 
         // filling in optional fields
         if (restconfError.getErrorMessage() != null) {
@@ -232,8 +233,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
             return DEFAULT_STATUS_CODE;
         }
 
-        final Set<Integer> allStatusCodesOfErrorEntries = errors.stream()
-                .map(restconfError -> restconfError.getErrorTag().getStatusCode())
+        final Set<Status> allStatusCodesOfErrorEntries = errors.stream()
+                .map(restconfError -> ErrorTags.statusOf(restconfError.getErrorTag()))
                 // we would like to preserve iteration order in collected entries - hence usage of LinkedHashSet
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         // choosing of the first status code from appended errors, if there are different status codes in error
@@ -243,7 +244,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
                     + "Different status codes have been found in appended error entries: {}. The first error "
                     + "entry status code is chosen for response.", exception, allStatusCodesOfErrorEntries);
         }
-        return Status.fromStatusCode(allStatusCodesOfErrorEntries.iterator().next());
+        return allStatusCodesOfErrorEntries.iterator().next();
     }
 
     /**

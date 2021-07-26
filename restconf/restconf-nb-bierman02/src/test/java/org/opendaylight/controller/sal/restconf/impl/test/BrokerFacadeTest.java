@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -33,6 +33,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,15 +64,16 @@ import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -168,19 +170,18 @@ public class BrokerFacadeTest {
     public void test503() throws Exception {
         final RpcError error = RpcResultBuilder.newError(
                 RpcError.ErrorType.TRANSPORT,
-                ErrorTag.RESOURCE_DENIED.getTagValue(),
+                ErrorTag.RESOURCE_DENIED.elementBody(),
                 "Master is down. Please try again.");
         doReturn(immediateFailedFluentFuture(new ReadFailedException("Read from transaction failed", error)))
                 .when(readTransaction).read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class));
-        try {
-            brokerFacade.readConfigurationData(this.instanceID, "explicit");
-            fail("This test should fail.");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("getErrorTag", ErrorTag.RESOURCE_DENIED_TRANSPORT, e.getErrors().get(0).getErrorTag());
-            assertEquals("getErrorType", ErrorType.TRANSPORT, e.getErrors().get(0).getErrorType());
-            assertEquals("getErrorMessage", "Master is down. Please try again.",
-                    e.getErrors().get(0).getErrorMessage());
-        }
+
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> brokerFacade.readConfigurationData(this.instanceID, "explicit"));
+        final List<RestconfError> errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals("getErrorTag", ErrorTags.RESOURCE_DENIED_TRANSPORT, errors.get(0).getErrorTag());
+        assertEquals("getErrorType", ErrorType.TRANSPORT,errors.get(0).getErrorType());
+        assertEquals("getErrorMessage", "Master is down. Please try again.", errors.get(0).getErrorMessage());
     }
 
     @Test
@@ -242,7 +243,7 @@ public class BrokerFacadeTest {
             this.brokerFacade.commitConfigurationDataPost((EffectiveModelContext) null, this.instanceID, this.dummyNode,
                     null, null);
         } catch (final RestconfDocumentedException e) {
-            assertEquals("getErrorTag", RestconfError.ErrorTag.DATA_EXISTS, e.getErrors().get(0).getErrorTag());
+            assertEquals("getErrorTag", ErrorTag.DATA_EXISTS, e.getErrors().get(0).getErrorTag());
             throw e;
         }
     }
@@ -281,13 +282,12 @@ public class BrokerFacadeTest {
         prepareDataForDelete(false);
 
         // try to delete and expect DATA_MISSING error
-        try {
-            this.brokerFacade.commitConfigurationDataDelete(this.instanceID);
-            fail("Delete operation should fail due to missing data");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> brokerFacade.commitConfigurationDataDelete(this.instanceID));
+        final List<RestconfError> errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.DATA_MISSING, errors.get(0).getErrorTag());
     }
 
     /**

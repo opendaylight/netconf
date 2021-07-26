@@ -36,11 +36,9 @@ public abstract class AbstractBodyReaderTest {
 
     static {
         try {
-            uriField = AbstractIdentifierAwareJaxRsProvider.class
-                    .getDeclaredField("uriInfo");
+            uriField = AbstractIdentifierAwareJaxRsProvider.class.getDeclaredField("uriInfo");
             uriField.setAccessible(true);
-            requestField = AbstractIdentifierAwareJaxRsProvider.class
-                    .getDeclaredField("request");
+            requestField = AbstractIdentifierAwareJaxRsProvider.class.getDeclaredField("request");
             requestField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
@@ -75,7 +73,7 @@ public abstract class AbstractBodyReaderTest {
         when(uriInfoMock.getPathParameters()).thenReturn(pathParm);
         when(uriInfoMock.getPathParameters(false)).thenReturn(pathParm);
         when(uriInfoMock.getPathParameters(true)).thenReturn(pathParm);
-        when(uriInfoMock.getAbsolutePath()).thenReturn(new URI("restconf"));
+        when(uriInfoMock.getAbsolutePath()).thenReturn(URI.create("restconf"));
         uriField.set(normalizedNodeProvider, uriInfoMock);
 
         final Request request = mock(Request.class);
@@ -97,10 +95,8 @@ public abstract class AbstractBodyReaderTest {
     protected static void checkNormalizedNodeContext(
             final NormalizedNodeContext nnContext) {
         assertNotNull(nnContext.getData());
-        assertNotNull(nnContext.getInstanceIdentifierContext()
-                .getInstanceIdentifier());
-        assertNotNull(nnContext.getInstanceIdentifierContext()
-                .getSchemaContext());
+        assertNotNull(nnContext.getInstanceIdentifierContext().getInstanceIdentifier());
+        assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaContext());
         assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaNode());
     }
 

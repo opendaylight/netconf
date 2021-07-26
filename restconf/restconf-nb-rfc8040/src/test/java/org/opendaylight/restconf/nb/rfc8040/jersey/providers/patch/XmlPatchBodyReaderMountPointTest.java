@@ -18,6 +18,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
@@ -47,8 +48,9 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
 
-        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml"));
+        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+            "/instanceidentifier/xml/xmlPATCHdata.xml");
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContextMountPoint(returnValue);
     }
 
@@ -64,7 +66,7 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
-        assertEquals("Error code 400 expected", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -78,11 +80,10 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
 
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
-        assertEquals("Error code 400 expected", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
-
 
     /**
      * Test of Yang Patch with absolute target path.
@@ -92,9 +93,9 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final String uri = MOUNT_POINT;
         mockBodyReader(uri, xmlToPatchBodyReader, false);
 
-        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml"));
-        checkPatchContextMountPoint(returnValue);
+        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            XmlBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml")));
     }
 
     /**
@@ -105,9 +106,9 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
 
-        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
-            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml"));
-        checkPatchContextMountPoint(returnValue);
+        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            XmlBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml")));
     }
 
     /**
@@ -118,10 +119,9 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
 
-        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
             XmlBodyReaderTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml"));
-        checkPatchContextMountPoint(returnValue);
+                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml")));
     }
 
     /**
@@ -132,9 +132,8 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
 
-        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+        checkPatchContextMountPoint(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
             XmlBodyReaderTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml"));
-        checkPatchContextMountPoint(returnValue);
+                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml")));
     }
 }
