@@ -31,10 +31,10 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -213,7 +213,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                             return operation.get();
                         } else {
                             return Futures.immediateFailedFuture(new NetconfDocumentedException("Lock operation failed",
-                                ErrorType.APPLICATION, DocumentedException.ErrorTag.LOCK_DENIED, ErrorSeverity.ERROR));
+                                ErrorType.APPLICATION, ErrorTag.LOCK_DENIED, ErrorSeverity.ERROR));
                         }
                     },
                     MoreExecutors.directExecutor());
@@ -252,18 +252,18 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         ErrorType errType = ErrorType.APPLICATION;
         ErrorSeverity errSeverity = ErrorSeverity.ERROR;
         StringJoiner msgBuilder = new StringJoiner(" ");
-        String errorTag = "operation-failed";
+        ErrorTag errorTag = ErrorTag.OPERATION_FAILED;
         for (final RpcError error : errors) {
             errType = error.getErrorType().toNetconf();
             errSeverity = error.getSeverity().toNetconf();
             msgBuilder.add(error.getMessage());
             msgBuilder.add(error.getInfo());
-            errorTag = error.getTag();
+            errorTag = new ErrorTag(error.getTag());
         }
 
         return new TransactionCommitFailedException("Netconf transaction commit failed",
-            new NetconfDocumentedException("RPC during tx failed. " + msgBuilder.toString(), errType,
-                DocumentedException.ErrorTag.from(errorTag), errSeverity));
+            new NetconfDocumentedException("RPC during tx failed. " + msgBuilder.toString(), errType, errorTag,
+                errSeverity));
     }
 
     private static void executeWithLogging(final Supplier<ListenableFuture<? extends DOMRpcResult>> operation) {
