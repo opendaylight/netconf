@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.common.errors.RestconfDocumentedException.MALFORMED_MESSAGE;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicates;
@@ -74,7 +75,6 @@ import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.DataChangeScope;
@@ -82,6 +82,7 @@ import org.opendaylight.restconf.common.util.OperationsResourceUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.Empty;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -579,10 +580,10 @@ public final class RestconfImpl implements RestconfService {
     private static void validateInput(final SchemaNode inputSchema, final NormalizedNodeContext payload) {
         if (inputSchema != null && payload.getData() == null) {
             // expected a non null payload
-            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, MALFORMED_MESSAGE);
         } else if (inputSchema == null && payload.getData() != null) {
             // did not expect any input
-            throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL, MALFORMED_MESSAGE);
         }
     }
 
@@ -845,7 +846,7 @@ public final class RestconfImpl implements RestconfService {
             // no "data" payload
             if (!node.getData().getIdentifier().getNodeType().equals(NETCONF_BASE_QNAME)) {
                 throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
-                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                        ErrorType.PROTOCOL, MALFORMED_MESSAGE);
             }
             // any arguments
         } else {
@@ -853,7 +854,7 @@ public final class RestconfImpl implements RestconfService {
             if (!payloadName.equals(identifierName)) {
                 throw new RestconfDocumentedException(
                         "Payload name (" + payloadName + ") is different from identifier name (" + identifierName + ")",
-                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                        ErrorType.PROTOCOL, MALFORMED_MESSAGE);
             }
         }
     }
@@ -912,7 +913,7 @@ public final class RestconfImpl implements RestconfService {
     @Override
     public Response createConfigurationData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
         if (payload == null) {
-            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, MALFORMED_MESSAGE);
         }
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
@@ -1286,7 +1287,7 @@ public final class RestconfImpl implements RestconfService {
     public PatchStatusContext patchConfigurationData(final String identifier, final PatchContext context,
                                                      final UriInfo uriInfo) {
         if (context == null) {
-            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, MALFORMED_MESSAGE);
         }
 
         try {
@@ -1301,7 +1302,7 @@ public final class RestconfImpl implements RestconfService {
     @Override
     public PatchStatusContext patchConfigurationData(final PatchContext context, @Context final UriInfo uriInfo) {
         if (context == null) {
-            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, MALFORMED_MESSAGE);
         }
 
         try {
