@@ -23,8 +23,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -399,7 +399,7 @@ public class YangInstanceIdentifierDeserializerTest {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/leafB"));
         assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", RestconfError.ErrorTag.DATA_MISSING,
+        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING,
             ex.getErrors().get(0).getErrorTag());
     }
 
@@ -414,7 +414,7 @@ public class YangInstanceIdentifierDeserializerTest {
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
                 "deserializer-test:list-no-key/disabled=false"));
         assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", RestconfError.ErrorTag.DATA_MISSING,
+        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING,
             ex.getErrors().get(0).getErrorTag());
     }
 
@@ -478,7 +478,7 @@ public class YangInstanceIdentifierDeserializerTest {
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
                     "deserializer-test:list-multiple-keys=%3Afoo/string-value"));
         assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", RestconfError.ErrorTag.MISSING_ATTRIBUTE,
+        assertEquals("Not expected error tag", ErrorTag.MISSING_ATTRIBUTE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
@@ -534,7 +534,7 @@ public class YangInstanceIdentifierDeserializerTest {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:leaf-list-0="));
         assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", RestconfError.ErrorTag.MISSING_ATTRIBUTE,
+        assertEquals("Not expected error tag", ErrorTag.MISSING_ATTRIBUTE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }

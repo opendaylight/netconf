@@ -12,6 +12,7 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 public final class QueryParametersParser {
@@ -57,14 +58,14 @@ public final class QueryParametersParser {
                 final int depth = Integer.parseInt(param);
                 if (depth < 1) {
                     throw new RestconfDocumentedException(
-                            new RestconfError(ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                            new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                             "Invalid depth parameter: " + depth, null,
                             "The depth parameter must be an integer > 1 or \"unbounded\""));
                 }
                 wpBuilder.setDepth(depth);
             } catch (final NumberFormatException e) {
                 throw new RestconfDocumentedException(e, new RestconfError(
-                        ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                         "Invalid depth parameter: " + e.getMessage(), null,
                         "The depth parameter must be an integer > 1 or \"unbounded\""));
             }
