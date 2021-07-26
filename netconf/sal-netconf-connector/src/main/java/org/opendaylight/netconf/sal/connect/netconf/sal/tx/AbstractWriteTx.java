@@ -33,6 +33,7 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -230,7 +231,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                         new NetconfDocumentedException(
                                 id + ":RPC during tx returned an exception" + throwable.getMessage(),
                                 new Exception(throwable),
-                                DocumentedException.ErrorType.APPLICATION,
+                                ErrorType.APPLICATION,
                                 DocumentedException.ErrorTag.OPERATION_FAILED,
                                 ErrorSeverity.ERROR);
                 transformed.setException(exception);
@@ -244,7 +245,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void extractResult(final List<DOMRpcResult> domRpcResults,
                                final SettableFuture<RpcResult<Void>> transformed) {
-        DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
+        ErrorType errType = ErrorType.APPLICATION;
         ErrorSeverity errSeverity = ErrorSeverity.ERROR;
         StringBuilder msgBuilder = new StringBuilder();
         boolean errorsEncouneterd = false;
@@ -254,25 +255,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             if (!domRpcResult.getErrors().isEmpty()) {
                 errorsEncouneterd = true;
                 final RpcError error = domRpcResult.getErrors().iterator().next();
-                final RpcError.ErrorType errorType = error.getErrorType();
-                switch (errorType) {
-                    case RPC:
-                        errType = DocumentedException.ErrorType.RPC;
-                        break;
-                    case PROTOCOL:
-                        errType = DocumentedException.ErrorType.PROTOCOL;
-                        break;
-                    case TRANSPORT:
-                        errType = DocumentedException.ErrorType.TRANSPORT;
-                        break;
-                    case APPLICATION:
-                        errType = DocumentedException.ErrorType.APPLICATION;
-                        break;
-                    default:
-                        errType = DocumentedException.ErrorType.APPLICATION;
-                        break;
-                }
 
+                errType = error.getErrorType().toNetconf();
                 errSeverity = error.getSeverity().toNetconf();
                 msgBuilder.append(error.getMessage());
                 msgBuilder.append(error.getInfo());

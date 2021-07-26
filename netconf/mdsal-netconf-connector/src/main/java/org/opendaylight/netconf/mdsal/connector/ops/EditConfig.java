@@ -16,13 +16,13 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
-import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -59,9 +59,7 @@ public final class EditConfig extends AbstractEdit {
         final Datastore targetDatastore = Datastore.valueOf(targetElement.getName());
         if (targetDatastore == Datastore.running) {
             throw new DocumentedException("edit-config on running datastore is not supported",
-                    ErrorType.PROTOCOL,
-                    ErrorTag.OPERATION_NOT_SUPPORTED,
-                    ErrorSeverity.ERROR);
+                    ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
 
         final ModifyAction defaultAction = getDefaultOperation(operationElement);

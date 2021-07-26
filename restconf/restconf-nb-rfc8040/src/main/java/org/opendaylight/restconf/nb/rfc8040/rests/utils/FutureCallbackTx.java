@@ -120,7 +120,7 @@ final class FutureCallbackTx {
                     if (error instanceof NetconfDocumentedException) {
                         throw new RestconfDocumentedException(error.getMessage(),
                                 RestconfError.ErrorType.valueOfCaseInsensitive(
-                                        ((NetconfDocumentedException) error).getErrorType().getTypeValue()),
+                                        ((NetconfDocumentedException) error).getErrorType().elementBody()),
                                 RestconfError.ErrorTag.valueOfCaseInsensitive(
                                         ((NetconfDocumentedException) error).getErrorTag().getTagValue()), e);
                     }
