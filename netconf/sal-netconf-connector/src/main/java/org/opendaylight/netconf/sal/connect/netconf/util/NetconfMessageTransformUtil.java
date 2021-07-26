@@ -51,9 +51,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata.Builder;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -295,7 +295,7 @@ public final class NetconfMessageTransformUtil {
             throw new NetconfDocumentedException("Response message contained unknown \"message-id\"",
                     null, NetconfDocumentedException.ErrorType.PROTOCOL,
                     NetconfDocumentedException.ErrorTag.BAD_ATTRIBUTE,
-                    NetconfDocumentedException.ErrorSeverity.ERROR, errorInfo);
+                    ErrorSeverity.ERROR, errorInfo);
         }
     }
 
@@ -316,22 +316,12 @@ public final class NetconfMessageTransformUtil {
             }
         }
 
-        final ErrorSeverity severity = toRpcErrorSeverity(ex.getErrorSeverity());
-        return severity == ErrorSeverity.ERROR
+        return ex.getErrorSeverity() == ErrorSeverity.ERROR
                 ? RpcResultBuilder.newError(toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause())
                 : RpcResultBuilder.newWarning(
                         toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
-    }
-
-    private static ErrorSeverity toRpcErrorSeverity(final NetconfDocumentedException.ErrorSeverity severity) {
-        switch (severity) {
-            case WARNING:
-                return RpcError.ErrorSeverity.WARNING;
-            default:
-                return RpcError.ErrorSeverity.ERROR;
-        }
     }
 
     private static RpcError.ErrorType toRpcErrorType(final NetconfDocumentedException.ErrorType type) {
@@ -570,13 +560,10 @@ public final class NetconfMessageTransformUtil {
 
     public static RpcResult<NetconfMessage> toRpcResult(final FailedNetconfMessage message) {
         return RpcResultBuilder.<NetconfMessage>failed()
-                .withRpcError(
-                        toRpcError(
-                                new NetconfDocumentedException(
-                                        message.getException().getMessage(),
-                                        DocumentedException.ErrorType.APPLICATION,
-                                        DocumentedException.ErrorTag.MALFORMED_MESSAGE,
-                                        DocumentedException.ErrorSeverity.ERROR)))
+                .withRpcError(toRpcError(new NetconfDocumentedException(message.getException().getMessage(),
+                    DocumentedException.ErrorType.APPLICATION,
+                    DocumentedException.ErrorTag.MALFORMED_MESSAGE,
+                    ErrorSeverity.ERROR)))
                 .build();
     }
 }

@@ -12,8 +12,8 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -30,6 +30,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -76,9 +77,8 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
 
             throw new DocumentedException(
                     String.format("Unable to handle rpc %s on session %s", messageAsString, session),
-                    e, DocumentedException.ErrorType.APPLICATION,
-                    tag, DocumentedException.ErrorSeverity.ERROR,
-                    Collections.singletonMap(tag.toString(), e.getMessage()));
+                    e, DocumentedException.ErrorType.APPLICATION, tag, ErrorSeverity.ERROR,
+                    Map.of(tag.toString(), e.getMessage()));
         } catch (final RuntimeException e) {
             throw handleUnexpectedEx("sort", e);
         }
@@ -100,8 +100,8 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
         return new DocumentedException("Unexpected error",
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.OPERATION_FAILED,
-                DocumentedException.ErrorSeverity.ERROR,
-                Collections.singletonMap(DocumentedException.ErrorSeverity.ERROR.toString(), exception.toString()));
+                ErrorSeverity.ERROR,
+                Map.of(ErrorSeverity.ERROR.toString(), exception.toString()));
     }
 
     private static Document executeOperationWithHighestPriority(final Document message,

@@ -11,6 +11,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -42,7 +43,7 @@ public class Lock extends AbstractSingletonNetconfOperation {
 
         throw new DocumentedException("Unable to lock " + targetDatastore + " datastore",
                 DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED,
-                DocumentedException.ErrorSeverity.ERROR);
+                ErrorSeverity.ERROR);
     }
 
     static Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {

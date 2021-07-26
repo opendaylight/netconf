@@ -13,7 +13,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +24,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -85,7 +85,7 @@ public class FilterContentValidator {
             throw new DocumentedException("Validation failed. Cause: " + e.getMessage(), e,
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
     }
 
@@ -110,7 +110,7 @@ public class FilterContentValidator {
                     + "in schema context: " + schemaContext.getCurrentContext().toString(),
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
-                DocumentedException.ErrorSeverity.ERROR);
+                ErrorSeverity.ERROR);
     }
 
     /**
@@ -197,7 +197,7 @@ public class FilterContentValidator {
             final List<XmlElement> childElements = current.getChildElements(pathElement);
             // if there are multiple list entries present in the filter, we can't use any keys and must read whole list
             if (childElements.size() != 1) {
-                return Collections.emptyMap();
+                return Map.of();
             }
             current = childElements.get(0);
         }
@@ -207,7 +207,7 @@ public class FilterContentValidator {
             final Optional<XmlElement> childElements =
                     current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
             if (childElements.isEmpty()) {
-                return Collections.emptyMap();
+                return Map.of();
             }
             final Optional<String> keyValue = childElements.get().getOnlyTextContentOptionally();
             if (keyValue.isPresent()) {
@@ -306,5 +306,4 @@ public class FilterContentValidator {
             super("Element " + child + " can't be child of " + parent);
         }
     }
-
 }
