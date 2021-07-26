@@ -9,11 +9,11 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.collect.ImmutableMap;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

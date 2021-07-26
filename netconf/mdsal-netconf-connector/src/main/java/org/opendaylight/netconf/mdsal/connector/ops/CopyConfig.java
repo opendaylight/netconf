@@ -26,13 +26,13 @@ import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -119,7 +119,7 @@ public final class CopyConfig extends AbstractEdit {
         final Optional<XmlElement> sourceElement = parent.getOnlyChildElementOptionally(SOURCE_KEY);
         if (sourceElement.isEmpty()) {
             throw new DocumentedException("<source> element is missing",
-                ErrorType.PROTOCOL, DocumentedException.ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR);
+                ErrorType.PROTOCOL, ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR);
         }
 
         return sourceElement.get();

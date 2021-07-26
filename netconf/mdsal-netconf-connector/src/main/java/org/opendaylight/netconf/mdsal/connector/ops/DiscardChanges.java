@@ -10,12 +10,12 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 import java.util.HashMap;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
         } catch (final IllegalStateException e) {
             LOG.warn("Abort failed ", e);
             final Map<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ErrorTag.OPERATION_FAILED.name(),
+            errorInfo.put(ErrorTag.OPERATION_FAILED.elementBody(),
                     "Operation failed. Use 'get-config' or 'edit-config' before triggering "
                             + OPERATION_NAME + " operation");
             throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,

@@ -24,6 +24,7 @@ import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 public final class NetconfTopologyUtils {
@@ -83,6 +84,6 @@ public final class NetconfTopologyUtils {
 
     public static DocumentedException createMasterIsDownException(final RemoteDeviceId id, final Exception cause) {
         return new DocumentedException(id + ":Master is down. Please try again.", cause,
-                ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.WARNING);
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.WARNING);
     }
 }

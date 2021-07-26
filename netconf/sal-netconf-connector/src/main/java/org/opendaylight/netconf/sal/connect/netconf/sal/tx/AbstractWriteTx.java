@@ -27,12 +27,12 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -230,10 +230,9 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                 final NetconfDocumentedException exception =
                         new NetconfDocumentedException(
                                 id + ":RPC during tx returned an exception" + throwable.getMessage(),
+                                // FIXME: add proper unmask/wrap to ExecutionException
                                 new Exception(throwable),
-                                ErrorType.APPLICATION,
-                                DocumentedException.ErrorTag.OPERATION_FAILED,
-                                ErrorSeverity.ERROR);
+                                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
                 transformed.setException(exception);
             }
         }, MoreExecutors.directExecutor());
@@ -264,11 +263,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             }
         }
         if (errorsEncouneterd) {
-            final NetconfDocumentedException exception = new NetconfDocumentedException(id
-                    + ":RPC during tx failed. " + msgBuilder.toString(),
-                    errType,
-                    DocumentedException.ErrorTag.from(errorTag),
-                    errSeverity);
+            final NetconfDocumentedException exception = new NetconfDocumentedException(
+                    id + ":RPC during tx failed. " + msgBuilder, errType, new ErrorTag(errorTag), errSeverity);
             transformed.setException(exception);
             return;
         }

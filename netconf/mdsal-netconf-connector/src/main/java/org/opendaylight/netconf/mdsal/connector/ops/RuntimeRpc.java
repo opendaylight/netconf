@@ -21,7 +21,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -31,6 +30,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -260,7 +260,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
         } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
             throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex, ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
+                    DocumentedException.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
 
         return (ContainerNode) resultHolder.getResult();
