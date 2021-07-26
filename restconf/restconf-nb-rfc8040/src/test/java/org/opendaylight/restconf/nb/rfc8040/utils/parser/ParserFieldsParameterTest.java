@@ -9,13 +9,11 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Sets;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,8 +24,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -185,8 +183,8 @@ public class ParserFieldsParameterTest {
         when(leafSpeed.isAugmenting()).thenReturn(true);
         when(containerPlayer.dataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
         when(containerPlayer.getDataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
-        doReturn(Collections.singletonList(leafSpeed)).when(speedAugmentation).getChildNodes();
-        doReturn(Collections.singleton(speedAugmentation)).when(containerPlayer).getAvailableAugmentations();
+        doReturn(List.of(leafSpeed)).when(speedAugmentation).getChildNodes();
+        doReturn(List.of(speedAugmentation)).when(containerPlayer).getAvailableAugmentations();
         when(speedAugmentation.findDataChildByName(SPEED_Q_NAME)).thenReturn(Optional.of(leafSpeed));
     }
 
@@ -322,10 +320,10 @@ public class ParserFieldsParameterTest {
         assertTrue(parsedFields.get(0).contains(SERVICES_Q_NAME));
 
         assertEquals(parsedFields.get(1).size(), 2);
-        assertTrue(parsedFields.get(1).containsAll(Sets.newHashSet(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME)));
+        assertTrue(parsedFields.get(1).containsAll(List.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME)));
 
         assertEquals(parsedFields.get(2).size(), 2);
-        assertTrue(parsedFields.get(2).containsAll(Sets.newHashSet(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME)));
+        assertTrue(parsedFields.get(2).containsAll(List.of(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME)));
     }
 
     /**
@@ -344,10 +342,10 @@ public class ParserFieldsParameterTest {
         assertTrue(parsedFields.get(0).contains(SERVICES_Q_NAME));
 
         assertEquals(parsedFields.get(1).size(), 2);
-        assertTrue(parsedFields.get(1).containsAll(Sets.newHashSet(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME)));
+        assertTrue(parsedFields.get(1).containsAll(List.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME)));
 
         assertEquals(parsedFields.get(2).size(), 2);
-        assertTrue(parsedFields.get(2).containsAll(Sets.newHashSet(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME)));
+        assertTrue(parsedFields.get(2).containsAll(List.of(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME)));
     }
 
     /**
@@ -367,11 +365,11 @@ public class ParserFieldsParameterTest {
 
         assertEquals(parsedFields.get(1).size(), 3);
         assertTrue(parsedFields.get(1).containsAll(
-                Sets.newHashSet(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME, NEXT_DATA_Q_NAME)));
+                List.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME, NEXT_DATA_Q_NAME)));
 
         assertEquals(parsedFields.get(2).size(), 2);
         assertTrue(parsedFields.get(2).containsAll(
-                Sets.newHashSet(INSTANCE_NAME_Q_NAME, NEXT_SERVICE_Q_NAME)));
+                List.of(INSTANCE_NAME_Q_NAME, NEXT_SERVICE_Q_NAME)));
     }
 
     /**
@@ -379,17 +377,11 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterNotExpectedCharacterNegativeTest() {
-        final String input = "*";
-
-        try {
-            ParserFieldsParameter.parseFieldsParameter(this.identifierJukebox, input);
-            fail("Test should fail due to not expected character used in parameter input value");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, "*"));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -399,15 +391,11 @@ public class ParserFieldsParameterTest {
     public void parseFieldsParameterMissingParenthesisNegativeTest() {
         final String input = "library(";
 
-        try {
-            ParserFieldsParameter.parseFieldsParameter(this.identifierJukebox, input);
-            fail("Test should fail due to missing closing parenthesis");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -417,15 +405,11 @@ public class ParserFieldsParameterTest {
     public void parseFieldsParameterMissingChildNodeNegativeTest() {
         final String input = "library(not-existing)";
 
-        try {
-            ParserFieldsParameter.parseFieldsParameter(this.identifierJukebox, input);
-            fail("Test should fail due to missing child node in parent node");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -435,15 +419,11 @@ public class ParserFieldsParameterTest {
     public void parseFieldsParameterAfterParenthesisNegativeTest() {
         final String input = "library(album);";
 
-        try {
-            ParserFieldsParameter.parseFieldsParameter(this.identifierJukebox, input);
-            fail("Test should fail due to unexpected character after parenthesis");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -453,15 +433,11 @@ public class ParserFieldsParameterTest {
     public void parseFieldsParameterMissingSemicolonNegativeTest() {
         final String input = "library(album)player";
 
-        try {
-            ParserFieldsParameter.parseFieldsParameter(this.identifierJukebox, input);
-            fail("Test should fail due to missing semicolon after parenthesis");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserFieldsParameter.parseFieldsParameter(this.identifierJukebox, input));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     @Test

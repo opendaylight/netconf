@@ -14,7 +14,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,12 +40,12 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -412,15 +411,11 @@ public class ReadDataTransactionUtilTest {
         parameters.put("content", List.of("not-allowed-parameter-value"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        try {
-            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
-            fail("Test expected to fail due to not allowed parameter value");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -435,15 +430,11 @@ public class ReadDataTransactionUtilTest {
         parameters.put("depth", List.of("bounded"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        try {
-            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
-            fail("Test expected to fail due to not allowed parameter value");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -459,15 +450,11 @@ public class ReadDataTransactionUtilTest {
                 "depth", List.of(String.valueOf(RestconfDataServiceConstant.ReadData.MIN_DEPTH - 1)));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        try {
-            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
-            fail("Test expected to fail due to not allowed parameter value");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -479,19 +466,14 @@ public class ReadDataTransactionUtilTest {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is too high
-        parameters.put(
-                "depth", List.of(String.valueOf(RestconfDataServiceConstant.ReadData.MAX_DEPTH + 1)));
+        parameters.put("depth", List.of(String.valueOf(RestconfDataServiceConstant.ReadData.MAX_DEPTH + 1)));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        try {
-            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
-            fail("Test expected to fail due to not allowed parameter value");
-        } catch (final RestconfDocumentedException e) {
-            // Bad request
-            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+        // Bad request
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -587,7 +569,6 @@ public class ReadDataTransactionUtilTest {
         final RestconfError error = errors.get(0);
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
-        assertEquals("Error status code is not correct", 400, error.getErrorTag().getStatusCode());
     }
 
 
@@ -614,7 +595,6 @@ public class ReadDataTransactionUtilTest {
         final RestconfError error = errors.get(0);
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
-        assertEquals("Error status code is not correct", 400, error.getErrorTag().getStatusCode());
     }
 
     /**
