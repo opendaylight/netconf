@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -16,7 +17,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -26,6 +26,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -197,11 +198,11 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void findBarContainerUsingNamespaceTest() throws Exception {
-        mockBodyReader("instance-identifier-module:cont/yang-ext:mount", this.xmlBodyReader, true);
-        final InputStream inputStream = XmlBodyReaderTest.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlDataFindBarContainer.xml");
-        final NormalizedNodeContext returnValue = this.xmlBodyReader
-                .readFrom(null, null, null, this.mediaType, null, inputStream);
+        mockBodyReader("instance-identifier-module:cont/yang-ext:mount", xmlBodyReader, true);
+        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+            "/instanceidentifier/xml/xmlDataFindBarContainer.xml");
+        final NormalizedNodeContext returnValue = xmlBodyReader.readFrom(null, null, null, this.mediaType, null,
+            inputStream);
 
         // check return value
         checkMountPointNormalizedNodeContext(returnValue);
@@ -220,16 +221,13 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     @Test
     public void wrongRootElementTest() throws Exception {
         mockBodyReader("instance-identifier-module:cont/yang-ext:mount", this.xmlBodyReader, false);
-        final InputStream inputStream =
-                XmlBodyReaderTest.class.getResourceAsStream(
-                "/instanceidentifier/xml/bug7933.xml");
-        try {
-            this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
-            Assert.fail("Test should fail due to malformed PUT operation message");
-        } catch (final RestconfDocumentedException exception) {
-            final RestconfError restconfError = exception.getErrors().get(0);
-            Assert.assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
-            Assert.assertEquals(RestconfError.ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
-        }
+        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+            "/instanceidentifier/xml/bug7933.xml");
+
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream));
+        final RestconfError restconfError = ex.getErrors().get(0);
+        assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
     }
 }

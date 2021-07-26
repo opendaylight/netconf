@@ -28,6 +28,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -282,7 +283,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         } catch (final RestconfDocumentedException exception) {
             final RestconfError restconfError = exception.getErrors().get(0);
             Assert.assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
-            Assert.assertEquals(RestconfError.ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+            Assert.assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
         }
     }
 
@@ -295,5 +296,4 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
 
         assertRangeViolation(() -> xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream));
     }
-
 }

@@ -28,9 +28,9 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -92,7 +92,7 @@ public final class ParserIdentifier {
         final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
         final DOMMountPoint mountPoint = mountPointService.get().getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
-                    ErrorType.PROTOCOL, ErrorTag.RESOURCE_DENIED_TRANSPORT));
+                    ErrorType.PROTOCOL, RestconfDocumentedException.RESOURCE_DENIED_TRANSPORT));
 
         final EffectiveModelContext mountSchemaContext = coerceModelContext(mountPoint);
         final String pathId = pathsIt.next().replaceFirst("/", "");

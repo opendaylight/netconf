@@ -9,7 +9,7 @@ package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import java.io.InputStream;
@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.JsonToPatchBodyReader;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class TestJsonPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
@@ -80,15 +81,12 @@ public class TestJsonPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
         final String uri = MOUNT_POINT + "/instance-identifier-patch-module:patch-cont/my-list1/leaf1";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
-                .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataValueMissing.json");
+        final InputStream inputStream = TestJsonBodyReader.class.getResourceAsStream(
+            "/instanceidentifier/json/jsonPATCHdataValueMissing.json");
 
-        try {
-            jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-            fail("Test should return error 400 due to missing value node when attempt to invoke create operation");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -103,12 +101,9 @@ public class TestJsonPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataValueNotSupported.json");
 
-        try {
-            jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-            fail("Test should return error 400 due to present value node when attempt to invoke delete operation");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**

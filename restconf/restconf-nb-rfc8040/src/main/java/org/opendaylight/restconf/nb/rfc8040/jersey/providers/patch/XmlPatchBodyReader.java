@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +27,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
@@ -36,6 +34,7 @@ import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -63,7 +62,6 @@ import org.xml.sax.SAXException;
 @Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
 public class XmlPatchBodyReader extends AbstractPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlPatchBodyReader.class);
-    private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
     public XmlPatchBodyReader(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointService mountPointService) {

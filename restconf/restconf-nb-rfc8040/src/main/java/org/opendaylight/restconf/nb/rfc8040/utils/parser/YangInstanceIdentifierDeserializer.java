@@ -18,10 +18,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -289,7 +289,7 @@ public final class YangInstanceIdentifierDeserializer {
 
     private void checkValidIdentifierStart() {
         checkValid(ParserConstants.YANG_IDENTIFIER_START.matches(currentChar()), ErrorTag.MALFORMED_MESSAGE,
-                "Identifier must start with character from set 'a-zA-Z_'");
+            "Identifier must start with character from set 'a-zA-Z_'");
     }
 
     private RestconfDocumentedException getParsingCharFailedException() {

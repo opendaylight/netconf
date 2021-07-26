@@ -97,7 +97,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             writer.writeEndElement();
 
             writer.writeStartElement("error-tag");
-            writer.writeCharacters(restconfError.getErrorTag().getTagValue());
+            writer.writeCharacters(restconfError.getErrorTag().elementBody());
             writer.writeEndElement();
 
             // optional node
