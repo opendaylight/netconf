@@ -5,15 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.Collections;
+import com.google.common.collect.Iterators;
 import java.util.Iterator;
+import java.util.Map;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -22,6 +21,7 @@ import javax.xml.xpath.XPathFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -42,7 +42,7 @@ public class NetconfDocumentedExceptionTest {
         xpath.setNamespaceContext(new NamespaceContext() {
             @Override
             public Iterator<String> getPrefixes(final String namespaceURI) {
-                return Collections.singletonList("netconf").iterator();
+                return Iterators.singletonIterator("netconf");
             }
 
             @Override
@@ -63,8 +63,8 @@ public class NetconfDocumentedExceptionTest {
         DocumentedException ex = new NetconfDocumentedException(errorMessage, null,
                 DocumentedException.ErrorType.PROTOCOL,
                 DocumentedException.ErrorTag.DATA_EXISTS,
-                DocumentedException.ErrorSeverity.WARNING,
-                ImmutableMap.of("foo", "bar"));
+                ErrorSeverity.WARNING,
+                Map.of("foo", "bar"));
 
         final Document doc = ex.toXMLDocument();
         assertNotNull("Document is null", doc);
@@ -89,8 +89,7 @@ public class NetconfDocumentedExceptionTest {
 
         final Node errorSeverityNode = getNode("netconf:error-severity", rpcErrorNode);
         assertNotNull("error-severity not found", errorSeverityNode);
-        assertEquals("error-severity", DocumentedException.ErrorSeverity.WARNING.getSeverityValue(),
-                errorSeverityNode.getTextContent());
+        assertEquals("error-severity", ErrorSeverity.WARNING.elementBody(), errorSeverityNode.getTextContent());
 
         final Node errorInfoNode = getNode("netconf:error-info/netconf:foo", rpcErrorNode);
         assertNotNull("foo not found", errorInfoNode);
@@ -105,11 +104,11 @@ public class NetconfDocumentedExceptionTest {
         ex = DocumentedException.fromXMLDocument(doc);
 
         assertNotNull("NetconfDocumentedException is null", ex);
-        assertEquals("getErrorSeverity", DocumentedException.ErrorSeverity.WARNING, ex.getErrorSeverity());
+        assertEquals("getErrorSeverity", ErrorSeverity.WARNING, ex.getErrorSeverity());
         assertEquals("getErrorTag", DocumentedException.ErrorTag.DATA_EXISTS, ex.getErrorTag());
         assertEquals("getErrorType", DocumentedException.ErrorType.PROTOCOL, ex.getErrorType());
         assertEquals("getLocalizedMessage", errorMessage, ex.getLocalizedMessage());
-        assertEquals("getErrorInfo", ImmutableMap.of("foo", "bar"), ex.getErrorInfo());
+        assertEquals("getErrorInfo", Map.of("foo", "bar"), ex.getErrorInfo());
     }
 
     @SuppressWarnings("unchecked")

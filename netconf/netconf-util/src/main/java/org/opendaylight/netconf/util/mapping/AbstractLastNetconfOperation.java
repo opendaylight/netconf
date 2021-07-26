@@ -11,6 +11,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -28,7 +29,7 @@ public abstract class AbstractLastNetconfOperation extends AbstractNetconfOperat
                     "No netconf operation expected to be subsequent to %s, but is %s", this, subsequentOperation),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.MALFORMED_MESSAGE,
-                    DocumentedException.ErrorSeverity.ERROR);
+                    ErrorSeverity.ERROR);
         }
 
         return handleWithNoSubsequentOperations(document, operationElement);

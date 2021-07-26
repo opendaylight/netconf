@@ -32,6 +32,7 @@ import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -231,7 +232,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                                 new Exception(throwable),
                                 DocumentedException.ErrorType.APPLICATION,
                                 DocumentedException.ErrorTag.OPERATION_FAILED,
-                                DocumentedException.ErrorSeverity.ERROR);
+                                ErrorSeverity.ERROR);
                 transformed.setException(exception);
             }
         }, MoreExecutors.directExecutor());
@@ -244,7 +245,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     private void extractResult(final List<DOMRpcResult> domRpcResults,
                                final SettableFuture<RpcResult<Void>> transformed) {
         DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
-        DocumentedException.ErrorSeverity errSeverity = DocumentedException.ErrorSeverity.ERROR;
+        ErrorSeverity errSeverity = ErrorSeverity.ERROR;
         StringBuilder msgBuilder = new StringBuilder();
         boolean errorsEncouneterd = false;
         String errorTag = "operation-failed";
@@ -271,18 +272,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                         errType = DocumentedException.ErrorType.APPLICATION;
                         break;
                 }
-                final RpcError.ErrorSeverity severity = error.getSeverity();
-                switch (severity) {
-                    case ERROR:
-                        errSeverity = DocumentedException.ErrorSeverity.ERROR;
-                        break;
-                    case WARNING:
-                        errSeverity = DocumentedException.ErrorSeverity.WARNING;
-                        break;
-                    default:
-                        errSeverity = DocumentedException.ErrorSeverity.ERROR;
-                        break;
-                }
+
+                errSeverity = error.getSeverity().toNetconf();
                 msgBuilder.append(error.getMessage());
                 msgBuilder.append(error.getInfo());
                 errorTag = error.getTag();

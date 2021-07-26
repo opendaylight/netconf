@@ -23,6 +23,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 
 public final class NetconfTopologyUtils {
     public static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 60000L;
@@ -82,6 +83,6 @@ public final class NetconfTopologyUtils {
     public static DocumentedException createMasterIsDownException(final RemoteDeviceId id, final Exception cause) {
         return new DocumentedException(id + ":Master is down. Please try again.", cause,
                 DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                DocumentedException.ErrorSeverity.WARNING);
+                ErrorSeverity.WARNING);
     }
 }
