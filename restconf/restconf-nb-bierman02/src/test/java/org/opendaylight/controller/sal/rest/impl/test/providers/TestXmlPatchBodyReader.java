@@ -8,7 +8,7 @@
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
@@ -43,10 +43,9 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
     public void moduleDataTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = TestXmlBodyReader.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+        final InputStream inputStream = TestXmlBodyReader.class.getResourceAsStream(
+            "/instanceidentifier/xml/xmlPATCHdata.xml");
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
     }
 
@@ -57,14 +56,12 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
     public void moduleDataValueMissingNegativeTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = TestXmlBodyReader.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataValueMissing.xml");
-        try {
-            xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-            fail("Test should return error 400 due to missing value node when attempt to invoke create operation");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final InputStream inputStream = TestXmlBodyReader.class.getResourceAsStream(
+            "/instanceidentifier/xml/xmlPATCHdataValueMissing.xml");
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+        assertEquals(1, ex.getErrors().size());
+        assertEquals(RestconfDocumentedException.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -75,14 +72,13 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
     public void moduleDataNotValueNotSupportedNegativeTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = TestXmlBodyReader.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
-        try {
-            xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-            fail("Test should return error 400 due to present value node when attempt to invoke delete operation");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final InputStream inputStream = TestXmlBodyReader.class.getResourceAsStream(
+            "/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
+
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+        assertEquals(1, ex.getErrors().size());
+        assertEquals(RestconfDocumentedException.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -94,8 +90,7 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
         mockBodyReader(uri, xmlToPatchBodyReader, false);
         final InputStream inputStream = TestXmlBodyReader.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
     }
 
@@ -122,8 +117,7 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
         mockBodyReader(uri, xmlToPatchBodyReader, false);
         final InputStream inputStream = TestXmlBodyReader.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
     }
 
@@ -136,8 +130,7 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
         mockBodyReader(uri, xmlToPatchBodyReader, false);
         final InputStream inputStream = TestXmlBodyReader.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
     }
 }
