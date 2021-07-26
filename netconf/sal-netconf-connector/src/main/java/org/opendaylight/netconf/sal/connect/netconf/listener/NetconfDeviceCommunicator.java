@@ -38,6 +38,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -227,7 +228,7 @@ public class NetconfDeviceCommunicator
     private static RpcResult<NetconfMessage> createErrorRpcResult(final RpcError.ErrorType errorType,
             final String message) {
         return RpcResultBuilder.<NetconfMessage>failed()
-            .withError(errorType, NetconfDocumentedException.ErrorTag.OPERATION_FAILED.getTagValue(), message).build();
+            .withError(errorType, ErrorTag.OPERATION_FAILED.elementBody(), message).build();
     }
 
     @Override

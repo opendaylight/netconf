@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata.Builder;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -289,7 +290,7 @@ public final class NetconfMessageTransformUtil {
 
         if (!inputMsgId.equals(outputMsgId)) {
             throw new NetconfDocumentedException("Response message contained unknown \"message-id\"", null,
-                    ErrorType.PROTOCOL, NetconfDocumentedException.ErrorTag.BAD_ATTRIBUTE, ErrorSeverity.ERROR,
+                    ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, ErrorSeverity.ERROR,
                     ImmutableMap.of("actual-message-id", outputMsgId, "expected-message-id", inputMsgId));
         }
     }
@@ -312,10 +313,10 @@ public final class NetconfMessageTransformUtil {
         }
 
         return ex.getErrorSeverity() == ErrorSeverity.ERROR
-                ? RpcResultBuilder.newError(ex.getErrorType().toLegacy(), ex.getErrorTag().getTagValue(),
+                ? RpcResultBuilder.newError(ex.getErrorType().toLegacy(), ex.getErrorTag().elementBody(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause())
                 : RpcResultBuilder.newWarning(
-                        ex.getErrorType().toLegacy(), ex.getErrorTag().getTagValue(),
+                        ex.getErrorType().toLegacy(), ex.getErrorTag().elementBody(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
     }
 
@@ -543,7 +544,7 @@ public final class NetconfMessageTransformUtil {
     public static RpcResult<NetconfMessage> toRpcResult(final FailedNetconfMessage message) {
         return RpcResultBuilder.<NetconfMessage>failed()
                 .withRpcError(toRpcError(new NetconfDocumentedException(message.getException().getMessage(),
-                    ErrorType.APPLICATION, DocumentedException.ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
+                    ErrorType.APPLICATION, DocumentedException.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
                 .build();
     }
 }

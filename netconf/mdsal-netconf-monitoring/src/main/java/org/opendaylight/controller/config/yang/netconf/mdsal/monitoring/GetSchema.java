@@ -17,6 +17,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,10 +59,11 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
             schema = cap.getSchemaForCapability(entry.identifier, entry.version);
         } catch (final IllegalStateException e) {
             final Map<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(DocumentedException.ErrorTag.OPERATION_FAILED.toString(), e.getMessage());
-            LOG.warn("Rpc error: {}", DocumentedException.ErrorTag.OPERATION_FAILED, e);
+            // FIXME: why this .toString()?
+            errorInfo.put(ErrorTag.OPERATION_FAILED.toString(), e.getMessage());
+            LOG.warn("Rpc error: {}", ErrorTag.OPERATION_FAILED, e);
             throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR, errorInfo);
+                    ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR, errorInfo);
         }
 
         final Element getSchemaResult;

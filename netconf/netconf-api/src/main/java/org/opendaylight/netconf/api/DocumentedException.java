@@ -10,12 +10,14 @@ package org.opendaylight.netconf.api;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +40,12 @@ public class DocumentedException extends Exception {
     public static final String ERROR_MESSAGE = "error-message";
     public static final String ERROR_INFO = "error-info";
 
+    // FIXME: This is an RFC6241 definition, remove it once we have yangtools-7.0.5
+    @Deprecated(forRemoval = true)
+    public static final ErrorTag MALFORMED_MESSAGE = new ErrorTag("malformed-message");
+
     private static final long serialVersionUID = 1L;
-
     private static final Logger LOG = LoggerFactory.getLogger(DocumentedException.class);
-
     private static final DocumentBuilderFactory BUILDER_FACTORY;
 
     static {
@@ -61,49 +65,8 @@ public class DocumentedException extends Exception {
         BUILDER_FACTORY.setIgnoringComments(true);
     }
 
-    public enum ErrorTag {
-        ACCESS_DENIED("access-denied"),
-        BAD_ATTRIBUTE("bad-attribute"),
-        BAD_ELEMENT("bad-element"),
-        DATA_EXISTS("data-exists"),
-        DATA_MISSING("data-missing"),
-        IN_USE("in-use"),
-        INVALID_VALUE("invalid-value"),
-        LOCK_DENIED("lock-denied"),
-        MALFORMED_MESSAGE("malformed-message"),
-        MISSING_ATTRIBUTE("missing-attribute"),
-        MISSING_ELEMENT("missing-element"),
-        OPERATION_FAILED("operation-failed"),
-        OPERATION_NOT_SUPPORTED("operation-not-supported"),
-        RESOURCE_DENIED("resource-denied"),
-        ROLLBCK_FAILED("rollback-failed"),
-        TOO_BIG("too-big"),
-        UNKNOWN_ATTRIBUTE("unknown-attribute"),
-        UNKNOWN_ELEMENT("unknown-element"),
-        UNKNOWN_NAMESPACE("unknown-namespace");
-
-        private final String tagValue;
-
-        ErrorTag(final String tagValue) {
-            this.tagValue = tagValue;
-        }
-
-        public String getTagValue() {
-            return this.tagValue;
-        }
-
-        public static ErrorTag from(final String text) {
-            for (ErrorTag e : values()) {
-                if (e.getTagValue().equals(text)) {
-                    return e;
-                }
-            }
-
-            return OPERATION_FAILED;
-        }
-    }
-
     private final ErrorType errorType;
+    @SuppressFBWarnings(value = "SE_BAD_FIELD", justification = "FIXME: should not be necessary with yangtools-7.0.5")
     private final ErrorTag errorTag;
     private final ErrorSeverity errorSeverity;
     private final Map<String, String> errorInfo;
@@ -145,10 +108,9 @@ public class DocumentedException extends Exception {
     }
 
     public static <E extends Exception> DocumentedException wrap(final E exception) throws DocumentedException {
-        final Map<String, String> errorInfo = new HashMap<>();
-        errorInfo.put(ErrorTag.OPERATION_FAILED.name(), "Exception thrown");
         throw new DocumentedException(exception.getMessage(), exception, ErrorType.APPLICATION,
-                ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR, errorInfo);
+                ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
+                Map.of(ErrorTag.OPERATION_FAILED.elementBody(), "Exception thrown"));
     }
 
     public static DocumentedException fromXMLDocument(final Document fromDoc) {
@@ -182,7 +144,7 @@ public class DocumentedException extends Exception {
                         // FIXME: this should be a hard error
                         errorType = type != null ? type : ErrorType.APPLICATION;
                     } else if (ERROR_TAG.equals(rpcErrorChild.getLocalName())) {
-                        errorTag = ErrorTag.from(rpcErrorChild.getTextContent());
+                        errorTag = new ErrorTag(rpcErrorChild.getTextContent());
                     } else if (ERROR_SEVERITY.equals(rpcErrorChild.getLocalName())) {
                         final ErrorSeverity sev = ErrorSeverity.forElementBody(rpcErrorChild.getTextContent());
                         // FIXME: this should be a hard error
@@ -248,7 +210,7 @@ public class DocumentedException extends Exception {
             rpcReply.appendChild(rpcError);
 
             rpcError.appendChild(createTextNode(doc, ERROR_TYPE, getErrorType().elementBody()));
-            rpcError.appendChild(createTextNode(doc, ERROR_TAG, getErrorTag().getTagValue()));
+            rpcError.appendChild(createTextNode(doc, ERROR_TAG, getErrorTag().elementBody()));
             rpcError.appendChild(createTextNode(doc, ERROR_SEVERITY, getErrorSeverity().elementBody()));
             rpcError.appendChild(createTextNode(doc, ERROR_MESSAGE, getLocalizedMessage()));
 

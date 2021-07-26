@@ -33,6 +33,7 @@ import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -113,7 +114,7 @@ public class NetconfOperationRouterImplTest {
     public void testOnNetconfMessageFail() throws Exception {
         final DocumentedException ex =  assertThrows(DocumentedException.class,
             () -> emptyOperationRouter.onNetconfMessage(TEST_RPC_DOC, null));
-        assertEquals(DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, ex.getErrorTag());
+        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, ex.getErrorTag());
     }
 
     @Test
