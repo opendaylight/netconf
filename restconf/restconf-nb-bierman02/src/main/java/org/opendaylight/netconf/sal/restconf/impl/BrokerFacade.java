@@ -54,7 +54,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
@@ -62,6 +61,7 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -330,11 +330,8 @@ public class BrokerFacade implements Closeable {
                         patchContext.getPatchId(),
                         null,
                         false,
-                        ImmutableList.of(new RestconfError(
-                                ErrorType.APPLICATION,
-                                ErrorTag.OPERATION_FAILED,
-                                "DOM data broker service isn't available for mount point "
-                                        + mountPoint.getIdentifier()))
+                        ImmutableList.of(new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                            "DOM data broker service isn't available for mount point " + mountPoint.getIdentifier()))
                 );
             }
         }

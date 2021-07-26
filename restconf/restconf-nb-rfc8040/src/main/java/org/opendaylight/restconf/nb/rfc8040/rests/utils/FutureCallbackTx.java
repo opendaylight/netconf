@@ -23,6 +23,7 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -108,19 +109,18 @@ final class FutureCallbackTx {
                         if (errorTag.equals(DocumentedException.ErrorTag.DATA_EXISTS)) {
                             LOG.trace("Operation via Restconf was not executed because data at {} already exists",
                                 path);
-                            throw new RestconfDocumentedException(e, new RestconfError(RestconfError.ErrorType.PROTOCOL,
+                            throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
                                 RestconfError.ErrorTag.DATA_EXISTS, "Data already exists", path));
                         } else if (errorTag.equals(DocumentedException.ErrorTag.DATA_MISSING)) {
                             LOG.trace("Operation via Restconf was not executed because data at {} does not exist",
                                 path);
-                            throw new RestconfDocumentedException(e, new RestconfError(RestconfError.ErrorType.PROTOCOL,
+                            throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
                                 RestconfError.ErrorTag.DATA_MISSING, "Data does not exist", path));
                         }
                     }
                     if (error instanceof NetconfDocumentedException) {
                         throw new RestconfDocumentedException(error.getMessage(),
-                                RestconfError.ErrorType.valueOfCaseInsensitive(
-                                        ((NetconfDocumentedException) error).getErrorType().elementBody()),
+                                ((NetconfDocumentedException) error).getErrorType(),
                                 RestconfError.ErrorTag.valueOfCaseInsensitive(
                                         ((NetconfDocumentedException) error).getErrorTag().getTagValue()), e);
                     }
