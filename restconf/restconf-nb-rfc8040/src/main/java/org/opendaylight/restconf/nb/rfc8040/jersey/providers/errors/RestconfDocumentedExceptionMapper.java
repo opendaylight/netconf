@@ -144,7 +144,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> entryBuilder =
             ImmutableUnkeyedListEntryNodeBuilder.create()
                 .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
-                .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().getErrorTypeTag()))
+                .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().elementBody()))
                 .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().getTagValue()));
 
         // filling in optional fields

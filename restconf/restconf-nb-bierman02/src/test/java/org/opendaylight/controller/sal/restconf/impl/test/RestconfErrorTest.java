@@ -20,7 +20,7 @@ import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
@@ -60,16 +60,6 @@ public class RestconfErrorTest {
     @Test
     public void testErrorTagValueOfIsLowercase() {
         assertEquals("in-use", ErrorTag.IN_USE.getTagValue());
-    }
-
-    @Test
-    public void testErrorTypeGetErrorTypeTagIsLowerCase() {
-        assertEquals(ErrorType.APPLICATION.name().toLowerCase(), ErrorType.APPLICATION.getErrorTypeTag());
-    }
-
-    @Test
-    public void testErrorTypeValueOf() {
-        assertEquals(ErrorType.APPLICATION, ErrorType.valueOfCaseInsensitive(ErrorType.APPLICATION.getErrorTypeTag()));
     }
 
     @Test
