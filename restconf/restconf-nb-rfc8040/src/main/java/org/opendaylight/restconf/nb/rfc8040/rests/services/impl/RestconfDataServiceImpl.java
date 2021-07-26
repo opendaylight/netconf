@@ -47,8 +47,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
@@ -72,6 +70,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUti
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Immutable;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -171,7 +170,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (node == null) {
             throw new RestconfDocumentedException(
                     "Request could not be completed because the relevant data model content does not exist",
-                    ErrorType.PROTOCOL, RestconfError.ErrorTag.DATA_MISSING);
+                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
         }
 
         if (parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL)
@@ -249,7 +248,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 case INSERT:
                     if (insertUsed) {
                         throw new RestconfDocumentedException("Insert parameter can be used only once.",
-                            ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
                     }
 
                     insertUsed = true;
@@ -257,13 +256,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     insert = Insert.forValue(str);
                     if (insert == null) {
                         throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
-                            ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
                     }
                     break;
                 case POINT:
                     if (pointUsed) {
                         throw new RestconfDocumentedException("Point parameter can be used only once.",
-                            ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
                     }
 
                     pointUsed = true;
@@ -271,7 +270,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     break;
                 default:
                     throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey(),
-                            ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
         }
 
@@ -283,13 +282,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (pointUsed) {
             if (!insertUsed) {
                 throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.",
-                    ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
 
             if (insert != Insert.BEFORE && insert != Insert.AFTER) {
                 throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.",
-                    ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
         }
     }
@@ -388,7 +387,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (yangIIdContext.isEmpty()
             && !RestconfDataServiceConstant.NETCONF_BASE_QNAME.equals(data.getIdentifier().getNodeType())) {
             throw new RestconfDocumentedException("Instance identifier need to contain at least one path argument",
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                ErrorType.PROTOCOL, RestconfDocumentedException.MALFORMED_MESSAGE);
         }
 
         final DOMActionResult response;
@@ -434,9 +433,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @VisibleForTesting
     public static void validInputData(final SchemaNode schemaNode, final NormalizedNodeContext payload) {
         if (schemaNode != null && payload.getData() == null) {
-            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL,
+                RestconfDocumentedException.MALFORMED_MESSAGE);
         } else if (schemaNode == null && payload.getData() != null) {
-            throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL,
+                RestconfDocumentedException.MALFORMED_MESSAGE);
         }
     }
 
@@ -454,14 +455,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             if (!payload.getData().getIdentifier().getNodeType().equals(
                 RestconfDataServiceConstant.NETCONF_BASE_QNAME)) {
                 throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
-                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                        ErrorType.PROTOCOL, RestconfDocumentedException.MALFORMED_MESSAGE);
             }
         } else {
             final String identifierName = path.getLastPathArgument().getNodeType().getLocalName();
             if (!payloadName.equals(identifierName)) {
                 throw new RestconfDocumentedException(
                         "Payload name (" + payloadName + ") is different from identifier name (" + identifierName + ")",
-                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                        ErrorType.PROTOCOL, RestconfDocumentedException.MALFORMED_MESSAGE);
             }
         }
     }
