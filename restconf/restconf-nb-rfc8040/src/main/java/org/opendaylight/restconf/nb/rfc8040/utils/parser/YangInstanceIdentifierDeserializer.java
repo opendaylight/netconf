@@ -18,10 +18,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -114,7 +114,7 @@ public final class YangInstanceIdentifierDeserializer {
 
     private void prepareNodeWithPredicates(final QName qname, final List<PathArgument> path,
             final ListSchemaNode listSchemaNode) {
-        checkValid(listSchemaNode != null, ErrorTag.MALFORMED_MESSAGE, "Data schema node is null");
+        checkValid(listSchemaNode != null, RestconfDocumentedException.MALFORMED_MESSAGE, "Data schema node is null");
 
         final Iterator<QName> keys = listSchemaNode.getKeyDefinition().iterator();
         final ImmutableMap.Builder<QName, Object> values = ImmutableMap.builder();
@@ -133,7 +133,7 @@ public final class YangInstanceIdentifierDeserializer {
             }
 
             // check if next value is parsable
-            checkValid(IDENTIFIER_PREDICATE.matches(currentChar()), ErrorTag.MALFORMED_MESSAGE,
+            checkValid(IDENTIFIER_PREDICATE.matches(currentChar()), RestconfDocumentedException.MALFORMED_MESSAGE,
                     "Value that starts with character %c is not parsable.", currentChar());
 
             // parse value
@@ -261,7 +261,8 @@ public final class YangInstanceIdentifierDeserializer {
                 return null;
             }
         }
-        checkValid(current != null, ErrorTag.MALFORMED_MESSAGE, "'%s' is not correct schema node identifier.", qname);
+        checkValid(current != null, RestconfDocumentedException.MALFORMED_MESSAGE,
+            "'%s' is not correct schema node identifier.", qname);
         while (current.isMixin()) {
             path.add(current.getIdentifier());
             current = current.getChild(qname);
@@ -288,14 +289,14 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private void checkValidIdentifierStart() {
-        checkValid(ParserConstants.YANG_IDENTIFIER_START.matches(currentChar()), ErrorTag.MALFORMED_MESSAGE,
-                "Identifier must start with character from set 'a-zA-Z_'");
+        checkValid(ParserConstants.YANG_IDENTIFIER_START.matches(currentChar()),
+            RestconfDocumentedException.MALFORMED_MESSAGE, "Identifier must start with character from set 'a-zA-Z_'");
     }
 
     private RestconfDocumentedException getParsingCharFailedException() {
         return new RestconfDocumentedException(String.format(PARSING_FAILED_MESSAGE, data, offset)
                 + String.format("Bad char '%c' on the current position.", currentChar()),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                ErrorType.PROTOCOL, RestconfDocumentedException.MALFORMED_MESSAGE);
     }
 
     private char currentChar() {
@@ -317,7 +318,8 @@ public final class YangInstanceIdentifierDeserializer {
     private void validArg() {
         // every identifier except of the first MUST start with slash
         if (offset != 0) {
-            checkValid('/' == currentChar(), ErrorTag.MALFORMED_MESSAGE, "Identifier must start with '/'.");
+            checkValid('/' == currentChar(), RestconfDocumentedException.MALFORMED_MESSAGE,
+                "Identifier must start with '/'.");
 
             // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
             // multiple slashes into a single one
@@ -326,7 +328,8 @@ public final class YangInstanceIdentifierDeserializer {
             }
 
             // check if slash is not also the last char in identifier
-            checkValid(!allCharsConsumed(), ErrorTag.MALFORMED_MESSAGE, "Identifier cannot end with '/'.");
+            checkValid(!allCharsConsumed(), RestconfDocumentedException.MALFORMED_MESSAGE,
+                "Identifier cannot end with '/'.");
         }
     }
 

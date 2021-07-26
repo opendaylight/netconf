@@ -85,7 +85,7 @@ public class TestJsonPatchBodyReader extends AbstractBodyReaderTest {
             jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
             fail("Test should return error 400 due to missing value node when attempt to invoke create operation");
         } catch (final RestconfDocumentedException e) {
-            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag());
         }
     }
 
@@ -105,7 +105,7 @@ public class TestJsonPatchBodyReader extends AbstractBodyReaderTest {
             jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
             fail("Test should return error 400 due to present value node when attempt to invoke delete operation");
         } catch (final RestconfDocumentedException e) {
-            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag());
         }
     }
 

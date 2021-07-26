@@ -111,19 +111,18 @@ final class FutureCallbackTx {
                             LOG.trace("Operation via Restconf was not executed because data at {} already exists",
                                 path);
                             throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
-                                RestconfError.ErrorTag.DATA_EXISTS, "Data already exists", path));
+                                ErrorTag.DATA_EXISTS, "Data already exists", path));
                         } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                             LOG.trace("Operation via Restconf was not executed because data at {} does not exist",
                                 path);
                             throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
-                                RestconfError.ErrorTag.DATA_MISSING, "Data does not exist", path));
+                                ErrorTag.DATA_MISSING, "Data does not exist", path));
                         }
                     }
                     if (error instanceof NetconfDocumentedException) {
                         throw new RestconfDocumentedException(error.getMessage(),
                                 ((NetconfDocumentedException) error).getErrorType(),
-                                RestconfError.ErrorTag.valueOfCaseInsensitive(
-                                        ((NetconfDocumentedException) error).getErrorTag().elementBody()), e);
+                                ((NetconfDocumentedException) error).getErrorTag(), e);
                     }
                 }
 
