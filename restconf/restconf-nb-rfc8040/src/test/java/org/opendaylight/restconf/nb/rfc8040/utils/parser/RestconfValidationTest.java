@@ -20,6 +20,7 @@ import java.util.List;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 /**
@@ -48,7 +49,7 @@ public class RestconfValidationTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetRevision(Collections.emptyIterator()));
 
-        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
         assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
@@ -82,7 +83,7 @@ public class RestconfValidationTest {
     public void validateAndGetModulNameNotSuppliedTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetModulName(Collections.emptyIterator()));
-        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
         assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
@@ -97,7 +98,7 @@ public class RestconfValidationTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator(
                 "01-not-parsable-as-name-on-firts-char")));
-        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
         assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
@@ -112,7 +113,7 @@ public class RestconfValidationTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator(
                 "not-parsable-as-name-after-first-char*")));
-        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
         assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
@@ -125,7 +126,7 @@ public class RestconfValidationTest {
     public void validateAndGetModuleNameNotParsableXmlTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator("xMl-module-name")));
-        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
         assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
@@ -138,7 +139,7 @@ public class RestconfValidationTest {
     public void validateAndGetModuleNameEmptyTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator("")));
-        assertEquals(RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(RestconfError.ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
         assertEquals(400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }

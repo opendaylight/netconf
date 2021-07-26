@@ -17,12 +17,12 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
@@ -127,7 +127,7 @@ public final class PutDataTransactionUtil {
             default:
                 throw new RestconfDocumentedException(
                         "Used bad value of insert parameter. Possible values are first, last, before or after, "
-                                + "but was: " + insert, RestconfError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
+                                + "but was: " + insert, ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
         }
     }
 
@@ -186,7 +186,7 @@ public final class PutDataTransactionUtil {
         if (dataSchemaNode instanceof ListSchemaNode) {
             if (!((ListSchemaNode) dataSchemaNode).isUserOrdered()) {
                 throw new RestconfDocumentedException("Insert parameter can be used only with ordered-by user list.",
-                        RestconfError.ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
             return dataSchemaNode;
         }
@@ -194,11 +194,11 @@ public final class PutDataTransactionUtil {
             if (!((LeafListSchemaNode) dataSchemaNode).isUserOrdered()) {
                 throw new RestconfDocumentedException(
                         "Insert parameter can be used only with ordered-by user leaf-list.",
-                        RestconfError.ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
             return dataSchemaNode;
         }
         throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list",
-                RestconfError.ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
     }
 }

@@ -81,7 +81,7 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
         for (final RestconfError restconfError : errors) {
             jsonWriter.beginObject();
-            jsonWriter.name("error-type").value(restconfError.getErrorType().getErrorTypeTag());
+            jsonWriter.name("error-type").value(restconfError.getErrorType().elementBody());
             jsonWriter.name("error-tag").value(restconfError.getErrorTag().getTagValue());
 
             // optional node
