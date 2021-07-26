@@ -35,6 +35,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -212,8 +213,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                             return operation.get();
                         } else {
                             return Futures.immediateFailedFuture(new NetconfDocumentedException("Lock operation failed",
-                                DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.LOCK_DENIED,
-                                ErrorSeverity.ERROR));
+                                ErrorType.APPLICATION, DocumentedException.ErrorTag.LOCK_DENIED, ErrorSeverity.ERROR));
                         }
                     },
                     MoreExecutors.directExecutor());
@@ -249,26 +249,12 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static TransactionCommitFailedException toCommitFailedException(
             final Collection<? extends RpcError> errors) {
-        DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
+        ErrorType errType = ErrorType.APPLICATION;
         ErrorSeverity errSeverity = ErrorSeverity.ERROR;
         StringJoiner msgBuilder = new StringJoiner(" ");
         String errorTag = "operation-failed";
         for (final RpcError error : errors) {
-            switch (error.getErrorType()) {
-                case RPC:
-                    errType = DocumentedException.ErrorType.RPC;
-                    break;
-                case PROTOCOL:
-                    errType = DocumentedException.ErrorType.PROTOCOL;
-                    break;
-                case TRANSPORT:
-                    errType = DocumentedException.ErrorType.TRANSPORT;
-                    break;
-                case APPLICATION:
-                default:
-                    errType = DocumentedException.ErrorType.APPLICATION;
-                    break;
-            }
+            errType = error.getErrorType().toNetconf();
             errSeverity = error.getSeverity().toNetconf();
             msgBuilder.add(error.getMessage());
             msgBuilder.add(error.getInfo());

@@ -16,6 +16,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.NetconfServerSession;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -53,10 +54,9 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
             requireNonNull(session, "Session was not set").delayedClose();
             LOG.info("Session {} closing", session.getSessionId());
         } catch (final Exception e) {
-            throw new DocumentedException("Unable to properly close session "
-                    + getNetconfSessionIdForReporting(), e, DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    ErrorSeverity.ERROR, Map.of(ErrorSeverity.ERROR.toString(), e.getMessage()));
+            throw new DocumentedException("Unable to properly close session " + getNetconfSessionIdForReporting(), e,
+                    ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
+                    Map.of(ErrorSeverity.ERROR.toString(), e.getMessage()));
         }
         return document.createElement(XmlNetconfConstants.OK);
     }

@@ -31,6 +31,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -77,8 +78,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
 
             throw new DocumentedException(
                     String.format("Unable to handle rpc %s on session %s", messageAsString, session),
-                    e, DocumentedException.ErrorType.APPLICATION, tag, ErrorSeverity.ERROR,
-                    Map.of(tag.toString(), e.getMessage()));
+                    e, ErrorType.APPLICATION, tag, ErrorSeverity.ERROR, Map.of(tag.toString(), e.getMessage()));
         } catch (final RuntimeException e) {
             throw handleUnexpectedEx("sort", e);
         }
@@ -98,9 +98,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
     private static DocumentedException handleUnexpectedEx(final String op, final Exception exception) {
         LOG.error("Unexpected exception during netconf operation {}", op, exception);
         return new DocumentedException("Unexpected error",
-                DocumentedException.ErrorType.APPLICATION,
-                DocumentedException.ErrorTag.OPERATION_FAILED,
-                ErrorSeverity.ERROR,
+                ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR,
                 Map.of(ErrorSeverity.ERROR.toString(), exception.toString()));
     }
 
