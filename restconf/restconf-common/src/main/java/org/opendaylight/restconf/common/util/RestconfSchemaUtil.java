@@ -10,7 +10,7 @@ package org.opendaylight.restconf.common.util;
 import java.util.Collection;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
@@ -46,5 +46,4 @@ public final class RestconfSchemaUtil {
         throw new RestconfDocumentedException("Schema node " + schemaNodeName + " does not exist in module.",
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
-
 }

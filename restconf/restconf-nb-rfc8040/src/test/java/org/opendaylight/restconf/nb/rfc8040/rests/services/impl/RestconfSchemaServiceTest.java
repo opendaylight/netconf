@@ -33,6 +33,7 @@ import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -257,7 +258,7 @@ public class RestconfSchemaServiceTest {
             this.schemaService.getSchema("");
             fail("Test should fail due to invalid identifier");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
@@ -278,7 +279,7 @@ public class RestconfSchemaServiceTest {
             this.schemaService.getSchema(MOUNT_POINT + "");
             fail("Test should fail due to invalid identifier");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
@@ -298,7 +299,7 @@ public class RestconfSchemaServiceTest {
             this.schemaService.getSchema("01_module/2016-01-01");
             fail("Test should fail due to invalid identifier");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
@@ -319,7 +320,7 @@ public class RestconfSchemaServiceTest {
             this.schemaService.getSchema(MOUNT_POINT + "01_module/2016-01-01");
             fail("Test should fail due to invalid identifier");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
@@ -342,7 +343,7 @@ public class RestconfSchemaServiceTest {
             this.schemaService.getSchema("2014-01-01");
             fail("Test should fail due to invalid identifier");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
@@ -366,7 +367,7 @@ public class RestconfSchemaServiceTest {
             this.schemaService.getSchema(MOUNT_POINT + "2014-01-01");
             fail("Test should fail due to invalid identifier");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
@@ -387,7 +388,7 @@ public class RestconfSchemaServiceTest {
             this.schemaService.getSchema("module");
             fail("Test should fail due to invalid identifier");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
@@ -408,7 +409,7 @@ public class RestconfSchemaServiceTest {
             this.schemaService.getSchema(MOUNT_POINT + "module");
             fail("Test should fail due to invalid identifier");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }

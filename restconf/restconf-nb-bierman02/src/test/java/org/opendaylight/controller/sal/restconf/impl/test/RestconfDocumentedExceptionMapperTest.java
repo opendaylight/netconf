@@ -65,8 +65,8 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -745,7 +745,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
             }
         }
 
-        assertEquals("error-type", expErrorType.getErrorTypeTag(), leafMap.remove("error-type"));
+        assertEquals("error-type", expErrorType.elementBody(), leafMap.remove("error-type"));
         assertEquals("error-tag", expErrorTag.getTagValue(), leafMap.remove("error-tag"));
 
         verifyOptionalJsonLeaf(leafMap.remove("error-message"), expErrorMessage, "error-message");
@@ -795,7 +795,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
             throws Exception {
 
         final String errorType = (String) ERROR_TYPE.evaluate(errorNode, XPathConstants.STRING);
-        assertEquals("error-type", expErrorType.getErrorTypeTag(), errorType);
+        assertEquals("error-type", expErrorType.elementBody(), errorType);
 
         final String errorTag = (String) ERROR_TAG.evaluate(errorNode, XPathConstants.STRING);
         assertEquals("error-tag", expErrorTag.getTagValue(), errorTag);

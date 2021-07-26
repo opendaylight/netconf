@@ -33,10 +33,10 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -249,7 +249,7 @@ public class ParserIdentifierTest {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.toInstanceIdentifier("/yang-ext:mount", SCHEMA_CONTEXT,
                 Optional.of(this.mountPointService)));
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", ErrorTag.RESOURCE_DENIED_TRANSPORT, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -294,7 +294,7 @@ public class ParserIdentifierTest {
     public void makeQNameFromIdentifierInvalidIdentifierNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.makeQNameFromIdentifier(TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME));
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", RestconfError.ErrorTag.INVALID_VALUE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
@@ -309,7 +309,7 @@ public class ParserIdentifierTest {
     public void makeQNameFromIdentifierTooShortIdentifierNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.makeQNameFromIdentifier(TEST_MODULE_NAME));
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", RestconfError.ErrorTag.INVALID_VALUE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
@@ -343,7 +343,7 @@ public class ParserIdentifierTest {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.makeQNameFromIdentifier(
                     MOUNT_POINT_IDENT + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME));
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", RestconfError.ErrorTag.INVALID_VALUE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
@@ -358,7 +358,7 @@ public class ParserIdentifierTest {
     public void makeQNameFromIdentifierMountPointTooShortIdentifierNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.makeQNameFromIdentifier(MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME));
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", RestconfError.ErrorTag.INVALID_VALUE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
@@ -382,7 +382,7 @@ public class ParserIdentifierTest {
     public void makeQNameFromIdentifierEmptyIdentifierNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.makeQNameFromIdentifier(""));
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", RestconfError.ErrorTag.INVALID_VALUE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
@@ -398,7 +398,7 @@ public class ParserIdentifierTest {
     public void makeQNameFromIdentifierDoubleSlashNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.makeQNameFromIdentifier(TEST_MODULE_NAME + "//" + TEST_MODULE_REVISION));
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", RestconfError.ErrorTag.INVALID_VALUE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
@@ -455,7 +455,7 @@ public class ParserIdentifierTest {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
                     SCHEMA_CONTEXT, TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null, sourceProvider));
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", RestconfError.ErrorTag.INVALID_VALUE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
@@ -510,7 +510,7 @@ public class ParserIdentifierTest {
                 MOUNT_POINT_IDENT + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, this.mountPointService,
                 sourceProvider));
 
-        assertEquals("Not expected error type", RestconfError.ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Not expected error tag", RestconfError.ErrorTag.INVALID_VALUE,
             ex.getErrors().get(0).getErrorTag());
         assertEquals("Not expected error status code", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
