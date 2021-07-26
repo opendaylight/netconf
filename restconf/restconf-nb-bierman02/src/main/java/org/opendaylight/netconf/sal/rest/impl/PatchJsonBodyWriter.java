@@ -100,7 +100,7 @@ public class PatchJsonBodyWriter implements MessageBodyWriter<PatchStatusContext
         for (final RestconfError restconfError : errors) {
             jsonWriter.beginObject();
             jsonWriter.name("error-type").value(restconfError.getErrorType().elementBody());
-            jsonWriter.name("error-tag").value(restconfError.getErrorTag().getTagValue());
+            jsonWriter.name("error-tag").value(restconfError.getErrorTag().elementBody());
 
             // optional node
             if (restconfError.getErrorPath() != null) {

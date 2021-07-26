@@ -113,7 +113,7 @@ public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext>
             writer.writeEndElement();
 
             writer.writeStartElement("error-tag");
-            writer.writeCharacters(restconfError.getErrorTag().getTagValue());
+            writer.writeCharacters(restconfError.getErrorTag().elementBody());
             writer.writeEndElement();
 
             // optional node
