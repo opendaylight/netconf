@@ -414,7 +414,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         if (resultData != null && resultData.isEmpty()) {
-            throw new WebApplicationException(Response.Status.NO_CONTENT);
+            return Response.status(204).build();
         }
 
         return Response.status(200).entity(new NormalizedNodeContext(new InstanceIdentifierContext<>(yangIIdContext,
