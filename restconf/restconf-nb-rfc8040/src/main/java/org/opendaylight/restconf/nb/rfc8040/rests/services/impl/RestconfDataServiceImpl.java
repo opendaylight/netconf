@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.Nullable;
@@ -442,7 +441,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         if (resultData != null && resultData.getValue().isEmpty()) {
-            throw new WebApplicationException(Response.Status.NO_CONTENT);
+            return Response.status(Response.Status.NO_CONTENT).build();
         }
 
         return Response.status(200).entity(new NormalizedNodeContext(new InstanceIdentifierContext<>(yangIIdContext,
