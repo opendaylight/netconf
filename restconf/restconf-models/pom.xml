@@ -26,5 +26,6 @@
     <module>ietf-restconf-monitoring</module>
     <module>ietf-restconf</module>
     <module>ietf-yang-patch</module>
+    <module>restconf-test-models</module>
   </modules>
 </project>

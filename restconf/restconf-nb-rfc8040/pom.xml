@@ -199,6 +199,11 @@
       <version>2.27.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>restconf-test-models</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
