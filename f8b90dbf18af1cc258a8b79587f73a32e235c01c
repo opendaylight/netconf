@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "50b4652a_730f7712",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2021-07-27T10:49:12Z",
+      "side": 1,
+      "message": "These FIXMEs can be removed as well, we finished the conversion.\nAs far as the refactor into AbstractExecutioinStrategy this seems like it would be a bit uglier since the Async strategy has the calls intertwined with the semaphore. So lets remove that as well.",
+      "revId": "f8b90dbf18af1cc258a8b79587f73a32e235c01c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8ce5fff4_8de60b07",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2021-07-27T10:49:12Z",
+      "side": 1,
+      "message": "No longer wip so remove this",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 5
+      },
+      "revId": "f8b90dbf18af1cc258a8b79587f73a32e235c01c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "122930fe_8ff1c5f8",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/AsyncExecutionStrategy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2021-07-27T10:49:12Z",
+      "side": 1,
+      "message": "This can be final",
+      "range": {
+        "startLine": 42,
+        "startChar": 12,
+        "endLine": 42,
+        "endChar": 18
+      },
+      "revId": "f8b90dbf18af1cc258a8b79587f73a32e235c01c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09927a5a_dd75df1f",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/AsyncExecutionStrategy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2021-07-27T10:49:12Z",
+      "side": 1,
+      "message": "can be final, use final where possible",
+      "range": {
+        "startLine": 45,
+        "startChar": 12,
+        "endLine": 45,
+        "endChar": 23
+      },
+      "revId": "f8b90dbf18af1cc258a8b79587f73a32e235c01c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}

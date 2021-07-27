@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "762039e5_1c3c89ae",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2021-07-27T10:49:12Z",
+      "side": 0,
+      "message": "Unrelated module to this patch so lets not pollute it",
+      "revId": "0cc245d37ebbe6d9d5933bcb0034a1ed9c5b093a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
