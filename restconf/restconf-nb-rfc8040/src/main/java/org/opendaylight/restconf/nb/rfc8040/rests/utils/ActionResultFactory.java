@@ -7,7 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import java.util.Collections;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.yangtools.concepts.Builder;
 
 /**
@@ -17,6 +19,8 @@ public class ActionResultFactory extends FutureDataFactory<DOMActionResult> impl
 
     @Override
     public DOMActionResult build() throws IllegalArgumentException {
-        return this.result;
+        // FIXME we need to process RpcResult into DOMActionResult here or make adjustments in mdsal/yangtools
+        // see org.opendaylight.yangtools.yang.binding.Action
+        return new SimpleDOMActionResult(Collections.emptyList());
     }
 }
