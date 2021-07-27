@@ -1,0 +1,20 @@
+module instance-identifier-module {
+  yang-version 1.1;
+  namespace "instance:identifier:module";
+
+  prefix "iimodule";
+  revision 2014-01-17;
+
+  container cont {
+    container cont1 {
+      action reset {
+        input {
+          leaf delay {
+            type uint32;
+            default 0;
+          }
+        }
+      }
+    }
+  }
+}
