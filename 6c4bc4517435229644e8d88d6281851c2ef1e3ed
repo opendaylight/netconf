@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "13e0777b_36edbb7d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/AsyncExecutionStrategy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-07-28T22:24:41Z",
+      "side": 1,
+      "message": "use a\n\nswitch (response.statusCode()) {\n   case 200:\n   case 204:\n       break;\n   default:\n       // ...\n\ninstead",
+      "range": {
+        "startLine": 52,
+        "startChar": 16,
+        "endLine": 52,
+        "endChar": 83
+      },
+      "revId": "6c4bc4517435229644e8d88d6281851c2ef1e3ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5262a3cc_024be461",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/AsyncExecutionStrategy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-07-28T22:24:41Z",
+      "side": 1,
+      "message": "remove this call, LOG.warn() will do that when needed",
+      "range": {
+        "startLine": 54,
+        "startChar": 52,
+        "endLine": 54,
+        "endChar": 62
+      },
+      "revId": "6c4bc4517435229644e8d88d6281851c2ef1e3ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
