@@ -19,11 +19,6 @@
   <version>2.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <properties>
-    <maven.deploy.skip>true</maven.deploy.skip>
-    <maven.install.skip>true</maven.install.skip>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -80,4 +75,11 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</connection>
+    <developerConnection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://git.opendaylight.org/gerrit/gitweb?p=netconf.git;a=summary</url>
+  </scm>
 </project>
