@@ -179,12 +179,12 @@ Testtool help
       --controller-ip CONTROLLER-IP
                              Ip of controller  if  available  it  will  be  used  for  spawning netconf
                              connectors via topology configuration as a part of URI(http://<controller-
-                             ip>:<controller-port>/restconf/config/...) otherwise  it  will  just start
+                             ip>:<controller-port>/rests/data/...)  otherwise   it   will   just  start
                              simulated devices and skip the execution of PATCH requests
       --controller-port CONTROLLER-PORT
                              Port of controller if  available  it  will  be  used  for spawning netconf
                              connectors via topology configuration as a part of URI(http://<controller-
-                             ip>:<controller-port>/restconf/config/...) otherwise  it  will  just start
+                             ip>:<controller-port>/rests/data/...)  otherwise   it   will   just  start
                              simulated devices and skip the execution of PATCH requests
       --device-count DEVICES-COUNT
                              Number of simulated netconf devices to spin.  This is the number of actual

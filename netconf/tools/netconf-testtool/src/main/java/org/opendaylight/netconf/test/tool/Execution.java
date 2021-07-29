@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 final class Execution implements Callable<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(Execution.class);
     private static final String NETCONF_TOPOLOGY_DESTINATION =
-            "http://%s:%s/restconf/config/network-topology:network-topology/topology/topology-netconf";
+            "http://%s:%s/rests/data/network-topology:network-topology/topology=topology-netconf";
 
     private final AsyncHttpClient httpClient;
     private final String destination;

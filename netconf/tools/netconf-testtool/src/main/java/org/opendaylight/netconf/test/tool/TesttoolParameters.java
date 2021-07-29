@@ -134,7 +134,7 @@ public final class TesttoolParameters {
                 .type(String.class)
                 .help("Ip of controller if available it will be used for spawning netconf connectors via topology"
                         + " configuration as a part of"
-                        + " URI(http://<controller-ip>:<controller-port>/restconf/config/...)"
+                        + " URI(http://<controller-ip>:<controller-port>/rests/data/...)"
                         + " otherwise it will just start simulated devices and skip the execution of PATCH requests")
                 .dest("controller-ip");
 
@@ -142,7 +142,7 @@ public final class TesttoolParameters {
                 .type(Integer.class)
                 .help("Port of controller if available it will be used for spawning netconf connectors via topology "
                         + "configuration as a part of"
-                        + " URI(http://<controller-ip>:<controller-port>/restconf/config/...) "
+                        + " URI(http://<controller-ip>:<controller-port>/rests/data/...) "
                         + "otherwise it will just start simulated devices and skip the execution of PATCH requests")
                 .dest("controller-port");
 
