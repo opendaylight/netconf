@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,52 +32,43 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     public TemporaryFolder tmpDir = new TemporaryFolder();
 
     @Test
-    public void testTargetMissing() throws Exception {
-        try {
-            copyConfig("messages/mapping/copyConfigs/copyConfig_no_target.xml");
-            fail("Should have failed - <target> element is missing");
-        } catch (final DocumentedException e) {
-            // FIXME: use assertThrows() and assertEquals()
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.MISSING_ATTRIBUTE);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+    public void testTargetMissing() {
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> copyConfig("messages/mapping/copyConfigs/copyConfig_no_target.xml"));
+
+        assertEquals(e.getErrorSeverity(),ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.MISSING_ATTRIBUTE);
+        assertEquals(e.getErrorType(), ErrorType.PROTOCOL);
     }
 
     @Test
-    public void testSourceMissing() throws Exception {
-        try {
-            copyConfig("messages/mapping/copyConfigs/copyConfig_no_source.xml");
-            fail("Should have fanode1iled - <source> element is missing");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.MISSING_ELEMENT);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+    public void testSourceMissing() {
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> copyConfig("messages/mapping/copyConfigs/copyConfig_no_source.xml"));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.MISSING_ELEMENT);
+        assertEquals(e.getErrorType(), ErrorType.PROTOCOL);
     }
 
     @Test
-    public void testConfigMissing() throws Exception {
-        try {
-            copyConfig("messages/mapping/copyConfigs/copyConfig_no_config.xml");
-            fail("Should have failed - neither <config> nor <url> element is present");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.MISSING_ELEMENT);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+    public void testConfigMissing() {
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> copyConfig("messages/mapping/copyConfigs/copyConfig_no_config.xml"));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.MISSING_ELEMENT);
+        assertEquals(e.getErrorType(), ErrorType.PROTOCOL);
     }
 
     @Test
-    public void testRunning() throws Exception {
-        try {
-            copyConfig("messages/mapping/copyConfigs/copyConfig_running.xml");
-            fail("Should have failed - copy config on running datastore is not supported");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+    public void testRunning() {
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> copyConfig("messages/mapping/copyConfigs/copyConfig_running.xml"));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.OPERATION_NOT_SUPPORTED);
+        assertEquals(e.getErrorType(), ErrorType.PROTOCOL);
     }
 
     @Test
@@ -217,35 +209,32 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testConfigFromInvalidUrl() throws Exception {
-        try {
-            copyConfig("messages/mapping/copyConfigs/copyConfig_invalid_url.xml");
-            fail("Should have failed - provided <url> is not valid");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.INVALID_VALUE);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-            assertTrue(e.getCause() instanceof MalformedURLException);
-        }
+    public void testConfigFromInvalidUrl() {
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> copyConfig("messages/mapping/copyConfigs/copyConfig_invalid_url.xml"));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.INVALID_VALUE);
+        assertEquals(e.getErrorType(), ErrorType.APPLICATION);
+        assertTrue(e.getCause() instanceof MalformedURLException);
     }
 
     @Test
     public void testExternalConfigInvalid() throws Exception {
-        try {
-            // Ask class loader for URI of config file and use it as <url> in <copy-config> RPC:
-            final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_from_file.xml");
-            final URI uri = getClass().getClassLoader()
+        // Ask class loader for URI of config file and use it as <url> in <copy-config> RPC:
+        final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_from_file.xml");
+        final URI uri = getClass().getClassLoader()
                 .getResource("messages/mapping/copyConfigs/config_file_invalid.xml").toURI();
-            final String copyConfig = template.replaceFirst("URL", uri.toString());
-            final Document request = XmlUtil.readXmlToDocument(copyConfig);
-            copyConfig(request);
-            fail("Should have failed - provided config is not valid XML");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-            assertTrue(e.getCause() instanceof SAXException);
-        }
+        final String copyConfig = template.replaceFirst("URL", uri.toString());
+        final Document request = XmlUtil.readXmlToDocument(copyConfig);
+
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> copyConfig(request));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.OPERATION_FAILED);
+        assertEquals(e.getErrorType(), ErrorType.APPLICATION);
+        assertTrue(e.getCause() instanceof SAXException);
     }
 
     @Test
@@ -270,15 +259,13 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testUnsupportedTargetUrlProtocol() throws Exception {
-        try {
-            copyConfig("messages/mapping/copyConfigs/copyConfig_to_unsupported_url_protocol.xml");
-            fail("Should have failed - exporting config to http server is not supported");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+    public void testUnsupportedTargetUrlProtocol() {
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> copyConfig("messages/mapping/copyConfigs/copyConfig_to_unsupported_url_protocol.xml"));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.OPERATION_NOT_SUPPORTED);
+        assertEquals(e.getErrorType(), ErrorType.PROTOCOL);
     }
 
     @Test
@@ -301,15 +288,13 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     }
 
     @Test
-    public void testRemoteToRemoteOperationIsNotSupported() throws Exception {
-        try {
-            copyConfig("messages/mapping/copyConfigs/copyConfig_url_remote_to_remote.xml");
-            fail("Should have failed - remote to remote operations are not supported");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
-            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
-        }
+    public void testRemoteToRemoteOperationIsNotSupported() {
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> copyConfig("messages/mapping/copyConfigs/copyConfig_url_remote_to_remote.xml"));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.OPERATION_NOT_SUPPORTED);
+        assertEquals(e.getErrorType(), ErrorType.PROTOCOL);
     }
 
     private Document copyConfig(final String resource) throws Exception {

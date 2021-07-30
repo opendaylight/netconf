@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -225,20 +226,18 @@ public class RuntimeRpcTest {
     @Test
     public void testFailedInvocation() throws Exception {
         final RuntimeRpc rpc = new RuntimeRpc(
-            SESSION_ID_FOR_REPORTING, currentSchemaContext, RPC_SERVICE_FAILED_INVOCATION);
+                SESSION_ID_FOR_REPORTING, currentSchemaContext, RPC_SERVICE_FAILED_INVOCATION);
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid.xml");
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
         Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
 
-        try {
-            rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
-            fail("should have failed with rpc invocation not implemented yet");
-        } catch (final DocumentedException e) {
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
-        }
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.OPERATION_FAILED);
+        assertEquals(e.getErrorType(), ErrorType.APPLICATION);
     }
 
     @Test
@@ -259,15 +258,12 @@ public class RuntimeRpcTest {
         final RuntimeRpc rpc = new RuntimeRpc(SESSION_ID_FOR_REPORTING, currentSchemaContext, RPC_SERVICE_VOID_INVOKER);
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-bad-namespace.xml");
 
-        try {
-            rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
-            fail("Should have failed, rpc has bad namespace");
-        } catch (final DocumentedException e) {
-            // FIXME: use assertThrows() and assertEquals()
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.BAD_ELEMENT);
-            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
-        }
+        final DocumentedException e = assertThrows(DocumentedException.class,
+                () -> rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT));
+
+        assertEquals(e.getErrorSeverity(), ErrorSeverity.ERROR);
+        assertEquals(e.getErrorTag(), ErrorTag.BAD_ELEMENT);
+        assertEquals(e.getErrorType(), ErrorType.APPLICATION);
     }
 
     private static void verifyResponse(final Document response, final Document template) {
