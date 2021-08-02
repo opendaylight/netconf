@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "d8dbfebb_4e8c9f8d",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2021-08-02T15:40:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a82ca060_36f44b38",
+      "range": {
+        "startLine": 83,
+        "startChar": 8,
+        "endLine": 83,
+        "endChar": 119
+      },
+      "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b7fda284_fcd111fb",
         "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
         "patchSetId": 1
@@ -45,6 +69,30 @@
       "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "318e8ae3_83969e78",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2021-08-02T15:40:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7fda284_fcd111fb",
+      "range": {
+        "startLine": 104,
+        "startChar": 37,
+        "endLine": 104,
+        "endChar": 66
+      },
+      "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "6529f5fd_e72e1197",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2021-08-02T15:40:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28fa1e35_5e95363c",
+      "range": {
+        "startLine": 111,
+        "startChar": 8,
+        "endLine": 111,
+        "endChar": 25
+      },
+      "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3970ad9f_e141bd43",
         "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
         "patchSetId": 1
@@ -91,6 +163,30 @@
       "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e07adab_cdf3a3f1",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2021-08-02T15:40:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3970ad9f_e141bd43",
+      "range": {
+        "startLine": 125,
+        "startChar": 34,
+        "endLine": 125,
+        "endChar": 46
+      },
+      "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "0727f079_2f3f0cef",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2021-08-02T15:40:50Z",
+      "side": 1,
+      "message": "I have copy this class from MDSAL and forgot to remove this annotation... thx\nhttps://github.com/opendaylight/mdsal/blob/master/binding/mdsal-binding-dom-adapter/src/main/java/org/opendaylight/mdsal/binding/dom/adapter/ActionProviderServiceAdapter.java#L97",
+      "parentUuid": "39ab0f80_60bc898a",
+      "range": {
+        "startLine": 168,
+        "startChar": 8,
+        "endLine": 168,
+        "endChar": 52
+      },
+      "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "70dadce8_0ec2269f",
         "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
         "patchSetId": 1
@@ -137,6 +257,30 @@
       "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8095b9e0_afba37a9",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/InvokeActionThroughRestconfDataServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2021-08-02T15:40:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70dadce8_0ec2269f",
+      "range": {
+        "startLine": 182,
+        "startChar": 15,
+        "endLine": 182,
+        "endChar": 23
+      },
+      "revId": "8ae73e2e0ac69a9c8cd0d85c4db626a897f25177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
