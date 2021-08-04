@@ -36,6 +36,14 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
+      <dependency>
+        <groupId>org.opendaylight.infrautils</groupId>
+        <artifactId>infrautils-artifacts</artifactId>
+        <version>2.0.2</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -50,6 +58,13 @@
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>features-controller-testing</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.infrautils</groupId>
+      <artifactId>features-infrautils</artifactId>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
