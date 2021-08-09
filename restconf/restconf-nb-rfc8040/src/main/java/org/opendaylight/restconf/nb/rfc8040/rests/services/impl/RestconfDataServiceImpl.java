@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -179,7 +180,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL)
                     || parameters.getContent().equals(RestconfDataServiceConstant.ReadData.CONFIG)) {
             final QName type = node.getNodeType();
-            return Response.status(200)
+            return Response.status(Status.OK)
                     .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
                         + "-" + type.getLocalName() + '"')
@@ -187,7 +188,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     .build();
         }
 
-        return Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node, parameters)).build();
+        return Response.status(Status.OK)
+            .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+            .build();
     }
 
     /**
@@ -441,11 +444,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         if (resultData != null && resultData.getValue().isEmpty()) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Status.NO_CONTENT).build();
         }
 
-        return Response.status(200).entity(new NormalizedNodeContext(new InstanceIdentifierContext<>(yangIIdContext,
-                resultNodeSchema, mountPoint, schemaContextRef), resultData)).build();
+        return Response.status(Status.OK)
+            .entity(new NormalizedNodeContext(
+                new InstanceIdentifierContext<>(yangIIdContext, resultNodeSchema, mountPoint, schemaContextRef),
+                resultData))
+            .build();
     }
 
     private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
