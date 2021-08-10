@@ -78,12 +78,12 @@ abstract class AbstractNotificationsData {
      * Delete data in DS.
      */
     protected void deleteDataInDS() throws Exception {
-        final DOMTransactionChain transactionChain = this.transactionChainHandler.get();
-        final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
-        wTx.delete(LogicalDatastoreType.OPERATIONAL, IdentifierCodec
+        try (DOMTransactionChain transactionChain = this.transactionChainHandler.get()) {
+            final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
+            wTx.delete(LogicalDatastoreType.OPERATIONAL, IdentifierCodec
                 .deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + this.localName, this.schemaHandler.get()));
-        wTx.commit().get();
-        transactionChain.close();
+            wTx.commit().get();
+        }
     }
 
     /**
