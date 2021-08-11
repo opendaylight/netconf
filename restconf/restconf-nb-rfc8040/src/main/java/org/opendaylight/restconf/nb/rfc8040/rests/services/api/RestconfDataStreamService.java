@@ -18,6 +18,10 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 
+/**
+ * Access to notification streams via Server-Sent Events.
+ */
+@Path("/")
 public interface RestconfDataStreamService {
     /**
      * Get target data resource.
