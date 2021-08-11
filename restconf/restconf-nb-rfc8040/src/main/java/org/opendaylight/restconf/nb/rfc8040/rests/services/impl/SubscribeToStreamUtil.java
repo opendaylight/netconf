@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Strings;
 import java.net.URI;
 import java.util.HashMap;
@@ -196,16 +194,17 @@ abstract class SubscribeToStreamUtil {
         }
 
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final Optional<ListenerAdapter> listener = ListenersBroker.getInstance().getDataChangeListenerFor(streamName);
-        checkArgument(listener.isPresent(), "Listener does not exist : %s", streamName);
+        final ListenerAdapter listener = ListenersBroker.getInstance().getDataChangeListenerFor(streamName)
+            .orElseThrow(() -> new RestconfDocumentedException("No listener found for stream " + streamName,
+                ErrorType.PROTOCOL.APPLICATION, ErrorTag.DATA_MISSING));
 
-        listener.get().setQueryParams(
+        listener.setQueryParams(
                 notificationQueryParams.getStart(),
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
                 false, notificationQueryParams.isSkipNotificationData());
-        listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
-        registration(datastoreType, listener.get(), handlersHolder.getDomDataBrokerHandler().get());
+        listener.setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+        registration(datastoreType, listener, handlersHolder.getDomDataBrokerHandler().get());
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
@@ -213,9 +212,9 @@ abstract class SubscribeToStreamUtil {
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
 
         final MapEntryNode mapToStreams =
-            RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
-                notificationQueryParams.getStart(), listener.get().getOutputType(), uri, schemaContext,
-                IdentifierCodec.serialize(listener.get().getPath(), schemaContext));
+            RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.getPath(),
+                notificationQueryParams.getStart(), listener.getOutputType(), uri, schemaContext,
+                IdentifierCodec.serialize(listener.getPath(), schemaContext));
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
