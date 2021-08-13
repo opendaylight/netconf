@@ -4,7 +4,7 @@
     <edit>
         <edit-id>edit1</edit-id>
         <operation>create</operation>
-        <target>/my-list2</target>
+        <target>/my-list2=my-leaf20</target>
         <value>
             <my-list2 xmlns="instance:identifier:patch:module">
                 <name>my-leaf20</name>
@@ -16,7 +16,7 @@
     <edit>
         <edit-id>edit2</edit-id>
         <operation>create</operation>
-        <target>/my-list2</target>
+        <target>/my-list2=my-leaf21</target>
         <value>
             <my-list2 xmlns="instance:identifier:patch:module">
                 <name>my-leaf21</name>
