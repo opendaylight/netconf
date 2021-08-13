@@ -234,7 +234,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                         edit.setTarget(path.getInstanceIdentifier());
                         edit.setTargetSchemaNode(path.getSchemaContext());
                     } else {
-                        edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()).concat(target)));
+                        edit.setTarget(ParserIdentifier.parserPatchTarget(path, target));
                         edit.setTargetSchemaNode(SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
                                 codec.getDataContextTree().findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
                                         .getPath().getParent()));

@@ -9,7 +9,7 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
@@ -45,10 +45,9 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleDataTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml"));
         checkPatchContext(returnValue);
     }
 
@@ -59,14 +58,12 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleDataValueMissingNegativeTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataValueMissing.xml");
-        try {
-            xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-            fail("Test should return error 400 due to missing value node when attempt to invoke create operation");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+            "/instanceidentifier/xml/xmlPATCHdataValueMissing.xml");
+
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+        assertEquals("Error code 400 expected", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 
     /**
@@ -77,14 +74,12 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleDataNotValueNotSupportedNegativeTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
-        try {
-            xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
-            fail("Test should return error 400 due to present value node when attempt to invoke delete operation");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
+        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
+            "/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
+
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+        assertEquals("Error code 400 expected", 400, ex.getErrors().get(0).getErrorTag().getStatusCode());
     }
 
 
@@ -95,10 +90,9 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleDataAbsoluteTargetPathTest() throws Exception {
         final String uri = "";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml"));
         checkPatchContext(returnValue);
     }
 
@@ -109,10 +103,9 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void modulePatchCompleteTargetInURITest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml"));
         checkPatchContext(returnValue);
     }
 
@@ -123,10 +116,10 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleDataMergeOperationOnListTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            XmlBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml"));
         checkPatchContext(returnValue);
     }
 
@@ -137,10 +130,9 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     public void moduleDataMergeOperationOnContainerTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont";
         mockBodyReader(uri, xmlToPatchBodyReader, false);
-        final InputStream inputStream = XmlBodyReaderTest.class
-                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml");
-        final PatchContext returnValue = xmlToPatchBodyReader
-                .readFrom(null, null, null, mediaType, null, inputStream);
+        final PatchContext returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null,
+            XmlBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml"));
         checkPatchContext(returnValue);
     }
 }

@@ -270,6 +270,20 @@ public final class ParserIdentifier {
         }
     }
 
+    public static YangInstanceIdentifier parserPatchTarget(final InstanceIdentifierContext<?> context,
+            final String target) {
+        final var schemaContext = context.getSchemaContext();
+        final var urlPath = context.getInstanceIdentifier();
+        final String targetUrl;
+        if (urlPath.isEmpty()) {
+            targetUrl = target.startsWith("/") ? target.substring(1) : target;
+        } else {
+            targetUrl = stringFromYangInstanceIdentifier(urlPath, schemaContext) + target;
+        }
+
+        return toInstanceIdentifier(targetUrl, schemaContext, Optional.empty()).getInstanceIdentifier();
+    }
+
     /**
      * Validation and parsing of revision.
      *

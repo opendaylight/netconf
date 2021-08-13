@@ -7,14 +7,14 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import javax.ws.rs.Consumes;
@@ -24,7 +24,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -33,13 +32,11 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -47,11 +44,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
@@ -117,28 +113,15 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
                 targetII = pathContext.getInstanceIdentifier();
                 targetNode = pathContext.getSchemaContext();
             } else {
-                // get namespace according to schema node from path context or value
-                final URI namespace = firstValueElement == null ? schemaNode.getQName().getNamespace()
-                    : URI.create(firstValueElement.getNamespaceURI());
-
-                // find module according to namespace
-                final Module module = pathContext.getSchemaContext().findModules(namespace).iterator().next();
-
-                // initialize codec + set default prefix derived from module name
-                final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
-                        pathContext.getSchemaContext(), module.getName());
-
-                targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
-                        .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
-                                namespace, module.getQNameModule().getRevision().orElse(null))));
-
-                targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                        codec.getDataContextTree().findChild(targetII).orElseThrow().getDataSchemaNode()
-                        .getPath().getParent());
+                // interpret as simple context
+                targetII = ParserIdentifier.parserPatchTarget(pathContext, target);
 
                 // move schema node
-                schemaNode = (DataSchemaNode) SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                        codec.getDataContextTree().findChild(targetII).orElseThrow().getDataSchemaNode().getPath());
+                final DataSchemaContextTree tree = DataSchemaContextTree.from(pathContext.getSchemaContext());
+                schemaNode = verifyNotNull(tree.findChild(targetII).orElseThrow().getDataSchemaNode());
+
+                targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
+                    schemaNode.getPath().getParent());
             }
 
             if (targetNode == null) {
@@ -208,74 +191,5 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
         }
 
         return result;
-    }
-
-    /**
-     * Prepare non-conditional XPath suitable for deserialization with {@link StringModuleInstanceIdentifierCodec}.
-     *
-     * @param schemaNode Top schema node
-     * @param target Edit operation target
-     * @param value Element with value
-     * @param namespace Module namespace
-     * @param revision Module revision
-     * @return Non-conditional XPath
-     */
-    private static String prepareNonCondXpath(final @NonNull DataSchemaNode schemaNode, final @NonNull String target,
-            final @NonNull Element value, final @NonNull URI namespace, final @Nullable Revision revision) {
-        final Iterator<String> args = SLASH_SPLITTER.split(target.substring(target.indexOf(':') + 1)).iterator();
-
-        final StringBuilder nonCondXpath = new StringBuilder();
-        SchemaNode childNode = schemaNode;
-
-        while (args.hasNext()) {
-            final String s = args.next();
-            nonCondXpath.append("/");
-            nonCondXpath.append(s);
-            childNode = ((DataNodeContainer) childNode).getDataChildByName(QName.create(namespace, revision, s));
-
-            if (childNode instanceof ListSchemaNode && args.hasNext()) {
-                appendKeys(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator(), args);
-            }
-        }
-
-        if (childNode instanceof ListSchemaNode && value != null) {
-            final Iterator<String> keyValues = readKeyValues(value,
-                    ((ListSchemaNode) childNode).getKeyDefinition().iterator());
-            appendKeys(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator(), keyValues);
-        }
-
-        return nonCondXpath.toString();
-    }
-
-    /**
-     * Read value for every list key.
-     *
-     * @param value Value element
-     * @param keys Iterator of list keys names
-     * @return Iterator of list keys values
-     */
-    private static Iterator<String> readKeyValues(final @NonNull Element value, final @NonNull Iterator<QName> keys) {
-        final List<String> result = new ArrayList<>();
-
-        while (keys.hasNext()) {
-            result.add(value.getElementsByTagName(keys.next().getLocalName()).item(0).getFirstChild().getNodeValue());
-        }
-
-        return result.iterator();
-    }
-
-    /**
-     * Append key name - key value pairs for every list key to {@code nonCondXpath}.
-     *
-     * @param nonCondXpath Builder for creating non-conditional XPath
-     * @param keyNames Iterator of list keys names
-     * @param keyValues Iterator of list keys values
-     */
-    private static void appendKeys(final @NonNull StringBuilder nonCondXpath, final @NonNull Iterator<QName> keyNames,
-            final @NonNull Iterator<String> keyValues) {
-        while (keyNames.hasNext()) {
-            nonCondXpath.append('[').append(keyNames.next().getLocalName()).append("='").append(keyValues.next())
-                .append("']");
-        }
     }
 }
