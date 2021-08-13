@@ -7,7 +7,7 @@
       {
         "edit-id": "edit1",
         "operation": "replace",
-        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']",
+        "target": "/my-list2=my-leaf20",
         "value": {
           "my-list2": {
             "name": "my-leaf20",
@@ -20,7 +20,7 @@
       {
         "edit-id": "edit2",
         "operation": "replace",
-        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']",
+        "target": "/my-list2=my-leaf20",
         "value": {
           "my-list2": {
             "name": "my-leaf20",

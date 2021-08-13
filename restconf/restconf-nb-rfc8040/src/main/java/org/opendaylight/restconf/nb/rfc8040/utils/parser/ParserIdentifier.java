@@ -269,6 +269,16 @@ public final class ParserIdentifier {
         }
     }
 
+    public static YangInstanceIdentifier parserPatchTarget(final InstanceIdentifierContext<?> context,
+            final String target) {
+        final var schemaContext = context.getSchemaContext();
+        return toInstanceIdentifier(
+            // FIXME: path should have this readily available
+            stringFromYangInstanceIdentifier(context.getInstanceIdentifier(), schemaContext) + target,
+            schemaContext, Optional.empty())
+                .getInstanceIdentifier();
+    }
+
     /**
      * Validation and parsing of revision.
      *
