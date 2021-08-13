@@ -37,7 +37,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.codecs.JsonInstanceIdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -116,7 +116,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path,
             final AtomicReference<String> patchId) throws IOException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
-        final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
+        final JsonInstanceIdentifierCodec codec = new JsonInstanceIdentifierCodec(
                 path.getSchemaContext());
         final JsonPatchBodyReader.PatchEdit edit = new JsonPatchBodyReader.PatchEdit();
 
@@ -171,7 +171,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      */
     private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
                              final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext<?> path,
-                             final @NonNull StringModuleInstanceIdentifierCodec codec,
+                             final @NonNull JsonInstanceIdentifierCodec codec,
                              final @NonNull List<PatchEntity> resultCollection,
                              final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
@@ -212,7 +212,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      */
     private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
                                     final @NonNull InstanceIdentifierContext<?> path,
-                                    final @NonNull StringModuleInstanceIdentifierCodec codec) throws IOException {
+                                    final @NonNull JsonInstanceIdentifierCodec codec) throws IOException {
         String deferredValue = null;
         in.beginObject();
 

@@ -35,7 +35,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.codecs.XmlInstanceIdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -108,6 +109,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue();
             final List<Element> values = readValueNodes(element, oper);
             final Element firstValueElement = values != null ? values.get(0) : null;
+            final EffectiveModelContext context = pathContext.getSchemaContext();
 
             // find complete path to target and target schema node
             // target can be also empty (only slash)
@@ -115,19 +117,17 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             final SchemaNode targetNode;
             if (target.equals("/")) {
                 targetII = pathContext.getInstanceIdentifier();
-                targetNode = pathContext.getSchemaContext();
+                targetNode = context;
             } else {
                 // get namespace according to schema node from path context or value
                 final XMLNamespace namespace = firstValueElement == null ? schemaNode.getQName().getNamespace()
                     : XMLNamespace.of(firstValueElement.getNamespaceURI());
 
                 // find module according to namespace
-                final Module module = pathContext.getSchemaContext().findModules(namespace).iterator().next();
+                final Module module = context.findModules(namespace).iterator().next();
 
                 // initialize codec + set default prefix derived from module name
-                final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
-                        pathContext.getSchemaContext(), module.getName());
-
+                final XmlInstanceIdentifierCodec codec = new XmlInstanceIdentifierCodec(context, module);
                 targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
                         .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
                                 namespace, module.getQNameModule().getRevision().orElse(null))));
@@ -213,7 +213,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
     }
 
     /**
-     * Prepare non-conditional XPath suitable for deserialization with {@link StringModuleInstanceIdentifierCodec}.
+     * Prepare non-conditional XPath suitable for deserialization with {@link XmlInstanceIdentifierCodec}.
      *
      * @param schemaNode Top schema node
      * @param target Edit operation target

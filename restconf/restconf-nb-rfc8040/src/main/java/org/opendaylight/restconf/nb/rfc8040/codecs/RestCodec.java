@@ -115,7 +115,7 @@ public final class RestCodec {
                     return null;
                 } else if (type instanceof InstanceIdentifierTypeDefinition) {
                     return input instanceof IdentityValuesDTO ? instanceIdentifier.deserialize(input)
-                        : new StringModuleInstanceIdentifierCodec(schemaContext).deserialize((String) input);
+                        : new JsonInstanceIdentifierCodec(schemaContext).deserialize((String) input);
                 } else {
                     final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
                             TypeDefinitionAwareCodec.from(this.type);
