@@ -248,12 +248,9 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                     checkArgument(edit.getData() == null && deferredValue == null, "Multiple value entries found");
 
                     if (edit.getTargetSchemaNode() == null) {
-                        final StringBuilder sb = new StringBuilder();
-
                         // save data defined in value node for next (later) processing, because target needs to be read
                         // always first and there is no ordering in Json input
-                        readValueNode(sb, in);
-                        deferredValue = sb.toString();
+                        deferredValue = readValueNode(in);
                     } else {
                         // We have a target schema node, reuse this reader without buffering the value.
                         edit.setData(readEditData(in, edit.getTargetSchemaNode(), path));
@@ -280,10 +277,9 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueNode(final @NonNull StringBuilder sb, final @NonNull JsonReader in) throws IOException {
+    private String readValueNode(final @NonNull JsonReader in) throws IOException {
         in.beginObject();
-
-        sb.append("{\"").append(in.nextName()).append("\":");
+        final StringBuilder sb = new StringBuilder().append("{\"").append(in.nextName()).append("\":");
 
         switch (in.peek()) {
             case BEGIN_ARRAY:
@@ -310,7 +306,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
         }
 
         in.endObject();
-        sb.append('}');
+        return sb.append('}').toString();
     }
 
     /**
