@@ -357,7 +357,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
-        final DOMMountPoint mountPoint = requireNonNull(context).getInstanceIdentifierContext().getMountPoint();
+        final DOMMountPoint mountPoint = RestconfDocumentedException.throwIfNull(context,
+            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "No patch documented provided")
+            .getInstanceIdentifierContext().getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         return PatchDataTransactionUtil.patchData(context, strategy, getSchemaContext(mountPoint));
     }
@@ -366,9 +368,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response patchData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
-                .getInstanceIdentifierContext();
-
+        final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
         PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
         PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
         PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
