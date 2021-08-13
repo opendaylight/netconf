@@ -26,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -117,12 +118,11 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 targetNode = pathContext.getSchemaContext();
             } else {
                 // get namespace according to schema node from path context or value
-                final String namespace = firstValueElement == null
-                        ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
+                final XMLNamespace namespace = firstValueElement == null ? schemaNode.getQName().getNamespace()
+                    : XMLNamespace.of(firstValueElement.getNamespaceURI());
 
                 // find module according to namespace
-                final Module module = pathContext.getSchemaContext().findModules(XMLNamespace.of(namespace)).iterator()
-                    .next();
+                final Module module = pathContext.getSchemaContext().findModules(namespace).iterator().next();
 
                 // initialize codec + set default prefix derived from module name
                 final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
@@ -130,8 +130,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
 
                 targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
                         .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
-                                namespace,
-                                module.getQNameModule().getRevision().map(Revision::toString).orElse(null))));
+                                namespace, module.getQNameModule().getRevision().orElse(null))));
 
                 // move schema node
                 schemaNode = verifyNotNull(codec.getDataContextTree().findChild(targetII).orElseThrow()
@@ -224,7 +223,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
      * @return Non-conditional XPath
      */
     private static String prepareNonCondXpath(final @NonNull DataSchemaNode schemaNode, final @NonNull String target,
-            final @NonNull Element value, final @NonNull String namespace, final @NonNull String revision) {
+            final @NonNull Element value, final @NonNull XMLNamespace namespace, final @Nullable Revision revision) {
         final Iterator<String> args = SLASH_SPLITTER.split(target.substring(target.indexOf(':') + 1)).iterator();
 
         final StringBuilder nonCondXpath = new StringBuilder();
