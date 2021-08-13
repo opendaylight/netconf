@@ -108,18 +108,6 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             final List<Element> values = readValueNodes(element, oper);
             final Element firstValueElement = values != null ? values.get(0) : null;
 
-            // get namespace according to schema node from path context or value
-            final String namespace = firstValueElement == null
-                    ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
-
-            // find module according to namespace
-            final Module module = pathContext.getSchemaContext().findModules(XMLNamespace.of(namespace)).iterator()
-                .next();
-
-            // initialize codec + set default prefix derived from module name
-            final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
-                    pathContext.getSchemaContext(), module.getName());
-
             // find complete path to target and target schema node
             // target can be also empty (only slash)
             YangInstanceIdentifier targetII;
@@ -128,6 +116,18 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 targetII = pathContext.getInstanceIdentifier();
                 targetNode = pathContext.getSchemaContext();
             } else {
+                // get namespace according to schema node from path context or value
+                final String namespace = firstValueElement == null
+                        ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
+
+                // find module according to namespace
+                final Module module = pathContext.getSchemaContext().findModules(XMLNamespace.of(namespace)).iterator()
+                    .next();
+
+                // initialize codec + set default prefix derived from module name
+                final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
+                        pathContext.getSchemaContext(), module.getName());
+
                 targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
                         .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
                                 namespace,
