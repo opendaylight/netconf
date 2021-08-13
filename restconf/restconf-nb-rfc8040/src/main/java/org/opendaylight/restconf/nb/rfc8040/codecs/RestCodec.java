@@ -102,9 +102,9 @@ public final class RestCodec {
         @Override
         public Object deserialize(final Object input) {
             try {
-                if (this.type instanceof IdentityrefTypeDefinition) {
+                if (type instanceof IdentityrefTypeDefinition) {
                     if (input instanceof IdentityValuesDTO) {
-                        return this.identityrefCodec.deserialize(input);
+                        return identityrefCodec.deserialize(input);
                     }
                     if (LOG.isDebugEnabled()) {
                         LOG.debug(
@@ -113,14 +113,9 @@ public final class RestCodec {
                             input == null ? "null" : input.getClass(), String.valueOf(input));
                     }
                     return null;
-                } else if (this.type instanceof InstanceIdentifierTypeDefinition) {
-                    if (input instanceof IdentityValuesDTO) {
-                        return this.instanceIdentifier.deserialize(input);
-                    } else {
-                        final StringModuleInstanceIdentifierCodec codec =
-                                new StringModuleInstanceIdentifierCodec(schemaContext);
-                        return codec.deserialize((String) input);
-                    }
+                } else if (type instanceof InstanceIdentifierTypeDefinition) {
+                    return input instanceof IdentityValuesDTO ? instanceIdentifier.deserialize(input)
+                        : new StringModuleInstanceIdentifierCodec(schemaContext).deserialize((String) input);
                 } else {
                     final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
                             TypeDefinitionAwareCodec.from(this.type);
