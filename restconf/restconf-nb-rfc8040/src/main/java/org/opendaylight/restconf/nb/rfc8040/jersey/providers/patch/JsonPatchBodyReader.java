@@ -232,7 +232,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                         edit.setTarget(path.getInstanceIdentifier());
                         edit.setTargetSchemaNode(path.getSchemaContext());
                     } else {
-                        edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()).concat(target)));
+                        edit.setTarget(ParserIdentifier.parserPatchTarget(path, target));
 
                         final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
                             path.getSchemaContext(),
