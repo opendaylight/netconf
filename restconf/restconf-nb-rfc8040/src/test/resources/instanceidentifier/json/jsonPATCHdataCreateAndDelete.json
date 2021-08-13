@@ -18,13 +18,13 @@
             }
           ]
         },
-        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']",
+        "target": "/my-list2=my-leaf20",
         "operation": "create"
       },
       {
         "edit-id": "edit2",
         "operation": "delete",
-        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']"
+        "target": "/my-list2=my-leaf20"
       }
     ]
   }
