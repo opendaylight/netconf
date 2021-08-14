@@ -115,6 +115,7 @@ public final class RestCodec {
                     return null;
                 } else if (type instanceof InstanceIdentifierTypeDefinition) {
                     return input instanceof IdentityValuesDTO ? instanceIdentifier.deserialize(input)
+                        // FIXME: what is it that we are trying to decode here and why?
                         : new StringModuleInstanceIdentifierCodec(schemaContext).deserialize((String) input);
                 } else {
                     final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =

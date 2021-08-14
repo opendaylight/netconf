@@ -10,48 +10,37 @@ package org.opendaylight.restconf.nb.rfc8040.codecs;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
-public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
-    private final @NonNull DataSchemaContextTree dataContextTree;
-    private final @Nullable String defaultPrefix;
+final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
     private final EffectiveModelContext context;
 
-    private StringModuleInstanceIdentifierCodec(final @Nullable String defaultPrefix,
-            final EffectiveModelContext context) {
-        // FIXME: what does the empty string mean, exactly?
-        this.defaultPrefix = defaultPrefix;
+    private volatile DataSchemaContextTree dataContextTree;
+
+    StringModuleInstanceIdentifierCodec(final @NonNull EffectiveModelContext context) {
         this.context = requireNonNull(context);
-        this.dataContextTree = DataSchemaContextTree.from(context);
-    }
-
-    public StringModuleInstanceIdentifierCodec(final EffectiveModelContext context) {
-        this(null, context);
-    }
-
-    public StringModuleInstanceIdentifierCodec(final EffectiveModelContext context,
-            final @NonNull String defaultPrefix) {
-        this(defaultPrefix.isEmpty() ? null : defaultPrefix, context);
     }
 
     @Override
     protected Module moduleForPrefix(final String prefix) {
-        final String moduleName = prefix.isEmpty() && defaultPrefix != null ? defaultPrefix : prefix;
-        return context.findModules(moduleName).stream().findFirst().orElse(null);
+        return context.findModules(prefix).stream().findFirst().orElse(null);
     }
 
     @Override
-    public DataSchemaContextTree getDataContextTree() {
-        return dataContextTree;
+    protected DataSchemaContextTree getDataContextTree() {
+        DataSchemaContextTree local = dataContextTree;
+        if (local == null) {
+            dataContextTree = local = DataSchemaContextTree.from(context);
+        }
+        return local;
     }
 
     @Override
     protected String prefixForNamespace(final XMLNamespace namespace) {
-        return this.context.findModules(namespace).stream().findFirst().map(Module::getName).orElse(null);
+        return context.findModules(namespace).stream().findFirst().map(Module::getName).orElse(null);
     }
 }
