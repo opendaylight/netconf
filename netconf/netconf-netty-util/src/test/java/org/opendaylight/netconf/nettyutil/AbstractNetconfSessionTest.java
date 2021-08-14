@@ -27,6 +27,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.io.EOFException;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
@@ -140,7 +141,7 @@ public class AbstractNetconfSessionTest {
         verifyNoMoreInteractions(listener);
         testingNetconfSession.sessionUp();
         testingNetconfSession.endOfInput();
-        verify(listener).onSessionDown(any(TestingNetconfSession.class), any(Exception.class));
+        verify(listener).onSessionDown(any(TestingNetconfSession.class), any(EOFException.class));
     }
 
     @Test

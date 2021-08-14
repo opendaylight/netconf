@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.api;
 
+import java.io.EOFException;
+
 // FIXME: NETCONF-554: rework this interface
 public interface NetconfSessionListener<S extends NetconfSession> {
     /**
@@ -21,7 +23,8 @@ public interface NetconfSessionListener<S extends NetconfSession> {
      * session.
      *
      * @param session that went down
-     * @param cause Exception that was thrown as the cause of session being down
+     * @param cause Exception that was thrown as the cause of session being down. A common cause is
+     *              {@link EOFException}, which indicates the remote end has shut down the communication channel.
      */
     void onSessionDown(S session, Exception cause);
 
