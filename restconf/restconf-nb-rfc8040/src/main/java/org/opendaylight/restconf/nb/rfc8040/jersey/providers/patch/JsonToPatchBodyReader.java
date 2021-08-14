@@ -36,7 +36,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
-import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -50,6 +49,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
@@ -117,9 +117,8 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
 
     private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path,
             final AtomicReference<String> patchId) throws IOException {
+        final DataSchemaContextTree schemaTree = DataSchemaContextTree.from(path.getSchemaContext());
         final List<PatchEntity> resultCollection = new ArrayList<>();
-        final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
-                path.getSchemaContext());
         final JsonToPatchBodyReader.PatchEdit edit = new JsonToPatchBodyReader.PatchEdit();
 
         while (in.hasNext()) {
@@ -143,7 +142,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                 case END_DOCUMENT:
                     break;
                 case NAME:
-                    parseByName(in.nextName(), edit, in, path, codec, resultCollection, patchId);
+                    parseByName(in.nextName(), edit, in, path, schemaTree, resultCollection, patchId);
                     break;
                 case END_OBJECT:
                     in.endObject();
@@ -173,7 +172,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      */
     private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
                              final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext<?> path,
-                             final @NonNull StringModuleInstanceIdentifierCodec codec,
+                             final @NonNull DataSchemaContextTree schemaTree,
                              final @NonNull List<PatchEntity> resultCollection,
                              final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
@@ -182,14 +181,14 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                     in.beginArray();
 
                     while (in.hasNext()) {
-                        readEditDefinition(edit, in, path, codec);
+                        readEditDefinition(edit, in, path, schemaTree);
                         resultCollection.add(prepareEditOperation(edit));
                         edit.clear();
                     }
 
                     in.endArray();
                 } else {
-                    readEditDefinition(edit, in, path, codec);
+                    readEditDefinition(edit, in, path, schemaTree);
                     resultCollection.add(prepareEditOperation(edit));
                     edit.clear();
                 }
@@ -214,7 +213,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      */
     private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
                                     final @NonNull InstanceIdentifierContext<?> path,
-                                    final @NonNull StringModuleInstanceIdentifierCodec codec) throws IOException {
+                                    final @NonNull DataSchemaContextTree schemaTree) throws IOException {
         String deferredValue = null;
         in.beginObject();
 
@@ -236,7 +235,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                     } else {
                         edit.setTarget(ParserIdentifier.parserPatchTarget(path, target));
                         edit.setTargetSchemaNode(SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
-                                codec.getDataContextTree().findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
+                                schemaTree.findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
                                         .getPath().getParent()));
                     }
 
