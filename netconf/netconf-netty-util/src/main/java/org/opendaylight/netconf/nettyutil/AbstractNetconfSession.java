@@ -15,7 +15,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.io.IOException;
+import java.io.EOFException;
 import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
@@ -31,10 +31,11 @@ import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOpt
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractNetconfSession<S extends NetconfSession,L extends NetconfSessionListener<S>>
+public abstract class AbstractNetconfSession<S extends NetconfSession, L extends NetconfSessionListener<S>>
         extends SimpleChannelInboundHandler<Object> implements NetconfSession, NetconfExiSession {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
+
+
     private final L sessionListener;
     private final long sessionId;
     private boolean up = false;
@@ -88,11 +89,9 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
     }
 
     protected void endOfInput() {
-        LOG.debug("Session {} end of input detected while session was in state {}", this, isUp() ? "up"
-                : "initialized");
-        if (isUp()) {
-            this.sessionListener.onSessionDown(thisInstance(),
-                    new IOException("End of input detected. Close the session."));
+        LOG.debug("Session {} end of input detected while session was in state {}", this, up ? "up" : "initialized");
+        if (up) {
+            this.sessionListener.onSessionDown(thisInstance(), new EOFException("End of input"));
         }
     }
 

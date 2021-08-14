@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
+import java.io.EOFException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -235,7 +236,11 @@ public class NetconfDeviceCommunicator
     public void onSessionDown(final NetconfClientSession session, final Exception exception) {
         // If session is already in closing, no need to call tearDown again.
         if (startClosing()) {
-            LOG.warn("{}: Session went down", id, exception);
+            if (exception instanceof EOFException) {
+                LOG.info("{}: Session went down: {}", id, exception.getMessage());
+            } else {
+                LOG.warn("{}: Session went down", id, exception);
+            }
             tearDown(null);
         }
     }
