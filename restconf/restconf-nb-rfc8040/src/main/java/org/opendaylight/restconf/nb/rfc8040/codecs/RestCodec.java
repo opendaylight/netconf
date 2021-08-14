@@ -56,11 +56,12 @@ import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// FIXME: what is this class even trying to do?
 public final class RestCodec {
-
     private static final Logger LOG = LoggerFactory.getLogger(RestCodec.class);
 
     private RestCodec() {
+        // Hidden on purpose
     }
 
     // FIXME: IllegalArgumentCodec is not quite accurate
@@ -115,6 +116,7 @@ public final class RestCodec {
                     return null;
                 } else if (type instanceof InstanceIdentifierTypeDefinition) {
                     return input instanceof IdentityValuesDTO ? instanceIdentifier.deserialize(input)
+                        // FIXME: what is it that we are trying to decode here and why?
                         : new StringModuleInstanceIdentifierCodec(schemaContext).deserialize((String) input);
                 } else {
                     final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
