@@ -17,9 +17,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  *
  */
 public final class IdentifierCodec {
-
     private IdentifierCodec() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 
     public static String serialize(final YangInstanceIdentifier data, final EffectiveModelContext schemaContext) {
@@ -27,9 +26,7 @@ public final class IdentifierCodec {
     }
 
     public static YangInstanceIdentifier deserialize(final String data, final EffectiveModelContext schemaContext) {
-        if (data == null) {
-            return YangInstanceIdentifier.builder().build();
-        }
-        return YangInstanceIdentifier.create(YangInstanceIdentifierDeserializer.create(schemaContext, data));
+        return data == null ? YangInstanceIdentifier.empty()
+            : YangInstanceIdentifier.create(YangInstanceIdentifierDeserializer.create(schemaContext, data));
     }
 }

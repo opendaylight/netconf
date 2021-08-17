@@ -38,7 +38,7 @@ public final class PatchDataTransactionUtil {
     static final String PATCH_TX_TYPE = "Patch";
 
     private PatchDataTransactionUtil() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 
     /**

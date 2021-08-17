@@ -27,7 +27,7 @@ public final class NetconfConsoleUtils {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConsoleUtils.class);
 
     private NetconfConsoleUtils() {
-        throw new IllegalStateException("Instantiating utility class.");
+        // Hidden on purpose
     }
 
     /**

@@ -38,7 +38,7 @@ public final class YangInstanceIdentifierSerializer {
             CharMatcher.anyOf(ParserConstants.RFC3986_RESERVED_CHARACTERS).precomputed();
 
     private YangInstanceIdentifierSerializer() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 
     /**

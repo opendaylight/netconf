@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.util.xml;
 
 import javax.xml.namespace.NamespaceContext;
@@ -21,7 +20,7 @@ public final class XMLNetconfUtil {
         XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
 
     private XMLNetconfUtil() {
-        throw new UnsupportedOperationException("Utility class");
+        // Hidden on purpose
     }
 
     public static XPathExpression compileXPath(final String xpath) {

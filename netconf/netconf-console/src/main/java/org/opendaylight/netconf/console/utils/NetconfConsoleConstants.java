@@ -5,14 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.utils;
 
 public final class NetconfConsoleConstants {
-
-    private NetconfConsoleConstants() {
-        throw new IllegalStateException("Instantiating utility class.");
-    }
 
     public static final String STATUS = "Status";
 
@@ -38,4 +33,7 @@ public final class NetconfConsoleConstants {
 
     public static final String NETCONF_NODE_CONTROLLER = "controller-config";
 
+    private NetconfConsoleConstants() {
+        // Hidden on purpose
+    }
 }

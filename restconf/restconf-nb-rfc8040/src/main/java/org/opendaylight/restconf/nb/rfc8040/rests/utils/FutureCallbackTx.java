@@ -38,7 +38,7 @@ final class FutureCallbackTx {
     private static final Logger LOG = LoggerFactory.getLogger(FutureCallbackTx.class);
 
     private FutureCallbackTx() {
-        throw new UnsupportedOperationException("Util class");
+        // Hidden on purpose
     }
 
     /**

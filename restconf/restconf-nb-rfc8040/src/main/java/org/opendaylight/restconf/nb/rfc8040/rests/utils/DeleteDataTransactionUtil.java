@@ -28,7 +28,7 @@ public final class DeleteDataTransactionUtil {
     public static final String DELETE_TX_TYPE = "DELETE";
 
     private DeleteDataTransactionUtil() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 
     /**

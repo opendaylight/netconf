@@ -85,7 +85,7 @@ public final class XmlUtil {
     };
 
     private XmlUtil() {
-        throw new UnsupportedOperationException("Utility class");
+        // Hidden on purpose
     }
 
     public static Element readXmlToElement(final File xmlFile) throws SAXException, IOException {

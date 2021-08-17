@@ -19,9 +19,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
  *
  */
 public final class RestconfSchemaUtil {
-
     private RestconfSchemaUtil() {
-        throw new UnsupportedOperationException("Util class");
+        // Hidden on purpose
     }
 
     /**

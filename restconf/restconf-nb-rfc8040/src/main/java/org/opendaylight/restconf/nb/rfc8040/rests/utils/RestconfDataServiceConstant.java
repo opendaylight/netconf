@@ -26,7 +26,7 @@ public final class RestconfDataServiceConstant {
     public static final QName NETCONF_BASE_QNAME = SchemaContext.NAME;
 
     private RestconfDataServiceConstant() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 
     /**
@@ -96,7 +96,7 @@ public final class RestconfDataServiceConstant {
         }
 
         private ReadData() {
-            throw new UnsupportedOperationException("Util class.");
+            // Hidden on purpose
         }
     }
 

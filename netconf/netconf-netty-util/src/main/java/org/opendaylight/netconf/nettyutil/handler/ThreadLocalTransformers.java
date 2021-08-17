@@ -48,7 +48,7 @@ final class ThreadLocalTransformers {
     };
 
     private ThreadLocalTransformers() {
-        throw new UnsupportedOperationException("Utility class");
+        // Hidden on purpose
     }
 
     /**

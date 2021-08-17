@@ -67,7 +67,7 @@ final class CreateStreamUtil {
         ImmutableSet.of(SCOPE_QNAME, DATASTORE_QNAME, OUTPUT_TYPE_QNAME));
 
     private CreateStreamUtil() {
-        throw new UnsupportedOperationException("Utility class");
+        // Hidden on purpose
     }
 
     /**

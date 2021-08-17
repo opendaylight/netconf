@@ -37,7 +37,7 @@ public final class RestconfInvokeOperationsUtil {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsUtil.class);
 
     private RestconfInvokeOperationsUtil() {
-        throw new UnsupportedOperationException("Util class");
+        // Hidden on purpose
     }
 
     /**

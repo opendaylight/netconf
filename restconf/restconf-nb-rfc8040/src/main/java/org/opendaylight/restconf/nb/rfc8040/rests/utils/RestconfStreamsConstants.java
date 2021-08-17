@@ -34,6 +34,6 @@ public final class RestconfStreamsConstants {
     public static final String YANG_NOTIFICATION_STREAM_PATTERN = '/' + NOTIFICATION_STREAM + "/*";
 
     private RestconfStreamsConstants() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 }

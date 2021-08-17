@@ -52,12 +52,11 @@ import org.slf4j.LoggerFactory;
  * Util class for parsing identifier.
  */
 public final class ParserIdentifier {
-
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
     private static final Splitter MP_SPLITTER = Splitter.on("/" + RestconfConstants.MOUNT);
 
     private ParserIdentifier() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 
     /**

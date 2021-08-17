@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 public final class TransactionUtil {
     private TransactionUtil() {
-        throw new UnsupportedOperationException("Util class");
+        // Hidden on purpose
     }
 
     /**

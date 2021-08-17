@@ -22,9 +22,8 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
  * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  */
 public final class RestconfValidationUtils {
-
     private RestconfValidationUtils() {
-        throw new UnsupportedOperationException("Utility class");
+        // Hidden on purpose
     }
 
     /**

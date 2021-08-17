@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.utils;
 
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
@@ -19,15 +18,14 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class NetconfIidFactory {
-
-    private NetconfIidFactory() {
-        throw new IllegalStateException("Instantiating utility class.");
-    }
-
     public static final InstanceIdentifier<Topology> NETCONF_TOPOLOGY_IID =
             InstanceIdentifier.builder(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
             .build();
+
+    private NetconfIidFactory() {
+        // Hidden on purpose
+    }
 
     public static InstanceIdentifier<Node> netconfNodeIid(final String nodeId) {
         return NETCONF_TOPOLOGY_IID.child(Node.class, new NodeKey(new NodeId(nodeId)));
