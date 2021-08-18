@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c42a1ff_dbee90ad",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-08-18T06:55:13Z",
+      "side": 1,
+      "message": "too much empty lines",
+      "revId": "887b9f76965a8cc7784cad753e4877a63ba40c72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "516f71c9_ba5f3c52",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NettyPipelineAwareChannelSubsystem.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-08-18T06:55:13Z",
+      "side": 1,
+      "message": "final, are the parameters nullable?",
+      "revId": "887b9f76965a8cc7784cad753e4877a63ba40c72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
