@@ -26,6 +26,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  */
 final class JsonStreamWriterWithDisabledValidation extends StreamWriterWithDisabledValidation {
 
+    private static final int DEFAULT_INDENT_SPACES_NUM = 2;
+
     private final JsonWriter jsonWriter;
     private final NormalizedNodeStreamWriter jsonNodeStreamWriter;
 
@@ -42,7 +44,7 @@ final class JsonStreamWriterWithDisabledValidation extends StreamWriterWithDisab
             final SchemaPath schemaPath, final XMLNamespace initialNs,
             final SchemaContextHandler schemaContextHandler) {
         super(excludedQName);
-        this.jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter);
+        this.jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter, DEFAULT_INDENT_SPACES_NUM);
         this.jsonNodeStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
                 JSONCodecFactorySupplier.RFC7951.getShared(schemaContextHandler.get()),
                 schemaPath, initialNs, jsonWriter);
