@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -169,13 +170,13 @@ public class RestconfDocumentedExceptionMapperTest {
                                 + "  \"errors\": {\n"
                                 + "    \"error\": [\n"
                                 + "      {\n"
-                                + "        \"error-message\": \"Sample error message\",\n"
                                 + "        \"error-tag\": \"operation-failed\",\n"
+                                + "        \"error-message\": \"Sample error message\",\n"
                                 + "        \"error-type\": \"application\"\n"
                                 + "      }\n"
                                 + "    ]\n"
                                 + "  }\n"
-                                + "}\n")
+                                + "}")
                         .build()
             },
             {
@@ -212,30 +213,30 @@ public class RestconfDocumentedExceptionMapperTest {
                                 + "  \"errors\": {\n"
                                 + "    \"error\": [\n"
                                 + "      {\n"
-                                + "        \"error-type\": \"application\",\n"
-                                + "        \"error-message\": \"message 1\",\n"
                                 + "        \"error-tag\": \"bad-attribute\",\n"
-                                + "        \"error-app-tag\": \"app tag #1\"\n"
+                                + "        \"error-app-tag\": \"app tag #1\",\n"
+                                + "        \"error-message\": \"message 1\",\n"
+                                + "        \"error-type\": \"application\"\n"
                                 + "      },\n"
                                 + "      {\n"
-                                + "        \"error-type\": \"application\",\n"
-                                + "        \"error-message\": \"message 2\",\n"
                                 + "        \"error-tag\": \"operation-failed\",\n"
                                 + "        \"error-app-tag\": \"app tag #2\",\n"
-                                + "        \"error-info\": \"my info\"\n"
+                                + "        \"error-info\": \"my info\",\n"
+                                + "        \"error-message\": \"message 2\",\n"
+                                + "        \"error-type\": \"application\"\n"
                                 + "      },\n"
                                 + "      {\n"
-                                + "        \"error-type\": \"rpc\",\n"
-                                + "        \"error-path\": \"/instance-identifier-patch-module:patch-cont/"
-                                + "my-list1[name='sample']/my-leaf12\",\n"
-                                + "        \"error-message\": \"message 3\",\n"
                                 + "        \"error-tag\": \"data-missing\",\n"
                                 + "        \"error-app-tag\": \" app tag #3\",\n"
-                                + "        \"error-info\": \"my error info\"\n"
+                                + "        \"error-info\": \"my error info\",\n"
+                                + "        \"error-message\": \"message 3\",\n"
+                                + "        \"error-path\": \"/instance-identifier-patch-module:patch-cont/"
+                                + "my-list1[name='sample']/my-leaf12\",\n"
+                                + "        \"error-type\": \"rpc\"\n"
                                 + "      }\n"
                                 + "    ]\n"
                                 + "  }\n"
-                                + "}\n")
+                                + "}")
                         .build()
             },
             {
@@ -287,6 +288,15 @@ public class RestconfDocumentedExceptionMapperTest {
         exceptionMapper.setHttpHeaders(httpHeaders);
         final Response response = exceptionMapper.toResponse(thrownException);
         compareResponseWithExpectation(expectedResponse, response);
+    }
+
+    @Test
+    public void testFormatingJson() throws JSONException {
+        assumeTrue(expectedResponse.getMediaType().equals(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE));
+
+        exceptionMapper.setHttpHeaders(httpHeaders);
+        final Response response = exceptionMapper.toResponse(thrownException);
+        assertEquals(expectedResponse.getEntity().toString(), response.getEntity().toString());
     }
 
     private static HttpHeaders mockHttpHeaders(final MediaType contentType, final List<MediaType> acceptedTypes) {
