@@ -77,6 +77,8 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
 
+    private static final int DEFAULT_INDENT_SPACES_NUM = 2;
+
     private static final XMLOutputFactory XML_FACTORY;
 
     static {
@@ -232,7 +234,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             initialNs = schema.getQName().getNamespace();
         }
 
-        final JsonWriter jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter);
+        final JsonWriter jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter, DEFAULT_INDENT_SPACES_NUM);
         final NormalizedNodeStreamWriter jsonStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
             JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(context.getSchemaContext()), path,
             initialNs, jsonWriter);
