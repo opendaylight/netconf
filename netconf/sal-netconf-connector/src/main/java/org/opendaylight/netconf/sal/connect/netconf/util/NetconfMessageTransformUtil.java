@@ -544,7 +544,7 @@ public final class NetconfMessageTransformUtil {
     public static RpcResult<NetconfMessage> toRpcResult(final FailedNetconfMessage message) {
         return RpcResultBuilder.<NetconfMessage>failed()
                 .withRpcError(toRpcError(new NetconfDocumentedException(message.getException().getMessage(),
-                    ErrorType.APPLICATION, DocumentedException.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
+                    ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR)))
                 .build();
     }
 }

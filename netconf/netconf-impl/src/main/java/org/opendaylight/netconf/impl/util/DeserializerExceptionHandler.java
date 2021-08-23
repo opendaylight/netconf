@@ -13,6 +13,7 @@ import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public final class DeserializerExceptionHandler extends ChannelInboundHandlerAda
     private static void handleDeserializerException(final ChannelHandlerContext ctx, final Throwable cause) {
         final String message = cause.getMessage();
         SendErrorExceptionUtil.sendErrorMessage(ctx.channel(), new DocumentedException(message,
-            ErrorType.RPC, DocumentedException.MALFORMED_MESSAGE, ErrorSeverity.ERROR,
+            ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR,
             message != null ? Map.of("cause", message) : Map.of()));
     }
 }
