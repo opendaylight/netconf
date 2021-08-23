@@ -11,7 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
+import org.opendaylight.netconf.impl.SendErrorExceptionUtil;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
