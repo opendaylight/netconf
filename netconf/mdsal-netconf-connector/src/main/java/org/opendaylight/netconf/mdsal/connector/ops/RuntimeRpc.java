@@ -259,8 +259,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
         } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
-            throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex, ErrorType.PROTOCOL,
-                    DocumentedException.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
+            throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex,
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
 
         return (ContainerNode) resultHolder.getResult();
