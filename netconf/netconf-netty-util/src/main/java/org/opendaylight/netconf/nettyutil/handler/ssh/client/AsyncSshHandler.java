@@ -55,6 +55,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         DEFAULT_CLIENT = c;
     }
 
+
     private final AtomicBoolean isDisconnected = new AtomicBoolean();
     private final AuthenticationHandler authenticationHandler;
     private final Future<?> negotiationFuture;
@@ -66,6 +67,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private ClientSession session;
     private ChannelPromise connectPromise;
     private GenericFutureListener negotiationFutureListener;
+    private SocketAddress remoteAddress;
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
             final Future<?> negotiationFuture) {
@@ -104,6 +106,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) throws IOException {
         LOG.debug("Starting SSH to {} on channel: {}", address, ctx.channel());
+        this.socketAddress = address;
+
 
         final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), address)
                .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS);
@@ -173,7 +177,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     private synchronized void handleSshSetupFailure(final ChannelHandlerContext ctx, final Throwable error) {
-        LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), error);
+        LOG.warn("Unable to setup SSH connection on channel: {}. Session to device on the address {} was terminated",
+                ctx.channel(), remoteAddress, error);
 
         // If the promise is not yet done, we have failed with initial connect and set connectPromise to failure
         if (!connectPromise.isDone()) {
@@ -189,7 +194,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     @Override
-    public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
+    public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteSocketAddress,
                                      final SocketAddress localAddress, final ChannelPromise promise) throws Exception {
         LOG.debug("SSH session connecting on channel {}. promise: {} ", ctx.channel(), connectPromise);
         this.connectPromise = promise;
@@ -203,7 +208,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             //complete connection promise with netconf negotiation future
             negotiationFuture.addListener(negotiationFutureListener);
         }
-        startSsh(ctx, remoteAddress);
+        startSsh(ctx, remoteSocketAddress);
     }
 
     @Override
@@ -220,8 +225,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     private synchronized void safelyDisconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
-        LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}",
-                ctx.channel(), connectPromise);
+        LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}. Session to device on"
+                        + " the address {} was terminated",
+                ctx.channel(), connectPromise, remoteAddress);
 
         // If we have already succeeded and the session was dropped after,
         // we need to fire inactive to notify reconnect logic
