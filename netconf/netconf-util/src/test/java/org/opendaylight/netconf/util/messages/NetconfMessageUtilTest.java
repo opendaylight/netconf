@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.util.messages;
 
 import static org.junit.Assert.assertFalse;
@@ -15,23 +14,22 @@ import java.util.Collection;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
-import org.w3c.dom.Document;
 
 public class NetconfMessageUtilTest {
     @Test
     public void testNetconfMessageUtil() throws Exception {
-        Document okMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
-        assertTrue(NetconfMessageUtil.isOKMessage(new NetconfMessage(okMessage)));
-        assertFalse(NetconfMessageUtil.isErrorMessage(new NetconfMessage(okMessage)));
+        final NetconfMessage okMessage = new NetconfMessage(XmlFileLoader.xmlFileToDocument(
+            "netconfMessages/rpc-reply_ok.xml"));
+        assertTrue(NetconfMessageUtil.isOKMessage(okMessage));
+        assertFalse(NetconfMessageUtil.isErrorMessage(okMessage));
 
-        Document errorMessage = XmlFileLoader
-                .xmlFileToDocument("netconfMessages/communicationError/testClientSendsRpcReply_expectedResponse.xml");
-        assertTrue(NetconfMessageUtil.isErrorMessage(new NetconfMessage(errorMessage)));
-        assertFalse(NetconfMessageUtil.isOKMessage(new NetconfMessage(errorMessage)));
+        final NetconfMessage errorMessage = new NetconfMessage(XmlFileLoader.xmlFileToDocument(
+            "netconfMessages/communicationError/testClientSendsRpcReply_expectedResponse.xml"));
+        assertTrue(NetconfMessageUtil.isErrorMessage(errorMessage));
+        assertFalse(NetconfMessageUtil.isOKMessage(errorMessage));
 
-        Document helloMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/client_hello.xml");
-        Collection<String> caps =
-                NetconfMessageUtil.extractCapabilitiesFromHello(new NetconfMessage(helloMessage).getDocument());
+        final Collection<String> caps = NetconfMessageUtil.extractCapabilitiesFromHello(
+            XmlFileLoader.xmlFileToDocument("netconfMessages/client_hello.xml"));
         assertTrue(caps.contains("urn:ietf:params:netconf:base:1.0"));
         assertTrue(caps.contains("urn:ietf:params:netconf:base:1.1"));
     }
