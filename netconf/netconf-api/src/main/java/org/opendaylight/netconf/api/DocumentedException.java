@@ -10,7 +10,6 @@ package org.opendaylight.netconf.api;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,10 +40,6 @@ public class DocumentedException extends Exception {
     public static final String ERROR_MESSAGE = "error-message";
     public static final String ERROR_INFO = "error-info";
 
-    // FIXME: This is an RFC6241 definition, remove it once we have yangtools-7.0.5
-    @Deprecated(forRemoval = true)
-    public static final ErrorTag MALFORMED_MESSAGE = new ErrorTag("malformed-message");
-
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(DocumentedException.class);
     private static final DocumentBuilderFactory BUILDER_FACTORY;
@@ -67,7 +62,6 @@ public class DocumentedException extends Exception {
     }
 
     private final ErrorType errorType;
-    @SuppressFBWarnings(value = "SE_BAD_FIELD", justification = "FIXME: should not be necessary with yangtools-7.0.5")
     private final ErrorTag errorTag;
     private final ErrorSeverity errorSeverity;
     private final Map<String, String> errorInfo;
