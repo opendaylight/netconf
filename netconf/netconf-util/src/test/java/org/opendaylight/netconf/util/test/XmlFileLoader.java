@@ -9,11 +9,11 @@ package org.opendaylight.netconf.util.test;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.io.ByteSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import javax.xml.parsers.ParserConfigurationException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 
 public final class XmlFileLoader {
     private XmlFileLoader() {
-
+        // Hidden on purpose
     }
 
     public static NetconfMessage xmlFileToNetconfMessage(final String fileName) throws IOException, SAXException,
@@ -42,27 +42,19 @@ public final class XmlFileLoader {
 
     public static Document xmlFileToDocument(final String fileName) throws IOException, SAXException,
             ParserConfigurationException {
-        try (InputStream resourceAsStream = XmlFileLoader.class.getClassLoader().getResourceAsStream(fileName)) {
-            requireNonNull(resourceAsStream, fileName);
-            final Document doc = XmlUtil.readXmlToDocument(resourceAsStream);
-            return doc;
+        try (InputStream resource = getResourceAsStream(fileName)) {
+            return XmlUtil.readXmlToDocument(resource);
         }
     }
 
     public static String fileToString(final String fileName) throws IOException {
-        try (InputStream resourceAsStream = XmlFileLoader.class.getClassLoader().getResourceAsStream(fileName)) {
-            requireNonNull(resourceAsStream);
-            return new ByteSource() {
-                @Override
-                public InputStream openStream() {
-                    return resourceAsStream;
-                }
-            }.asCharSource(StandardCharsets.UTF_8).read();
-
+        try (InputStream resource = getResourceAsStream(fileName)) {
+            return new String(resource.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
-    public static InputStream getResourceAsStream(final String fileName) {
-        return XmlFileLoader.class.getClassLoader().getResourceAsStream(fileName);
+    public static @NonNull InputStream getResourceAsStream(final String fileName) {
+        final String resourceName = requireNonNull(fileName);
+        return requireNonNull(XmlFileLoader.class.getResourceAsStream(resourceName), resourceName);
     }
 }
