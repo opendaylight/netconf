@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
 
+    private SocketAddress socketAddress;
+
     public static final String SUBSYSTEM = "netconf";
 
     public static final int SSH_DEFAULT_NIO_WORKERS = 8;
@@ -104,6 +106,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) throws IOException {
         LOG.debug("Starting SSH to {} on channel: {}", address, ctx.channel());
+        this.socketAddress = address;
+
 
         final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), address)
                .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS);
@@ -173,7 +177,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     private synchronized void handleSshSetupFailure(final ChannelHandlerContext ctx, final Throwable error) {
-        LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), error);
+        LOG.warn("Unable to setup SSH connection on channel: {}. Device on this address {} got killed",
+                ctx.channel(), socketAddress, error);
 
         // If the promise is not yet done, we have failed with initial connect and set connectPromise to failure
         if (!connectPromise.isDone()) {
@@ -227,6 +232,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         // we need to fire inactive to notify reconnect logic
         if (connectPromise.isSuccess()) {
             ctx.fireChannelInactive();
+            LOG.trace("Closing SSH session on channel: {}. Device on this address: {} got killed.",
+                    ctx.channel(), socketAddress);
         }
 
         if (sshWriteAsyncHandler != null) {
