@@ -90,13 +90,8 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
                 throw DocumentedException.wrap(e);
             }
             identifier = identifierElement.getTextContent();
-            final Optional<XmlElement> versionElement = getSchemaElement
-                    .getOnlyChildElementWithSameNamespaceOptionally(VERSION);
-            if (versionElement.isPresent()) {
-                version = Optional.of(versionElement.get().getTextContent());
-            } else {
-                version = Optional.empty();
-            }
+            version = getSchemaElement.getOnlyChildElementWithSameNamespaceOptionally(VERSION)
+                .map(XmlElement::getTextContext);
         }
     }
 }
