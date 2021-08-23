@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
+import static com.google.common.base.Preconditions.checkState;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -81,62 +81,53 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     }
 
     synchronized String getSchemaForModuleRevision(final String moduleName, final Optional<String> revision) {
-
-        Map<String, String> revisionMapRequest = mappedModulesToRevisionToSchema.get(moduleName);
-        Preconditions.checkState(revisionMapRequest != null,
+        final Map<String, String> revisionMapRequest = mappedModulesToRevisionToSchema.get(moduleName);
+        checkState(revisionMapRequest != null,
                 "Capability for module %s not present, available modules : %s",
                 moduleName, Collections2.transform(capabilities.values(), CAPABILITY_TO_URI));
 
-        if (revision.isPresent()) {
-            String schema = revisionMapRequest.get(revision.get());
-
-            Preconditions.checkState(schema != null,
-                    "Capability for module %s:%s not present, available revisions for module: %s", moduleName,
-                    revision.get(), revisionMapRequest.keySet());
-
+        final String revToLookup = revision.orElse("");
+        final String schema = revisionMapRequest.get(revToLookup);
+        if (schema != null) {
+            // Exact match found
             return schema;
         }
 
-        Preconditions.checkState(revisionMapRequest.size() == 1,
+        // We can recover only if the revision was not specified
+        checkState(revision.isEmpty(),
+            "Capability for module %s:%s not present, available revisions for module: %s", moduleName,
+            revToLookup, revisionMapRequest.keySet());
+
+        checkState(revisionMapRequest.size() == 1,
                 "Expected 1 capability for module %s, available revisions : %s", moduleName,
                 revisionMapRequest.keySet());
-        //Only one revision is present, so return it
+        // Only one revision is present, so return it
         return revisionMapRequest.values().iterator().next();
     }
 
     private void updateCapabilityToSchemaMap(final Set<Capability> added, final Set<Capability> removed) {
         for (final Capability cap : added) {
-            if (!isValidModuleCapability(cap)) {
-                continue;
+            if (isValidModuleCapability(cap)) {
+                mappedModulesToRevisionToSchema.computeIfAbsent(cap.getModuleName().get(), k -> new HashMap<>())
+                    .put(cap.getRevision().orElse(""), cap.getCapabilitySchema().get());
             }
-
-            final String currentModuleName = cap.getModuleName().get();
-            Map<String, String> revisionMap =
-                mappedModulesToRevisionToSchema.computeIfAbsent(currentModuleName, k -> new HashMap<>());
-
-            final String currentRevision = cap.getRevision().get();
-            revisionMap.put(currentRevision, cap.getCapabilitySchema().get());
         }
         for (final Capability cap : removed) {
-            if (!isValidModuleCapability(cap)) {
-                continue;
-            }
-            final Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(cap.getModuleName().get());
-            if (revisionMap != null) {
-                revisionMap.remove(cap.getRevision().get());
-                if (revisionMap.isEmpty()) {
-                    mappedModulesToRevisionToSchema.remove(cap.getModuleName().get());
+            if (isValidModuleCapability(cap)) {
+                final Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(cap.getModuleName().get());
+                if (revisionMap != null) {
+                    revisionMap.remove(cap.getRevision().get());
+                    if (revisionMap.isEmpty()) {
+                        mappedModulesToRevisionToSchema.remove(cap.getModuleName().get());
+                    }
                 }
             }
         }
     }
 
     private static boolean isValidModuleCapability(final Capability cap) {
-        return cap.getModuleName().isPresent()
-                && cap.getRevision().isPresent()
-                && cap.getCapabilitySchema().isPresent();
+        return cap.getModuleName().isPresent() && cap.getCapabilitySchema().isPresent();
     }
-
 
     synchronized Capabilities getCapabilities() {
         return new CapabilitiesBuilder().setCapability(Lists.newArrayList(capabilities.keySet())).build();
@@ -156,10 +147,9 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     private static Schemas transformSchemas(final Set<Capability> caps) {
         final Map<SchemaKey, Schema> schemas = Maps.newHashMapWithExpectedSize(caps.size());
         for (final Capability cap : caps) {
-            if (cap.getCapabilitySchema().isPresent()) {
-                Preconditions.checkState(isValidModuleCapability(cap));
-
-                final SchemaKey key = new SchemaKey(Yang.class, cap.getModuleName().get(), cap.getRevision().get());
+            if (isValidModuleCapability(cap)) {
+                final SchemaKey key = new SchemaKey(Yang.class, cap.getModuleName().get(),
+                    cap.getRevision().orElse(""));
                 schemas.put(key, new SchemaBuilder()
                     .withKey(key)
                     .setNamespace(new Uri(cap.getModuleNamespace().get()))
