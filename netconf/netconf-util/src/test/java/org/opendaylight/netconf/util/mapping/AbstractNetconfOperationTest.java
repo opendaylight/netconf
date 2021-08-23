@@ -27,12 +27,10 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class AbstractNetconfOperationTest {
-
-    class NetconfOperationImpl extends AbstractNetconfOperation {
-
+    static class NetconfOperationImpl extends AbstractNetconfOperation {
         public boolean handleRun;
 
-        protected NetconfOperationImpl(String netconfSessionIdForReporting) {
+        protected NetconfOperationImpl(final String netconfSessionIdForReporting) {
             super(netconfSessionIdForReporting);
             this.handleRun = false;
         }
@@ -43,29 +41,28 @@ public class AbstractNetconfOperationTest {
         }
 
         @Override
-        protected Element handle(Document document, XmlElement message,
-                                 NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
+        protected Element handle(final Document document, final XmlElement message,
+                final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
             this.handleRun = true;
             try {
                 return XmlUtil.readXmlToElement("<element/>");
             } catch (SAXException | IOException e) {
-                throw new RuntimeException(e);
+                throw DocumentedException.wrap(e);
             }
         }
     }
 
-    private NetconfOperationImpl netconfOperation;
+    private final NetconfOperationImpl netconfOperation = new NetconfOperationImpl("str");
     private NetconfOperationChainedExecution operation;
 
     @Before
     public void setUp() throws Exception {
-        netconfOperation = new NetconfOperationImpl("str");
         operation = mock(NetconfOperationChainedExecution.class);
     }
 
     @Test
     public void testAbstractNetconfOperation() throws Exception {
-        Document helloMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/edit_config.xml");
+        Document helloMessage = XmlFileLoader.xmlFileToDocument("/netconfMessages/edit_config.xml");
         assertEquals(netconfOperation.getNetconfSessionIdForReporting(), "str");
         assertNotNull(netconfOperation.canHandle(helloMessage));
         assertEquals(netconfOperation.getHandlingPriority(), HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY);
