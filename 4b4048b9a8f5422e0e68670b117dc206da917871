@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "33eefe01_664417bb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-08-24T20:51:20Z",
+      "side": 1,
+      "message": "add better description\n\nwhy is it helpful to add address to logs",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 0
+      },
+      "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2558e87e_fd64dcec",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-08-24T20:51:20Z",
+      "side": 1,
+      "message": "better naming - remoteAddress\n\nalso, move this field to place where also other mutable fields are specified",
+      "range": {
+        "startLine": 38,
+        "startChar": 26,
+        "endLine": 38,
+        "endChar": 39
+      },
+      "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cbf8d0b5_f3ce1c21",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-08-24T20:51:20Z",
+      "side": 1,
+      "message": "Session to device",
+      "range": {
+        "startLine": 180,
+        "startChar": 65,
+        "endLine": 180,
+        "endChar": 71
+      },
+      "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "415d5541_b1da12fd",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-08-24T20:51:20Z",
+      "side": 1,
+      "message": "was terminated",
+      "range": {
+        "startLine": 180,
+        "startChar": 91,
+        "endLine": 180,
+        "endChar": 94
+      },
+      "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d57e4cb_91cf977b",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-08-24T20:51:20Z",
+      "side": 1,
+      "message": "the",
+      "range": {
+        "startLine": 180,
+        "startChar": 75,
+        "endLine": 180,
+        "endChar": 79
+      },
+      "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46b5bedd_2ad10d36",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2021-08-24T20:51:20Z",
+      "side": 1,
+      "message": "it would be better to add address here, so it is common for all cases that may happen in this method (there are more LOG calls)",
+      "range": {
+        "startLine": 228,
+        "startChar": 8,
+        "endLine": 228,
+        "endChar": 17
+      },
+      "revId": "4b4048b9a8f5422e0e68670b117dc206da917871",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
