@@ -19,7 +19,6 @@ import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARA
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -36,17 +35,13 @@ import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
@@ -64,11 +59,6 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     private YangModuleCapability moduleCapability1;
     private YangModuleCapability moduleCapability2;
-    private static final Session SESSION = new SessionBuilder()
-            .setSessionId(Uint32.valueOf(1))
-            .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
-            .setUsername("admin")
-            .build();
     private int capabilitiesSize;
 
     private final Set<Capability> capabilities = new HashSet<>();
@@ -115,7 +105,7 @@ public class NetconfCapabilityMonitoringServiceTest {
         doNothing().when(notificationPublisher).onCapabilityChanged(any());
 
         monitoringService = new NetconfCapabilityMonitoringService(operationServiceFactoryMock);
-        monitoringService.onCapabilitiesChanged(capabilities, Collections.emptySet());
+        monitoringService.onCapabilitiesChanged(capabilities, Set.of());
         monitoringService.setNotificationPublisher(notificationPublisher);
         monitoringService.registerListener(listener);
         capabilitiesSize = monitoringService.getCapabilities().getCapability().size();
@@ -125,7 +115,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     public void testListeners() throws Exception {
         HashSet<Capability> added = new HashSet<>();
         added.add(new BasicCapability("toAdd"));
-        monitoringService.onCapabilitiesChanged(added, Collections.emptySet());
+        monitoringService.onCapabilitiesChanged(added, Set.of());
         //onCapabilitiesChanged and onSchemasChanged are invoked also after listener registration
         verify(listener, times(2)).onCapabilitiesChanged(any());
         verify(listener, times(2)).onSchemasChanged(any());
@@ -143,7 +133,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     @Test
     public void testGetSchemaForCapability() throws Exception {
         //test multiple revisions of the same capability
-        monitoringService.onCapabilitiesChanged(Collections.singleton(moduleCapability2), Collections.emptySet());
+        monitoringService.onCapabilitiesChanged(Set.of(moduleCapability2), Set.of());
         final String schema =
                 monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV));
         assertEquals(TEST_MODULE_CONTENT, schema);
@@ -151,7 +141,7 @@ public class NetconfCapabilityMonitoringServiceTest {
                 monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV2));
         assertEquals(TEST_MODULE_CONTENT2, schema2);
         //remove one revision
-        monitoringService.onCapabilitiesChanged(Collections.emptySet(), Collections.singleton(moduleCapability1));
+        monitoringService.onCapabilitiesChanged(Set.of(), Set.of(moduleCapability1));
         //only one revision present
         final String schema3 = monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.empty());
         assertEquals(TEST_MODULE_CONTENT2, schema3);
@@ -173,9 +163,9 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     @Test
     public void testClose() throws Exception {
-        assertFalse(monitoringService.getCapabilities().getCapability().isEmpty());
+        assertEquals(6, monitoringService.getCapabilities().getCapability().size());
         monitoringService.close();
-        assertTrue(monitoringService.getCapabilities().getCapability().isEmpty());
+        assertEquals(List.of(), monitoringService.getCapabilities().getCapability());
     }
 
     @Test
@@ -188,9 +178,9 @@ public class NetconfCapabilityMonitoringServiceTest {
                 ArgumentCaptor.forClass(NetconfCapabilityChange.class);
         final ArgumentCaptor<Capabilities> monitoringListenerCaptor = ArgumentCaptor.forClass(Capabilities.class);
         //add capability
-        monitoringService.onCapabilitiesChanged(testCaps, Collections.emptySet());
+        monitoringService.onCapabilitiesChanged(testCaps, Set.of());
         //remove capability
-        monitoringService.onCapabilitiesChanged(Collections.emptySet(), testCaps);
+        monitoringService.onCapabilitiesChanged(Set.of(), testCaps);
 
         verify(listener, times(3)).onCapabilitiesChanged(monitoringListenerCaptor.capture());
         verify(notificationPublisher, times(2)).onCapabilityChanged(capabilityChangeCaptor.capture());
@@ -213,9 +203,9 @@ public class NetconfCapabilityMonitoringServiceTest {
         final NetconfCapabilityChange afterAdd = publisherValues.get(0);
         final NetconfCapabilityChange afterRemove = publisherValues.get(1);
 
-        assertEquals(Collections.singleton(uri), new HashSet<>(afterAdd.getAddedCapability()));
-        assertEquals(Collections.emptySet(), new HashSet<>(afterAdd.getDeletedCapability()));
-        assertEquals(Collections.singleton(uri), new HashSet<>(afterRemove.getDeletedCapability()));
-        assertEquals(Collections.emptySet(), new HashSet<>(afterRemove.getAddedCapability()));
+        assertEquals(Set.of(uri), Set.copyOf(afterAdd.getAddedCapability()));
+        assertEquals(List.of(), afterAdd.getDeletedCapability());
+        assertEquals(Set.of(uri), Set.copyOf(afterRemove.getDeletedCapability()));
+        assertEquals(List.of(), afterRemove.getAddedCapability());
     }
 }
