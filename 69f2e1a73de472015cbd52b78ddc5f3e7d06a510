@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "13c5298b_8c17cacc",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapperTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-08-31T12:34:24Z",
+      "side": 1,
+      "message": "why are these needed?",
+      "range": {
+        "startLine": 174,
+        "startChar": 43,
+        "endLine": 174,
+        "endChar": 90
+      },
+      "revId": "69f2e1a73de472015cbd52b78ddc5f3e7d06a510",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b0b0747b_c26e81de",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapperTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-08-31T12:34:24Z",
+      "side": 1,
+      "message": "use a static import for assumeTrue\nseparate the assumption from the rest by an empty line",
+      "range": {
+        "startLine": 295,
+        "startChar": 8,
+        "endLine": 295,
+        "endChar": 25
+      },
+      "revId": "69f2e1a73de472015cbd52b78ddc5f3e7d06a510",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
