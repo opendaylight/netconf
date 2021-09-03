@@ -19,12 +19,13 @@ import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
 final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionListener<? super S>>
-        extends DefaultPromise<Void> {
+        extends DefaultPromise<Empty> implements ReconnectFuture {
     private static final Logger LOG = LoggerFactory.getLogger(ReconnectPromise.class);
 
     private final AbstractNetconfDispatcher<S, L> dispatcher;
