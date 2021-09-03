@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
+import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -64,7 +65,7 @@ public class NetconfClientDispatcherImpl
     }
 
     @Override
-    public Future<Void> createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
+    public ReconnectFuture createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
         switch (clientConfiguration.getProtocol()) {
             case TCP:
                 return createReconnectingTcpClient(clientConfiguration);
@@ -84,7 +85,7 @@ public class NetconfClientDispatcherImpl
                         currentConfiguration.getSessionListener()).initialize(ch, promise));
     }
 
-    private Future<Void> createReconnectingTcpClient(
+    private ReconnectFuture createReconnectingTcpClient(
             final NetconfReconnectingClientConfiguration currentConfiguration) {
         LOG.debug("Creating reconnecting TCP client with configuration: {}", currentConfiguration);
         final TcpClientChannelInitializer init =
@@ -103,7 +104,7 @@ public class NetconfClientDispatcherImpl
                         currentConfiguration.getSshClient()).initialize(ch, sessionPromise));
     }
 
-    private Future<Void> createReconnectingSshClient(
+    private ReconnectFuture createReconnectingSshClient(
             final NetconfReconnectingClientConfiguration currentConfiguration) {
         LOG.debug("Creating reconnecting SSH client with configuration: {}", currentConfiguration);
         final SshClientChannelInitializer init = new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
@@ -122,7 +123,7 @@ public class NetconfClientDispatcherImpl
                     .initialize(ch, sessionPromise));
     }
 
-    private Future<Void> createReconnectingTlsClient(
+    private ReconnectFuture createReconnectingTlsClient(
             final NetconfReconnectingClientConfiguration currentConfiguration) {
         LOG.debug("Creating reconnecting TLS client with configuration: {}", currentConfiguration);
         final TlsClientChannelInitializer init = new TlsClientChannelInitializer(
