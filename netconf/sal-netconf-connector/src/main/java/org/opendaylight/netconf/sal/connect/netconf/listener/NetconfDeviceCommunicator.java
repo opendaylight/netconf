@@ -145,8 +145,8 @@ public class NetconfDeviceCommunicator
      *
      * @param dispatcher {@code NetconfCLientDispatcher}
      * @param config     {@code NetconfClientConfiguration}
-     * @return future that returns succes on first succesfull connection and failure when the underlying
-     *     reconnecting strategy runs out of reconnection attempts
+     * @return a ListenableFuture that returns success on first successful connection and failure when the underlying
+     *         reconnecting strategy runs out of reconnection attempts
      */
     public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(
             final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
@@ -155,7 +155,6 @@ public class NetconfDeviceCommunicator
         } else {
             initFuture = dispatcher.createClient(config);
         }
-
 
         initFuture.addListener(future -> {
             if (!future.isSuccess() && !future.isCancelled()) {
