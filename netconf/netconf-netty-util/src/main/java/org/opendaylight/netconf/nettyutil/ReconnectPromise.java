@@ -15,18 +15,20 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher.PipelineInitializer;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
 final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionListener<? super S>>
-        extends DefaultPromise<Void> {
+        extends DefaultPromise<Empty> implements ReconnectFuture {
     private static final Logger LOG = LoggerFactory.getLogger(ReconnectPromise.class);
 
     private final AbstractNetconfDispatcher<S, L> dispatcher;
@@ -34,6 +36,7 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
     private final ReconnectStrategyFactory strategyFactory;
     private final Bootstrap bootstrap;
     private final PipelineInitializer<S> initializer;
+    private final Promise<Empty> firstSessionFuture;
     /**
      * Channel handler that responds to channelInactive event and reconnects the session unless the promise is
      * cancelled.
@@ -66,6 +69,7 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
             final InetSocketAddress address, final ReconnectStrategyFactory connectStrategyFactory,
             final Bootstrap bootstrap, final PipelineInitializer<S> initializer) {
         super(executor);
+        this.firstSessionFuture = new DefaultPromise<>(executor);
         this.bootstrap = requireNonNull(bootstrap);
         this.initializer = requireNonNull(initializer);
         this.dispatcher = requireNonNull(dispatcher);
@@ -76,10 +80,16 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
     @Override
     public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
         if (super.cancel(mayInterruptIfRunning)) {
+            firstSessionFuture.cancel(mayInterruptIfRunning);
             pending.cancel(mayInterruptIfRunning);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Future<Empty> firstSessionFuture() {
+        return firstSessionFuture;
     }
 
     synchronized void connect() {
@@ -104,10 +114,12 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
             channel.pipeline().addLast(inboundHandler);
         });
 
-        pending.addListener(future -> {
-            if (!future.isSuccess() && !isDone()) {
-                setFailure(future.cause());
-            }
-        });
+        if (!firstSessionFuture.isDone()) {
+            pending.addListener(future -> {
+                if (!future.isSuccess() && !firstSessionFuture.isDone()) {
+                    firstSessionFuture.setFailure(future.cause());
+                }
+            });
+        }
     }
 }

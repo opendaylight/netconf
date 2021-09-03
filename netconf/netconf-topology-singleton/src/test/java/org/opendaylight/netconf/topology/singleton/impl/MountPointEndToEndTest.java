@@ -37,7 +37,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
 import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
@@ -99,6 +98,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegist
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
@@ -224,7 +224,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private SchemaResourceManager resourceManager;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Before
     public void setUp() throws Exception {
         deleteCacheDir();
@@ -250,7 +249,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
 
-        doReturn(mock(Future.class)).when(mockClientDispatcher).createReconnectingClient(any());
+        doReturn(mock(ReconnectFuture.class)).when(mockClientDispatcher).createReconnectingClient(any());
 
         LOG.info("****** Setup complete");
     }
