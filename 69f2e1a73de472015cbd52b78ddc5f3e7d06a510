@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3d9f9477_61a23a33",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapperTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 9022
+      },
+      "writtenOn": "2021-09-03T11:50:49Z",
+      "side": 1,
+      "message": "I needed to change the order of the lines so the strings in assertEquals() match completely, otherwise assertEquals() would fail",
+      "parentUuid": "13c5298b_8c17cacc",
+      "range": {
+        "startLine": 174,
+        "startChar": 43,
+        "endLine": 174,
+        "endChar": 90
+      },
+      "revId": "69f2e1a73de472015cbd52b78ddc5f3e7d06a510",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b0b0747b_c26e81de",
         "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapperTest.java",
         "patchSetId": 3
