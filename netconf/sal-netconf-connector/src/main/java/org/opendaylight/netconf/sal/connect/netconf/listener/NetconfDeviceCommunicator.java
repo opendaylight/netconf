@@ -64,7 +64,7 @@ public class NetconfDeviceCommunicator
     private NetconfClientSession currentSession;
 
     private final SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
-    private Future<?> initFuture;
+    private Future<?> taskFuture;
 
     // isSessionClosing indicates a close operation on the session is issued and
     // tearDown will surely be called later to finish the close.
@@ -150,17 +150,26 @@ public class NetconfDeviceCommunicator
      */
     public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(
             final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
+
+        final Future<?> connectFuture;
         if (config instanceof NetconfReconnectingClientConfiguration) {
-            initFuture = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
+            // FIXME: This is weird. If I understand it correctly we want to know about the first connection so as to
+            //        forward error state. Analyze the call graph to understand what is going on here. We really want
+            //        to move reconnection away from the socket layer, so that it can properly interface with sessions
+            //        and generally has some event-driven state (as all good network glue does). There is a second story
+            //        which is we want to avoid duplicate code, so it depends on other users as well.
+            final var future = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
+            taskFuture = future;
+            connectFuture = future.firstSessionFuture();
         } else {
-            initFuture = dispatcher.createClient(config);
+            taskFuture = connectFuture = dispatcher.createClient(config);
         }
 
-        initFuture.addListener(future -> {
+        connectFuture.addListener(future -> {
             if (!future.isSuccess() && !future.isCancelled()) {
                 LOG.debug("{}: Connection failed", id, future.cause());
-                NetconfDeviceCommunicator.this.remoteDevice.onRemoteSessionFailed(future.cause());
-                if (firstConnectionFuture.isDone()) {
+                remoteDevice.onRemoteSessionFailed(future.cause());
+                if (!firstConnectionFuture.isDone()) {
                     firstConnectionFuture.setException(future.cause());
                 }
             }
@@ -254,8 +263,8 @@ public class NetconfDeviceCommunicator
     @Override
     public void close() {
         // Cancel reconnect if in progress
-        if (initFuture != null) {
-            initFuture.cancel(false);
+        if (taskFuture != null) {
+            taskFuture.cancel(false);
         }
         // Disconnect from device
         // tear down not necessary, called indirectly by the close in disconnect()
