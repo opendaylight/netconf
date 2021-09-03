@@ -16,36 +16,89 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
+import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher.PipelineInitializer;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
 final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionListener<? super S>>
-        extends DefaultPromise<Void> {
+        extends DefaultPromise<Empty> implements ReconnectFuture {
     private static final Logger LOG = LoggerFactory.getLogger(ReconnectPromise.class);
 
     private final AbstractNetconfDispatcher<S, L> dispatcher;
     private final InetSocketAddress address;
     private final ReconnectStrategyFactory strategyFactory;
     private final Bootstrap bootstrap;
-    private final AbstractNetconfDispatcher.PipelineInitializer<S> initializer;
+    private final PipelineInitializer<S> initializer;
+    private final Promise<Empty> firstSessionFuture;
+    /**
+     * Channel handler that responds to channelInactive event and reconnects the session unless the promise is
+     * cancelled.
+     */
+    private final ChannelInboundHandlerAdapter inboundHandler = new ChannelInboundHandlerAdapter() {
+        @Override
+        public void channelInactive(final ChannelHandlerContext ctx) {
+            // This is the ultimate channel inactive handler, not forwarding
+            if (isCancelled()) {
+                return;
+            }
+
+            synchronized (ReconnectPromise.this) {
+                final Future<?> attempt = pending;
+                if (!attempt.isDone() || !attempt.isSuccess()) {
+                    // Connection refused, negotiation failed, or similar
+                    LOG.debug("Connection to {} was dropped during negotiation, reattempting", address);
+                }
+
+                LOG.debug("Reconnecting after connection to {} was dropped", address);
+                lockedConnect();
+            }
+        }
+    };
+
+    @GuardedBy("this")
     private Future<?> pending;
 
     ReconnectPromise(final EventExecutor executor, final AbstractNetconfDispatcher<S, L> dispatcher,
             final InetSocketAddress address, final ReconnectStrategyFactory connectStrategyFactory,
             final Bootstrap bootstrap, final AbstractNetconfDispatcher.PipelineInitializer<S> initializer) {
         super(executor);
-        this.bootstrap = bootstrap;
+        this.firstSessionFuture = new DefaultPromise<>(executor);
+        this.bootstrap = requireNonNull(bootstrap);
         this.initializer = requireNonNull(initializer);
         this.dispatcher = requireNonNull(dispatcher);
         this.address = requireNonNull(address);
         this.strategyFactory = requireNonNull(connectStrategyFactory);
     }
 
+    @Override
+    public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
+        if (super.cancel(mayInterruptIfRunning)) {
+            firstSessionFuture.cancel(mayInterruptIfRunning);
+            pending.cancel(mayInterruptIfRunning);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Future<?> firstSessionFuture() {
+        return firstSessionFuture;
+    }
+
     synchronized void connect() {
+        lockedConnect();
+    }
+
+    @Holding("this")
+    private void lockedConnect() {
         final ReconnectStrategy cs = this.strategyFactory.createReconnectStrategy();
 
         // Set up a client with pre-configured bootstrap, but add a closed channel handler into the pipeline to support
@@ -62,11 +115,13 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
             channel.pipeline().addLast(new ClosedChannelHandler(ReconnectPromise.this));
         });
 
-        pending.addListener(future -> {
-            if (!future.isSuccess() && !ReconnectPromise.this.isDone()) {
-                ReconnectPromise.this.setFailure(future.cause());
-            }
-        });
+        if (!firstSessionFuture.isDone()) {
+            pending.addListener(future -> {
+                if (!future.isSuccess() && !firstSessionFuture.isDone()) {
+                    firstSessionFuture.setFailure(future.cause());
+                }
+            });
+        }
     }
 
     /**
@@ -80,17 +135,6 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
     private synchronized boolean isInitialConnectFinished() {
         requireNonNull(pending);
         return pending.isDone() && pending.isSuccess();
-    }
-
-    @Override
-    public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
-        if (super.cancel(mayInterruptIfRunning)) {
-            requireNonNull(pending);
-            this.pending.cancel(mayInterruptIfRunning);
-            return true;
-        }
-
-        return false;
     }
 
     /**

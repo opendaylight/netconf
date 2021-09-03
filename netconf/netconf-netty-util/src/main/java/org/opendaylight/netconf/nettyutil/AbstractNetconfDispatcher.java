@@ -225,7 +225,7 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
      *             instead.
      */
     @Deprecated
-    protected Future<Void> createReconnectingClient(final InetSocketAddress address,
+    protected ReconnectFuture createReconnectingClient(final InetSocketAddress address,
             final ReconnectStrategyFactory connectStrategyFactory, final ReconnectStrategy reestablishStrategy,
             final PipelineInitializer<S> initializer) {
         return createReconnectingClient(address, connectStrategyFactory, initializer);
@@ -239,7 +239,7 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
      * @return Future representing the reconnection task. It will report completion based on reestablishStrategy, e.g.
      *         success is never reported, only failure when it runs out of reconnection attempts.
      */
-    protected Future<Void> createReconnectingClient(final InetSocketAddress address,
+    protected ReconnectFuture createReconnectingClient(final InetSocketAddress address,
             final ReconnectStrategyFactory connectStrategyFactory, final PipelineInitializer<S> initializer) {
         final Bootstrap b = new Bootstrap();
 

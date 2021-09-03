@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
@@ -37,7 +38,6 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import io.netty.util.concurrent.SucceededFuture;
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -98,6 +98,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegist
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager;
@@ -249,8 +250,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
 
-        doReturn(new SucceededFuture(GlobalEventExecutor.INSTANCE, null)).when(mockClientDispatcher)
-                .createReconnectingClient(any());
+        doReturn(mock(ReconnectFuture.class)).when(mockClientDispatcher).createReconnectingClient(any());
 
         LOG.info("****** Setup complete");
     }

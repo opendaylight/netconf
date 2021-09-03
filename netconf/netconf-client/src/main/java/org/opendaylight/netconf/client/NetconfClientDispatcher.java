@@ -10,6 +10,7 @@ package org.opendaylight.netconf.client;
 import io.netty.util.concurrent.Future;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 
 public interface NetconfClientDispatcher {
 
@@ -22,5 +23,5 @@ public interface NetconfClientDispatcher {
      */
     Future<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration);
 
-    Future<Void> createReconnectingClient(NetconfReconnectingClientConfiguration clientConfiguration);
+    ReconnectFuture createReconnectingClient(NetconfReconnectingClientConfiguration clientConfiguration);
 }

@@ -77,9 +77,8 @@ class CallHomeMountSessionContext {
                 .build();
     }
 
-    @SuppressWarnings("unchecked")
-    <V> Promise<V> activateNetconfChannel(final NetconfClientSessionListener sessionListener) {
-        return (Promise<V>) activator.activate(wrap(sessionListener));
+    Promise<NetconfClientSession> activateNetconfChannel(final NetconfClientSessionListener sessionListener) {
+        return activator.activate(wrap(sessionListener));
     }
 
     @Override
