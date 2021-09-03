@@ -27,6 +27,7 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
+import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
@@ -89,8 +90,8 @@ public class NetconfClientDispatcherImplTest {
         Future<NetconfClientSession> sshSession = dispatcher.createClient(cfg);
         Future<NetconfClientSession> tcpSession = dispatcher.createClient(cfg2);
 
-        Future<Void> sshReconn = dispatcher.createReconnectingClient(cfg);
-        final Future<Void> tcpReconn = dispatcher.createReconnectingClient(cfg2);
+        ReconnectFuture sshReconn = dispatcher.createReconnectingClient(cfg);
+        final ReconnectFuture tcpReconn = dispatcher.createReconnectingClient(cfg2);
 
         assertNotNull(sshSession);
         assertNotNull(tcpSession);
@@ -109,7 +110,7 @@ public class NetconfClientDispatcherImplTest {
                 .withSslHandlerFactory(sslHandlerFactory).build();
 
         Future<NetconfClientSession> tlsSession = dispatcher.createClient(cfg3);
-        Future<Void> tlsReconn = dispatcher.createReconnectingClient(cfg3);
+        ReconnectFuture tlsReconn = dispatcher.createReconnectingClient(cfg3);
 
         assertNotNull(tlsSession);
         assertNotNull(tlsReconn);
