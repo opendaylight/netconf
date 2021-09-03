@@ -26,6 +26,7 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
@@ -92,18 +93,16 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     }
 
     @Override
-    public Future<Void> createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
-        return activateChannel(clientConfiguration);
+    public ReconnectFuture createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
+        return new SingleReconnectFuture(eventExecutor, activateChannel(clientConfiguration));
     }
 
-    private <V> Future<V> activateChannel(final NetconfClientConfiguration conf) {
+    private Future<NetconfClientSession> activateChannel(final NetconfClientConfiguration conf) {
         final InetSocketAddress remoteAddr = conf.getAddress();
         final CallHomeMountSessionContext context = getSessionManager().getByAddress(remoteAddr);
         LOG.info("Activating NETCONF channel for ip {} device context {}", remoteAddr, context);
-        if (context == null) {
-            return new FailedFuture<>(eventExecutor, new NullPointerException());
-        }
-        return context.activateNetconfChannel(conf.getSessionListener());
+        return context == null ? new FailedFuture<>(eventExecutor, new NullPointerException())
+            : context.activateNetconfChannel(conf.getSessionListener());
     }
 
     void createTopology() {
