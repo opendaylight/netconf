@@ -136,6 +136,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -172,9 +173,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final String TOP_MODULE_NAME = "opendaylight-mdsal-list-test";
     private static final String ACTOR_SYSTEM_NAME = "test";
     private static final String TOPOLOGY_ID = TopologyNetconf.QNAME.getLocalName();
-    private static final NodeId NODE_ID = new NodeId("node-id");
-    private static final InstanceIdentifier<Node> NODE_INSTANCE_ID = NetconfTopologyUtils.createTopologyNodeListPath(
-            new NodeKey(NODE_ID), TOPOLOGY_ID);
+    private static final KeyedInstanceIdentifier<Node, NodeKey> NODE_INSTANCE_ID =
+        NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(new NodeId("node-id")), TOPOLOGY_ID);
 
     private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
     private static final String TEST_DEFAULT_SUBDIR = "test-schema";
@@ -616,7 +616,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static void writeNetconfNode(final String cacheDir, final DataBroker databroker)
             throws InterruptedException, ExecutionException, TimeoutException {
         final Node node = new NodeBuilder()
-                .setNodeId(NODE_ID)
+                .withKey(NODE_INSTANCE_ID.getKey())
                 .addAugmentation(new NetconfNodeBuilder()
                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                     .setPort(new PortNumber(Uint16.valueOf(1234)))
