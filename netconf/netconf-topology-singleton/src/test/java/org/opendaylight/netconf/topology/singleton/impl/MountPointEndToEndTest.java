@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
@@ -36,8 +37,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
 import io.netty.util.concurrent.EventExecutor;
+import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import io.netty.util.concurrent.SucceededFuture;
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -166,7 +167,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Pantelis
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final Logger LOG = LoggerFactory.getLogger(MountPointEndToEndTest.class);
 
@@ -223,7 +224,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private SchemaResourceManager resourceManager;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Before
     public void setUp() throws Exception {
         deleteCacheDir();
@@ -249,8 +249,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
 
-        doReturn(new SucceededFuture(GlobalEventExecutor.INSTANCE, null)).when(mockClientDispatcher)
-                .createReconnectingClient(any());
+        doReturn(mock(Future.class)).when(mockClientDispatcher).createReconnectingClient(any());
 
         LOG.info("****** Setup complete");
     }
