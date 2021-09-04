@@ -73,7 +73,8 @@ public final class NetconfTopologyUtils {
         return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
     }
 
-    public static InstanceIdentifier<Node> createTopologyNodeListPath(final NodeKey key, final String topologyId) {
+    public static KeyedInstanceIdentifier<Node, NodeKey> createTopologyNodeListPath(final NodeKey key,
+            final String topologyId) {
         return createTopologyListPath(topologyId)
                 .child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
     }
