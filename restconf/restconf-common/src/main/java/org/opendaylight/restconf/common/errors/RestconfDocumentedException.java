@@ -24,7 +24,6 @@ import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.codec.YangInvalidValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -242,9 +241,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         if (cause instanceof YangError) {
             final YangError error = (YangError) cause;
             throw new RestconfDocumentedException(cause, new RestconfError(error.getErrorType().toNetconf(),
-                // FIXME: this is a special-case until we have YangError.getTag()
-                cause instanceof YangInvalidValueException ? ErrorTag.INVALID_VALUE : ErrorTag.MALFORMED_MESSAGE,
-                    error.getErrorMessage().orElse(null), error.getErrorAppTag().orElse(null)));
+                error.getErrorTag(), error.getErrorMessage().orElse(null), error.getErrorAppTag().orElse(null)));
         }
     }
 
