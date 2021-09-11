@@ -247,7 +247,7 @@ public class RestconfSchemaServiceTest {
         // make test and verify
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> schemaService.getSchema(""));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -264,7 +264,7 @@ public class RestconfSchemaServiceTest {
         // make test and verify
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> schemaService.getSchema(MOUNT_POINT + ""));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -280,7 +280,7 @@ public class RestconfSchemaServiceTest {
         // make test and verify
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> schemaService.getSchema("01_module/2016-01-01"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -297,7 +297,7 @@ public class RestconfSchemaServiceTest {
         // make test and verify
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> schemaService.getSchema(MOUNT_POINT + "01_module/2016-01-01"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -316,7 +316,7 @@ public class RestconfSchemaServiceTest {
         // make test and verify
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> schemaService.getSchema("2014-01-01"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -336,7 +336,7 @@ public class RestconfSchemaServiceTest {
         // make test and verify
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> schemaService.getSchema(MOUNT_POINT + "2014-01-01"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -353,7 +353,7 @@ public class RestconfSchemaServiceTest {
         // make test and verify
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> schemaService.getSchema("module"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -370,7 +370,7 @@ public class RestconfSchemaServiceTest {
         // make test and verify
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> schemaService.getSchema(MOUNT_POINT + "module"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 

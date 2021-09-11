@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
@@ -33,6 +32,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
@@ -226,8 +226,8 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream));
-        final RestconfError restconfError = ex.getErrors().get(0);
-        assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
+        final YangNetconfError restconfError = ex.getErrors().get(0);
+        assertEquals(ErrorType.PROTOCOL, restconfError.type());
         assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
     }
 }

@@ -380,7 +380,7 @@ public class ParserFieldsParameterTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, "*"));
         // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -394,7 +394,7 @@ public class ParserFieldsParameterTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
         // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -408,7 +408,7 @@ public class ParserFieldsParameterTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
         // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -422,7 +422,7 @@ public class ParserFieldsParameterTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
         // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
@@ -436,7 +436,7 @@ public class ParserFieldsParameterTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserFieldsParameter.parseFieldsParameter(this.identifierJukebox, input));
         // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).type());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 

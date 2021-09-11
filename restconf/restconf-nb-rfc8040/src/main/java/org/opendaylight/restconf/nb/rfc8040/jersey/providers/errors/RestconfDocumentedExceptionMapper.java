@@ -31,7 +31,6 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
@@ -39,6 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.re
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
@@ -140,12 +140,12 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @param restconfError Error details.
      * @return Built list entry.
      */
-    private static UnkeyedListEntryNode createErrorEntry(final RestconfError restconfError) {
+    private static UnkeyedListEntryNode createErrorEntry(final YangNetconfError restconfError) {
         // filling in mandatory leafs
         final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> entryBuilder =
             ImmutableUnkeyedListEntryNodeBuilder.create()
                 .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
-                .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().elementBody()))
+                .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.type().elementBody()))
                 .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().elementBody()));
 
         // filling in optional fields

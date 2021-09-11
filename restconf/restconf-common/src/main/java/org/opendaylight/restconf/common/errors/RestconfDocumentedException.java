@@ -24,9 +24,8 @@ import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.codec.YangInvalidValueException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -39,10 +38,9 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Pantelis
  */
 public class RestconfDocumentedException extends WebApplicationException {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedException.class);
     private static final long serialVersionUID = 1L;
 
-    private final ImmutableList<RestconfError> errors;
+    private final ImmutableList<YangNetconfError> errors;
     private final Status status;
 
     /**
@@ -121,14 +119,15 @@ public class RestconfDocumentedException extends WebApplicationException {
     /**
      * Constructs an instance with the given error.
      */
-    public RestconfDocumentedException(final RestconfError error) {
+    public RestconfDocumentedException(final YangNetconfError error) {
         this(null, error);
     }
 
     /**
      * Constructs an instance with the given errors.
      */
-    public RestconfDocumentedException(final String message, final Throwable cause, final List<RestconfError> errors) {
+    public RestconfDocumentedException(final String message, final Throwable cause,
+            final List<YangNetconfError> errors) {
         // FIXME: We override getMessage so supplied message is lost for any public access
         // this was lost also in original code.
         super(cause);
@@ -161,8 +160,8 @@ public class RestconfDocumentedException extends WebApplicationException {
         this.status = requireNonNull(status, "Status can't be null");
     }
 
-    public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
-        super(cause, ErrorTags.statusOf(error.getErrorTag()));
+    public RestconfDocumentedException(final Throwable cause, final YangNetconfError error) {
+        super(cause, ErrorTags.statusOf(error.tag()));
         errors = ImmutableList.of(error);
         status = null;
     }
@@ -248,8 +247,8 @@ public class RestconfDocumentedException extends WebApplicationException {
         }
     }
 
-    private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
-        final List<RestconfError> errorList = new ArrayList<>();
+    private static List<YangNetconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
+        final List<YangNetconfError> errorList = new ArrayList<>();
         if (rpcErrors != null) {
             for (RpcError rpcError : rpcErrors) {
                 errorList.add(new RestconfError(rpcError));
@@ -259,7 +258,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         return errorList;
     }
 
-    public List<RestconfError> getErrors() {
+    public List<YangNetconfError> getErrors() {
         return errors;
     }
 

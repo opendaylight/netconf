@@ -33,7 +33,6 @@ import org.opendaylight.netconf.sal.rest.impl.PatchJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.api.JSONRestconfService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;

@@ -289,7 +289,7 @@ public class PatchDataTransactionUtilTest {
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,
-                patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorType());
+                patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).type());
         assertEquals(ErrorTag.DATA_MISSING,
                 patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorTag());
     }
@@ -299,9 +299,7 @@ public class PatchDataTransactionUtilTest {
             PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
 
         assertFalse(patchStatusContext.isOk());
-        assertEquals(ErrorType.PROTOCOL,
-            patchStatusContext.getGlobalErrors().get(0).getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING,
-            patchStatusContext.getGlobalErrors().get(0).getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, patchStatusContext.getGlobalErrors().get(0).type());
+        assertEquals(ErrorTag.DATA_MISSING, patchStatusContext.getGlobalErrors().get(0).getErrorTag());
     }
 }
