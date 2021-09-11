@@ -136,7 +136,6 @@ public class JSONRestconfServiceImplTest {
                 StandardCharsets.UTF_8).read();
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPut() throws Exception {
         final PutResult result = mock(PutResult.class);
@@ -168,7 +167,6 @@ public class JSONRestconfServiceImplTest {
         verifyLeafNode(actualNode, DESC_QNAME, "some interface");
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPutBehindMountPoint() throws Exception {
         final PutResult result = mock(PutResult.class);
@@ -215,7 +213,6 @@ public class JSONRestconfServiceImplTest {
         this.service.put(uriPath, payload);
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPost() throws Exception {
         doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade).commitConfigurationDataPost(
@@ -256,7 +253,6 @@ public class JSONRestconfServiceImplTest {
         verifyLeafNode(entryNode, DESC_QNAME, "some interface");
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPostBehindMountPoint() throws Exception {
         doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade).commitConfigurationDataPost(
@@ -414,7 +410,6 @@ public class JSONRestconfServiceImplTest {
         this.service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION);
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testInvokeRpcWithInput() throws Exception {
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode)null);

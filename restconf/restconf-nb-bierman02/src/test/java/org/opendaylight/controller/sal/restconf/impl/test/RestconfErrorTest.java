@@ -15,11 +15,11 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 
 /**
  * Unit tests for RestconfError.
@@ -129,7 +129,7 @@ public class RestconfErrorTest {
 
     private static void validateRestConfError(final String expectedMessage, final ErrorType expectedErrorType,
             final ErrorTag expectedErrorTag, final String expectedErrorAppTag, final String errorInfo,
-            final RestconfError error) {
+            final YangNetconfError error) {
 
         validateRestConfError(expectedMessage, expectedErrorType, expectedErrorTag, expectedErrorAppTag,
                 equalTo(errorInfo), error);
@@ -137,12 +137,12 @@ public class RestconfErrorTest {
 
     private static void validateRestConfError(final String expectedMessage, final ErrorType expectedErrorType,
             final ErrorTag expectedErrorTag, final String expectedErrorAppTag, final Matcher<String> errorInfoMatcher,
-            final RestconfError error) {
+            final YangNetconfError error) {
 
-        assertEquals("getErrorMessage", expectedMessage, error.getErrorMessage());
-        assertEquals("getErrorType", expectedErrorType, error.getErrorType());
-        assertEquals("getErrorTag", expectedErrorTag, error.getErrorTag());
-        assertEquals("getErrorAppTag", expectedErrorAppTag, error.getErrorAppTag());
+        assertEquals("getErrorMessage", expectedMessage, error.message());
+        assertEquals("getErrorType", expectedErrorType, error.type());
+        assertEquals("getErrorTag", expectedErrorTag, error.tag());
+        assertEquals("getErrorAppTag", expectedErrorAppTag, error.appTag());
         assertThat("getErrorInfo", error.getErrorInfo(), errorInfoMatcher);
         error.toString(); // really just checking for NPE etc. Don't care about
                       // contents.

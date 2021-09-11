@@ -7,6 +7,8 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.json.to.nn.test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -126,7 +128,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         assertEquals(
                 "Error parsing input: Schema node with name wrong was not found under "
                         + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
-                exception.getErrors().get(0).getErrorMessage());
+                exception.getErrors().get(0).message());
 
         inputStream = this.getClass().getResourceAsStream(
                 "/json-to-nn/wrong-top-level2.json");
@@ -142,7 +144,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         assertEquals(
                 "Error parsing input: Schema node with name lst1 was not found under "
                         + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
-                exception.getErrors().get(0).getErrorMessage());
+                exception.getErrors().get(0).message());
 
         inputStream = this.getClass().getResourceAsStream(
                 "/json-to-nn/wrong-top-level3.json");
@@ -158,7 +160,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         assertEquals(
                 "Error parsing input: Schema node with name lf was not found under "
                         + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
-                exception.getErrors().get(0).getErrorMessage());
+                exception.getErrors().get(0).message());
         assertEquals(3, countExceptions);
     }
 
@@ -186,7 +188,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
             exception = e;
         }
         assertNotNull(exception);
-        assertEquals("Error parsing input: null", exception.getErrors().get(0).getErrorMessage());
+        assertEquals("Error parsing input: null", exception.getErrors().get(0).message());
     }
 
     @Test
@@ -303,9 +305,9 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         } catch (final RestconfDocumentedException e) {
             exception = e;
         }
-        LOG.info(exception.getErrors().get(0).getErrorMessage());
+        LOG.info(exception.getErrors().get(0).message());
 
-        assertTrue(exception.getErrors().get(0).getErrorMessage().contains("is not a simple type"));
+        assertThat(exception.getErrors().get(0).message(), containsString("is not a simple type"));
     }
 
     @Test
