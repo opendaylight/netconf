@@ -30,7 +30,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
 import org.opendaylight.yangtools.yang.common.ErrorTag;

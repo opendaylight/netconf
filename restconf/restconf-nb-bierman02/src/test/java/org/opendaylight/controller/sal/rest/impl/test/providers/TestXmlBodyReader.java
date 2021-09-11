@@ -25,7 +25,6 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -280,7 +279,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
             this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
             Assert.fail("Test should fail due to malformed PUT operation message");
         } catch (final RestconfDocumentedException exception) {
-            final RestconfError restconfError = exception.getErrors().get(0);
+            final YangNettconfError restconfError = exception.getErrors().get(0);
             assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
             assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
         }

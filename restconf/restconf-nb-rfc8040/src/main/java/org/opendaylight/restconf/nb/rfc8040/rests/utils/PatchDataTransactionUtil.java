@@ -17,7 +17,6 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -114,7 +113,7 @@ public final class PatchDataTransactionUtil {
                         break;
                     default:
                         editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                false, Lists.newArrayList(new RestconfError(ErrorType.PROTOCOL,
+                                false, List.of(new RestconfError(ErrorType.PROTOCOL,
                                 ErrorTag.OPERATION_NOT_SUPPORTED, "Not supported Yang Patch operation"))));
                         noError = false;
                         break;

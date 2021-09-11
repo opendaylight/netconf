@@ -20,11 +20,11 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_XML)
@@ -87,17 +87,17 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         writer.flush();
     }
 
-    private static void reportErrors(final List<RestconfError> errors, final XMLStreamWriter writer)
+    private static void reportErrors(final List<YangNetconfError> errors, final XMLStreamWriter writer)
             throws XMLStreamException {
         writer.writeStartElement("errors");
 
-        for (final RestconfError restconfError : errors) {
+        for (final YangNetconfError restconfError : errors) {
             writer.writeStartElement("error-type");
-            writer.writeCharacters(restconfError.getErrorType().elementBody());
+            writer.writeCharacters(restconfError.type().elementBody());
             writer.writeEndElement();
 
             writer.writeStartElement("error-tag");
-            writer.writeCharacters(restconfError.getErrorTag().elementBody());
+            writer.writeCharacters(restconfError.type().elementBody());
             writer.writeEndElement();
 
             // optional node

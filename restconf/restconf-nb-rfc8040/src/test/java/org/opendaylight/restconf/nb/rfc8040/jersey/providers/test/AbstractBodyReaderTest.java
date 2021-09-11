@@ -30,7 +30,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
@@ -39,6 +38,7 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentif
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractBodyReaderTest {
@@ -128,13 +128,13 @@ public abstract class AbstractBodyReaderTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class, runnable);
         assertEquals(Status.BAD_REQUEST, ex.getResponse().getStatusInfo());
 
-        final List<RestconfError> errors = ex.getErrors();
+        final List<YangNetconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
-        final RestconfError error = errors.get(0);
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-        assertEquals("bar error app tag", error.getErrorAppTag());
+        final YangNetconfError error = errors.get(0);
+        assertEquals(ErrorType.APPLICATION, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
+        assertEquals("bar error app tag", error.appTag());
         assertEquals("bar error message", error.getErrorMessage());
     }
 }
