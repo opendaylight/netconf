@@ -46,7 +46,6 @@ import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -54,6 +53,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -169,22 +169,21 @@ public class InvokeRpcMethodTest {
             final ErrorType expErrorType, final ErrorTag expErrorTag, final Optional<String> expErrorMsg,
             final Optional<String> expAppTag) {
 
-        final List<RestconfError> errors = restDocumentedException.getErrors();
+        final List<YangNetconfError> errors = restDocumentedException.getErrors();
         assertTrue("RestconfError not found at index " + index, errors.size() > index);
 
-        RestconfError actual = errors.get(index);
+        YangNetconfError actual = errors.get(index);
 
-        assertEquals("getErrorType", expErrorType, actual.getErrorType());
-        assertEquals("getErrorTag", expErrorTag, actual.getErrorTag());
-        assertNotNull("getErrorMessage is null", actual.getErrorMessage());
+        assertEquals("getErrorType", expErrorType, actual.type());
+        assertEquals("getErrorTag", expErrorTag, actual.tag());
+        assertNotNull("getErrorMessage is null", actual.message());
 
-        if (expErrorMsg.isPresent()) {
-            assertEquals("getErrorMessage", expErrorMsg.get(), actual.getErrorMessage());
-        }
-
-        if (expAppTag.isPresent()) {
-            assertEquals("getErrorAppTag", expAppTag.get(), actual.getErrorAppTag());
-        }
+        expErrorMsg.ifPresent(expMessage -> {
+            assertEquals("getErrorMessage", expErrorMsg.get(), actual.message());
+        });
+        expAppTag.ifPresent(tag -> {
+            assertEquals("getErrorAppTag", expAppTag.get(), actual.appTag());
+        });
     }
 
     @Test

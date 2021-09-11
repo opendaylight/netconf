@@ -63,7 +63,7 @@ public class TestXmlPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
             "/instanceidentifier/xml/xmlPATCHdataValueMissing.xml");
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -78,7 +78,7 @@ public class TestXmlPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataValueNotSupported.xml");
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).tag());
     }
 
     /**

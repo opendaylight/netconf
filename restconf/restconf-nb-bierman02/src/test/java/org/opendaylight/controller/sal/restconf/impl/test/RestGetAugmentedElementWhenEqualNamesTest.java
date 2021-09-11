@@ -7,29 +7,26 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class RestGetAugmentedElementWhenEqualNamesTest {
-
     private static EffectiveModelContext schemaContext;
 
     private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
     public static void init() throws FileNotFoundException {
@@ -47,12 +44,9 @@ public class RestGetAugmentedElementWhenEqualNamesTest {
 
     @Test
     public void nodeWithoutNamespaceHasMoreAugments() {
-        try {
-            controllerContext.toInstanceIdentifier("main:cont/cont1");
-            fail("Expected exception");
-        } catch (final RestconfDocumentedException e) {
-            assertTrue(e.getErrors().get(0).getErrorMessage()
-                    .contains("is added as augment from more than one module"));
-        }
+        final List<YangNetconfError> errors = assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("main:cont/cont1")).getErrors();
+        assertEquals(1, errors.size());
+        assertThat(errors.get(0).message(), containsString("is added as augment from more than one module"));
     }
 }

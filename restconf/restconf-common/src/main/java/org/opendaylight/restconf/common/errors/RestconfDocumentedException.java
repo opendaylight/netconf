@@ -18,12 +18,15 @@ import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.ErrorTags;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangError;
+import org.opendaylight.yangtools.yang.data.api.ImmutableYangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -38,7 +41,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 public class RestconfDocumentedException extends WebApplicationException {
     private static final long serialVersionUID = 1L;
 
-    private final ImmutableList<RestconfError> errors;
+    private final ImmutableList<YangNetconfError> errors;
     private final Status status;
 
     /**
@@ -66,7 +69,13 @@ public class RestconfDocumentedException extends WebApplicationException {
      */
     public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
                                        final Throwable cause) {
-        this(cause, new RestconfError(errorType, errorTag, message, null, cause.getMessage(), null));
+        this(cause, ImmutableYangNetconfError.builder()
+            .severity(ErrorSeverity.ERROR)
+            .type(errorType)
+            .tag(errorTag)
+            .message(message)
+            .addInfo(cause.getMessage())
+            .build());
     }
 
     /**
@@ -80,7 +89,12 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            The enumerated tag representing a more specific error cause.
      */
     public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag) {
-        this(null, new RestconfError(errorType, errorTag, message));
+        this(null, ImmutableYangNetconfError.builder()
+            .severity(ErrorSeverity.ERROR)
+            .type(errorType)
+            .tag(errorTag)
+            .message(message)
+            .build());
     }
 
     /**
@@ -97,7 +111,13 @@ public class RestconfDocumentedException extends WebApplicationException {
      */
     public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
                                        final YangInstanceIdentifier errorPath) {
-        this(null, new RestconfError(errorType, errorTag, message, errorPath));
+        this(null, ImmutableYangNetconfError.builder()
+            .severity(ErrorSeverity.ERROR)
+            .type(errorType)
+            .tag(errorTag)
+            .message(message)
+            .path(errorPath)
+            .build());
     }
 
     /**
@@ -110,29 +130,39 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            The underlying exception cause.
      */
     public RestconfDocumentedException(final String message, final Throwable cause) {
-        this(cause, new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message, null,
-            cause.getMessage(), null));
+        this(cause, ImmutableYangNetconfError.builder()
+            .severity(ErrorSeverity.ERROR)
+            .type(ErrorType.APPLICATION)
+            .tag(ErrorTag.OPERATION_FAILED)
+            .message(message)
+            .addInfo(cause.getMessage())
+            .build());
     }
 
     /**
      * Constructs an instance with the given error.
      */
-    public RestconfDocumentedException(final RestconfError error) {
+    public RestconfDocumentedException(final YangNetconfError error) {
         this(null, error);
     }
 
     /**
      * Constructs an instance with the given errors.
      */
-    public RestconfDocumentedException(final String message, final Throwable cause, final List<RestconfError> errors) {
+    public RestconfDocumentedException(final String message, final Throwable cause,
+            final List<YangNetconfError> errors) {
         // FIXME: We override getMessage so supplied message is lost for any public access
         // this was lost also in original code.
         super(cause);
-        if (!errors.isEmpty()) {
-            this.errors = ImmutableList.copyOf(errors);
+        if (errors.isEmpty()) {
+            this.errors = ImmutableList.of(ImmutableYangNetconfError.builder()
+                .severity(ErrorSeverity.ERROR)
+                .type(ErrorType.APPLICATION)
+                .tag(ErrorTag.OPERATION_FAILED)
+                .message(message)
+                .build());
         } else {
-            this.errors = ImmutableList.of(
-                new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message));
+            this.errors = ImmutableList.copyOf(errors);
         }
 
         status = null;
@@ -157,8 +187,8 @@ public class RestconfDocumentedException extends WebApplicationException {
         this.status = requireNonNull(status, "Status can't be null");
     }
 
-    public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
-        super(cause, ErrorTags.statusOf(error.getErrorTag()));
+    public RestconfDocumentedException(final Throwable cause, final YangNetconfError error) {
+        super(cause, ErrorTags.statusOf(error.tag()));
         errors = ImmutableList.of(error);
         status = null;
     }
@@ -237,14 +267,18 @@ public class RestconfDocumentedException extends WebApplicationException {
     public static void throwIfYangError(final Throwable cause) {
         if (cause instanceof YangError) {
             final YangError error = (YangError) cause;
-            throw new RestconfDocumentedException(cause, new RestconfError(error.getErrorType().toNetconf(),
-                new ErrorTag(error.getErrorTag()), error.getErrorMessage().orElse(null),
-                error.getErrorAppTag().orElse(null)));
+            throw new RestconfDocumentedException(cause, ImmutableYangNetconfError.builder()
+                .severity(ErrorSeverity.ERROR)
+                .type(error.getErrorType().toNetconf())
+                .tag(new ErrorTag(error.getErrorTag()))
+                .message(error.getErrorMessage().orElse(null))
+                .appTag(error.getErrorAppTag().orElse(null))
+                .build());
         }
     }
 
-    private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
-        final List<RestconfError> errorList = new ArrayList<>();
+    private static List<YangNetconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
+        final List<YangNetconfError> errorList = new ArrayList<>();
         if (rpcErrors != null) {
             for (RpcError rpcError : rpcErrors) {
                 errorList.add(new RestconfError(rpcError));
@@ -254,7 +288,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         return errorList;
     }
 
-    public List<RestconfError> getErrors() {
+    public List<YangNetconfError> getErrors() {
         return errors;
     }
 

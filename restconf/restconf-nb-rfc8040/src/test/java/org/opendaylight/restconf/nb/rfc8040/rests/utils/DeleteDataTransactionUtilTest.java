@@ -110,8 +110,8 @@ public class DeleteDataTransactionUtilTest {
             DeleteDataTransactionUtil.deleteData(strategy, context.getInstanceIdentifier());
             fail("Delete operation should fail due to missing data");
         } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).type());
+            assertEquals(ErrorTag.DATA_MISSING, e.getErrors().get(0).tag());
         }
     }
 }

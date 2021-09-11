@@ -17,15 +17,16 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.data.api.ImmutableYangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -65,8 +66,9 @@ public final class PatchDataTransactionUtil {
                                 schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false,
+                                // FIXME: do not copy this once its immutable
+                                Lists.newArrayList(e.getErrors())));
                             noError = false;
                         }
                         break;
@@ -75,8 +77,9 @@ public final class PatchDataTransactionUtil {
                             deleteDataWithinTransaction(patchEntity.getTargetNode(), transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false,
+                                // FIXME: do not copy this once its immutable
+                                Lists.newArrayList(e.getErrors())));
                             noError = false;
                         }
                         break;
@@ -86,8 +89,9 @@ public final class PatchDataTransactionUtil {
                                 schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false,
+                                // FIXME: do not copy this once its immutable
+                                Lists.newArrayList(e.getErrors())));
                             noError = false;
                         }
                         break;
@@ -97,8 +101,9 @@ public final class PatchDataTransactionUtil {
                                 schemaContext, transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false,
+                                // FIXME: do not copy this once its immutable
+                                Lists.newArrayList(e.getErrors())));
                             noError = false;
                         }
                         break;
@@ -107,15 +112,20 @@ public final class PatchDataTransactionUtil {
                             removeDataWithinTransaction(patchEntity.getTargetNode(), transaction);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                    false, Lists.newArrayList(e.getErrors())));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false,
+                                // FIXME: do not copy this once its immutable
+                                Lists.newArrayList(e.getErrors())));
                             noError = false;
                         }
                         break;
                     default:
-                        editCollection.add(new PatchStatusEntity(patchEntity.getEditId(),
-                                false, Lists.newArrayList(new RestconfError(ErrorType.PROTOCOL,
-                                ErrorTag.OPERATION_NOT_SUPPORTED, "Not supported Yang Patch operation"))));
+                        editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false,
+                            List.of(ImmutableYangNetconfError.builder()
+                                .severity(ErrorSeverity.ERROR)
+                                .type(ErrorType.PROTOCOL)
+                                .tag(ErrorTag.OPERATION_NOT_SUPPORTED)
+                                .message("Not supported Yang Patch operation")
+                                .build())));
                         noError = false;
                         break;
                 }

@@ -34,13 +34,13 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -158,10 +158,10 @@ public class RestPutListDataTest {
 
     private static void verifyException(final RestconfDocumentedException restDocumentedException,
                                         final ErrorType errorType, final ErrorTag errorTag) {
-        final List<RestconfError> errors = restDocumentedException.getErrors();
+        final List<YangNetconfError> errors = restDocumentedException.getErrors();
         assertEquals("getErrors() size", 1, errors.size());
-        assertEquals("RestconfError getErrorType()", errorType, errors.get(0).getErrorType());
-        assertEquals("RestconfError getErrorTag()", errorTag, errors.get(0).getErrorTag());
+        assertEquals("RestconfError getErrorType()", errorType, errors.get(0).type());
+        assertEquals("RestconfError getErrorTag()", errorTag, errors.get(0).tag());
     }
 
     public void putListDataTest(final String uriKey1, final String uriKey2, final String payloadKey1,
