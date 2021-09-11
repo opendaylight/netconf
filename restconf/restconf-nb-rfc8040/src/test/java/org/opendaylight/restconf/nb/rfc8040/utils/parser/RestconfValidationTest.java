@@ -50,7 +50,7 @@ public class RestconfValidationTest {
             () -> ParserIdentifier.validateAndGetRevision(Collections.emptyIterator()));
 
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -83,7 +83,7 @@ public class RestconfValidationTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetModulName(Collections.emptyIterator()));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -97,7 +97,7 @@ public class RestconfValidationTest {
             () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator(
                 "01-not-parsable-as-name-on-firts-char")));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -111,7 +111,7 @@ public class RestconfValidationTest {
             () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator(
                 "not-parsable-as-name-after-first-char*")));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -123,7 +123,7 @@ public class RestconfValidationTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator("xMl-module-name")));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -135,6 +135,6 @@ public class RestconfValidationTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator("")));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 }

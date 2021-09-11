@@ -40,6 +40,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -256,7 +257,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         if (exception instanceof RestconfDocumentedException) {
             final RestconfDocumentedException rde = (RestconfDocumentedException)exception;
             if (!rde.getErrors().isEmpty()) {
-                if (rde.getErrors().get(0).getErrorTag() == ErrorTag.DATA_MISSING) {
+                if (rde.getErrors().get(0).tag().equals(ErrorTag.DATA_MISSING)) {
                     dataMissing = true;
                 }
             }
@@ -278,12 +279,11 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         throw new OperationFailedException(String.format("%s failed for URI %s", operation, uriPath), exception);
     }
 
-    private static RpcError[] toRpcErrors(final List<RestconfError> from) {
+    private static RpcError[] toRpcErrors(final List<YangNetconfError> from) {
         final RpcError[] to = new RpcError[from.size()];
         int index = 0;
-        for (final RestconfError e: from) {
-            to[index++] = RpcResultBuilder.newError(e.getErrorType().toLegacy(), e.getErrorTag().elementBody(),
-                    e.getErrorMessage());
+        for (final YangNetconfError e: from) {
+            to[index++] = RpcResultBuilder.newError(e.type().toLegacy(), e.tag().elementBody(), e.getErrorMessage());
         }
 
         return to;

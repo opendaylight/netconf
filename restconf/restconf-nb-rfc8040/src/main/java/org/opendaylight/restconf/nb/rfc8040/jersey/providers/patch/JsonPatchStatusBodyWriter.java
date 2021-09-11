@@ -83,7 +83,7 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         for (final YangNetconfError restconfError : errors) {
             jsonWriter.beginObject();
             jsonWriter.name("error-type").value(restconfError.type().elementBody());
-            jsonWriter.name("error-tag").value(restconfError.getErrorTag().elementBody());
+            jsonWriter.name("error-tag").value(restconfError.tag().elementBody());
 
             // optional node
             if (restconfError.getErrorPath() != null) {

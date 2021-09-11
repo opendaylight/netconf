@@ -134,7 +134,7 @@ public abstract class AbstractBodyReaderTest {
         final YangNetconfError error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
-        assertEquals("bar error app tag", error.getErrorAppTag());
+        assertEquals("bar error app tag", error.appTag());
         assertEquals("bar error message", error.getErrorMessage());
     }
 }

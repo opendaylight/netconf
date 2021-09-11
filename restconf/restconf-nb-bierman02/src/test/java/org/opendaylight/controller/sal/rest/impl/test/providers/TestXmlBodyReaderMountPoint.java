@@ -211,7 +211,7 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
             this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
             Assert.fail("Test should fail due to malformed PUT operation message");
         } catch (final RestconfDocumentedException exception) {
-            final RestconfError restconfError = exception.getErrors().get(0);
+            final YangNettconfError restconfError = exception.getErrors().get(0);
             assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
             assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
         }

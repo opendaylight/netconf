@@ -183,7 +183,7 @@ public class InvokeRpcMethodTest {
         }
 
         if (expAppTag.isPresent()) {
-            assertEquals("getErrorAppTag", expAppTag.get(), actual.getErrorAppTag());
+            assertEquals("getErrorAppTag", expAppTag.get(), actual.appTag());
         }
     }
 

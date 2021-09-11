@@ -228,6 +228,6 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
             () -> xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream));
         final YangNetconfError restconfError = ex.getErrors().get(0);
         assertEquals(ErrorType.PROTOCOL, restconfError.type());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.tag());
     }
 }

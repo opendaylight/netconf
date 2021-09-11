@@ -415,7 +415,7 @@ public class ReadDataTransactionUtilTest {
             () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -434,7 +434,7 @@ public class ReadDataTransactionUtilTest {
             () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -454,7 +454,7 @@ public class ReadDataTransactionUtilTest {
             () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).type());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -568,7 +568,7 @@ public class ReadDataTransactionUtilTest {
 
         final YangNetconfError error = errors.get(0);
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.type());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.tag());
     }
 
 
@@ -589,12 +589,12 @@ public class ReadDataTransactionUtilTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ReadDataTransactionUtil.checkParametersTypes(Set.of("not-allowed-parameter"),
                 Set.of(RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH)));
-        final List<RestconfError> errors = ex.getErrors();
+        final List<YangNetconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
-        final RestconfError error = errors.get(0);
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
+        final YangNetconfError error = errors.get(0);
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.type());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.tag());
     }
 
     /**

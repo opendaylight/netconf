@@ -291,7 +291,7 @@ public class PatchDataTransactionUtilTest {
         assertEquals(ErrorType.PROTOCOL,
                 patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).type());
         assertEquals(ErrorTag.DATA_MISSING,
-                patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).getErrorTag());
+                patchStatusContext.getEditCollection().get(0).getEditErrors().get(0).tag());
     }
 
     private void deleteNetconf(final PatchContext patchContext, final RestconfStrategy strategy) {
@@ -300,6 +300,6 @@ public class PatchDataTransactionUtilTest {
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL, patchStatusContext.getGlobalErrors().get(0).type());
-        assertEquals(ErrorTag.DATA_MISSING, patchStatusContext.getGlobalErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.DATA_MISSING, patchStatusContext.getGlobalErrors().get(0).tag());
     }
 }
