@@ -52,7 +52,6 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
@@ -60,13 +59,16 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.ImmutableYangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -326,18 +328,20 @@ public class BrokerFacade implements Closeable {
                 // if mount point does not have broker it is not possible to continue and global error is reported
                 LOG.error("Http Patch {} has failed - device {} does not support broker service",
                         patchContext.getPatchId(), mountPoint.getIdentifier());
-                return new PatchStatusContext(
-                        patchContext.getPatchId(),
-                        null,
-                        false,
-                        ImmutableList.of(new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-                            "DOM data broker service isn't available for mount point " + mountPoint.getIdentifier()))
+                return new PatchStatusContext(patchContext.getPatchId(), null, false,
+                    ImmutableList.of(ImmutableYangNetconfError.builder()
+                        .severity(ErrorSeverity.ERROR)
+                        .type(ErrorType.APPLICATION)
+                        .tag(ErrorTag.OPERATION_FAILED)
+                        .message(
+                            "DOM data broker service isn't available for mount point " + mountPoint.getIdentifier())
+                        .build())
                 );
             }
         }
 
         final List<PatchStatusEntity> editCollection = new ArrayList<>();
-        List<RestconfError> editErrors;
+        List<YangNetconfError> editErrors;
         boolean withoutError = true;
 
         for (final PatchEntity patchEntity : patchContext.getData()) {
@@ -448,8 +452,12 @@ public class BrokerFacade implements Closeable {
                 // if commit failed it is global error
                 LOG.error("Http Patch {} transaction commit has failed", patchContext.getPatchId());
                 status.setStatus(new PatchStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
-                    false, ImmutableList.of(
-                        new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, throwable.getMessage()))));
+                    false, ImmutableList.of(ImmutableYangNetconfError.builder()
+                        .severity(ErrorSeverity.ERROR)
+                        .type(ErrorType.APPLICATION)
+                        .tag(ErrorTag.OPERATION_FAILED)
+                        .message(throwable.getMessage())
+                        .build())));
                 waiter.countDown();
             }
         }, MoreExecutors.directExecutor());

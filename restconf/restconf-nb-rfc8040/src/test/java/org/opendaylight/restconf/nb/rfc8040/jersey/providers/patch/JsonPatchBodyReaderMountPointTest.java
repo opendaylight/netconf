@@ -78,7 +78,7 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -95,7 +95,7 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).tag());
     }
 
     /**
