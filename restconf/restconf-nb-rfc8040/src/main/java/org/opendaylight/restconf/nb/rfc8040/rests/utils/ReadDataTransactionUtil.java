@@ -30,13 +30,14 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.data.api.ImmutableYangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -250,9 +251,13 @@ public final class ReadDataTransactionUtil {
             case RestconfDataServiceConstant.ReadData.ALL:
                 return readAllData(strategy, path, withDefa, ctx, fields);
             default:
-                throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                        "Invalid content parameter: " + valueOfContent, null,
-                        "The content parameter value must be either config, nonconfig or all (default)"));
+                throw new RestconfDocumentedException(ImmutableYangNetconfError.builder()
+                    .severity(ErrorSeverity.ERROR)
+                    .type(ErrorType.PROTOCOL)
+                    .tag(ErrorTag.INVALID_VALUE)
+                    .message("Invalid content parameter: " + valueOfContent)
+                    .addInfo("The content parameter value must be either config, nonconfig or all (default)")
+                    .build());
         }
     }
 

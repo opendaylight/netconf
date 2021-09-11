@@ -11,9 +11,10 @@ import com.google.common.base.Strings;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.data.api.ImmutableYangNetconfError;
 
 public final class QueryParametersParser {
 
@@ -57,17 +58,23 @@ public final class QueryParametersParser {
             try {
                 final int depth = Integer.parseInt(param);
                 if (depth < 1) {
-                    throw new RestconfDocumentedException(
-                            new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                            "Invalid depth parameter: " + depth, null,
-                            "The depth parameter must be an integer > 1 or \"unbounded\""));
+                    throw new RestconfDocumentedException(ImmutableYangNetconfError.builder()
+                        .severity(ErrorSeverity.ERROR)
+                        .type(ErrorType.PROTOCOL)
+                        .tag(ErrorTag.INVALID_VALUE)
+                        .message("Invalid depth parameter: " + depth)
+                        .addInfo("The depth parameter must be an integer > 1 or \"unbounded\"")
+                        .build());
                 }
                 wpBuilder.setDepth(depth);
             } catch (final NumberFormatException e) {
-                throw new RestconfDocumentedException(e, new RestconfError(
-                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                        "Invalid depth parameter: " + e.getMessage(), null,
-                        "The depth parameter must be an integer > 1 or \"unbounded\""));
+                throw new RestconfDocumentedException(e, ImmutableYangNetconfError.builder()
+                    .severity(ErrorSeverity.ERROR)
+                    .type(ErrorType.PROTOCOL)
+                    .tag(ErrorTag.INVALID_VALUE)
+                    .message("Invalid depth parameter: " + e.getMessage())
+                    .addInfo("The depth parameter must be an integer > 1 or \"unbounded\"")
+                    .build());
             }
         }
         param = info.getQueryParameters(false).getFirst(UriParameters.PRETTY_PRINT.toString());
