@@ -62,7 +62,7 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
         assertEquals(1, ex.getErrors().size());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).tag());
     }
 
     /**
@@ -79,7 +79,7 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
         assertEquals(1, ex.getErrors().size());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, ex.getErrors().get(0).tag());
     }
 
     /**

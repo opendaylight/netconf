@@ -63,10 +63,12 @@ import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.data.api.ImmutableYangNetconfError;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -359,17 +361,21 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
     @Test
     public void testToJsonResponseWithErrorAppTag() throws Exception {
-
-        testJsonResponse(new RestconfDocumentedException(new RestconfError(ErrorType.APPLICATION,
-                ErrorTag.INVALID_VALUE, "mock error", "mock-app-tag")), Status.BAD_REQUEST, ErrorType.APPLICATION,
-                ErrorTag.INVALID_VALUE, "mock error", "mock-app-tag", null);
+        testJsonResponse(new RestconfDocumentedException(ImmutableYangNetconfError.builder()
+            .severity(ErrorSeverity.ERROR)
+            .type(ErrorType.APPLICATION)
+            .tag(ErrorTag.INVALID_VALUE)
+            .message("mock error")
+            .appTag("mock-app-tag")
+            .build()), Status.BAD_REQUEST, ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, "mock error", "mock-app-tag",
+            null);
     }
 
     @Test
     @Ignore // FIXME : find why it return "error-type" RPC no expected APPLICATION
     public void testToJsonResponseWithMultipleErrors() throws Exception {
 
-        final List<RestconfError> errorList = Arrays.asList(
+        final List<YangNetconfError> errorList = List.of(
                 new RestconfError(ErrorType.APPLICATION, ErrorTag.LOCK_DENIED, "mock error1"),
                 new RestconfError(ErrorType.RPC, ErrorTag.ROLLBACK_FAILED, "mock error2"));
         stageMockEx(new RestconfDocumentedException("mock", null, errorList));

@@ -8,10 +8,10 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.Futures;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -45,9 +46,11 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangErrorInfo;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -222,32 +225,34 @@ public class PostDataTransactionUtilTest {
         doReturn(immediateFailedFluentFuture(domException)).when(this.readWrite).commit();
         doReturn(immediateFailedFluentFuture(domException)).when(this.netconfService)
             .create(any(), any(), any(), any());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
 
-        try {
-            PostDataTransactionUtil.postData(this.uriInfo, payload,
-                    new MdsalRestconfStrategy(mockDataBroker), this.schema, null, null);
-            fail("Expected RestconfDocumentedException");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(1, e.getErrors().size());
-            assertTrue(e.getErrors().get(0).getErrorInfo().contains(domException.getMessage()));
-        }
+        List<YangNetconfError> errors = assertThrows(RestconfDocumentedException.class,
+            () -> PostDataTransactionUtil.postData(uriInfo, payload, new MdsalRestconfStrategy(mockDataBroker), schema,
+                null, null)).getErrors();
+        assertEquals(1, errors.size());
+        List<YangErrorInfo> infos = errors.get(0).info();
+        assertEquals(1, infos.size());
+        Object info = infos.get(0).value().body();
+        assertThat(info, instanceOf(String.class));
+        assertThat((String) info, containsString(domException.getMessage()));
 
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
-        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
+        verify(readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION,
+            payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
-        try {
-            PostDataTransactionUtil.postData(this.uriInfo, payload,
-                    new NetconfRestconfStrategy(netconfService), this.schema, null, null);
-            fail("Expected RestconfDocumentedException");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(1, e.getErrors().size());
-            assertTrue(e.getErrors().get(0).getErrorInfo().contains(domException.getMessage()));
-        }
+        errors = assertThrows(RestconfDocumentedException.class,
+            () -> PostDataTransactionUtil.postData(uriInfo, payload, new NetconfRestconfStrategy(netconfService),
+                schema, null, null)).getErrors();
+        assertEquals(1, errors.size());
+        infos = errors.get(0).info();
+        assertEquals(1, infos.size());
+        info = infos.get(0).value().body();
+        assertThat(info, instanceOf(String.class));
+        assertThat((String) info, containsString(domException.getMessage()));
 
-        verify(this.netconfService).create(LogicalDatastoreType.CONFIGURATION,
-                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
+        verify(netconfService).create(LogicalDatastoreType.CONFIGURATION,
+            payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 }

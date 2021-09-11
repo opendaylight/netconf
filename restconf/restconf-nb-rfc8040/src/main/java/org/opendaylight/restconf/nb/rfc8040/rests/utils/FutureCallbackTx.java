@@ -15,9 +15,10 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.data.api.ImmutableYangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,18 +89,29 @@ final class FutureCallbackTx {
                 */
                 final List<Throwable> causalChain = Throwables.getCausalChain(cause);
                 for (Throwable error : causalChain) {
+                    // FIXME: NETCONF-793: all of this remapping should not be necessary
                     if (error instanceof DocumentedException) {
                         final ErrorTag errorTag = ((DocumentedException) error).getErrorTag();
                         if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                             LOG.trace("Operation via Restconf was not executed because data at {} already exists",
                                 path);
-                            throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
-                                ErrorTag.DATA_EXISTS, "Data already exists", path));
+                            throw new RestconfDocumentedException(e, ImmutableYangNetconfError.builder()
+                                .severity(ErrorSeverity.ERROR)
+                                .type(ErrorType.PROTOCOL)
+                                .tag(ErrorTag.DATA_EXISTS)
+                                .message("Data already exists")
+                                .path(path)
+                                .build());
                         } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                             LOG.trace("Operation via Restconf was not executed because data at {} does not exist",
                                 path);
-                            throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
-                                ErrorTag.DATA_MISSING, "Data does not exist", path));
+                            throw new RestconfDocumentedException(e, ImmutableYangNetconfError.builder()
+                                .severity(ErrorSeverity.ERROR)
+                                .type(ErrorType.PROTOCOL)
+                                .tag(ErrorTag.DATA_MISSING)
+                                .message("Data does not exist")
+                                .path(path)
+                                .build());
                         }
                     }
                     if (error instanceof NetconfDocumentedException) {

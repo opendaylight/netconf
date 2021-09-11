@@ -517,9 +517,8 @@ public class RestconfDataServiceImplTest {
         assertTrue(status.getEditCollection().get(0).isOk());
         assertTrue(status.getEditCollection().get(1).isOk());
         assertFalse(status.getEditCollection().get(2).isOk());
-        assertFalse(status.getEditCollection().get(2).getEditErrors().isEmpty());
-        final String errorMessage = status.getEditCollection().get(2).getEditErrors().get(0).getErrorMessage();
-        assertEquals("Data does not exist", errorMessage);
+        assertEquals(1, status.getEditCollection().get(2).getEditErrors().size());
+        assertEquals("Data does not exist", status.getEditCollection().get(2).getEditErrors().get(0).message());
     }
 
     @Test

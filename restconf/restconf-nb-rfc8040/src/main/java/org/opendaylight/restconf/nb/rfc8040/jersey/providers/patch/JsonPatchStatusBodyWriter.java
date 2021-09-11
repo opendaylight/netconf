@@ -19,10 +19,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
 @Provider
@@ -73,25 +73,27 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         jsonWriter.name("ok").beginArray().nullValue().endArray();
     }
 
-    private static void reportErrors(final List<RestconfError> errors, final JsonWriter jsonWriter) throws IOException {
+    private static void reportErrors(final List<YangNetconfError> errors, final JsonWriter jsonWriter)
+            throws IOException {
         jsonWriter.name("errors");
         jsonWriter.beginObject();
         jsonWriter.name("error");
         jsonWriter.beginArray();
 
-        for (final RestconfError restconfError : errors) {
+        for (final YangNetconfError restconfError : errors) {
             jsonWriter.beginObject();
-            jsonWriter.name("error-type").value(restconfError.getErrorType().elementBody());
-            jsonWriter.name("error-tag").value(restconfError.getErrorTag().elementBody());
+            jsonWriter.name("error-type").value(restconfError.type().elementBody());
+            jsonWriter.name("error-tag").value(restconfError.tag().elementBody());
 
             // optional node
-            if (restconfError.getErrorPath() != null) {
-                jsonWriter.name("error-path").value(restconfError.getErrorPath().toString());
+            if (restconfError.path() != null) {
+                // FIXME: Use proper codec
+                jsonWriter.name("error-path").value(restconfError.path().toString());
             }
 
             // optional node
-            if (restconfError.getErrorMessage() != null) {
-                jsonWriter.name("error-message").value(restconfError.getErrorMessage());
+            if (restconfError.message() != null) {
+                jsonWriter.name("error-message").value(restconfError.message());
             }
 
             // optional node
