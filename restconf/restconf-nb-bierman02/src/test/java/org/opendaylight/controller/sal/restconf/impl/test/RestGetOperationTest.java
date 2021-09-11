@@ -7,10 +7,13 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,6 +61,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -671,18 +675,16 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     private void getDataWithInvalidDepthParameterTest(final UriInfo uriInfo) {
-        try {
-            final QName qNameDepth1Cont = QName.create("urn:nested:module", "2014-06-3", "depth1-cont");
-            final YangInstanceIdentifier ii = YangInstanceIdentifier.builder().node(qNameDepth1Cont).build();
-            final NormalizedNode value =
-                    Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(qNameDepth1Cont)).build();
-            when(brokerFacade.readConfigurationData(eq(ii))).thenReturn(value);
-            restconfImpl.readConfigurationData("nested-module:depth1-cont", uriInfo);
-            fail("Expected RestconfDocumentedException");
-        } catch (final RestconfDocumentedException e) {
-            assertTrue("Unexpected error message: " + e.getErrors().get(0).getErrorMessage(), e.getErrors().get(0)
-                    .getErrorMessage().contains("depth"));
-        }
+        final QName qNameDepth1Cont = QName.create("urn:nested:module", "2014-06-3", "depth1-cont");
+        final YangInstanceIdentifier ii = YangInstanceIdentifier.builder().node(qNameDepth1Cont).build();
+        final NormalizedNode value =
+            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(qNameDepth1Cont)).build();
+        when(brokerFacade.readConfigurationData(eq(ii))).thenReturn(value);
+
+        final List<YangNetconfError> errors = assertThrows(RestconfDocumentedException.class,
+            () -> restconfImpl.readConfigurationData("nested-module:depth1-cont", uriInfo)).getErrors();
+        assertEquals(1, errors.size());
+        assertThat(errors.get(0).message(), containsString("depth"));
     }
 
     @SuppressWarnings("unused")

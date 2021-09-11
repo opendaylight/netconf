@@ -25,7 +25,6 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -34,6 +33,7 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -280,9 +280,9 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
             this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
             Assert.fail("Test should fail due to malformed PUT operation message");
         } catch (final RestconfDocumentedException exception) {
-            final RestconfError restconfError = exception.getErrors().get(0);
-            assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
-            assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+            final YangNetconfError restconfError = exception.getErrors().get(0);
+            assertEquals(ErrorType.PROTOCOL, restconfError.type());
+            assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.tag());
         }
     }
 }

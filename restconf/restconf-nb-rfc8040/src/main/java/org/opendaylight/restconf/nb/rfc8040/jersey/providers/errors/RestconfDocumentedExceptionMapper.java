@@ -31,19 +31,22 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.data.api.YangErrorInfo;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableUnkeyedListEntryNodeBuilder;
@@ -140,30 +143,37 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @param restconfError Error details.
      * @return Built list entry.
      */
-    private static UnkeyedListEntryNode createErrorEntry(final RestconfError restconfError) {
+    private static UnkeyedListEntryNode createErrorEntry(final YangNetconfError restconfError) {
         // filling in mandatory leafs
         final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> entryBuilder =
             ImmutableUnkeyedListEntryNodeBuilder.create()
                 .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
-                .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().elementBody()))
-                .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().elementBody()));
+                .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.type().elementBody()))
+                .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.tag().elementBody()));
 
         // filling in optional fields
-        if (restconfError.getErrorMessage() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_MESSAGE_QNAME, restconfError.getErrorMessage()));
+        if (restconfError.message() != null) {
+            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_MESSAGE_QNAME, restconfError.message()));
         }
-        if (restconfError.getErrorAppTag() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_APP_TAG_QNAME, restconfError.getErrorAppTag()));
+        if (restconfError.appTag() != null) {
+            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_APP_TAG_QNAME, restconfError.appTag()));
         }
-        if (restconfError.getErrorInfo() != null) {
+
+        final List<YangErrorInfo> infos = restconfError.info();
+        if (!infos.isEmpty()) {
+            // FIXME: clean up this comment
             // Oddly, error-info is defined as an empty container in the restconf yang. Apparently the
             // intention is for implementors to define their own data content so we'll just treat it as a leaf
             // with string data.
-            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_INFO_QNAME, restconfError.getErrorInfo()));
+            final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(ERROR_INFO_QNAME));
+            for (YangErrorInfo errorInfo : restconfError.info()) {
+                builder.withChild((DataContainerChild) errorInfo.value());
+            }
         }
 
-        if (restconfError.getErrorPath() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_PATH_QNAME, restconfError.getErrorPath()));
+        if (restconfError.path() != null) {
+            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_PATH_QNAME, restconfError.path()));
         }
         return entryBuilder.build();
     }
@@ -226,7 +236,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
             return status;
         }
 
-        final List<RestconfError> errors = exception.getErrors();
+        final List<YangNetconfError> errors = exception.getErrors();
         if (errors.isEmpty()) {
             // if the module, that thrown exception, doesn't specify status code, it is treated as internal
             // server error
@@ -234,7 +244,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         }
 
         final Set<Status> allStatusCodesOfErrorEntries = errors.stream()
-                .map(restconfError -> ErrorTags.statusOf(restconfError.getErrorTag()))
+                .map(restconfError -> ErrorTags.statusOf(restconfError.tag()))
                 // we would like to preserve iteration order in collected entries - hence usage of LinkedHashSet
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         // choosing of the first status code from appended errors, if there are different status codes in error

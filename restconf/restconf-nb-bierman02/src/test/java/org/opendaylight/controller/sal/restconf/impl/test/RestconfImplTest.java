@@ -9,6 +9,7 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -54,12 +55,12 @@ import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
@@ -125,26 +126,19 @@ public class RestconfImplTest {
 
     @Test
     public void binaryKeyFailTest() {
-        final List<Byte> al = new ArrayList<>();
-        al.add((byte) 1);
-        final List<Byte> al2 = new ArrayList<>();
-        try {
-            binaryKeyTest(al, al2);
-        } catch (final RestconfDocumentedException e) {
-            final RestconfError err = e.getErrors().iterator().next();
-            assertEquals(ErrorType.PROTOCOL, err.getErrorType());
-            assertEquals(ErrorTag.INVALID_VALUE, err.getErrorTag());
-        }
+        final List<YangNetconfError> errors = assertThrows(RestconfDocumentedException.class,
+            () -> binaryKeyTest(List.of((byte) 1), List.of())).getErrors();
+        assertEquals(1, errors.size());
+        final YangNetconfError err = errors.get(0);
+        assertEquals(ErrorType.PROTOCOL, err.type());
+        assertEquals(ErrorTag.INVALID_VALUE, err.tag());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testExample() throws FileNotFoundException, ParseException {
-        @SuppressWarnings("rawtypes")
         final NormalizedNode normalizedNodeData = TestUtils.prepareNormalizedNodeWithIetfInterfacesInterfacesData();
         when(brokerFacade.readOperationalData(isNull())).thenReturn(normalizedNodeData);
-        assertEquals(normalizedNodeData,
-                brokerFacade.readOperationalData(null));
+        assertEquals(normalizedNodeData, brokerFacade.readOperationalData(null));
     }
 
     @Test

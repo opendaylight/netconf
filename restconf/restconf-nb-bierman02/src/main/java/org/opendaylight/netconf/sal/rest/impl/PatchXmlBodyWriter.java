@@ -25,9 +25,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 
 @Provider
 @Produces({ Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML })
@@ -103,30 +103,31 @@ public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext>
         writer.flush();
     }
 
-    private static void reportErrors(final List<RestconfError> errors, final XMLStreamWriter writer)
+    private static void reportErrors(final List<YangNetconfError> errors, final XMLStreamWriter writer)
             throws XMLStreamException {
         writer.writeStartElement("errors");
 
-        for (final RestconfError restconfError : errors) {
+        for (final YangNetconfError restconfError : errors) {
             writer.writeStartElement("error-type");
-            writer.writeCharacters(restconfError.getErrorType().elementBody());
+            writer.writeCharacters(restconfError.type().elementBody());
             writer.writeEndElement();
 
             writer.writeStartElement("error-tag");
-            writer.writeCharacters(restconfError.getErrorTag().elementBody());
+            writer.writeCharacters(restconfError.tag().elementBody());
             writer.writeEndElement();
 
             // optional node
-            if (restconfError.getErrorPath() != null) {
+            if (restconfError.path() != null) {
                 writer.writeStartElement("error-path");
-                writer.writeCharacters(restconfError.getErrorPath().toString());
+                // FIXME: Use proper codec
+                writer.writeCharacters(restconfError.path().toString());
                 writer.writeEndElement();
             }
 
             // optional node
-            if (restconfError.getErrorMessage() != null) {
+            if (restconfError.message() != null) {
                 writer.writeStartElement("error-message");
-                writer.writeCharacters(restconfError.getErrorMessage());
+                writer.writeCharacters(restconfError.message());
                 writer.writeEndElement();
             }
 

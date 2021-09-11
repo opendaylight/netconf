@@ -67,7 +67,6 @@ import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.DataChangeScope;
@@ -80,6 +79,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -177,11 +177,11 @@ public class BrokerFacadeTest {
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> brokerFacade.readConfigurationData(this.instanceID, "explicit"));
-        final List<RestconfError> errors = ex.getErrors();
+        final List<YangNetconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
-        assertEquals("getErrorTag", ErrorTags.RESOURCE_DENIED_TRANSPORT, errors.get(0).getErrorTag());
-        assertEquals("getErrorType", ErrorType.TRANSPORT,errors.get(0).getErrorType());
-        assertEquals("getErrorMessage", "Master is down. Please try again.", errors.get(0).getErrorMessage());
+        assertEquals("getErrorTag", ErrorTags.RESOURCE_DENIED_TRANSPORT, errors.get(0).tag());
+        assertEquals("getErrorType", ErrorType.TRANSPORT,errors.get(0).type());
+        assertEquals("getErrorMessage", "Master is down. Please try again.", errors.get(0).message());
     }
 
     @Test
@@ -243,7 +243,7 @@ public class BrokerFacadeTest {
             this.brokerFacade.commitConfigurationDataPost((EffectiveModelContext) null, this.instanceID, this.dummyNode,
                     null, null);
         } catch (final RestconfDocumentedException e) {
-            assertEquals("getErrorTag", ErrorTag.DATA_EXISTS, e.getErrors().get(0).getErrorTag());
+            assertEquals("getErrorTag", ErrorTag.DATA_EXISTS, e.getErrors().get(0).tag());
             throw e;
         }
     }
@@ -284,10 +284,10 @@ public class BrokerFacadeTest {
         // try to delete and expect DATA_MISSING error
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> brokerFacade.commitConfigurationDataDelete(this.instanceID));
-        final List<RestconfError> errors = ex.getErrors();
+        final List<YangNetconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
-        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, errors.get(0).getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).type());
+        assertEquals(ErrorTag.DATA_MISSING, errors.get(0).tag());
     }
 
     /**
@@ -436,8 +436,8 @@ public class BrokerFacadeTest {
         // assert not successful operation with error
         assertNotNull(status.getGlobalErrors());
         assertEquals(1, status.getGlobalErrors().size());
-        assertEquals(ErrorType.APPLICATION, status.getGlobalErrors().get(0).getErrorType());
-        assertEquals(ErrorTag.OPERATION_FAILED, status.getGlobalErrors().get(0).getErrorTag());
+        assertEquals(ErrorType.APPLICATION, status.getGlobalErrors().get(0).type());
+        assertEquals(ErrorTag.OPERATION_FAILED, status.getGlobalErrors().get(0).tag());
 
         assertFalse("Patch operation should fail on mounted device without Broker", status.isOk());
     }
