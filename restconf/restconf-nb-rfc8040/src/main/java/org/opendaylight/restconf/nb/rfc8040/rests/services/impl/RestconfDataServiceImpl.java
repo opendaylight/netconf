@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -131,12 +132,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response readData(final UriInfo uriInfo) {
-        return readData(null, uriInfo);
+    public void readData(final UriInfo uriInfo, final AsyncResponse ar) {
+        readData(null, uriInfo, ar);
     }
 
     @Override
-    public Response readData(final String identifier, final UriInfo uriInfo) {
+    public void readData(final String identifier, final UriInfo uriInfo, final AsyncResponse ar) {
         final EffectiveModelContext schemaContextRef = this.schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(mountPointService));
