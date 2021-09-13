@@ -210,15 +210,10 @@ public final class ReadDataTransactionUtil {
                                                     final String withDefa, final EffectiveModelContext ctx) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
-                if (withDefa == null) {
-                    return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true);
-                } else {
-                    return prepareDataByParamWithDef(
-                            readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true),
-                            path, withDefa, ctx);
-                }
+                final NormalizedNode read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
+                return withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
             case RestconfDataServiceConstant.ReadData.NONCONFIG:
-                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, true);
+                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
             case RestconfDataServiceConstant.ReadData.ALL:
                 return readAllData(strategy, path, withDefa, ctx);
             default:
@@ -247,15 +242,11 @@ public final class ReadDataTransactionUtil {
             final @NonNull List<YangInstanceIdentifier> fields) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
-                if (withDefa == null) {
-                    return readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields);
-                } else {
-                    return prepareDataByParamWithDef(
-                            readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields),
-                            path, withDefa, ctx);
-                }
+                final NormalizedNode read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
+                    fields);
+                return withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
             case RestconfDataServiceConstant.ReadData.NONCONFIG:
-                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, true, fields);
+                return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, fields);
             case RestconfDataServiceConstant.ReadData.ALL:
                 return readAllData(strategy, path, withDefa, ctx, fields);
             default:
@@ -433,10 +424,8 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     static @Nullable NormalizedNode readDataViaTransaction(final @NonNull RestconfStrategy strategy,
-            final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final boolean closeTransactionChain) {
-        final ListenableFuture<Optional<NormalizedNode>> listenableFuture = strategy.read(store, path);
-        return extractReadData(strategy, path, closeTransactionChain, listenableFuture);
+            final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        return extractReadData(strategy, path, strategy.read(store, path));
     }
 
     /**
@@ -453,21 +442,14 @@ public final class ReadDataTransactionUtil {
      */
     private static @Nullable NormalizedNode readDataViaTransaction(final @NonNull RestconfStrategy strategy,
             final @NonNull LogicalDatastoreType store, final @NonNull YangInstanceIdentifier path,
-            final boolean closeTransactionChain, final @NonNull List<YangInstanceIdentifier> fields) {
-        final ListenableFuture<Optional<NormalizedNode>> listenableFuture = strategy.read(store, path, fields);
-        return extractReadData(strategy, path, closeTransactionChain, listenableFuture);
+            final @NonNull List<YangInstanceIdentifier> fields) {
+        return extractReadData(strategy, path, strategy.read(store, path, fields));
     }
 
     private static NormalizedNode extractReadData(final RestconfStrategy strategy,
-            final YangInstanceIdentifier path, final boolean closeTransactionChain,
-            final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
+            final YangInstanceIdentifier path, final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        if (closeTransactionChain) {
-            //Method close transactionChain if any
-            FutureCallbackTx.addCallback(dataFuture, READ_TYPE_TX, dataFactory, strategy, path);
-        } else {
-            FutureCallbackTx.addCallback(dataFuture, READ_TYPE_TX, dataFactory);
-        }
+        FutureCallbackTx.addCallback(dataFuture, READ_TYPE_TX, dataFactory, path);
         return dataFactory.build();
     }
 
@@ -483,22 +465,13 @@ public final class ReadDataTransactionUtil {
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
             final YangInstanceIdentifier path, final String withDefa, final EffectiveModelContext ctx) {
         // PREPARE STATE DATA NODE
-        final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path,
-            false);
-
+        final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
         // PREPARE CONFIG DATA NODE
-        final NormalizedNode configDataNode;
-        //Here will be closed transactionChain if any
-        if (withDefa == null) {
-            configDataNode = readDataViaTransaction(
-                    strategy, LogicalDatastoreType.CONFIGURATION, path, true);
-        } else {
-            configDataNode = prepareDataByParamWithDef(
-                    readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true),
-                    path, withDefa, ctx);
-        }
+        final NormalizedNode configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION,
+            path);
 
-        return mergeConfigAndSTateDataIfNeeded(stateDataNode, configDataNode);
+        return mergeConfigAndSTateDataIfNeeded(stateDataNode,
+            withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
     }
 
     /**
@@ -517,20 +490,13 @@ public final class ReadDataTransactionUtil {
             final @NonNull EffectiveModelContext ctx, final @NonNull List<YangInstanceIdentifier> fields) {
         // PREPARE STATE DATA NODE
         final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path,
-            false, fields);
+            fields);
 
         // PREPARE CONFIG DATA NODE
-        final NormalizedNode configDataNode;
-        //Here will be closed transactionChain if any
-        if (withDefa == null) {
-            configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields);
-        } else {
-            configDataNode = prepareDataByParamWithDef(
-                    readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path, true, fields),
-                    path, withDefa, ctx);
-        }
-
-        return mergeConfigAndSTateDataIfNeeded(stateDataNode, configDataNode);
+        final NormalizedNode configDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
+            fields);
+        return mergeConfigAndSTateDataIfNeeded(stateDataNode,
+            withDefa == null ? configDataNode : prepareDataByParamWithDef(configDataNode, path, withDefa, ctx));
     }
 
     private static NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,

@@ -69,7 +69,7 @@ public final class PutDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
             payload.getData(), insert, point);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, strategy, path);
+        FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, path);
         return responseFactory.build();
     }
 
@@ -134,8 +134,7 @@ public final class PutDataTransactionUtil {
     // FIXME: this method is only called from a context where we are modifying data. This should be part of strategy,
     //        requiring an already-open transaction. It also must return a future, so it can be properly composed.
     static NormalizedNode readList(final RestconfStrategy strategy, final YangInstanceIdentifier path) {
-        return ReadDataTransactionUtil.readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
-            false);
+        return ReadDataTransactionUtil.readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
     }
 
     private static void insertWithPointPut(final RestconfTransaction transaction,

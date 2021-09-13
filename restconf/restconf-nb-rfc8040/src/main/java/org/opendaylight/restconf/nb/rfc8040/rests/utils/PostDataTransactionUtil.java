@@ -72,7 +72,7 @@ public final class PostDataTransactionUtil {
         final URI location = resolveLocation(uriInfo, path, schemaContext, payload.getData());
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, POST_TX_TYPE, dataFactory, strategy, path);
+        FutureCallbackTx.addCallback(future, POST_TX_TYPE, dataFactory, path);
         return dataFactory.build();
     }
 

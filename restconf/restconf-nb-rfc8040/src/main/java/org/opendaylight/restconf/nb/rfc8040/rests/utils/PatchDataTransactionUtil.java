@@ -130,8 +130,7 @@ public final class PatchDataTransactionUtil {
             final FluentFuture<? extends CommitInfo> future = transaction.commit();
 
             try {
-                //This method will close transactionChain if any
-                FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response, strategy, null);
+                FutureCallbackTx.addCallback(future, PATCH_TX_TYPE, response, null);
             } catch (final RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
