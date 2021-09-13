@@ -12,7 +12,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
@@ -22,7 +21,6 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -56,7 +54,7 @@ final class FutureCallbackTx {
     // FIXME: this is a *synchronous operation* and has to die
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
                                 final FutureDataFactory<? super T> dataFactory) throws RestconfDocumentedException {
-        addCallback(listenableFuture, txType, dataFactory, null, null);
+        addCallback(listenableFuture, txType, dataFactory, null);
     }
 
     /**
@@ -68,16 +66,14 @@ final class FutureCallbackTx {
      *             type of operation (READ, POST, PUT, DELETE)
      * @param dataFactory
      *             factory setting result
-     * @param strategy Strategy for various RESTCONF operations
      * @param path unique identifier of a particular node instance in the data tree
      * @throws RestconfDocumentedException
      *             if the Future throws an exception
      */
     // FIXME: this is a *synchronous operation* and has to die
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
-                                final FutureDataFactory<? super T> dataFactory,
-                                @Nullable final RestconfStrategy strategy,
-                                final YangInstanceIdentifier path) throws RestconfDocumentedException {
+            final FutureDataFactory<? super T> dataFactory, final YangInstanceIdentifier path)
+                throws RestconfDocumentedException {
         try {
             final T result = listenableFuture.get();
             dataFactory.setResult(result);
