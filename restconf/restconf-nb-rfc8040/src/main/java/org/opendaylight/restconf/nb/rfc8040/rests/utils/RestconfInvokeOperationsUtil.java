@@ -7,20 +7,29 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -62,19 +71,29 @@ public final class RestconfInvokeOperationsUtil {
     /**
      * Invoke rpc.
      *
-     * @param data
-     *             input data
-     * @param rpc
-     *             RPC type
-     * @param rpcService
-     *             rpc service to invoke rpc
+     * @param data input data
+     * @param rpc RPC type
+     * @param rpcService rpc service to invoke rpc
      * @return {@link DOMRpcResult}
      */
+    // FIXME: we should be returning a future here
     public static DOMRpcResult invokeRpc(final NormalizedNode data, final QName rpc, final DOMRpcService rpcService) {
-        final ListenableFuture<? extends DOMRpcResult> future = rpcService.invokeRpc(rpc, nonnullInput(rpc, data));
-        final RpcResultFactory dataFactory = new RpcResultFactory();
-        FutureCallbackTx.addCallback(future, PostDataTransactionUtil.POST_TX_TYPE, dataFactory);
-        return dataFactory.build();
+        final ListenableFuture<? extends DOMRpcResult> future = Futures.catching(
+            rpcService.invokeRpc(rpc, nonnullInput(rpc, data)), DOMRpcException.class,
+            cause -> new DefaultDOMRpcResult(ImmutableList.of(RpcResultBuilder.newError(
+                RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))),
+            MoreExecutors.directExecutor());
+
+        try {
+          return future.get();
+        } catch (InterruptedException e) {
+            throw new RestconfDocumentedException("Interrupted while waiting for result of " + rpc, e);
+        } catch (ExecutionException e) {
+            LOG.trace("RPC {} failed", rpc, e);
+            final Throwable cause = e.getCause();
+            Throwables.throwIfInstanceOf(cause, RestconfDocumentedException.class);
+            throw new RestconfDocumentedException("RPC invocation failed", cause);
+        }
     }
 
     private static @NonNull NormalizedNode nonnullInput(final QName type, final NormalizedNode input) {
