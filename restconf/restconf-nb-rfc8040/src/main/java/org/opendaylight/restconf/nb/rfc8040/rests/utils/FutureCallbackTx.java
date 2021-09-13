@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
-import org.opendaylight.mdsal.dom.api.DOMRpcException;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -87,10 +85,7 @@ final class FutureCallbackTx {
             LOG.warn("Transaction({}) FAILED!", txType, e);
 
             final Throwable cause = e.getCause();
-            if (cause instanceof DOMRpcException) {
-                dataFactory.setResult((T) new DefaultDOMRpcResult(ImmutableList.of(
-                    RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))));
-            } else if (cause instanceof DOMActionException) {
+            if (cause instanceof DOMActionException) {
                 dataFactory.setResult((T) new SimpleDOMActionResult(ImmutableList.of(
                     RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))));
             } else if (cause instanceof TransactionCommitFailedException) {
