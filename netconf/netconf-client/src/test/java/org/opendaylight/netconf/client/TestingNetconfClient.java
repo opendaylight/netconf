@@ -119,6 +119,7 @@ public class TestingNetconfClient implements Closeable {
             final Optional<? extends AuthenticationHandler> maybeAuthHandler) throws UnknownHostException {
         InetSocketAddress netconfAddress = new InetSocketAddress(InetAddress.getByName(host), port);
         final NetconfClientConfigurationBuilder b = NetconfClientConfigurationBuilder.create();
+        b.withNodeId("test-node");
         b.withAddress(netconfAddress);
         b.withSessionListener(new SimpleNetconfClientSessionListener());
         b.withReconnectStrategy(new NeverReconnectStrategy(GlobalEventExecutor.INSTANCE,

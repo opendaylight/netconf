@@ -385,6 +385,7 @@ public class ConcurrentClientsTest {
 
         private NetconfClientConfiguration getClientConfig() {
             final NetconfClientConfigurationBuilder b = NetconfClientConfigurationBuilder.create();
+            b.withNodeId("test-node");
             b.withAddress(NETCONF_ADDRESS);
             b.withAdditionalHeader(new NetconfHelloMessageAdditionalHeader("uname", "10.10.10.1", "830", "tcp",
                     "client"));
