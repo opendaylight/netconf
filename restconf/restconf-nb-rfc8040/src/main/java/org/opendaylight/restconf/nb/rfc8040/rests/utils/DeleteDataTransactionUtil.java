@@ -49,7 +49,7 @@ public final class DeleteDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> future = transaction.commit();
         final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
         //This method will close transactionChain if any
-        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, strategy, path);
+        FutureCallbackTx.addCallback(future, DELETE_TX_TYPE, response, path);
         return response.build();
     }
 
