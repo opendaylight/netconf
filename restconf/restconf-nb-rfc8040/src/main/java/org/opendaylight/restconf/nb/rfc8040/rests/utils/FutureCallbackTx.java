@@ -44,7 +44,7 @@ final class FutureCallbackTx {
      * @throws RestconfDocumentedException
      *             if the Future throws an exception
      */
-    // FIXME: this is a *synchronous operation* and has to die
+    // FIXME: NETCONF-718: this is a *synchronous operation* and has to die
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
                                 final FutureDataFactory<? super T> dataFactory) throws RestconfDocumentedException {
         addCallback(listenableFuture, txType, dataFactory, null);
@@ -63,7 +63,7 @@ final class FutureCallbackTx {
      * @throws RestconfDocumentedException
      *             if the Future throws an exception
      */
-    // FIXME: this is a *synchronous operation* and has to die
+    // FIXME: NETCONF-718: this is a *synchronous operation* and has to die
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
             final FutureDataFactory<? super T> dataFactory, final YangInstanceIdentifier path)
                 throws RestconfDocumentedException {
