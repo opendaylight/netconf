@@ -8,23 +8,16 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
-import org.opendaylight.mdsal.dom.api.DOMActionException;
-import org.opendaylight.mdsal.dom.api.DOMRpcException;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,13 +80,7 @@ final class FutureCallbackTx {
             LOG.warn("Transaction({}) FAILED!", txType, e);
 
             final Throwable cause = e.getCause();
-            if (cause instanceof DOMRpcException) {
-                dataFactory.setResult((T) new DefaultDOMRpcResult(ImmutableList.of(
-                    RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))));
-            } else if (cause instanceof DOMActionException) {
-                dataFactory.setResult((T) new SimpleDOMActionResult(ImmutableList.of(
-                    RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))));
-            } else if (cause instanceof TransactionCommitFailedException) {
+            if (cause instanceof TransactionCommitFailedException) {
                 /* If device send some error message we want this message to get to client
                    and not just to throw it away or override it with new generic message.
                    We search for NetconfDocumentedException that was send from netconfSB
