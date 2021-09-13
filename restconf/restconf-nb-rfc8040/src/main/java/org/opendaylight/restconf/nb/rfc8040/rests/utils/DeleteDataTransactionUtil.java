@@ -61,16 +61,13 @@ public final class DeleteDataTransactionUtil {
      * @param path           Path to be checked
      * @param operationType  Type of operation (READ, POST, PUT, DELETE...)
      */
-    public static void checkItemExists(final FluentFuture<Boolean> isExistsFuture,
-                                       final YangInstanceIdentifier path,
+    // FIXME: NETCONF-718: we should return ListenableFuture<?> to enable composition
+    public static void checkItemExists(final FluentFuture<Boolean> isExistsFuture, final YangInstanceIdentifier path,
                                        final String operationType) {
-        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-        FutureCallbackTx.addCallback(isExistsFuture, operationType, response);
-
-        if (!response.result) {
+        if (!new RestconfFuture<>(isExistsFuture, operationType, path).getChecked()) {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
-            throw new RestconfDocumentedException(
-                "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
+            throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                path);
         }
     }
 }
