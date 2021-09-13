@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
-class TestData {
+final class TestData {
 
     final YangInstanceIdentifier path;
     final YangInstanceIdentifier path2;
@@ -38,10 +38,6 @@ class TestData {
     final LeafNode<?> contentLeaf;
     final LeafNode<?> contentLeaf2;
     final MapEntryNode checkData;
-    final QName rpc;
-    final QName errorRpc;
-    final ContainerNode input;
-    final ContainerNode output;
     final LeafSetNode<String> leafSetNode1;
     final LeafSetNode<String> leafSetNode2;
     final LeafSetNode<String> orderedLeafSetNode1;
@@ -158,24 +154,5 @@ class TestData {
                 new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(content2).build();
         unkeyedListNode2 = Builders.unkeyedListBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(unkeyedListEntryNode2).build();
-
-        rpc = QName.create("ns", "2015-02-28", "test-rpc");
-        errorRpc = QName.create(rpc, "error-rpc");
-        final LeafNode<?> contentLeafNode = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(rpc, "content")))
-                .withValue("test")
-                .build();
-        input = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(rpc, "input")))
-                .withChild(contentLeafNode)
-                .build();
-        final LeafNode<?> resultLeafNode = Builders.leafBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(rpc, "content")))
-                .withValue("operation result")
-                .build();
-        output = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(QName.create(rpc, "output")))
-                .withChild(resultLeafNode)
-                .build();
     }
 }
