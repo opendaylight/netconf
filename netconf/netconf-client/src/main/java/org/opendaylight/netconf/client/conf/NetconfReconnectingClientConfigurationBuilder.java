@@ -38,13 +38,18 @@ public final class NetconfReconnectingClientConfigurationBuilder extends Netconf
 
     @Override
     public NetconfReconnectingClientConfiguration build() {
-        return new NetconfReconnectingClientConfiguration(getProtocol(), getAddress(), getConnectionTimeoutMillis(),
-                getAdditionalHeader(), getSessionListener(), getReconnectStrategy(), connectStrategyFactory,
-                getAuthHandler(), getSslHandlerFactory(), getSshClient(), getOdlHelloCapabilities(),
-                getMaximumIncomingChunkSize());
+        return new NetconfReconnectingClientConfiguration(getNodeId(), getProtocol(), getAddress(),
+                getConnectionTimeoutMillis(), getAdditionalHeader(), getSessionListener(), getReconnectStrategy(),
+                connectStrategyFactory, getAuthHandler(), getSslHandlerFactory(), getSshClient(),
+                getOdlHelloCapabilities(), getMaximumIncomingChunkSize());
     }
 
     // Override setter methods to return subtype
+
+    @Override
+    public NetconfReconnectingClientConfigurationBuilder withNodeId(final String nodeId) {
+        return (NetconfReconnectingClientConfigurationBuilder) super.withNodeId(nodeId);
+    }
 
     @Override
     public NetconfReconnectingClientConfigurationBuilder withAddress(final InetSocketAddress address) {

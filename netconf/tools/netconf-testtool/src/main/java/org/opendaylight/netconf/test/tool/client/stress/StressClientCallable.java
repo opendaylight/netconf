@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 public class StressClientCallable implements Callable<Boolean> {
 
     private static final Logger LOG = LoggerFactory.getLogger(StressClientCallable.class);
+    private static final String NODE_ID = "secure-test";
 
     private final Parameters params;
     private final NetconfDeviceCommunicator sessionListener;
@@ -78,13 +79,14 @@ public class StressClientCallable implements Callable<Boolean> {
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> loggingRemoteDevice =
             new StressClient.LoggingRemoteDevice();
         return new NetconfDeviceCommunicator(
-            new RemoteDeviceId("secure-test", inetAddress), loggingRemoteDevice, messageLimit);
+            new RemoteDeviceId(NODE_ID, inetAddress), loggingRemoteDevice, messageLimit);
     }
 
     private static NetconfClientConfiguration getNetconfClientConfiguration(final Parameters params,
             final NetconfDeviceCommunicator sessionListener) {
         final NetconfClientConfigurationBuilder netconfClientConfigurationBuilder = NetconfClientConfigurationBuilder
             .create();
+        netconfClientConfigurationBuilder.withNodeId(NODE_ID);
         netconfClientConfigurationBuilder.withSessionListener(sessionListener);
         netconfClientConfigurationBuilder.withAddress(params.getInetAddress());
         if (params.tcpHeader != null) {

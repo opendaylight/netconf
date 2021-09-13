@@ -26,8 +26,8 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
 
     private final ReconnectStrategyFactory connectStrategyFactory;
 
-    NetconfReconnectingClientConfiguration(final NetconfClientProtocol clientProtocol, final InetSocketAddress address,
-                                           final Long connectionTimeoutMillis,
+    NetconfReconnectingClientConfiguration(final String nodeId, final NetconfClientProtocol clientProtocol,
+                                           final InetSocketAddress address, final Long connectionTimeoutMillis,
                                            final NetconfHelloMessageAdditionalHeader additionalHeader,
                                            final NetconfClientSessionListener sessionListener,
                                            final ReconnectStrategy reconnectStrategy,
@@ -37,8 +37,9 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
                                            final NetconfSshClient sshClient,
                                            final List<Uri> odlHelloCapabilities,
                                            final @NonNegative int maximumIncomingChunkSize) {
-        super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
-                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities, maximumIncomingChunkSize);
+        super(nodeId, clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener,
+                reconnectStrategy, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities,
+                maximumIncomingChunkSize);
         this.connectStrategyFactory = connectStrategyFactory;
         validateReconnectConfiguration();
     }

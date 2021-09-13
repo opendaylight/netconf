@@ -212,6 +212,7 @@ public class TestToolTest {
                                                               final NetconfClientSessionListener sessionListener) {
         User user = ((InMemoryAuthenticationProvider) simulatorConfig.getAuthProvider()).user;
         return NetconfClientConfigurationBuilder.create()
+            .withNodeId("test-node")
             .withAddress(new InetSocketAddress(host, port))
             .withSessionListener(sessionListener)
             .withReconnectStrategy(new NeverReconnectStrategy(GlobalEventExecutor.INSTANCE,

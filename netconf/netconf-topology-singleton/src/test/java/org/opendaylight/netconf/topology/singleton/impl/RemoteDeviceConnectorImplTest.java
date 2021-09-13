@@ -206,7 +206,7 @@ public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
                 new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);
 
         final NetconfReconnectingClientConfiguration defaultClientConfig =
-                remoteDeviceConnection.getClientConfig(listener, testingNode);
+                remoteDeviceConnection.getClientConfig(listener, testingNode, new NodeId("test"));
 
         assertEquals(defaultClientConfig.getConnectionTimeoutMillis().longValue(), 1000L);
         assertEquals(defaultClientConfig.getAddress(), new InetSocketAddress(InetAddresses.forString("127.0.0.1"),
