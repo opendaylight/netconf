@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2021 PANTHEON.tech, s.r.o.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -38,7 +39,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class CreateStreamUtilTest {
+public class SalRemoteServiceImplTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/streams";
 
     private NormalizedNodeContext payload;

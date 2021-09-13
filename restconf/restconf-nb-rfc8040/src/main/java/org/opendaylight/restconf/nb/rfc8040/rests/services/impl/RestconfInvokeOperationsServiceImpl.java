@@ -34,13 +34,11 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -58,10 +56,6 @@ import org.slf4j.LoggerFactory;
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsServiceImpl.class);
 
-    // FIXME: at some point we do not want to have this here
-    private static final XMLNamespace SAL_REMOTE_NAMESPACE =
-        XMLNamespace.of("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote");
-
     private final DOMRpcService rpcService;
     private final SchemaContextHandler schemaContextHandler;
 
@@ -74,27 +68,16 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
-        final QName schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
+        final QName rpcName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final XMLNamespace namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
 
         final DOMRpcResult response;
         final EffectiveModelContext schemaContextRef;
         if (mountPoint == null) {
+            response = invokeRpc(payload.getData(), rpcName, rpcService);
             schemaContextRef = schemaContextHandler.get();
-            // FIXME: this really should be a normal RPC invocation service which has its own interface with JAX-RS
-            if (SAL_REMOTE_NAMESPACE.equals(namespace)) {
-                if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCRIPTION)) {
-                    response = CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContextRef);
-                } else {
-                    throw new RestconfDocumentedException("Not supported operation", ErrorType.RPC,
-                            ErrorTag.OPERATION_NOT_SUPPORTED);
-                }
-            } else {
-                response = invokeRpc(payload.getData(), schemaPath, rpcService);
-            }
         } else {
-            response = invokeRpc(payload.getData(), schemaPath, mountPoint);
+            response = invokeRpc(payload.getData(), rpcName, mountPoint);
             schemaContextRef = modelContext(mountPoint);
         }
 
