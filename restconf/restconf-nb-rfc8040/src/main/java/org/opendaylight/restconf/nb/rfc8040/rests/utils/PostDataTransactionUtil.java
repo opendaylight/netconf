@@ -219,15 +219,13 @@ public final class PostDataTransactionUtil {
      * @param isExistsFuture if checked data exists
      * @param path           Path to be checked
      */
+    // FIXME: NETCONF-718: we should return ListenableFuture<?> to enable composition
     public static void checkItemDoesNotExists(final FluentFuture<Boolean> isExistsFuture,
-                                              final YangInstanceIdentifier path) {
-        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
-        FutureCallbackTx.addCallback(isExistsFuture, POST_TX_TYPE, response);
-
-        if (response.result) {
+            final YangInstanceIdentifier path) {
+        if (new RestconfFuture<>(isExistsFuture, POST_TX_TYPE, path).getChecked()) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-            throw new RestconfDocumentedException(
-                "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
+            throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
+                path);
         }
     }
 }
