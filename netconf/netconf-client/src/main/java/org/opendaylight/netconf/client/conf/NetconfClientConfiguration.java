@@ -42,14 +42,16 @@ public class NetconfClientConfiguration {
     private final NetconfSshClient sshClient;
 
     private final List<Uri> odlHelloCapabilities;
+    private final String nodeId;
 
-    NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
-                               final Long connectionTimeoutMillis,
+    NetconfClientConfiguration(final String nodeId, final NetconfClientProtocol protocol,
+                               final InetSocketAddress address, final Long connectionTimeoutMillis,
                                final NetconfHelloMessageAdditionalHeader additionalHeader,
                                final NetconfClientSessionListener sessionListener,
                                final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler,
                                final SslHandlerFactory sslHandlerFactory, final NetconfSshClient sshClient,
                                final List<Uri> odlHelloCapabilities) {
+        this.nodeId = nodeId;
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -61,6 +63,10 @@ public class NetconfClientConfiguration {
         this.sshClient = sshClient;
         this.odlHelloCapabilities = odlHelloCapabilities;
         validateConfiguration();
+    }
+
+    public String getNodeId() {
+        return nodeId;
     }
 
     public final InetSocketAddress getAddress() {
@@ -105,6 +111,7 @@ public class NetconfClientConfiguration {
     }
 
     private void validateConfiguration() {
+        requireNonNull(nodeId, "nodeId");
         switch (requireNonNull(clientProtocol)) {
             case TLS:
                 validateTlsConfiguration();
@@ -145,6 +152,7 @@ public class NetconfClientConfiguration {
 
     protected ToStringHelper buildToStringHelper() {
         return MoreObjects.toStringHelper(this)
+                .add("node-id", nodeId)
                 .add("address", address)
                 .add("connectionTimeoutMillis", connectionTimeoutMillis)
                 .add("additionalHeader", additionalHeader)

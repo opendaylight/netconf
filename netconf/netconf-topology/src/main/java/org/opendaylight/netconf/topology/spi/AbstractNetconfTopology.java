@@ -174,7 +174,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
         final NetconfReconnectingClientConfiguration clientConfig =
-                getClientConfig(netconfClientSessionListener, netconfNode);
+                getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
         final ListenableFuture<NetconfDeviceCapabilities> future =
                 deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
 
@@ -310,8 +310,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.privateKeyPassphrase = privateKeyPassphrase;
     }
 
+    @VisibleForTesting
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
-                                                                  final NetconfNode node) {
+                                                                  final NetconfNode node,
+                                                                  final NodeId nodeId) {
         final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
                 node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
                 node.requireSleepFactor());
@@ -339,6 +341,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         return reconnectingClientConfigurationBuilder
+                .withNodeId(nodeId.getValue())
                 .withAddress(getSocketAddress(node.getHost(), node.getPort().getValue().toJava()))
                 .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava())
                 .withReconnectStrategy(sf.createReconnectStrategy())

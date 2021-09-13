@@ -108,7 +108,8 @@ public class SSHTest {
         final ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<>() {
             @Override
             public void initChannel(final NioSocketChannel ch) throws Exception {
-                ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(new LoginPasswordHandler("a", "a")));
+                ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(new LoginPasswordHandler("a", "a"),
+                        "test-node"));
                 ch.pipeline().addLast(echoClientHandler);
             }
         };
