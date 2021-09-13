@@ -93,7 +93,7 @@ public class AsyncSshHandlerTest {
 
         promise = getMockedPromise();
 
-        asyncSshHandler = new AsyncSshHandler(authHandler, sshClient);
+        asyncSshHandler = new AsyncSshHandler(authHandler, sshClient, "test-node");
     }
 
     @After

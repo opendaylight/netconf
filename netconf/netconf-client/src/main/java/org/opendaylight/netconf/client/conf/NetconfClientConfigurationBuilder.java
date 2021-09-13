@@ -23,6 +23,7 @@ public class NetconfClientConfigurationBuilder {
     public static final NetconfClientConfiguration.NetconfClientProtocol DEFAULT_CLIENT_PROTOCOL =
             NetconfClientConfiguration.NetconfClientProtocol.TCP;
 
+    private String nodeId;
     private InetSocketAddress address;
     private long connectionTimeoutMillis = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
     private NetconfHelloMessageAdditionalHeader additionalHeader;
@@ -34,12 +35,17 @@ public class NetconfClientConfigurationBuilder {
     private NetconfSshClient sshClient;
     private List<Uri> odlHelloCapabilities;
 
-
     protected NetconfClientConfigurationBuilder() {
     }
 
     public static NetconfClientConfigurationBuilder create() {
         return new NetconfClientConfigurationBuilder();
+    }
+
+    @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withNodeId(final String nodeId) {
+        this.nodeId = nodeId;
+        return this;
     }
 
     @SuppressWarnings("checkstyle:hiddenField")
@@ -104,6 +110,10 @@ public class NetconfClientConfigurationBuilder {
         return this;
     }
 
+    final String getNodeId() {
+        return nodeId;
+    }
+
     final InetSocketAddress getAddress() {
         return address;
     }
@@ -145,7 +155,8 @@ public class NetconfClientConfigurationBuilder {
     }
 
     public NetconfClientConfiguration build() {
-        return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities);
+        return new NetconfClientConfiguration(nodeId, clientProtocol, address, connectionTimeoutMillis,
+                additionalHeader, sessionListener, reconnectStrategy, authHandler, sslHandlerFactory,
+                sshClient, odlHelloCapabilities);
     }
 }

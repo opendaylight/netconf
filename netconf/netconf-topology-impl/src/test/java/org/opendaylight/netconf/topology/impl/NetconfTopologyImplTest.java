@@ -215,7 +215,7 @@ public class NetconfTopologyImplTest {
                         .setUsername("testuser").setPassword("testpassword").build())
                 .build();
         final NetconfReconnectingClientConfiguration configuration =
-                spyTopology.getClientConfig(sessionListener, testingNode);
+                spyTopology.getClientConfig(sessionListener, testingNode, new NodeId("test"));
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TCP, configuration.getProtocol());
         assertNotNull(configuration.getAuthHandler());
         assertNull(configuration.getSslHandlerFactory());
@@ -233,7 +233,7 @@ public class NetconfTopologyImplTest {
                         .setUsername("testuser").setPassword("testpassword").build())
                 .build();
         final NetconfReconnectingClientConfiguration configuration2 =
-                spyTopology.getClientConfig(sessionListener, testingNode2);
+                spyTopology.getClientConfig(sessionListener, testingNode2, new NodeId("test"));
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration2.getProtocol());
         assertNotNull(configuration2.getAuthHandler());
         assertNull(configuration2.getSslHandlerFactory());
@@ -252,7 +252,7 @@ public class NetconfTopologyImplTest {
                         .setUsername("testuser").setPassword("testpassword").build())
                 .build();
         final NetconfReconnectingClientConfiguration configuration3 =
-                spyTopology.getClientConfig(sessionListener, testingNode3);
+                spyTopology.getClientConfig(sessionListener, testingNode3, new NodeId("test"));
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration3.getProtocol());
         assertNotNull(configuration3.getAuthHandler());
         assertNull(configuration3.getSslHandlerFactory());
@@ -271,7 +271,7 @@ public class NetconfTopologyImplTest {
                         .setUsername("testuser").setPassword("testpassword").build())
                 .build();
         final NetconfReconnectingClientConfiguration configuration4 =
-                spyTopology.getClientConfig(sessionListener, testingNode4);
+                spyTopology.getClientConfig(sessionListener, testingNode4, new NodeId("test"));
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, configuration4.getProtocol());
         assertNull(configuration4.getAuthHandler());
         assertNotNull(configuration4.getSslHandlerFactory());

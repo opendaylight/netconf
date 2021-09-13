@@ -34,6 +34,7 @@ public class NetconfReconnectingClientConfigurationTest {
         ReconnectStrategy reconnect = Mockito.mock(ReconnectStrategy.class);
 
         NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
+                .withNodeId("test")
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
@@ -54,6 +55,7 @@ public class NetconfReconnectingClientConfigurationTest {
 
         SslHandlerFactory sslHandlerFactory = Mockito.mock(SslHandlerFactory.class);
         NetconfReconnectingClientConfiguration cfg2 = NetconfReconnectingClientConfigurationBuilder.create()
+                .withNodeId("test")
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)

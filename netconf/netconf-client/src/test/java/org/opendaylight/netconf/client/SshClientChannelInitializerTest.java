@@ -51,7 +51,7 @@ public class SshClientChannelInitializerTest {
         doReturn("").when(promise).toString();
 
         SshClientChannelInitializer initializer = new SshClientChannelInitializer(authenticationHandler,
-                negotiatorFactory, sessionListener);
+                negotiatorFactory, sessionListener, "test-node");
         initializer.initialize(channel, promise);
         verify(pipeline, times(1)).addFirst(any(ChannelHandler.class));
     }

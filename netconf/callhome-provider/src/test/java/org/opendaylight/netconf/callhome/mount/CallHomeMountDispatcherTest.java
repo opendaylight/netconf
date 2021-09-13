@@ -97,10 +97,15 @@ public class CallHomeMountDispatcherTest {
         final ReconnectStrategy reconnectStrategy = mock(ReconnectStrategy.class);
         final AuthenticationHandler authHandler = mock(AuthenticationHandler.class);
 
-        return NetconfClientConfigurationBuilder.create().withProtocol(protocol).withAddress(address)
-                .withConnectionTimeoutMillis(0).withAdditionalHeader(additionalHeader)
-                .withSessionListener(sessionListener).withReconnectStrategy(reconnectStrategy)
-                .withAuthHandler(authHandler).build();
+        return NetconfClientConfigurationBuilder.create().withNodeId("test-node")
+                .withProtocol(protocol)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(0)
+                .withAdditionalHeader(additionalHeader)
+                .withSessionListener(sessionListener)
+                .withReconnectStrategy(reconnectStrategy)
+                .withAuthHandler(authHandler)
+                .build();
     }
 
     @Test

@@ -416,6 +416,7 @@ public class NetconfDeviceCommunicatorTest {
             final NetconfDeviceCommunicator listener = new NetconfDeviceCommunicator(
                     new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), device, 10);
             final NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
+                    .withNodeId("test")
                     .withAddress(new InetSocketAddress("localhost", 65000))
                     .withReconnectStrategy(reconnectStrategy)
                     .withConnectStrategyFactory(() -> reconnectStrategy)

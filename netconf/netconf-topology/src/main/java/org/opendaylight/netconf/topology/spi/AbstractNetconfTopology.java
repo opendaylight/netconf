@@ -186,7 +186,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
         final NetconfReconnectingClientConfiguration clientConfig =
-                getClientConfig(netconfClientSessionListener, netconfNode);
+                getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
         final ListenableFuture<NetconfDeviceCapabilities> future =
                 deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
 
@@ -332,8 +332,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.privateKeyPassphrase = privateKeyPassphrase;
     }
 
+    @VisibleForTesting
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
-                                                                  final NetconfNode node) {
+                                                                  final NetconfNode node, final NodeId nodeId) {
 
         //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null
@@ -374,6 +375,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         return reconnectingClientConfigurationBuilder
+                .withNodeId(nodeId.getValue())
                 .withAddress(socketAddress)
                 .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
                 .withReconnectStrategy(sf.createReconnectStrategy())

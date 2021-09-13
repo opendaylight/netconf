@@ -25,8 +25,8 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
 
     private final ReconnectStrategyFactory connectStrategyFactory;
 
-    NetconfReconnectingClientConfiguration(final NetconfClientProtocol clientProtocol, final InetSocketAddress address,
-                                           final Long connectionTimeoutMillis,
+    NetconfReconnectingClientConfiguration(final String nodeId, final NetconfClientProtocol clientProtocol,
+                                           final InetSocketAddress address, final Long connectionTimeoutMillis,
                                            final NetconfHelloMessageAdditionalHeader additionalHeader,
                                            final NetconfClientSessionListener sessionListener,
                                            final ReconnectStrategy reconnectStrategy,
@@ -35,8 +35,8 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
                                            final SslHandlerFactory sslHandlerFactory,
                                            final NetconfSshClient sshClient,
                                            final List<Uri> odlHelloCapabilities) {
-        super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
-                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities);
+        super(nodeId, clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener,
+                reconnectStrategy, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities);
         this.connectStrategyFactory = connectStrategyFactory;
         validateReconnectConfiguration();
     }

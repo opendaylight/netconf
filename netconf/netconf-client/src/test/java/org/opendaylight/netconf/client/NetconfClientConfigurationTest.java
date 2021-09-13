@@ -21,7 +21,8 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 
 public class NetconfClientConfigurationTest {
     @Test
-    public void testNetconfClientConfiguration() throws Exception {
+    public void testNetconfClientConfiguration() {
+        final String nodeId = "test-node";
         Long timeout = 200L;
         NetconfHelloMessageAdditionalHeader header =
                 new NetconfHelloMessageAdditionalHeader("a", "host", "port", "trans", "id");
@@ -30,6 +31,7 @@ public class NetconfClientConfigurationTest {
         ReconnectStrategy strategy = Mockito.mock(ReconnectStrategy.class);
         AuthenticationHandler handler = Mockito.mock(AuthenticationHandler.class);
         NetconfClientConfiguration cfg = NetconfClientConfigurationBuilder.create()
+                .withNodeId(nodeId)
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
@@ -45,9 +47,11 @@ public class NetconfClientConfigurationTest {
         Assert.assertEquals(strategy, cfg.getReconnectStrategy());
         Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, cfg.getProtocol());
         Assert.assertEquals(address, cfg.getAddress());
+        Assert.assertEquals(nodeId, cfg.getNodeId());
 
         SslHandlerFactory sslHandlerFactory = Mockito.mock(SslHandlerFactory.class);
         NetconfClientConfiguration cfg2 = NetconfClientConfigurationBuilder.create()
+                .withNodeId(nodeId)
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
@@ -63,5 +67,6 @@ public class NetconfClientConfigurationTest {
         Assert.assertEquals(strategy, cfg2.getReconnectStrategy());
         Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, cfg2.getProtocol());
         Assert.assertEquals(address, cfg2.getAddress());
+        Assert.assertEquals(nodeId, cfg2.getNodeId());
     }
 }
