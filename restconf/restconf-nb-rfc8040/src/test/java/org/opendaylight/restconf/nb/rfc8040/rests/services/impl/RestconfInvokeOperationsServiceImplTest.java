@@ -45,7 +45,6 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -134,7 +133,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void invokeRpcTest() {
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(OUTPUT, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(RPC, INPUT);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(INPUT, RPC, rpcService);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, rpcService);
         assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(OUTPUT, rpcResult.getResult());
     }
@@ -145,7 +144,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException(
                 "No implementation of RPC " + errorRpc + " available.");
         doReturn(immediateFailedFluentFuture(exception)).when(rpcService).invokeRpc(errorRpc, INPUT);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(INPUT, errorRpc, rpcService);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, errorRpc, rpcService);
         assertNull(rpcResult.getResult());
         final Collection<? extends RpcError> errorList = rpcResult.getErrors();
         assertEquals(1, errorList.size());
@@ -154,7 +153,8 @@ public class RestconfInvokeOperationsServiceImplTest {
         assertEquals("operation-failed", actual.getTag());
         assertEquals(RpcError.ErrorType.RPC, actual.getErrorType());
 
-        assertThrows(RestconfDocumentedException.class, () -> RestconfInvokeOperationsUtil.checkResponse(rpcResult));
+        assertThrows(RestconfDocumentedException.class,
+            () -> RestconfInvokeOperationsServiceImpl.checkResponse(rpcResult));
     }
 
     @Test
@@ -162,7 +162,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         doReturn(Optional.ofNullable(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(OUTPUT, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(RPC, INPUT);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(INPUT, RPC, mountPoint);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, mountPoint);
         assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(OUTPUT, rpcResult.getResult());
     }
@@ -171,17 +171,17 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void invokeRpcMissingMountPointServiceTest() {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
         assertThrows(RestconfDocumentedException.class,
-            () -> RestconfInvokeOperationsUtil.invokeRpc(INPUT, RPC, mountPoint));
+            () -> RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, mountPoint));
     }
 
     @Test
     public void checkResponseTest() {
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(OUTPUT, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(RPC, INPUT);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(INPUT, RPC, rpcService);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, rpcService);
         assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(OUTPUT, rpcResult.getResult());
-        assertNotNull(RestconfInvokeOperationsUtil.checkResponse(rpcResult));
+        assertNotNull(RestconfInvokeOperationsServiceImpl.checkResponse(rpcResult));
     }
 
     private NormalizedNodeContext prepNNC(final NormalizedNode result) {
