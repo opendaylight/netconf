@@ -67,6 +67,7 @@ public class NetconfClientDispatcherImplTest {
         doReturn(reconnect).when(reconnectStrategyFactory).createReconnectStrategy();
 
         NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
+                .withNodeId("test")
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
@@ -77,6 +78,7 @@ public class NetconfClientDispatcherImplTest {
                 .withAuthHandler(handler).build();
 
         NetconfReconnectingClientConfiguration cfg2 = NetconfReconnectingClientConfigurationBuilder.create()
+                .withNodeId("test")
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
@@ -100,6 +102,7 @@ public class NetconfClientDispatcherImplTest {
 
         SslHandlerFactory sslHandlerFactory = Mockito.mock(SslHandlerFactory.class);
         NetconfReconnectingClientConfiguration cfg3 = NetconfReconnectingClientConfigurationBuilder.create()
+                .withNodeId("test")
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
                 .withAddress(address)
                 .withConnectionTimeoutMillis(timeout)
