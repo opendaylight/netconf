@@ -11,18 +11,11 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
  * Constants for streams.
  */
 public final class RestconfStreamsConstants {
-    public static final String STREAM_PATH_PARAM_NAME = "path";
     public static final String DATASTORE_PARAM_NAME = "datastore";
     public static final String SCOPE_PARAM_NAME = "scope";
-    public static final String OUTPUT_TYPE_PARAM_NAME = "notification-output-type";
-
-    public static final String DS_URI = '/' + DATASTORE_PARAM_NAME + '=';
-    public static final String SCOPE_URI = '/' + SCOPE_PARAM_NAME + '=';
 
     public static final String DATA_SUBSCRIPTION = "data-change-event-subscription";
-    public static final String CREATE_DATA_SUBSCRIPTION = "create-" + DATA_SUBSCRIPTION;
     public static final String NOTIFICATION_STREAM = "notification-stream";
-    public static final String CREATE_NOTIFICATION_STREAM = "create-" + NOTIFICATION_STREAM;
 
     public static final String STREAMS_PATH = "ietf-restconf-monitoring:restconf-state/streams";
     public static final String STREAM_PATH_PART = "/stream=";
