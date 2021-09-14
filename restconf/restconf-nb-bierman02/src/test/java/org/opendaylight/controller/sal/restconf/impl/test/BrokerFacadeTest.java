@@ -70,7 +70,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.common.util.DataChangeScope;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -313,15 +313,13 @@ public class BrokerFacadeTest {
         DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, this.instanceID);
         when(changeService.registerDataTreeChangeListener(eq(loc), eq(listener))).thenReturn(mockRegistration);
 
-        this.brokerFacade.registerToListenDataChanges(
-                LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
+        this.brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, Scope.BASE, listener);
 
         verify(changeService).registerDataTreeChangeListener(loc, listener);
 
         assertEquals("isListening", true, listener.isListening());
 
-        this.brokerFacade.registerToListenDataChanges(
-                LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
+        this.brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, Scope.BASE, listener);
         verifyNoMoreInteractions(changeService);
     }
 

@@ -76,9 +76,9 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.restconf.common.util.OperationsResourceUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -141,8 +141,6 @@ public final class RestconfImpl implements RestconfService {
     private static final String SAL_REMOTE_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfImpl.class);
-
-    private static final DataChangeScope DEFAULT_SCOPE = DataChangeScope.BASE;
 
     private static final LogicalDatastoreType DEFAULT_DATASTORE = LogicalDatastoreType.CONFIGURATION;
 
@@ -610,8 +608,8 @@ public final class RestconfImpl implements RestconfService {
                     parseEnumTypeParameter(value, LogicalDatastoreType.class, DATASTORE_PARAM_NAME);
             datastore = datastore == null ? DEFAULT_DATASTORE : datastore;
 
-            DataChangeScope scope = parseEnumTypeParameter(value, DataChangeScope.class, SCOPE_PARAM_NAME);
-            scope = scope == null ? DEFAULT_SCOPE : scope;
+            Scope scope = parseEnumTypeParameter(value, Scope.class, SCOPE_PARAM_NAME);
+            scope = scope == null ? Scope.BASE : scope;
 
             outputType = parseEnumTypeParameter(value, NotificationOutputType.class, OUTPUT_TYPE_PARAM_NAME);
             outputType = outputType == null ? NotificationOutputType.XML : outputType;
@@ -1048,7 +1046,7 @@ public final class RestconfImpl implements RestconfService {
      * <ul>
      * <li>datastore - default CONFIGURATION (other values of
      * {@link LogicalDatastoreType} enum type)</li>
-     * <li>scope - default BASE (other values of {@link DataChangeScope})</li>
+     * <li>scope - default BASE (other values of {@link Scope})</li>
      * </ul>
      */
     @Override
@@ -1262,8 +1260,7 @@ public final class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream name doesn't contains datastore value (pattern /datastore=)",
                     ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
-        final DataChangeScope scope =
-                parserURIEnumParameter(DataChangeScope.class, paramToValues.get(SCOPE_PARAM_NAME));
+        final Scope scope = parserURIEnumParameter(Scope.class, paramToValues.get(SCOPE_PARAM_NAME));
         if (scope == null) {
             throw new RestconfDocumentedException("Stream name doesn't contains datastore value (pattern /scope=)",
                     ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
