@@ -7,14 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
@@ -22,12 +24,15 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -49,7 +54,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -94,55 +98,48 @@ public class RestconfInvokeOperationsServiceImplTest {
 
     @Test
     public void testInvokeRpcWithNonEmptyOutput() {
-        final String identifier = "invoke-rpc-module:rpcTest";
         final ContainerNode result = mock(ContainerNode.class);
-        final LeafNode<?> outputChild = mock(LeafNode.class);
-        doCallRealMethod().when(result).isEmpty();
-        doReturn(List.of(outputChild)).when(result).body();
+        doReturn(false).when(result).isEmpty();
 
-        final NormalizedNodeContext payload = prepNNC(result);
-        final UriInfo uriInfo = mock(UriInfo.class);
+        final AsyncResponse ar = mock(AsyncResponse.class);
+        final ArgumentCaptor<NormalizedNodeContext> response = ArgumentCaptor.forClass(NormalizedNodeContext.class);
+        invokeOperationsService.invokeRpc("invoke-rpc-module:rpcTest", prepNNC(result), mock(UriInfo.class), ar);
+        verify(ar).resume(response.capture());
 
-        final NormalizedNodeContext rpc = this.invokeOperationsService.invokeRpc(identifier, payload, uriInfo);
-        assertEquals(result, rpc.getData());
+        assertSame(result, response.getValue().getData());
     }
 
     @Test
     public void testInvokeRpcWithEmptyOutput() {
-        final String identifier = "invoke-rpc-module:rpcTest";
         final ContainerNode result = mock(ContainerNode.class);
         doReturn(true).when(result).isEmpty();
 
-        final NormalizedNodeContext payload = prepNNC(result);
-        final UriInfo uriInfo = mock(UriInfo.class);
+        final AsyncResponse ar = mock(AsyncResponse.class);
+        final ArgumentCaptor<Throwable> response = ArgumentCaptor.forClass(Throwable.class);
+        invokeOperationsService.invokeRpc("invoke-rpc-module:rpcTest", prepNNC(result), mock(UriInfo.class), ar);
+        verify(ar).resume(response.capture());
 
-        WebApplicationException exceptionToBeThrown = null;
-        try {
-            this.invokeOperationsService.invokeRpc(identifier, payload, uriInfo);
-        } catch (final WebApplicationException exception) {
-            exceptionToBeThrown = exception;
-
-        }
-        assertNotNull("WebApplicationException with status code 204 is expected.", exceptionToBeThrown);
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), exceptionToBeThrown.getResponse().getStatus());
+        final Throwable failure = response.getValue();
+        assertThat(failure, instanceOf(WebApplicationException.class));
+        assertEquals(Status.NO_CONTENT.getStatusCode(), ((WebApplicationException) failure).getResponse().getStatus());
     }
 
     @Test
-    public void invokeRpcTest() {
+    public void invokeRpcTest() throws InterruptedException, ExecutionException {
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(OUTPUT, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(RPC, INPUT);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, rpcService);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, rpcService).get();
         assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(OUTPUT, rpcResult.getResult());
     }
 
     @Test
-    public void invokeRpcErrorsAndCheckTestTest() {
+    public void invokeRpcErrorsAndCheckTestTest() throws InterruptedException, ExecutionException {
         final QName errorRpc = QName.create(RPC, "error-rpc");
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException(
                 "No implementation of RPC " + errorRpc + " available.");
         doReturn(immediateFailedFluentFuture(exception)).when(rpcService).invokeRpc(errorRpc, INPUT);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, errorRpc, rpcService);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, errorRpc, rpcService).get();
         assertNull(rpcResult.getResult());
         final Collection<? extends RpcError> errorList = rpcResult.getErrors();
         assertEquals(1, errorList.size());
@@ -150,17 +147,14 @@ public class RestconfInvokeOperationsServiceImplTest {
         assertEquals("No implementation of RPC " + errorRpc + " available.", actual.getMessage());
         assertEquals("operation-failed", actual.getTag());
         assertEquals(RpcError.ErrorType.RPC, actual.getErrorType());
-
-        assertThrows(RestconfDocumentedException.class,
-            () -> RestconfInvokeOperationsServiceImpl.checkResponse(rpcResult));
     }
 
     @Test
-    public void invokeRpcViaMountPointTest() {
+    public void invokeRpcViaMountPointTest() throws InterruptedException, ExecutionException {
         doReturn(Optional.ofNullable(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(OUTPUT, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(RPC, INPUT);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, mountPoint);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, mountPoint).get();
         assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(OUTPUT, rpcResult.getResult());
     }
@@ -173,13 +167,12 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void checkResponseTest() {
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(OUTPUT, List.of());
-        doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(RPC, INPUT);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, rpcService);
+    public void checkResponseTest() throws InterruptedException, ExecutionException {
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult(OUTPUT, List.of())))
+            .when(rpcService).invokeRpc(RPC, INPUT);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, rpcService).get();
         assertTrue(rpcResult.getErrors().isEmpty());
         assertEquals(OUTPUT, rpcResult.getResult());
-        assertNotNull(RestconfInvokeOperationsServiceImpl.checkResponse(rpcResult));
     }
 
     private NormalizedNodeContext prepNNC(final NormalizedNode result) {
