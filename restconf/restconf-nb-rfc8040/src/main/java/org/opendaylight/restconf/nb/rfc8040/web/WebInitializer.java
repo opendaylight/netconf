@@ -50,6 +50,7 @@ public class WebInitializer {
             .addServlet(ServletDetails.builder()
                 .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(webApp).build())
+                .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
                 .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/notif/*")
