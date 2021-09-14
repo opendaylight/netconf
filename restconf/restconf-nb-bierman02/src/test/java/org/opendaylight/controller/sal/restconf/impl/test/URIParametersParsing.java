@@ -30,7 +30,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.restconf.common.util.DataChangeScope;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -70,16 +70,16 @@ public class URIParametersParsing {
 
     @Test
     public void resolveURIParametersConcreteValues() {
-        resolveURIParameters("OPERATIONAL", "SUBTREE", LogicalDatastoreType.OPERATIONAL, DataChangeScope.SUBTREE);
+        resolveURIParameters("OPERATIONAL", "SUBTREE", LogicalDatastoreType.OPERATIONAL, Scope.SUBTREE);
     }
 
     @Test
     public void resolveURIParametersDefaultValues() {
-        resolveURIParameters(null, null, LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE);
+        resolveURIParameters(null, null, LogicalDatastoreType.CONFIGURATION, Scope.BASE);
     }
 
     private void resolveURIParameters(final String datastore, final String scope,
-            final LogicalDatastoreType datastoreExpected, final DataChangeScope scopeExpected) {
+            final LogicalDatastoreType datastoreExpected, final Scope scopeExpected) {
 
         final InstanceIdentifierBuilder iiBuilder = YangInstanceIdentifier.builder();
         iiBuilder.node(QName.create("", "dummyStreamName"));

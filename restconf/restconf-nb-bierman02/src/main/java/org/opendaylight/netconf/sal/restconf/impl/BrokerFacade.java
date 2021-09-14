@@ -58,7 +58,7 @@ import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
-import org.opendaylight.restconf.common.util.DataChangeScope;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -510,7 +510,7 @@ public class BrokerFacade implements Closeable {
         return this.rpcService.invokeRpc(type, input);
     }
 
-    public void registerToListenDataChanges(final LogicalDatastoreType datastore, final DataChangeScope scope,
+    public void registerToListenDataChanges(final LogicalDatastoreType datastore, final Scope scope,
             final ListenerAdapter listener) {
         if (listener.isListening()) {
             return;
