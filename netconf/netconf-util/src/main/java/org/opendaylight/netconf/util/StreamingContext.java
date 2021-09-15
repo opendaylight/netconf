@@ -171,7 +171,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+        void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
                                   final PathNode subtree) throws IOException {
             verifyActualPathArgument(first);
 
@@ -264,21 +264,32 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        final void emitChildTreeNode(final NormalizedNodeStreamWriter writer, final PathNode node) throws IOException {
+        final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                                  final PathNode subtree) throws IOException {
+            final PathNode updatedSubtree = addKeyLeaves(subtree);
+            final Collection<PathNode> children = updatedSubtree.children();
+
+            emitElementStart(writer, first, children.size());
+            if (children.size() > 0) {
+                getChildOperation(first).streamToWriter(writer, first, updatedSubtree);
+            }
+            writer.endNode();
+        }
+
+        final PathNode addKeyLeaves(final PathNode node) {
             final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) node.element();
-            final StreamingContext<?> childOp = getChildOperation(childPath);
+
             if (childPath.size() == 0 && node.isEmpty() || childPath.keySet().containsAll(keyLeaves)) {
                 // This is a query for the entire list, or the query specifies everything we need
-                childOp.streamToWriter(writer, childPath, node);
-                return;
+                return node;
             }
 
             // Inexact query, we need to also request the leaf nodes we need to for reconstructing a valid instance
             // NodeIdentifierWithPredicates.
-            childOp.streamToWriter(writer, childPath, node.copyWith(keyLeaves.stream()
+            return node.copyWith(keyLeaves.stream()
                 .filter(qname -> !childPath.containsKey(qname))
                 .map(NodeIdentifier::new)
-                .collect(Collectors.toUnmodifiableList())));
+                .collect(Collectors.toUnmodifiableList()));
         }
     }
 
@@ -456,6 +467,14 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         final boolean isMixin() {
             return true;
         }
+
+        @Override
+        final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                                  final PathNode subtree) throws IOException {
+            emitElementStart(writer, first, subtree.children().size());
+            getChildOperation(first).streamToWriter(writer, first, subtree);
+            writer.endNode();
+        }
     }
 
     private static final class OrderedLeafListMixin extends LeafListMixin {
@@ -540,6 +559,14 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         @Override
         boolean isMixin() {
             return true;
+        }
+
+        @Override
+        void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                                  final PathNode subtree) throws IOException {
+            emitElementStart(writer, first, subtree.children().size());
+            getChildOperation(first).streamToWriter(writer, first, subtree);
+            writer.endNode();
         }
 
         @Override
