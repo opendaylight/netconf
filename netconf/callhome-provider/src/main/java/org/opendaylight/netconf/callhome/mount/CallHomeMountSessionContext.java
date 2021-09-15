@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.netty.util.concurrent.Promise;
+import io.netty.util.concurrent.Future;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
@@ -77,7 +77,7 @@ class CallHomeMountSessionContext {
                 .build();
     }
 
-    Promise<NetconfClientSession> activateNetconfChannel(final NetconfClientSessionListener sessionListener) {
+    Future<NetconfClientSession> activateNetconfChannel(final NetconfClientSessionListener sessionListener) {
         return activator.activate(wrap(sessionListener));
     }
 
