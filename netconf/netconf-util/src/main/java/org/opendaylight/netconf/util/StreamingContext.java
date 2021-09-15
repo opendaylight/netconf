@@ -171,21 +171,19 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+        void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
                                   final PathNode subtree) throws IOException {
             verifyActualPathArgument(first);
 
             final Collection<PathNode> children = subtree.children();
             emitElementStart(writer, first, children.size());
             for (final PathNode node : subtree.children()) {
-                emitChildTreeNode(writer, node);
+                final PathArgument childPath = node.element();
+                if (!(node.element() instanceof AugmentationIdentifier)) {
+                    getChildOperation(childPath).streamToWriter(writer, childPath, node);
+                }
             }
             writer.endNode();
-        }
-
-        void emitChildTreeNode(final NormalizedNodeStreamWriter writer, final PathNode node) throws IOException {
-            final PathArgument childPath = node.element();
-            getChildOperation(childPath).streamToWriter(writer, childPath, node);
         }
 
         private void verifyActualPathArgument(final PathArgument first) {
@@ -249,8 +247,8 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
         AbstractMapMixin(final ListSchemaNode list) {
             super(NodeIdentifier.create(list.getQName()));
-            this.innerNode = new ListEntry(NodeIdentifierWithPredicates.of(list.getQName()), list);
-            this.keyLeaves = list.getKeyDefinition();
+            innerNode = new ListEntry(NodeIdentifierWithPredicates.of(list.getQName()), list);
+            keyLeaves = list.getKeyDefinition();
         }
 
         @Override
@@ -264,21 +262,41 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         @Override
-        final void emitChildTreeNode(final NormalizedNodeStreamWriter writer, final PathNode node) throws IOException {
+        final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                                  final PathNode subtree) throws IOException {
+            final PathNode updatedSubtree = addKeyLeaves(subtree);
+            final Collection<PathNode> children = updatedSubtree.children();
+            final int childSize = hasEntrySet(subtree) ? Integer.max(children.size(), 1) : children.size();
+
+            emitElementStart(writer, first, childSize);
+            if (children.size() > 0 || hasEntrySet(subtree)) {
+                getChildOperation(first).streamToWriter(writer, first, updatedSubtree);
+            }
+            writer.endNode();
+        }
+
+        // This is for the case where a specific list node without any child
+        // (NetconfMessageTransformerTest.getSpecificListEntriesWithSpecificFieldsTest).
+        // But is it a valid test case? This doesn't seem to match 'fields-expr' in RFC 8040
+        // because 'list-instance' is not included in the pattern.
+        private static boolean hasEntrySet(final PathNode node) {
+            return ((NodeIdentifierWithPredicates) node.element()).size() > 0;
+        }
+
+        final PathNode addKeyLeaves(final PathNode node) {
             final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) node.element();
-            final StreamingContext<?> childOp = getChildOperation(childPath);
+
             if (childPath.size() == 0 && node.isEmpty() || childPath.keySet().containsAll(keyLeaves)) {
                 // This is a query for the entire list, or the query specifies everything we need
-                childOp.streamToWriter(writer, childPath, node);
-                return;
+                return node;
             }
 
             // Inexact query, we need to also request the leaf nodes we need to for reconstructing a valid instance
             // NodeIdentifierWithPredicates.
-            childOp.streamToWriter(writer, childPath, node.copyWith(keyLeaves.stream()
+            return node.copyWith(keyLeaves.stream()
                 .filter(qname -> !childPath.containsKey(qname))
                 .map(NodeIdentifier::new)
-                .collect(Collectors.toUnmodifiableList())));
+                .collect(Collectors.toUnmodifiableList()));
         }
     }
 
@@ -336,6 +354,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
         @Override
         StreamingContext<?> getChild(final PathArgument child) {
+            if (child instanceof NodeIdentifierWithPredicates) {
+                return byArg.get(NodeIdentifier.create(child.getNodeType()));
+            }
             return byArg.get(child);
         }
 
@@ -439,7 +460,26 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
     }
 
-    private abstract static class LeafListMixin extends AbstractComposite<NodeIdentifier> {
+    private abstract static class AbstractListMixin extends AbstractComposite<NodeIdentifier> {
+        AbstractListMixin(final NodeIdentifier identifier) {
+            super(identifier);
+        }
+
+        @Override
+        final boolean isMixin() {
+            return true;
+        }
+
+        @Override
+        final void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
+                                  final PathNode subtree) throws IOException {
+            emitElementStart(writer, first, subtree.children().size());
+            getChildOperation(first).streamToWriter(writer, first, subtree);
+            writer.endNode();
+        }
+    }
+
+    private abstract static class LeafListMixin extends AbstractListMixin {
         private final StreamingContext<?> innerOp;
 
         LeafListMixin(final LeafListSchemaNode potential) {
@@ -450,11 +490,6 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         @Override
         final StreamingContext<?> getChild(final PathArgument child) {
             return child instanceof NodeWithValue ? innerOp : null;
-        }
-
-        @Override
-        final boolean isMixin() {
-            return true;
         }
     }
 
@@ -524,22 +559,17 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
     }
 
-    private static final class UnkeyedListMixin extends AbstractComposite<NodeIdentifier> {
+    private static final class UnkeyedListMixin extends AbstractListMixin {
         private final UnkeyedListItem innerNode;
 
         UnkeyedListMixin(final ListSchemaNode list) {
             super(NodeIdentifier.create(list.getQName()));
-            this.innerNode = new UnkeyedListItem(list);
+            innerNode = new UnkeyedListItem(list);
         }
 
         @Override
         StreamingContext<?> getChild(final PathArgument child) {
             return child.getNodeType().equals(getIdentifier().getNodeType()) ? innerNode : null;
-        }
-
-        @Override
-        boolean isMixin() {
-            return true;
         }
 
         @Override
