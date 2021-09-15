@@ -39,12 +39,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Util class to post data to DS.
- *
  */
 public final class PostDataTransactionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(PostDataTransactionUtil.class);
-    // FIXME: why is this being reused from other places?
-    static final String POST_TX_TYPE = "POST";
+    private static final String POST_TX_TYPE = "POST";
 
     private PostDataTransactionUtil() {
         // Hidden on purpose
