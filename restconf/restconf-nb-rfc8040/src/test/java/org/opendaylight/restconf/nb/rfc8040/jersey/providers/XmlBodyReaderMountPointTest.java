@@ -162,9 +162,9 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         if (qualifiedName != null && dataSchemaNode instanceof DataNodeContainer) {
             final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode).getDataChildByName(qualifiedName);
             dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent).node(child.getQName()).build();
-            assertTrue(nnContext.getInstanceIdentifierContext().getSchemaNode().equals(child));
+            assertEquals(nnContext.getInstanceIdentifierContext().getSchemaNode(), child);
         } else {
-            assertTrue(mountDataSchemaNode.equals(dataSchemaNode));
+            assertEquals(mountDataSchemaNode, dataSchemaNode);
         }
         assertNotNull(NormalizedNodes.findNode(nnContext.getData(), dataNodeIdent));
     }
