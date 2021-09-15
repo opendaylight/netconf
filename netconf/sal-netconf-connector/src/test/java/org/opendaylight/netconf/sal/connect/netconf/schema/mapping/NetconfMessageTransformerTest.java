@@ -68,6 +68,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Statistics;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.Datastore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.datastore.Locks;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.datastore.locks.LockType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.datastore.locks.lock.type.partial.lock.PartialLock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
@@ -949,11 +950,13 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getSpecificFieldsUnderListTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME),
-                toId(Schemas.QNAME), toId(Schema.QNAME), NodeIdentifierWithPredicates.of(Schema.QNAME));
+        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(
+                toId(NetconfState.QNAME), toId(Schemas.QNAME));
         final YangInstanceIdentifier versionField = YangInstanceIdentifier.create(
+                NodeIdentifierWithPredicates.of(Schema.QNAME),
                 toId(QName.create(Schema.QNAME, "version").intern()));
         final YangInstanceIdentifier identifierField = YangInstanceIdentifier.create(
+                NodeIdentifierWithPredicates.of(Schema.QNAME),
                 toId(QName.create(Schema.QNAME, "namespace").intern()));
 
         // building filter structure and NETCONF message
@@ -987,14 +990,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // preparation of the fields
         final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(
                 toId(NetconfState.QNAME), toId(Datastores.QNAME));
-        final YangInstanceIdentifier partialLockYiid = YangInstanceIdentifier.create(toId(Datastore.QNAME),
-                NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME),
-                toId(QName.create(Locks.QNAME, "lock-type").intern()), toId(PartialLock.QNAME),
+        final YangInstanceIdentifier partialLockYiid = YangInstanceIdentifier.create(
+                NodeIdentifierWithPredicates.of(Datastore.QNAME),
+                toId(Locks.QNAME), toId(LockType.QNAME),
                 NodeIdentifierWithPredicates.of(PartialLock.QNAME));
         final YangInstanceIdentifier lockedTimeField = partialLockYiid.node(
-                QName.create(Locks.QNAME, "locked-time").intern());
+                QName.create(PartialLock.QNAME, "locked-time").intern());
         final YangInstanceIdentifier lockedBySessionField = partialLockYiid.node(
-                QName.create(Locks.QNAME, "locked-by-session").intern());
+                QName.create(PartialLock.QNAME, "locked-by-session").intern());
 
         // building filter structure and NETCONF message
         final AnyxmlNode<?> filterStructure = toFilterStructure(
@@ -1031,9 +1034,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // preparation of the fields
         final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME));
         final YangInstanceIdentifier datastoreListField = YangInstanceIdentifier.create(toId(Datastores.QNAME),
-                toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME));
+                NodeIdentifierWithPredicates.of(Datastore.QNAME));
         final YangInstanceIdentifier sessionListField = YangInstanceIdentifier.create(toId(Sessions.QNAME),
-                toId(Session.QNAME), NodeIdentifierWithPredicates.of(Session.QNAME));
+                NodeIdentifierWithPredicates.of(Session.QNAME));
 
         // building filter structure and NETCONF message
         final AnyxmlNode<?> filterStructure = toFilterStructure(
@@ -1064,9 +1067,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.create(toId(NetconfState.QNAME),
                 toId(Sessions.QNAME));
         final QName sessionId = QName.create(Session.QNAME, "session-id").intern();
-        final YangInstanceIdentifier session1Field = YangInstanceIdentifier.create(toId(Session.QNAME),
+        final YangInstanceIdentifier session1Field = YangInstanceIdentifier.create(
                 NodeIdentifierWithPredicates.of(Session.QNAME, sessionId, 1));
-        final YangInstanceIdentifier session2TransportField = YangInstanceIdentifier.create(toId(Session.QNAME),
+        final YangInstanceIdentifier session2TransportField = YangInstanceIdentifier.create(
                 NodeIdentifierWithPredicates.of(Session.QNAME, sessionId, 2),
                 toId(QName.create(Session.QNAME, "transport").intern()));
 
