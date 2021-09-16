@@ -14,6 +14,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
+import java.nio.file.InvalidPathException;
 import java.text.ParseException;
 import java.util.Objects;
 import javax.ws.rs.PathParam;
@@ -24,6 +25,7 @@ import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.UnqualifiedQName;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Intermediate representation of a parsed {@code api-path} string as defined in
@@ -227,6 +229,10 @@ public final class ApiPath implements Immutable {
         } else {
             return new ApiPath(subList);
         }
+    }
+
+    public ApiSegment toSegment(final EffectiveModelContext context) throws InvalidPathException {
+        return ApiSegment.create(context, steps);
     }
 
     @Override
