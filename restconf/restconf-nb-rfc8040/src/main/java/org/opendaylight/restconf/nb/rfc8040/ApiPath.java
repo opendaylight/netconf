@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.UnqualifiedQName;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Intermediate representation of a parsed {@code api-path} string as defined in
@@ -146,8 +147,8 @@ public final class ApiPath implements Immutable {
         return new ApiPath(steps.build());
     }
 
-    public ImmutableList<Step> steps() {
-        return steps;
+    public ApiSegment toSegment(final EffectiveModelContext context) throws InvalidPathException {
+        return ApiSegment.create(context, steps);
     }
 
     private static Step parseStep(final String str, final int offset, final int limit) throws ParseException {
