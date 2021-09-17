@@ -60,7 +60,11 @@ public class WebInitializer {
             .addServlet(ServletDetails.builder()
                 .addAllUrlPatterns(List.of(
                     RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*",
+<<<<<<< HEAD
                     RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*"))
+=======
+                    RestconfConstants.BASE_URI_PATTERN + '/' + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*"))
+>>>>>>> d7aa4c196 (WIP: Integrate ApiPath path parsing)
                 .servlet(webSocketServlet)
                 .build())
             .addServlet(ServletDetails.builder()

@@ -15,6 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 
 /**
@@ -54,5 +55,5 @@ public interface RestconfOperationsService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext getOperations(@PathParam("identifier") ApiPath identifier, @Context UriInfo uriInfo);
 }

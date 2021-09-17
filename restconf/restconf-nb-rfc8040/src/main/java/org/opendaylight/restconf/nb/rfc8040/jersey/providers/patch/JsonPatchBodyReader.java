@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +36,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -88,12 +90,10 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public PatchContext readFrom(final String uriPath, final InputStream entityStream) throws
-            RestconfDocumentedException {
+    public PatchContext readFrom(final String uriPath, final InputStream entityStream) {
         try {
-            return readFrom(
-                    ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(),
-                            Optional.ofNullable(getMountPointService())), entityStream);
+            return readFrom(ParserIdentifier.toInstanceIdentifier(ApiPath.valueOf(uriPath), getSchemaContext(),
+                Optional.ofNullable(getMountPointService())), entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op
@@ -231,7 +231,11 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                         edit.setTarget(path.getInstanceIdentifier());
                         edit.setTargetSchemaNode(path.getSchemaContext());
                     } else {
-                        edit.setTarget(ParserIdentifier.parserPatchTarget(path, target));
+                        try {
+                            edit.setTarget(ParserIdentifier.parserPatchTarget(path, target));
+                        } catch (ParseException e) {
+                            throw new IOException("Failed to parse target '" + target + "'", e);
+                        }
 
                         final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
                             path.getSchemaContext(),

@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -110,7 +111,11 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 targetNode = pathContext.getSchemaContext();
             } else {
                 // interpret as simple context
-                targetII = ParserIdentifier.parserPatchTarget(pathContext, target);
+                try {
+                    targetII = ParserIdentifier.parserPatchTarget(pathContext, target);
+                } catch (ParseException e) {
+                    throw new RestconfDocumentedException("Failed to parse target", e);
+                }
 
                 // move schema node
                 schemaNode = verifyNotNull(DataSchemaContextTree.from(pathContext.getSchemaContext())
