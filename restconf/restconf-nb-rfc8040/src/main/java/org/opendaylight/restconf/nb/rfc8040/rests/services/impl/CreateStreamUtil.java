@@ -21,15 +21,12 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -51,14 +48,11 @@ import org.slf4j.LoggerFactory;
  */
 final class CreateStreamUtil {
     private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
-    private static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(
-        XMLNamespace.of("urn:sal:restconf:event:subscription"), Revision.of("2014-07-08"));
-    private static final QName DATASTORE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.DATASTORE_PARAM_NAME).intern();
-    private static final QName SCOPE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.SCOPE_PARAM_NAME).intern();
-    private static final QName OUTPUT_TYPE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.OUTPUT_TYPE_PARAM_NAME).intern();
+    private static final QName DATASTORE_QNAME = QName.create("urn:sal:restconf:event:subscription", "2014-07-08",
+        RestconfStreamsConstants.DATASTORE_PARAM_NAME).intern();
+    private static final QName SCOPE_QNAME = QName.create(DATASTORE_QNAME, RestconfStreamsConstants.SCOPE_PARAM_NAME)
+        .intern();
+    private static final QName OUTPUT_TYPE_QNAME = QName.create(DATASTORE_QNAME, "notification-output-type").intern();
     private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(DATASTORE_QNAME);
     private static final NodeIdentifier SCOPE_NODEID = NodeIdentifier.create(SCOPE_QNAME);
     private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
@@ -156,13 +150,9 @@ final class CreateStreamUtil {
         final Scope scope = scopeName != null ? Scope.forName(scopeName).orElseThrow() : Scope.BASE;
 
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
-                + "/"
-                + ListenersBroker.createStreamNameFromUri(
-                ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext)
-                        + RestconfStreamsConstants.DS_URI
-                        + datastoreType
-                        + RestconfStreamsConstants.SCOPE_URI
-                        + scope);
+            + "/" + ListenersBroker.createStreamNameFromUri(IdentifierCodec.serialize(path, schemaContext)
+                + "/" + RestconfStreamsConstants.DATASTORE_PARAM_NAME + "=" + datastoreType
+                + "/" + RestconfStreamsConstants.SCOPE_PARAM_NAME + "=" + scope);
     }
 
     /**

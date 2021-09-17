@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -65,14 +66,14 @@ public final class YangInstanceIdentifierDeserializer {
     private static final int PERCENT_ENCODED_RADIX = 16;
 
     private final EffectiveModelContext schemaContext;
-    private final String data;
+    private final ApiPath path;
 
     private DataSchemaContextNode<?> current;
     private int offset;
 
-    private YangInstanceIdentifierDeserializer(final EffectiveModelContext schemaContext, final String data) {
+    private YangInstanceIdentifierDeserializer(final EffectiveModelContext schemaContext, final ApiPath path) {
         this.schemaContext = requireNonNull(schemaContext);
-        this.data = requireNonNull(data);
+        this.path = requireNonNull(path);
         current = DataSchemaContextTree.from(schemaContext).getRoot();
     }
 
@@ -83,8 +84,8 @@ public final class YangInstanceIdentifierDeserializer {
      * @param data path to data, in URL string form
      * @return {@link Iterable} of {@link PathArgument}
      */
-    public static Iterable<PathArgument> create(final EffectiveModelContext schemaContext, final String data) {
-        return new YangInstanceIdentifierDeserializer(schemaContext, data).parse();
+    public static Iterable<PathArgument> create(final EffectiveModelContext schemaContext, final ApiPath path) {
+        return new YangInstanceIdentifierDeserializer(schemaContext, path).parse();
     }
 
     private List<PathArgument> parse() {

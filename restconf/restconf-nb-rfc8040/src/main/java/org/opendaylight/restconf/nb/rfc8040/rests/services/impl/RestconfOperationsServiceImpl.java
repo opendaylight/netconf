@@ -19,6 +19,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.OperationsResourceUtils;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -58,10 +59,11 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
     }
 
     @Override
-    public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
-        if (!identifier.contains(RestconfConstants.MOUNT)) {
+    public NormalizedNodeContext getOperations(final ApiPath identifier, final UriInfo uriInfo) {
+        final int mount = identifier.indexOf(RestconfConstants.MOUNT_MODULE, RestconfConstants.MOUNT_IDENTIFIER);
+        if (mount != -1) {
             final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
-                    + " end with " + RestconfConstants.MOUNT;
+                    + " contain " + RestconfConstants.MOUNT;
             LOG.debug("{} for {}", errMsg, identifier);
             throw new RestconfDocumentedException(errMsg + RestconfConstants.MOUNT, ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
