@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -51,11 +52,13 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     }
 
     @Override
-    public final T readFrom(final Class<T> type, final Type genericType,
-            final Annotation[] annotations, final MediaType mediaType,
-            final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
-            WebApplicationException {
-        final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
+    public final T readFrom(final Class<T> type, final Type genericType, final Annotation[] annotations,
+            final MediaType mediaType, final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream)
+                throws IOException, WebApplicationException {
+        // TODO: is there a better way to do this?
+        final InstanceIdentifierContext<?> path = ParserIdentifier.toInstanceIdentifier(
+            ApiPath.valueOf(uriInfo.getPathParameters(false).getFirst("identifier")), getSchemaContext(),
+            Optional.ofNullable(getMountPointService()));
 
         final PushbackInputStream pushbackInputStream = new PushbackInputStream(entityStream);
 
@@ -66,7 +69,6 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
             pushbackInputStream.unread(firstByte);
             return readBody(path, pushbackInputStream);
         }
-
     }
 
     /**
@@ -79,16 +81,6 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
 
     protected abstract T readBody(InstanceIdentifierContext<?> path, InputStream entityStream)
             throws WebApplicationException;
-
-
-    private String getIdentifier() {
-        return this.uriInfo.getPathParameters(false).getFirst("identifier");
-    }
-
-    private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
-        return ParserIdentifier.toInstanceIdentifier(getIdentifier(), getSchemaContext(),
-                Optional.ofNullable(getMountPointService()));
-    }
 
     protected UriInfo getUriInfo() {
         return this.uriInfo;

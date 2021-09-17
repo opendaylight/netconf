@@ -9,9 +9,11 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import java.text.ParseException;
 import javax.ws.rs.Path;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
@@ -43,7 +45,12 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
     @Override
     public SchemaExportContext getSchema(final String identifier) {
-        return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextHandler.get(), identifier,
-            mountPointService, sourceProvider);
+        try {
+            return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextHandler.get(), identifier,
+                mountPointService, sourceProvider);
+        } catch (ParseException e) {
+            // FIXME: better mapping?
+            throw new RestconfDocumentedException("Failed to parse identifier", e);
+        }
     }
 }

@@ -11,11 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.INSERT;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.POINT;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAMS_PATH;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_LOCATION_PATH_PART;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -55,6 +50,8 @@ import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath.Step;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
@@ -103,10 +100,10 @@ import org.slf4j.LoggerFactory;
 public class RestconfDataServiceImpl implements RestconfDataService {
     // FIXME: we should be able to interpret 'point' and refactor this class into a behavior
     private static final class QueryParams implements Immutable {
-        final @Nullable String point;
+        final @Nullable ApiPath point;
         final @Nullable Insert insert;
 
-        QueryParams(final @Nullable Insert insert, final @Nullable String point) {
+        QueryParams(final @Nullable Insert insert, final @Nullable ApiPath point) {
             this.insert = insert;
             this.point = point;
         }
@@ -129,7 +126,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final DOMActionService actionService, final Configuration configuration) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.dataBroker = requireNonNull(dataBroker);
-        this.restconfStrategy = new MdsalRestconfStrategy(dataBroker);
+        restconfStrategy = new MdsalRestconfStrategy(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
@@ -143,18 +140,39 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response readData(final String identifier, final UriInfo uriInfo) {
-        final EffectiveModelContext schemaContextRef = this.schemaContextHandler.get();
+    public Response readData(final ApiPath identifier, final UriInfo uriInfo) {
+        final EffectiveModelContext schemaContextRef = schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(mountPointService));
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
 
-        // FIXME: this looks quite crazy, why do we even have it?
-        if (mountPoint == null && identifier != null && identifier.contains(STREAMS_PATH)
-            && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(schemaContextRef, uriInfo);
+        // FIXME: okay, this is crazy-ass play-pretend with datastore, which really should be living with whoever is
+        //        providing notification routing.
+        //
+        //        When somebody looks at restconf-state:streams, we first go all nuclear and write to OPER an entry for
+        //        each notification type which is known to the EffectiveModel context. We then let the read proceed, so
+        //        that it picks the data from the datastore.
+        //
+        //        So yeah, this is extremely slow, as it is being done on each access. Now this is slightly stupid, as
+        //        the streams will not be there if someone reads root -- showing the lifecycle is messed up. Furthermore
+        //        in a cluster this is supposed to be the *local* view of what streams have been created.
+        //
+        //        Optimal solution would be for the notification support to register an on-demand datastore fragment
+        //        servicing operational datastore at /restconf-state/streams.
+        //
+        //        Since we do not have that, though, we have to do the routing ourselves. Note this function should be
+        //        exposed as a separate JAX-RS endpoint as well, so it is properly isolated. In this method we should
+        //        only handle only the case when user requests the entire root -- in which case we merge the contents
+        //        of the datastore with notification support's view of /restconf-state/streams.
+        if (mountPoint == null && identifier != null) {
+            final var steps = identifier.steps();
+            if (steps.size() == 2) {
+                if (isMonitoringStep(steps.get(0), "restconf-state") && isMonitoringStep(steps.get(1), "streams")) {
+                    createAllYangNotificationStreams(schemaContextRef, uriInfo);
+                }
+            }
         }
 
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
@@ -168,12 +186,27 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         // FIXME: this is utter craziness, refactor it properly!
-        if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
-                && identifier.contains(STREAM_LOCATION_PATH_PART)) {
-            final String value = (String) node.body();
-            final String streamName = value.substring(value.indexOf(NOTIFICATION_STREAM + '/'));
-            this.delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
+        //
+        //        First of all, we are ignoring the fact we are talking to a mount point -- this purely a local
+        //        operation.
+        //
+        //        Second, and more importantly, this also routes the request to the delegate. The delegate is
+        //        overlapping our definition JAX-RS definition. This should not really be happening as we should be
+        //        implementing that routing directly.
+        if (identifier != null) {
+            final var steps = identifier.steps();
+            if (steps.size() == 5) {
+                if (isMonitoringStep(steps.get(0), "restconf-state") && isMonitoringStep(steps.get(1), "streams")
+                    && isMonitoringStep(steps.get(2), "stream") && isMonitoringStep(steps.get(3), "access")
+                    && isMonitoringStep(steps.get(4), "location")) {
+
+                    final String value = (String) node.body();
+                    final String streamName = value.substring(value.indexOf(NOTIFICATION_STREAM + '/'));
+                    delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
+                }
+            }
         }
+
         if (node == null) {
             throw new RestconfDocumentedException(
                     "Request could not be completed because the relevant data model content does not exist",
@@ -194,6 +227,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return Response.status(Status.OK)
             .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
             .build();
+    }
+
+    private static boolean isMonitoringStep(final Step step, final String identifier) {
+        final String mod = step.module();
+        return (mod == null || mod.equals("ietf-restconf-monitoring")) && step.identifier().equals(identifier);
     }
 
     private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
@@ -225,7 +263,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response putData(final ApiPath identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
@@ -238,7 +276,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final EffectiveModelContext ref = mountPoint == null
-                ? this.schemaContextHandler.get() : modelContext(mountPoint);
+                ? schemaContextHandler.get() : modelContext(mountPoint);
 
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         return PutDataTransactionUtil.putData(payload, ref, strategy, checkedParms.insert, checkedParms.point);
@@ -282,7 +320,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         checkQueryParams(insertUsed, pointUsed, insert);
-        return new QueryParams(insert, point);
+        return new QueryParams(insert, ApiPath.valueOf(point == null ? "" : point));
     }
 
     private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed, final Insert insert) {
@@ -301,7 +339,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response postData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response postData(final ApiPath identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         return postData(payload, uriInfo);
     }
 
@@ -320,9 +358,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response deleteData(final String identifier) {
+    public Response deleteData(final ApiPath identifier) {
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, this.schemaContextHandler.get(), Optional.of(mountPointService));
+                identifier, schemaContextHandler.get(), Optional.of(mountPointService));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
@@ -330,7 +368,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public PatchStatusContext patchData(final String identifier, final PatchContext context, final UriInfo uriInfo) {
+    public PatchStatusContext patchData(final ApiPath identifier, final PatchContext context, final UriInfo uriInfo) {
         return patchData(context, uriInfo);
     }
 
@@ -344,7 +382,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response patchData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response patchData(final ApiPath identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
@@ -354,7 +392,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final EffectiveModelContext ref = mountPoint == null
-                ? this.schemaContextHandler.get() : modelContext(mountPoint);
+                ? schemaContextHandler.get() : modelContext(mountPoint);
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
 
         return PlainPatchDataTransactionUtil.patchData(payload, strategy, ref);

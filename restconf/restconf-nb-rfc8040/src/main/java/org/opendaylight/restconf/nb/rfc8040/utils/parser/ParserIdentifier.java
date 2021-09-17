@@ -11,8 +11,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import java.text.ParseException;
 import java.time.format.DateTimeParseException;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Date;
@@ -30,6 +30,7 @@ import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -54,7 +55,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class ParserIdentifier {
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
-    private static final Splitter MP_SPLITTER = Splitter.on("/" + RestconfConstants.MOUNT);
 
     private ParserIdentifier() {
         // Hidden on purpose
@@ -79,25 +79,29 @@ public final class ParserIdentifier {
      *           - mount point service
      * @return {@link InstanceIdentifierContext}
      */
-    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
+    public static InstanceIdentifierContext<?> toInstanceIdentifier(final ApiPath identifier,
             final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
-        if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
+        if (identifier == null) {
+            return createIIdContext(schemaContext, null, null);
+        }
+
+        final int mount = identifier.indexOf(RestconfConstants.MOUNT_MODULE, RestconfConstants.MOUNT_IDENTIFIER);
+        if (mount == -1) {
             return createIIdContext(schemaContext, identifier, null);
         }
-        if (mountPointService.isEmpty()) {
-            throw new RestconfDocumentedException("Mount point service is not available");
-        }
 
-        final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
-        final String mountPointId = pathsIt.next();
-        final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
-        final DOMMountPoint mountPoint = mountPointService.get().getMountPoint(mountPath)
-                .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
-                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+        final var mountService = mountPointService
+            .orElseThrow(() -> new RestconfDocumentedException("Mount point service is not available"));
+        final var mountApi = identifier.subPath(0, mount);
+        final var mountPointPath = IdentifierCodec.deserialize(mountApi, schemaContext);
+
+        final DOMMountPoint mountPoint = mountService.getMountPoint(mountPointPath)
+            // FIXME: propagate mountApi when it has a reasonable .toString()
+            .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
+                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
 
         final EffectiveModelContext mountSchemaContext = coerceModelContext(mountPoint);
-        final String pathId = pathsIt.next().replaceFirst("/", "");
-        return createIIdContext(mountSchemaContext, pathId, mountPoint);
+        return createIIdContext(mountSchemaContext, identifier.subPath(mount + 1), mountPoint);
     }
 
     /**
@@ -111,8 +115,8 @@ public final class ParserIdentifier {
      * @throws RestconfDocumentedException if the path cannot be resolved
      */
     private static InstanceIdentifierContext<?> createIIdContext(final EffectiveModelContext schemaContext,
-            final String url, final @Nullable DOMMountPoint mountPoint) {
-        final YangInstanceIdentifier urlPath = IdentifierCodec.deserialize(url, schemaContext);
+            final ApiPath identifier, final @Nullable DOMMountPoint mountPoint) {
+        final YangInstanceIdentifier urlPath = IdentifierCodec.deserialize(identifier, schemaContext);
         return new InstanceIdentifierContext<>(urlPath, getPathSchema(schemaContext, urlPath), mountPoint,
                 schemaContext);
     }
@@ -223,7 +227,7 @@ public final class ParserIdentifier {
      */
     public static SchemaExportContext toSchemaExportContextFromIdentifier(final EffectiveModelContext schemaContext,
             final String identifier, final DOMMountPointService domMountPointService,
-            final DOMYangTextSourceProvider sourceProvider) {
+            final DOMYangTextSourceProvider sourceProvider) throws ParseException {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
@@ -247,8 +251,9 @@ public final class ParserIdentifier {
 
                 pathBuilder.append(current);
             }
-            final InstanceIdentifierContext<?> point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
-                Optional.of(domMountPointService));
+
+            final InstanceIdentifierContext<?> point = toInstanceIdentifier(
+                ApiPath.valueOf(pathBuilder.toString()), schemaContext, Optional.of(domMountPointService));
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
@@ -268,7 +273,8 @@ public final class ParserIdentifier {
             targetUrl = IdentifierCodec.serialize(urlPath, schemaContext) + target;
         }
 
-        return toInstanceIdentifier(targetUrl, schemaContext, Optional.empty()).getInstanceIdentifier();
+        return toInstanceIdentifier(ApiPath.valueOf(targetUrl), schemaContext, Optional.empty())
+            .getInstanceIdentifier();
     }
 
     /**
