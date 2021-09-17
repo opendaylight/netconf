@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 
 /**
@@ -50,7 +51,7 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response readData(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    Response readData(@Encoded @PathParam("identifier") ApiPath identifier, @Context UriInfo uriInfo);
 
     /**
      * Get target data resource from data root.
@@ -88,7 +89,7 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    Response putData(@Encoded @PathParam("identifier") ApiPath identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
     /**
@@ -111,7 +112,7 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response postData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    Response postData(@Encoded @PathParam("identifier") ApiPath identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
     /**
@@ -143,7 +144,7 @@ public interface RestconfDataService {
      */
     @DELETE
     @Path("/data/{identifier:.+}")
-    Response deleteData(@Encoded @PathParam("identifier") String identifier);
+    Response deleteData(@Encoded @PathParam("identifier") ApiPath identifier);
 
     /**
      * Ordered list of edits that are applied to the target datastore by the
@@ -167,7 +168,7 @@ public interface RestconfDataService {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    PatchStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PatchContext context,
+    PatchStatusContext patchData(@Encoded @PathParam("identifier") ApiPath identifier, PatchContext context,
                                  @Context UriInfo uriInfo);
 
     /**
@@ -210,6 +211,6 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response patchData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    Response patchData(@Encoded @PathParam("identifier") ApiPath identifier, NormalizedNodeContext payload,
                        @Context UriInfo uriInfo);
 }

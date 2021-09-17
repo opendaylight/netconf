@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -111,7 +112,8 @@ public class RestconfMappingNodeUtilTest {
     @Test
     public void toStreamEntryNodeTest() throws Exception {
         final YangInstanceIdentifier path = ParserIdentifier.toInstanceIdentifier(
-                "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
+            ApiPath.valueOf("nested-module:depth1-cont/depth2-leaf1"), schemaContextMonitoring, null)
+                .getInstanceIdentifier();
         final Instant start = Instant.now();
         final String outputType = "XML";
         final URI uri = new URI("uri");

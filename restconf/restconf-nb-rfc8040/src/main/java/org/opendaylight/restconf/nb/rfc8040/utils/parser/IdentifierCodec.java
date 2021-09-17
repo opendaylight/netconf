@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -25,8 +26,8 @@ public final class IdentifierCodec {
         return YangInstanceIdentifierSerializer.create(schemaContext, data);
     }
 
-    public static YangInstanceIdentifier deserialize(final String data, final EffectiveModelContext schemaContext) {
-        return data == null ? YangInstanceIdentifier.empty()
-            : YangInstanceIdentifier.create(YangInstanceIdentifierDeserializer.create(schemaContext, data));
+    public static YangInstanceIdentifier deserialize(final ApiPath path, final EffectiveModelContext schemaContext) {
+        return path == null ? YangInstanceIdentifier.empty()
+            : YangInstanceIdentifier.create(YangInstanceIdentifierDeserializer.create(schemaContext, path));
     }
 }
