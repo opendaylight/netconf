@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
@@ -149,10 +150,8 @@ public final class RestconfMappingNodeUtil {
     public static MapEntryNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
             final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
             final EffectiveModelContext schemaContext, final String streamName) {
-        final SchemaNode schemaNode = ParserIdentifier
-                .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
-                        schemaContext, Optional.empty())
-                .getSchemaNode();
+        final SchemaNode schemaNode = ParserIdentifier.toInstanceIdentifier(
+            IdentifierCodec.serialize(path, schemaContext), schemaContext, Optional.empty()).getSchemaNode();
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
             Builders.mapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
