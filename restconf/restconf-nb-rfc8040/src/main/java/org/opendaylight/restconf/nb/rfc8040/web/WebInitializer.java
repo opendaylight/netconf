@@ -59,8 +59,8 @@ public class WebInitializer {
                 .build())
             .addServlet(ServletDetails.builder()
                 .addAllUrlPatterns(List.of(
-                    RestconfConstants.BASE_URI_PATTERN + RestconfStreamsConstants.DATA_CHANGE_EVENT_STREAM_PATTERN,
-                    RestconfConstants.BASE_URI_PATTERN + RestconfStreamsConstants.YANG_NOTIFICATION_STREAM_PATTERN))
+                    RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*",
+                    RestconfConstants.BASE_URI_PATTERN + "/" + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*"))
                 .servlet(webSocketServlet)
                 .build())
             .addServlet(ServletDetails.builder()
