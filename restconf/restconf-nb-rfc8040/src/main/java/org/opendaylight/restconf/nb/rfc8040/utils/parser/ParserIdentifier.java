@@ -164,18 +164,6 @@ public final class ParserIdentifier {
     }
 
     /**
-     * Make {@link String} from {@link YangInstanceIdentifier}.
-     *
-     * @param instanceIdentifier    Instance identifier
-     * @param schemaContext         Schema context
-     * @return                      Yang instance identifier serialized to String
-     */
-    public static String stringFromYangInstanceIdentifier(final YangInstanceIdentifier instanceIdentifier,
-            final EffectiveModelContext schemaContext) {
-        return IdentifierCodec.serialize(instanceIdentifier, schemaContext);
-    }
-
-    /**
      * Make a moduleName/Revision pair from identifier.
      *
      * @param identifier
@@ -277,7 +265,7 @@ public final class ParserIdentifier {
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;
         } else {
-            targetUrl = stringFromYangInstanceIdentifier(urlPath, schemaContext) + target;
+            targetUrl = IdentifierCodec.serialize(urlPath, schemaContext) + target;
         }
 
         return toInstanceIdentifier(targetUrl, schemaContext, Optional.empty()).getInstanceIdentifier();
