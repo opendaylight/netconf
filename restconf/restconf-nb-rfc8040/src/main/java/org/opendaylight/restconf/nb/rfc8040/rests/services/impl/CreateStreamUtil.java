@@ -21,7 +21,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -58,7 +58,7 @@ final class CreateStreamUtil {
     private static final QName SCOPE_QNAME =
         QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.SCOPE_PARAM_NAME).intern();
     private static final QName OUTPUT_TYPE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.OUTPUT_TYPE_PARAM_NAME).intern();
+        QName.create(SAL_REMOTE_AUGMENT, "notification-output-type").intern();
     private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(DATASTORE_QNAME);
     private static final NodeIdentifier SCOPE_NODEID = NodeIdentifier.create(SCOPE_QNAME);
     private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
@@ -156,13 +156,9 @@ final class CreateStreamUtil {
         final Scope scope = scopeName != null ? Scope.forName(scopeName).orElseThrow() : Scope.BASE;
 
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
-                + "/"
-                + ListenersBroker.createStreamNameFromUri(
-                ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext)
-                        + RestconfStreamsConstants.DS_URI
-                        + datastoreType
-                        + RestconfStreamsConstants.SCOPE_URI
-                        + scope);
+            + "/" + ListenersBroker.createStreamNameFromUri(IdentifierCodec.serialize(path, schemaContext)
+                + "/" + RestconfStreamsConstants.DATASTORE_PARAM_NAME + "=" + datastoreType
+                + "/" + RestconfStreamsConstants.SCOPE_PARAM_NAME + "=" + scope);
     }
 
     /**
@@ -174,12 +170,9 @@ final class CreateStreamUtil {
      *     are going to be generated.
      */
     private static YangInstanceIdentifier preparePath(final ContainerNode data, final QName qualifiedName) {
-        final Optional<DataContainerChild> path = data.findChildByArg(
-                new NodeIdentifier(QName.create(qualifiedName, RestconfStreamsConstants.STREAM_PATH_PARAM_NAME)));
-        Object pathValue = null;
-        if (path.isPresent()) {
-            pathValue = path.get().body();
-        }
+        final Object pathValue = data.findChildByArg(new NodeIdentifier(QName.create(qualifiedName, "path")))
+            .map(DataContainerChild::body)
+            .orElse(null);
         if (!(pathValue instanceof YangInstanceIdentifier)) {
             LOG.debug("Instance identifier {} was not normalized correctly", qualifiedName);
             throw new RestconfDocumentedException(

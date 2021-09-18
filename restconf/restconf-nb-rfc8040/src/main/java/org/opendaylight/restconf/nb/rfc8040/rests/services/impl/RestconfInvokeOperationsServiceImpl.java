@@ -34,7 +34,6 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -84,7 +83,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             schemaContextRef = schemaContextHandler.get();
             // FIXME: this really should be a normal RPC invocation service which has its own interface with JAX-RS
             if (SAL_REMOTE_NAMESPACE.equals(namespace)) {
-                if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCRIPTION)) {
+                if (identifier.contains("create-data-change-event-subscription")) {
                     response = CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContextRef);
                 } else {
                     throw new RestconfDocumentedException("Not supported operation", ErrorType.RPC,
