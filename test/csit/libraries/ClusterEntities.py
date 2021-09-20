@@ -2,7 +2,7 @@
     Utility library for retrieving entity related data from ODL.
 """
 
-from logging import debug, warning
+from logging import info
 from requests import post
 from sys import argv
 
@@ -18,7 +18,7 @@ def get_entities(restconf_url):
         auth=("admin", "admin"),
     )
 
-    debug(
+    info(
         "Response %s ",
         resp,
     )
@@ -44,7 +44,7 @@ def get_entity(restconf_url, type, name):
         name,
     )
 
-    debug("Data %s", data)
+    info("Data %s", data)
 
     resp = post(
         url=restconf_url + """/operations/odl-entity-owners:get-entity""",
@@ -57,21 +57,9 @@ def get_entity(restconf_url, type, name):
         auth=("admin", "admin"),
     )
 
-    warning(
-        "Response %s ",
-        resp,
-    )
-
-    warning(
-        "Json %s",
+    info(
+        "Entity json %s",
         resp.json(),
-    )
-
-    all_entities = get_entities(restconf_url)
-
-    warning(
-        "All entities %s",
-        all_entities,
     )
 
     result = {
@@ -95,7 +83,7 @@ def get_entity_owner(restconf_url, type, name):
         name,
     )
 
-    debug("Data %s", data)
+    info("Data %s", data)
 
     resp = post(
         url=restconf_url + """/operations/odl-entity-owners:get-entity-owner""",
@@ -108,7 +96,7 @@ def get_entity_owner(restconf_url, type, name):
         auth=("admin", "admin"),
     )
 
-    debug(
+    info(
         "Response %s ",
         resp,
     )
