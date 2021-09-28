@@ -192,7 +192,10 @@ PASSWORD = "EMPTY"
 AUTH = [u"admin", u"admin"]
 SCOPE = "sdn"
 HEADERS = {"Content-Type": "application/json"}
-HEADERS_YANG_JSON = {"Content-Type": "application/yang.data+json"}
+# FIXME: keep it as 'application/json' to make it work for both Bierman02
+#  and RFC8040 URLs. Change it to RFC8040 media type once RFC8040 migration
+#  is completed.
+HEADERS_YANG_JSON = {"Content-Type": "application/json"}
 HEADERS_XML = {"Content-Type": "application/xml"}
 ACCEPT_XML = {"Accept": "application/xml"}
 ACCEPT_JSON = {"Accept": "application/json"}
