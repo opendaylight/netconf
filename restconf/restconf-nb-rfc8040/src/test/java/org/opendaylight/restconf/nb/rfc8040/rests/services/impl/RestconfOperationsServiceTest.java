@@ -9,61 +9,51 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
-import com.google.common.collect.ImmutableSet;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfOperationsServiceTest {
-
-    @Mock
-    private DOMMountPointService domMountPointService;
-
-    @Mock
-    private UriInfo uriInfo;
-
-    private EffectiveModelContext schemaContext;
-    private SchemaContextHandler schemaContextHandler;
-
     private Set<QName> listOfRpcsNames;
+    private RestconfOperationsServiceImpl oper;
 
     @Before
     public void init() throws Exception {
-        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
-        this.schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
+        oper = new RestconfOperationsServiceImpl(TestUtils.newSchemaContextHandler(
+            YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"))),
+            mock(DOMMountPointService.class));
 
         final QNameModule module1 = QNameModule.create(XMLNamespace.of("module:1"));
         final QNameModule module2 = QNameModule.create(XMLNamespace.of("module:2"));
-
-        this.listOfRpcsNames = ImmutableSet.of(QName.create(module1, "dummy-rpc1-module1"),
-                QName.create(module1, "dummy-rpc2-module1"), QName.create(module2, "dummy-rpc1-module2"),
-                QName.create(module2, "dummy-rpc2-module2"));
+        listOfRpcsNames = Set.of(
+            QName.create(module1, "dummy-rpc1-module1"), QName.create(module1, "dummy-rpc2-module1"),
+            QName.create(module2, "dummy-rpc1-module2"), QName.create(module2, "dummy-rpc2-module2"));
     }
 
     @Test
-    public void getOperationsTest() {
-        final RestconfOperationsServiceImpl oper =
-                new RestconfOperationsServiceImpl(this.schemaContextHandler, this.domMountPointService);
-        final NormalizedNodeContext operations = oper.getOperations(this.uriInfo);
+    public void getOperationsTest() throws IOException {
+        final NormalizedNodeContext operations = oper.getOperations(mock(UriInfo.class));
         final ContainerNode data = (ContainerNode) operations.getData();
         assertEquals("urn:ietf:params:xml:ns:yang:ietf-restconf",
             data.getIdentifier().getNodeType().getNamespace().toString());
@@ -75,7 +65,20 @@ public class RestconfOperationsServiceTest {
             assertEquals(Empty.getInstance(), child.body());
 
             final QName qname = child.getIdentifier().getNodeType().withoutRevision();
-            assertTrue(this.listOfRpcsNames.contains(qname));
+            assertTrue(listOfRpcsNames.contains(qname));
         }
+
+        // FIXME: add XML validation
+        assertEquals("{\"ietf-restconf:operations\":{"
+            + "\"module1:dummy-rpc1-module1\":[null],"
+            + "\"module2:dummy-rpc1-module2\":[null],"
+            + "\"module2:dummy-rpc2-module2\":[null],"
+            + "\"module1:dummy-rpc2-module1\":[null]}}", toJson(operations));
+    }
+
+    private static String toJson(final NormalizedNodeContext operations) throws IOException {
+        final var bos = new ByteArrayOutputStream();
+        new JsonNormalizedNodeBodyWriter().writeTo(operations, null, null, null, null, null, bos);
+        return new String(bos.toString(StandardCharsets.UTF_8));
     }
 }
