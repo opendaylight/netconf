@@ -71,6 +71,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.restconf.common.OperationsContent;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -327,8 +328,14 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     @Deprecated
-    public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        return OperationsResourceUtils.contextForModelContext(controllerContext.getGlobalSchema(), null);
+    public String getOperationsJSON() {
+        return OperationsContent.JSON.bodyFor(controllerContext.getGlobalSchema());
+    }
+
+    @Override
+    @Deprecated
+    public String getOperationsXML() {
+        return OperationsContent.XML.bodyFor(controllerContext.getGlobalSchema());
     }
 
     @Override

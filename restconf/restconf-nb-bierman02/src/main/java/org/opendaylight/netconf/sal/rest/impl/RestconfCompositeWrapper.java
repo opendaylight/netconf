@@ -49,8 +49,13 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
     }
 
     @Override
-    public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        return this.restconf.getOperations(uriInfo);
+    public String getOperationsJSON() {
+        return this.restconf.getOperationsJSON();
+    }
+
+    @Override
+    public String getOperationsXML() {
+        return this.restconf.getOperationsXML();
     }
 
     @Override

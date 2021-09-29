@@ -127,23 +127,28 @@ public interface RestconfService {
     /**
      * List of rpc or action operations supported by the server.
      *
-     * @param uriInfo
-     *            URI information
-     * @return {@link NormalizedNodeContext}
+     * @return A JSON document string
      * @deprecated do not use this method. It will be replaced by
      *             RestconfOperationsService#getOperations(UriInfo)
      */
     @Deprecated
     @GET
     @Path("/operations")
-    @Produces({
-        Draft02.MediaTypes.API + JSON,
-        Draft02.MediaTypes.API + XML,
-        MediaType.APPLICATION_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.TEXT_XML
-    })
-    NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
+    @Produces({ Draft02.MediaTypes.API + JSON, MediaType.APPLICATION_JSON })
+    String getOperationsJSON();
+
+    /**
+     * List of rpc or action operations supported by the server.
+     *
+     * @return A XML document string
+     * @deprecated do not use this method. It will be replaced by
+     *             RestconfOperationsService#getOperations(UriInfo)
+     */
+    @Deprecated
+    @GET
+    @Path("/operations")
+    @Produces({ Draft02.MediaTypes.API + XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    String getOperationsXML();
 
     /**
      * Valid for mount points. List of operations supported by the server.

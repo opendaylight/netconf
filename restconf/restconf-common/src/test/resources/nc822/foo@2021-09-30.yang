@@ -1,0 +1,7 @@
+module foo {
+  prefix foo;
+  namespace foo;
+  revision 2021-09-30;
+
+  rpc new;
+}
