@@ -22,21 +22,24 @@ import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
  */
 public interface RestconfOperationsService {
     /**
-     * List of rpc or action operations supported by the server.
+     * List RPC and action operations in RFC7951 format.
      *
-     * @param uriInfo URI information
-     * @return {@link NormalizedNodeContext}
+     * @return A string containing a JSON document conforming to both RFC8040 and RFC7951.
      */
     @GET
     @Path("/operations")
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML,
-        MediaType.APPLICATION_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.TEXT_XML
-    })
-    NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
+    @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
+    String getOperationsJSON();
+
+    /**
+     * List RPC and action operations in RFC8040 XML format.
+     *
+     * @return A string containing a JSON document conforming to both RFC8040 section 11.3.1 and page 84.
+     */
+    @GET
+    @Path("/operations")
+    @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    String getOperationsXML();
 
     /**
      * Valid for mount points. List of operations supported by the server.

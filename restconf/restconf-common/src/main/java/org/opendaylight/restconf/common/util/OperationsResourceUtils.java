@@ -26,6 +26,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 
+// FIXME: remove this class
 public final class OperationsResourceUtils {
     private OperationsResourceUtils() {
         // Hidden on purpose

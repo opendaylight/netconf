@@ -77,8 +77,13 @@ public final class StatisticsRestconfServiceWrapper implements RestconfService {
     }
 
     @Override
-    public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        return this.delegate.getOperations(uriInfo);
+    public String getOperationsJSON() {
+        return this.delegate.getOperationsJSON();
+    }
+
+    @Override
+    public String getOperationsXML() {
+        return this.delegate.getOperationsXML();
     }
 
     @Override

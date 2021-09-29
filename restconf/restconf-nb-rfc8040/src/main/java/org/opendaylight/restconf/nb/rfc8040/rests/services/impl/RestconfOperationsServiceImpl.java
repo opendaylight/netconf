@@ -15,6 +15,7 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.common.OperationsContent;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -53,8 +54,13 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
     }
 
     @Override
-    public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        return OperationsResourceUtils.contextForModelContext(schemaContextHandler.get(), null);
+    public String getOperationsJSON() {
+        return OperationsContent.JSON.bodyFor(schemaContextHandler.get());
+    }
+
+    @Override
+    public String getOperationsXML() {
+        return OperationsContent.XML.bodyFor(schemaContextHandler.get());
     }
 
     @Override
