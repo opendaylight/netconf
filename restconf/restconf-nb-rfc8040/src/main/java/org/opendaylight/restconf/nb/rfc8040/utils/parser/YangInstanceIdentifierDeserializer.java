@@ -9,33 +9,35 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.RestUtil;
-import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath.Step;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.ContainerLike;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -44,6 +46,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -52,25 +55,14 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
  * Deserializer for {@link String} to {@link YangInstanceIdentifier} for restconf.
  */
 public final class YangInstanceIdentifierDeserializer {
-    private static final CharMatcher IDENTIFIER_PREDICATE =
-            CharMatcher.noneOf(ParserConstants.RFC3986_RESERVED_CHARACTERS).precomputed();
-    private static final CharMatcher PERCENT_ENCODING = CharMatcher.is('%');
-    // position of the first encoded char after percent sign in percent encoded string
-    private static final int FIRST_ENCODED_CHAR = 1;
-    // position of the last encoded char after percent sign in percent encoded string
-    private static final int LAST_ENCODED_CHAR = 3;
-    // percent encoded radix for parsing integers
-    private static final int PERCENT_ENCODED_RADIX = 16;
-
     private final EffectiveModelContext schemaContext;
-    private final String data;
+    private final ApiPath apiPath;
 
     private DataSchemaContextNode<?> current;
-    private int offset;
 
-    private YangInstanceIdentifierDeserializer(final EffectiveModelContext schemaContext, final String data) {
+    private YangInstanceIdentifierDeserializer(final EffectiveModelContext schemaContext, final ApiPath apiPath) {
         this.schemaContext = requireNonNull(schemaContext);
-        this.data = requireNonNull(data);
+        this.apiPath = requireNonNull(apiPath);
         current = DataSchemaContextTree.from(schemaContext).getRoot();
     }
 
@@ -80,91 +72,90 @@ public final class YangInstanceIdentifierDeserializer {
      * @param schemaContext for validate of parsing path arguments
      * @param data path to data, in URL string form
      * @return {@link Iterable} of {@link PathArgument}
+     * @throws RestconfDocumentedException the path is not valid
      */
     public static List<PathArgument> create(final EffectiveModelContext schemaContext, final String data) {
-        return new YangInstanceIdentifierDeserializer(schemaContext, data).parse();
+        final ApiPath path;
+        try {
+            path = ApiPath.parse(requireNonNull(data));
+        } catch (ParseException e) {
+            throw new RestconfDocumentedException("Invalid path '" + data + "' at offset " + e.getErrorOffset(),
+                ErrorType.APPLICATION, ErrorTag.MALFORMED_MESSAGE, e);
+        }
+        return new YangInstanceIdentifierDeserializer(schemaContext, path).parse();
     }
 
-    private List<PathArgument> parse() {
+    private ImmutableList<PathArgument> parse() {
+        final var steps = apiPath.steps();
+        if (steps.isEmpty()) {
+            return ImmutableList.of();
+        }
+
         final List<PathArgument> path = new ArrayList<>();
-
-        while (!allCharsConsumed()) {
-            validArg();
-            final QName qname = prepareQName();
-
-            // this is the last identifier (input is consumed) or end of identifier (slash)
-            if (allCharsConsumed() || currentChar() == '/') {
-                prepareIdentifier(qname, path);
-                path.add(current == null ? NodeIdentifier.create(qname) : current.getIdentifier());
-            } else if (currentChar() == '=') {
-                if (nextContextNode(qname, path).getDataSchemaNode() instanceof ListSchemaNode) {
-                    prepareNodeWithPredicates(qname, path, (ListSchemaNode) current.getDataSchemaNode());
-                } else {
-                    prepareNodeWithValue(qname, path);
+        QNameModule prevNs = null;
+        for (Step step : steps) {
+            final var module = step.module();
+            final QNameModule ns;
+            if (module == null) {
+                if (prevNs == null) {
+                    throw new RestconfDocumentedException(
+                        "First member must use namespace-qualified form, '" + step.identifier() + "' does not",
+                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
                 }
+                ns = prevNs;
             } else {
-                throw getParsingCharFailedException();
+                ns = resolveNamespace(module);
             }
+
+            final QName qname = step.identifier().bindTo(ns);
+            final DataSchemaContextNode<?> nextContext = nextContextNode(qname, path);
+            final PathArgument pathArg;
+            if (step instanceof ListInstance) {
+                final var values = ((ListInstance) step).keyValues();
+                final var schema = nextContext.getDataSchemaNode();
+                pathArg = schema instanceof ListSchemaNode
+                    // FIXME: is 'current' always the same as 'next' ? can we use 'schema' instead here?
+                    ? prepareNodeWithPredicates(qname, (ListSchemaNode) current.getDataSchemaNode(), values)
+                        : prepareNodeWithValue(qname, values);
+            } else {
+                RestconfDocumentedException.throwIf(nextContext != null && nextContext.isKeyedEntry(),
+                    ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
+                    "Entry '%s' requires key or value predicate to be present.", qname);
+                pathArg = current == null ? NodeIdentifier.create(qname) : current.getIdentifier();
+            }
+            path.add(pathArg);
+            prevNs = ns;
         }
 
         return ImmutableList.copyOf(path);
     }
 
-    private void prepareNodeWithPredicates(final QName qname, final List<PathArgument> path,
-            final ListSchemaNode listSchemaNode) {
-        checkValid(listSchemaNode != null, ErrorTag.MALFORMED_MESSAGE, "Data schema node is null");
+    private NodeIdentifierWithPredicates prepareNodeWithPredicates(final QName qname,
+            final ListSchemaNode schema, final List<@NonNull String> keyValues) {
+        // FIXME: this should be guaranteed by caller
+        final var listSchemaNode = RestconfDocumentedException.throwIfNull(schema,
+            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "Data schema node is null");
 
-        final Iterator<QName> keys = listSchemaNode.getKeyDefinition().iterator();
-        final ImmutableMap.Builder<QName, Object> values = ImmutableMap.builder();
-
-        // skip already expected equal sign
-        skipCurrentChar();
-
-        // read key value separated by comma
-        while (keys.hasNext() && !allCharsConsumed() && currentChar() != '/') {
-
-            // empty key value
-            if (currentChar() == ',') {
-                values.put(keys.next(), "");
-                skipCurrentChar();
-                continue;
-            }
-
-            // check if next value is parsable
-            checkValid(IDENTIFIER_PREDICATE.matches(currentChar()), ErrorTag.MALFORMED_MESSAGE,
-                    "Value that starts with character %c is not parsable.", currentChar());
-
-            // parse value
-            final QName key = keys.next();
-            Optional<DataSchemaNode> leafSchemaNode = listSchemaNode.findDataChildByName(key);
-            RestconfDocumentedException.throwIf(leafSchemaNode.isEmpty(), ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
-                    "Schema not found for %s", key);
-
-            final String value = findAndParsePercentEncoded(nextIdentifierFromNextSequence(IDENTIFIER_PREDICATE));
-            final Object valueByType = prepareValueByType(leafSchemaNode.get(), value);
-            values.put(key, valueByType);
-
-            // skip comma
-            if (keys.hasNext() && !allCharsConsumed() && currentChar() == ',') {
-                skipCurrentChar();
-            }
+        final var keyDef = listSchemaNode.getKeyDefinition();
+        final var keySize = keyDef.size();
+        final var varSize = keyValues.size();
+        if (keySize != varSize) {
+            throw new RestconfDocumentedException(
+                "Schema for " + qname + " requires " + keySize + " key values, " + varSize + " supplied",
+                ErrorType.PROTOCOL,keySize > varSize ? ErrorTag.MISSING_ATTRIBUTE : ErrorTag.UNKNOWN_ATTRIBUTE);
         }
 
-        // the last key is considered to be empty
-        if (keys.hasNext()) {
-            // at this point, it must be true that current char is '/' or all chars have already been consumed
-            values.put(keys.next(), "");
-
-            // there should be no more missing keys
-            RestconfDocumentedException.throwIf(keys.hasNext(), ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
-                    "Cannot parse input identifier '%s'. Key value is missing for QName: %s", data, qname);
+        final var values = ImmutableMap.<QName, Object>builderWithExpectedSize(keySize);
+        for (int i = 0; i < keySize; ++i) {
+            final QName keyName = keyDef.get(i);
+            values.put(keyName, prepareValueByType(listSchemaNode.findDataChildByName(keyName).orElseThrow(),
+                keyValues.get(i)));
         }
 
-        path.add(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(qname, values.build()));
+        return NodeIdentifierWithPredicates.of(qname, values.build());
     }
 
-    private Object prepareValueByType(final DataSchemaNode schemaNode, final String value) {
-        Object decoded;
+    private Object prepareValueByType(final DataSchemaNode schemaNode, final @NonNull String value) {
 
         TypeDefinition<? extends TypeDefinition<?>> typedef;
         if (schemaNode instanceof LeafListSchemaNode) {
@@ -177,69 +168,27 @@ public final class YangInstanceIdentifierDeserializer {
             typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, schemaNode.getPath())
                 .resolveLeafref((LeafrefTypeDefinition) baseType);
         }
-        decoded = RestCodec.from(typedef, null, schemaContext).deserialize(value);
-        if (decoded == null && typedef instanceof IdentityrefTypeDefinition) {
-            decoded = toIdentityrefQName(value, schemaNode);
+
+        if (typedef instanceof IdentityrefTypeDefinition) {
+            return toIdentityrefQName(value, schemaNode);
         }
-        return decoded;
-    }
-
-    private QName prepareQName() {
-        checkValidIdentifierStart();
-        final String preparedPrefix = nextIdentifierFromNextSequence(ParserConstants.YANG_IDENTIFIER_PART);
-        final String prefix;
-        final String localName;
-
-        if (allCharsConsumed()) {
-            return getQNameOfDataSchemaNode(preparedPrefix);
-        }
-
-        switch (currentChar()) {
-            case '/':
-            case '=':
-                prefix = preparedPrefix;
-                return getQNameOfDataSchemaNode(prefix);
-            case ':':
-                prefix = preparedPrefix;
-                skipCurrentChar();
-                checkValidIdentifierStart();
-                localName = nextIdentifierFromNextSequence(ParserConstants.YANG_IDENTIFIER_PART);
-
-                if (!allCharsConsumed() && currentChar() == '=') {
-                    return getQNameOfDataSchemaNode(localName);
-                } else {
-                    final Module module = moduleForPrefix(prefix);
-                    RestconfDocumentedException.throwIf(module == null, ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT,
-                            "Failed to lookup for module with name '%s'.", prefix);
-                    return QName.create(module.getQNameModule(), localName);
-                }
-            default:
-                throw getParsingCharFailedException();
+        try {
+            return RestCodec.from(typedef, null, schemaContext).deserialize(value);
+        } catch (IllegalArgumentException e) {
+            throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
     }
 
-    private void prepareNodeWithValue(final QName qname, final List<PathArgument> path) {
-        skipCurrentChar();
-        final String value = nextIdentifierFromNextSequence(IDENTIFIER_PREDICATE);
-
-        // exception if value attribute is missing
-        RestconfDocumentedException.throwIf(value.isEmpty(), ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
-                "Cannot parse input identifier '%s' - value is missing for QName: %s.", data, qname);
-        final DataSchemaNode dataSchemaNode = current.getDataSchemaNode();
-        final Object valueByType = prepareValueByType(dataSchemaNode, findAndParsePercentEncoded(value));
-        path.add(new YangInstanceIdentifier.NodeWithValue<>(qname, valueByType));
-    }
-
-    private void prepareIdentifier(final QName qname, final List<PathArgument> path) {
-        final DataSchemaContextNode<?> currentNode = nextContextNode(qname, path);
-        if (currentNode != null) {
-            checkValid(!currentNode.isKeyedEntry(), ErrorTag.MISSING_ATTRIBUTE,
-                    "Entry '%s' requires key or value predicate to be present.", qname);
-        }
+    private NodeWithValue<?> prepareNodeWithValue(final QName qname, final List<String> keyValues) {
+        return new NodeWithValue<>(qname, prepareValueByType(current.getDataSchemaNode(),
+            // FIXME: ahem: we probably wnat to do something differently here
+            keyValues.get(0)));
     }
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH",
             justification = "code does check for null 'current' but FB doesn't recognize it")
+    // FIXME: receive current node and make this method static, adjusting the caller to do the right thing
     private DataSchemaContextNode<?> nextContextNode(final QName qname, final List<PathArgument> path) {
         final DataSchemaContextNode<?> initialContext = current;
         final DataSchemaNode initialDataSchema = initialContext.getDataSchemaNode();
@@ -259,103 +208,14 @@ public final class YangInstanceIdentifierDeserializer {
                 return null;
             }
         }
-        checkValid(current != null, ErrorTag.MALFORMED_MESSAGE, "'%s' is not correct schema node identifier.", qname);
+
+        RestconfDocumentedException.throwIfNull(current, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+            "Schema for '%s' not found", qname);
         while (current.isMixin()) {
             path.add(current.getIdentifier());
             current = current.getChild(qname);
         }
         return current;
-    }
-
-    private Module moduleForPrefix(final String prefix) {
-        return schemaContext.findModules(prefix).stream().findFirst().orElse(null);
-    }
-
-    private boolean allCharsConsumed() {
-        return offset == data.length();
-    }
-
-    private void checkValid(final boolean condition, final ErrorTag errorTag, final String errorMsg) {
-        if (!condition) {
-            throw createParsingException(errorTag, errorMsg);
-        }
-    }
-
-    private void checkValid(final boolean condition, final ErrorTag errorTag, final String fmt, final Object arg) {
-        if (!condition) {
-            throw createParsingException(errorTag, String.format(fmt, arg));
-        }
-    }
-
-    private void checkValidIdentifierStart() {
-        checkValid(ParserConstants.YANG_IDENTIFIER_START.matches(currentChar()), ErrorTag.MALFORMED_MESSAGE,
-            "Identifier must start with character from set 'a-zA-Z_'");
-    }
-
-    private RestconfDocumentedException getParsingCharFailedException() {
-        return createParsingException(ErrorTag.MALFORMED_MESSAGE,
-            "Bad char '" + currentChar() + "' on the current position.");
-    }
-
-    private RestconfDocumentedException createParsingException(final ErrorTag errorTag, final String reason) {
-        return new RestconfDocumentedException(
-            "Could not parse Instance Identifier '" + data + "'. Offset: '" + offset + "' : Reason: " + reason,
-            ErrorType.PROTOCOL, errorTag);
-    }
-
-    private char currentChar() {
-        return data.charAt(offset);
-    }
-
-    private void skipCurrentChar() {
-        offset++;
-    }
-
-    private String nextIdentifierFromNextSequence(final CharMatcher matcher) {
-        final int start = offset;
-        while (!allCharsConsumed() && matcher.matches(currentChar())) {
-            skipCurrentChar();
-        }
-        return data.substring(start, offset);
-    }
-
-    private void validArg() {
-        // every identifier except of the first MUST start with slash
-        if (offset != 0) {
-            checkValid('/' == currentChar(), ErrorTag.MALFORMED_MESSAGE, "Identifier must start with '/'.");
-
-            // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
-            // multiple slashes into a single one
-            while (!allCharsConsumed() && '/' == currentChar()) {
-                skipCurrentChar();
-            }
-
-            // check if slash is not also the last char in identifier
-            checkValid(!allCharsConsumed(), ErrorTag.MALFORMED_MESSAGE, "Identifier cannot end with '/'.");
-        }
-    }
-
-    private QName getQNameOfDataSchemaNode(final String nodeName) {
-        final DataSchemaNode dataSchemaNode = current.getDataSchemaNode();
-        if (dataSchemaNode instanceof ContainerLike) {
-            return getQNameOfDataSchemaNode((ContainerLike) dataSchemaNode, nodeName);
-        } else if (dataSchemaNode instanceof ListSchemaNode) {
-            return getQNameOfDataSchemaNode((ListSchemaNode) dataSchemaNode, nodeName);
-        }
-
-        throw new UnsupportedOperationException("Unsupported schema node " + dataSchemaNode);
-    }
-
-    private static <T extends DataNodeContainer & SchemaNode & ActionNodeContainer> QName getQNameOfDataSchemaNode(
-            final T parent, final String nodeName) {
-        final Optional<? extends ActionDefinition> actionDef = findActionDefinition(parent, nodeName);
-        final SchemaNode node;
-        if (actionDef.isPresent()) {
-            node = actionDef.get();
-        } else {
-            node = RestconfSchemaUtil.findSchemaNodeInCollection(parent.getChildNodes(), nodeName);
-        }
-        return node.getQName();
     }
 
     private static Optional<? extends ActionDefinition> findActionDefinition(final SchemaNode dataSchemaNode,
@@ -368,68 +228,32 @@ public final class YangInstanceIdentifierDeserializer {
         return Optional.empty();
     }
 
-    private static String findAndParsePercentEncoded(final String preparedPrefix) {
-        if (preparedPrefix.indexOf('%') == -1) {
-            return preparedPrefix;
-        }
-
-        // FIXME: this is extremely inefficient: we should be converting ranges of characters, not driven by
-        //        CharMatcher, but by String.indexOf()
-        final StringBuilder parsedPrefix = new StringBuilder(preparedPrefix);
-        while (PERCENT_ENCODING.matchesAnyOf(parsedPrefix)) {
-            final int percentCharPosition = PERCENT_ENCODING.indexIn(parsedPrefix);
-            parsedPrefix.replace(percentCharPosition, percentCharPosition + LAST_ENCODED_CHAR,
-                    String.valueOf((char) Integer.parseInt(parsedPrefix.substring(
-                            percentCharPosition + FIRST_ENCODED_CHAR, percentCharPosition + LAST_ENCODED_CHAR),
-                            PERCENT_ENCODED_RADIX)));
-        }
-
-        return parsedPrefix.toString();
-    }
-
     private QName toIdentityrefQName(final String value, final DataSchemaNode schemaNode) {
-        final String moduleName = toModuleName(value);
-        final String nodeName = toNodeName(value);
-        final Iterator<? extends Module> modulesIterator = schemaContext.findModules(moduleName).iterator();
-        if (!modulesIterator.hasNext()) {
-            throw new RestconfDocumentedException(String.format("Cannot decode value '%s' for identityref type "
-                    + "in %s. Make sure reserved characters such as comma, single-quote, double-quote, colon,"
-                    + " double-quote, space, and forward slash (,'\":\" /) are percent-encoded,"
-                    + " for example ':' is '%%3A'", value, current.getIdentifier().getNodeType()),
-                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+        final QNameModule namespace;
+        final String localName;
+        final int firstColon = value.indexOf(':');
+        if (firstColon != -1) {
+            namespace = resolveNamespace(value.substring(0, firstColon));
+            localName = value.substring(firstColon + 1);
+        } else {
+            namespace = schemaNode.getQName().getModule();
+            localName = value;
         }
-        for (final IdentitySchemaNode identitySchemaNode : modulesIterator.next().getIdentities()) {
-            final QName qName = identitySchemaNode.getQName();
-            if (qName.getLocalName().equals(nodeName)) {
-                return qName;
-            }
-        }
-        return QName.create(schemaNode.getQName().getNamespace(), schemaNode.getQName().getRevision(), nodeName);
+
+        return schemaContext.getModuleStatement(namespace)
+            .streamEffectiveSubstatements(IdentityEffectiveStatement.class)
+            .map(IdentityEffectiveStatement::argument)
+            .filter(qname -> localName.equals(qname.getLocalName()))
+            .findFirst()
+            .orElseThrow(() -> new RestconfDocumentedException(
+                "No identity found for '" + localName + "' in namespace " + namespace,
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
     }
 
-    private static String toNodeName(final String str) {
-        final int idx = str.indexOf(':');
-        if (idx == -1) {
-            return str;
-        }
-
-        if (str.indexOf(':', idx + 1) != -1) {
-            return str;
-        }
-
-        return str.substring(idx + 1);
-    }
-
-    private static String toModuleName(final String str) {
-        final int idx = str.indexOf(':');
-        if (idx == -1) {
-            return null;
-        }
-
-        if (str.indexOf(':', idx + 1) != -1) {
-            return null;
-        }
-
-        return str.substring(0, idx);
+    private @NonNull QNameModule resolveNamespace(final String moduleName) {
+        final var modules = schemaContext.findModules(moduleName);
+        RestconfDocumentedException.throwIf(modules.isEmpty(), ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT,
+            "Failed to lookup for module with name '%s'.", moduleName);
+        return modules.iterator().next().getQNameModule();
     }
 }
