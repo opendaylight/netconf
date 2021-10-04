@@ -26,6 +26,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
+// FIXME: this class is incomplete in its scope and needs to be replcated via RestconfExecutionStrategy
 public abstract class RestconfStrategy {
     RestconfStrategy() {
         // Hidden on purpose
