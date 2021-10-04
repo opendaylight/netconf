@@ -181,7 +181,7 @@ abstract class SubscribeToStreamUtil {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         final ListenerAdapter listener = ListenersBroker.getInstance().getDataChangeListenerFor(streamName)
             .orElseThrow(() -> new RestconfDocumentedException("No listener found for stream " + streamName,
-                ErrorType.PROTOCOL.APPLICATION, ErrorTag.DATA_MISSING));
+                ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
 
         listener.setQueryParams(
                 notificationQueryParams.getStart(),
