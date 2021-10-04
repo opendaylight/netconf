@@ -22,6 +22,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -199,7 +200,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeMultipleSlashesTest() {
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:contA////list-A=40//list-key");
+            ApiPath.parseUrl("deserializer-test:contA////list-A=40//list-key"));
         assertEquals(4, result.size());
 
         // container
@@ -230,7 +231,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void nullDataNegativeNegativeTest() {
         assertThrows(NullPointerException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, null));
+            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, (String) null));
     }
 
     /**
@@ -329,7 +330,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareQnameErrorParsingNegativeTest() {
-        assertThrows(StringIndexOutOfBoundsException.class,
+        assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:"));
     }
 
@@ -389,11 +390,11 @@ public class YangInstanceIdentifierDeserializerTest {
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-multiple-keys");
         final Map<QName, Object> values = ImmutableMap.of(
             QName.create(list, "name"), ":foo",
-            QName.create(list, "number"), "",
-            QName.create(list, "enabled"), "");
+            QName.create(list, "number"), Uint8.ONE,
+            QName.create(list, "enabled"), false);
 
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:list-multiple-keys=%3Afoo,,/string-value");
+            "deserializer-test:list-multiple-keys=%3Afoo,1,false/string-value");
         assertEquals(3, result.size());
         // list
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -443,11 +444,11 @@ public class YangInstanceIdentifierDeserializerTest {
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-multiple-keys");
         final Map<QName, Object> values = ImmutableMap.of(
             QName.create(list, "name"), "",
-            QName.create(list, "number"), "",
-            QName.create(list, "enabled"), "");
+            QName.create(list, "number"), Uint8.ZERO,
+            QName.create(list, "enabled"), true);
 
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:list-multiple-keys=,,");
+            "deserializer-test:list-multiple-keys=,0,true");
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(list), result.get(0));
         assertEquals(NodeIdentifierWithPredicates.of(list, values), result.get(1));
@@ -463,7 +464,7 @@ public class YangInstanceIdentifierDeserializerTest {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:leaf-list-0="));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals(ErrorTag.MISSING_ATTRIBUTE, ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -472,7 +473,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializePartInOtherModuleTest() {
         final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test-included:augmented-list=100/augmented-leaf");
+            "deserializer-test-included:augmented-list=100/deserializer-test:augmented-leaf");
 
         assertEquals(4, result.size());
 
@@ -495,7 +496,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializePathWithIdentityrefKeyValueTest() {
         final var pathArgs = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-                "refs/list-with-identityref=deserializer-test%3Aderived-identity/foo");
+                "deserializer-test-included:refs/list-with-identityref=deserializer-test%3Aderived-identity/foo");
         assertEquals(4, pathArgs.size());
 
         assertEquals("refs", pathArgs.get(0).getNodeType().getLocalName());
