@@ -79,6 +79,10 @@ public final class ParserIdentifier {
      *           - mount point service
      * @return {@link InstanceIdentifierContext}
      */
+    // FIXME: NETCONF-631: this method should not be here, it should be a static factory in InstanceIdentifierContext:
+    //
+    //        @NonNull InstanceIdentifierContext forUrl(identifier, schemaContexxt, mountPointService)
+    //
     public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
             final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
         if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
@@ -170,7 +174,8 @@ public final class ParserIdentifier {
      *             path parameter
      * @return {@link QName}
      */
-    public static Entry<String, Revision> makeQNameFromIdentifier(final String identifier) {
+    @VisibleForTesting
+    static Entry<String, Revision> makeQNameFromIdentifier(final String identifier) {
         // check if more than one slash is not used as path separator
         if (identifier.contains("//")) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
