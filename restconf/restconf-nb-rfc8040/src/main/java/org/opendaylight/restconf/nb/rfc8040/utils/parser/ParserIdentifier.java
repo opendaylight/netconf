@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
@@ -21,31 +20,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
-import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.ModeledRequest;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,113 +48,6 @@ public final class ParserIdentifier {
 
     private ParserIdentifier() {
         // Hidden on purpose
-    }
-
-    /**
-     * Make {@link InstanceIdentifierContext} from {@link String} identifier
-     * <br>
-     * For identifiers of data NOT behind mount points returned
-     * {@link InstanceIdentifierContext} is prepared with {@code null} reference of {@link DOMMountPoint} and with
-     * controller's {@link SchemaContext}.
-     * <br>
-     * For identifiers of data behind mount points returned
-     * {@link InstanceIdentifierContext} is prepared with reference of {@link DOMMountPoint} and its
-     * own {@link SchemaContext}.
-     *
-     * @param identifier
-     *           - path identifier
-     * @param schemaContext
-     *           - controller schema context
-     * @param mountPointService
-     *           - mount point service
-     * @return {@link InstanceIdentifierContext}
-     */
-    // FIXME: NETCONF-718: this method should not be here, it should be a static factory in InstanceIdentifierContext:
-    //
-    //        @NonNull InstanceIdentifierContext forUrl(identifier, schemaContexxt, mountPointService)
-    //
-    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
-            final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
-        if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
-            return createIIdContext(schemaContext, identifier, null);
-        }
-        if (mountPointService.isEmpty()) {
-            throw new RestconfDocumentedException("Mount point service is not available");
-        }
-
-        final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
-        final String mountPointId = pathsIt.next();
-        final YangInstanceIdentifier mountPath = IdentifierCodec.deserialize(mountPointId, schemaContext);
-        final DOMMountPoint mountPoint = mountPointService.get().getMountPoint(mountPath)
-                .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
-                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
-
-        final EffectiveModelContext mountSchemaContext = coerceModelContext(mountPoint);
-        final String pathId = pathsIt.next().replaceFirst("/", "");
-        return createIIdContext(mountSchemaContext, pathId, mountPoint);
-    }
-
-    /**
-     * Method to create {@link InstanceIdentifierContext} from {@link YangInstanceIdentifier}
-     * and {@link SchemaContext}, {@link DOMMountPoint}.
-     *
-     * @param url Invocation URL
-     * @param schemaContext SchemaContext in which the path is to be interpreted in
-     * @param mountPoint A mount point handle, if the URL is being interpreted relative to a mount point
-     * @return {@link InstanceIdentifierContext}
-     * @throws RestconfDocumentedException if the path cannot be resolved
-     */
-    private static InstanceIdentifierContext<?> createIIdContext(final EffectiveModelContext schemaContext,
-            final String url, final @Nullable DOMMountPoint mountPoint) {
-        final YangInstanceIdentifier urlPath = IdentifierCodec.deserialize(url, schemaContext);
-        return new InstanceIdentifierContext<>(urlPath, getPathSchema(schemaContext, urlPath), mountPoint,
-                schemaContext);
-    }
-
-    private static SchemaNode getPathSchema(final EffectiveModelContext schemaContext,
-            final YangInstanceIdentifier urlPath) {
-        // First things first: an empty path means data invocation on SchemaContext
-        if (urlPath.isEmpty()) {
-            return schemaContext;
-        }
-
-        // Peel the last component and locate the parent data node, empty path resolves to SchemaContext
-        final DataSchemaContextNode<?> parent = DataSchemaContextTree.from(schemaContext)
-                .findChild(verifyNotNull(urlPath.getParent()))
-                .orElseThrow(
-                    // Parent data node is not present, this is not a valid location.
-                    () -> new RestconfDocumentedException("Parent of " + urlPath + " not found",
-                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
-
-        // Now try to resolve the last component as a data item...
-        final DataSchemaContextNode<?> data = parent.getChild(urlPath.getLastPathArgument());
-        if (data != null) {
-            return data.getDataSchemaNode();
-        }
-
-        // ... otherwise this has to be an operation invocation. RPCs cannot be defined anywhere but schema root,
-        // actions can reside everywhere else (and SchemaContext reports them empty)
-        final QName qname = urlPath.getLastPathArgument().getNodeType();
-        final DataSchemaNode parentSchema = parent.getDataSchemaNode();
-        if (parentSchema instanceof SchemaContext) {
-            for (final RpcDefinition rpc : ((SchemaContext) parentSchema).getOperations()) {
-                if (qname.equals(rpc.getQName())) {
-                    return rpc;
-                }
-            }
-        }
-        if (parentSchema instanceof ActionNodeContainer) {
-            for (final ActionDefinition action : ((ActionNodeContainer) parentSchema).getActions()) {
-                if (qname.equals(action.getQName())) {
-                    return action;
-                }
-            }
-        }
-
-        // No luck: even if we found the parent, we did not locate a data, nor RPC, nor action node, hence the URL
-        //          is deemed invalid
-        throw new RestconfDocumentedException("Context for " + urlPath + " not found", ErrorType.PROTOCOL,
-            ErrorTag.INVALID_VALUE);
     }
 
     /**
@@ -252,8 +135,8 @@ public final class ParserIdentifier {
 
                 pathBuilder.append(current);
             }
-            final InstanceIdentifierContext<?> point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
-                Optional.of(domMountPointService));
+            final InstanceIdentifierContext<?> point = ModeledRequest.createIdentifierContext(pathBuilder.toString(),
+                schemaContext, Optional.of(domMountPointService));
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
@@ -273,7 +156,9 @@ public final class ParserIdentifier {
             targetUrl = IdentifierCodec.serialize(urlPath, schemaContext) + target;
         }
 
-        return toInstanceIdentifier(targetUrl, schemaContext, Optional.empty()).getInstanceIdentifier();
+        // FIXME: this needs to be strict parsing and we should support mount points down the road
+        return ModeledRequest.createIdentifierContext(targetUrl, schemaContext, Optional.empty())
+            .getInstanceIdentifier();
     }
 
     /**
