@@ -83,7 +83,7 @@ public final class YangInstanceIdentifierDeserializer {
      * @param data path to data, in URL string form
      * @return {@link Iterable} of {@link PathArgument}
      */
-    public static Iterable<PathArgument> create(final EffectiveModelContext schemaContext, final String data) {
+    public static List<PathArgument> create(final EffectiveModelContext schemaContext, final String data) {
         return new YangInstanceIdentifierDeserializer(schemaContext, data).parse();
     }
 

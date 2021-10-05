@@ -11,11 +11,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableMap;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -28,6 +27,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -62,13 +62,9 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer
-                .create(SCHEMA_CONTEXT, "deserializer-test:contA");
-
-        assertEquals("Result does not contains expected number of path arguments", 1, Iterables.size(result));
-        assertEquals("Not expected path argument",
-                NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")),
-                result.iterator().next());
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA");
+        assertEquals(1, result.size());
+        assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
     }
 
     /**
@@ -77,18 +73,10 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithLeafTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer
-                .create(SCHEMA_CONTEXT, "deserializer-test:contA/leaf-A");
-
-        assertEquals("Result does not contains expected number of path arguments", 2, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
-        assertEquals("Not expected path argument",
-                NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")),
-                iterator.next());
-        assertEquals("Not expected path argument",
-                NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "leaf-A")),
-                iterator.next());
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/leaf-A");
+        assertEquals(2, result.size());
+        assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
+        assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "leaf-A")), result.get(1));
     }
 
     /**
@@ -97,28 +85,21 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithListWithLeafListTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer
-                .create(SCHEMA_CONTEXT, "deserializer-test:contA/list-A=100/leaf-list-AA=instance");
-
-        assertEquals("Result does not contains expected number of path arguments", 5, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "deserializer-test:contA/list-A=100/leaf-list-AA=instance");
+        assertEquals(5, result.size());
 
         // container
-        assertEquals("Not expected path argument",
-                NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")),
-                iterator.next());
-
+        assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
         // list
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-A");
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
-        assertEquals("Not expected path argument", NodeIdentifierWithPredicates.of(
-            list, QName.create(list, "list-key"), 100).toString(), iterator.next().toString());
-
+        assertEquals(NodeIdentifier.create(list), result.get(1));
+        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), Uint8.valueOf(100)),
+            result.get(2));
         // leaf list
         final QName leafList = QName.create("deserializer:test", "2016-06-06", "leaf-list-AA");
-        assertEquals("Not expected path argument", NodeIdentifier.create(leafList), iterator.next());
-        assertEquals("Not expected path argument", new NodeWithValue<>(leafList, "instance"), iterator.next());
+        assertEquals(NodeIdentifier.create(leafList), result.get(3));
+        assertEquals(new NodeWithValue<>(leafList, "instance"), result.get(4));
     }
 
     /**
@@ -127,27 +108,19 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithListWithActionTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "example-actions:interfaces/interface=eth0/reset");
-        assertEquals("Result does not contains expected number of path arguments", 4, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
-
+        assertEquals(4, result.size());
         // container
-        assertEquals("Not expected path argument",
-            NodeIdentifier.create(QName.create("https://example.com/ns/example-actions", "2016-07-07", "interfaces")),
-            iterator.next());
-
+        assertEquals(NodeIdentifier.create(
+            QName.create("https://example.com/ns/example-actions", "2016-07-07", "interfaces")), result.get(0));
         // list
         final QName list = QName.create("https://example.com/ns/example-actions", "2016-07-07", "interface");
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
-        assertEquals("Not expected path argument",
-            NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "eth0"), iterator.next());
-
-        // action QName
-        final QName action = QName.create("https://example.com/ns/example-actions", "2016-07-07", "reset");
-        assertEquals("Not expected path argument", NodeIdentifier.create(action),
-            iterator.next());
+        assertEquals(NodeIdentifier.create(list), result.get(1));
+        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "eth0"), result.get(2));
+        // action
+        assertEquals(NodeIdentifier.create(
+            QName.create("https://example.com/ns/example-actions", "2016-07-07", "reset")), result.get(3));
     }
 
     /**
@@ -156,16 +129,11 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeListWithNoKeysTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:list-no-key");
-
-        assertEquals("Result does not contains expected number of path arguments", 2, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-no-key");
+        assertEquals(2, result.size());
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-no-key");
-
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
+        assertEquals(NodeIdentifier.create(list), result.get(0));
+        assertEquals(NodeIdentifier.create(list), result.get(1));
     }
 
     /**
@@ -174,17 +142,12 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeListWithOneKeyTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "deserializer-test:list-one-key=value");
-
-        assertEquals("Result does not contains expected number of path arguments", 2, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
+        assertEquals(2, result.size());
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-one-key");
-
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
-        assertEquals("Not expected path argument",
-            NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "value"), iterator.next());
+        assertEquals(NodeIdentifier.create(list), result.get(0));
+        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "value"), result.get(1));
     }
 
     /**
@@ -194,21 +157,16 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeListWithMultipleKeysTest() {
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-multiple-keys");
-        final Map<QName, Object> values = new LinkedHashMap<>();
-        values.put(QName.create(list, "name"), "value");
-        values.put(QName.create(list, "number"), 100);
-        values.put(QName.create(list, "enabled"), false);
+        final Map<QName, Object> values = ImmutableMap.of(
+            QName.create(list, "name"), "value",
+            QName.create(list, "number"), Uint8.valueOf(100),
+            QName.create(list, "enabled"), false);
 
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "deserializer-test:list-multiple-keys=value,100,false");
-
-        assertEquals("Result does not contains expected number of path arguments", 2, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
-
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
-        assertEquals("Not expected path argument", NodeIdentifierWithPredicates.of(list, values).toString(),
-                iterator.next().toString());
+        assertEquals(2, result.size());
+        assertEquals(NodeIdentifier.create(list), result.get(0));
+        assertEquals(NodeIdentifierWithPredicates.of(list, values), result.get(1));
     }
 
     /**
@@ -217,17 +175,13 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeLeafListTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "deserializer-test:leaf-list-0=true");
+        assertEquals(2, result.size());
 
-        assertEquals("Result does not contains expected number of path arguments", 2, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
         final QName leafList = QName.create("deserializer:test", "2016-06-06", "leaf-list-0");
-
-        assertEquals("Not expected path argument", new NodeIdentifier(leafList), iterator.next());
-        assertEquals("Not expected path argument",
-                new NodeWithValue<>(leafList, true).toString(), iterator.next().toString());
+        assertEquals(new NodeIdentifier(leafList), result.get(0));
+        assertEquals(new NodeWithValue<>(leafList, true), result.get(1));
     }
 
     /**
@@ -235,8 +189,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeEmptyDataTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "");
-        assertTrue("Empty result expected", Iterables.isEmpty(result));
+        assertEquals(List.of(), YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, ""));
     }
 
     /**
@@ -245,28 +198,19 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeMultipleSlashesTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer
-                .create(SCHEMA_CONTEXT, "deserializer-test:contA////list-A=40//list-key");
-
-        assertEquals("Result does not contains expected number of path arguments", 4, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "deserializer-test:contA////list-A=40//list-key");
+        assertEquals(4, result.size());
 
         // container
-        assertEquals("Not expected path argument",
-                NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")),
-                iterator.next());
-
+        assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
         // list
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-A");
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
-        assertEquals("Not expected path argument",
-                NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 40).toString(),
-                iterator.next().toString());
-
+        assertEquals(NodeIdentifier.create(list), result.get(1));
+        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), Uint8.valueOf(40)),
+            result.get(2));
         // leaf
-        assertEquals("Not expected path argument",
-                new NodeIdentifier(QName.create("deserializer:test", "2016-06-06", "list-key")), iterator.next());
+        assertEquals(new NodeIdentifier(QName.create("deserializer:test", "2016-06-06", "list-key")), result.get(3));
     }
 
     /**
@@ -398,9 +342,8 @@ public class YangInstanceIdentifierDeserializerTest {
     public void prepareQnameNotValidContainerNameNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/leafB"));
-        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING,
-            ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -413,9 +356,8 @@ public class YangInstanceIdentifierDeserializerTest {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
                 "deserializer-test:list-no-key/disabled=false"));
-        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING,
-            ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -435,7 +377,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeKeysEndsWithComaNegativeTest() {
         assertThrows(RestconfDocumentedException.class, () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-                "deserializer-test:list-multiple-keys=value,100,false,"));
+            "deserializer-test:list-multiple-keys=value,100,false,"));
     }
 
     /**
@@ -445,26 +387,20 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void notAllListKeysEncodedPositiveTest() {
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-multiple-keys");
-        final Map<QName, Object> values = new LinkedHashMap<>();
-        values.put(QName.create(list, "name"), ":foo");
-        values.put(QName.create(list, "number"), "");
-        values.put(QName.create(list, "enabled"), "");
+        final Map<QName, Object> values = ImmutableMap.of(
+            QName.create(list, "name"), ":foo",
+            QName.create(list, "number"), "",
+            QName.create(list, "enabled"), "");
 
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(
-                SCHEMA_CONTEXT, "deserializer-test:list-multiple-keys=%3Afoo,,/string-value");
-
-        assertEquals("Result does not contains expected number of path arguments", 3, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
-
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "deserializer-test:list-multiple-keys=%3Afoo,,/string-value");
+        assertEquals(3, result.size());
         // list
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
-        assertEquals("Not expected path argument", NodeIdentifierWithPredicates.of(list, values).toString(),
-                iterator.next().toString());
-
+        assertEquals(NodeIdentifier.create(list), result.get(0));
+        assertEquals(NodeIdentifierWithPredicates.of(list, values), result.get(1));
         // leaf
-        assertEquals("Not expected path argument",
-                new NodeIdentifier(QName.create("deserializer:test", "2016-06-06", "string-value")), iterator.next());
+        assertEquals(new NodeIdentifier(QName.create("deserializer:test", "2016-06-06", "string-value")),
+            result.get(2));
     }
 
     /**
@@ -477,9 +413,8 @@ public class YangInstanceIdentifierDeserializerTest {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
                     "deserializer-test:list-multiple-keys=%3Afoo/string-value"));
-        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", ErrorTag.MISSING_ATTRIBUTE,
-            ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.MISSING_ATTRIBUTE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -506,21 +441,16 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeAllKeysEmptyTest() {
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-multiple-keys");
-        final Map<QName, Object> values = new LinkedHashMap<>();
-        values.put(QName.create(list, "name"), "");
-        values.put(QName.create(list, "number"), "");
-        values.put(QName.create(list, "enabled"), "");
+        final Map<QName, Object> values = ImmutableMap.of(
+            QName.create(list, "name"), "",
+            QName.create(list, "number"), "",
+            QName.create(list, "enabled"), "");
 
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer
-                .create(SCHEMA_CONTEXT, "deserializer-test:list-multiple-keys=,,");
-
-        assertEquals("Result does not contains expected number of path arguments", 2, Iterables.size(result));
-
-        final Iterator<PathArgument> iterator = result.iterator();
-
-        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
-        assertEquals("Not expected path argument", NodeIdentifierWithPredicates.of(list, values).toString(),
-                iterator.next().toString());
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "deserializer-test:list-multiple-keys=,,");
+        assertEquals(2, result.size());
+        assertEquals(NodeIdentifier.create(list), result.get(0));
+        assertEquals(NodeIdentifierWithPredicates.of(list, values), result.get(1));
     }
 
     /**
@@ -532,9 +462,8 @@ public class YangInstanceIdentifierDeserializerTest {
     public void leafListMissingKeyNegativeTest() {
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:leaf-list-0="));
-        assertEquals("Not expected error type", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Not expected error tag", ErrorTag.MISSING_ATTRIBUTE,
-            ex.getErrors().get(0).getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.MISSING_ATTRIBUTE, ex.getErrors().get(0).getErrorTag());
     }
 
     /**
@@ -542,27 +471,22 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializePartInOtherModuleTest() {
-        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "deserializer-test-included:augmented-list=100/augmented-leaf");
 
-        assertEquals("Result does not contains expected number of path arguments", 4, Iterables.size(result));
+        assertEquals(4, result.size());
 
-        final Iterator<PathArgument> iterator = result.iterator();
         final QName list = QName.create("deserializer:test:included", "2016-06-06", "augmented-list");
         final QName child = QName.create("deserializer:test", "2016-06-06", "augmented-leaf");
 
         // list
-        assertEquals("Not expected path argument",
-                NodeIdentifier.create(list),
-                iterator.next());
-
-        assertEquals("Not expected path argument",
-                NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 100).toString(),
-                iterator.next().toString());
+        assertEquals(NodeIdentifier.create(list), result.get(0));
+        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), Uint16.valueOf(100)),
+            result.get(1));
 
         // augmented leaf
-        assertEquals("Not expected path argument", new AugmentationIdentifier(Sets.newHashSet(child)), iterator.next());
-        assertEquals("Not expected path argument", NodeIdentifier.create(child), iterator.next());
+        assertEquals(new AugmentationIdentifier(Set.of(child)), result.get(2));
+        assertEquals(NodeIdentifier.create(child), result.get(3));
     }
 
     /**
@@ -570,15 +494,14 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializePathWithIdentityrefKeyValueTest() {
-        final Iterable<PathArgument> pathArgs = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var pathArgs = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
                 "refs/list-with-identityref=deserializer-test%3Aderived-identity/foo");
-        assertEquals(4, Iterables.size(pathArgs));
-        final Iterator<PathArgument> pathArgsIterator = pathArgs.iterator();
+        assertEquals(4, pathArgs.size());
 
-        assertEquals("refs", pathArgsIterator.next().getNodeType().getLocalName());
-        assertEquals("list-with-identityref", pathArgsIterator.next().getNodeType().getLocalName());
+        assertEquals("refs", pathArgs.get(0).getNodeType().getLocalName());
+        assertEquals("list-with-identityref", pathArgs.get(1).getNodeType().getLocalName());
 
-        final PathArgument listEntryArg = pathArgsIterator.next();
+        final PathArgument listEntryArg = pathArgs.get(2);
         assertTrue(listEntryArg instanceof NodeIdentifierWithPredicates);
         assertEquals("list-with-identityref", listEntryArg.getNodeType().getLocalName());
         final Set<QName> keys = ((NodeIdentifierWithPredicates) listEntryArg).keySet();
@@ -587,7 +510,7 @@ public class YangInstanceIdentifierDeserializerTest {
         final Object keyValue = ((NodeIdentifierWithPredicates) listEntryArg).values().iterator().next();
         assertEquals(QName.create("deserializer:test", "derived-identity", Revision.of("2016-06-06")), keyValue);
 
-        assertEquals("foo", pathArgsIterator.next().getNodeType().getLocalName());
+        assertEquals("foo", pathArgs.get(3).getNodeType().getLocalName());
     }
 
     /**
@@ -596,6 +519,6 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializePathWithInvalidIdentityrefKeyValueTest() {
         assertThrows(RestconfDocumentedException.class, () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-                "refs/list-with-identityref=deserializer-test:derived-identity/foo"));
+            "refs/list-with-identityref=deserializer-test:derived-identity/foo"));
     }
 }
