@@ -297,9 +297,9 @@ public final class YangInstanceIdentifierDeserializer {
             "Bad char '" + currentChar() + "' on the current position.");
     }
 
-    private RestconfDocumentedException createParsingException(final ErrorTag errorTag, final String messagePart) {
-        return new RestconfDocumentedException(String.format(
-            "Could not parse Instance Identifier '%s'. Offset: '%d' : Reason: %s", data, offset, messagePart),
+    private RestconfDocumentedException createParsingException(final ErrorTag errorTag, final String reason) {
+        return new RestconfDocumentedException(
+            "Could not parse Instance Identifier '" + data + "'. Offset: '" + offset + "' : Reason: " + reason,
             ErrorType.PROTOCOL, errorTag);
     }
 
