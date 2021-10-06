@@ -54,8 +54,6 @@ import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 public final class YangInstanceIdentifierDeserializer {
     private static final CharMatcher IDENTIFIER_PREDICATE =
             CharMatcher.noneOf(ParserConstants.RFC3986_RESERVED_CHARACTERS).precomputed();
-    private static final String PARSING_FAILED_MESSAGE = "Could not parse Instance Identifier '%s'. "
-            + "Offset: '%d' : Reason: ";
     private static final CharMatcher PERCENT_ENCODING = CharMatcher.is('%');
     // position of the first encoded char after percent sign in percent encoded string
     private static final int FIRST_ENCODED_CHAR = 1;
@@ -284,7 +282,7 @@ public final class YangInstanceIdentifierDeserializer {
         allMessageArguments[1] = offset;
         System.arraycopy(messageArgs, 0, allMessageArguments, 2, messageArgs.length);
         RestconfDocumentedException.throwIf(!condition, ErrorType.PROTOCOL, errorTag,
-                PARSING_FAILED_MESSAGE + errorMsg, allMessageArguments);
+            "Could not parse Instance Identifier '%s'. Offset: '%d' : Reason: " + errorMsg, allMessageArguments);
     }
 
     private void checkValidIdentifierStart() {
@@ -293,9 +291,9 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private RestconfDocumentedException getParsingCharFailedException() {
-        return new RestconfDocumentedException(String.format(PARSING_FAILED_MESSAGE, data, offset)
-                + String.format("Bad char '%c' on the current position.", currentChar()),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        return new RestconfDocumentedException(String.format("Could not parse Instance Identifier '%s'. Offset: '%d' :"
+            + " Reason: Bad char '%c' on the current position.", data, offset, currentChar()),
+            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
     }
 
     private char currentChar() {
