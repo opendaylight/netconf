@@ -54,8 +54,6 @@ import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 public final class YangInstanceIdentifierDeserializer {
     private static final CharMatcher IDENTIFIER_PREDICATE =
             CharMatcher.noneOf(ParserConstants.RFC3986_RESERVED_CHARACTERS).precomputed();
-    private static final String PARSING_FAILED_MESSAGE = "Could not parse Instance Identifier '%s'. "
-            + "Offset: '%d' : Reason: ";
     private static final CharMatcher PERCENT_ENCODING = CharMatcher.is('%');
     // position of the first encoded char after percent sign in percent encoded string
     private static final int FIRST_ENCODED_CHAR = 1;
@@ -277,14 +275,17 @@ public final class YangInstanceIdentifierDeserializer {
         return offset == data.length();
     }
 
-    private void checkValid(final boolean condition, final ErrorTag errorTag, final String errorMsg,
-                            final Object... messageArgs) {
-        final Object[] allMessageArguments = new Object[messageArgs.length + 2];
-        allMessageArguments[0] = data;
-        allMessageArguments[1] = offset;
-        System.arraycopy(messageArgs, 0, allMessageArguments, 2, messageArgs.length);
+    private void checkValid(final boolean condition, final ErrorTag errorTag, final String fmt, final Object arg) {
+        if (!condition) {
+            throw new RestconfDocumentedException(String.format(
+                "Could not parse Instance Identifier '%s'. Offset: '%d' : Reason: " + fmt, data, offset, arg),
+                ErrorType.PROTOCOL, errorTag);
+        }
+    }
+
+    private void checkValid(final boolean condition, final ErrorTag errorTag, final String errorMsg) {
         RestconfDocumentedException.throwIf(!condition, ErrorType.PROTOCOL, errorTag,
-                PARSING_FAILED_MESSAGE + errorMsg, allMessageArguments);
+            "Could not parse Instance Identifier '%s'. Offset: '%d' : Reason: %s", data, offset, errorMsg);
     }
 
     private void checkValidIdentifierStart() {
@@ -293,9 +294,9 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private RestconfDocumentedException getParsingCharFailedException() {
-        return new RestconfDocumentedException(String.format(PARSING_FAILED_MESSAGE, data, offset)
-                + String.format("Bad char '%c' on the current position.", currentChar()),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        return new RestconfDocumentedException(String.format("Could not parse Instance Identifier '%s'. Offset: '%d' :"
+            + " Reason: Bad char '%c' on the current position.", data, offset, currentChar()),
+            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
     }
 
     private char currentChar() {
