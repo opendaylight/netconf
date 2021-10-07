@@ -178,6 +178,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
             final Collection<PathNode> children = subtree.children();
             emitElementStart(writer, first, children.size());
             for (final PathNode node : subtree.children()) {
+                if (node.element() instanceof AugmentationIdentifier) {
+                    continue;
+                }
                 emitChildTreeNode(writer, node);
             }
             writer.endNode();
