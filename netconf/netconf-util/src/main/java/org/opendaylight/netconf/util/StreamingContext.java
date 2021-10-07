@@ -178,6 +178,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
             final Collection<PathNode> children = subtree.children();
             emitElementStart(writer, first, children.size());
             for (final PathNode node : subtree.children()) {
+                if (node.element() instanceof AugmentationIdentifier) {
+                    continue;
+                }
                 emitChildTreeNode(writer, node);
             }
             writer.endNode();
@@ -282,12 +285,21 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         // But is it a valid test case? This doesn't seem to match 'fields-expr' in RFC 8040
         // because 'list-instance' is not included in the pattern.
         final boolean hasEntrySet(final PathNode node) {
+<<<<<<< HEAD
             final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) node.element();
             return (childPath.entrySet().size() > 0);
         }
 
         final PathNode addKeyLeaves(final PathNode node) {
             final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) node.element();
+=======
+            final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) node.element();
+            return (childPath.entrySet().size() > 0);
+        }
+
+        final PathNode addKeyLeaves(final PathNode node) {
+            final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) node.element();
+>>>>>>> 30f45edf8 (Fix incorrect handling of list path in the RESTCONF fields)
 
             if (childPath.size() == 0 && node.isEmpty() || childPath.keySet().containsAll(keyLeaves)) {
                 // This is a query for the entire list, or the query specifies everything we need
