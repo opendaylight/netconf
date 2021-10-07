@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8c5915aa_159900b7",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/StreamingContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2021-10-07T16:06:06Z",
+      "side": 1,
+      "message": "This prevents descending down into the augmented child. For example, \n```\nfields\u003dinterface(type;enabled;host-management-std:loopback/ipv6)\n```\nwon\u0027t return any \u0027ipv6\u0027 because it\u0027s augmented.",
+      "revId": "54c98505c1bc8347f34ce090df87784658fc16c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
