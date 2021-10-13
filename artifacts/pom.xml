@@ -471,6 +471,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>ietf-subscribed-notifications</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-common-models</artifactId>
                 <version>${project.version}</version>
             </dependency>
