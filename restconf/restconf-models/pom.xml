@@ -24,5 +24,6 @@
 
   <modules>
     <module>ietf-restconf-monitoring</module>
+    <module>ietf-subscribed-notifications</module>
   </modules>
 </project>
