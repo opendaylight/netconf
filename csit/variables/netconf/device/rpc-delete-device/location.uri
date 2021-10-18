@@ -1,1 +1,1 @@
-restconf/operations/netconf-node-topology:delete-device
+rests/operations/netconf-node-topology:delete-device

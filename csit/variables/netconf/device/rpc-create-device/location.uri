@@ -1,1 +1,1 @@
-restconf/operations/netconf-node-topology:create-device
+rests/operations/netconf-node-topology:create-device
