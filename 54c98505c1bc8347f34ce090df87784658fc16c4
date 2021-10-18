@@ -16,6 +16,52 @@
       "revId": "54c98505c1bc8347f34ce090df87784658fc16c4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d69846a_78aa30b0",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/StreamingContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-10-18T05:53:32Z",
+      "side": 1,
+      "message": "should also be static",
+      "range": {
+        "startLine": 287,
+        "startChar": 8,
+        "endLine": 287,
+        "endChar": 13
+      },
+      "revId": "54c98505c1bc8347f34ce090df87784658fc16c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6145046_c2966df3",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/StreamingContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-10-18T05:53:32Z",
+      "side": 1,
+      "message": "just childPath.size()",
+      "range": {
+        "startLine": 289,
+        "startChar": 20,
+        "endLine": 289,
+        "endChar": 47
+      },
+      "revId": "54c98505c1bc8347f34ce090df87784658fc16c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
