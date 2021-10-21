@@ -54,7 +54,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
     public NnToXmlTest() {
         super(schemaContext, null);
-        this.xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
+        xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
     @BeforeClass
@@ -97,8 +97,8 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
             "<not-existing>value</not-existing>", "<lfLfrefNegative>value</lfLfrefnegative>"));
         final Throwable rootCause = Throwables.getRootCause(ex);
         assertThat(rootCause, instanceOf(IllegalArgumentException.class));
-        assertEquals("Data tree child (basic:module?revision=2013-12-02)not-existing not present",
-            rootCause.getMessage());
+        assertEquals("Data tree child (basic:module?revision=2013-12-02)not-existing not present in schema parent "
+            + "(basic:module?revision=2013-12-02)cont", rootCause.getMessage());
     }
 
     @Test
@@ -313,7 +313,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     private void nnToXml(final NormalizedNodeContext normalizedNodeContext, final String... xmlRepresentation)
             throws Exception {
         final OutputStream output = new ByteArrayOutputStream();
-        this.xmlBodyWriter.writeTo(normalizedNodeContext, null, null, null, this.mediaType, null, output);
+        xmlBodyWriter.writeTo(normalizedNodeContext, null, null, null, mediaType, null, output);
 
         for (String element : xmlRepresentation) {
             assertTrue(output.toString().contains(element));
