@@ -70,6 +70,10 @@ public final class ApiPath implements Immutable {
         ApiIdentifier(final @Nullable String module, final String identifier) {
             super(module, identifier);
         }
+
+        ApiIdentifier(final String identifier) {
+            this(null, identifier);
+        }
     }
 
     /**
