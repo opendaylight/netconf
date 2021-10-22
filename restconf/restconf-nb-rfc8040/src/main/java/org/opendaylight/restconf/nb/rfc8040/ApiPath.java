@@ -11,6 +11,7 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
@@ -69,6 +70,11 @@ public final class ApiPath implements Immutable {
     public static final class ApiIdentifier extends Step {
         ApiIdentifier(final @Nullable String module, final String identifier) {
             super(module, identifier);
+        }
+
+        @VisibleForTesting
+        ApiIdentifier(final String identifier) {
+            this(null, identifier);
         }
     }
 
