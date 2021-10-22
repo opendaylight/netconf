@@ -249,8 +249,8 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
         AbstractMapMixin(final ListSchemaNode list) {
             super(NodeIdentifier.create(list.getQName()));
-            this.innerNode = new ListEntry(NodeIdentifierWithPredicates.of(list.getQName()), list);
-            this.keyLeaves = list.getKeyDefinition();
+            innerNode = new ListEntry(NodeIdentifierWithPredicates.of(list.getQName()), list);
+            keyLeaves = list.getKeyDefinition();
         }
 
         @Override
@@ -265,7 +265,12 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
         @Override
         final void emitChildTreeNode(final NormalizedNodeStreamWriter writer, final PathNode node) throws IOException {
-            final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) node.element();
+            final PathArgument element = node.element();
+            if (!(element instanceof NodeIdentifierWithPredicates)) {
+                throw new IOException("Child identifier " + element + " is invalid in parent " + getIdentifier());
+            }
+
+            final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) element;
             final StreamingContext<?> childOp = getChildOperation(childPath);
             if (childPath.size() == 0 && node.isEmpty() || childPath.keySet().containsAll(keyLeaves)) {
                 // This is a query for the entire list, or the query specifies everything we need
@@ -529,7 +534,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
         UnkeyedListMixin(final ListSchemaNode list) {
             super(NodeIdentifier.create(list.getQName()));
-            this.innerNode = new UnkeyedListItem(list);
+            innerNode = new UnkeyedListItem(list);
         }
 
         @Override
