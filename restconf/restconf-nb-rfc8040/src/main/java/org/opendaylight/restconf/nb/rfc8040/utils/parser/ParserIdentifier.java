@@ -35,6 +35,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
@@ -306,12 +307,12 @@ public final class ParserIdentifier {
         final String name = moduleName.next();
 
         RestconfDocumentedException.throwIf(
-            name.isEmpty() || !ParserConstants.YANG_IDENTIFIER_START.matches(name.charAt(0)),
+            name.isEmpty() || !YangNames.IDENTIFIER_START.matches(name.charAt(0)),
             "Identifier must start with character from set 'a-zA-Z_", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         RestconfDocumentedException.throwIf(name.toUpperCase(Locale.ROOT).startsWith("XML"),
             "Identifier must NOT start with XML ignore case.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         RestconfDocumentedException.throwIf(
-            !ParserConstants.YANG_IDENTIFIER_PART.matchesAllOf(name.substring(1)),
+            YangNames.NOT_IDENTIFIER_PART.matchesAnyOf(name.substring(1)),
             "Supplied name has not expected identifier format.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
 
         return name;

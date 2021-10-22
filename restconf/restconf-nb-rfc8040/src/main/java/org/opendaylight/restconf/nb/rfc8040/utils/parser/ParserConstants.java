@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import com.google.common.base.CharMatcher;
+import org.opendaylight.yangtools.yang.common.YangNames;
 
 /**
  * Various constants related to RFC3986 (URI) and RFC7950 (YANG) parsing in the context of RFC8040.
@@ -18,12 +19,8 @@ final class ParserConstants {
             // FIXME: this space should not be here, but that was a day-0 bug and we have asserts on this
             + " ";
 
-    // First character of RFC7950 "identifier" rule
-    static final CharMatcher YANG_IDENTIFIER_START =
-            CharMatcher.inRange('A', 'Z').or(CharMatcher.inRange('a', 'z').or(CharMatcher.is('_'))).precomputed();
     // Subsequent characters of RFC7950 "identifier" rule
-    static final CharMatcher YANG_IDENTIFIER_PART =
-            YANG_IDENTIFIER_START.or(CharMatcher.inRange('0', '9')).or(CharMatcher.anyOf("-.")).precomputed();
+    static final CharMatcher YANG_IDENTIFIER_PART = YangNames.NOT_IDENTIFIER_PART.negate().precomputed();
 
     private ParserConstants() {
         // Hidden on purpose

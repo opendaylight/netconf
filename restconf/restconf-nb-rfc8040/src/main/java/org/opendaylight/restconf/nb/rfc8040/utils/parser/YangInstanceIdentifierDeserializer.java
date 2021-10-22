@@ -24,6 +24,7 @@ import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -288,7 +289,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private void checkValidIdentifierStart() {
-        checkValid(ParserConstants.YANG_IDENTIFIER_START.matches(currentChar()), ErrorTag.MALFORMED_MESSAGE,
+        checkValid(YangNames.IDENTIFIER_START.matches(currentChar()), ErrorTag.MALFORMED_MESSAGE,
             "Identifier must start with character from set 'a-zA-Z_'");
     }
 
