@@ -15,6 +15,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
 import java.text.ParseException;
+import java.util.Objects;
 import javax.ws.rs.PathParam;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -54,6 +55,16 @@ public final class ApiPath implements Immutable {
         }
 
         @Override
+        public abstract int hashCode();
+
+        @Override
+        public abstract boolean equals(@Nullable Object obj);
+
+        final boolean equals(final Step other) {
+            return Objects.equals(module, other.module) && identifier.equals(other.identifier);
+        }
+
+        @Override
         public final String toString() {
             return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
         }
@@ -70,6 +81,16 @@ public final class ApiPath implements Immutable {
         ApiIdentifier(final @Nullable String module, final String identifier) {
             super(module, identifier);
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(module(), identifier());
+        }
+
+        @Override
+        public boolean equals(final @Nullable Object obj) {
+            return this == obj || obj instanceof ApiIdentifier && equals((ApiIdentifier) obj);
+        }
     }
 
     /**
@@ -85,6 +106,23 @@ public final class ApiPath implements Immutable {
 
         public ImmutableList<String> keyValues() {
             return keyValues;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(module(), identifier(), keyValues);
+        }
+
+        @Override
+        public boolean equals(final @Nullable Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof ListInstance)) {
+                return false;
+            }
+            final var other = (ListInstance) obj;
+            return equals(other) && keyValues.equals(other.keyValues);
         }
 
         @Override
