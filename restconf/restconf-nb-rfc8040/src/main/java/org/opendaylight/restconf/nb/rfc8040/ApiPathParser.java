@@ -11,7 +11,6 @@ import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import java.text.ParseException;
@@ -21,6 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.Step;
+import org.opendaylight.yangtools.yang.common.YangNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +29,6 @@ import org.slf4j.LoggerFactory;
  */
 class ApiPathParser {
     private static final Logger LOG = LoggerFactory.getLogger(ApiPathParser.class);
-
-    // FIXME: use these from YangNames
-    private static final CharMatcher IDENTIFIER_START =
-        CharMatcher.inRange('A', 'Z').or(CharMatcher.inRange('a', 'z').or(CharMatcher.is('_'))).precomputed();
-    private static final CharMatcher NOT_IDENTIFIER_PART =
-        IDENTIFIER_START.or(CharMatcher.inRange('0', '9')).or(CharMatcher.anyOf("-.")).negate().precomputed();
 
     /**
      * A lenient interpretation: '//' is '/', i.e. there is no segment.
@@ -242,7 +236,7 @@ class ApiPathParser {
 
         startSub(offset);
         final char ch = peekBasicLatin(str, offset, limit);
-        if (!IDENTIFIER_START.matches(ch)) {
+        if (!YangNames.IDENTIFIER_START.matches(ch)) {
             throw new ParseException("Expecting [a-zA-Z_], not '" + ch + "'", offset);
         }
         append(ch);
@@ -250,7 +244,7 @@ class ApiPathParser {
     }
 
     private int continueIdentifer(final int offset, final char ch) throws ParseException {
-        if (NOT_IDENTIFIER_PART.matches(ch)) {
+        if (YangNames.NOT_IDENTIFIER_PART.matches(ch)) {
             throw new ParseException("Expecting [a-zA-Z_.-], not '" + ch + "'", offset);
         }
         append(ch);
