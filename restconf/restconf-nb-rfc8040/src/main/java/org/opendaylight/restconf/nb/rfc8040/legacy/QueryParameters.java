@@ -10,7 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.legacy;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -26,8 +28,7 @@ public final class QueryParameters {
         private List<Set<QName>> fields;
         private ContentParameter content;
         private WithDefaultsParameter withDefault;
-        // FIXME: this should be a DepthParameter
-        private Integer depth;
+        private DepthParameter depth;
         private boolean prettyPrint;
         private boolean tagged;
 
@@ -40,7 +41,7 @@ public final class QueryParameters {
             return this;
         }
 
-        public Builder setDepth(final int depth) {
+        public Builder setDepth(final DepthParameter depth) {
             this.depth = depth;
             return this;
         }
@@ -82,7 +83,7 @@ public final class QueryParameters {
     private final List<Set<QName>> fields;
     private final WithDefaultsParameter withDefault;
     private final ContentParameter content;
-    private final Integer depth;
+    private final DepthParameter depth;
     private final boolean prettyPrint;
     private final boolean tagged;
 
@@ -108,7 +109,7 @@ public final class QueryParameters {
         return content;
     }
 
-    public Integer getDepth() {
+    public @Nullable DepthParameter getDepth() {
         return depth;
     }
 
