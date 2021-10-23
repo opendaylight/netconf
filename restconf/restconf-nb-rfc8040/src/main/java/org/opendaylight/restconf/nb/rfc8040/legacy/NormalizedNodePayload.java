@@ -57,8 +57,8 @@ public final class NormalizedNodePayload {
             QueryParameters.empty(), ImmutableMap.of("Location", location));
     }
 
-    public static Object ofReadData(final InstanceIdentifierContext<?> path, final NormalizedNode data,
-            final QueryParameters parameters) {
+    public static @NonNull NormalizedNodePayload ofReadData(final InstanceIdentifierContext<?> path,
+            final NormalizedNode data, final QueryParameters parameters) {
         return new NormalizedNodePayload(requireNonNull(path), requireNonNull(data), parameters, ImmutableMap.of());
     }
 

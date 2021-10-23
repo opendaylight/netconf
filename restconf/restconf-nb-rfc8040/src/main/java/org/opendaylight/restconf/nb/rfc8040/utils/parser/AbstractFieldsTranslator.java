@@ -44,17 +44,14 @@ public abstract class AbstractFieldsTranslator<T> {
      */
     protected final @NonNull List<Set<T>> parseFields(final @NonNull InstanceIdentifierContext<?> identifier,
                                                       final @NonNull FieldsParam input) {
-        final DataSchemaContextNode<?> startNode = DataSchemaContextNode.fromDataSchemaNode(
-                (DataSchemaNode) identifier.getSchemaNode());
+        final var schema = (DataSchemaNode) identifier.getSchemaNode();
+        final var startNode = RestconfDocumentedException.throwIfNull(
+            DataSchemaContextNode.fromDataSchemaNode(schema), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            "Start node missing in %s", input);
 
-        if (startNode == null) {
-            throw new RestconfDocumentedException(
-                    "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
-        final List<Set<T>> parsed = new ArrayList<>();
-        processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
-            startNode, input.nodeSelectors());
+        final var parsed = new ArrayList<Set<T>>();
+        processSelectors(parsed, identifier.getSchemaContext(), schema.getQName().getModule(), startNode,
+            input.nodeSelectors());
         return parsed;
     }
 

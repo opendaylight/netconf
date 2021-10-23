@@ -27,6 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.api.ReadDataService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -71,9 +72,9 @@ public class Netconf799Test {
             Builders.containerBuilder().withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME)).build())))
             .when(actionService).invokeAction(eq(Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME)), any(), any());
 
-        final RestconfDataServiceImpl dataService = new RestconfDataServiceImpl(schemaContextHandler, mockDataBroker,
-            mock(DOMMountPointService.class), mock(RestconfStreamsSubscriptionService.class),
-            actionService, mock(Configuration.class));
+        final RestconfDataServiceImpl dataService = new RestconfDataServiceImpl(schemaContextHandler,
+            mock(ReadDataService.class), mockDataBroker, mock(DOMMountPointService.class),
+            mock(RestconfStreamsSubscriptionService.class), actionService, mock(Configuration.class));
 
         final var schemaNode = loadAction(contextRef, RESET_QNAME, ACTION_YII).orElseThrow();
         final var response = dataService.invokeAction(NormalizedNodePayload.of(

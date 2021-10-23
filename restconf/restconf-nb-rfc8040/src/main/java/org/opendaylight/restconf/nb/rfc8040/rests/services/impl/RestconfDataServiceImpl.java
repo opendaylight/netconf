@@ -20,9 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -49,13 +47,13 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
+import org.opendaylight.restconf.nb.rfc8040.api.ReadDataService;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -65,7 +63,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
@@ -74,7 +71,6 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -99,7 +95,6 @@ import org.slf4j.LoggerFactory;
 @Path("/")
 public class RestconfDataServiceImpl implements RestconfDataService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
     private static final QName NETCONF_BASE_QNAME = SchemaContext.NAME;
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
@@ -108,13 +103,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
+    private final ReadDataService readData;
     private final DOMDataBroker dataBroker;
 
-    public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
+    public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler, final ReadDataService readData,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final DOMActionService actionService, final Configuration configuration) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.readData = requireNonNull(readData);
         this.dataBroker = requireNonNull(dataBroker);
         restconfStrategy = new MdsalRestconfStrategy(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
@@ -125,65 +122,43 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response readData(final UriInfo uriInfo) {
-        return readData(null, uriInfo);
+    public void readData(final UriInfo uriInfo, final AsyncResponse ar) {
+        readData(ApiPath.empty(), uriInfo, ar);
     }
 
     @Override
-    public Response readData(final String identifier, final UriInfo uriInfo) {
-        final ReadDataParams readParams = QueryParams.newReadDataParams(uriInfo);
+    public void readData(final String identifier, final UriInfo uriInfo, final AsyncResponse ar) {
+        final var apiPath = ApiPath.valueOf(identifier);
 
-        final EffectiveModelContext schemaContextRef = schemaContextHandler.get();
-        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, schemaContextRef, Optional.of(mountPointService));
-        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-
-        // FIXME: this looks quite crazy, why do we even have it?
-        if (mountPoint == null && identifier != null && identifier.contains(STREAMS_PATH)
-            && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(schemaContextRef, uriInfo);
+        // FIXME: this an utterly crazy check for a lifecycle hack. Why would subscription service care about what
+        //        requests are made, and why should that ever affect the operational datastore?!
+        if (!apiPath.steps().stream()
+            .anyMatch(step -> "yang-ext".equals(step.module()) && "mount".equals(step.identifier().getLocalName()))) {
+            if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
+                createAllYangNotificationStreams(schemaContextHandler.get(), uriInfo);
+            }
         }
 
-        final QueryParameters queryParams = QueryParams.newQueryParameters(readParams, instanceIdentifier);
-        final List<YangInstanceIdentifier> fieldPaths = queryParams.fieldPaths();
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        final NormalizedNode node;
-        if (fieldPaths != null && !fieldPaths.isEmpty()) {
-            node = ReadDataTransactionUtil.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, readParams.withDefaults(), schemaContextRef, fieldPaths);
-        } else {
-            node = ReadDataTransactionUtil.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, readParams.withDefaults(), schemaContextRef);
-        }
-
-        // FIXME: this is utter craziness, refactor it properly!
+        // FIXME: proper check for apiPath contents
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
-                && identifier.contains(STREAM_LOCATION_PATH_PART)) {
+            && identifier.contains(STREAM_LOCATION_PATH_PART)) {
+            // FIXME: read body?!
             final String value = (String) node.body();
             final String streamName = value.substring(value.indexOf(NOTIFICATION_STREAM + '/'));
             delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
         }
-        if (node == null) {
-            throw new RestconfDocumentedException(
-                    "Request could not be completed because the relevant data model content does not exist",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
-        }
 
-        switch (readParams.content()) {
-            case ALL:
-            case CONFIG:
-                final QName type = node.getIdentifier().getNodeType();
-                return Response.status(Status.OK)
-                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, queryParams))
-                    .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
-                        + "-" + type.getLocalName() + '"')
-                    .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
-                    .build();
-            default:
-                return Response.status(Status.OK)
-                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, queryParams))
-                    .build();
-        }
+        readData(apiPath, uriInfo, ar);
+    }
+
+    private void readData(final ApiPath apiPath, final UriInfo uriInfo, final AsyncResponse ar) {
+        readData.readData(apiPath, QueryParams.newReadDataParams(uriInfo)).whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                ar.resume(throwable);
+            } else {
+                ar.resume(result);
+            }
+        });
     }
 
     private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
