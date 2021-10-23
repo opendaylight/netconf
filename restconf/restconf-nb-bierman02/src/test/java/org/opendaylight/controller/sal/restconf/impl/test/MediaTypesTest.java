@@ -31,9 +31,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 
 public class MediaTypesTest extends JerseyTest {
 

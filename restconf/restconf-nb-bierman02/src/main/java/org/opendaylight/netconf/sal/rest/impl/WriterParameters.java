@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.context;
+package org.opendaylight.netconf.sal.rest.impl;
 
 @Deprecated(forRemoval = true, since = "2.0.6")
 public final class WriterParameters {
