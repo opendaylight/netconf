@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.common.context;
 
+@Deprecated(forRemoval = true, since = "2.0.6")
 public class WriterParameters {
     static final WriterParameters EMPTY = new WriterParametersBuilder().build();
 
