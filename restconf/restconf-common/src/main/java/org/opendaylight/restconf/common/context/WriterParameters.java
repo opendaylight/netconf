@@ -7,13 +7,14 @@
  */
 package org.opendaylight.restconf.common.context;
 
-public class WriterParameters {
+@Deprecated(forRemoval = true, since = "2.0.6")
+public final class WriterParameters {
     static final WriterParameters EMPTY = new WriterParametersBuilder().build();
 
     private final Integer depth;
     private final boolean prettyPrint;
 
-    protected WriterParameters(final WriterParametersBuilder builder) {
+    private WriterParameters(final WriterParametersBuilder builder) {
         depth = builder.depth;
         prettyPrint = builder.prettyPrint;
     }
@@ -26,13 +27,10 @@ public class WriterParameters {
         return prettyPrint;
     }
 
-    public static class WriterParametersBuilder {
+    @Deprecated(forRemoval = true, since = "2.0.6")
+    public static final class WriterParametersBuilder {
         private Integer depth;
         private boolean prettyPrint;
-
-        public WriterParametersBuilder() {
-
-        }
 
         public WriterParametersBuilder setDepth(final int depth) {
             this.depth = depth;
