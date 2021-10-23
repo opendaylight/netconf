@@ -105,7 +105,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public ControllerContext(final DOMSchemaService schemaService, final DOMMountPointService mountService,
             final DOMSchemaService domSchemaService) {
         this.mountService = mountService;
-        this.yangTextSourceProvider = domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+        yangTextSourceProvider = domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
 
         onModelContextUpdated(schemaService.getGlobalContext());
         listenerRegistration = schemaService.registerSchemaContextListener(this);
@@ -126,7 +126,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     private void setGlobalSchema(final EffectiveModelContext globalSchema) {
         this.globalSchema = globalSchema;
-        this.dataNormalizer = new DataNormalizer(globalSchema);
+        dataNormalizer = new DataNormalizer(globalSchema);
     }
 
     public DOMYangTextSourceProvider getYangTextSourceProvider() {
@@ -134,7 +134,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     private void checkPreconditions() {
-        if (this.globalSchema == null) {
+        if (globalSchema == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
     }
@@ -154,7 +154,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     public EffectiveModelContext getGlobalSchema() {
-        return this.globalSchema;
+        return globalSchema;
     }
 
     public InstanceIdentifierContext<?> toMountPointIdentifier(final String restconfInstance) {
@@ -166,8 +166,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         checkPreconditions();
 
         if (restconfInstance == null) {
-            return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), this.globalSchema, null,
-                    this.globalSchema);
+            return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), globalSchema, null,
+                    globalSchema);
         }
 
         final List<String> pathArgs = urlPathArgsDecode(SLASH_SPLITTER.split(restconfInstance));
@@ -184,7 +184,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         }
 
         final InstanceIdentifierBuilder builder = YangInstanceIdentifier.builder();
-        final Collection<? extends Module> latestModule = this.globalSchema.findModules(startModule);
+        final Collection<? extends Module> latestModule = globalSchema.findModules(startModule);
 
         if (latestModule.isEmpty()) {
             throw new RestconfDocumentedException("The module named '" + startModule + "' does not exist.",
@@ -226,7 +226,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public Module findModuleByName(final String moduleName) {
         checkPreconditions();
         checkArgument(moduleName != null && !moduleName.isEmpty());
-        return this.globalSchema.findModules(moduleName).stream().findFirst().orElse(null);
+        return globalSchema.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
     public static Module findModuleByName(final DOMMountPoint mountPoint, final String moduleName) {
@@ -240,7 +240,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public Module findModuleByNamespace(final XMLNamespace namespace) {
         checkPreconditions();
         checkArgument(namespace != null);
-        return this.globalSchema.findModules(namespace).stream().findFirst().orElse(null);
+        return globalSchema.findModules(namespace).stream().findFirst().orElse(null);
     }
 
     public static Module findModuleByNamespace(final DOMMountPoint mountPoint, final XMLNamespace namespace) {
@@ -255,7 +255,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         checkPreconditions();
         checkArgument(name != null && revision != null);
 
-        return this.globalSchema.findModule(name, revision).orElse(null);
+        return globalSchema.findModule(name, revision).orElse(null);
     }
 
     public Module findModuleByNameAndRevision(final DOMMountPoint mountPoint, final String name,
@@ -273,7 +273,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         final Iterable<PathArgument> elements = path.getPathArguments();
         final PathArgument head = elements.iterator().next();
         final QName startQName = head.getNodeType();
-        final Module initialModule = this.globalSchema.findModule(startQName.getModule()).orElse(null);
+        final Module initialModule = globalSchema.findModule(startQName.getModule()).orElse(null);
         DataNodeContainer node = initialModule;
         for (final PathArgument element : elements) {
             final QName _nodeType = element.getNodeType();
@@ -298,7 +298,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         if (mount != null) {
             schemaContext = getModelContext(mount);
         } else {
-            schemaContext = this.globalSchema;
+            schemaContext = globalSchema;
         }
         final Module initialModule = schemaContext.findModule(startQName.getModule()).orElse(null);
         DataNodeContainer node = initialModule;
@@ -326,8 +326,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return module == null ? null : module.getName();
     }
 
-    public String findModuleNameByNamespace(final DOMMountPoint mountPoint, final XMLNamespace namespace) {
-        final Module module = this.findModuleByNamespace(mountPoint, namespace);
+    public static String findModuleNameByNamespace(final DOMMountPoint mountPoint, final XMLNamespace namespace) {
+        final Module module = findModuleByNamespace(mountPoint, namespace);
         return module == null ? null : module.getName();
     }
 
@@ -336,8 +336,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return module == null ? null : module.getNamespace();
     }
 
-    public XMLNamespace findNamespaceByModuleName(final DOMMountPoint mountPoint, final String moduleName) {
-        final Module module = this.findModuleByName(mountPoint, moduleName);
+    public static XMLNamespace findNamespaceByModuleName(final DOMMountPoint mountPoint, final String moduleName) {
+        final Module module = findModuleByName(mountPoint, moduleName);
         return module == null ? null : module.getNamespace();
     }
 
@@ -350,7 +350,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     public Collection<? extends Module> getAllModules() {
         checkPreconditions();
-        return this.globalSchema.getModules();
+        return globalSchema.getModules();
     }
 
     private static String toRestconfIdentifier(final EffectiveModelContext context, final QName qname) {
@@ -366,7 +366,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public String toRestconfIdentifier(final QName qname) {
         checkPreconditions();
 
-        return toRestconfIdentifier(this.globalSchema, qname);
+        return toRestconfIdentifier(globalSchema, qname);
     }
 
     public static String toRestconfIdentifier(final DOMMountPoint mountPoint, final QName qname) {
@@ -535,7 +535,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
         if (strings.isEmpty()) {
             return createContext(builder.build(), (DataSchemaNode) parentNode, mountPoint,
-                mountPoint != null ? getModelContext(mountPoint) : this.globalSchema);
+                mountPoint != null ? getModelContext(mountPoint) : globalSchema);
         }
 
         final String head = strings.iterator().next();
@@ -556,14 +556,14 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                             ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
 
-                if (this.mountService == null) {
+                if (mountService == null) {
                     throw new RestconfDocumentedException(
                             "MountService was not found. Finding behind mount points does not work.",
                             ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
 
-                final YangInstanceIdentifier partialPath = this.dataNormalizer.toNormalized(builder.build());
-                final Optional<DOMMountPoint> mountOpt = this.mountService.getMountPoint(partialPath);
+                final YangInstanceIdentifier partialPath = dataNormalizer.toNormalized(builder.build());
+                final Optional<DOMMountPoint> mountOpt = mountService.getMountPoint(partialPath);
                 if (mountOpt.isEmpty()) {
                     LOG.debug("Instance identifier to missing mount point: {}", partialPath);
                     throw new RestconfDocumentedException("Mount point does not exist.", ErrorType.PROTOCOL,
@@ -604,7 +604,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             Module module = null;
             if (mountPoint == null) {
                 checkPreconditions();
-                module = this.globalSchema.findModules(moduleName).stream().findFirst().orElse(null);
+                module = globalSchema.findModules(moduleName).stream().findFirst().orElse(null);
                 if (module == null) {
                     throw new RestconfDocumentedException("\"" + moduleName + "\" module does not exist.",
                             ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
@@ -634,7 +634,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
                 if (rpc != null) {
                     return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint,
-                            mountPoint != null ? getModelContext(mountPoint) : this.globalSchema);
+                            mountPoint != null ? getModelContext(mountPoint) : globalSchema);
                 }
             }
 
@@ -713,7 +713,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         }
 
         return createContext(builder.build(), targetNode, mountPoint,
-            mountPoint != null ? getModelContext(mountPoint) : this.globalSchema);
+            mountPoint != null ? getModelContext(mountPoint) : globalSchema);
     }
 
     private static InstanceIdentifierContext<?> createContext(final YangInstanceIdentifier instance,
@@ -850,13 +850,13 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     public RpcDefinition getRpcDefinition(final String name, final Optional<Revision> revisionDate) {
-        final QName validName = toQName(this.globalSchema, name, revisionDate);
-        return validName == null ? null : this.qnameToRpc.get().get(validName);
+        final QName validName = toQName(globalSchema, name, revisionDate);
+        return validName == null ? null : qnameToRpc.get().get(validName);
     }
 
     public RpcDefinition getRpcDefinition(final String name) {
-        final QName validName = toQName(this.globalSchema, name);
-        return validName == null ? null : this.qnameToRpc.get().get(validName);
+        final QName validName = toQName(globalSchema, name);
+        return validName == null ? null : qnameToRpc.get().get(validName);
     }
 
     private static RpcDefinition getRpcDefinition(final Module module, final String rpcName) {
@@ -880,7 +880,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             }
 
             // FIXME: still not completely atomic
-            this.qnameToRpc.set(ImmutableMap.copyOf(newMap));
+            qnameToRpc.set(ImmutableMap.copyOf(newMap));
             setGlobalSchema(context);
         }
     }
@@ -957,7 +957,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     public YangInstanceIdentifier toNormalized(final YangInstanceIdentifier legacy) {
         try {
-            return this.dataNormalizer.toNormalized(legacy);
+            return dataNormalizer.toNormalized(legacy);
         } catch (final NullPointerException e) {
             throw new RestconfDocumentedException("Data normalizer isn't set. Normalization isn't possible", e);
         }
@@ -965,7 +965,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     public YangInstanceIdentifier toXpathRepresentation(final YangInstanceIdentifier instanceIdentifier) {
         try {
-            return this.dataNormalizer.toLegacy(instanceIdentifier);
+            return dataNormalizer.toLegacy(instanceIdentifier);
         } catch (final NullPointerException e) {
             throw new RestconfDocumentedException("Data normalizer isn't set. Normalization isn't possible", e);
         } catch (final DataNormalizationException e) {
@@ -976,7 +976,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public boolean isNodeMixin(final YangInstanceIdentifier path) {
         final DataNormalizationOperation<?> operation;
         try {
-            operation = this.dataNormalizer.getOperation(path);
+            operation = dataNormalizer.getOperation(path);
         } catch (final DataNormalizationException e) {
             throw new RestconfDocumentedException("Data normalizer failed. Normalization isn't possible", e);
         }

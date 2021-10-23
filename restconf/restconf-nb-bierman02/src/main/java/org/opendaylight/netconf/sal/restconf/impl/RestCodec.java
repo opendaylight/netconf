@@ -73,16 +73,16 @@ public final class RestCodec {
         private ObjectCodec(final TypeDefinition<?> typeDefinition, final DOMMountPoint mountPoint,
                 final ControllerContext controllerContext) {
             this.controllerContext = controllerContext;
-            this.type = RestUtil.resolveBaseTypeFrom(typeDefinition);
-            if (this.type instanceof IdentityrefTypeDefinition) {
-                this.identityrefCodec = new IdentityrefCodecImpl(mountPoint, controllerContext);
+            type = RestUtil.resolveBaseTypeFrom(typeDefinition);
+            if (type instanceof IdentityrefTypeDefinition) {
+                identityrefCodec = new IdentityrefCodecImpl(mountPoint, controllerContext);
             } else {
-                this.identityrefCodec = null;
+                identityrefCodec = null;
             }
-            if (this.type instanceof InstanceIdentifierTypeDefinition) {
-                this.instanceIdentifier = new InstanceIdentifierCodecImpl(mountPoint, controllerContext);
+            if (type instanceof InstanceIdentifierTypeDefinition) {
+                instanceIdentifier = new InstanceIdentifierCodecImpl(mountPoint, controllerContext);
             } else {
-                this.instanceIdentifier = null;
+                instanceIdentifier = null;
             }
         }
 
@@ -90,9 +90,9 @@ public final class RestCodec {
         @Override
         public Object deserialize(final Object input) {
             try {
-                if (this.type instanceof IdentityrefTypeDefinition) {
+                if (type instanceof IdentityrefTypeDefinition) {
                     if (input instanceof IdentityValuesDTO) {
-                        return this.identityrefCodec.deserialize(input);
+                        return identityrefCodec.deserialize(input);
                     }
                     if (LOG.isDebugEnabled()) {
                         LOG.debug(
@@ -101,9 +101,9 @@ public final class RestCodec {
                             input == null ? "null" : input.getClass(), String.valueOf(input));
                     }
                     return null;
-                } else if (this.type instanceof InstanceIdentifierTypeDefinition) {
+                } else if (type instanceof InstanceIdentifierTypeDefinition) {
                     if (input instanceof IdentityValuesDTO) {
-                        return this.instanceIdentifier.deserialize(input);
+                        return instanceIdentifier.deserialize(input);
                     } else {
                         final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
                                 controllerContext.getGlobalSchema());
@@ -111,7 +111,7 @@ public final class RestCodec {
                     }
                 } else {
                     final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
-                            TypeDefinitionAwareCodec.from(this.type);
+                            TypeDefinitionAwareCodec.from(type);
                     if (typeAwarecodec != null) {
                         if (input instanceof IdentityValuesDTO) {
                             return typeAwarecodec.deserialize(((IdentityValuesDTO) input).getOriginValue());
@@ -132,15 +132,15 @@ public final class RestCodec {
         @Override
         public Object serialize(final Object input) {
             try {
-                if (this.type instanceof IdentityrefTypeDefinition) {
-                    return this.identityrefCodec.serialize(input);
-                } else if (this.type instanceof LeafrefTypeDefinition) {
+                if (type instanceof IdentityrefTypeDefinition) {
+                    return identityrefCodec.serialize(input);
+                } else if (type instanceof LeafrefTypeDefinition) {
                     return LEAFREF_DEFAULT_CODEC.serialize(input);
-                } else if (this.type instanceof InstanceIdentifierTypeDefinition) {
-                    return this.instanceIdentifier.serialize(input);
+                } else if (type instanceof InstanceIdentifierTypeDefinition) {
+                    return instanceIdentifier.serialize(input);
                 } else {
                     final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
-                            TypeDefinitionAwareCodec.from(this.type);
+                            TypeDefinitionAwareCodec.from(type);
                     if (typeAwarecodec != null) {
                         return typeAwarecodec.serialize(input);
                     } else {
@@ -176,7 +176,7 @@ public final class RestCodec {
         @Override
         public QName deserialize(final IdentityValuesDTO data) {
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
-            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), this.mountPoint,
+            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint,
                     controllerContext);
             if (module == null) {
                 LOG.info("Module was not found for namespace {}", valueWithNamespace.getNamespace());
@@ -241,7 +241,7 @@ public final class RestCodec {
         public YangInstanceIdentifier deserialize(final IdentityValuesDTO data) {
             final List<PathArgument> result = new ArrayList<>();
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
-            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), this.mountPoint,
+            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint,
                     controllerContext);
             if (module == null) {
                 LOG.info("Module by namespace '{}' of first node in instance-identifier was not found.",
@@ -255,7 +255,7 @@ public final class RestCodec {
             final List<IdentityValue> identities = data.getValuesWithNamespaces();
             for (int i = 0; i < identities.size(); i++) {
                 final IdentityValue identityValue = identities.get(i);
-                XMLNamespace validNamespace = resolveValidNamespace(identityValue.getNamespace(), this.mountPoint,
+                XMLNamespace validNamespace = resolveValidNamespace(identityValue.getNamespace(), mountPoint,
                         controllerContext);
                 final DataSchemaNode node = ControllerContext.findInstanceDataChildByNameAndNamespace(
                         parentContainer, identityValue.getValue(), validNamespace);
@@ -283,7 +283,7 @@ public final class RestCodec {
                         final DataNodeContainer listNode = (DataNodeContainer) node;
                         final Map<QName, Object> predicatesMap = new HashMap<>();
                         for (final Predicate predicate : identityValue.getPredicates()) {
-                            validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), this.mountPoint,
+                            validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), mountPoint,
                                     controllerContext);
                             final DataSchemaNode listKey = ControllerContext
                                     .findInstanceDataChildByNameAndNamespace(listNode, predicate.getName().getValue(),
@@ -341,7 +341,7 @@ public final class RestCodec {
 
         Module module = null;
         if (mountPoint != null) {
-            module = controllerContext.findModuleByNamespace(mountPoint, validNamespace);
+            module = ControllerContext.findModuleByNamespace(mountPoint, validNamespace);
         } else {
             module = controllerContext.findModuleByNamespace(validNamespace);
         }
@@ -356,7 +356,7 @@ public final class RestCodec {
             final ControllerContext controllerContext) {
         XMLNamespace validNamespace;
         if (mountPoint != null) {
-            validNamespace = controllerContext.findNamespaceByModuleName(mountPoint, namespace);
+            validNamespace = ControllerContext.findNamespaceByModuleName(mountPoint, namespace);
         } else {
             validNamespace = controllerContext.findNamespaceByModuleName(namespace);
         }
