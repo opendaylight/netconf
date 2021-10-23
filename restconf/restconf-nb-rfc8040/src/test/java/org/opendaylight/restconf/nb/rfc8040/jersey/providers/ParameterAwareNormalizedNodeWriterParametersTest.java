@@ -21,6 +21,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
@@ -99,7 +100,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
         limitedFields.add(Sets.newHashSet(leafSetEntryNodeIdentifier.getNodeType()));
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, 1, limitedFields);
+                writer, DepthParameter.min(), limitedFields);
 
         parameterWriter.write(containerNodeData);
 
