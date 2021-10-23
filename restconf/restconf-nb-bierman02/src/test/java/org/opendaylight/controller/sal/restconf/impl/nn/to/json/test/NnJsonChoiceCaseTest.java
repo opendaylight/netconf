@@ -16,8 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyReaderTest;
+import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {

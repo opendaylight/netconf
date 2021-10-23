@@ -21,7 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;

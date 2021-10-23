@@ -25,8 +25,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 

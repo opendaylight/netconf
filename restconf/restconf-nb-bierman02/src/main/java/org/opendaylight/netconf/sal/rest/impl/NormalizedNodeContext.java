@@ -5,11 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.context;
+package org.opendaylight.netconf.sal.rest.impl;
 
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
