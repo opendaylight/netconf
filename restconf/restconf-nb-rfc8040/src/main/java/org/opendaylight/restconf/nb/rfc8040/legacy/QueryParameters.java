@@ -10,24 +10,29 @@ package org.opendaylight.restconf.nb.rfc8040.legacy;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
- * A RFC8040 overlay over {@link WriterParameters}. This holds various options acquired from a requests's query part.
- * This class needs to be further split up to make sense of it, as parts of it pertain to how a
- * {@link NormalizedNodePayload} should be created while others how it needs to be processed (for example filtered).
+ * This holds various options acquired from a requests's query part. This class needs to be further split up to make
+ * sense of it, as parts of it pertain to how a {@link NormalizedNodePayload} should be created while others how it
+ * needs to be processed (for example filtered).
  */
-public final class QueryParameters extends WriterParameters {
-    public static final class Builder extends WriterParametersBuilder {
+public final class QueryParameters {
+    public static final class Builder {
         private List<YangInstanceIdentifier> fieldPaths;
         private List<Set<QName>> fields;
-        private WithDefaultsParameter withDefault;
-        private boolean tagged;
         private ContentParameter content;
+        private WithDefaultsParameter withDefault;
+        // FIXME: this should be a DepthParameter
+        private Integer depth;
+        private boolean prettyPrint;
+        private boolean tagged;
+
+        // FIXME: we are missing parity on 'prettyPrint' property, which indents output with 2 spaces. Implement it as
+        //        odl-indent, where user can select 0,1,2,4 (and not more).
 
         Builder() {
             // Hidden on purpose
@@ -35,6 +40,11 @@ public final class QueryParameters extends WriterParameters {
 
         public Builder setContent(final ContentParameter content) {
             this.content = content;
+            return this;
+        }
+
+        public Builder setDepth(final int depth) {
+            this.depth = depth;
             return this;
         }
 
@@ -48,6 +58,12 @@ public final class QueryParameters extends WriterParameters {
             return this;
         }
 
+        // FIXME: this is not called from anywhere. Create a PrettyPrintParameter or similar to hold it
+        public Builder setPrettyPrint(final boolean prettyPrint) {
+            this.prettyPrint = prettyPrint;
+            return this;
+        }
+
         public Builder setTagged(final boolean tagged) {
             this.tagged = tagged;
             return this;
@@ -58,7 +74,6 @@ public final class QueryParameters extends WriterParameters {
             return this;
         }
 
-        @Override
         public @NonNull QueryParameters build() {
             return new QueryParameters(this);
         }
@@ -70,14 +85,17 @@ public final class QueryParameters extends WriterParameters {
     private final List<Set<QName>> fields;
     private final WithDefaultsParameter withDefault;
     private final ContentParameter content;
+    private final Integer depth;
+    private final boolean prettyPrint;
     private final boolean tagged;
 
     private QueryParameters(final Builder builder) {
-        super(builder);
         content = builder.content;
+        depth = builder.depth;
         fields = builder.fields;
         fieldPaths = builder.fieldPaths;
         tagged = builder.tagged;
+        prettyPrint = builder.prettyPrint;
         withDefault = builder.withDefault;
     }
 
@@ -93,6 +111,10 @@ public final class QueryParameters extends WriterParameters {
         return content;
     }
 
+    public Integer getDepth() {
+        return depth;
+    }
+
     public List<Set<QName>> getFields() {
         return fields;
     }
@@ -103,6 +125,10 @@ public final class QueryParameters extends WriterParameters {
 
     public WithDefaultsParameter getWithDefault() {
         return withDefault;
+    }
+
+    public boolean isPrettyPrint() {
+        return prettyPrint;
     }
 
     public boolean isTagged() {
