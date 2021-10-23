@@ -29,7 +29,7 @@ public final class QueryParametersParser {
 
         @Override
         public String toString() {
-            return this.uriParameterName;
+            return uriParameterName;
         }
     }
 
@@ -38,16 +38,7 @@ public final class QueryParametersParser {
     }
 
     public static WriterParameters parseWriterParameters(final UriInfo info) {
-        return parseParams(info, false);
-    }
-
-    public static WriterParameters parseWriterParameters(final UriInfo uriInfo, final boolean tagged) {
-        return parseParams(uriInfo, tagged);
-    }
-
-    private static WriterParameters parseParams(final UriInfo info, final boolean tagged) {
         final WriterParameters.WriterParametersBuilder wpBuilder = new WriterParameters.WriterParametersBuilder();
-        wpBuilder.setTagged(tagged);
         if (info == null) {
             return wpBuilder.build();
         }

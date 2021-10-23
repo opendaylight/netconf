@@ -24,6 +24,7 @@ public final class QueryParameters extends WriterParameters {
         private List<YangInstanceIdentifier> fieldPaths;
         private List<Set<QName>> fields;
         private String withDefault;
+        private boolean tagged;
         private String content;
 
         Builder() {
@@ -45,6 +46,11 @@ public final class QueryParameters extends WriterParameters {
             return this;
         }
 
+        public Builder setTagged(final boolean tagged) {
+            this.tagged = tagged;
+            return this;
+        }
+
         public Builder setWithDefault(final String withDefault) {
             this.withDefault = withDefault;
             return this;
@@ -61,6 +67,7 @@ public final class QueryParameters extends WriterParameters {
     private final List<YangInstanceIdentifier> fieldPaths;
     private final List<Set<QName>> fields;
     private final String withDefault;
+    private final boolean tagged;
     private final String content;
 
     private QueryParameters(final Builder builder) {
@@ -68,6 +75,7 @@ public final class QueryParameters extends WriterParameters {
         content = builder.content;
         fields = builder.fields;
         fieldPaths = builder.fieldPaths;
+        tagged = builder.tagged;
         withDefault = builder.withDefault;
     }
 
@@ -93,5 +101,9 @@ public final class QueryParameters extends WriterParameters {
 
     public String getWithDefault() {
         return withDefault;
+    }
+
+    public boolean isTagged() {
+        return tagged;
     }
 }
