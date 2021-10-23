@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -55,10 +56,10 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
     protected final List<Set<QName>> fields;
     protected int currentDepth = 0;
 
-    private ParameterAwareNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final Integer maxDepth,
+    private ParameterAwareNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParameter depth,
                                                final List<Set<QName>> fields) {
         this.writer = requireNonNull(writer);
-        this.maxDepth = maxDepth;
+        maxDepth = depth == null ? null : depth.value();
         this.fields = fields;
     }
 
@@ -75,33 +76,31 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
      * @return A new instance.
      */
     public static ParameterAwareNormalizedNodeWriter forStreamWriter(
-            final NormalizedNodeStreamWriter writer, final Integer maxDepth, final List<Set<QName>> fields) {
+            final NormalizedNodeStreamWriter writer, final DepthParameter maxDepth, final List<Set<QName>> fields) {
         return forStreamWriter(writer, true,  maxDepth, fields);
     }
 
     /**
      * Create a new writer backed by a {@link NormalizedNodeStreamWriter}. Unlike the simple
-     * {@link #forStreamWriter(NormalizedNodeStreamWriter, Integer, List)}
-     * method, this allows the caller to switch off RFC6020 XML compliance, providing better
-     * throughput. The reason is that the XML mapping rules in RFC6020 require the encoding
-     * to emit leaf nodes which participate in a list's key first and in the order in which
-     * they are defined in the key. For JSON, this requirement is completely relaxed and leaves
-     * can be ordered in any way we see fit. The former requires a bit of work: first a lookup
-     * for each key and then for each emitted node we need to check whether it was already
-     * emitted.
+     * {@link #forStreamWriter(NormalizedNodeStreamWriter, DepthParameter, List)} method, this allows the caller to
+     * switch off RFC6020 XML compliance, providing better throughput. The reason is that the XML mapping rules in
+     * RFC6020 require the encoding to emit leaf nodes which participate in a list's key first and in the order in which
+     * they are defined in the key. For JSON, this requirement is completely relaxed and leaves can be ordered in any
+     * way we see fit. The former requires a bit of work: first a lookup for each key and then for each emitted node we
+     * need to check whether it was already emitted.
      *
      * @param writer Back-end writer
      * @param orderKeyLeaves whether the returned instance should be RFC6020 XML compliant.
-     * @param maxDepth Maximal depth to write
+     * @param depth Maximal depth to write
      * @param fields Selected child nodes to write
      * @return A new instance.
      */
     public static ParameterAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
                                                                      final boolean orderKeyLeaves,
-                                                                     final Integer maxDepth,
+                                                                     final DepthParameter depth,
                                                                      final List<Set<QName>> fields) {
-        return orderKeyLeaves ? new OrderedParameterAwareNormalizedNodeWriter(writer, maxDepth, fields)
-                : new ParameterAwareNormalizedNodeWriter(writer, maxDepth, fields);
+        return orderKeyLeaves ? new OrderedParameterAwareNormalizedNodeWriter(writer, depth, fields)
+                : new ParameterAwareNormalizedNodeWriter(writer, depth, fields);
     }
 
     /**
@@ -323,9 +322,9 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
     private static final class OrderedParameterAwareNormalizedNodeWriter extends ParameterAwareNormalizedNodeWriter {
         private static final Logger LOG = LoggerFactory.getLogger(OrderedParameterAwareNormalizedNodeWriter.class);
 
-        OrderedParameterAwareNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final Integer maxDepth,
+        OrderedParameterAwareNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParameter depth,
                                                   final List<Set<QName>> fields) {
-            super(writer, maxDepth, fields);
+            super(writer, depth, fields);
         }
 
         @Override
