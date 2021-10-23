@@ -8,8 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.INSERT;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.POINT;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAMS_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
@@ -54,6 +52,8 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.InsertParameter;
+import org.opendaylight.restconf.nb.rfc8040.PointParameter;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -68,8 +68,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactio
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
@@ -92,6 +90,7 @@ import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -104,10 +103,10 @@ import org.slf4j.LoggerFactory;
 public class RestconfDataServiceImpl implements RestconfDataService {
     // FIXME: we should be able to interpret 'point' and refactor this class into a behavior
     private static final class QueryParams implements Immutable {
-        final @Nullable String point;
-        final @Nullable Insert insert;
+        final @Nullable PointParameter point;
+        final @Nullable InsertParameter insert;
 
-        QueryParams(final @Nullable Insert insert, final @Nullable String point) {
+        QueryParams(final @Nullable InsertParameter insert, final @Nullable PointParameter point) {
             this.insert = insert;
             this.point = point;
         }
@@ -115,6 +114,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
+    private static final QName NETCONF_BASE_QNAME = SchemaContext.NAME;
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
     private final SchemaContextHandler schemaContextHandler;
@@ -182,20 +182,21 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
         }
 
-        if (parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL)
-                    || parameters.getContent().equals(RestconfDataServiceConstant.ReadData.CONFIG)) {
-            final QName type = node.getIdentifier().getNodeType();
-            return Response.status(Status.OK)
+        switch (parameters.getContent()) {
+            case ALL:
+            case CONFIG:
+                final QName type = node.getIdentifier().getNodeType();
+                return Response.status(Status.OK)
                     .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
                         + "-" + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
+            default:
+                return Response.status(Status.OK)
+                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .build();
         }
-
-        return Response.status(Status.OK)
-            .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
-            .build();
     }
 
     private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
@@ -249,37 +250,36 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private static QueryParams checkQueryParameters(final UriInfo uriInfo) {
         boolean insertUsed = false;
         boolean pointUsed = false;
-        Insert insert = null;
-        String point = null;
+        InsertParameter insert = null;
+        PointParameter point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case INSERT:
-                    if (insertUsed) {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.",
-                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
-                    }
+            final String uriName = entry.getKey();
+            if (InsertParameter.uriName().equals(uriName)) {
+                if (insertUsed) {
+                    throw new RestconfDocumentedException("Insert parameter can be used only once.",
+                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                }
 
-                    insertUsed = true;
-                    final String str = entry.getValue().get(0);
-                    insert = Insert.forValue(str);
-                    if (insert == null) {
-                        throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
-                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
-                    }
-                    break;
-                case POINT:
-                    if (pointUsed) {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.",
-                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
-                    }
+                insertUsed = true;
+                final String str = entry.getValue().get(0);
+                insert = InsertParameter.forUriValue(str);
+                if (insert == null) {
+                    throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
+                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                }
+                // FIXME: define a PointParameter to hold this
+            } else if (PointParameter.uriName().equals(uriName)) {
+                if (pointUsed) {
+                    throw new RestconfDocumentedException("Point parameter can be used only once.",
+                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                }
 
-                    pointUsed = true;
-                    point = entry.getValue().get(0);
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey(),
-                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                pointUsed = true;
+                point = PointParameter.forUriValue(entry.getValue().get(0));
+            } else {
+                throw new RestconfDocumentedException("Bad parameter for post: " + uriName,
+                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
         }
 
@@ -287,14 +287,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return new QueryParams(insert, point);
     }
 
-    private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed, final Insert insert) {
+    private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed,
+            final InsertParameter insert) {
         if (pointUsed) {
             if (!insertUsed) {
                 throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.",
                     ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
-
-            if (insert != Insert.BEFORE && insert != Insert.AFTER) {
+            if (insert != InsertParameter.BEFORE && insert != InsertParameter.AFTER) {
                 throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.",
                     ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
@@ -394,7 +394,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final NormalizedNode data = payload.getData();
 
         if (yangIIdContext.isEmpty()
-            && !RestconfDataServiceConstant.NETCONF_BASE_QNAME.equals(data.getIdentifier().getNodeType())) {
+            && !NETCONF_BASE_QNAME.equals(data.getIdentifier().getNodeType())) {
             throw new RestconfDocumentedException("Instance identifier need to contain at least one path argument",
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -513,16 +513,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      */
     @VisibleForTesting
     public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodeContext payload) {
-        final String payloadName = payload.getData().getIdentifier().getNodeType().getLocalName();
-
+        final QName dataNodeType = payload.getData().getIdentifier().getNodeType();
         if (path.isEmpty()) {
-            if (!payload.getData().getIdentifier().getNodeType().equals(
-                RestconfDataServiceConstant.NETCONF_BASE_QNAME)) {
+            if (!NETCONF_BASE_QNAME.equals(dataNodeType)) {
                 throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
                         ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
         } else {
             final String identifierName = path.getLastPathArgument().getNodeType().getLocalName();
+            final String payloadName = dataNodeType.getLocalName();
             if (!payloadName.equals(identifierName)) {
                 throw new RestconfDocumentedException(
                         "Payload name (" + payloadName + ") is different from identifier name (" + identifierName + ")",
