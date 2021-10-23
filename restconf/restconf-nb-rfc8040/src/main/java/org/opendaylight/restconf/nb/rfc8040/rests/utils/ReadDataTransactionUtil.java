@@ -13,6 +13,7 @@ import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsPara
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +30,12 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -83,12 +87,19 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  */
 public final class ReadDataTransactionUtil {
     private static final Set<String> ALLOWED_PARAMETERS = Set.of(
-        RestconfDataServiceConstant.ReadData.CONTENT,
-        RestconfDataServiceConstant.ReadData.DEPTH,
-        RestconfDataServiceConstant.ReadData.FIELDS,
-        RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
-    private static final List<String> DEFAULT_CONTENT = List.of(RestconfDataServiceConstant.ReadData.ALL);
+        ContentParameter.uriName(),
+        DepthParameter.uriName(),
+        FieldsParameter.uriName(),
+        WithDefaultsParameter.uriName());
+    private static final List<String> DEFAULT_CONTENT = List.of(ContentParameter.ALL.uriValue());
     private static final List<String> DEFAULT_DEPTH = List.of(RestconfDataServiceConstant.ReadData.UNBOUNDED);
+    private static final List<String> POSSIBLE_CONTENT = Arrays.stream(ContentParameter.values())
+        .map(ContentParameter::uriValue)
+        .collect(Collectors.toUnmodifiableList());
+    private static final List<String> POSSIBLE_WITH_DEFAULTS = Arrays.stream(WithDefaultsParameter.values())
+        .map(WithDefaultsParameter::uriValue)
+        .collect(Collectors.toUnmodifiableList());
+
     private static final String READ_TYPE_TX = "READ";
 
     private ReadDataTransactionUtil() {
@@ -114,36 +125,23 @@ public final class ReadDataTransactionUtil {
         checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);
 
         // read parameters from URI or set default values
-        final List<String> content = queryParams.getOrDefault(
-                RestconfDataServiceConstant.ReadData.CONTENT, DEFAULT_CONTENT);
-        final List<String> depth = queryParams.getOrDefault(
-                RestconfDataServiceConstant.ReadData.DEPTH, DEFAULT_DEPTH);
-        final List<String> withDefaults = queryParams.getOrDefault(
-                RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of());
+        final List<String> content = queryParams.getOrDefault(ContentParameter.uriName(), DEFAULT_CONTENT);
+        final List<String> depth = queryParams.getOrDefault(DepthParameter.uriName(), DEFAULT_DEPTH);
+        final List<String> withDefaults = queryParams.getOrDefault(WithDefaultsParameter.uriName(), List.of());
         // fields
-        final List<String> fields = queryParams.getOrDefault(RestconfDataServiceConstant.ReadData.FIELDS, List.of());
+        final List<String> fields = queryParams.getOrDefault(FieldsParameter.uriName(), List.of());
 
         // parameter can be in URI at most once
-        checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
-        checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
-        checkParameterCount(fields, RestconfDataServiceConstant.ReadData.FIELDS);
-        checkParameterCount(withDefaults, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
+        checkParameterCount(content, ContentParameter.uriName());
+        checkParameterCount(depth, DepthParameter.uriName());
+        checkParameterCount(fields, FieldsParameter.uriName());
+        checkParameterCount(withDefaults, WithDefaultsParameter.uriName());
 
         // check and set content
-        final String contentValue = content.get(0);
-        switch (contentValue) {
-            case RestconfDataServiceConstant.ReadData.ALL:
-            case RestconfDataServiceConstant.ReadData.CONFIG:
-            case RestconfDataServiceConstant.ReadData.NONCONFIG:
-                // FIXME: we really want to have a proper enumeration for this field
-                builder.setContent(contentValue);
-                break;
-            default:
-                throw new RestconfDocumentedException(
-                    new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                        "Invalid content parameter: " + contentValue, null,
-                        "The content parameter value must be either config, nonconfig or all (default)"));
-        }
+        final String contentValueStr = content.get(0);
+        builder.setContent(RestconfDocumentedException.throwIfNull(
+            ContentParameter.forUriValue(contentValueStr), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            "Invalid content parameter: %s, allowed values are %s", contentValueStr, POSSIBLE_CONTENT));
 
         // check and set depth
         if (!depth.get(0).equals(RestconfDataServiceConstant.ReadData.UNBOUNDED)) {
@@ -172,11 +170,11 @@ public final class ReadDataTransactionUtil {
         // check and set withDefaults parameter
         if (!withDefaults.isEmpty()) {
             final String str = withDefaults.get(0);
-            final WithDefaults val = WithDefaults.forValue(str);
+            final WithDefaultsParameter val = WithDefaultsParameter.forUriValue(str);
             if (val == null) {
                 throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                     "Invalid with-defaults parameter: " + str, null,
-                    "The with-defaults parameter must be a string in " + WithDefaults.possibleValues()));
+                    "The with-defaults parameter must be a string in " + POSSIBLE_WITH_DEFAULTS));
             }
 
             switch (val) {
@@ -186,7 +184,7 @@ public final class ReadDataTransactionUtil {
                     builder.setTagged(true);
                     break;
                 default:
-                    builder.setWithDefault(val.value());
+                    builder.setWithDefault(val);
             }
         }
         return builder.build();
@@ -196,29 +194,31 @@ public final class ReadDataTransactionUtil {
      * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} if any
      * inside of object {@link RestconfStrategy} provided as a parameter.
      *
-     * @param valueOfContent type of data to read (config, state, all)
+     * @param content        type of data to read (config, state, all)
      * @param path           the path to read
      * @param strategy       {@link RestconfStrategy} - object that perform the actual DS operations
      * @param withDefa       value of with-defaults parameter
      * @param ctx            schema context
      * @return {@link NormalizedNode}
      */
-    public static @Nullable NormalizedNode readData(final @NonNull String valueOfContent,
+    public static @Nullable NormalizedNode readData(final @NonNull ContentParameter content,
                                                     final @NonNull YangInstanceIdentifier path,
                                                     final @NonNull RestconfStrategy strategy,
-                                                    final String withDefa, final EffectiveModelContext ctx) {
-        switch (valueOfContent) {
-            case RestconfDataServiceConstant.ReadData.CONFIG:
+                                                    final WithDefaultsParameter withDefa,
+                                                    final EffectiveModelContext ctx) {
+        // FIXME: use a switch expression when they are available, removing source of RestconfDocumentedException
+        switch (content) {
+            case ALL:
+                return readAllData(strategy, path, withDefa, ctx);
+            case CONFIG:
                 final NormalizedNode read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path);
                 return withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
-            case RestconfDataServiceConstant.ReadData.NONCONFIG:
+            case NONCONFIG:
                 return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
-            case RestconfDataServiceConstant.ReadData.ALL:
-                return readAllData(strategy, path, withDefa, ctx);
             default:
                 throw new RestconfDocumentedException(
                         new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                                "Invalid content parameter: " + valueOfContent, null,
+                                "Invalid content parameter: " + content.uriValue(), null,
                                 "The content parameter value must be either config, nonconfig or all (default)"));
         }
     }
@@ -235,22 +235,23 @@ public final class ReadDataTransactionUtil {
      * @param fields         paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */
-    public static @Nullable NormalizedNode readData(final @NonNull String valueOfContent,
+    public static @Nullable NormalizedNode readData(final @NonNull ContentParameter content,
             final @NonNull YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
-            final @Nullable String withDefa, @NonNull final EffectiveModelContext ctx,
+            final @Nullable WithDefaultsParameter withDefa, @NonNull final EffectiveModelContext ctx,
             final @NonNull List<YangInstanceIdentifier> fields) {
-        switch (valueOfContent) {
-            case RestconfDataServiceConstant.ReadData.CONFIG:
+        // FIXME: use a switch expression when they are available, removing source of RestconfDocumentedException
+        switch (content) {
+            case ALL:
+                return readAllData(strategy, path, withDefa, ctx, fields);
+            case CONFIG:
                 final NormalizedNode read = readDataViaTransaction(strategy, LogicalDatastoreType.CONFIGURATION, path,
                     fields);
                 return withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa, ctx);
-            case RestconfDataServiceConstant.ReadData.NONCONFIG:
+            case NONCONFIG:
                 return readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path, fields);
-            case RestconfDataServiceConstant.ReadData.ALL:
-                return readAllData(strategy, path, withDefa, ctx, fields);
             default:
                 throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                        "Invalid content parameter: " + valueOfContent, null,
+                        "Invalid content parameter: " + content.uriValue(), null,
                         "The content parameter value must be either config, nonconfig or all (default)"));
         }
     }
@@ -290,17 +291,17 @@ public final class ReadDataTransactionUtil {
     }
 
     private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode result,
-            final YangInstanceIdentifier path, final String withDefa, final EffectiveModelContext ctx) {
+            final YangInstanceIdentifier path, final WithDefaultsParameter withDefa, final EffectiveModelContext ctx) {
         boolean trim;
         switch (withDefa) {
-            case "trim":
+            case TRIM:
                 trim = true;
                 break;
-            case "explicit":
+            case EXPLICIT:
                 trim = false;
                 break;
             default:
-                throw new RestconfDocumentedException("");
+                throw new RestconfDocumentedException("Unsupported with-defaults value " + withDefa.uriValue());
         }
 
         final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
@@ -462,7 +463,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
-            final YangInstanceIdentifier path, final String withDefa, final EffectiveModelContext ctx) {
+            final YangInstanceIdentifier path, final WithDefaultsParameter withDefa, final EffectiveModelContext ctx) {
         // PREPARE STATE DATA NODE
         final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
         // PREPARE CONFIG DATA NODE
@@ -485,7 +486,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
-            final @NonNull YangInstanceIdentifier path, final @Nullable String withDefa,
+            final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParameter withDefa,
             final @NonNull EffectiveModelContext ctx, final @NonNull List<YangInstanceIdentifier> fields) {
         // PREPARE STATE DATA NODE
         final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path,

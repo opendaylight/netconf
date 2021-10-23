@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.context.WriterParameters;
+import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -23,15 +25,15 @@ public final class QueryParameters extends WriterParameters {
     public static final class Builder extends WriterParametersBuilder {
         private List<YangInstanceIdentifier> fieldPaths;
         private List<Set<QName>> fields;
-        private String withDefault;
+        private WithDefaultsParameter withDefault;
         private boolean tagged;
-        private String content;
+        private ContentParameter content;
 
         Builder() {
             // Hidden on purpose
         }
 
-        public Builder setContent(final String content) {
+        public Builder setContent(final ContentParameter content) {
             this.content = content;
             return this;
         }
@@ -51,7 +53,7 @@ public final class QueryParameters extends WriterParameters {
             return this;
         }
 
-        public Builder setWithDefault(final String withDefault) {
+        public Builder setWithDefault(final WithDefaultsParameter withDefault) {
             this.withDefault = withDefault;
             return this;
         }
@@ -66,9 +68,9 @@ public final class QueryParameters extends WriterParameters {
 
     private final List<YangInstanceIdentifier> fieldPaths;
     private final List<Set<QName>> fields;
-    private final String withDefault;
+    private final WithDefaultsParameter withDefault;
+    private final ContentParameter content;
     private final boolean tagged;
-    private final String content;
 
     private QueryParameters(final Builder builder) {
         super(builder);
@@ -87,7 +89,7 @@ public final class QueryParameters extends WriterParameters {
         return new Builder();
     }
 
-    public String getContent() {
+    public ContentParameter getContent() {
         return content;
     }
 
@@ -99,7 +101,7 @@ public final class QueryParameters extends WriterParameters {
         return fieldPaths;
     }
 
-    public String getWithDefault() {
+    public WithDefaultsParameter getWithDefault() {
         return withDefault;
     }
 

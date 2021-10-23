@@ -34,7 +34,8 @@ public final class NormalizedNodePayload extends NormalizedNodeContext {
         return new NormalizedNodePayload(requireNonNull(path), null, QueryParameters.empty(), ImmutableMap.of());
     }
 
-    public static @NonNull NormalizedNodePayload of(final InstanceIdentifierContext<?> path, final NormalizedNode data) {
+    public static @NonNull NormalizedNodePayload of(final InstanceIdentifierContext<?> path,
+            final NormalizedNode data) {
         return new NormalizedNodePayload(requireNonNull(path), requireNonNull(data), QueryParameters.empty(),
             ImmutableMap.of());
     }
