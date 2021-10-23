@@ -26,10 +26,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -71,7 +71,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected NormalizedNodeContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+    protected NormalizedNodePayload readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws WebApplicationException {
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
@@ -86,7 +86,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         }
     }
 
-    private NormalizedNodeContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc)
+    private NormalizedNodePayload parse(final InstanceIdentifierContext<?> pathContext, final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
@@ -164,7 +164,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         final InstanceIdentifierContext<? extends SchemaNode> outIIContext = new InstanceIdentifierContext<>(
                 fullIIToData, pathContext.getSchemaNode(), pathContext.getMountPoint(), pathContext.getSchemaContext());
 
-        return new NormalizedNodeContext(outIIContext, parsed);
+        // FIXME: can result really be null?
+        return NormalizedNodePayload.ofNullable(outIIContext, parsed);
     }
 
     private static Deque<Object> findPathToSchemaNodeByName(final DataSchemaNode schemaNode, final String elementName,

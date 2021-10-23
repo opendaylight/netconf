@@ -51,12 +51,13 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfDataService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -147,7 +148,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final EffectiveModelContext schemaContextRef = schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(mountPointService));
-        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
+        final QueryParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
 
@@ -226,7 +227,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response putData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
         final QueryParams checkedParms = checkQueryParameters(uriInfo);
@@ -302,12 +303,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response postData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response postData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo) {
         return postData(payload, uriInfo);
     }
 
     @Override
-    public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response postData(final NormalizedNodePayload payload, final UriInfo uriInfo) {
         requireNonNull(payload);
         if (payload.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition) {
             return invokeAction(payload);
@@ -345,7 +346,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response patchData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response patchData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();

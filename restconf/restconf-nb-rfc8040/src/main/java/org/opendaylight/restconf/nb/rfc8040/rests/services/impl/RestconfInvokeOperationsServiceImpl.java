@@ -34,6 +34,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -73,7 +74,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     }
 
     @Override
-    public void invokeRpc(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo,
+    public void invokeRpc(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo,
             final AsyncResponse ar) {
         final SchemaNode schema = payload.getInstanceIdentifierContext().getSchemaNode();
         final QName rpcName = schema.getQName();

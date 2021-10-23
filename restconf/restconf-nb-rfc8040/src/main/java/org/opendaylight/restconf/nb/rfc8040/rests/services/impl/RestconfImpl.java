@@ -11,9 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import javax.ws.rs.Path;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -35,7 +35,7 @@ public class RestconfImpl implements RestconfService {
     }
 
     @Override
-    public NormalizedNodeContext getLibraryVersion() {
+    public NormalizedNodePayload getLibraryVersion() {
         final EffectiveModelContext context = schemaContextHandler.get();
 
         // FIXME: why are we going through a grouping here?!
@@ -51,7 +51,7 @@ public class RestconfImpl implements RestconfService {
             (LeafSchemaNode) ((ContainerSchemaNode) grouping.getDataChildByName(Restconf.QNAME))
             .getDataChildByName(YANG_LIBRARY_VERSION);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(
+        return NormalizedNodePayload.of(new InstanceIdentifierContext<>(
             YangInstanceIdentifier.of(YANG_LIBRARY_VERSION), schemaNode, null, context),
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, IetfYangLibrary.REVISION.toString()));
     }

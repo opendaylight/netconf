@@ -28,8 +28,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -71,7 +71,7 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        this.schema = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+        schema = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
         final QName qnJukebox = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName qnPlayer = QName.create(qnJukebox, "player");
@@ -84,29 +84,29 @@ public class PlainPatchDataTransactionUtilTest {
         final NodeIdentifierWithPredicates nidBandB =
                 NodeIdentifierWithPredicates.of(qnPlaylist, qnPlaylistKey, "MyFavoriteBand-B");
 
-        this.iidGap = YangInstanceIdentifier.builder()
+        iidGap = YangInstanceIdentifier.builder()
                 .node(qnJukebox)
                 .node(qnPlayer)
                 .node(qnGap)
                 .build();
-        this.schemaNodeForGap = DataSchemaContextTree.from(this.schema).findChild(this.iidGap).orElseThrow()
+        schemaNodeForGap = DataSchemaContextTree.from(schema).findChild(iidGap).orElseThrow()
                 .getDataSchemaNode();
 
-        this.iidJukebox = YangInstanceIdentifier.builder()
+        iidJukebox = YangInstanceIdentifier.builder()
                 .node(qnJukebox)
                 .build();
-        this.schemaNodeForJukebox = DataSchemaContextTree.from(this.schema)
-                .findChild(this.iidJukebox).orElseThrow().getDataSchemaNode();
+        schemaNodeForJukebox = DataSchemaContextTree.from(schema)
+                .findChild(iidJukebox).orElseThrow().getDataSchemaNode();
 
-        this.leafGap = Builders.leafBuilder()
+        leafGap = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(qnGap))
                 .withValue(0.2)
                 .build();
         final ContainerNode playerContainer = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(qnPlayer))
-                .withChild(this.leafGap)
+                .withChild(leafGap)
                 .build();
-        this.jukeboxContainerWithPlayer = Builders.containerBuilder()
+        jukeboxContainerWithPlayer = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(qnJukebox))
                 .withChild(playerContainer)
                 .build();
@@ -146,78 +146,78 @@ public class PlainPatchDataTransactionUtilTest {
                 .withChild(entryBandA)
                 .withChild(entryBandB)
                 .build();
-        this.jukeboxContainerWithPlaylist = Builders.containerBuilder()
+        jukeboxContainerWithPlaylist = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(qnJukebox))
                 .withChild(listBands)
                 .build();
 
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
     }
 
     @Test
     public void testPatchContainerData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iidJukebox, this.schemaNodeForJukebox, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.jukeboxContainerWithPlayer);
+                new InstanceIdentifierContext<>(iidJukebox, schemaNodeForJukebox, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlayer);
 
-        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).merge(any(), any(),any(),
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),any(),
                 any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), this.schema);
-        verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), schema);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
         PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
-                this.schema);
-        verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION,
+                schema);
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPatchLeafData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iidGap, this.schemaNodeForGap, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.leafGap);
+                new InstanceIdentifierContext<>(iidGap, schemaNodeForGap, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, leafGap);
 
-        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(), any(), any());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), this.schema);
-        verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION,
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), schema);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
 
         PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
-                this.schema);
-        verify(this.netconfService).lock();
-        verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION,
+                schema);
+        verify(netconfService).lock();
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPatchListData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iidJukebox, this.schemaNodeForJukebox, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.jukeboxContainerWithPlaylist);
+                new InstanceIdentifierContext<>(iidJukebox, schemaNodeForJukebox, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlaylist);
 
-        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(any(), any(),any(),any());
 
-        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), this.schema);
-        verify(this.readWrite).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData());
+        PlainPatchDataTransactionUtil.patchData(payload, new MdsalRestconfStrategy(mockDataBroker), schema);
+        verify(readWrite).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, payload.getData());
 
         PlainPatchDataTransactionUtil.patchData(payload, new NetconfRestconfStrategy(netconfService),
-                this.schema);
-        verify(this.netconfService).merge(LogicalDatastoreType.CONFIGURATION, this.iidJukebox, payload.getData(),
+                schema);
+        verify(netconfService).merge(LogicalDatastoreType.CONFIGURATION, iidJukebox, payload.getData(),
                 Optional.empty());
     }
 }

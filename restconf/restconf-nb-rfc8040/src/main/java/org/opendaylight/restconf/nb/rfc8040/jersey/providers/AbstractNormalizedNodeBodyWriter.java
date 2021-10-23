@@ -11,12 +11,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
-abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
+abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<NormalizedNodePayload> {
     @Override
     public final boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations,
             final MediaType mediaType) {
-        return type.equals(NormalizedNodeContext.class);
+        return type.equals(NormalizedNodePayload.class);
     }
 }

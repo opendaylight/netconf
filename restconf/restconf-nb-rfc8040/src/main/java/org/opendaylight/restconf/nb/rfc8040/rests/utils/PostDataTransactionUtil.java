@@ -18,8 +18,8 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
@@ -61,7 +61,7 @@ public final class PostDataTransactionUtil {
      * @param insert        insert
      * @return {@link Response}
      */
-    public static Response postData(final UriInfo uriInfo, final NormalizedNodeContext payload,
+    public static Response postData(final UriInfo uriInfo, final NormalizedNodePayload payload,
                                     final RestconfStrategy strategy,
                                     final EffectiveModelContext schemaContext, final Insert insert,
                                     final String point) {

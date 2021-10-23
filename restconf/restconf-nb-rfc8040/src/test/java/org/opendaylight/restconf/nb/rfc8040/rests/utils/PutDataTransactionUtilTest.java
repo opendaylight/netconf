@@ -33,6 +33,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -80,7 +81,7 @@ public class PutDataTransactionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        this.schema =
+        schema =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
 
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
@@ -94,35 +95,35 @@ public class PutDataTransactionUtilTest {
         final NodeIdentifierWithPredicates nodeWithKey2 =
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band 2");
 
-        final DataSchemaContextTree tree = DataSchemaContextTree.from(this.schema);
-        this.iid = YangInstanceIdentifier.builder()
+        final DataSchemaContextTree tree = DataSchemaContextTree.from(schema);
+        iid = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerQname)
                 .node(leafQname)
                 .build();
-        this.schemaNode = tree.findChild(this.iid).orElseThrow().getDataSchemaNode();
+        schemaNode = tree.findChild(iid).orElseThrow().getDataSchemaNode();
 
-        this.iid2 = YangInstanceIdentifier.builder()
+        iid2 = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .build();
-        this.schemaNode2 = tree.findChild(this.iid2).orElseThrow().getDataSchemaNode();
+        schemaNode2 = tree.findChild(iid2).orElseThrow().getDataSchemaNode();
 
-        this.iid3 = YangInstanceIdentifier.builder()
+        iid3 = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(listQname)
                 .node(nodeWithKey)
                 .build();
-        this.schemaNode3 = tree.findChild(this.iid3).orElseThrow().getDataSchemaNode();
+        schemaNode3 = tree.findChild(iid3).orElseThrow().getDataSchemaNode();
 
-        this.buildLeaf = Builders.leafBuilder()
+        buildLeaf = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(leafQname))
                 .withValue(0.2)
                 .build();
         final ContainerNode buildPlayerCont = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(containerQname))
-                .withChild(this.buildLeaf)
+                .withChild(buildLeaf)
                 .build();
-        this.buildBaseCont = Builders.containerBuilder()
+        buildBaseCont = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(baseQName))
                 .withChild(buildPlayerCont)
                 .build();
@@ -134,7 +135,7 @@ public class PutDataTransactionUtilTest {
                 .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
                 .withValue("band description")
                 .build();
-        this.buildListEntry = Builders.mapEntryBuilder()
+        buildListEntry = Builders.mapEntryBuilder()
                 .withNodeIdentifier(nodeWithKey)
                 .withChild(content)
                 .withChild(content2)
@@ -154,237 +155,237 @@ public class PutDataTransactionUtilTest {
                 .build();
         final MapNode buildList = Builders.mapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(listQname))
-                .withChild(this.buildListEntry)
+                .withChild(buildListEntry)
                 .withChild(buildListEntry2)
                 .build();
-        this.buildBaseContWithList = Builders.containerBuilder()
+        buildBaseContWithList = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(baseQName))
                 .withChild(buildList)
                 .build();
 
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
     }
 
     @Test
     public void testValidInputData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
+                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildLeaf);
         RestconfDataServiceImpl.validInputData(iidContext.getSchemaNode(), payload);
     }
 
     @Test
     public void testValidTopLevelNodeName() {
         InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
-        NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
+                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildLeaf);
         RestconfDataServiceImpl.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
 
-        iidContext = new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
-        payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
+        iidContext = new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        payload = new NormalizedNodeContext(iidContext, buildBaseCont);
         RestconfDataServiceImpl.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testValidTopLevelNodeNamePathEmpty() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
+                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildLeaf);
         RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.empty(), payload);
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testValidTopLevelNodeNameWrongTopIdentifier() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
-        RestconfDataServiceImpl.validTopLevelNodeName(this.iid.getAncestor(1), payload);
+                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildLeaf);
+        RestconfDataServiceImpl.validTopLevelNodeName(iid.getAncestor(1), payload);
     }
 
     @Test
     public void testValidateListKeysEqualityInPayloadAndUri() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid3, this.schemaNode3, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildListEntry);
+                new InstanceIdentifierContext<>(iid3, schemaNode3, null, schema);
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildListEntry);
         RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
 
     @Test
     public void testPutContainerData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
+                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
-        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
-        doReturn(this.read).when(this.mockDataBroker).newReadOnlyTransaction();
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
-                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
+                .when(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
-        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION,
+        PutDataTransactionUtil.putData(payload, schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
+        verify(read).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
-        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
     }
 
     @Test
     public void testPutCreateContainerData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
+                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
-        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid2);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(iid2);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(),
                 payload.getData(), Optional.empty());
 
-        PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(payload, schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
-        verify(this.netconfService).lock();
-        verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
+        verify(netconfService).lock();
+        verify(netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPutReplaceContainerData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
+                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))))
-                .when(this.netconfService).getConfig(this.iid2);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+                .when(netconfService).getConfig(iid2);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
 
-        PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(payload, schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
-        verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
+        verify(netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPutLeafData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
+                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
-        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
-        doReturn(this.read).when(this.mockDataBroker).newReadOnlyTransaction();
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
-                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
+                .when(read).exists(LogicalDatastoreType.CONFIGURATION, iid);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
-        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION,
+        PutDataTransactionUtil.putData(payload, schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
+        verify(read).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
-        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
     }
 
     @Test
     public void testPutCreateLeafData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
+                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
-        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(this.iid);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(iid);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
 
-        PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(payload, schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
-        verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
+        verify(netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPutReplaceLeafData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
+                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class))))
-                .when(this.netconfService).getConfig(this.iid);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+                .when(netconfService).getConfig(iid);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
 
-        PutDataTransactionUtil.putData(payload, this.schema,
+        PutDataTransactionUtil.putData(payload, schema,
                 new NetconfRestconfStrategy(netconfService), null, null);
-        verify(this.netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION,
+        verify(netconfService).getConfig(payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPutListData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
+                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseContWithList);
 
-        doReturn(this.readWrite).when(this.mockDataBroker).newReadWriteTransaction();
-        doReturn(this.read).when(this.mockDataBroker).newReadOnlyTransaction();
+        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
-                .when(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
+                .when(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
+        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        PutDataTransactionUtil.putData(payload, this.schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
-        verify(this.read).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
-        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        PutDataTransactionUtil.putData(payload, schema, new MdsalRestconfStrategy(mockDataBroker), null, null);
+        verify(read).exists(LogicalDatastoreType.CONFIGURATION, iid2);
+        verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData());
     }
 
     @Test
     public void testPutCreateListData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
+                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseContWithList);
 
-        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService)
-                .getConfig(this.iid2);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .replace(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData(), Optional.empty());
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService)
+                .getConfig(iid2);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .replace(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData(), Optional.empty());
 
-        PutDataTransactionUtil.putData(payload, this.schema, new NetconfRestconfStrategy(netconfService),
+        PutDataTransactionUtil.putData(payload, schema, new NetconfRestconfStrategy(netconfService),
                 null, null);
-        verify(this.netconfService).getConfig(this.iid2);
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION, this.iid2,
+        verify(netconfService).getConfig(iid2);
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2,
                 payload.getData(), Optional.empty());
     }
 
     @Test
     public void testPutReplaceListData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
+                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseContWithList);
 
-        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(this.netconfService)
-                .getConfig(this.iid2);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
+                .getConfig(iid2);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(LogicalDatastoreType.CONFIGURATION,
-                this.iid2, payload.getData(), Optional.empty());
+                iid2, payload.getData(), Optional.empty());
 
-        PutDataTransactionUtil.putData(payload, this.schema,
+        PutDataTransactionUtil.putData(payload, schema,
                 new NetconfRestconfStrategy(netconfService), null, null);
-        verify(this.netconfService).getConfig(this.iid2);
-        verify(this.netconfService).replace(LogicalDatastoreType.CONFIGURATION, this.iid2,
+        verify(netconfService).getConfig(iid2);
+        verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2,
                 payload.getData(), Optional.empty());
     }
 }

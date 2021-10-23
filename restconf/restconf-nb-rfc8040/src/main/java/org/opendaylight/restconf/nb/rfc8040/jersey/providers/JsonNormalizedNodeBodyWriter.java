@@ -23,9 +23,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -50,7 +50,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
 
     @Override
-    public void writeTo(final NormalizedNodeContext context,
+    public void writeTo(final NormalizedNodePayload context,
                         final Class<?> type,
                         final Type genericType,
                         final Annotation[] annotations,

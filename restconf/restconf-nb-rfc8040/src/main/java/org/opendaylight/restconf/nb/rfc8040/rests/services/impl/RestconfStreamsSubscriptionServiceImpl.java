@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -26,9 +25,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
@@ -36,7 +35,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -80,7 +78,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     }
 
     @Override
-    public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
+    public NormalizedNodePayload subscribeToStream(final String identifier, final UriInfo uriInfo) {
         final NotificationQueryParams notificationQueryParams = NotificationQueryParams.fromUriInfo(uriInfo);
 
         final URI response;
@@ -95,8 +93,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         // prepare node with value of location
-        return new NormalizedNodeContext(prepareIIDSubsStreamOutput(handlersHolder.getSchemaHandler()),
-            ImmutableNodes.leafNode(LOCATION_NODEID, response.toString()), ImmutableMap.of("Location", response));
+        return NormalizedNodePayload.ofLocation(prepareIIDSubsStreamOutput(handlersHolder.getSchemaHandler()),
+            LOCATION_NODEID, response);
     }
 
     /**

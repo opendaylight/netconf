@@ -22,10 +22,10 @@ import javax.ws.rs.ext.Provider;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -63,7 +63,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected NormalizedNodeContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+    protected NormalizedNodePayload readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws WebApplicationException {
         try {
             return readFrom(path, entityStream, isPost());
@@ -73,7 +73,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         }
     }
 
-    public static NormalizedNodeContext readFrom(
+    public static NormalizedNodePayload readFrom(
             final InstanceIdentifierContext<?> path, final InputStream entityStream, final boolean isPost) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
@@ -130,7 +130,8 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         newIIContext = new InstanceIdentifierContext<>(fullIIToData, path.getSchemaNode(), path.getMountPoint(),
                 path.getSchemaContext());
 
-        return new NormalizedNodeContext(newIIContext, result);
+        // FIXME: can result really be null?
+        return NormalizedNodePayload.ofNullable(newIIContext, result);
     }
 
     private static void propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {
