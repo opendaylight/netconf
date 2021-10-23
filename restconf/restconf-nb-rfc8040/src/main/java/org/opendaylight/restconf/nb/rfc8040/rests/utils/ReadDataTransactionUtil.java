@@ -11,7 +11,6 @@ import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsPara
 import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsPaths;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,19 +85,13 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  * </ul>
  */
 public final class ReadDataTransactionUtil {
-    // depth values
-    // FIXME: these are known to DepthParameter
-    private static final String UNBOUNDED = "unbounded";
-    private static final int MIN_DEPTH = 1;
-    private static final int MAX_DEPTH = 65535;
-
     private static final Set<String> ALLOWED_PARAMETERS = Set.of(
         ContentParameter.uriName(),
         DepthParameter.uriName(),
         FieldsParameter.uriName(),
         WithDefaultsParameter.uriName());
     private static final List<String> DEFAULT_CONTENT = List.of(ContentParameter.ALL.uriValue());
-    private static final List<String> DEFAULT_DEPTH = List.of(UNBOUNDED);
+    private static final List<String> DEFAULT_DEPTH = List.of(DepthParameter.unboundedUriValue());
     private static final List<String> POSSIBLE_CONTENT = Arrays.stream(ContentParameter.values())
         .map(ContentParameter::uriValue)
         .collect(Collectors.toUnmodifiableList());
@@ -144,23 +137,18 @@ public final class ReadDataTransactionUtil {
         checkParameterCount(withDefaults, WithDefaultsParameter.uriName());
 
         // check and set content
-        final String contentValueStr = content.get(0);
+        final String contentStr = content.get(0);
         builder.setContent(RestconfDocumentedException.throwIfNull(
-            ContentParameter.forUriValue(contentValueStr), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-            "Invalid content parameter: %s, allowed values are %s", contentValueStr, POSSIBLE_CONTENT));
+            ContentParameter.forUriValue(contentStr), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT));
 
-        // check and set depth
-        if (!depth.get(0).equals(UNBOUNDED)) {
-            final Integer value = Ints.tryParse(depth.get(0));
-
-            if (value == null || value < MIN_DEPTH || value > MAX_DEPTH) {
-                throw new RestconfDocumentedException(
-                        new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                                "Invalid depth parameter: " + depth, null,
-                                "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
-            } else {
-                builder.setDepth(value);
-            }
+        final String depthStr = depth.get(0);
+        try {
+            builder.setDepth(DepthParameter.forUriValue(depthStr));
+        } catch (IllegalArgumentException e) {
+            throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Invalid depth parameter: " + depthStr, null,
+                "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
         }
 
         // check and set fields
