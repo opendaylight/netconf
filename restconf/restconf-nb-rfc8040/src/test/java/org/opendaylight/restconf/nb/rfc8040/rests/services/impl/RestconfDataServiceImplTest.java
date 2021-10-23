@@ -7,15 +7,19 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
@@ -25,10 +29,10 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -37,6 +41,7 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -58,6 +63,8 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.api.ReadDataResponse.OfNormalizedNode;
+import org.opendaylight.restconf.nb.rfc8040.api.ReadDataService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -199,9 +206,10 @@ public class RestconfDataServiceImplTest {
 
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
                 mockDataBroker, mock(DOMSchemaService.class));
-
         schemaContextHandler.onModelContextUpdated(contextRef);
-        dataService = new RestconfDataServiceImpl(schemaContextHandler, mockDataBroker, mountPointService,
+
+        final ReadDataService readData = null;
+        dataService = new RestconfDataServiceImpl(schemaContextHandler, readData, mockDataBroker, mountPointService,
                 delegRestconfSubscrService, actionService, configuration);
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
@@ -220,10 +228,17 @@ public class RestconfDataServiceImplTest {
                 .read(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(read).read(LogicalDatastoreType.OPERATIONAL, iidBase);
-        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
-        assertNotNull(response);
-        assertEquals(200, response.getStatus());
-        assertEquals(buildBaseCont, ((NormalizedNodePayload) response.getEntity()).getData());
+        assertEquals(buildBaseCont, readData("example-jukebox:jukebox"));
+    }
+
+    private NormalizedNode readData(final String identifier) {
+        final var ar = mock(AsyncResponse.class);
+        final var captor = ArgumentCaptor.forClass(Object.class);
+        verify(ar).resume(captor.capture());
+        dataService.readData(identifier, uriInfo, ar);
+        final var arg = captor.getValue();
+        assertThat(arg, instanceOf(OfNormalizedNode.class));
+        return ((OfNormalizedNode) arg).payload.getData();
     }
 
     @Test
@@ -235,16 +250,14 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(buildBaseContOperational))))
                 .when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.empty());
-        final Response response = dataService.readData(uriInfo);
-        assertNotNull(response);
-        assertEquals(200, response.getStatus());
 
-        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
-        assertTrue(data instanceof ContainerNode);
-        final Collection<DataContainerChild> rootNodes = ((ContainerNode) data).body();
+        final var data = readData(null);
+        assertThat(data, instanceOf(ContainerNode.class));
+        final var rootNodes = ((ContainerNode) data).body();
         assertEquals(1, rootNodes.size());
-        final Collection<DataContainerChild> allDataChildren = ((ContainerNode) rootNodes.iterator().next()).body();
-        assertEquals(3, allDataChildren.size());
+        final var allData = rootNodes.iterator().next();
+        assertThat(allData, instanceOf(ContainerNode.class));
+        assertEquals(3, ((ContainerNode) allData).body().size());
     }
 
     private static ContainerNode wrapNodeByDataRootContainer(final DataContainerChild data) {
@@ -266,29 +279,25 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFluentFuture(Optional.of(buildBaseContOperational))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, iidBase);
 
-        final Response response = dataService.readData(
-                "example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", uriInfo);
-
-        assertNotNull(response);
-        assertEquals(200, response.getStatus());
-
         // response must contain all child nodes from config and operational containers merged in one container
-        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
-        assertTrue(data instanceof ContainerNode);
+        final NormalizedNode data = readData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox");
+        assertThat(data, instanceOf(ContainerNode.class));
         assertEquals(3, ((ContainerNode) data).size());
         assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());
         assertTrue(((ContainerNode) data).findChildByArg(buildLibraryCont.getIdentifier()).isPresent());
         assertTrue(((ContainerNode) data).findChildByArg(buildPlaylistList.getIdentifier()).isPresent());
     }
 
-    @Test(expected = RestconfDocumentedException.class)
+    @Test
     public void testReadDataNoData() {
         doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(read).read(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(read).read(LogicalDatastoreType.OPERATIONAL, iidBase);
-        dataService.readData("example-jukebox:jukebox", uriInfo);
+
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> readData("example-jukebox:jukebox"));
+        assertEquals("", ex.getMessage());
     }
 
     /**
@@ -303,13 +312,8 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFluentFuture(Optional.of(buildBaseContConfig))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, iidBase);
 
-        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
-
-        assertNotNull(response);
-        assertEquals(200, response.getStatus());
-
         // response must contain only config data
-        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
+        final NormalizedNode data = readData("example-jukebox:jukebox");
 
         // config data present
         assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());
@@ -331,13 +335,8 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFluentFuture(Optional.of(buildBaseContOperational))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, iidBase);
 
-        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
-
-        assertNotNull(response);
-        assertEquals(200, response.getStatus());
-
         // response must contain only operational data
-        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
+        final NormalizedNode data = readData("example-jukebox:jukebox");
 
         // state data present
         assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());
