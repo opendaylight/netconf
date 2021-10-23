@@ -13,8 +13,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -42,7 +42,7 @@ public final class PlainPatchDataTransactionUtil {
      * @param strategy      object that perform the actual DS operations
      * @return {@link Response}
      */
-    public static Response patchData(final NormalizedNodeContext payload,
+    public static Response patchData(final NormalizedNodePayload payload,
                                      final RestconfStrategy strategy,
                                      final EffectiveModelContext schemaContext) {
 

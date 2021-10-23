@@ -40,6 +40,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -97,14 +98,14 @@ public class ReadDataTransactionUtilTest {
         DOMDataBroker mockDataBroker = mock(DOMDataBroker.class);
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         mdsalStrategy = new MdsalRestconfStrategy(mockDataBroker);
-        netconfStrategy = new NetconfRestconfStrategy(this.netconfService);
+        netconfStrategy = new NetconfRestconfStrategy(netconfService);
     }
 
     @Test
     public void readDataConfigTest() {
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
-        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(this.netconfService).getConfig(DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
         NormalizedNode normalizedNode = readData(valueOfContent, DATA.path, mdsalStrategy);
         assertEquals(DATA.data3, normalizedNode);
@@ -119,8 +120,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
-        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(this.netconfService).getConfig(DATA.path);
-        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).get(DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(DATA.path);
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         NormalizedNode normalizedNode = readData(valueOfContent, DATA.path, mdsalStrategy);
         assertEquals(DATA.data3, normalizedNode);
@@ -135,8 +136,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
-        doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(this.netconfService).get(DATA.path2);
-        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(DATA.path2);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(netconfService).get(DATA.path2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(DATA.path2);
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         NormalizedNode normalizedNode = readData(valueOfContent, DATA.path2, mdsalStrategy);
         assertEquals(DATA.data2, normalizedNode);
@@ -149,7 +150,7 @@ public class ReadDataTransactionUtilTest {
     public void readDataNonConfigTest() {
         doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
-        doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(this.netconfService).get(DATA.path2);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(netconfService).get(DATA.path2);
         final String valueOfContent = RestconfDataServiceConstant.ReadData.NONCONFIG;
         NormalizedNode normalizedNode = readData(valueOfContent, DATA.path2, mdsalStrategy);
         assertEquals(DATA.data2, normalizedNode);
@@ -164,8 +165,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
-        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(this.netconfService).getConfig(DATA.path);
-        doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(this.netconfService).get(DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(netconfService).get(DATA.path);
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final ContainerNode checkingData = Builders
                 .containerBuilder()
@@ -186,8 +187,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
-        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(this.netconfService).getConfig(DATA.path);
-        doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(this.netconfService).get(DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
+        doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(netconfService).get(DATA.path);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
@@ -207,8 +208,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
         doReturn(immediateFluentFuture(Optional.of(DATA.listData2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
-        doReturn(immediateFluentFuture(Optional.of(DATA.listData))).when(this.netconfService).get(DATA.path3);
-        doReturn(immediateFluentFuture(Optional.of(DATA.listData2))).when(this.netconfService).getConfig(DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.listData))).when(netconfService).get(DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.listData2))).when(netconfService).getConfig(DATA.path3);
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final MapNode checkingData = Builders
                 .mapBuilder()
@@ -228,8 +229,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
         doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
-        doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode1))).when(this.netconfService).get(DATA.path3);
-        doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode2))).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode1))).when(netconfService).get(DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode2))).when(netconfService)
                 .getConfig(DATA.path3);
         final MapNode expectedData = Builders.orderedMapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
@@ -249,8 +250,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
         doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
-        doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode1))).when(this.netconfService).get(DATA.path3);
-        doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode2))).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode1))).when(netconfService).get(DATA.path3);
+        doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode2))).when(netconfService)
                 .getConfig(DATA.path3);
         final UnkeyedListNode expectedData = Builders.unkeyedListBuilder()
                 .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
@@ -271,9 +272,9 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.leafSetNodePath);
         doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.leafSetNodePath);
-        doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode1))).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode1))).when(netconfService)
                 .get(DATA.leafSetNodePath);
-        doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode2))).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode2))).when(netconfService)
                 .getConfig(DATA.leafSetNodePath);
         final LeafSetNode<String> expectedData = Builders.<String>leafSetBuilder()
                 .withNodeIdentifier(new NodeIdentifier(DATA.leafListQname))
@@ -296,9 +297,9 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.leafSetNodePath);
         doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.leafSetNodePath);
-        doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode1))).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode1))).when(netconfService)
                 .get(DATA.leafSetNodePath);
-        doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode2))).when(this.netconfService)
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode2))).when(netconfService)
                 .getConfig(DATA.leafSetNodePath);
         final LeafSetNode<String> expectedData = Builders.<String>orderedLeafSetBuilder()
                 .withNodeIdentifier(new NodeIdentifier(DATA.leafListQname))
@@ -319,7 +320,7 @@ public class ReadDataTransactionUtilTest {
     public void readDataWrongPathOrNoContentTest() {
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
-        doReturn(immediateFluentFuture(Optional.empty())).when(this.netconfService).getConfig(DATA.path2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(DATA.path2);
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
         NormalizedNode normalizedNode = readData(valueOfContent, DATA.path2, mdsalStrategy);
         assertNull(normalizedNode);
@@ -349,7 +350,7 @@ public class ReadDataTransactionUtilTest {
         // no parameters, default values should be used
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        final QueryParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
 
         assertEquals("Not correctly parsed URI parameter",
                 RestconfDataServiceConstant.ReadData.ALL, parsedParameters.getContent());
@@ -377,7 +378,7 @@ public class ReadDataTransactionUtilTest {
 
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        final QueryParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
 
         // content
         assertEquals("Not correctly parsed URI parameter",

@@ -14,8 +14,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
  * Container that provides access to the data-model specific operations supported by the server.
@@ -46,7 +46,7 @@ public interface RestconfOperationsService {
      *
      * @param identifier path parameter
      * @param uriInfo URI information
-     * @return {@link NormalizedNodeContext}
+     * @return {@link NormalizedNodePayload}
      */
     @GET
     @Path("/operations/{identifier:.+}")
@@ -57,5 +57,5 @@ public interface RestconfOperationsService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodePayload getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 }

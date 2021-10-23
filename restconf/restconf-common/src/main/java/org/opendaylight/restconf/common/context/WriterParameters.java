@@ -7,46 +7,23 @@
  */
 package org.opendaylight.restconf.common.context;
 
-import java.util.List;
-import java.util.Set;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-
-public final class WriterParameters {
+public class WriterParameters {
     static final WriterParameters EMPTY = new WriterParametersBuilder().build();
 
-    private final String content;
     private final Integer depth;
-    private final List<Set<QName>> fields;
-    private final List<YangInstanceIdentifier> fieldPaths;
     private final boolean prettyPrint;
     private final boolean tagged;
     private final String withDefault;
 
-    private WriterParameters(final WriterParametersBuilder builder) {
-        content = builder.content;
+    protected WriterParameters(final WriterParametersBuilder builder) {
         depth = builder.depth;
-        fields = builder.fields;
-        fieldPaths = builder.fieldPaths;
         prettyPrint = builder.prettyPrint;
         tagged = builder.tagged;
         withDefault = builder.withDefault;
     }
 
-    public String getContent() {
-        return content;
-    }
-
     public Integer getDepth() {
         return depth;
-    }
-
-    public List<Set<QName>> getFields() {
-        return fields;
-    }
-
-    public List<YangInstanceIdentifier> getFieldPaths() {
-        return fieldPaths;
     }
 
     public boolean isPrettyPrint() {
@@ -62,10 +39,7 @@ public final class WriterParameters {
     }
 
     public static class WriterParametersBuilder {
-        private String content;
         private Integer depth;
-        private List<Set<QName>> fields;
-        private List<YangInstanceIdentifier> fieldPaths;
         private boolean prettyPrint;
         private boolean tagged;
         private String withDefault;
@@ -74,23 +48,8 @@ public final class WriterParameters {
 
         }
 
-        public WriterParametersBuilder setContent(final String content) {
-            this.content = content;
-            return this;
-        }
-
         public WriterParametersBuilder setDepth(final int depth) {
             this.depth = depth;
-            return this;
-        }
-
-        public WriterParametersBuilder setFields(final List<Set<QName>> fields) {
-            this.fields = fields;
-            return this;
-        }
-
-        public WriterParametersBuilder setFieldPaths(final List<YangInstanceIdentifier> fieldPaths) {
-            this.fieldPaths = fieldPaths;
             return this;
         }
 

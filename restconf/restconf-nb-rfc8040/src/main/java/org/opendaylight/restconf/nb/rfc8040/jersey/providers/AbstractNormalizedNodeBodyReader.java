@@ -11,14 +11,14 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
- * Common superclass for readers producing {@link NormalizedNodeContext}.
+ * Common superclass for readers producing {@link NormalizedNodePayload}.
  */
-abstract class AbstractNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider<NormalizedNodeContext> {
+abstract class AbstractNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider<NormalizedNodePayload> {
     AbstractNormalizedNodeBodyReader(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointService mountPointService) {
         super(schemaContextHandler, mountPointService);
@@ -30,7 +30,7 @@ abstract class AbstractNormalizedNodeBodyReader extends AbstractIdentifierAwareJ
     }
 
     @Override
-    protected final NormalizedNodeContext emptyBody(final InstanceIdentifierContext<?> path) {
-        return new NormalizedNodeContext(path, null);
+    protected final NormalizedNodePayload emptyBody(final InstanceIdentifierContext<?> path) {
+        return NormalizedNodePayload.empty(path);
     }
 }
