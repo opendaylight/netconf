@@ -20,12 +20,12 @@ import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -51,7 +51,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     public XmlBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
+        xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override
@@ -71,12 +71,12 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final DataSchemaNode dataSchemaNode = schemaContext
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont";
-        mockBodyReader(uri, this.xmlBodyReader, false);
+        mockBodyReader(uri, xmlBodyReader, false);
         final InputStream inputStream = XmlBodyReaderMountPointTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmldata.xml");
-        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
-        checkMountPointNormalizedNodeContext(returnValue);
+        final NormalizedNodePayload returnValue = xmlBodyReader.readFrom(null,
+                null, null, mediaType, null, inputStream);
+        checkMountPointNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue);
     }
 
@@ -85,12 +85,12 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final DataSchemaNode dataSchemaNode = schemaContext
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont/cont1";
-        mockBodyReader(uri, this.xmlBodyReader, false);
+        mockBodyReader(uri, xmlBodyReader, false);
         final InputStream inputStream = XmlBodyReaderMountPointTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml");
-        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
-        checkMountPointNormalizedNodeContext(returnValue);
+        final NormalizedNodePayload returnValue = xmlBodyReader.readFrom(null,
+                null, null, mediaType, null, inputStream);
+        checkMountPointNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue,
                 QName.create(dataSchemaNode.getQName(), "cont1"));
     }
@@ -100,12 +100,12 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final DataSchemaNode dataSchemaNode = schemaContext
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont";
-        mockBodyReader(uri, this.xmlBodyReader, true);
+        mockBodyReader(uri, xmlBodyReader, true);
         final InputStream inputStream = XmlBodyReaderMountPointTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml");
-        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
-        checkMountPointNormalizedNodeContext(returnValue);
+        final NormalizedNodePayload returnValue = xmlBodyReader.readFrom(null,
+                null, null, mediaType, null, inputStream);
+        checkMountPointNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue);
     }
 
@@ -114,24 +114,24 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final Optional<DataSchemaNode> dataSchemaNode = schemaContext
             .findDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont/cont1/reset";
-        mockBodyReader(uri, this.xmlBodyReader, true);
+        mockBodyReader(uri, xmlBodyReader, true);
         final InputStream inputStream = XmlBodyReaderMountPointTest.class
             .getResourceAsStream("/instanceidentifier/xml/xml_cont_action.xml");
-        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
-            null, null, this.mediaType, null, inputStream);
-        checkMountPointNormalizedNodeContext(returnValue);
+        final NormalizedNodePayload returnValue = xmlBodyReader.readFrom(null,
+            null, null, mediaType, null, inputStream);
+        checkMountPointNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode.get(), returnValue);
     }
 
     @Test
     public void rpcModuleInputTest() throws Exception {
         final String uri = "instance-identifier-module:cont/yang-ext:mount/invoke-rpc-module:rpc-test";
-        mockBodyReader(uri, this.xmlBodyReader, true);
+        mockBodyReader(uri, xmlBodyReader, true);
         final InputStream inputStream = XmlBodyReaderMountPointTest.class
                 .getResourceAsStream("/invoke-rpc/xml/rpc-input.xml");
-        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
-        checkNormalizedNodeContext(returnValue);
+        final NormalizedNodePayload returnValue = xmlBodyReader.readFrom(null,
+                null, null, mediaType, null, inputStream);
+        checkNormalizedNodePayload(returnValue);
         final ContainerNode contNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(
             QName.create(contNode.getIdentifier().getNodeType(), "cont"));
@@ -148,12 +148,12 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
-            final NormalizedNodeContext nnContext) {
+            final NormalizedNodePayload nnContext) {
         checkExpectValueNormalizeNodeContext(dataSchemaNode, nnContext, null);
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
-            final NormalizedNodeContext nnContext, final QName qualifiedName) {
+            final NormalizedNodePayload nnContext, final QName qualifiedName) {
         YangInstanceIdentifier dataNodeIdent = YangInstanceIdentifier.of(dataSchemaNode.getQName());
         final DOMMountPoint mountPoint = nnContext.getInstanceIdentifierContext().getMountPoint();
         final DataSchemaNode mountDataSchemaNode = modelContext(mountPoint)
@@ -176,14 +176,14 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void findFooContainerUsingNamespaceTest() throws Exception {
-        mockBodyReader("instance-identifier-module:cont/yang-ext:mount", this.xmlBodyReader, true);
+        mockBodyReader("instance-identifier-module:cont/yang-ext:mount", xmlBodyReader, true);
         final InputStream inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlDataFindFooContainer.xml");
-        final NormalizedNodeContext returnValue = this.xmlBodyReader
-                .readFrom(null, null, null, this.mediaType, null, inputStream);
+        final NormalizedNodePayload returnValue = xmlBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
 
         // check return value
-        checkMountPointNormalizedNodeContext(returnValue);
+        checkMountPointNormalizedNodePayload(returnValue);
         // check if container was found both according to its name and namespace
         assertEquals("Not correct container found, name was ignored",
                 "foo-bar-container", returnValue.getData().getIdentifier().getNodeType().getLocalName());
@@ -201,11 +201,11 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         mockBodyReader("instance-identifier-module:cont/yang-ext:mount", xmlBodyReader, true);
         final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/xml/xmlDataFindBarContainer.xml");
-        final NormalizedNodeContext returnValue = xmlBodyReader.readFrom(null, null, null, this.mediaType, null,
+        final NormalizedNodePayload returnValue = xmlBodyReader.readFrom(null, null, null, mediaType, null,
             inputStream);
 
         // check return value
-        checkMountPointNormalizedNodeContext(returnValue);
+        checkMountPointNormalizedNodePayload(returnValue);
         // check if container was found both according to its name and namespace
         assertEquals("Not correct container found, name was ignored",
                 "foo-bar-container", returnValue.getData().getIdentifier().getNodeType().getLocalName());
@@ -220,12 +220,12 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void wrongRootElementTest() throws Exception {
-        mockBodyReader("instance-identifier-module:cont/yang-ext:mount", this.xmlBodyReader, false);
+        mockBodyReader("instance-identifier-module:cont/yang-ext:mount", xmlBodyReader, false);
         final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream(
             "/instanceidentifier/xml/bug7933.xml");
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream));
+            () -> xmlBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
         final RestconfError restconfError = ex.getErrors().get(0);
         assertEquals(ErrorType.PROTOCOL, restconfError.getErrorType());
         assertEquals(ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
