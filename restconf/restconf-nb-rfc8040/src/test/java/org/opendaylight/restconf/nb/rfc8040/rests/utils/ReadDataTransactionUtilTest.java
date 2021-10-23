@@ -348,11 +348,10 @@ public class ReadDataTransactionUtilTest {
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
-        final String depth = "10";
         final String fields = containerChildQName.getLocalName();
 
         parameters.put("content", List.of("config"));
-        parameters.put("depth", List.of(depth));
+        parameters.put("depth", List.of("10"));
         parameters.put("fields", List.of(fields));
 
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
@@ -363,20 +362,13 @@ public class ReadDataTransactionUtilTest {
         assertEquals(ContentParameter.CONFIG, parsedParameters.getContent());
 
         // depth
-        assertNotNull("Not correctly parsed URI parameter",
-                parsedParameters.getDepth());
-        assertEquals("Not correctly parsed URI parameter",
-                depth, parsedParameters.getDepth().toString());
+        assertEquals(DepthParameter.of(12), parsedParameters.getDepth());
 
         // fields
-        assertNotNull("Not correctly parsed URI parameter",
-                parsedParameters.getFields());
-        assertEquals("Not correctly parsed URI parameter",
-                1, parsedParameters.getFields().size());
-        assertEquals("Not correctly parsed URI parameter",
-                1, parsedParameters.getFields().get(0).size());
-        assertEquals("Not correctly parsed URI parameter",
-                containerChildQName, parsedParameters.getFields().get(0).iterator().next());
+        assertNotNull(parsedParameters.getFields());
+        assertEquals(1, parsedParameters.getFields().size());
+        assertEquals(1, parsedParameters.getFields().get(0).size());
+        assertEquals(containerChildQName, parsedParameters.getFields().get(0).iterator().next());
     }
 
     /**
