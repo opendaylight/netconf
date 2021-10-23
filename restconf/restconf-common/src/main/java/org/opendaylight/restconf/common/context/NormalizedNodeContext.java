@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
+@Deprecated(forRemoval = true, since = "2.0.6")
 public class NormalizedNodeContext {
     private final InstanceIdentifierContext<? extends SchemaNode> context;
     private final ImmutableMap<String, Object> headers;

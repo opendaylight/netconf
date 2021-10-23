@@ -16,8 +16,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
@@ -97,7 +97,7 @@ final class CreateStreamUtil {
      *     }
      *     </pre>
      */
-    static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodeContext payload,
+    static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodePayload payload,
             final EffectiveModelContext refSchemaCtx) {
         // parsing out of container with settings and path
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();

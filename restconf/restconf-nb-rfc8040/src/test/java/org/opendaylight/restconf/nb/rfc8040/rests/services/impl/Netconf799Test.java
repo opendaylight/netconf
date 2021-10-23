@@ -26,9 +26,9 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -76,7 +76,7 @@ public class Netconf799Test {
             actionService, mock(Configuration.class));
 
         final var schemaNode = loadAction(contextRef, RESET_QNAME, ACTION_YII).orElseThrow();
-        final var response = dataService.invokeAction(new NormalizedNodeContext(
+        final var response = dataService.invokeAction(NormalizedNodePayload.of(
             new InstanceIdentifierContext<>(ACTION_YII, schemaNode, null, contextRef),
             Builders.containerBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(INPUT_QNAME))
