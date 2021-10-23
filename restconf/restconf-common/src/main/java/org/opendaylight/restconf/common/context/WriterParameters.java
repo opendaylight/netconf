@@ -13,6 +13,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public final class WriterParameters {
+    static final WriterParameters EMPTY = new WriterParametersBuilder().build();
+
     private final String content;
     private final Integer depth;
     private final List<Set<QName>> fields;
@@ -22,37 +24,37 @@ public final class WriterParameters {
     private final String withDefault;
 
     private WriterParameters(final WriterParametersBuilder builder) {
-        this.content = builder.content;
-        this.depth = builder.depth;
-        this.fields = builder.fields;
-        this.fieldPaths = builder.fieldPaths;
-        this.prettyPrint = builder.prettyPrint;
-        this.tagged = builder.tagged;
-        this.withDefault = builder.withDefault;
+        content = builder.content;
+        depth = builder.depth;
+        fields = builder.fields;
+        fieldPaths = builder.fieldPaths;
+        prettyPrint = builder.prettyPrint;
+        tagged = builder.tagged;
+        withDefault = builder.withDefault;
     }
 
     public String getContent() {
-        return this.content;
+        return content;
     }
 
     public Integer getDepth() {
-        return this.depth;
+        return depth;
     }
 
     public List<Set<QName>> getFields() {
-        return this.fields;
+        return fields;
     }
 
     public List<YangInstanceIdentifier> getFieldPaths() {
-        return this.fieldPaths;
+        return fieldPaths;
     }
 
     public boolean isPrettyPrint() {
-        return this.prettyPrint;
+        return prettyPrint;
     }
 
     public boolean isTagged() {
-        return this.tagged;
+        return tagged;
     }
 
     public String getWithDefault() {

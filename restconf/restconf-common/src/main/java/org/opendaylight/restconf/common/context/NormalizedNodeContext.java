@@ -40,7 +40,7 @@ public class NormalizedNodeContext {
         this.context = context;
         this.data = data;
         // default writer parameters
-        this.writerParameters = new WriterParameters.WriterParametersBuilder().build();
+        writerParameters = WriterParameters.EMPTY;
     }
 
     public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
@@ -48,20 +48,20 @@ public class NormalizedNodeContext {
         this.context = context;
         this.data = data;
         // default writer parameters
-        this.writerParameters = new WriterParameters.WriterParametersBuilder().build();
+        writerParameters = WriterParameters.EMPTY;
         this.headers = headers;
     }
 
     public InstanceIdentifierContext<? extends SchemaNode> getInstanceIdentifierContext() {
-        return this.context;
+        return context;
     }
 
     public NormalizedNode getData() {
-        return this.data;
+        return data;
     }
 
     public WriterParameters getWriterParameters() {
-        return this.writerParameters;
+        return writerParameters;
     }
 
     /**
@@ -70,6 +70,6 @@ public class NormalizedNodeContext {
      * @return map of headers
      */
     public Map<String, Object> getNewHeaders() {
-        return this.headers;
+        return headers;
     }
 }
