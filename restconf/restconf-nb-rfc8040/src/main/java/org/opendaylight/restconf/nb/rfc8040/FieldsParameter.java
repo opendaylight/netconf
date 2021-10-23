@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import java.net.URI;
 import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
@@ -72,6 +73,8 @@ public final class FieldsParameter implements Immutable {
         }
     }
 
+    private static final URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:fields:1.0");
+
     private final ImmutableList<NodeSelector> nodeSelectors;
 
     FieldsParameter(final ImmutableList<NodeSelector> nodeSelectors) {
@@ -88,6 +91,14 @@ public final class FieldsParameter implements Immutable {
      */
     public static FieldsParameter parse(final String str) throws ParseException {
         return new FieldsParameterParser().parse(str);
+    }
+
+    public static String uriName() {
+        return "fields";
+    }
+
+    public static URI capabilityUri() {
+        return CAPABILITY;
     }
 
     /**

@@ -182,20 +182,21 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
         }
 
-        if (parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL)
-                    || parameters.getContent().equals(RestconfDataServiceConstant.ReadData.CONFIG)) {
-            final QName type = node.getIdentifier().getNodeType();
-            return Response.status(Status.OK)
+        switch (parameters.getContent()) {
+            case ALL:
+            case CONFIG:
+                final QName type = node.getIdentifier().getNodeType();
+                return Response.status(Status.OK)
                     .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
                         + "-" + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
+            default:
+                return Response.status(Status.OK)
+                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .build();
         }
-
-        return Response.status(Status.OK)
-            .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
-            .build();
     }
 
     private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
