@@ -29,6 +29,10 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
@@ -83,10 +87,10 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  */
 public final class ReadDataTransactionUtil {
     private static final Set<String> ALLOWED_PARAMETERS = Set.of(
-        RestconfDataServiceConstant.ReadData.CONTENT,
-        RestconfDataServiceConstant.ReadData.DEPTH,
-        RestconfDataServiceConstant.ReadData.FIELDS,
-        RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
+        ContentParameter.uriName(),
+        DepthParameter.uriName(),
+        FieldsParameter.uriName(),
+        WithDefaultsParameter.uriName());
     private static final List<String> DEFAULT_CONTENT = List.of(RestconfDataServiceConstant.ReadData.ALL);
     private static final List<String> DEFAULT_DEPTH = List.of(RestconfDataServiceConstant.ReadData.UNBOUNDED);
     private static final String READ_TYPE_TX = "READ";
@@ -114,20 +118,17 @@ public final class ReadDataTransactionUtil {
         checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);
 
         // read parameters from URI or set default values
-        final List<String> content = queryParams.getOrDefault(
-                RestconfDataServiceConstant.ReadData.CONTENT, DEFAULT_CONTENT);
-        final List<String> depth = queryParams.getOrDefault(
-                RestconfDataServiceConstant.ReadData.DEPTH, DEFAULT_DEPTH);
-        final List<String> withDefaults = queryParams.getOrDefault(
-                RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of());
+        final List<String> content = queryParams.getOrDefault(ContentParameter.uriName(), DEFAULT_CONTENT);
+        final List<String> depth = queryParams.getOrDefault(DepthParameter.uriName(), DEFAULT_DEPTH);
+        final List<String> withDefaults = queryParams.getOrDefault(WithDefaultsParameter.uriName(), List.of());
         // fields
-        final List<String> fields = queryParams.getOrDefault(RestconfDataServiceConstant.ReadData.FIELDS, List.of());
+        final List<String> fields = queryParams.getOrDefault(FieldsParameter.uriName(), List.of());
 
         // parameter can be in URI at most once
-        checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
-        checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
-        checkParameterCount(fields, RestconfDataServiceConstant.ReadData.FIELDS);
-        checkParameterCount(withDefaults, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
+        checkParameterCount(content, ContentParameter.uriName());
+        checkParameterCount(depth, DepthParameter.uriName());
+        checkParameterCount(fields, FieldsParameter.uriName());
+        checkParameterCount(withDefaults, WithDefaultsParameter.uriName());
 
         // check and set content
         final String contentValue = content.get(0);

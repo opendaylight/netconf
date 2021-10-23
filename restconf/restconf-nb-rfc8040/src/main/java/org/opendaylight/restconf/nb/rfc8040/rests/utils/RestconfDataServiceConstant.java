@@ -34,10 +34,6 @@ public final class RestconfDataServiceConstant {
      *
      */
     public static final class ReadData {
-        // URI parameters
-        public static final String CONTENT = "content";
-        public static final String DEPTH = "depth";
-        public static final String FIELDS = "fields";
 
         // content values
         public static final String CONFIG = "config";
@@ -48,8 +44,6 @@ public final class RestconfDataServiceConstant {
         public static final String UNBOUNDED = "unbounded";
         public static final int MIN_DEPTH = 1;
         public static final int MAX_DEPTH = 65535;
-
-        public static final String WITH_DEFAULTS = "with-defaults";
 
         /**
          * With-default values, as per

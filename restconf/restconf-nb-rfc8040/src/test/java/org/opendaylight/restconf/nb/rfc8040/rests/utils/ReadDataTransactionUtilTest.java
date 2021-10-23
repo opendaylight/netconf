@@ -39,11 +39,12 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -485,7 +486,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of("explicit"));
+        parameters.put("with-defaults", List.of("explicit"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -501,7 +502,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of("invalid"));
+        parameters.put("with-defaults", List.of("invalid"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -520,8 +521,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                List.of(ReadData.WithDefaults.REPORT_ALL_TAGGED.value()));
+        parameters.put("with-defaults", List.of("report-all-tagged"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -538,8 +538,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                List.of(ReadData.WithDefaults.REPORT_ALL.value()));
+        parameters.put("with-defaults", List.of("report-all"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -552,7 +551,7 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void checkParameterCountTest() {
-        ReadDataTransactionUtil.checkParameterCount(List.of("all"), RestconfDataServiceConstant.ReadData.CONTENT);
+        ReadDataTransactionUtil.checkParameterCount(List.of("all"), ContentParameter.uriName());
     }
 
     /**
@@ -562,7 +561,7 @@ public class ReadDataTransactionUtilTest {
     public void checkParameterCountNegativeTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ReadDataTransactionUtil.checkParameterCount(List.of("config", "nonconfig", "all"),
-                    RestconfDataServiceConstant.ReadData.CONTENT));
+                    ContentParameter.uriName()));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
@@ -578,7 +577,7 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void checkParametersTypesTest() {
         ReadDataTransactionUtil.checkParametersTypes(Set.of("content"),
-            Set.of(RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH));
+            Set.of(ContentParameter.uriName(), DepthParameter.uriName()));
     }
 
     /**
@@ -588,7 +587,7 @@ public class ReadDataTransactionUtilTest {
     public void checkParametersTypesNegativeTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ReadDataTransactionUtil.checkParametersTypes(Set.of("not-allowed-parameter"),
-                Set.of(RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH)));
+                Set.of(ContentParameter.uriName(), DepthParameter.uriName())));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
