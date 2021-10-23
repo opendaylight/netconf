@@ -23,9 +23,9 @@ import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -51,7 +51,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     public JsonBodyReaderTest() throws Exception {
         super(schemaContext);
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
+        jsonBodyReader = new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointService);
     }
 
     @Override
@@ -73,12 +73,12 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName());
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, this.jsonBodyReader, false);
+        mockBodyReader(uri, jsonBodyReader, false);
         final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsondata.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
+        final NormalizedNodePayload returnValue = jsonBodyReader.readFrom(null, null, null, mediaType, null,
                 inputStream);
-        checkNormalizedNodeContext(returnValue);
+        checkNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue, dataII);
     }
 
@@ -90,12 +90,12 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final DataSchemaNode dataSchemaNodeOnPath = ((DataNodeContainer) dataSchemaNode).getDataChildByName(cont1QName);
         final String uri = "instance-identifier-module:cont/cont1";
-        mockBodyReader(uri, this.jsonBodyReader, false);
+        mockBodyReader(uri, jsonBodyReader, false);
         final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/json_sub_container.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
+        final NormalizedNodePayload returnValue = jsonBodyReader.readFrom(null, null, null, mediaType, null,
                 inputStream);
-        checkNormalizedNodeContext(returnValue);
+        checkNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNodeOnPath, returnValue, dataII);
     }
 
@@ -106,12 +106,12 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, this.jsonBodyReader, true);
+        mockBodyReader(uri, jsonBodyReader, true);
         final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/json_sub_container.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
+        final NormalizedNodePayload returnValue = jsonBodyReader.readFrom(null, null, null, mediaType, null,
                 inputStream);
-        checkNormalizedNodeContext(returnValue);
+        checkNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue, dataII);
     }
 
@@ -124,12 +124,12 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.get().getQName())
             .node(cont1QName).node(actionQName);
         final String uri = "instance-identifier-module:cont/cont1/reset";
-        mockBodyReader(uri, this.jsonBodyReader, true);
+        mockBodyReader(uri, jsonBodyReader, true);
         final InputStream inputStream = JsonBodyReaderTest.class
             .getResourceAsStream("/instanceidentifier/json/json_cont_action.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader
-            .readFrom(null, null, null, this.mediaType, null, inputStream);
-        checkNormalizedNodeContext(returnValue);
+        final NormalizedNodePayload returnValue = jsonBodyReader
+            .readFrom(null, null, null, mediaType, null, inputStream);
+        checkNormalizedNodePayload(returnValue);
         assertTrue(returnValue.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition);
     }
 
@@ -144,13 +144,13 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(augII)
                 .node(contAugmentQName);
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, this.jsonBodyReader, true);
+        mockBodyReader(uri, jsonBodyReader, true);
         final InputStream inputStream =
                 XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/json_augment_container.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
+        final NormalizedNodePayload returnValue = jsonBodyReader.readFrom(null, null, null, mediaType, null,
                 inputStream);
-        checkNormalizedNodeContext(returnValue);
+        checkNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue, dataII);
     }
 
@@ -169,18 +169,18 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(augChoice1II)
                 .node(augmentChoice1QName).node(augChoice2II).node(augmentChoice2QName).node(containerQName);
         final String uri = "instance-identifier-module:cont";
-        mockBodyReader(uri, this.jsonBodyReader, true);
+        mockBodyReader(uri, jsonBodyReader, true);
         final InputStream inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/json_augment_choice_container.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
+        final NormalizedNodePayload returnValue = jsonBodyReader.readFrom(null, null, null, mediaType, null,
                 inputStream);
-        checkNormalizedNodeContext(returnValue);
+        checkNormalizedNodePayload(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue, dataII);
     }
 
     @Test
     public void testRangeViolation() throws Exception {
-        mockBodyReader("netconf786:foo", this.jsonBodyReader, false);
+        mockBodyReader("netconf786:foo", jsonBodyReader, false);
 
         final InputStream inputStream = new ByteArrayInputStream(("{\n"
             + "  \"netconf786:foo\": {\n"
@@ -188,11 +188,11 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
             + "  }\n"
             + "}").getBytes(StandardCharsets.UTF_8));
 
-        assertRangeViolation(() -> jsonBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream));
+        assertRangeViolation(() -> jsonBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
     }
 
     private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
-            final NormalizedNodeContext nnContext, final YangInstanceIdentifier dataNodeIdent) {
+            final NormalizedNodePayload nnContext, final YangInstanceIdentifier dataNodeIdent) {
         assertEquals(dataSchemaNode, nnContext.getInstanceIdentifierContext().getSchemaNode());
         assertEquals(dataNodeIdent, nnContext.getInstanceIdentifierContext().getInstanceIdentifier());
         assertNotNull(NormalizedNodes.findNode(nnContext.getData(), dataNodeIdent));

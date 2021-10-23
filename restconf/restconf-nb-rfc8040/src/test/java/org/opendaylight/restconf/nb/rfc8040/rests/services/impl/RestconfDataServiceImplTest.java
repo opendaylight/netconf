@@ -53,7 +53,6 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
@@ -224,7 +223,7 @@ public class RestconfDataServiceImplTest {
         final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
         assertNotNull(response);
         assertEquals(200, response.getStatus());
-        assertEquals(buildBaseCont, ((NormalizedNodeContext) response.getEntity()).getData());
+        assertEquals(buildBaseCont, ((NormalizedNodePayload) response.getEntity()).getData());
     }
 
     @Test
@@ -240,7 +239,7 @@ public class RestconfDataServiceImplTest {
         assertNotNull(response);
         assertEquals(200, response.getStatus());
 
-        final NormalizedNode data = ((NormalizedNodeContext) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
         assertTrue(data instanceof ContainerNode);
         final Collection<DataContainerChild> rootNodes = ((ContainerNode) data).body();
         assertEquals(1, rootNodes.size());
@@ -274,7 +273,7 @@ public class RestconfDataServiceImplTest {
         assertEquals(200, response.getStatus());
 
         // response must contain all child nodes from config and operational containers merged in one container
-        final NormalizedNode data = ((NormalizedNodeContext) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
         assertTrue(data instanceof ContainerNode);
         assertEquals(3, ((ContainerNode) data).size());
         assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());
@@ -310,7 +309,7 @@ public class RestconfDataServiceImplTest {
         assertEquals(200, response.getStatus());
 
         // response must contain only config data
-        final NormalizedNode data = ((NormalizedNodeContext) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
 
         // config data present
         assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());
@@ -338,7 +337,7 @@ public class RestconfDataServiceImplTest {
         assertEquals(200, response.getStatus());
 
         // response must contain only operational data
-        final NormalizedNode data = ((NormalizedNodeContext) response.getEntity()).getData();
+        final NormalizedNode data = ((NormalizedNodePayload) response.getEntity()).getData();
 
         // state data present
         assertTrue(((ContainerNode) data).findChildByArg(buildPlayerCont.getIdentifier()).isPresent());

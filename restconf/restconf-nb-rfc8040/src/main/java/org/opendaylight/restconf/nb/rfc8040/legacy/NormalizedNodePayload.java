@@ -10,24 +10,31 @@ package org.opendaylight.restconf.nb.rfc8040.legacy;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
- * A RFC8040 overlay over {@link NormalizedNodeContext}. This represents a NormalizedNode along with further messy
- * details needed to deal with the payload.
+ * A RFC8040 overlay from our marriage to NormalizedNodeContext. This represents a NormalizedNode along with further
+ * messy details needed to deal with the payload.
  */
-public final class NormalizedNodePayload extends NormalizedNodeContext {
+public final class NormalizedNodePayload {
+    private final InstanceIdentifierContext<? extends SchemaNode> context;
+    private final ImmutableMap<String, Object> headers;
+    private final QueryParameters writerParameters;
+    private final NormalizedNode data;
+
     private NormalizedNodePayload(final InstanceIdentifierContext<?> context,
             final NormalizedNode data, final QueryParameters writerParameters,
             final ImmutableMap<String, Object> headers) {
-        super(context, data, writerParameters, headers);
+        this.context = context;
+        this.data = data;
+        this.writerParameters = requireNonNull(writerParameters);
+        this.headers = requireNonNull(headers);
     }
 
     public static @NonNull NormalizedNodePayload empty(final InstanceIdentifierContext<?> path) {
@@ -51,9 +58,30 @@ public final class NormalizedNodePayload extends NormalizedNodeContext {
             QueryParameters.empty(), ImmutableMap.of("Location", location));
     }
 
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE", justification = "Ensured via constructor")
-    @Override
+    public static Object ofReadData(final InstanceIdentifierContext<?> path, final NormalizedNode data,
+            final QueryParameters parameters) {
+        return new NormalizedNodePayload(requireNonNull(path), requireNonNull(data), parameters, ImmutableMap.of());
+    }
+
+    public InstanceIdentifierContext<? extends SchemaNode> getInstanceIdentifierContext() {
+        return context;
+    }
+
+    public NormalizedNode getData() {
+        return data;
+    }
+
+    /**
+     * Return headers response headers.
+     *
+     * @return map of headers
+     */
+    // FIXME: this is only used for redirect on subscribe
+    public ImmutableMap<String, Object> getNewHeaders() {
+        return headers;
+    }
+
     public QueryParameters getWriterParameters() {
-        return (QueryParameters) super.getWriterParameters();
+        return writerParameters;
     }
 }

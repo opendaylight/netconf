@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -30,7 +31,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -171,43 +171,49 @@ public class PutDataTransactionUtilTest {
     public void testValidInputData() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildLeaf);
-        RestconfDataServiceImpl.validInputData(iidContext.getSchemaNode(), payload);
+        RestconfDataServiceImpl.validInputData(iidContext.getSchemaNode(),
+            NormalizedNodePayload.of(iidContext, buildLeaf));
     }
 
     @Test
     public void testValidTopLevelNodeName() {
         InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
-        NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildLeaf);
+        NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
         RestconfDataServiceImpl.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
 
         iidContext = new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
-        payload = new NormalizedNodeContext(iidContext, buildBaseCont);
+        payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
         RestconfDataServiceImpl.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
     }
 
-    @Test(expected = RestconfDocumentedException.class)
+    @Test
     public void testValidTopLevelNodeNamePathEmpty() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildLeaf);
-        RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.empty(), payload);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
+
+        // FIXME: more asserts
+        assertThrows(RestconfDocumentedException.class,
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(YangInstanceIdentifier.empty(), payload));
     }
 
-    @Test(expected = RestconfDocumentedException.class)
+    @Test
     public void testValidTopLevelNodeNameWrongTopIdentifier() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildLeaf);
-        RestconfDataServiceImpl.validTopLevelNodeName(iid.getAncestor(1), payload);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
+
+        // FIXME: more asserts
+        assertThrows(RestconfDocumentedException.class,
+            () -> RestconfDataServiceImpl.validTopLevelNodeName(iid.getAncestor(1), payload));
     }
 
     @Test
     public void testValidateListKeysEqualityInPayloadAndUri() {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(iid3, schemaNode3, null, schema);
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildListEntry);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildListEntry);
         RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
 
