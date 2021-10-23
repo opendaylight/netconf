@@ -28,7 +28,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
@@ -36,6 +35,7 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -90,14 +90,12 @@ public abstract class AbstractBodyReaderTest {
         normalizedNodeProvider.setRequest(request);
     }
 
-    protected static void checkMountPointNormalizedNodeContext(
-            final NormalizedNodeContext nnContext) {
-        checkNormalizedNodeContext(nnContext);
+    protected static void checkMountPointNormalizedNodePayload(final NormalizedNodePayload nnContext) {
+        checkNormalizedNodePayload(nnContext);
         assertNotNull(nnContext.getInstanceIdentifierContext().getMountPoint());
     }
 
-    protected static void checkNormalizedNodeContext(
-            final NormalizedNodeContext nnContext) {
+    protected static void checkNormalizedNodePayload(final NormalizedNodePayload nnContext) {
         assertNotNull(nnContext.getData());
         assertNotNull(nnContext.getInstanceIdentifierContext()
                 .getInstanceIdentifier());

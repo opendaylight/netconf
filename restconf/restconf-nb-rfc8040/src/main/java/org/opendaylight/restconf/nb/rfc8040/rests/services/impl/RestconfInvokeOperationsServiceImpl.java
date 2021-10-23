@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -116,7 +115,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                 if (resultData == null || ((ContainerNode) resultData).isEmpty()) {
                     ar.resume(new WebApplicationException(Status.NO_CONTENT));
                 } else {
-                    ar.resume(new NormalizedNodeContext(new InstanceIdentifierContext<>(null, (RpcDefinition) schema,
+                    ar.resume(NormalizedNodePayload.of(new InstanceIdentifierContext<>(null, (RpcDefinition) schema,
                         mountPoint, schemaContextRef), resultData));
                 }
             }

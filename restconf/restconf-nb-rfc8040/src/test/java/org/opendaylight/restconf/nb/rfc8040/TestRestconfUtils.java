@@ -21,7 +21,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -68,12 +68,8 @@ public final class TestRestconfUtils {
         return schemaContext;
     }
 
-    public static NormalizedNodeContext loadNormalizedContextFromJsonFile() {
-        throw new AbstractMethodError("Not implemented yet");
-    }
-
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static NormalizedNodeContext loadNormalizedContextFromXmlFile(final String pathToInputFile,
+    public static NormalizedNodePayload loadNormalizedContextFromXmlFile(final String pathToInputFile,
             final String uri, final EffectiveModelContext schemaContext) {
         final InstanceIdentifierContext<?> iiContext =
                 ParserIdentifier.toInstanceIdentifier(uri, schemaContext, Optional.empty());
@@ -81,7 +77,7 @@ public final class TestRestconfUtils {
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
             final NormalizedNode nn = parse(iiContext, doc);
-            return new NormalizedNodeContext(iiContext, nn);
+            return NormalizedNodePayload.of(iiContext, nn);
         } catch (final Exception e) {
             LOG.error("Load xml file " + pathToInputFile + " fail.", e);
         }

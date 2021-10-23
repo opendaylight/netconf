@@ -46,7 +46,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -103,7 +102,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         doReturn(false).when(result).isEmpty();
 
         final AsyncResponse ar = mock(AsyncResponse.class);
-        final ArgumentCaptor<NormalizedNodeContext> response = ArgumentCaptor.forClass(NormalizedNodeContext.class);
+        final ArgumentCaptor<NormalizedNodePayload> response = ArgumentCaptor.forClass(NormalizedNodePayload.class);
         invokeOperationsService.invokeRpc("invoke-rpc-module:rpcTest", prepNNC(result), mock(UriInfo.class), ar);
         verify(ar).resume(response.capture());
 
