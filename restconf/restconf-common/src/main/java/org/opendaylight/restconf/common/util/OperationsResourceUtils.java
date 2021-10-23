@@ -10,11 +10,12 @@ package org.opendaylight.restconf.common.util;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -32,8 +33,8 @@ public final class OperationsResourceUtils {
         // Hidden on purpose
     }
 
-    public static @NonNull NormalizedNodeContext contextForModelContext(final @NonNull SchemaContext context,
-            final @Nullable DOMMountPoint mountPoint) {
+    public static @NonNull Entry<InstanceIdentifierContext<OperationsContainerSchemaNode>, ContainerNode>
+                contextForModelContext(final @NonNull SchemaContext context, final @Nullable DOMMountPoint mountPoint) {
         // Determine which modules we need and construct leaf schemas to correspond to all RPC definitions
         final Collection<Module> modules = new ArrayList<>();
         final ArrayList<OperationsLeafSchemaNode> rpcLeafSchemas = new ArrayList<>();
@@ -59,7 +60,7 @@ public final class OperationsResourceUtils {
             operationsBuilder.withChild(ImmutableNodes.leafNode(leaf.getQName(), Empty.getInstance()));
         }
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, operatationsSchema, mountPoint,
-                new OperationsEffectiveModuleContext(ImmutableSet.copyOf(modules))), operationsBuilder.build());
+        return Map.entry(new InstanceIdentifierContext<>(null, operatationsSchema, mountPoint,
+            new OperationsEffectiveModuleContext(ImmutableSet.copyOf(modules))), operationsBuilder.build());
     }
 }

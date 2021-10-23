@@ -18,8 +18,8 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
  * An operation resource represents a protocol operation defined with the YANG {@code rpc} statement. It is invoked
@@ -30,9 +30,9 @@ public interface RestconfInvokeOperationsService {
      * Invoke RPC operation.
      *
      * @param identifier module name and rpc identifier string for the desired operation
-     * @param payload {@link NormalizedNodeContext} - the body of the operation
+     * @param payload {@link NormalizedNodePayload} - the body of the operation
      * @param uriInfo URI info
-     * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodeContext} ouput
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodePayload} output
      */
     @POST
     @Path("/operations/{identifier:.+}")
@@ -50,6 +50,6 @@ public interface RestconfInvokeOperationsService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    void invokeRpc(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    void invokeRpc(@Encoded @PathParam("identifier") String identifier, NormalizedNodePayload payload,
         @Context UriInfo uriInfo, @Suspended AsyncResponse ar);
 }

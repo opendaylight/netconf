@@ -352,7 +352,8 @@ public final class RestconfImpl implements RestconfService {
         final InstanceIdentifierContext<?> mountPointIdentifier =
                 controllerContext.toMountPointIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
-        return OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
+        final var entry = OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
+        return new NormalizedNodeContext(entry.getKey(), entry.getValue());
     }
 
     private Module getRestconfModule() {

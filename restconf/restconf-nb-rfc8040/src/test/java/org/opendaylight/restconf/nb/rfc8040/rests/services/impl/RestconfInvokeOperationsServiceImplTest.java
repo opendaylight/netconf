@@ -50,6 +50,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -92,8 +93,8 @@ public class RestconfInvokeOperationsServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(dataBroker,
             mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(contextRef);
-        this.invokeOperationsService =
-                new RestconfInvokeOperationsServiceImpl(this.rpcService, schemaContextHandler);
+        invokeOperationsService =
+                new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler);
     }
 
     @Test
@@ -175,7 +176,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         assertEquals(OUTPUT, rpcResult.getResult());
     }
 
-    private NormalizedNodeContext prepNNC(final NormalizedNode result) {
+    private NormalizedNodePayload prepNNC(final NormalizedNode result) {
         final InstanceIdentifierContext<?> context = mock(InstanceIdentifierContext.class);
         final RpcDefinition schemaNode = mock(RpcDefinition.class);
         final QName qname = QName.create("invoke:rpc:module", "2013-12-03", "rpcTest");
@@ -185,6 +186,6 @@ public class RestconfInvokeOperationsServiceImplTest {
         final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);
         doReturn(immediateFluentFuture(domRpcResult)).when(rpcService).invokeRpc(qname, data);
         doReturn(result).when(domRpcResult).getResult();
-        return new NormalizedNodeContext(context, data);
+        return NormalizedNodePayload.of(context, data);
     }
 }

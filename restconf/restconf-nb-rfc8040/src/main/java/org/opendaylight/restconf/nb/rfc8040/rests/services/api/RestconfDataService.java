@@ -20,11 +20,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
  * The "{+restconf}/data" subtree represents the datastore resource type, which
@@ -39,7 +39,7 @@ public interface RestconfDataService {
      *            path to target
      * @param uriInfo
      *            URI info
-     * @return {@link NormalizedNodeContext}
+     * @return {@link NormalizedNodePayload}
      */
     @GET
     @Path("/data/{identifier:.+}")
@@ -57,7 +57,7 @@ public interface RestconfDataService {
      *
      * @param uriInfo
      *            URI info
-     * @return {@link NormalizedNodeContext}
+     * @return {@link NormalizedNodePayload}
      */
     @GET
     @Path("/data")
@@ -88,7 +88,7 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodePayload payload,
             @Context UriInfo uriInfo);
 
     /**
@@ -111,7 +111,7 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response postData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    Response postData(@Encoded @PathParam("identifier") String identifier, NormalizedNodePayload payload,
             @Context UriInfo uriInfo);
 
     /**
@@ -132,7 +132,7 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response postData(NormalizedNodeContext payload, @Context UriInfo uriInfo);
+    Response postData(NormalizedNodePayload payload, @Context UriInfo uriInfo);
 
     /**
      * Delete the target data resource.
@@ -210,6 +210,6 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response patchData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    Response patchData(@Encoded @PathParam("identifier") String identifier, NormalizedNodePayload payload,
                        @Context UriInfo uriInfo);
 }
