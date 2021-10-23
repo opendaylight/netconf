@@ -48,7 +48,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -187,14 +186,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             case CONFIG:
                 final QName type = node.getIdentifier().getNodeType();
                 return Response.status(Status.OK)
-                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, parameters))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
                         + "-" + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
             default:
                 return Response.status(Status.OK)
-                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, parameters))
                     .build();
         }
     }
@@ -382,10 +381,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     /**
      * Invoke Action operation.
      *
-     * @param payload {@link NormalizedNodeContext} - the body of the operation
-     * @return {@link NormalizedNodeContext} wrapped in {@link Response}
+     * @param payload {@link NormalizedNodePayload} - the body of the operation
+     * @return {@link NormalizedNodePayload} wrapped in {@link Response}
      */
-    public Response invokeAction(final NormalizedNodeContext payload) {
+    public Response invokeAction(final NormalizedNodePayload payload) {
         final InstanceIdentifierContext<?> context = payload.getInstanceIdentifierContext();
         final DOMMountPoint mountPoint = context.getMountPoint();
         final Absolute schemaPath = Absolute.of(ImmutableList.copyOf(context.getSchemaNode().getPath()
@@ -425,7 +424,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         return Response.status(Status.OK)
-            .entity(new NormalizedNodeContext(
+            .entity(NormalizedNodePayload.ofNullable(
                 new InstanceIdentifierContext<>(yangIIdContext, resultNodeSchema, mountPoint, schemaContextRef),
                 resultData))
             .build();
@@ -497,7 +496,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param payload    input data
      */
     @VisibleForTesting
-    public static void validInputData(final SchemaNode schemaNode, final NormalizedNodeContext payload) {
+    public static void validInputData(final SchemaNode schemaNode, final NormalizedNodePayload payload) {
         if (schemaNode != null && payload.getData() == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         } else if (schemaNode == null && payload.getData() != null) {
@@ -512,7 +511,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param payload data
      */
     @VisibleForTesting
-    public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodeContext payload) {
+    public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodePayload payload) {
         final QName dataNodeType = payload.getData().getIdentifier().getNodeType();
         if (path.isEmpty()) {
             if (!NETCONF_BASE_QNAME.equals(dataNodeType)) {
@@ -538,7 +537,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @throws RestconfDocumentedException if key values or key count in payload and URI isn't equal
      */
     @VisibleForTesting
-    public static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodeContext payload) {
+    public static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodePayload payload) {
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
         final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
         final SchemaNode schemaNode = iiWithData.getSchemaNode();
