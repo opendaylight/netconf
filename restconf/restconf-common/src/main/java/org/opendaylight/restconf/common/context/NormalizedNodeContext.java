@@ -7,49 +7,40 @@
  */
 package org.opendaylight.restconf.common.context;
 
-import java.util.HashMap;
-import java.util.Map;
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.collect.ImmutableMap;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public class NormalizedNodeContext {
-
     private final InstanceIdentifierContext<? extends SchemaNode> context;
+    private final ImmutableMap<String, Object> headers;
     private final WriterParameters writerParameters;
     private final NormalizedNode data;
 
-    private Map<String, Object> headers = new HashMap<>();
-
     public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
-                                 final NormalizedNode data, final WriterParameters writerParameters) {
+            final NormalizedNode data, final WriterParameters writerParameters,
+            final ImmutableMap<String, Object> headers) {
         this.context = context;
         this.data = data;
         this.writerParameters = writerParameters;
+        this.headers = requireNonNull(headers);
     }
 
     public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
-            final NormalizedNode data, final WriterParameters writerParameters, final Map<String, Object> headers) {
-        this.context = context;
-        this.data = data;
-        this.writerParameters = writerParameters;
-        this.headers = headers;
+                                 final NormalizedNode data, final WriterParameters writerParameters) {
+        this(context, data, writerParameters, ImmutableMap.of());
     }
 
     public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
                                  final NormalizedNode data) {
-        this.context = context;
-        this.data = data;
-        // default writer parameters
-        writerParameters = WriterParameters.EMPTY;
+        this(context, data, WriterParameters.EMPTY, ImmutableMap.of());
     }
 
     public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
-            final NormalizedNode data, final Map<String, Object> headers) {
-        this.context = context;
-        this.data = data;
-        // default writer parameters
-        writerParameters = WriterParameters.EMPTY;
-        this.headers = headers;
+            final NormalizedNode data, final ImmutableMap<String, Object> headers) {
+        this(context, data, WriterParameters.EMPTY, headers);
     }
 
     public InstanceIdentifierContext<? extends SchemaNode> getInstanceIdentifierContext() {
@@ -69,7 +60,7 @@ public class NormalizedNodeContext {
      *
      * @return map of headers
      */
-    public Map<String, Object> getNewHeaders() {
+    public ImmutableMap<String, Object> getNewHeaders() {
         return headers;
     }
 }

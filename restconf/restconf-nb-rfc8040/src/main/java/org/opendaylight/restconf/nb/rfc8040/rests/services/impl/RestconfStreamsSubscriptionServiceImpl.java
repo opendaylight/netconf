@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -16,9 +17,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.ws.rs.Path;
@@ -37,7 +36,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -75,7 +74,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
             final DOMNotificationService notificationService, final SchemaContextHandler schemaHandler,
             final Configuration configuration) {
-        this.handlersHolder = new HandlersHolder(dataBroker, notificationService, schemaHandler);
+        handlersHolder = new HandlersHolder(dataBroker, notificationService, schemaHandler);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
     }
@@ -95,16 +94,9 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
             throw new RestconfDocumentedException(msg);
         }
 
-        // prepare new header with location
-        final Map<String, Object> headers = new HashMap<>();
-        headers.put("Location", response);
-
         // prepare node with value of location
         return new NormalizedNodeContext(prepareIIDSubsStreamOutput(handlersHolder.getSchemaHandler()),
-            ImmutableLeafNodeBuilder.create()
-                .withNodeIdentifier(LOCATION_NODEID)
-                .withValue(response.toString())
-                .build(), headers);
+            ImmutableNodes.leafNode(LOCATION_NODEID, response.toString()), ImmutableMap.of("Location", response));
     }
 
     /**
@@ -146,7 +138,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          * @return the dataBroker
          */
         public DOMDataBroker getDataBroker() {
-            return this.dataBroker;
+            return dataBroker;
         }
 
         /**
@@ -155,7 +147,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          * @return the notificationService
          */
         public DOMNotificationService getNotificationServiceHandler() {
-            return this.notificationService;
+            return notificationService;
         }
 
         /**
@@ -164,7 +156,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          * @return the schemaHandler
          */
         public SchemaContextHandler getSchemaHandler() {
-            return this.schemaHandler;
+            return schemaHandler;
         }
     }
 

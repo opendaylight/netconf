@@ -17,6 +17,7 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FluentFuture;
@@ -210,10 +211,10 @@ public final class RestconfImpl implements RestconfService {
     public NormalizedNodeContext getModules(final UriInfo uriInfo) {
         final MapNode allModuleMap = makeModuleMapNode(controllerContext.getAllModules());
 
-        final EffectiveModelContext schemaContext = this.controllerContext.getGlobalSchema();
+        final EffectiveModelContext schemaContext = controllerContext.getGlobalSchema();
 
         final Module restconfModule = getRestconfModule();
-        final DataSchemaNode modulesSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
+        final DataSchemaNode modulesSchemaNode = controllerContext.getRestconfModuleRestConfSchemaNode(
                 restconfModule, Draft02.RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
         checkState(modulesSchemaNode instanceof ContainerSchemaNode);
 
@@ -239,12 +240,12 @@ public final class RestconfImpl implements RestconfService {
         }
 
         final InstanceIdentifierContext<?> mountPointIdentifier =
-                this.controllerContext.toMountPointIdentifier(identifier);
+                controllerContext.toMountPointIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final MapNode mountPointModulesMap = makeModuleMapNode(controllerContext.getAllModules(mountPoint));
 
         final Module restconfModule = getRestconfModule();
-        final DataSchemaNode modulesSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
+        final DataSchemaNode modulesSchemaNode = controllerContext.getRestconfModuleRestConfSchemaNode(
                 restconfModule, Draft02.RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
         checkState(modulesSchemaNode instanceof ContainerSchemaNode);
 
@@ -254,7 +255,7 @@ public final class RestconfImpl implements RestconfService {
 
         return new NormalizedNodeContext(
                 new InstanceIdentifierContext<>(null, modulesSchemaNode, mountPoint,
-                        this.controllerContext.getGlobalSchema()),
+                        controllerContext.getGlobalSchema()),
                 moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -267,14 +268,14 @@ public final class RestconfImpl implements RestconfService {
         final EffectiveModelContext schemaContext;
         if (identifier.contains(ControllerContext.MOUNT)) {
             final InstanceIdentifierContext<?> mountPointIdentifier =
-                    this.controllerContext.toMountPointIdentifier(identifier);
+                    controllerContext.toMountPointIdentifier(identifier);
             mountPoint = mountPointIdentifier.getMountPoint();
-            module = this.controllerContext.findModuleByNameAndRevision(mountPoint, nameRev.getKey(),
+            module = controllerContext.findModuleByNameAndRevision(mountPoint, nameRev.getKey(),
                 nameRev.getValue());
             schemaContext = modelContext(mountPoint);
         } else {
-            module = this.controllerContext.findModuleByNameAndRevision(nameRev.getKey(), nameRev.getValue());
-            schemaContext = this.controllerContext.getGlobalSchema();
+            module = controllerContext.findModuleByNameAndRevision(nameRev.getKey(), nameRev.getValue());
+            schemaContext = controllerContext.getGlobalSchema();
         }
 
         if (module == null) {
@@ -287,7 +288,7 @@ public final class RestconfImpl implements RestconfService {
         final Set<Module> modules = Collections.singleton(module);
         final MapNode moduleMap = makeModuleMapNode(modules);
 
-        final DataSchemaNode moduleSchemaNode = this.controllerContext
+        final DataSchemaNode moduleSchemaNode = controllerContext
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.MODULE_LIST_SCHEMA_NODE);
         checkState(moduleSchemaNode instanceof ListSchemaNode);
 
@@ -299,10 +300,10 @@ public final class RestconfImpl implements RestconfService {
     @Override
     @Deprecated
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
-        final EffectiveModelContext schemaContext = this.controllerContext.getGlobalSchema();
+        final EffectiveModelContext schemaContext = controllerContext.getGlobalSchema();
         final Set<String> availableStreams = Notificator.getStreamNames();
         final Module restconfModule = getRestconfModule();
-        final DataSchemaNode streamSchemaNode = this.controllerContext
+        final DataSchemaNode streamSchemaNode = controllerContext
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.STREAM_LIST_SCHEMA_NODE);
         checkState(streamSchemaNode instanceof ListSchemaNode);
 
@@ -313,7 +314,7 @@ public final class RestconfImpl implements RestconfService {
             listStreamsBuilder.withChild(toStreamEntryNode(streamName, streamSchemaNode));
         }
 
-        final DataSchemaNode streamsContainerSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
+        final DataSchemaNode streamsContainerSchemaNode = controllerContext.getRestconfModuleRestConfSchemaNode(
                 restconfModule, Draft02.RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
         checkState(streamsContainerSchemaNode instanceof ContainerSchemaNode);
 
@@ -349,13 +350,13 @@ public final class RestconfImpl implements RestconfService {
         }
 
         final InstanceIdentifierContext<?> mountPointIdentifier =
-                this.controllerContext.toMountPointIdentifier(identifier);
+                controllerContext.toMountPointIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         return OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
     }
 
     private Module getRestconfModule() {
-        final Module restconfModule = this.controllerContext.getRestconfModule();
+        final Module restconfModule = controllerContext.getRestconfModule();
         if (restconfModule == null) {
             LOG.debug("ietf-restconf module was not found.");
             throw new RestconfDocumentedException("ietf-restconf module was not found.", ErrorType.APPLICATION,
@@ -432,9 +433,9 @@ public final class RestconfImpl implements RestconfService {
                     throw new RestconfDocumentedException(msg, ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
             } else {
-                response = this.broker.invokeRpc(schema.getQName(), input);
+                response = broker.invokeRpc(schema.getQName(), input);
             }
-            schemaContext = this.controllerContext.getGlobalSchema();
+            schemaContext = controllerContext.getGlobalSchema();
         }
 
         final DOMRpcResult result = checkRpcResponse(response);
@@ -465,7 +466,7 @@ public final class RestconfImpl implements RestconfService {
         final EffectiveModelContext schemaContext;
         if (identifier.contains(ControllerContext.MOUNT)) {
             // mounted RPC call - look up mount instance.
-            final InstanceIdentifierContext<?> mountPointId = this.controllerContext.toMountPointIdentifier(identifier);
+            final InstanceIdentifierContext<?> mountPointId = controllerContext.toMountPointIdentifier(identifier);
             mountPoint = mountPointId.getMountPoint();
             schemaContext = modelContext(mountPoint);
             final int startOfRemoteRpcName =
@@ -476,7 +477,7 @@ public final class RestconfImpl implements RestconfService {
         } else if (identifier.indexOf('/') == CHAR_NOT_FOUND) {
             identifierEncoded = identifier;
             mountPoint = null;
-            schemaContext = this.controllerContext.getGlobalSchema();
+            schemaContext = controllerContext.getGlobalSchema();
         } else {
             LOG.debug("Identifier {} cannot contain slash character (/).", identifier);
             throw new RestconfDocumentedException(String.format("Identifier %n%s%ncan\'t contain slash character (/).%n"
@@ -487,7 +488,7 @@ public final class RestconfImpl implements RestconfService {
         final String identifierDecoded = ControllerContext.urlPathArgDecode(identifierEncoded);
         final RpcDefinition rpc;
         if (mountPoint == null) {
-            rpc = this.controllerContext.getRpcDefinition(identifierDecoded);
+            rpc = controllerContext.getRpcDefinition(identifierDecoded);
         } else {
             rpc = findRpc(modelContext(mountPoint), identifierDecoded);
         }
@@ -512,7 +513,7 @@ public final class RestconfImpl implements RestconfService {
             }
             response = mountRpcServices.get().invokeRpc(rpc.getQName(), input);
         } else {
-            response = this.broker.invokeRpc(rpc.getQName(), input);
+            response = broker.invokeRpc(rpc.getQName(), input);
         }
 
         final NormalizedNode result = checkRpcResponse(response).getResult();
@@ -609,7 +610,7 @@ public final class RestconfImpl implements RestconfService {
         NotificationOutputType outputType = null;
         if (!pathIdentifier.isEmpty()) {
             final String fullRestconfIdentifier =
-                    DATA_SUBSCR + this.controllerContext.toFullRestconfIdentifier(pathIdentifier, null);
+                    DATA_SUBSCR + controllerContext.toFullRestconfIdentifier(pathIdentifier, null);
 
             LogicalDatastoreType datastore =
                     parseEnumTypeParameter(value, LogicalDatastoreType.class, DATASTORE_PARAM_NAME);
@@ -696,14 +697,14 @@ public final class RestconfImpl implements RestconfService {
             }
         }
 
-        final InstanceIdentifierContext<?> iiWithData = this.controllerContext.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         NormalizedNode data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
         if (mountPoint != null) {
-            data = this.broker.readConfigurationData(mountPoint, normalizedII, withDefa);
+            data = broker.readConfigurationData(mountPoint, normalizedII, withDefa);
         } else {
-            data = this.broker.readConfigurationData(normalizedII, withDefa);
+            data = broker.readConfigurationData(normalizedII, withDefa);
         }
         if (data == null) {
             throw dataMissing(identifier);
@@ -714,14 +715,14 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext readOperationalData(final String identifier, final UriInfo uriInfo) {
-        final InstanceIdentifierContext<?> iiWithData = this.controllerContext.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         NormalizedNode data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
         if (mountPoint != null) {
-            data = this.broker.readOperationalData(mountPoint, normalizedII);
+            data = broker.readOperationalData(mountPoint, normalizedII);
         } else {
-            data = this.broker.readOperationalData(normalizedII);
+            data = broker.readOperationalData(normalizedII);
         }
         if (data == null) {
             throw dataMissing(identifier);
@@ -807,10 +808,10 @@ public final class RestconfImpl implements RestconfService {
         while (true) {
             if (mountPoint != null) {
 
-                result = this.broker.commitMountPointDataPut(mountPoint, normalizedII, payload.getData(), insert,
+                result = broker.commitMountPointDataPut(mountPoint, normalizedII, payload.getData(), insert,
                         point);
             } else {
-                result = this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(), normalizedII,
+                result = broker.commitConfigurationDataPut(controllerContext.getGlobalSchema(), normalizedII,
                         payload.getData(), insert, point);
             }
 
@@ -963,10 +964,10 @@ public final class RestconfImpl implements RestconfService {
 
         FluentFuture<? extends CommitInfo> future;
         if (mountPoint != null) {
-            future = this.broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData(), insert,
+            future = broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData(), insert,
                     point);
         } else {
-            future = this.broker.commitConfigurationDataPost(this.controllerContext.getGlobalSchema(), normalizedII,
+            future = broker.commitConfigurationDataPost(controllerContext.getGlobalSchema(), normalizedII,
                     payload.getData(), insert, point);
         }
 
@@ -1003,7 +1004,7 @@ public final class RestconfImpl implements RestconfService {
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
         uriBuilder.path("config");
         try {
-            uriBuilder.path(this.controllerContext.toFullRestconfIdentifier(normalizedII, mountPoint));
+            uriBuilder.path(controllerContext.toFullRestconfIdentifier(normalizedII, mountPoint));
         } catch (final Exception e) {
             LOG.info("Location for instance identifier {} was not created", normalizedII, e);
             return null;
@@ -1013,15 +1014,15 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public Response deleteConfigurationData(final String identifier) {
-        final InstanceIdentifierContext<?> iiWithData = this.controllerContext.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
         final FluentFuture<? extends CommitInfo> future;
         if (mountPoint != null) {
-            future = this.broker.commitConfigurationDataDelete(mountPoint, normalizedII);
+            future = broker.commitConfigurationDataDelete(mountPoint, normalizedII);
         } else {
-            future = this.broker.commitConfigurationDataDelete(normalizedII);
+            future = broker.commitConfigurationDataDelete(normalizedII);
         }
 
         try {
@@ -1135,10 +1136,7 @@ public final class RestconfImpl implements RestconfService {
                     NodeIdentifier.create(QName.create("subscribe:to:notification", "2016-10-28", "location")));
 
             // prepare new header with location
-            final Map<String, Object> headers = new HashMap<>();
-            headers.put("Location", response);
-
-            return new NormalizedNodeContext(iid, builder.build(), headers);
+             return new NormalizedNodeContext(iid, builder.build(), ImmutableMap.of("Location", response));
         }
 
         final String msg = "Bad type of notification of sal-remote";
@@ -1206,7 +1204,7 @@ public final class RestconfImpl implements RestconfService {
         }
 
         for (final NotificationListenerAdapter listener : listeners) {
-            this.broker.registerToListenNotification(listener);
+            broker.registerToListenNotification(listener);
             listener.setQueryParams(start, Optional.ofNullable(stop), Optional.ofNullable(filter), false, false);
         }
 
@@ -1273,7 +1271,7 @@ public final class RestconfImpl implements RestconfService {
                     ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
 
-        this.broker.registerToListenDataChanges(datastore, scope, listener);
+        broker.registerToListenDataChanges(datastore, scope, listener);
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
 
@@ -1294,7 +1292,7 @@ public final class RestconfImpl implements RestconfService {
         }
 
         try {
-            return this.broker.patchConfigurationDataWithinTransaction(context);
+            return broker.patchConfigurationDataWithinTransaction(context);
         } catch (final Exception e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage(), e);
@@ -1309,7 +1307,7 @@ public final class RestconfImpl implements RestconfService {
         }
 
         try {
-            return this.broker.patchConfigurationDataWithinTransaction(context);
+            return broker.patchConfigurationDataWithinTransaction(context);
         } catch (final Exception e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage(), e);
@@ -1388,7 +1386,7 @@ public final class RestconfImpl implements RestconfService {
     private MapNode makeModuleMapNode(final Collection<? extends Module> modules) {
         requireNonNull(modules);
         final Module restconfModule = getRestconfModule();
-        final DataSchemaNode moduleSchemaNode = this.controllerContext
+        final DataSchemaNode moduleSchemaNode = controllerContext
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.MODULE_LIST_SCHEMA_NODE);
         checkState(moduleSchemaNode instanceof ListSchemaNode);
 
