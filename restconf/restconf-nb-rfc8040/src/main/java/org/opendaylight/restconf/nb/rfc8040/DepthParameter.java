@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.annotations.Beta;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -20,6 +21,8 @@ import org.opendaylight.yangtools.concepts.Immutable;
  */
 public final class DepthParameter implements Immutable {
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:depth:1.0");
+    private static final @NonNull DepthParameter MIN = of(1);
+    private static final @NonNull DepthParameter MAX = of(65535);
 
     private final int value;
 
@@ -28,12 +31,22 @@ public final class DepthParameter implements Immutable {
         checkArgument(value >= 1 && value <= 65535);
     }
 
-    public static DepthParameter of(final int value) {
+    public static @NonNull DepthParameter of(final int value) {
         return new DepthParameter(value);
     }
 
+    @Beta
+    public static @NonNull DepthParameter min() {
+        return MIN;
+    }
+
+    @Beta
+    public static @NonNull DepthParameter max() {
+        return MAX;
+    }
+
     public static @Nullable DepthParameter forUriValue(final String uriValue) {
-        return uriValue.equals("unbounded") ? null : of(Integer.parseUnsignedInt(uriValue, 10));
+        return uriValue.equals(unboundedUriValue()) ? null : of(Integer.parseUnsignedInt(uriValue, 10));
     }
 
     public int value() {
@@ -46,6 +59,10 @@ public final class DepthParameter implements Immutable {
 
     public @NonNull String uriValue() {
         return String.valueOf(value);
+    }
+
+    public static String unboundedUriValue() {
+        return "unbounded";
     }
 
     public static @NonNull URI capabilityUri() {
