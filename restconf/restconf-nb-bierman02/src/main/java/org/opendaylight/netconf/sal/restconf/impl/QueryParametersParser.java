@@ -9,7 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Strings;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.restconf.common.context.WriterParameters;
+import org.opendaylight.netconf.sal.rest.impl.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
