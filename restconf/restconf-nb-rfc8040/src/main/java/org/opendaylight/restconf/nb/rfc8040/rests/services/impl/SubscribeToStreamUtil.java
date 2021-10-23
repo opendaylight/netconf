@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Subscribe to stream util class.
  */
-abstract class SubscribeToStreamUtil {
+public abstract class SubscribeToStreamUtil {
     /**
      * Implementation of SubscribeToStreamUtil for Server-sent events.
      */
@@ -88,11 +88,11 @@ abstract class SubscribeToStreamUtil {
         // Hidden on purpose
     }
 
-    static SubscribeToStreamUtil serverSentEvents() {
+    public static SubscribeToStreamUtil serverSentEvents() {
         return ServerSentEvents.INSTANCE;
     }
 
-    static SubscribeToStreamUtil webSockets() {
+    public static SubscribeToStreamUtil webSockets() {
         return WebSockets.INSTANCE;
     }
 
