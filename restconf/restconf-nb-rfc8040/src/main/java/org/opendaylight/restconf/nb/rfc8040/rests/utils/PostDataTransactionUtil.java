@@ -19,10 +19,10 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.InsertParameter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.Insert;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -63,7 +63,7 @@ public final class PostDataTransactionUtil {
      */
     public static Response postData(final UriInfo uriInfo, final NormalizedNodePayload payload,
                                     final RestconfStrategy strategy,
-                                    final EffectiveModelContext schemaContext, final Insert insert,
+                                    final EffectiveModelContext schemaContext, final InsertParameter insert,
                                     final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
         final FluentFuture<? extends CommitInfo> future = submitData(path, payload.getData(),
@@ -90,7 +90,7 @@ public final class PostDataTransactionUtil {
                                                                  final NormalizedNode data,
                                                                  final RestconfStrategy strategy,
                                                                  final EffectiveModelContext schemaContext,
-                                                                 final Insert insert, final String point) {
+                                                                 final InsertParameter insert, final String point) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         if (insert == null) {
             makePost(path, data, schemaContext, transaction);
