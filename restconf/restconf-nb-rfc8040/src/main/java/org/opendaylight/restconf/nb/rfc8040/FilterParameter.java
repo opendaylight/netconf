@@ -10,8 +10,12 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.concepts.Immutable;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathExpression;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathMathMode;
+import org.opendaylight.yangtools.yang.xpath.api.YangXPathParserFactory;
 
 /**
  * This class represents a {@code filter} parameter as defined in
@@ -21,23 +25,23 @@ import org.opendaylight.yangtools.concepts.Immutable;
 public final class FilterParameter implements Immutable {
     private static final URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:filter:1.0");
 
-    // FIXME: can we have a parsed, but not bound version of an XPath, please?
-    private final String value;
+    private final YangXPathExpression value;
 
-    private FilterParameter(final String value) {
+    private FilterParameter(final YangXPathExpression value) {
         this.value = requireNonNull(value);
     }
 
-    public static FilterParameter forUriValue(final String uriValue) {
-        return new FilterParameter(uriValue);
+    public static FilterParameter forUriValue(final YangXPathParserFactory parserFactory, final String uriValue)
+            throws XPathExpressionException {
+        return new FilterParameter(parserFactory.newParser(YangXPathMathMode.EXACT).parseExpression(uriValue));
+    }
+
+    public YangXPathExpression value() {
+        return value;
     }
 
     public static String uriName() {
         return "filter";
-    }
-
-    public String uriValue() {
-        return value;
     }
 
     public static URI capabilityUri() {
