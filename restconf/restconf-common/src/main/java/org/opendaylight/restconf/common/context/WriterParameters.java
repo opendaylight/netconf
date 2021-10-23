@@ -12,12 +12,10 @@ public class WriterParameters {
 
     private final Integer depth;
     private final boolean prettyPrint;
-    private final boolean tagged;
 
     protected WriterParameters(final WriterParametersBuilder builder) {
         depth = builder.depth;
         prettyPrint = builder.prettyPrint;
-        tagged = builder.tagged;
     }
 
     public Integer getDepth() {
@@ -28,14 +26,9 @@ public class WriterParameters {
         return prettyPrint;
     }
 
-    public boolean isTagged() {
-        return tagged;
-    }
-
     public static class WriterParametersBuilder {
         private Integer depth;
         private boolean prettyPrint;
-        private boolean tagged;
 
         public WriterParametersBuilder() {
 
@@ -53,10 +46,6 @@ public class WriterParameters {
 
         public WriterParameters build() {
             return new WriterParameters(this);
-        }
-
-        public void setTagged(final boolean tagged) {
-            this.tagged = tagged;
         }
     }
 }

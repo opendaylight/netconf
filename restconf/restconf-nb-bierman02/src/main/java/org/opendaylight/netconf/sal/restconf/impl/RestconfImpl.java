@@ -687,6 +687,8 @@ public final class RestconfImpl implements RestconfService {
                     break;
             }
         }
+
+        // TODO: this flag is always ignored
         boolean tagged = false;
         if (withDefaUsed) {
             if ("report-all-tagged".equals(withDefa)) {
@@ -710,8 +712,7 @@ public final class RestconfImpl implements RestconfService {
         if (data == null) {
             throw dataMissing(identifier);
         }
-        return new NormalizedNodeContext(iiWithData, data,
-                QueryParametersParser.parseWriterParameters(uriInfo, tagged));
+        return new NormalizedNodeContext(iiWithData, data, QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     @Override
