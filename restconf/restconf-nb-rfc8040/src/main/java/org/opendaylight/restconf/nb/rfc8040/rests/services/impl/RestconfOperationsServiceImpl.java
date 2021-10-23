@@ -17,10 +17,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.OperationsContent;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.OperationsResourceUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -64,7 +64,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
     }
 
     @Override
-    public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
+    public NormalizedNodePayload getOperations(final String identifier, final UriInfo uriInfo) {
         if (!identifier.contains(RestconfConstants.MOUNT)) {
             final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
                     + " end with " + RestconfConstants.MOUNT;
@@ -76,7 +76,8 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             schemaContextHandler.get(), Optional.of(mountPointService));
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
-        return OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
+        final var entry = OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
+        return NormalizedNodePayload.of(entry.getKey(), entry.getValue());
     }
 
     private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {

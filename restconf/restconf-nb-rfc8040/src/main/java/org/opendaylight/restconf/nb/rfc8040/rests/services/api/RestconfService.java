@@ -11,8 +11,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
  * Service for getting yang library version.
@@ -21,7 +21,7 @@ public interface RestconfService {
     /**
      * Get yang library version.
      *
-     * @return {@link NormalizedNodeContext}
+     * @return {@link NormalizedNodePayload}
      */
     @GET
     @Path("/yang-library-version")
@@ -32,5 +32,5 @@ public interface RestconfService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    NormalizedNodeContext getLibraryVersion();
+    NormalizedNodePayload getLibraryVersion();
 }
