@@ -39,12 +39,13 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData.WithDefaults;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -105,11 +106,10 @@ public class ReadDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
-        final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
-        NormalizedNode normalizedNode = readData(valueOfContent, DATA.path, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.CONFIG, DATA.path, mdsalStrategy);
         assertEquals(DATA.data3, normalizedNode);
 
-        normalizedNode = readData(valueOfContent, DATA.path, netconfStrategy);
+        normalizedNode = readData(ContentParameter.CONFIG, DATA.path, netconfStrategy);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -121,11 +121,10 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(DATA.path);
-        final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        NormalizedNode normalizedNode = readData(valueOfContent, DATA.path, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path, mdsalStrategy);
         assertEquals(DATA.data3, normalizedNode);
 
-        normalizedNode = readData(valueOfContent, DATA.path, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.path, netconfStrategy);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -137,11 +136,10 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
         doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(netconfService).get(DATA.path2);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(DATA.path2);
-        final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        NormalizedNode normalizedNode = readData(valueOfContent, DATA.path2, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path2, mdsalStrategy);
         assertEquals(DATA.data2, normalizedNode);
 
-        normalizedNode = readData(valueOfContent, DATA.path2, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.path2, netconfStrategy);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -150,11 +148,10 @@ public class ReadDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
         doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(netconfService).get(DATA.path2);
-        final String valueOfContent = RestconfDataServiceConstant.ReadData.NONCONFIG;
-        NormalizedNode normalizedNode = readData(valueOfContent, DATA.path2, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.NONCONFIG, DATA.path2, mdsalStrategy);
         assertEquals(DATA.data2, normalizedNode);
 
-        normalizedNode = readData(valueOfContent, DATA.path2, netconfStrategy);
+        normalizedNode = readData(ContentParameter.NONCONFIG, DATA.path2, netconfStrategy);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -166,17 +163,16 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(netconfService).get(DATA.path);
-        final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
                 .withChild(DATA.contentLeaf)
                 .withChild(DATA.contentLeaf2)
                 .build();
-        NormalizedNode normalizedNode = readData(valueOfContent, DATA.path, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path, mdsalStrategy);
         assertEquals(checkingData, normalizedNode);
 
-        normalizedNode = readData(valueOfContent, DATA.path, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.path, netconfStrategy);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -194,10 +190,10 @@ public class ReadDataTransactionUtilTest {
                 .withChild(DATA.contentLeaf)
                 .withChild(DATA.contentLeaf2)
                 .build();
-        NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.path, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path, mdsalStrategy);
         assertEquals(checkingData, normalizedNode);
 
-        normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.path, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.path, netconfStrategy);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -209,16 +205,15 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
         doReturn(immediateFluentFuture(Optional.of(DATA.listData))).when(netconfService).get(DATA.path3);
         doReturn(immediateFluentFuture(Optional.of(DATA.listData2))).when(netconfService).getConfig(DATA.path3);
-        final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final MapNode checkingData = Builders
                 .mapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
                 .withChild(DATA.checkData)
                 .build();
-        NormalizedNode normalizedNode = readData(valueOfContent, DATA.path3, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path3, mdsalStrategy);
         assertEquals(checkingData, normalizedNode);
 
-        normalizedNode = readData(valueOfContent, DATA.path3, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.path3, netconfStrategy);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -235,11 +230,11 @@ public class ReadDataTransactionUtilTest {
                 .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
                 .withChild(DATA.checkData)
                 .build();
-        NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.path3,
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path3,
                 mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
-        normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.path3, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.path3, netconfStrategy);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -258,10 +253,10 @@ public class ReadDataTransactionUtilTest {
                         .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
                         .withChild(DATA.unkeyedListEntryNode1.body().iterator().next())
                         .withChild(DATA.unkeyedListEntryNode2.body().iterator().next()).build()).build();
-        NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.path3, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path3, mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
-        normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.path3, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.path3, netconfStrategy);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -282,11 +277,11 @@ public class ReadDataTransactionUtilTest {
                         .addAll(DATA.leafSetNode2.body())
                         .build())
                 .build();
-        NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.leafSetNodePath,
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.leafSetNodePath,
                 mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
-        normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.leafSetNodePath, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.leafSetNodePath, netconfStrategy);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -307,11 +302,11 @@ public class ReadDataTransactionUtilTest {
                         .addAll(DATA.orderedLeafSetNode2.body())
                         .build())
                 .build();
-        NormalizedNode normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.leafSetNodePath,
+        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.leafSetNodePath,
                 mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
-        normalizedNode = readData(RestconfDataServiceConstant.ReadData.ALL, DATA.leafSetNodePath, netconfStrategy);
+        normalizedNode = readData(ContentParameter.ALL, DATA.leafSetNodePath, netconfStrategy);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -320,21 +315,10 @@ public class ReadDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(DATA.path2);
-        final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
-        NormalizedNode normalizedNode = readData(valueOfContent, DATA.path2, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParameter.CONFIG, DATA.path2, mdsalStrategy);
         assertNull(normalizedNode);
 
-        normalizedNode = readData(valueOfContent, DATA.path2, netconfStrategy);
-        assertNull(normalizedNode);
-    }
-
-    @Test(expected = RestconfDocumentedException.class)
-    public void readDataFailTest() {
-        final String valueOfContent = "nonsense";
-        NormalizedNode normalizedNode = readData(valueOfContent, null, mdsalStrategy);
-        assertNull(normalizedNode);
-
-        normalizedNode = readData(valueOfContent, null, netconfStrategy);
+        normalizedNode = readData(ContentParameter.CONFIG, DATA.path2, netconfStrategy);
         assertNull(normalizedNode);
     }
 
@@ -351,12 +335,9 @@ public class ReadDataTransactionUtilTest {
 
         final QueryParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
 
-        assertEquals("Not correctly parsed URI parameter",
-                RestconfDataServiceConstant.ReadData.ALL, parsedParameters.getContent());
-        assertNull("Not correctly parsed URI parameter",
-                parsedParameters.getDepth());
-        assertNull("Not correctly parsed URI parameter",
-                parsedParameters.getFields());
+        assertEquals(ContentParameter.ALL, parsedParameters.getContent());
+        assertNull(parsedParameters.getDepth());
+        assertNull(parsedParameters.getFields());
     }
 
     /**
@@ -367,11 +348,10 @@ public class ReadDataTransactionUtilTest {
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
-        final String content = "config";
         final String depth = "10";
         final String fields = containerChildQName.getLocalName();
 
-        parameters.put("content", List.of(content));
+        parameters.put("content", List.of("config"));
         parameters.put("depth", List.of(depth));
         parameters.put("fields", List.of(fields));
 
@@ -380,8 +360,7 @@ public class ReadDataTransactionUtilTest {
         final QueryParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
 
         // content
-        assertEquals("Not correctly parsed URI parameter",
-                content, parsedParameters.getContent());
+        assertEquals(ContentParameter.CONFIG, parsedParameters.getContent());
 
         // depth
         assertNotNull("Not correctly parsed URI parameter",
@@ -446,8 +425,7 @@ public class ReadDataTransactionUtilTest {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is too low
-        parameters.put(
-                "depth", List.of(String.valueOf(RestconfDataServiceConstant.ReadData.MIN_DEPTH - 1)));
+        parameters.put("depth", List.of("0"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -466,7 +444,7 @@ public class ReadDataTransactionUtilTest {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is too high
-        parameters.put("depth", List.of(String.valueOf(RestconfDataServiceConstant.ReadData.MAX_DEPTH + 1)));
+        parameters.put("depth", List.of("65536"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -485,11 +463,11 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of("explicit"));
+        parameters.put("with-defaults", List.of("explicit"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
-        assertSame(WithDefaults.EXPLICIT.value(), writerParameters.getWithDefault());
+        assertSame(WithDefaultsParameter.EXPLICIT, writerParameters.getWithDefault());
         assertFalse(writerParameters.isTagged());
     }
 
@@ -501,7 +479,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS, List.of("invalid"));
+        parameters.put("with-defaults", List.of("invalid"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -520,8 +498,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                List.of(ReadData.WithDefaults.REPORT_ALL_TAGGED.value()));
+        parameters.put("with-defaults", List.of("report-all-tagged"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -538,8 +515,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
-                List.of(ReadData.WithDefaults.REPORT_ALL.value()));
+        parameters.put("with-defaults", List.of("report-all"));
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -552,7 +528,7 @@ public class ReadDataTransactionUtilTest {
      */
     @Test
     public void checkParameterCountTest() {
-        ReadDataTransactionUtil.checkParameterCount(List.of("all"), RestconfDataServiceConstant.ReadData.CONTENT);
+        ReadDataTransactionUtil.checkParameterCount(List.of("all"), ContentParameter.uriName());
     }
 
     /**
@@ -562,7 +538,7 @@ public class ReadDataTransactionUtilTest {
     public void checkParameterCountNegativeTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ReadDataTransactionUtil.checkParameterCount(List.of("config", "nonconfig", "all"),
-                    RestconfDataServiceConstant.ReadData.CONTENT));
+                    ContentParameter.uriName()));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
@@ -578,7 +554,7 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void checkParametersTypesTest() {
         ReadDataTransactionUtil.checkParametersTypes(Set.of("content"),
-            Set.of(RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH));
+            Set.of(ContentParameter.uriName(), DepthParameter.uriName()));
     }
 
     /**
@@ -588,7 +564,7 @@ public class ReadDataTransactionUtilTest {
     public void checkParametersTypesNegativeTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ReadDataTransactionUtil.checkParametersTypes(Set.of("not-allowed-parameter"),
-                Set.of(RestconfDataServiceConstant.ReadData.CONTENT, RestconfDataServiceConstant.ReadData.DEPTH)));
+                Set.of(ContentParameter.uriName(), DepthParameter.uriName())));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
@@ -600,12 +576,12 @@ public class ReadDataTransactionUtilTest {
     /**
      * Read specific type of data from data store via transaction.
      *
-     * @param valueOfContent type of data to read (config, state, all)
+     * @param content        type of data to read (config, state, all)
      * @param strategy       {@link RestconfStrategy} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    private @Nullable NormalizedNode readData(final @NonNull String valueOfContent,
+    private @Nullable NormalizedNode readData(final @NonNull ContentParameter content,
             final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
-        return ReadDataTransactionUtil.readData(valueOfContent, path, strategy, null, schemaContext);
+        return ReadDataTransactionUtil.readData(content, path, strategy, null, schemaContext);
     }
 }
