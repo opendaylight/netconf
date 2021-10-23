@@ -129,7 +129,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final DOMActionService actionService, final Configuration configuration) {
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.dataBroker = requireNonNull(dataBroker);
-        this.restconfStrategy = new MdsalRestconfStrategy(dataBroker);
+        restconfStrategy = new MdsalRestconfStrategy(dataBroker);
         this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
@@ -144,7 +144,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response readData(final String identifier, final UriInfo uriInfo) {
-        final EffectiveModelContext schemaContextRef = this.schemaContextHandler.get();
+        final EffectiveModelContext schemaContextRef = schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(mountPointService));
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
@@ -157,11 +157,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             createAllYangNotificationStreams(schemaContextRef, uriInfo);
         }
 
+        final List<YangInstanceIdentifier> fieldPaths = parameters.getFieldPaths();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         final NormalizedNode node;
-        if (parameters.getFieldPaths() != null && !parameters.getFieldPaths().isEmpty()) {
+        if (fieldPaths != null && !fieldPaths.isEmpty()) {
             node = ReadDataTransactionUtil.readData(parameters.getContent(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, parameters.getWithDefault(), schemaContextRef, parameters.getFieldPaths());
+                    strategy, parameters.getWithDefault(), schemaContextRef, fieldPaths);
         } else {
             node = ReadDataTransactionUtil.readData(parameters.getContent(), instanceIdentifier.getInstanceIdentifier(),
                     strategy, parameters.getWithDefault(), schemaContextRef);
@@ -172,7 +173,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.body();
             final String streamName = value.substring(value.indexOf(NOTIFICATION_STREAM + '/'));
-            this.delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
+            delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
         }
         if (node == null) {
             throw new RestconfDocumentedException(
@@ -238,7 +239,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final EffectiveModelContext ref = mountPoint == null
-                ? this.schemaContextHandler.get() : modelContext(mountPoint);
+                ? schemaContextHandler.get() : modelContext(mountPoint);
 
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         return PutDataTransactionUtil.putData(payload, ref, strategy, checkedParms.insert, checkedParms.point);
@@ -322,7 +323,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response deleteData(final String identifier) {
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
-                identifier, this.schemaContextHandler.get(), Optional.of(mountPointService));
+                identifier, schemaContextHandler.get(), Optional.of(mountPointService));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
@@ -354,7 +355,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final EffectiveModelContext ref = mountPoint == null
-                ? this.schemaContextHandler.get() : modelContext(mountPoint);
+                ? schemaContextHandler.get() : modelContext(mountPoint);
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
 
         return PlainPatchDataTransactionUtil.patchData(payload, strategy, ref);
