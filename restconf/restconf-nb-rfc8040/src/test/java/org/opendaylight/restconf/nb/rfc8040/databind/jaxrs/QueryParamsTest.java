@@ -19,7 +19,7 @@ import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
-public class UriInfoSupportTest {
+public class QueryParamsTest {
     /**
      * Test when parameter is present at most once.
      */
@@ -27,7 +27,7 @@ public class UriInfoSupportTest {
     public void getSingleParameterTest() {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.putSingle(ContentParameter.uriName(), "all");
-        assertEquals("all", UriInfoSupport.getSingleParameter(parameters, ContentParameter.uriName()));
+        assertEquals("all", QueryParams.getSingleParameter(parameters, ContentParameter.uriName()));
     }
 
     /**
@@ -39,7 +39,7 @@ public class UriInfoSupportTest {
         parameters.put(ContentParameter.uriName(), List.of("config", "nonconfig", "all"));
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> UriInfoSupport.getSingleParameter(parameters, ContentParameter.uriName()));
+            () -> QueryParams.getSingleParameter(parameters, ContentParameter.uriName()));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 

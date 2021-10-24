@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import static org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.UriInfoSupport.getSingleParameter;
+import static org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams.getSingleParameter;
 import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsParameter;
 import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsPaths;
 

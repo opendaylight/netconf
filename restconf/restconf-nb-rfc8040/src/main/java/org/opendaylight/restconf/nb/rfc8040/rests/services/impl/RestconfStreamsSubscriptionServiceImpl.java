@@ -18,7 +18,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
-import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.UriInfoSupport;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -71,13 +71,13 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     @Override
     public NormalizedNodePayload subscribeToStream(final String identifier, final UriInfo uriInfo) {
-        final NotificationQueryParams notificationQueryParams = UriInfoSupport.newNotificationQueryParams(uriInfo);
+        final NotificationQueryParams params = QueryParams.newNotificationQueryParams(uriInfo);
 
         final URI response;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = streamUtils.subscribeToDataStream(identifier, uriInfo, notificationQueryParams, handlersHolder);
+            response = streamUtils.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            response = streamUtils.subscribeToYangStream(identifier, uriInfo, notificationQueryParams, handlersHolder);
+            response = streamUtils.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
         } else {
             final String msg = "Bad type of notification of sal-remote";
             LOG.warn(msg);
