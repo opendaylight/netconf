@@ -3,13 +3,15 @@
 """
 
 from logging import info
+from requests import codes as status_codes
+from requests import get
 from requests import post
 from sys import argv
 
 
 def get_entities(restconf_url):
     resp = post(
-        url=restconf_url + """/operations/odl-entity-owners:get-entities""",
+        url=restconf_url + "/operations/odl-entity-owners:get-entities",
         headers={
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -26,7 +28,7 @@ def get_entities(restconf_url):
     return resp.json()
 
 
-def get_entity(restconf_url, type, name):
+def get_entity(restconf_url, e_type, e_name):
     """Calls the get-entity rpc on the controller and returns the result in a
     dictionary that contains the parsed response in two keys:
     "candidates" and "owner"
@@ -40,14 +42,14 @@ def get_entity(restconf_url, type, name):
         }
     }
     """ % (
-        type,
-        name,
+        e_type,
+        e_name,
     )
 
     info("Data %s", data)
 
     resp = post(
-        url=restconf_url + """/operations/odl-entity-owners:get-entity""",
+        url=restconf_url + "/operations/odl-entity-owners:get-entity",
         headers={
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -62,15 +64,22 @@ def get_entity(restconf_url, type, name):
         resp.json(),
     )
 
-    result = {
-        "candidates": resp.json()["odl-entity-owners:output"]["candidate-nodes"],
-        "owner": resp.json()["odl-entity-owners:output"]["owner-node"],
-    }
+    if resp.status_code == status_codes["bad_request"]:
+        info(
+            "Status code is '%s' - trying operational data instead.",
+            resp.status_code,
+        )
+        result = get_entity_data(restconf_url, e_type, e_name)
+    else:
+        result = {
+            "candidates": resp.json()["odl-entity-owners:output"]["candidate-nodes"],
+            "owner": resp.json()["odl-entity-owners:output"]["owner-node"],
+        }
 
     return result
 
 
-def get_entity_owner(restconf_url, type, name):
+def get_entity_owner(restconf_url, e_type, e_name):
     data = """
     {
         "odl-entity-owners:input" : {
@@ -79,14 +88,14 @@ def get_entity_owner(restconf_url, type, name):
         }
     }
     """ % (
-        type,
-        name,
+        e_type,
+        e_name,
     )
 
     info("Data %s", data)
 
     resp = post(
-        url=restconf_url + """/operations/odl-entity-owners:get-entity-owner""",
+        url=restconf_url + "/operations/odl-entity-owners:get-entity-owner",
         headers={
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -101,7 +110,75 @@ def get_entity_owner(restconf_url, type, name):
         resp,
     )
 
-    return resp.json()["odl-entity-owners:output"]["owner-node"]
+    if resp.status_code == status_codes["bad_request"]:
+        info(
+            "Status code is '%s' - trying operational data instead.",
+            resp.status_code,
+        )
+        result = get_entity_owner_data(restconf_url, e_type, e_name)
+    else:
+        result = resp.json()["odl-entity-owners:output"]["owner-node"]
+
+    return result
+
+
+def get_entity_type_data(restconf_url, e_type):
+    """
+    Get the entity information for the given entity type from the datastore
+    for Silicon or earlier versions.
+    :param restconf_url: RESTCONF URL up to the RESTCONF root
+    :param e_type: entity type
+    :return: entity-type
+    """
+    resp = get(
+        url=restconf_url
+        + "/data/entity-owners:entity-owners"
+        + "/entity-type=%s" % e_type,
+        headers={
+            "Accept": "application/yang-data+json",
+            "User-Agent": "csit agent",
+        },
+        auth=("admin", "admin"),
+    )
+
+    return resp.json()["entity-owners:entity-type"][0]
+
+
+def get_entity_data(restconf_url, e_type, e_name):
+    """
+    Get the entity owner & candidates for the given entity type
+    and entity name from the datastore for Silicon or earlier versions
+    :param restconf_url: RESTCONF URL up to the RESTCONF root
+    :param e_type: entity type
+    :param e_name: entity name
+    :return: entity owner & candidates
+    """
+    entity_type = get_entity_type_data(restconf_url, e_type)
+    entity = [
+        e
+        for e in entity_type["entity"]
+        if e["id"] == "/odl-general-entity:entity[name='%s']" % e_name
+    ][0]
+
+    result = {
+        "candidates": [c["name"] for c in entity["candidate"]],
+        "owner": entity["owner"],
+    }
+
+    return result
+
+
+def get_entity_owner_data(restconf_url, e_type, e_name):
+    """
+    Get the entity owner for the given entity type and entity name
+    from the datastore for Silicon or earlier versions
+    :param restconf_url: RESTCONF URL up to the RESTCONF root
+    :param e_type: entity type
+    :param e_name: entity name
+    :return: entity owner
+    """
+    entity = get_entity_data(restconf_url, e_type, e_name)
+    return entity["owner"]
 
 
 def main(args):
@@ -113,15 +190,15 @@ def main(args):
     elif args[0] == "get-entity":
         json = get_entity(
             restconf_url="http://127.0.0.1:8181/rests",
-            type=args[1],
-            name=args[2],
+            e_type=args[1],
+            e_name=args[2],
         )
         print(json)
     elif args[0] == "get-entity-owner":
         json = get_entity_owner(
             restconf_url="http://127.0.0.1:8181/rests",
-            type=args[1],
-            name=args[2],
+            e_type=args[1],
+            e_name=args[2],
         )
         print(json)
     else:
