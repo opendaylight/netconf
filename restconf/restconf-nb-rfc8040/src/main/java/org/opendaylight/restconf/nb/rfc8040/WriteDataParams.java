@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -66,6 +69,12 @@ public final class WriteDataParams implements Immutable {
 
     public @Nullable PointParam point() {
         return point;
+    }
+
+    @Beta
+    // FIXME: it seems callers' structure should be able to cater with just point() and insert()
+    public @NonNull PointParam getPoint() {
+        return verifyNotNull(point);
     }
 
     @Override

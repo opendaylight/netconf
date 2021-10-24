@@ -21,6 +21,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.InsertParam;
 import org.opendaylight.restconf.nb.rfc8040.PointParam;
+import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
@@ -58,17 +59,15 @@ public final class PostDataTransactionUtil {
      * @param payload       data
      * @param strategy      Object that perform the actual DS operations
      * @param schemaContext reference to actual {@link EffectiveModelContext}
-     * @param point         point
-     * @param insert        insert
+     * @param params        {@link WriteDataParams}
      * @return {@link Response}
      */
     public static Response postData(final UriInfo uriInfo, final NormalizedNodePayload payload,
                                     final RestconfStrategy strategy,
-                                    final EffectiveModelContext schemaContext, final InsertParam insert,
-                                    final PointParam point) {
+                                    final EffectiveModelContext schemaContext, final WriteDataParams params) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
         final FluentFuture<? extends CommitInfo> future = submitData(path, payload.getData(),
-                strategy, schemaContext, insert, point);
+                strategy, schemaContext, params);
         final URI location = resolveLocation(uriInfo, path, schemaContext, payload.getData());
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain if any
@@ -91,9 +90,9 @@ public final class PostDataTransactionUtil {
                                                                  final NormalizedNode data,
                                                                  final RestconfStrategy strategy,
                                                                  final EffectiveModelContext schemaContext,
-                                                                 final InsertParam insert,
-                                                                 final PointParam point) {
+                                                                 final WriteDataParams params) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
+        final InsertParam insert = params.insert();
         if (insert == null) {
             makePost(path, data, schemaContext, transaction);
             return transaction.commit();
@@ -123,7 +122,7 @@ public final class PostDataTransactionUtil {
                     return transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-                insertWithPointPost(path, data, schemaContext, point,
+                insertWithPointPost(path, data, schemaContext, params.getPoint(),
                     (NormalizedNodeContainer<?>) readData, true, transaction);
                 return transaction.commit();
             case AFTER:
@@ -133,7 +132,7 @@ public final class PostDataTransactionUtil {
                     return transaction.commit();
                 }
                 checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-                insertWithPointPost(path, data, schemaContext, point,
+                insertWithPointPost(path, data, schemaContext, params.getPoint(),
                     (NormalizedNodeContainer<?>) readData, false, transaction);
                 return transaction.commit();
             default:
