@@ -17,9 +17,9 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
-import org.opendaylight.restconf.nb.rfc8040.StartTimeParameter;
-import org.opendaylight.restconf.nb.rfc8040.StopTimeParameter;
+import org.opendaylight.restconf.nb.rfc8040.FilterParam;
+import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
+import org.opendaylight.restconf.nb.rfc8040.StopTimeParam;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
@@ -55,8 +55,8 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param leafNodesOnly If TRUE, notifications will contain changes of leaf nodes only.
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    public final void setQueryParams(final StartTimeParameter startTime, final StopTimeParameter stopTime,
-            final FilterParameter filter, final boolean leafNodesOnly, final boolean skipNotificationData) {
+    public final void setQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
+            final FilterParam filter, final boolean leafNodesOnly, final boolean skipNotificationData) {
         start = startTime == null ? Instant.now() : parseDateAndTime(startTime.value());
         stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
         this.leafNodesOnly = leafNodesOnly;
@@ -64,7 +64,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
 
         if (filter != null) {
             try {
-                setFilter(filter.uriValue());
+                setFilter(filter.paramValue());
             } catch (XPathExpressionException e) {
                 throw new IllegalArgumentException("Failed to get filter", e);
             }

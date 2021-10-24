@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Enumeration of possible {@code content} values as defined by
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.1">RFC8040, section 4.8.1</a>.
  */
-public enum ContentParameter {
+public enum ContentParam implements RestconfQueryParam<ContentParam> {
     /**
      * Return all descendant data nodes.
      */
@@ -32,11 +32,22 @@ public enum ContentParameter {
 
     private final @NonNull String uriValue;
 
-    ContentParameter(final String uriValue) {
+    ContentParam(final String uriValue) {
         this.uriValue = requireNonNull(uriValue);
     }
 
-    public @NonNull String uriValue() {
+    @Override
+    public final Class<@NonNull ContentParam> javaClass() {
+        return ContentParam.class;
+    }
+
+    @Override
+    public final String paramName() {
+        return uriName();
+    }
+
+    @Override
+    public String paramValue() {
         return uriValue;
     }
 
@@ -45,7 +56,7 @@ public enum ContentParameter {
     }
 
     // Note: returns null of unknowns
-    public static @Nullable ContentParameter forUriValue(final String uriValue) {
+    public static @Nullable ContentParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "all":
                 return ALL;

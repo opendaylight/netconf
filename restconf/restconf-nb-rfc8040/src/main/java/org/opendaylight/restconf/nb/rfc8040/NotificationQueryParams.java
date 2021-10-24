@@ -19,21 +19,21 @@ import org.opendaylight.yangtools.concepts.Immutable;
  * Parser and holder of query parameters from uriInfo for notifications.
  */
 public final class NotificationQueryParams implements Immutable {
-    private final StartTimeParameter startTime;
-    private final StopTimeParameter stopTime;
-    private final FilterParameter filter;
+    private final StartTimeParam startTime;
+    private final StopTimeParam stopTime;
+    private final FilterParam filter;
     private final boolean skipNotificationData;
 
-    private NotificationQueryParams(final StartTimeParameter startTime, final StopTimeParameter stopTime,
-            final FilterParameter filter, final boolean skipNotificationData) {
+    private NotificationQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
+            final FilterParam filter, final boolean skipNotificationData) {
         this.startTime = startTime;
         this.stopTime = stopTime;
         this.filter = filter;
         this.skipNotificationData = skipNotificationData;
     }
 
-    public static @NonNull NotificationQueryParams of(final StartTimeParameter startTime,
-            final StopTimeParameter stopTime, final FilterParameter filter, final boolean skipNotificationData) {
+    public static @NonNull NotificationQueryParams of(final StartTimeParam startTime, final StopTimeParam stopTime,
+            final FilterParam filter, final boolean skipNotificationData) {
         checkArgument(stopTime == null || startTime != null,
             "Stop-time parameter has to be used with start-time parameter.");
         return new NotificationQueryParams(startTime, stopTime, filter, skipNotificationData);
@@ -44,7 +44,7 @@ public final class NotificationQueryParams implements Immutable {
      *
      * @return start-time
      */
-    public @Nullable StartTimeParameter startTime() {
+    public @Nullable StartTimeParam startTime() {
         return startTime;
     }
 
@@ -53,7 +53,7 @@ public final class NotificationQueryParams implements Immutable {
      *
      * @return stop-time
      */
-    public @Nullable StopTimeParameter stopTime() {
+    public @Nullable StopTimeParam stopTime() {
         return stopTime;
     }
 
@@ -62,7 +62,7 @@ public final class NotificationQueryParams implements Immutable {
      *
      * @return filter
      */
-    public @Nullable FilterParameter filter() {
+    public @Nullable FilterParam filter() {
         return filter;
     }
 
@@ -79,13 +79,13 @@ public final class NotificationQueryParams implements Immutable {
     public String toString() {
         final var helper = MoreObjects.toStringHelper(this);
         if (startTime != null) {
-            helper.add("startTime", startTime.uriValue());
+            helper.add("startTime", startTime.paramValue());
         }
         if (stopTime != null) {
-            helper.add("stopTime", stopTime.uriValue());
+            helper.add("stopTime", stopTime.paramValue());
         }
         if (filter != null) {
-            helper.add("filter", filter.uriValue());
+            helper.add("filter", filter.paramValue());
         }
         return helper.add("skipNotificationData", skipNotificationData).toString();
     }

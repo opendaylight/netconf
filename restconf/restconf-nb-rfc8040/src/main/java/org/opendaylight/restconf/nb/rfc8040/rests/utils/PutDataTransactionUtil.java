@@ -16,8 +16,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.InsertParameter;
-import org.opendaylight.restconf.nb.rfc8040.PointParameter;
+import org.opendaylight.restconf.nb.rfc8040.InsertParam;
+import org.opendaylight.restconf.nb.rfc8040.PointParam;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
@@ -58,8 +58,8 @@ public final class PutDataTransactionUtil {
      * @return {@link Response}
      */
     public static Response putData(final NormalizedNodePayload payload, final EffectiveModelContext schemaContext,
-                                   final RestconfStrategy strategy, final InsertParameter insert,
-                                   final PointParameter point) {
+                                   final RestconfStrategy strategy, final InsertParam insert,
+                                   final PointParam point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
 
         final FluentFuture<Boolean> existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
@@ -90,8 +90,8 @@ public final class PutDataTransactionUtil {
                                                                  final EffectiveModelContext schemaContext,
                                                                  final RestconfStrategy strategy,
                                                                  final NormalizedNode data,
-                                                                 final InsertParameter insert,
-                                                                 final PointParameter point) {
+                                                                 final InsertParam insert,
+                                                                 final PointParam point) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
         if (insert == null) {
             return makePut(path, schemaContext, transaction, data);
@@ -143,7 +143,7 @@ public final class PutDataTransactionUtil {
     private static void insertWithPointPut(final RestconfTransaction transaction,
                                            final YangInstanceIdentifier path,
                                            final NormalizedNode data,
-                                           final EffectiveModelContext schemaContext, final PointParameter point,
+                                           final EffectiveModelContext schemaContext, final PointParam point,
                                            final NormalizedNodeContainer<?> readList, final boolean before) {
         transaction.remove(path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =

@@ -28,12 +28,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.AbstractReplayParameter;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
-import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
+import org.opendaylight.restconf.nb.rfc8040.AbstractReplayParam;
+import org.opendaylight.restconf.nb.rfc8040.DepthParam;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParam;
+import org.opendaylight.restconf.nb.rfc8040.FilterParam;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
-import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
@@ -178,11 +178,11 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
                 .withNodeIdentifier(new NodeIdentifier(Capabilities.QNAME))
                 .withChild(Builders.<String>orderedLeafSetBuilder()
                     .withNodeIdentifier(new NodeIdentifier(CAPABILITY_QNAME))
-                    .withChildValue(DepthParameter.capabilityUri().toString())
-                    .withChildValue(FieldsParameter.capabilityUri().toString())
-                    .withChildValue(FilterParameter.capabilityUri().toString())
-                    .withChildValue(AbstractReplayParameter.capabilityUri().toString())
-                    .withChildValue(WithDefaultsParameter.capabilityUri().toString())
+                    .withChildValue(DepthParam.capabilityUri().toString())
+                    .withChildValue(FieldsParam.capabilityUri().toString())
+                    .withChildValue(FilterParam.capabilityUri().toString())
+                    .withChildValue(AbstractReplayParam.capabilityUri().toString())
+                    .withChildValue(WithDefaultsParam.capabilityUri().toString())
                     .build())
                 .build())
             .build();

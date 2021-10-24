@@ -14,7 +14,7 @@ import java.text.ParseException;
 import java.util.List;
 import org.junit.Test;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParameter.NodeSelector;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParam.NodeSelector;
 
 public class FieldsParameterTest {
     // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3:
@@ -176,14 +176,14 @@ public class FieldsParameterTest {
     }
 
     private static void assertInvalidFields(final String str, final String message, final int errorOffset) {
-        final var ex = assertThrows(ParseException.class, () -> FieldsParameter.parse(str));
+        final var ex = assertThrows(ParseException.class, () -> FieldsParam.parse(str));
         assertEquals(message, ex.getMessage());
         assertEquals(errorOffset, ex.getErrorOffset());
     }
 
     private static List<NodeSelector> assertValidFields(final String str) {
         try {
-            return FieldsParameter.parse(str).nodeSelectors();
+            return FieldsParam.parse(str).nodeSelectors();
         } catch (ParseException e) {
             throw new AssertionError(e);
         }

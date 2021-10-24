@@ -13,56 +13,62 @@ import com.google.common.annotations.Beta;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * This class represents a {@code depth} parameter as defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3">RFC8040 section 4.8.2</a>.
  */
-public final class DepthParameter implements Immutable {
+public final class DepthParam implements RestconfQueryParam<DepthParam> {
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:depth:1.0");
-    private static final @NonNull DepthParameter MIN = of(1);
-    private static final @NonNull DepthParameter MAX = of(65535);
+    private static final @NonNull DepthParam MIN = of(1);
+    private static final @NonNull DepthParam MAX = of(65535);
 
     private final int value;
 
-    private DepthParameter(final int value) {
+    private DepthParam(final int value) {
         this.value = value;
         checkArgument(value >= 1 && value <= 65535);
     }
 
-    public static @NonNull DepthParameter of(final int value) {
-        return new DepthParameter(value);
+    public static @NonNull DepthParam of(final int value) {
+        return new DepthParam(value);
     }
 
-    @Beta
-    public static @NonNull DepthParameter min() {
-        return MIN;
+    @Override
+    public Class<@NonNull DepthParam> javaClass() {
+        return DepthParam.class;
     }
 
-    @Beta
-    public static @NonNull DepthParameter max() {
-        return MAX;
+    @Override
+    public String paramName() {
+        return uriName();
     }
 
-    public static @Nullable DepthParameter forUriValue(final String uriValue) {
-        return uriValue.equals(unboundedUriValue()) ? null : of(Integer.parseUnsignedInt(uriValue, 10));
-    }
-
-    public int value() {
-        return value;
+    @Override
+    public String paramValue() {
+        return String.valueOf(value);
     }
 
     public static @NonNull String uriName() {
         return "depth";
     }
 
-    public @NonNull String uriValue() {
-        return String.valueOf(value);
+    @Beta
+    public static @NonNull DepthParam min() {
+        return MIN;
     }
 
-    public static String unboundedUriValue() {
-        return "unbounded";
+    @Beta
+    public static @NonNull DepthParam max() {
+        return MAX;
+    }
+
+    public static @Nullable DepthParam forUriValue(final String uriValue) {
+        return "unbounded".equals(uriValue) ? null : of(Integer.parseUnsignedInt(uriValue, 10));
+    }
+
+    public int value() {
+        return value;
     }
 
     public static @NonNull URI capabilityUri() {

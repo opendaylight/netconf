@@ -15,6 +15,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.text.ParseException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -25,7 +26,7 @@ import org.opendaylight.yangtools.concepts.Immutable;
  */
 @Beta
 @NonNullByDefault
-public final class FieldsParameter implements Immutable {
+public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
     /**
      * A selector for a single node as identified by {@link #path()}. Individual child nodes are subject to further
      * filtering based on {@link #subSelectors()}.
@@ -76,12 +77,12 @@ public final class FieldsParameter implements Immutable {
     private static final URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:fields:1.0");
 
     private final ImmutableList<NodeSelector> nodeSelectors;
-    private final String uriValue;
+    private final String paramValue;
 
-    private FieldsParameter(final ImmutableList<NodeSelector> nodeSelectors, final String uriValue) {
+    private FieldsParam(final ImmutableList<NodeSelector> nodeSelectors, final String uriValue) {
         this.nodeSelectors = requireNonNull(nodeSelectors);
         checkArgument(!nodeSelectors.isEmpty(), "At least one selector is required");
-        this.uriValue = requireNonNull(uriValue);
+        this.paramValue = requireNonNull(uriValue);
     }
 
     /**
@@ -91,8 +92,18 @@ public final class FieldsParameter implements Immutable {
      * @return The contents of parameter
      * @throws ParseException if {@code str} does not represent a valid {@code fields} parameter.
      */
-    public static FieldsParameter parse(final String str) throws ParseException {
-        return new FieldsParameter(new FieldsParameterParser().parseNodeSelectors(str), str);
+    public static FieldsParam parse(final String str) throws ParseException {
+        return new FieldsParam(new FieldsParameterParser().parseNodeSelectors(str), str);
+    }
+
+    @Override
+    public Class<@NonNull FieldsParam> javaClass() {
+        return FieldsParam.class;
+    }
+
+    @Override
+    public String paramName() {
+        return uriName();
     }
 
     public static String uriName() {
@@ -112,9 +123,9 @@ public final class FieldsParameter implements Immutable {
         return nodeSelectors;
     }
 
-    // FIXME: for migration only
-    public String uriValue() {
-        return uriValue;
+    @Override
+    public String paramValue() {
+        return paramValue;
     }
 
     @Override

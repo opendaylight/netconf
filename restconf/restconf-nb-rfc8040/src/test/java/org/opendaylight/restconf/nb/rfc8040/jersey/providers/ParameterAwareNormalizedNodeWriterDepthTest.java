@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -135,7 +135,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeContainerWithoutChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParameter.min(), null);
+                writer, DepthParam.min(), null);
 
         parameterWriter.write(containerNodeData);
 
@@ -152,7 +152,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeContainerWithChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParameter.max(), null);
+                writer, DepthParam.max(), null);
 
         parameterWriter.write(containerNodeData);
 
@@ -172,7 +172,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapNodeWithoutChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParameter.min(), null);
+                writer, DepthParam.min(), null);
 
         parameterWriter.write(mapNodeData);
 
@@ -194,7 +194,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapNodeWithChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParameter.max(), null);
+                writer, DepthParam.max(), null);
 
         parameterWriter.write(mapNodeData);
 
@@ -221,7 +221,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeLeafSetNodeWithoutChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParameter.min(), null);
+                writer, DepthParam.min(), null);
 
         parameterWriter.write(leafSetNodeData);
 
@@ -238,7 +238,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeLeafSetNodeWithChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParameter.max(), null);
+                writer, DepthParam.max(), null);
 
         parameterWriter.write(leafSetNodeData);
 
@@ -257,7 +257,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeLeafSetEntryNodeDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, DepthParameter.max(), null);
+                writer, DepthParam.max(), null);
 
         parameterWriter.write(leafSetEntryNodeData);
 
@@ -275,7 +275,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapEntryNodeUnorderedOnlyKeysDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, false, DepthParameter.min(), null);
+                writer, false, DepthParam.min(), null);
 
         parameterWriter.write(mapEntryNodeData);
 
@@ -295,7 +295,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapEntryNodeUnorderedDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, false, DepthParameter.max(), null);
+                writer, false, DepthParam.max(), null);
 
         parameterWriter.write(mapEntryNodeData);
 
@@ -316,7 +316,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapEntryNodeOrderedWithoutChildrenTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, true, DepthParameter.min(), null);
+                writer, true, DepthParam.min(), null);
 
         parameterWriter.write(mapEntryNodeData);
 
@@ -337,7 +337,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapEntryNodeOrderedTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, true, DepthParameter.max(), null);
+                writer, true, DepthParam.max(), null);
 
         parameterWriter.write(mapEntryNodeData);
 

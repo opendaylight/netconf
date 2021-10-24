@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.ContentParam;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
@@ -76,10 +76,10 @@ public class ReadDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
-        NormalizedNode normalizedNode = readData(ContentParameter.CONFIG, DATA.path, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.CONFIG, DATA.path, mdsalStrategy);
         assertEquals(DATA.data3, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.CONFIG, DATA.path, netconfStrategy);
+        normalizedNode = readData(ContentParam.CONFIG, DATA.path, netconfStrategy);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -91,10 +91,10 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(netconfService).getConfig(DATA.path);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(DATA.path);
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.path, mdsalStrategy);
         assertEquals(DATA.data3, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.path, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.path, netconfStrategy);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -106,10 +106,10 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
         doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(netconfService).get(DATA.path2);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(DATA.path2);
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path2, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.path2, mdsalStrategy);
         assertEquals(DATA.data2, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.path2, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.path2, netconfStrategy);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -118,10 +118,10 @@ public class ReadDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
         doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(netconfService).get(DATA.path2);
-        NormalizedNode normalizedNode = readData(ContentParameter.NONCONFIG, DATA.path2, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.NONCONFIG, DATA.path2, mdsalStrategy);
         assertEquals(DATA.data2, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.NONCONFIG, DATA.path2, netconfStrategy);
+        normalizedNode = readData(ContentParam.NONCONFIG, DATA.path2, netconfStrategy);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -139,10 +139,10 @@ public class ReadDataTransactionUtilTest {
                 .withChild(DATA.contentLeaf)
                 .withChild(DATA.contentLeaf2)
                 .build();
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.path, mdsalStrategy);
         assertEquals(checkingData, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.path, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.path, netconfStrategy);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -160,10 +160,10 @@ public class ReadDataTransactionUtilTest {
                 .withChild(DATA.contentLeaf)
                 .withChild(DATA.contentLeaf2)
                 .build();
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.path, mdsalStrategy);
         assertEquals(checkingData, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.path, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.path, netconfStrategy);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -180,10 +180,10 @@ public class ReadDataTransactionUtilTest {
                 .withNodeIdentifier(new NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
                 .withChild(DATA.checkData)
                 .build();
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path3, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.path3, mdsalStrategy);
         assertEquals(checkingData, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.path3, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.path3, netconfStrategy);
         assertEquals(checkingData, normalizedNode);
     }
 
@@ -200,11 +200,11 @@ public class ReadDataTransactionUtilTest {
                 .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
                 .withChild(DATA.checkData)
                 .build();
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path3,
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.path3,
                 mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.path3, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.path3, netconfStrategy);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -223,10 +223,10 @@ public class ReadDataTransactionUtilTest {
                         .withNodeIdentifier(new NodeIdentifier(DATA.listQname))
                         .withChild(DATA.unkeyedListEntryNode1.body().iterator().next())
                         .withChild(DATA.unkeyedListEntryNode2.body().iterator().next()).build()).build();
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.path3, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.path3, mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.path3, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.path3, netconfStrategy);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -247,11 +247,11 @@ public class ReadDataTransactionUtilTest {
                         .addAll(DATA.leafSetNode2.body())
                         .build())
                 .build();
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.leafSetNodePath,
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.leafSetNodePath,
                 mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.leafSetNodePath, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.leafSetNodePath, netconfStrategy);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -272,11 +272,11 @@ public class ReadDataTransactionUtilTest {
                         .addAll(DATA.orderedLeafSetNode2.body())
                         .build())
                 .build();
-        NormalizedNode normalizedNode = readData(ContentParameter.ALL, DATA.leafSetNodePath,
+        NormalizedNode normalizedNode = readData(ContentParam.ALL, DATA.leafSetNodePath,
                 mdsalStrategy);
         assertEquals(expectedData, normalizedNode);
 
-        normalizedNode = readData(ContentParameter.ALL, DATA.leafSetNodePath, netconfStrategy);
+        normalizedNode = readData(ContentParam.ALL, DATA.leafSetNodePath, netconfStrategy);
         assertEquals(expectedData, normalizedNode);
     }
 
@@ -285,10 +285,10 @@ public class ReadDataTransactionUtilTest {
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(DATA.path2);
-        NormalizedNode normalizedNode = readData(ContentParameter.CONFIG, DATA.path2, mdsalStrategy);
+        NormalizedNode normalizedNode = readData(ContentParam.CONFIG, DATA.path2, mdsalStrategy);
         assertNull(normalizedNode);
 
-        normalizedNode = readData(ContentParameter.CONFIG, DATA.path2, netconfStrategy);
+        normalizedNode = readData(ContentParam.CONFIG, DATA.path2, netconfStrategy);
         assertNull(normalizedNode);
     }
 
@@ -299,7 +299,7 @@ public class ReadDataTransactionUtilTest {
      * @param strategy       {@link RestconfStrategy} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    private @Nullable NormalizedNode readData(final @NonNull ContentParameter content,
+    private @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
         return ReadDataTransactionUtil.readData(content, path, strategy, null, schemaContext);
     }

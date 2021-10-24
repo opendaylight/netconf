@@ -12,38 +12,38 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import java.net.URI;
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
-import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * Abstract base class for StartTimeParameter and StopTimeParameter.
  */
 @Beta
-@NonNullByDefault
-public abstract class AbstractReplayParameter implements Immutable {
-    private static final URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:replay:1.0");
+// FIXME: sealed when we have JDK17+
+public abstract class AbstractReplayParam<T extends AbstractReplayParam<T>> implements RestconfQueryParam<T> {
+    private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:replay:1.0");
 
-    private final DateAndTime value;
+    private final @NonNull DateAndTime value;
 
-    AbstractReplayParameter(final DateAndTime value) {
+    AbstractReplayParam(final DateAndTime value) {
         this.value = requireNonNull(value);
     }
 
-    public final DateAndTime value() {
+    public final @NonNull DateAndTime value() {
         return value;
     }
 
-    public final String uriValue() {
+    @Override
+    public final String paramValue() {
         return value.getValue();
     }
 
     @Override
     public final String toString() {
-        return MoreObjects.toStringHelper(this).add("value", uriValue()).toString();
+        return MoreObjects.toStringHelper(this).add("value", paramValue()).toString();
     }
 
-    public static final URI capabilityUri() {
+    public static final @NonNull URI capabilityUri() {
         return CAPABILITY;
     }
 }

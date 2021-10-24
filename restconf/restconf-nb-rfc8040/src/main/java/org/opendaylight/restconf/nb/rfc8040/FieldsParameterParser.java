@@ -16,12 +16,12 @@ import java.util.Deque;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParameter.NodeSelector;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParam.NodeSelector;
 import org.opendaylight.yangtools.yang.common.YangNames;
 
 /**
- * Stateful parser for {@link FieldsParameter}. This is not as hard as IETF's ABNF would lead you to believe. The
- * original definition is:
+ * Stateful parser for {@link FieldsParam}. This is not as hard as IETF's ABNF would lead you to believe. The original
+ *  definition is:
  * <pre>
  *    fields-expr = path "(" fields-expr ")" / path ";" fields-expr / path
  *    path = api-identifier [ "/" path ]
@@ -55,7 +55,7 @@ import org.opendaylight.yangtools.yang.common.YangNames;
  * </pre>
  *
  * <p>
- * That ANTLR4 grammar dictates the layout of {@link FieldsParameter}. It also shows the parsing is recursive on
+ * That ANTLR4 grammar dictates the layout of {@link FieldsParam}. It also shows the parsing is recursive on
  * {@code node-selectors}, which is what {@link #parse(String)} and
  * {@link NodeSelectorParser#parseSubSelectors(String, int)} deal with.
  */

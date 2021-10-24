@@ -23,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -85,7 +85,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
 
     private static void writeNormalizedNode(final JsonWriter jsonWriter,
             final SchemaPath path, final InstanceIdentifierContext<SchemaNode> context, final NormalizedNode data,
-            final DepthParameter depth, final List<Set<QName>> fields) throws IOException {
+            final DepthParam depth, final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
 
         if (context.getSchemaNode() instanceof RpcDefinition) {
@@ -148,7 +148,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
             final InstanceIdentifierContext<SchemaNode> context, final SchemaPath path, final JsonWriter jsonWriter,
-            final DepthParameter depth, final List<Set<QName>> fields) {
+            final DepthParam depth, final List<Set<QName>> fields) {
 
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);

@@ -14,20 +14,30 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
  * This class represents a {@code stop-time} parameter as defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.8">RFC8040 section 4.8.8</a>.
  */
-public final class StopTimeParameter extends AbstractReplayParameter {
-    private StopTimeParameter(final DateAndTime value) {
+public final class StopTimeParam extends AbstractReplayParam<StopTimeParam> {
+    private StopTimeParam(final DateAndTime value) {
         super(value);
     }
 
-    public static @NonNull StopTimeParameter of(final DateAndTime value) {
-        return new StopTimeParameter(value);
+    public static @NonNull StopTimeParam of(final DateAndTime value) {
+        return new StopTimeParam(value);
+    }
+
+    @Override
+    public Class<@NonNull StopTimeParam> javaClass() {
+        return StopTimeParam.class;
+    }
+
+    @Override
+    public String paramName() {
+        return uriName();
     }
 
     public static @NonNull String uriName() {
         return "stop-time";
     }
 
-    public static @NonNull StopTimeParameter forUriValue(final String uriValue) {
+    public static @NonNull StopTimeParam forUriValue(final String uriValue) {
         return of(new DateAndTime(uriValue));
     }
 }

@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Enumeration of possible {@code insert} values as defined by
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.1">RFC8040, section 4.8.1</a>.
  */
-public enum InsertParameter {
+public enum InsertParam implements RestconfQueryParam<InsertParam> {
     /**
      * Insert the new data after the insertion point, as specified by the value of the "point" parameter.
      */
@@ -36,11 +36,22 @@ public enum InsertParameter {
 
     private @NonNull String uriValue;
 
-    InsertParameter(final String uriValue) {
+    InsertParam(final String uriValue) {
         this.uriValue = requireNonNull(uriValue);
     }
 
-    public @NonNull String uriValue() {
+    @Override
+    public Class<@NonNull InsertParam> javaClass() {
+        return InsertParam.class;
+    }
+
+    @Override
+    public String paramName() {
+        return uriName();
+    }
+
+    @Override
+    public String paramValue() {
         return uriValue;
     }
 
@@ -49,7 +60,7 @@ public enum InsertParameter {
     }
 
     // Note: returns null of unknowns
-    public static @Nullable InsertParameter forUriValue(final String uriValue) {
+    public static @Nullable InsertParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "after":
                 return AFTER;

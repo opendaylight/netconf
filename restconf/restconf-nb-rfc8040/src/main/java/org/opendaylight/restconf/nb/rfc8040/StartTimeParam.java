@@ -14,20 +14,30 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
  * This class represents a {@code start-time} parameter as defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.7">RFC8040 section 4.8.7</a>.
  */
-public final class StartTimeParameter extends AbstractReplayParameter {
-    private StartTimeParameter(final DateAndTime value) {
+public final class StartTimeParam extends AbstractReplayParam<StartTimeParam> {
+    private StartTimeParam(final DateAndTime value) {
         super(value);
     }
 
-    public static @NonNull StartTimeParameter of(final DateAndTime value) {
-        return new StartTimeParameter(value);
+    public static @NonNull StartTimeParam of(final DateAndTime value) {
+        return new StartTimeParam(value);
+    }
+
+    @Override
+    public Class<@NonNull StartTimeParam> javaClass() {
+        return StartTimeParam.class;
+    }
+
+    @Override
+    public String paramName() {
+        return uriName();
     }
 
     public static @NonNull String uriName() {
         return "start-time";
     }
 
-    public static @NonNull StartTimeParameter forUriValue(final String uriValue) {
+    public static @NonNull StartTimeParam forUriValue(final String uriValue) {
         return of(new DateAndTime(uriValue));
     }
 }
