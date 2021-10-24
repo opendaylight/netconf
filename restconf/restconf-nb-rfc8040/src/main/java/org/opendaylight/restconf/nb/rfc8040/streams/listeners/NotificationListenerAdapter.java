@@ -80,9 +80,9 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     @Override
-    public void setQueryParams(final Instant start, final Instant stop, final String filter,
+    public void setQueryParams(final Instant startTime, final Instant stopTime, final String filter,
                                final boolean leafNodesOnly, final boolean skipNotificationData) {
-        super.setQueryParams(start, stop, filter, leafNodesOnly, skipNotificationData);
+        super.setQueryParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData);
         try {
             this.formatter = getFormatter(filter);
         } catch (XPathExpressionException e) {

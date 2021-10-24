@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.time.Instant;
@@ -22,10 +23,14 @@ import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
+import org.opendaylight.restconf.nb.rfc8040.StartTimeParameter;
+import org.opendaylight.restconf.nb.rfc8040.StopTimeParameter;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -172,72 +177,74 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                 .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
                 .appendOffset("+HH:MM", "Z").toFormatter();
 
-        private final Instant start;
-        private final Instant stop;
+        private final @NonNull Instant startTime;
+        private final Instant stopTime;
         private final String filter;
         private final boolean skipNotificationData;
 
-        private NotificationQueryParams(final Instant start, final Instant stop, final String filter,
+        private NotificationQueryParams(final Instant startTime, final Instant stopTime, final String filter,
                 final boolean skipNotificationData) {
-            this.start = start == null ? Instant.now() : start;
-            this.stop = stop;
+            this.startTime = requireNonNull(startTime);
+            this.stopTime = stopTime;
             this.filter = filter;
             this.skipNotificationData = skipNotificationData;
         }
 
         static NotificationQueryParams fromUriInfo(final UriInfo uriInfo) {
-            Instant start = null;
-            boolean startTimeUsed = false;
-            Instant stop = null;
-            boolean stopTimeUsed = false;
+            Instant startTime = null;
+            Instant stopTime = null;
             String filter = null;
-            boolean filterUsed = false;
-            boolean skipNotificationDataUsed = false;
             boolean skipNotificationData = false;
 
             for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-                switch (entry.getKey()) {
-                    case "start-time":
-                        if (!startTimeUsed) {
-                            startTimeUsed = true;
-                            start = parseDateFromQueryParam(entry);
-                        } else {
+                final String paramName = entry.getKey();
+                final List<String> paramValues = entry.getValue();
+                if (paramName.equals(StartTimeParameter.uriName())) {
+                    switch (paramValues.size()) {
+                        case 0:
+                            break;
+                        case 1:
+                            startTime = parseDateFromQueryParam(paramValues.get(0));
+                            break;
+                        default:
                             throw new RestconfDocumentedException("Start-time parameter can be used only once.");
-                        }
-                        break;
-                    case "stop-time":
-                        if (!stopTimeUsed) {
-                            stopTimeUsed = true;
-                            stop = parseDateFromQueryParam(entry);
-                        } else {
+                    }
+                } else if (paramName.equals(StopTimeParameter.uriName())) {
+                    switch (paramValues.size()) {
+                        case 0:
+                            break;
+                        case 1:
+                            stopTime = parseDateFromQueryParam(paramValues.get(0));
+                            break;
+                        default:
                             throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
-                        }
-                        break;
-                    case "filter":
-                        if (!filterUsed) {
-                            filterUsed = true;
-                            filter = entry.getValue().iterator().next();
-                        }
-                        break;
-                    case "odl-skip-notification-data":
-                        if (!skipNotificationDataUsed) {
-                            skipNotificationDataUsed = true;
-                            skipNotificationData = Boolean.parseBoolean(entry.getValue().iterator().next());
-                        } else {
+                    }
+                } else if (paramName.equals(FilterParameter.uriName())) {
+                    if (!paramValues.isEmpty()) {
+                        // FIXME: use FilterParameter
+                        filter = paramValues.get(0);
+                    }
+                } else if (paramName.equals("odl-skip-notification-data")) {
+                    switch (paramValues.size()) {
+                        case 0:
+                            break;
+                        case 1:
+                            skipNotificationData = Boolean.parseBoolean(paramValues.get(0));
+                            break;
+                        default:
                             throw new RestconfDocumentedException(
-                                    "Odl-skip-notification-data parameter can be used only once.");
-                        }
-                        break;
-                    default:
-                        throw new RestconfDocumentedException(
-                                "Bad parameter used with notifications: " + entry.getKey());
+                                "Odl-skip-notification-data parameter can be used only once.");
+                    }
+                } else {
+                    throw new RestconfDocumentedException("Bad parameter used with notifications: " + paramName);
                 }
             }
-            if (!startTimeUsed && stopTimeUsed) {
+            if (startTime == null && stopTime != null) {
                 throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
             }
 
-            return new NotificationQueryParams(start, stop, filter, skipNotificationData);
+            return new NotificationQueryParams(startTime == null ? Instant.now() : startTime, stopTime, filter,
+                skipNotificationData);
         }
 
 
@@ -245,17 +252,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          * Parse input of query parameters - start-time or stop-time - from {@link DateAndTime} format
          * to {@link Instant} format.
          *
-         * @param entry Start-time or stop-time as string in {@link DateAndTime} format.
+         * @param uriValue Start-time or stop-time as string in {@link DateAndTime} format.
          * @return Parsed {@link Instant} by entry.
          */
-        private static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
-            final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
-            final String value = event.getValue();
+        private static @NonNull Instant parseDateFromQueryParam(final String uriValue) {
             final TemporalAccessor accessor;
             try {
-                accessor = FORMATTER.parse(value);
-            } catch (final DateTimeParseException e) {
-                throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
+                accessor = FORMATTER.parse(new DateAndTime(uriValue).getValue());
+            } catch (final DateTimeParseException | IllegalArgumentException e) {
+                throw new RestconfDocumentedException("Cannot parse of value in date: " + uriValue, e);
             }
             return Instant.from(accessor);
         }
@@ -265,8 +270,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return start-time
          */
-        public @NonNull Instant getStart() {
-            return start;
+        public @NonNull Instant startTime() {
+            return startTime;
         }
 
         /**
@@ -274,8 +279,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return stop-time
          */
-        public Optional<Instant> getStop() {
-            return Optional.ofNullable(stop);
+        public @Nullable Instant stopTime() {
+            return stopTime;
         }
 
         /**
