@@ -19,9 +19,12 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
+import org.opendaylight.restconf.nb.rfc8040.InsertParameter;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
+import org.opendaylight.restconf.nb.rfc8040.PointParameter;
 import org.opendaylight.restconf.nb.rfc8040.StartTimeParameter;
 import org.opendaylight.restconf.nb.rfc8040.StopTimeParameter;
+import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -63,6 +66,40 @@ public final class UriInfoSupport {
 
         try {
             return NotificationQueryParams.of(startTime, stopTime, filter, skipNotificationData);
+        } catch (IllegalArgumentException e) {
+            throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
+        }
+    }
+
+    public static @NonNull WriteDataParams newWriteDataParams(final UriInfo uriInfo) {
+        InsertParameter insert = null;
+        PointParameter point = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            final String uriName = entry.getKey();
+            final List<String> paramValues = entry.getValue();
+            if (uriName.equals(InsertParameter.uriName())) {
+                final String str = optionalParam(uriName, paramValues);
+                if (str != null) {
+                    insert = InsertParameter.forUriValue(str);
+                    if (insert == null) {
+                        throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
+                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                    }
+                }
+            } else if (PointParameter.uriName().equals(uriName)) {
+                final String str = optionalParam(uriName, paramValues);
+                if (str != null) {
+                    point = PointParameter.forUriValue(str);
+                }
+            } else {
+                throw new RestconfDocumentedException("Bad parameter for post: " + uriName,
+                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+            }
+        }
+
+        try {
+            return WriteDataParams.of(insert, point);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
         }
