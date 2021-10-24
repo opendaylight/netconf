@@ -20,7 +20,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -64,7 +63,7 @@ public final class QueryParams {
         FilterParam filter = null;
         boolean skipNotificationData = false;
 
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+        for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             final String paramName = entry.getKey();
             final List<String> paramValues = entry.getValue();
 
@@ -81,7 +80,8 @@ public final class QueryParams {
                     // FIXME: this should be properly encapsulated in SkipNotificatioDataParameter
                     skipNotificationData = Boolean.parseBoolean(optionalParam(paramName, paramValues));
                 } else {
-                    throw new RestconfDocumentedException("Bad parameter used with notifications: " + paramName);
+                    throw new RestconfDocumentedException("Bad parameter used with notifications: " + paramName,
+                        ErrorType.PROTOCOL, ErrorTag. UNKNOWN_ATTRIBUTE);
                 }
             } catch (IllegalArgumentException e) {
                 throw new RestconfDocumentedException("Invalid " + paramName + " value: " + e.getMessage(), e);
@@ -114,78 +114,73 @@ public final class QueryParams {
      * @return {@link ReadDataParams}
      */
     public static @NonNull ReadDataParams newReadDataParams(final UriInfo uriInfo) {
-        // check only allowed parameters
-        final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);
+        ContentParam content = ContentParam.ALL;
+        DepthParam depth = null;
+        FieldsParam fields = null;
+        WithDefaultsParam withDefaults = null;
+        boolean tagged = false;
 
-        // check and set content
-        final String contentStr = getSingleParameter(queryParams, ContentParam.uriName());
-        final ContentParam content = contentStr == null ? ContentParam.ALL
-            : RestconfDocumentedException.throwIfNull(ContentParam.forUriValue(contentStr),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT);
+        for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            final String paramName = entry.getKey();
+            final List<String> paramValues = entry.getValue();
 
-        // check and set depth
-        final DepthParam depth;
-        final String depthStr = getSingleParameter(queryParams, DepthParam.uriName());
-        if (depthStr != null) {
-            try {
-                depth = DepthParam.forUriValue(depthStr);
-            } catch (IllegalArgumentException e) {
-                throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    "Invalid depth parameter: " + depthStr, null,
-                    "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
+            if (paramName.equals(ContentParam.uriName())) {
+                final String str = optionalParam(paramName, paramValues);
+                if (str != null) {
+                    content = RestconfDocumentedException.throwIfNull(ContentParam.forUriValue(str),
+                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                        "Invalid content parameter: %s, allowed values are %s", str, POSSIBLE_CONTENT);
+                }
+            } else if (paramName.equals(DepthParam.uriName())) {
+                final String str = optionalParam(paramName, paramValues);
+                try {
+                    depth = DepthParam.forUriValue(str);
+                } catch (IllegalArgumentException e) {
+                    throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
+                        ErrorTag.INVALID_VALUE, "Invalid depth parameter: " + str, null,
+                        "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
+                }
+            } else if (paramName.equals(FieldsParam.uriName())) {
+                final String str = optionalParam(paramName, paramValues);
+                if (str != null) {
+                    try {
+                        fields = FieldsParam.parse(str);
+                    } catch (ParseException e) {
+                        throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
+                            ErrorTag.INVALID_VALUE, "Invalid filds parameter: " + str));
+                    }
+                }
+            } else if (paramName.equals(WithDefaultsParam.uriName())) {
+                final String str = optionalParam(paramName, paramValues);
+                if (str != null) {
+                    final WithDefaultsParam val = WithDefaultsParam.forUriValue(str);
+                    if (val == null) {
+                        throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL,
+                            ErrorTag.INVALID_VALUE, "Invalid with-defaults parameter: " + str, null,
+                            "The with-defaults parameter must be a string in " + POSSIBLE_WITH_DEFAULTS));
+                    }
+
+                    switch (val) {
+                        case REPORT_ALL:
+                            withDefaults = null;
+                            tagged = false;
+                            break;
+                        case REPORT_ALL_TAGGED:
+                            withDefaults = null;
+                            tagged = true;
+                            break;
+                        default:
+                            withDefaults = val;
+                            tagged = false;
+                    }
+                }
+            } else {
+                // FIXME: recognize pretty-print here
+                throw new RestconfDocumentedException("Not allowed parameter for read operation: " + paramName,
+                    ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ATTRIBUTE);
             }
-        } else {
-            depth = null;
         }
 
-        // check and set fields
-        final FieldsParam fields;
-        final String fieldsStr = getSingleParameter(queryParams, FieldsParam.uriName());
-        if (fieldsStr != null) {
-            try {
-                fields = FieldsParam.parse(fieldsStr);
-            } catch (ParseException e) {
-                throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    "Invalid filds parameter: " + fieldsStr));
-            }
-        } else {
-            fields = null;
-        }
-
-        // check and set withDefaults parameter
-        final WithDefaultsParam withDefaults;
-        final boolean tagged;
-
-        final String withDefaultsStr = getSingleParameter(queryParams, WithDefaultsParam.uriName());
-        if (withDefaultsStr != null) {
-            final WithDefaultsParam val = WithDefaultsParam.forUriValue(withDefaultsStr);
-            if (val == null) {
-                throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    "Invalid with-defaults parameter: " + withDefaultsStr, null,
-                    "The with-defaults parameter must be a string in " + POSSIBLE_WITH_DEFAULTS));
-            }
-
-            switch (val) {
-                case REPORT_ALL:
-                    withDefaults = null;
-                    tagged = false;
-                    break;
-                case REPORT_ALL_TAGGED:
-                    withDefaults = null;
-                    tagged = true;
-                    break;
-                default:
-                    withDefaults = val;
-                    tagged = false;
-            }
-        } else {
-            withDefaults = null;
-            tagged = false;
-        }
-
-        // FIXME: recognize pretty-print here
         return ReadDataParams.of(content, depth, fields, withDefaults, tagged, false);
     }
 
@@ -212,7 +207,7 @@ public final class QueryParams {
                 }
             } else {
                 throw new RestconfDocumentedException("Bad parameter for post: " + uriName,
-                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                    ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ATTRIBUTE);
             }
         }
 
@@ -223,30 +218,8 @@ public final class QueryParams {
         }
     }
 
-    /**
-     * Check if URI does not contain not allowed parameters for specified operation.
-     *
-     * @param usedParameters parameters used in URI request
-     * @param allowedParameters allowed parameters for operation
-     */
     @VisibleForTesting
-    static void checkParametersTypes(final Set<String> usedParameters, final Set<String> allowedParameters) {
-        if (!allowedParameters.containsAll(usedParameters)) {
-            final Set<String> notAllowedParameters = usedParameters.stream()
-                .filter(param -> !allowedParameters.contains(param))
-                .collect(Collectors.toSet());
-            throw new RestconfDocumentedException("Not allowed parameters for read operation: " + notAllowedParameters,
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-    }
-
-    @VisibleForTesting
-    static @Nullable String getSingleParameter(final MultivaluedMap<String, String> params, final String name) {
-        final var values = params.get(name);
-        return values == null ? null : optionalParam(name, values);
-    }
-
-    private static @Nullable String optionalParam(final String name, final List<String> values) {
+    static @Nullable String optionalParam(final String name, final List<String> values) {
         switch (values.size()) {
             case 0:
                 return null;

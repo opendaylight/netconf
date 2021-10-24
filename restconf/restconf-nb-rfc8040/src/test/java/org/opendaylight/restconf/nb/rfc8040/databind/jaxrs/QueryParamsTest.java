@@ -57,22 +57,17 @@ public class QueryParamsTest {
      * Test when parameter is present at most once.
      */
     @Test
-    public void getSingleParameterTest() {
-        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.putSingle(ContentParam.uriName(), "all");
-        assertEquals("all", QueryParams.getSingleParameter(parameters, ContentParam.uriName()));
+    public void optionalParamTest() {
+        assertEquals("all", QueryParams.optionalParam(ContentParam.uriName(), List.of("all")));
     }
 
     /**
      * Test when parameter is present more than once.
      */
     @Test
-    public void getSingleParameterNegativeTest() {
-        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(ContentParam.uriName(), List.of("config", "nonconfig", "all"));
-
+    public void optionalParamMultipleTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.getSingleParameter(parameters, ContentParam.uriName()));
+            () -> QueryParams.optionalParam(ContentParam.uriName(), List.of("config", "nonconfig", "all")));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
@@ -82,22 +77,14 @@ public class QueryParamsTest {
     }
 
     /**
-     * Test when all parameters are allowed.
-     */
-    @Test
-    public void checkParametersTypesTest() {
-        QueryParams.checkParametersTypes(Set.of("content"),
-            Set.of(ContentParam.uriName(), DepthParam.uriName()));
-    }
-
-    /**
      * Test when not allowed parameter type is used.
      */
     @Test
     public void checkParametersTypesNegativeTest() {
+        mockQueryParameter("not-allowed-parameter", "does-not-matter");
+
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.checkParametersTypes(Set.of("not-allowed-parameter"),
-                Set.of(ContentParam.uriName(), DepthParam.uriName())));
+            () -> QueryParams.newWriteDataParams(uriInfo));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
