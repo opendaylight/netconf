@@ -30,6 +30,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
 import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -113,11 +114,10 @@ public class QueryParamsTest {
         // no parameters, default values should be used
         mockQueryParameters(new MultivaluedHashMap<String, String>());
 
-        final QueryParameters parsedParameters = QueryParams.newReadDataParams(context, uriInfo);
-
-        assertEquals(ContentParameter.ALL, parsedParameters.getContent());
-        assertNull(parsedParameters.getDepth());
-        assertNull(parsedParameters.getFields());
+        final var parsedParameters = QueryParams.newReadDataParams(uriInfo);
+        assertEquals(ContentParameter.ALL, parsedParameters.content());
+        assertNull(parsedParameters.depth());
+        assertNull(parsedParameters.fields());
     }
 
     /**
@@ -129,7 +129,7 @@ public class QueryParamsTest {
         mockQueryParameter("with-defaults", "invalid");
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.newReadDataParams(context, uriInfo));
+            () -> QueryParams.newReadDataParams(uriInfo));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorTag.INVALID_VALUE, errors.get(0).getErrorTag());
@@ -144,7 +144,7 @@ public class QueryParamsTest {
         mockQueryParameter("depth", "bounded");
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.newReadDataParams(context, uriInfo));
+            () -> QueryParams.newReadDataParams(uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -158,7 +158,7 @@ public class QueryParamsTest {
         mockQueryParameter("content", "not-allowed-parameter-value");
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.newReadDataParams(context, uriInfo));
+            () -> QueryParams.newReadDataParams(uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -173,7 +173,7 @@ public class QueryParamsTest {
         mockQueryParameter("depth", "65536");
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.newReadDataParams(context, uriInfo));
+            () -> QueryParams.newReadDataParams(uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -188,7 +188,7 @@ public class QueryParamsTest {
         mockQueryParameter("depth", "0");
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.newReadDataParams(context, uriInfo));
+            () -> QueryParams.newReadDataParams(uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -203,9 +203,9 @@ public class QueryParamsTest {
         // preparation of input data
         mockQueryParameter("with-defaults", "report-all-tagged");
 
-        final QueryParameters writerParameters = QueryParams.newReadDataParams(context, uriInfo);
-        assertNull(writerParameters.getWithDefault());
-        assertTrue(writerParameters.isTagged());
+        final var parsedParameters = QueryParams.newReadDataParams(uriInfo);
+        assertNull(parsedParameters.withDefaults());
+        assertTrue(parsedParameters.tagged());
     }
 
     /**
@@ -217,9 +217,9 @@ public class QueryParamsTest {
         // preparation of input data
         mockQueryParameter("with-defaults", "report-all");
 
-        final QueryParameters writerParameters = QueryParams.newReadDataParams(context, uriInfo);
-        assertNull(writerParameters.getWithDefault());
-        assertFalse(writerParameters.isTagged());
+        final var parsedParameters = QueryParams.newReadDataParams(uriInfo);
+        assertNull(parsedParameters.withDefaults());
+        assertFalse(parsedParameters.tagged());
     }
 
     /**
@@ -231,9 +231,9 @@ public class QueryParamsTest {
         // preparation of input data
         mockQueryParameter("with-defaults", "explicit");
 
-        final QueryParameters writerParameters = QueryParams.newReadDataParams(context, uriInfo);
-        assertSame(WithDefaultsParameter.EXPLICIT, writerParameters.getWithDefault());
-        assertFalse(writerParameters.isTagged());
+        final var parsedParameters = QueryParams.newReadDataParams(uriInfo);
+        assertSame(WithDefaultsParameter.EXPLICIT, parsedParameters.withDefaults());
+        assertFalse(parsedParameters.tagged());
     }
 
     /**
@@ -249,28 +249,30 @@ public class QueryParamsTest {
         parameters.putSingle("fields", "container-child");
         mockQueryParameters(parameters);
 
-        doReturn(QName.create(containerChild, "container")).when(containerSchema).getQName();
-        doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
-        doReturn(containerChild).when(containerChildSchema).getQName();
-
-        doReturn(modelContext).when(context).getSchemaContext();
-        doReturn(containerSchema).when(context).getSchemaNode();
-
-        final QueryParameters parsedParameters = QueryParams.newReadDataParams(context, uriInfo);
-
+        final ReadDataParams parsedParameters = QueryParams.newReadDataParams(uriInfo);
         // content
-        assertEquals(ContentParameter.CONFIG, parsedParameters.getContent());
+        assertEquals(ContentParameter.CONFIG, parsedParameters.content());
 
         // depth
-        final DepthParameter depth = parsedParameters.getDepth();
+        final DepthParameter depth = parsedParameters.depth();
         assertNotNull(depth);
         assertEquals(10, depth.value());
 
         // fields
-        assertNotNull(parsedParameters.getFields());
-        assertEquals(1, parsedParameters.getFields().size());
-        assertEquals(1, parsedParameters.getFields().get(0).size());
-        assertEquals(containerChild, parsedParameters.getFields().get(0).iterator().next());
+        assertNotNull(parsedParameters.fields());
+
+        // fields for write filtering
+        doReturn(QName.create(containerChild, "container")).when(containerSchema).getQName();
+        doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
+        doReturn(containerChild).when(containerChildSchema).getQName();
+        doReturn(modelContext).when(context).getSchemaContext();
+        doReturn(containerSchema).when(context).getSchemaNode();
+
+        final QueryParameters queryParameters = QueryParams.newQueryParameters(parsedParameters, context);
+        final List<Set<QName>> fields = queryParameters.fields();
+        assertNotNull(fields);
+        assertEquals(1, fields.size());
+        assertEquals(Set.of(containerChild), fields.get(0));
     }
 
     private void mockQueryParameter(final String name, final String value) {

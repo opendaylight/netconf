@@ -74,7 +74,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
         XMLStreamWriter xmlWriter;
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
-            if (context.getWriterParameters().isPrettyPrint()) {
+            if (context.getWriterParameters().prettyPrint()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
         } catch (final XMLStreamException | FactoryConfigurationError e) {
@@ -83,8 +83,8 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
         final NormalizedNode data = context.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
-        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().getDepth(),
-                context.getWriterParameters().getFields());
+        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().depth(),
+                context.getWriterParameters().fields());
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath path,

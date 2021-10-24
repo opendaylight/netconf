@@ -76,10 +76,12 @@ public final class FieldsParameter implements Immutable {
     private static final URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:fields:1.0");
 
     private final ImmutableList<NodeSelector> nodeSelectors;
+    private final String uriValue;
 
-    FieldsParameter(final ImmutableList<NodeSelector> nodeSelectors) {
+    private FieldsParameter(final ImmutableList<NodeSelector> nodeSelectors, final String uriValue) {
         this.nodeSelectors = requireNonNull(nodeSelectors);
         checkArgument(!nodeSelectors.isEmpty(), "At least one selector is required");
+        this.uriValue = requireNonNull(uriValue);
     }
 
     /**
@@ -90,7 +92,7 @@ public final class FieldsParameter implements Immutable {
      * @throws ParseException if {@code str} does not represent a valid {@code fields} parameter.
      */
     public static FieldsParameter parse(final String str) throws ParseException {
-        return new FieldsParameterParser().parse(str);
+        return new FieldsParameter(new FieldsParameterParser().parseNodeSelectors(str), str);
     }
 
     public static String uriName() {
@@ -108,6 +110,11 @@ public final class FieldsParameter implements Immutable {
      */
     public ImmutableList<NodeSelector> nodeSelectors() {
         return nodeSelectors;
+    }
+
+    // FIXME: for migration only
+    public String uriValue() {
+        return uriValue;
     }
 
     @Override

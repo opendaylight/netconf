@@ -49,6 +49,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
@@ -130,11 +131,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response readData(final String identifier, final UriInfo uriInfo) {
+        final ReadDataParams readParams = QueryParams.newReadDataParams(uriInfo);
+
         final EffectiveModelContext schemaContextRef = schemaContextHandler.get();
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(mountPointService));
-        final QueryParameters parameters = QueryParams.newReadDataParams(instanceIdentifier, uriInfo);
-
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
 
         // FIXME: this looks quite crazy, why do we even have it?
@@ -143,15 +144,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             createAllYangNotificationStreams(schemaContextRef, uriInfo);
         }
 
-        final List<YangInstanceIdentifier> fieldPaths = parameters.getFieldPaths();
+        final QueryParameters queryParams = QueryParams.newQueryParameters(readParams, instanceIdentifier);
+        final List<YangInstanceIdentifier> fieldPaths = queryParams.fieldPaths();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
-            node = ReadDataTransactionUtil.readData(parameters.getContent(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, parameters.getWithDefault(), schemaContextRef, fieldPaths);
+            node = ReadDataTransactionUtil.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
+                    strategy, readParams.withDefaults(), schemaContextRef, fieldPaths);
         } else {
-            node = ReadDataTransactionUtil.readData(parameters.getContent(), instanceIdentifier.getInstanceIdentifier(),
-                    strategy, parameters.getWithDefault(), schemaContextRef);
+            node = ReadDataTransactionUtil.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
+                    strategy, readParams.withDefaults(), schemaContextRef);
         }
 
         // FIXME: this is utter craziness, refactor it properly!
@@ -167,19 +169,19 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
         }
 
-        switch (parameters.getContent()) {
+        switch (readParams.content()) {
             case ALL:
             case CONFIG:
                 final QName type = node.getIdentifier().getNodeType();
                 return Response.status(Status.OK)
-                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, parameters))
+                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, queryParams))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
                         + "-" + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
             default:
                 return Response.status(Status.OK)
-                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, parameters))
+                    .entity(NormalizedNodePayload.ofReadData(instanceIdentifier, node, queryParams))
                     .build();
         }
     }

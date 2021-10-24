@@ -13,6 +13,7 @@ import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsPara
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
@@ -33,12 +34,12 @@ import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
 import org.opendaylight.restconf.nb.rfc8040.InsertParameter;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.PointParameter;
+import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.StartTimeParameter;
 import org.opendaylight.restconf.nb.rfc8040.StopTimeParameter;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters.Builder;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -94,52 +95,69 @@ public final class QueryParams {
         }
     }
 
+    public static QueryParameters newQueryParameters(final ReadDataParams params,
+            final InstanceIdentifierContext<?> identifier) {
+        final var fields = params.fields();
+        if (fields == null) {
+            return QueryParameters.of(params);
+        }
+
+        return identifier.getMountPoint() != null
+            ? QueryParameters.ofFieldPaths(params, parseFieldsPaths(identifier, fields.uriValue()))
+                : QueryParameters.ofFields(params, parseFieldsParameter(identifier, fields.uriValue()));
+    }
+
     /**
      * Parse parameters from URI request and check their types and values.
      *
-     * @param identifier {@link InstanceIdentifierContext}
      * @param uriInfo    URI info
-     * @return {@link QueryParameters}
+     * @return {@link ReadDataParams}
      */
-    public static QueryParameters newReadDataParams(final InstanceIdentifierContext<?> identifier,
-                                                    final UriInfo uriInfo) {
+    public static @NonNull ReadDataParams newReadDataParams(final UriInfo uriInfo) {
         // check only allowed parameters
         final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);
 
-        final Builder builder = QueryParameters.builder();
         // check and set content
         final String contentStr = getSingleParameter(queryParams, ContentParameter.uriName());
-        if (contentStr != null) {
-            builder.setContent(RestconfDocumentedException.throwIfNull(
-                ContentParameter.forUriValue(contentStr), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT));
-        }
+        final ContentParameter content = contentStr == null ? ContentParameter.ALL
+            : RestconfDocumentedException.throwIfNull(ContentParameter.forUriValue(contentStr),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT);
 
         // check and set depth
+        final DepthParameter depth;
         final String depthStr = getSingleParameter(queryParams, DepthParameter.uriName());
         if (depthStr != null) {
             try {
-                builder.setDepth(DepthParameter.forUriValue(depthStr));
+                depth = DepthParameter.forUriValue(depthStr);
             } catch (IllegalArgumentException e) {
                 throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                     "Invalid depth parameter: " + depthStr, null,
                     "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
             }
+        } else {
+            depth = null;
         }
 
         // check and set fields
+        final FieldsParameter fields;
         final String fieldsStr = getSingleParameter(queryParams, FieldsParameter.uriName());
         if (fieldsStr != null) {
-            // FIXME: parse a FieldsParameter instead
-            if (identifier.getMountPoint() != null) {
-                builder.setFieldPaths(parseFieldsPaths(identifier, fieldsStr));
-            } else {
-                builder.setFields(parseFieldsParameter(identifier, fieldsStr));
+            try {
+                fields = FieldsParameter.parse(fieldsStr);
+            } catch (ParseException e) {
+                throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                    "Invalid filds parameter: " + fieldsStr));
             }
+        } else {
+            fields = null;
         }
 
         // check and set withDefaults parameter
+        final WithDefaultsParameter withDefaults;
+        final boolean tagged;
+
         final String withDefaultsStr = getSingleParameter(queryParams, WithDefaultsParameter.uriName());
         if (withDefaultsStr != null) {
             final WithDefaultsParameter val = WithDefaultsParameter.forUriValue(withDefaultsStr);
@@ -151,16 +169,24 @@ public final class QueryParams {
 
             switch (val) {
                 case REPORT_ALL:
+                    withDefaults = null;
+                    tagged = false;
                     break;
                 case REPORT_ALL_TAGGED:
-                    builder.setTagged(true);
+                    withDefaults = null;
+                    tagged = true;
                     break;
                 default:
-                    builder.setWithDefault(val);
+                    withDefaults = val;
+                    tagged = false;
             }
+        } else {
+            withDefaults = null;
+            tagged = false;
         }
 
-        return builder.build();
+        // FIXME: recognize pretty-print here
+        return ReadDataParams.of(content, depth, fields, withDefaults, tagged, false);
     }
 
     public static @NonNull WriteDataParams newWriteDataParams(final UriInfo uriInfo) {

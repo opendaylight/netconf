@@ -9,13 +9,13 @@ package org.opendaylight.restconf.nb.rfc8040.legacy;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
 import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
-import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
+import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -24,114 +24,57 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  * sense of it, as parts of it pertain to how a {@link NormalizedNodePayload} should be created while others how it
  * needs to be processed (for example filtered).
  */
+@Beta
+// FIXME: this probably needs to be renamed back to WriterParams, or somesuch
 public final class QueryParameters {
-    public static final class Builder {
-        private @NonNull ContentParameter content = ContentParameter.ALL;
-        private List<YangInstanceIdentifier> fieldPaths;
-        private List<Set<QName>> fields;
-        private WithDefaultsParameter withDefault;
-        private DepthParameter depth;
-        private boolean prettyPrint;
-        private boolean tagged;
+    private static final @NonNull QueryParameters EMPTY = of(ReadDataParams.empty());
 
-        Builder() {
-            // Hidden on purpose
-        }
-
-        public Builder setContent(final ContentParameter content) {
-            this.content = requireNonNull(content);
-            return this;
-        }
-
-        public Builder setDepth(final DepthParameter depth) {
-            this.depth = depth;
-            return this;
-        }
-
-        public Builder setFields(final List<Set<QName>> fields) {
-            this.fields = fields;
-            return this;
-        }
-
-        public Builder setFieldPaths(final List<YangInstanceIdentifier> fieldPaths) {
-            this.fieldPaths = fieldPaths;
-            return this;
-        }
-
-        // FIXME: this is not called from anywhere. Create a PrettyPrintParameter or similar to hold it
-        public Builder setPrettyPrint(final boolean prettyPrint) {
-            this.prettyPrint = prettyPrint;
-            return this;
-        }
-
-        public Builder setTagged(final boolean tagged) {
-            this.tagged = tagged;
-            return this;
-        }
-
-        public Builder setWithDefault(final WithDefaultsParameter withDefault) {
-            this.withDefault = withDefault;
-            return this;
-        }
-
-        public @NonNull QueryParameters build() {
-            return new QueryParameters(this);
-        }
-    }
-
-    private static final @NonNull QueryParameters EMPTY = new Builder().build();
-
+    private final @NonNull ReadDataParams params;
     private final List<YangInstanceIdentifier> fieldPaths;
     private final List<Set<QName>> fields;
-    private final WithDefaultsParameter withDefault;
-    private final @NonNull ContentParameter content;
-    private final DepthParameter depth;
-    private final boolean prettyPrint;
-    private final boolean tagged;
 
-    private QueryParameters(final Builder builder) {
-        content = builder.content;
-        depth = builder.depth;
-        fields = builder.fields;
-        fieldPaths = builder.fieldPaths;
-        tagged = builder.tagged;
-        prettyPrint = builder.prettyPrint;
-        withDefault = builder.withDefault;
+    private QueryParameters(final ReadDataParams params, final List<Set<QName>> fields,
+            final List<YangInstanceIdentifier> fieldPaths) {
+        this.params = requireNonNull(params);
+        this.fields = fields;
+        this.fieldPaths = fieldPaths;
     }
 
     public static @NonNull QueryParameters empty() {
         return EMPTY;
     }
 
-    public static @NonNull Builder builder() {
-        return new Builder();
+    public static @NonNull QueryParameters of(final ReadDataParams params) {
+        return new QueryParameters(params, null, null);
     }
 
-    public @NonNull ContentParameter getContent() {
-        return content;
+    public static @NonNull QueryParameters ofFields(final ReadDataParams params, final List<Set<QName>> fields) {
+        return new QueryParameters(params, fields, null);
     }
 
-    public @Nullable DepthParameter getDepth() {
-        return depth;
+    public static @NonNull QueryParameters ofFieldPaths(final ReadDataParams params,
+            final List<YangInstanceIdentifier> fieldPaths) {
+        return new QueryParameters(params, null, fieldPaths);
     }
 
-    public List<Set<QName>> getFields() {
+    public @NonNull ReadDataParams params() {
+        return params;
+    }
+
+    public @Nullable DepthParameter depth() {
+        return params.depth();
+    }
+
+
+    public @Nullable List<Set<QName>> fields() {
         return fields;
     }
 
-    public List<YangInstanceIdentifier> getFieldPaths() {
+    public @Nullable List<YangInstanceIdentifier> fieldPaths() {
         return fieldPaths;
     }
 
-    public WithDefaultsParameter getWithDefault() {
-        return withDefault;
-    }
-
-    public boolean isPrettyPrint() {
-        return prettyPrint;
-    }
-
-    public boolean isTagged() {
-        return tagged;
+    public boolean prettyPrint() {
+        return params.prettyPrint();
     }
 }
