@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.legacy;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
@@ -24,9 +26,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  */
 public final class QueryParameters {
     public static final class Builder {
+        private @NonNull ContentParameter content = ContentParameter.ALL;
         private List<YangInstanceIdentifier> fieldPaths;
         private List<Set<QName>> fields;
-        private ContentParameter content;
         private WithDefaultsParameter withDefault;
         private DepthParameter depth;
         private boolean prettyPrint;
@@ -37,7 +39,7 @@ public final class QueryParameters {
         }
 
         public Builder setContent(final ContentParameter content) {
-            this.content = content;
+            this.content = requireNonNull(content);
             return this;
         }
 
@@ -82,7 +84,7 @@ public final class QueryParameters {
     private final List<YangInstanceIdentifier> fieldPaths;
     private final List<Set<QName>> fields;
     private final WithDefaultsParameter withDefault;
-    private final ContentParameter content;
+    private final @NonNull ContentParameter content;
     private final DepthParameter depth;
     private final boolean prettyPrint;
     private final boolean tagged;
@@ -105,7 +107,7 @@ public final class QueryParameters {
         return new Builder();
     }
 
-    public ContentParameter getContent() {
+    public @NonNull ContentParameter getContent() {
         return content;
     }
 

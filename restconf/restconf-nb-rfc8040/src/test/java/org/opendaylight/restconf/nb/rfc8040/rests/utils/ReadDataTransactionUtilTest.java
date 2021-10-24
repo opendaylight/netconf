@@ -347,12 +347,9 @@ public class ReadDataTransactionUtilTest {
     public void parseUriParametersUserDefinedTest() {
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-
-        final String fields = containerChildQName.getLocalName();
-
-        parameters.put("content", List.of("config"));
-        parameters.put("depth", List.of("10"));
-        parameters.put("fields", List.of(fields));
+        parameters.putSingle("content", "config");
+        parameters.putSingle("depth", "10");
+        parameters.putSingle("fields", containerChildQName.getLocalName());
 
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
@@ -380,8 +377,7 @@ public class ReadDataTransactionUtilTest {
     public void parseUriParametersContentParameterNegativeTest() {
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-
-        parameters.put("content", List.of("not-allowed-parameter-value"));
+        parameters.putSingle("content", "not-allowed-parameter-value");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -400,7 +396,7 @@ public class ReadDataTransactionUtilTest {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is not allowed
-        parameters.put("depth", List.of("bounded"));
+        parameters.putSingle("depth", "bounded");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -419,7 +415,7 @@ public class ReadDataTransactionUtilTest {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is too low
-        parameters.put("depth", List.of("0"));
+        parameters.putSingle("depth", "0");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -438,7 +434,7 @@ public class ReadDataTransactionUtilTest {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
 
         // inserted value is too high
-        parameters.put("depth", List.of("65536"));
+        parameters.putSingle("depth", "65536");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -457,7 +453,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put("with-defaults", List.of("explicit"));
+        parameters.putSingle("with-defaults", "explicit");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -473,7 +469,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put("with-defaults", List.of("invalid"));
+        parameters.putSingle("with-defaults", "invalid");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
@@ -492,7 +488,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put("with-defaults", List.of("report-all-tagged"));
+        parameters.putSingle("with-defaults", "report-all-tagged");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -509,7 +505,7 @@ public class ReadDataTransactionUtilTest {
         // preparation of input data
         final UriInfo uriInfo = mock(UriInfo.class);
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put("with-defaults", List.of("report-all"));
+        parameters.putSingle("with-defaults", "report-all");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
@@ -521,18 +517,22 @@ public class ReadDataTransactionUtilTest {
      * Test when parameter is present at most once.
      */
     @Test
-    public void checkParameterCountTest() {
-        ReadDataTransactionUtil.checkParameterCount(List.of("all"), ContentParameter.uriName());
+    public void getSingleParameterTest() {
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+        parameters.putSingle(ContentParameter.uriName(), "all");
+        assertEquals("all", ReadDataTransactionUtil.getSingleParameter(parameters, ContentParameter.uriName()));
     }
 
     /**
      * Test when parameter is present more than once.
      */
     @Test
-    public void checkParameterCountNegativeTest() {
+    public void getSingleParameterNegativeTest() {
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+        parameters.put(ContentParameter.uriName(), List.of("config", "nonconfig", "all"));
+
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.checkParameterCount(List.of("config", "nonconfig", "all"),
-                    ContentParameter.uriName()));
+            () -> ReadDataTransactionUtil.getSingleParameter(parameters, ContentParameter.uriName()));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
@@ -540,7 +540,6 @@ public class ReadDataTransactionUtilTest {
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
     }
-
 
     /**
      * Test when all parameters are allowed.
