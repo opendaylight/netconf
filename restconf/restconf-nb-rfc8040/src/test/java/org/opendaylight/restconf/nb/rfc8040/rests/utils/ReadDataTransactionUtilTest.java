@@ -514,34 +514,6 @@ public class ReadDataTransactionUtilTest {
     }
 
     /**
-     * Test when parameter is present at most once.
-     */
-    @Test
-    public void getSingleParameterTest() {
-        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.putSingle(ContentParameter.uriName(), "all");
-        assertEquals("all", ReadDataTransactionUtil.getSingleParameter(parameters, ContentParameter.uriName()));
-    }
-
-    /**
-     * Test when parameter is present more than once.
-     */
-    @Test
-    public void getSingleParameterNegativeTest() {
-        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(ContentParameter.uriName(), List.of("config", "nonconfig", "all"));
-
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.getSingleParameter(parameters, ContentParameter.uriName()));
-        final List<RestconfError> errors = ex.getErrors();
-        assertEquals(1, errors.size());
-
-        final RestconfError error = errors.get(0);
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
-    }
-
-    /**
      * Test when all parameters are allowed.
      */
     @Test

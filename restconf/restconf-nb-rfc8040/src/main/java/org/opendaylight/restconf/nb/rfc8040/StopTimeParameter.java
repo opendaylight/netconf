@@ -7,28 +7,27 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
  * This class represents a {@code stop-time} parameter as defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.8">RFC8040 section 4.8.8</a>.
  */
-@NonNullByDefault
 public final class StopTimeParameter extends AbstractReplayParameter {
     private StopTimeParameter(final DateAndTime value) {
         super(value);
     }
 
-    public static StopTimeParameter of(final DateAndTime value) {
+    public static @NonNull StopTimeParameter of(final DateAndTime value) {
         return new StopTimeParameter(value);
     }
 
-    public static String uriName() {
+    public static @NonNull String uriName() {
         return "stop-time";
     }
 
-    public static StopTimeParameter forUriValue(final String uriValue) {
+    public static @NonNull StopTimeParameter forUriValue(final String uriValue) {
         return of(new DateAndTime(uriValue));
     }
 }

@@ -7,28 +7,27 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
  * This class represents a {@code start-time} parameter as defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.7">RFC8040 section 4.8.7</a>.
  */
-@NonNullByDefault
 public final class StartTimeParameter extends AbstractReplayParameter {
     private StartTimeParameter(final DateAndTime value) {
         super(value);
     }
 
-    public static StartTimeParameter of(final DateAndTime value) {
+    public static @NonNull StartTimeParameter of(final DateAndTime value) {
         return new StartTimeParameter(value);
     }
 
-    public static String uriName() {
+    public static @NonNull String uriName() {
         return "start-time";
     }
 
-    public static StartTimeParameter forUriValue(final String uriValue) {
+    public static @NonNull StartTimeParameter forUriValue(final String uriValue) {
         return of(new DateAndTime(uriValue));
     }
 }
