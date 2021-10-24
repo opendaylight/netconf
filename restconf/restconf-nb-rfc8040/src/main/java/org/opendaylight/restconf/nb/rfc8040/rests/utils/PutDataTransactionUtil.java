@@ -18,6 +18,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.InsertParam;
 import org.opendaylight.restconf.nb.rfc8040.PointParam;
+import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfTransaction;
@@ -53,13 +54,11 @@ public final class PutDataTransactionUtil {
      * @param payload       data to put
      * @param schemaContext reference to {@link EffectiveModelContext}
      * @param strategy      object that perform the actual DS operations
-     * @param point         query parameter
-     * @param insert        query parameter
+     * @param params        {@link WriteDataParams}
      * @return {@link Response}
      */
     public static Response putData(final NormalizedNodePayload payload, final EffectiveModelContext schemaContext,
-                                   final RestconfStrategy strategy, final InsertParam insert,
-                                   final PointParam point) {
+                                   final RestconfStrategy strategy, final WriteDataParams params) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
 
         final FluentFuture<Boolean> existsFuture = strategy.exists(LogicalDatastoreType.CONFIGURATION, path);
@@ -69,7 +68,7 @@ public final class PutDataTransactionUtil {
         final ResponseFactory responseFactory =
             new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
         final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext, strategy,
-            payload.getData(), insert, point);
+            payload.getData(), params);
         //This method will close transactionChain if any
         FutureCallbackTx.addCallback(submitData, PUT_TX_TYPE, responseFactory, path);
         return responseFactory.build();
@@ -82,17 +81,16 @@ public final class PutDataTransactionUtil {
      * @param schemaContext {@link SchemaContext}
      * @param strategy      object that perform the actual DS operations
      * @param data          data
-     * @param point         query parameter
-     * @param insert        query parameter
+     * @param params        {@link WriteDataParams}
      * @return {@link FluentFuture}
      */
     private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
                                                                  final EffectiveModelContext schemaContext,
                                                                  final RestconfStrategy strategy,
                                                                  final NormalizedNode data,
-                                                                 final InsertParam insert,
-                                                                 final PointParam point) {
+                                                                 final WriteDataParams params) {
         final RestconfTransaction transaction = strategy.prepareWriteExecution();
+        final InsertParam insert = params.insert();
         if (insert == null) {
             return makePut(path, schemaContext, transaction, data);
         }
@@ -116,16 +114,16 @@ public final class PutDataTransactionUtil {
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     return makePut(path, schemaContext, transaction, data);
                 }
-                insertWithPointPut(transaction, path, data, schemaContext, point, (NormalizedNodeContainer<?>) readData,
-                    true);
+                insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(),
+                    (NormalizedNodeContainer<?>) readData, true);
                 return transaction.commit();
             case AFTER:
                 readData = readList(strategy, path.getParent());
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     return makePut(path, schemaContext, transaction, data);
                 }
-                insertWithPointPut(transaction, path, data, schemaContext, point, (NormalizedNodeContainer<?>) readData,
-                    false);
+                insertWithPointPut(transaction, path, data, schemaContext, params.getPoint(),
+                    (NormalizedNodeContainer<?>) readData, false);
                 return transaction.commit();
             default:
                 throw new RestconfDocumentedException(

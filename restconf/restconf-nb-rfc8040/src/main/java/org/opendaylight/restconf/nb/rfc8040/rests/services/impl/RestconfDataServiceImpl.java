@@ -218,7 +218,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response putData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
-        final WriteDataParams checkedParms = QueryParams.newWriteDataParams(uriInfo);
+        final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
 
@@ -231,7 +231,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 ? schemaContextHandler.get() : modelContext(mountPoint);
 
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        return PutDataTransactionUtil.putData(payload, ref, strategy, checkedParms.insert(), checkedParms.point());
+        return PutDataTransactionUtil.putData(payload, ref, strategy, params);
     }
 
     @Override
@@ -246,11 +246,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             return invokeAction(payload);
         }
 
-        final WriteDataParams checkedParms = QueryParams.newWriteDataParams(uriInfo);
+        final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        return PostDataTransactionUtil.postData(uriInfo, payload, strategy,
-                getSchemaContext(mountPoint), checkedParms.insert(), checkedParms.point());
+        return PostDataTransactionUtil.postData(uriInfo, payload, strategy, getSchemaContext(mountPoint), params);
     }
 
     @Override
