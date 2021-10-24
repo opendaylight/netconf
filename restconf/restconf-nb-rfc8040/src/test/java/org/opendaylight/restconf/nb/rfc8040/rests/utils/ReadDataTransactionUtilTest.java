@@ -22,7 +22,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
@@ -42,6 +41,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
 import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -333,7 +333,7 @@ public class ReadDataTransactionUtilTest {
         // no parameters, default values should be used
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final QueryParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        final QueryParameters parsedParameters = QueryParams.newReadDataParams(context, uriInfo);
 
         assertEquals(ContentParameter.ALL, parsedParameters.getContent());
         assertNull(parsedParameters.getDepth());
@@ -353,7 +353,7 @@ public class ReadDataTransactionUtilTest {
 
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final QueryParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        final QueryParameters parsedParameters = QueryParams.newReadDataParams(context, uriInfo);
 
         // content
         assertEquals(ContentParameter.CONFIG, parsedParameters.getContent());
@@ -381,7 +381,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+            () -> QueryParams.newReadDataParams(context, uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -400,7 +400,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+            () -> QueryParams.newReadDataParams(context, uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -419,7 +419,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+            () -> QueryParams.newReadDataParams(context, uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -438,7 +438,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+            () -> QueryParams.newReadDataParams(context, uriInfo));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -456,7 +456,7 @@ public class ReadDataTransactionUtilTest {
         parameters.putSingle("with-defaults", "explicit");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        final QueryParameters writerParameters = QueryParams.newReadDataParams(context, uriInfo);
         assertSame(WithDefaultsParameter.EXPLICIT, writerParameters.getWithDefault());
         assertFalse(writerParameters.isTagged());
     }
@@ -473,7 +473,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.parseUriParameters(context, uriInfo));
+            () -> QueryParams.newReadDataParams(context, uriInfo));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorTag.INVALID_VALUE, errors.get(0).getErrorTag());
@@ -491,7 +491,7 @@ public class ReadDataTransactionUtilTest {
         parameters.putSingle("with-defaults", "report-all-tagged");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        final QueryParameters writerParameters = QueryParams.newReadDataParams(context, uriInfo);
         assertNull(writerParameters.getWithDefault());
         assertTrue(writerParameters.isTagged());
     }
@@ -508,34 +508,9 @@ public class ReadDataTransactionUtilTest {
         parameters.putSingle("with-defaults", "report-all");
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final QueryParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        final QueryParameters writerParameters = QueryParams.newReadDataParams(context, uriInfo);
         assertNull(writerParameters.getWithDefault());
         assertFalse(writerParameters.isTagged());
-    }
-
-    /**
-     * Test when all parameters are allowed.
-     */
-    @Test
-    public void checkParametersTypesTest() {
-        ReadDataTransactionUtil.checkParametersTypes(Set.of("content"),
-            Set.of(ContentParameter.uriName(), DepthParameter.uriName()));
-    }
-
-    /**
-     * Test when not allowed parameter type is used.
-     */
-    @Test
-    public void checkParametersTypesNegativeTest() {
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ReadDataTransactionUtil.checkParametersTypes(Set.of("not-allowed-parameter"),
-                Set.of(ContentParameter.uriName(), DepthParameter.uriName())));
-        final List<RestconfError> errors = ex.getErrors();
-        assertEquals(1, errors.size());
-
-        final RestconfError error = errors.get(0);
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
     }
 
     /**

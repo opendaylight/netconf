@@ -7,34 +7,21 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import static org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams.getSingleParameter;
-import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsParameter;
-import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsPaths;
-
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -86,92 +73,8 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  * </ul>
  */
 public final class ReadDataTransactionUtil {
-    private static final Set<String> ALLOWED_PARAMETERS = Set.of(ContentParameter.uriName(), DepthParameter.uriName(),
-        FieldsParameter.uriName(), WithDefaultsParameter.uriName());
-    private static final List<String> POSSIBLE_CONTENT = Arrays.stream(ContentParameter.values())
-        .map(ContentParameter::uriValue)
-        .collect(Collectors.toUnmodifiableList());
-    private static final List<String> POSSIBLE_WITH_DEFAULTS = Arrays.stream(WithDefaultsParameter.values())
-        .map(WithDefaultsParameter::uriValue)
-        .collect(Collectors.toUnmodifiableList());
-
-    private static final String READ_TYPE_TX = "READ";
-
     private ReadDataTransactionUtil() {
         // Hidden on purpose
-    }
-
-    /**
-     * Parse parameters from URI request and check their types and values.
-     *
-     * @param identifier {@link InstanceIdentifierContext}
-     * @param uriInfo    URI info
-     * @return {@link QueryParameters}
-     */
-    public static QueryParameters parseUriParameters(final InstanceIdentifierContext<?> identifier,
-                                                      final UriInfo uriInfo) {
-        final QueryParameters.Builder builder = QueryParameters.builder();
-        if (uriInfo == null) {
-            return builder.build();
-        }
-
-        // check only allowed parameters
-        final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);
-
-        // check and set content
-        final String contentStr = getSingleParameter(queryParams, ContentParameter.uriName());
-        if (contentStr != null) {
-            builder.setContent(RestconfDocumentedException.throwIfNull(
-                ContentParameter.forUriValue(contentStr), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT));
-        }
-
-        // check and set depth
-        final String depthStr = getSingleParameter(queryParams, DepthParameter.uriName());
-        if (depthStr != null) {
-            try {
-                builder.setDepth(DepthParameter.forUriValue(depthStr));
-            } catch (IllegalArgumentException e) {
-                throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    "Invalid depth parameter: " + depthStr, null,
-                    "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
-            }
-        }
-
-        // check and set fields
-        final String fieldsStr = getSingleParameter(queryParams, FieldsParameter.uriName());
-        if (fieldsStr != null) {
-            // FIXME: parse a FieldsParameter instead
-            if (identifier.getMountPoint() != null) {
-                builder.setFieldPaths(parseFieldsPaths(identifier, fieldsStr));
-            } else {
-                builder.setFields(parseFieldsParameter(identifier, fieldsStr));
-            }
-        }
-
-        // check and set withDefaults parameter
-        final String withDefaultsStr = getSingleParameter(queryParams, WithDefaultsParameter.uriName());
-        if (withDefaultsStr != null) {
-            final WithDefaultsParameter val = WithDefaultsParameter.forUriValue(withDefaultsStr);
-            if (val == null) {
-                throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    "Invalid with-defaults parameter: " + withDefaultsStr, null,
-                    "The with-defaults parameter must be a string in " + POSSIBLE_WITH_DEFAULTS));
-            }
-
-            switch (val) {
-                case REPORT_ALL:
-                    break;
-                case REPORT_ALL_TAGGED:
-                    builder.setTagged(true);
-                    break;
-                default:
-                    builder.setWithDefault(val);
-            }
-        }
-
-        return builder.build();
     }
 
     /**
@@ -237,24 +140,6 @@ public final class ReadDataTransactionUtil {
                 throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                         "Invalid content parameter: " + content.uriValue(), null,
                         "The content parameter value must be either config, nonconfig or all (default)"));
-        }
-    }
-
-    /**
-     * Check if URI does not contain not allowed parameters for specified operation.
-     *
-     * @param usedParameters parameters used in URI request
-     * @param allowedParameters allowed parameters for operation
-     */
-    @VisibleForTesting
-    static void checkParametersTypes(final Set<String> usedParameters, final Set<String> allowedParameters) {
-        if (!allowedParameters.containsAll(usedParameters)) {
-            final Set<String> notAllowedParameters = usedParameters.stream()
-                .filter(param -> !allowedParameters.contains(param))
-                .collect(Collectors.toSet());
-            throw new RestconfDocumentedException(
-                "Not allowed parameters for " + READ_TYPE_TX + " operation: " + notAllowedParameters,
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
     }
 
@@ -417,7 +302,7 @@ public final class ReadDataTransactionUtil {
     private static NormalizedNode extractReadData(final RestconfStrategy strategy,
             final YangInstanceIdentifier path, final ListenableFuture<Optional<NormalizedNode>> dataFuture) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        FutureCallbackTx.addCallback(dataFuture, READ_TYPE_TX, dataFactory, path);
+        FutureCallbackTx.addCallback(dataFuture, "READ", dataFactory, path);
         return dataFactory.build();
     }
 

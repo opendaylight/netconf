@@ -11,11 +11,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import java.util.List;
+import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -40,6 +42,31 @@ public class QueryParamsTest {
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> QueryParams.getSingleParameter(parameters, ContentParameter.uriName()));
+        final List<RestconfError> errors = ex.getErrors();
+        assertEquals(1, errors.size());
+
+        final RestconfError error = errors.get(0);
+        assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
+    }
+
+    /**
+     * Test when all parameters are allowed.
+     */
+    @Test
+    public void checkParametersTypesTest() {
+        QueryParams.checkParametersTypes(Set.of("content"),
+            Set.of(ContentParameter.uriName(), DepthParameter.uriName()));
+    }
+
+    /**
+     * Test when not allowed parameter type is used.
+     */
+    @Test
+    public void checkParametersTypesNegativeTest() {
+        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+            () -> QueryParams.checkParametersTypes(Set.of("not-allowed-parameter"),
+                Set.of(ContentParameter.uriName(), DepthParameter.uriName())));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
