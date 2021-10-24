@@ -10,47 +10,16 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.io.StringReader;
 import java.time.Instant;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 /**
  * Features of query parameters part of both notifications.
  */
 abstract class AbstractQueryParams extends AbstractNotificationsData {
-    // FIXME: BUG-7956: switch to using UntrustedXML
-    private static final DocumentBuilderFactory DBF;
-
-    static {
-        final DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-        f.setCoalescing(true);
-        f.setExpandEntityReferences(false);
-        f.setIgnoringElementContentWhitespace(true);
-        f.setIgnoringComments(true);
-        f.setXIncludeAware(false);
-        try {
-            f.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            f.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            f.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            f.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        } catch (final ParserConfigurationException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-        DBF = f;
-    }
-
     // FIXME: these should be final
     private Instant startTime = null;
     private Instant stopTime = null;
-    private String filter = null;
     private boolean leafNodesOnly = false;
     private boolean skipNotificationData = false;
 
@@ -67,12 +36,14 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param filter        Indicates which subset of all possible events are of interest.
      * @param leafNodesOnly If TRUE, notifications will contain changes of leaf nodes only.
      */
+    public abstract void setQueryParams(Instant startTime, Instant stopTime, String filter,
+            boolean leafNodesOnly, boolean skipNotificationData);
+
     @SuppressWarnings("checkstyle:hiddenField")
-    public void setQueryParams(final Instant startTime, final Instant stopTime, final String filter,
-            final boolean leafNodesOnly, final boolean skipNotificationData) {
+    final void setQueryParams(final Instant startTime, final Instant stopTime, final boolean leafNodesOnly,
+            final boolean skipNotificationData) {
         this.startTime = requireNonNull(startTime);
         this.stopTime = stopTime;
-        this.filter = filter;
         this.leafNodesOnly = leafNodesOnly;
         this.skipNotificationData = skipNotificationData;
     }
@@ -117,36 +88,5 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Check if is filter used and then prepare and post data do client.
-     *
-     * @param xml XML data of notification.
-     */
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    // FIXME: this method is never called, have we lost functionality compared to bierman02?
-    boolean checkFilter(final String xml) {
-        if (filter == null) {
-            return true;
-        }
-        try {
-            return parseFilterParam(xml);
-        } catch (final Exception e) {
-            throw new RestconfDocumentedException("Problem while parsing filter.", e);
-        }
-    }
-
-    /**
-     * Parse and evaluate filter statement by XML format.
-     *
-     * @return {@code true} or {@code false} depending on filter expression and data of notification.
-     * @throws Exception If operation fails.
-     */
-    private boolean parseFilterParam(final String xml) throws Exception {
-        final Document docOfXml = DBF.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
-        final XPath xPath = XPathFactory.newInstance().newXPath();
-        // FIXME: BUG-7956: xPath.setNamespaceContext(nsContext);
-        return (boolean) xPath.compile(filter).evaluate(docOfXml, XPathConstants.BOOLEAN);
     }
 }

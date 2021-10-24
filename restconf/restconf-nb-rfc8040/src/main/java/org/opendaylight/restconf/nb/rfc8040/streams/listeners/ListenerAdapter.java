@@ -84,11 +84,11 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     @Override
-    public void setQueryParams(final Instant start, final Instant stop, final String filter,
+    public void setQueryParams(final Instant startTime, final Instant stopTime, final String filter,
                                final boolean leafNodesOnly, final boolean skipNotificationData) {
-        super.setQueryParams(start, stop, filter, leafNodesOnly, skipNotificationData);
+        setQueryParams(startTime, stopTime, leafNodesOnly, skipNotificationData);
         try {
-            this.formatter = getFormatter(filter);
+            formatter = getFormatter(filter);
         } catch (final XPathExpressionException e) {
             throw new IllegalArgumentException("Failed to get filter", e);
         }
@@ -129,12 +129,12 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     @Override
     public String getStreamName() {
-        return this.streamName;
+        return streamName;
     }
 
     @Override
     public String getOutputType() {
-        return this.outputType.getName();
+        return outputType.getName();
     }
 
     /**
@@ -143,7 +143,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @return Path pointed to data in data store.
      */
     public YangInstanceIdentifier getPath() {
-        return this.path;
+        return path;
     }
 
     /**

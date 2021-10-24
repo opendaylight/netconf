@@ -58,7 +58,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         this.path = requireNonNull(path);
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
-        this.formatter = getFormatterFactory().getFormatter();
+        formatter = getFormatterFactory().getFormatter();
 
         LOG.debug("output type: {}, {}", outputType, this.outputType);
     }
@@ -82,9 +82,9 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     @Override
     public void setQueryParams(final Instant startTime, final Instant stopTime, final String filter,
                                final boolean leafNodesOnly, final boolean skipNotificationData) {
-        super.setQueryParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData);
+        setQueryParams(startTime, stopTime, leafNodesOnly, skipNotificationData);
         try {
-            this.formatter = getFormatter(filter);
+            formatter = getFormatter(filter);
         } catch (XPathExpressionException e) {
             throw new IllegalArgumentException("Failed to get filter", e);
         }
@@ -97,7 +97,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     @Override
     public String getOutputType() {
-        return this.outputType.getName();
+        return outputType.getName();
     }
 
     @Override
@@ -128,7 +128,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     @Override
     public String getStreamName() {
-        return this.streamName;
+        return streamName;
     }
 
     /**
@@ -137,7 +137,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      * @return The configured schema path that points to observing YANG notification schema node.
      */
     public Absolute getSchemaPath() {
-        return this.path;
+        return path;
     }
 
     public final synchronized void listen(final DOMNotificationService notificationService) {
