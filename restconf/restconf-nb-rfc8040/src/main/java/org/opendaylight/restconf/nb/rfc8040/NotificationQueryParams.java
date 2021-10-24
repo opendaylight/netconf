@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
- * Parser and holder of query paramteres from uriInfo for notifications.
+ * Parser and holder of query parameters from uriInfo for notifications.
  */
 public final class NotificationQueryParams implements Immutable {
     private final StartTimeParameter startTime;
