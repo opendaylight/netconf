@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
+import com.google.common.base.MoreObjects;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
@@ -35,6 +36,11 @@ public abstract class AbstractReplayParameter implements Immutable {
 
     public final String uriValue() {
         return value.getValue();
+    }
+
+    @Override
+    public final String toString() {
+        return MoreObjects.toStringHelper(this).add("value", uriValue()).toString();
     }
 
     public static final URI capabilityUri() {
