@@ -7,8 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -16,6 +18,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -23,7 +26,11 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
@@ -50,7 +57,14 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response readData(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    Response readData(
+        @QueryParam("content") @DefaultValue("all") List<ContentParameter> content,
+        @QueryParam("depth") List<DepthParameter> depth,
+        @QueryParam("fields") List<FieldsParameter> fields,
+        @QueryParam("with-defaults") List<WithDefaultsParameter> withDefaults,
+        @Encoded @PathParam("identifier") String identifier,
+        // FIXME: this should not be needed:
+        @Context UriInfo uriInfo);
 
     /**
      * Get target data resource from data root.
@@ -68,7 +82,13 @@ public interface RestconfDataService {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    Response readData(@Context UriInfo uriInfo);
+    Response readData(
+        @QueryParam("content") @DefaultValue("all") List<ContentParameter> content,
+        @QueryParam("depth") List<DepthParameter> depth,
+        @QueryParam("fields") List<FieldsParameter> fields,
+        @QueryParam("with-defaults") List<WithDefaultsParameter> withDefaults,
+        // FIXME: this should not be needed:
+        @Context UriInfo uriInfo);
 
     /**
      * Create or replace the target data resource.

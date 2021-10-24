@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.ContentParameterProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.DepthParameterProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.FieldsParameterProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.WithDefaultsParameterProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
@@ -45,6 +49,11 @@ abstract class AbstractRestconfApplication extends Application {
     @Override
     public final Set<Class<?>> getClasses() {
         return Set.of(
+            // Query parameters
+            ContentParameterProvider.class, DepthParameterProvider.class, FieldsParameterProvider.class,
+            WithDefaultsParameterProvider.class,
+
+            // Body output
             JsonNormalizedNodeBodyWriter.class, XmlNormalizedNodeBodyWriter.class,
             YinSchemaExportBodyWriter.class, YangSchemaExportBodyWriter.class,
             JsonPatchStatusBodyWriter.class, XmlPatchStatusBodyWriter.class);
