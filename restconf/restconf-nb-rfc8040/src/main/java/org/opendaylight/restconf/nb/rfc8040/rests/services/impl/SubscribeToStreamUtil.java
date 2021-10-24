@@ -132,15 +132,15 @@ abstract class SubscribeToStreamUtil {
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
         notificationListenerAdapter.setQueryParams(
-                notificationQueryParams.getStart(),
-                notificationQueryParams.getStop().orElse(null),
-                notificationQueryParams.getFilter().orElse(null),
+                notificationQueryParams.startTime(),
+                notificationQueryParams.stopTime(),
+                notificationQueryParams.filter(),
                 false, notificationQueryParams.isSkipNotificationData());
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getSchemaHandler());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                     notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
-                    schemaContext.getNotifications(), notificationQueryParams.getStart(),
+                    schemaContext.getNotifications(), notificationQueryParams.startTime(),
                     notificationListenerAdapter.getOutputType(), uri);
 
         // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
@@ -184,9 +184,9 @@ abstract class SubscribeToStreamUtil {
                 ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
 
         listener.setQueryParams(
-                notificationQueryParams.getStart(),
-                notificationQueryParams.getStop().orElse(null),
-                notificationQueryParams.getFilter().orElse(null),
+                notificationQueryParams.startTime(),
+                notificationQueryParams.stopTime(),
+                notificationQueryParams.filter(),
                 false, notificationQueryParams.isSkipNotificationData());
 
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
@@ -200,7 +200,7 @@ abstract class SubscribeToStreamUtil {
 
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.getPath(),
-                notificationQueryParams.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
+                notificationQueryParams.startTime(), listener.getOutputType(), uri, schemaContext, serializedPath);
         final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);

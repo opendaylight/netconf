@@ -48,30 +48,30 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     }
 
     // FIXME: these should be final
-    private Instant start = null;
-    private Instant stop = null;
+    private Instant startTime = null;
+    private Instant stopTime = null;
     private String filter = null;
     private boolean leafNodesOnly = false;
     private boolean skipNotificationData = false;
 
     @VisibleForTesting
     public final Instant getStart() {
-        return start;
+        return startTime;
     }
 
     /**
      * Set query parameters for listener.
      *
-     * @param start         Start-time of getting notification.
-     * @param stop          Stop-time of getting notification.
+     * @param startTime     Start-time of getting notification.
+     * @param stopTime      Stop-time of getting notification.
      * @param filter        Indicates which subset of all possible events are of interest.
      * @param leafNodesOnly If TRUE, notifications will contain changes of leaf nodes only.
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    public void setQueryParams(final Instant start, final Instant stop, final String filter,
+    public void setQueryParams(final Instant startTime, final Instant stopTime, final String filter,
             final boolean leafNodesOnly, final boolean skipNotificationData) {
-        this.start = requireNonNull(start);
-        this.stop = stop;
+        this.startTime = requireNonNull(startTime);
+        this.stopTime = stopTime;
         this.filter = filter;
         this.leafNodesOnly = leafNodesOnly;
         this.skipNotificationData = skipNotificationData;
@@ -97,20 +97,20 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     <T extends BaseListenerInterface> boolean checkStartStop(final Instant now, final T listener) {
-        if (this.stop != null) {
-            if (this.start.compareTo(now) < 0 && this.stop.compareTo(now) > 0) {
+        if (stopTime != null) {
+            if (startTime.compareTo(now) < 0 && stopTime.compareTo(now) > 0) {
                 return true;
             }
-            if (this.stop.compareTo(now) < 0) {
+            if (stopTime.compareTo(now) < 0) {
                 try {
                     listener.close();
                 } catch (final Exception e) {
                     throw new RestconfDocumentedException("Problem with unregister listener." + e);
                 }
             }
-        } else if (this.start != null) {
-            if (this.start.compareTo(now) < 0) {
-                this.start = null;
+        } else if (startTime != null) {
+            if (startTime.compareTo(now) < 0) {
+                startTime = null;
                 return true;
             }
         } else {
@@ -125,8 +125,9 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param xml XML data of notification.
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
+    // FIXME: this method is never called, have we lost functionality compared to bierman02?
     boolean checkFilter(final String xml) {
-        if (this.filter == null) {
+        if (filter == null) {
             return true;
         }
         try {
@@ -146,6 +147,6 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
         final Document docOfXml = DBF.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
         final XPath xPath = XPathFactory.newInstance().newXPath();
         // FIXME: BUG-7956: xPath.setNamespaceContext(nsContext);
-        return (boolean) xPath.compile(this.filter).evaluate(docOfXml, XPathConstants.BOOLEAN);
+        return (boolean) xPath.compile(filter).evaluate(docOfXml, XPathConstants.BOOLEAN);
     }
 }
