@@ -103,10 +103,6 @@ public final class QueryParams {
      */
     public static QueryParameters newReadDataParams(final InstanceIdentifierContext<?> identifier,
                                                     final UriInfo uriInfo) {
-        if (uriInfo == null) {
-            return QueryParameters.empty();
-        }
-
         // check only allowed parameters
         final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);

@@ -53,6 +53,7 @@ final class TestData {
     final QName leafListQname = QName.create(base, "leaf-list");
     final QName listQname = QName.create(base, "list");
 
+    // FIXME: ${DEITY}, this is fugly. All these are essentially constants for ReadDataTransactionUtilTest!
     TestData() {
         final NodeIdentifierWithPredicates nodeWithKey =
                 NodeIdentifierWithPredicates.of(listQname, listKeyQName, "keyValue");
