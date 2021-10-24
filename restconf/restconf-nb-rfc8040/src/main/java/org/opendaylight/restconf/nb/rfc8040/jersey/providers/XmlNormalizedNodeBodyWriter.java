@@ -27,7 +27,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -88,7 +88,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath path,
-            final InstanceIdentifierContext<?> pathContext, final NormalizedNode data, final DepthParameter depth,
+            final InstanceIdentifierContext<?> pathContext, final NormalizedNode data, final DepthParam depth,
             final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();
@@ -135,7 +135,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-            final EffectiveModelContext schemaContext, final SchemaPath schemaPath, final DepthParameter depth,
+            final EffectiveModelContext schemaContext, final SchemaPath schemaPath, final DepthParam depth,
             final List<Set<QName>> fields) {
         final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter
                 .create(xmlWriter, schemaContext, schemaPath);

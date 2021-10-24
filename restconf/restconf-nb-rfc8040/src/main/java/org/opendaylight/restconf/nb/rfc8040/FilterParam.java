@@ -11,25 +11,34 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * This class represents a {@code filter} parameter as defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.4">RFC8040 section 4.8.4</a>.
  */
 
-public final class FilterParameter implements Immutable {
+public final class FilterParam implements RestconfQueryParam<FilterParam> {
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:filter:1.0");
 
     // FIXME: can we have a parsed, but not bound version of an XPath, please?
     private final @NonNull String value;
 
-    private FilterParameter(final String value) {
+    private FilterParam(final String value) {
         this.value = requireNonNull(value);
     }
 
-    public static @NonNull FilterParameter forUriValue(final String uriValue) {
-        return new FilterParameter(uriValue);
+    @Override
+    public Class<@NonNull FilterParam> javaClass() {
+        return FilterParam.class;
+    }
+
+    @Override
+    public String paramName() {
+        return uriName();
+    }
+
+    public static @NonNull FilterParam forUriValue(final String uriValue) {
+        return new FilterParam(uriValue);
     }
 
     public static @NonNull String uriName() {

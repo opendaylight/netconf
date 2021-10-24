@@ -34,7 +34,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.StartTimeParameter;
+import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
@@ -120,7 +120,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                               final NotificationOutputTypeGrouping.NotificationOutputType outputType,
                               final boolean leafNodesOnly, final boolean skipNotificationData) {
             super(path, streamName, outputType);
-            setQueryParams(StartTimeParameter.forUriValue("1970-01-01T00:00:00Z"), null, null, leafNodesOnly,
+            setQueryParams(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null, leafNodesOnly,
                 skipNotificationData);
         }
 

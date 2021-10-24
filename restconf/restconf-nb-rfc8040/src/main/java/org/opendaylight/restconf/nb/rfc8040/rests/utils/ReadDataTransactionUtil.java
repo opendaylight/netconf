@@ -20,8 +20,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
-import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
+import org.opendaylight.restconf.nb.rfc8040.ContentParam;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -88,10 +88,10 @@ public final class ReadDataTransactionUtil {
      * @param ctx            schema context
      * @return {@link NormalizedNode}
      */
-    public static @Nullable NormalizedNode readData(final @NonNull ContentParameter content,
+    public static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
                                                     final @NonNull YangInstanceIdentifier path,
                                                     final @NonNull RestconfStrategy strategy,
-                                                    final WithDefaultsParameter withDefa,
+                                                    final WithDefaultsParam withDefa,
                                                     final EffectiveModelContext ctx) {
         // FIXME: use a switch expression when they are available, removing source of RestconfDocumentedException
         switch (content) {
@@ -122,9 +122,9 @@ public final class ReadDataTransactionUtil {
      * @param fields         paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */
-    public static @Nullable NormalizedNode readData(final @NonNull ContentParameter content,
+    public static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy,
-            final @Nullable WithDefaultsParameter withDefa, @NonNull final EffectiveModelContext ctx,
+            final @Nullable WithDefaultsParam withDefa, @NonNull final EffectiveModelContext ctx,
             final @NonNull List<YangInstanceIdentifier> fields) {
         // FIXME: use a switch expression when they are available, removing source of RestconfDocumentedException
         switch (content) {
@@ -144,7 +144,7 @@ public final class ReadDataTransactionUtil {
     }
 
     private static NormalizedNode prepareDataByParamWithDef(final NormalizedNode result,
-            final YangInstanceIdentifier path, final WithDefaultsParameter withDefa, final EffectiveModelContext ctx) {
+            final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
         boolean trim;
         switch (withDefa) {
             case TRIM:
@@ -316,7 +316,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
-            final YangInstanceIdentifier path, final WithDefaultsParameter withDefa, final EffectiveModelContext ctx) {
+            final YangInstanceIdentifier path, final WithDefaultsParam withDefa, final EffectiveModelContext ctx) {
         // PREPARE STATE DATA NODE
         final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path);
         // PREPARE CONFIG DATA NODE
@@ -339,7 +339,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readAllData(final @NonNull RestconfStrategy strategy,
-            final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParameter withDefa,
+            final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
             final @NonNull EffectiveModelContext ctx, final @NonNull List<YangInstanceIdentifier> fields) {
         // PREPARE STATE DATA NODE
         final NormalizedNode stateDataNode = readDataViaTransaction(strategy, LogicalDatastoreType.OPERATIONAL, path,

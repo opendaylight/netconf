@@ -22,17 +22,17 @@ import org.opendaylight.yangtools.concepts.Immutable;
 // FIXME: this should be a record once we have JDK17+
 public final class ReadDataParams implements Immutable {
     private static final @NonNull ReadDataParams EMPTY =
-        new ReadDataParams(ContentParameter.ALL, null, null, null, false, false);
+        new ReadDataParams(ContentParam.ALL, null, null, null, false, false);
 
-    private final @NonNull ContentParameter content;
-    private final WithDefaultsParameter withDefaults;
-    private final FieldsParameter fields;
-    private final DepthParameter depth;
+    private final @NonNull ContentParam content;
+    private final WithDefaultsParam withDefaults;
+    private final FieldsParam fields;
+    private final DepthParam depth;
     private final boolean prettyPrint;
     private final boolean tagged;
 
-    private ReadDataParams(final ContentParameter content,  final DepthParameter depth, final FieldsParameter fields,
-            final WithDefaultsParameter withDefaults, final boolean tagged, final boolean prettyPrint) {
+    private ReadDataParams(final ContentParam content,  final DepthParam depth, final FieldsParam fields,
+            final WithDefaultsParam withDefaults, final boolean tagged, final boolean prettyPrint) {
         this.content = requireNonNull(content);
         this.depth = depth;
         this.fields = fields;
@@ -45,25 +45,25 @@ public final class ReadDataParams implements Immutable {
         return EMPTY;
     }
 
-    public static @NonNull ReadDataParams of(final ContentParameter content,  final DepthParameter depth,
-            final FieldsParameter fields, final WithDefaultsParameter withDefaults, final boolean tagged,
+    public static @NonNull ReadDataParams of(final ContentParam content,  final DepthParam depth,
+            final FieldsParam fields, final WithDefaultsParam withDefaults, final boolean tagged,
             final boolean prettyPrint) {
         return new ReadDataParams(content, depth, fields, withDefaults, tagged, prettyPrint);
     }
 
-    public @NonNull ContentParameter content() {
+    public @NonNull ContentParam content() {
         return content;
     }
 
-    public @Nullable DepthParameter depth() {
+    public @Nullable DepthParam depth() {
         return depth;
     }
 
-    public @Nullable FieldsParameter fields() {
+    public @Nullable FieldsParam fields() {
         return fields;
     }
 
-    public @Nullable WithDefaultsParameter withDefaults() {
+    public @Nullable WithDefaultsParam withDefaults() {
         return withDefaults;
     }
 

@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Enumeration of possible {@code with-defaults} parameter values as defined by
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.9">RFC8040, section 4.8.9</a>.
  */
-public enum WithDefaultsParameter {
+public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
     /**
      * Data nodes set to the YANG default by the client are reported.
      */
@@ -39,8 +39,18 @@ public enum WithDefaultsParameter {
 
     private final @NonNull String uriValue;
 
-    WithDefaultsParameter(final String uriValue) {
+    WithDefaultsParam(final String uriValue) {
         this.uriValue = requireNonNull(uriValue);
+    }
+
+    @Override
+    public Class<@NonNull WithDefaultsParam> javaClass() {
+        return WithDefaultsParam.class;
+    }
+
+    @Override
+    public String paramName() {
+        return uriName();
     }
 
     public static @NonNull String uriName() {
@@ -51,7 +61,7 @@ public enum WithDefaultsParameter {
         return uriValue;
     }
 
-    public static @Nullable WithDefaultsParameter forUriValue(final String uriValue) {
+    public static @Nullable WithDefaultsParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "explicit":
                 return EXPLICIT;

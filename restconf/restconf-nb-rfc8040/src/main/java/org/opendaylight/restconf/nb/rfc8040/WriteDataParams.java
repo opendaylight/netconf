@@ -19,10 +19,10 @@ import org.opendaylight.yangtools.concepts.Immutable;
 public final class WriteDataParams implements Immutable {
     private static final @NonNull WriteDataParams EMPTY = new WriteDataParams(null, null);
 
-    private final PointParameter point;
-    private final InsertParameter insert;
+    private final PointParam point;
+    private final InsertParam insert;
 
-    private WriteDataParams(final InsertParameter insert, final PointParameter point) {
+    private WriteDataParams(final InsertParam insert, final PointParam point) {
         this.insert = insert;
         this.point = point;
     }
@@ -31,7 +31,7 @@ public final class WriteDataParams implements Immutable {
         return EMPTY;
     }
 
-    public static @NonNull WriteDataParams of(final InsertParameter insert, final PointParameter point) {
+    public static @NonNull WriteDataParams of(final InsertParam insert, final PointParam point) {
         if (point == null) {
             if (insert == null) {
                 return empty();
@@ -41,7 +41,7 @@ public final class WriteDataParams implements Immutable {
             //        If the values "before" or "after" are used, then a "point" query
             //        parameter for the "insert" query parameter MUST also be present, or a
             //        "400 Bad Request" status-line is returned.
-            if (insert == InsertParameter.BEFORE || insert == InsertParameter.AFTER) {
+            if (insert == InsertParam.BEFORE || insert == InsertParam.AFTER) {
                 throw new IllegalArgumentException(
                     "Insert parameter " + insert.uriValue() + " cannot be used without a Point parameter.");
             }
@@ -51,7 +51,7 @@ public final class WriteDataParams implements Immutable {
             //        If the "insert" query parameter is not present or has a value other
             //        than "before" or "after", then a "400 Bad Request" status-line is
             //        returned.
-            if (insert != InsertParameter.BEFORE && insert != InsertParameter.AFTER) {
+            if (insert != InsertParam.BEFORE && insert != InsertParam.AFTER) {
                 throw new IllegalArgumentException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
             }
@@ -60,11 +60,11 @@ public final class WriteDataParams implements Immutable {
         return new WriteDataParams(insert, point);
     }
 
-    public @Nullable InsertParameter insert() {
+    public @Nullable InsertParam insert() {
         return insert;
     }
 
-    public @Nullable PointParameter point() {
+    public @Nullable PointParam point() {
         return point;
     }
 

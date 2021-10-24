@@ -9,24 +9,34 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import static java.util.Objects.requireNonNull;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * This class represents a {@code point} parameter as defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.4">RFC8040 section 4.8.4</a>.
  */
 @NonNullByDefault
-public final class PointParameter implements Immutable {
+public final class PointParam implements RestconfQueryParam<PointParam> {
     // FIXME: This should be ApiPath
     private final String value;
 
-    private PointParameter(final String value) {
+    private PointParam(final String value) {
         this.value = requireNonNull(value);
     }
 
-    public static PointParameter forUriValue(final String uriValue) {
-        return new PointParameter(uriValue);
+    @Override
+    public Class<@NonNull PointParam> javaClass() {
+        return PointParam.class;
+    }
+
+    @Override
+    public String paramName() {
+        return uriName();
+    }
+
+    public static PointParam forUriValue(final String uriValue) {
+        return new PointParam(uriValue);
     }
 
     public static String uriName() {

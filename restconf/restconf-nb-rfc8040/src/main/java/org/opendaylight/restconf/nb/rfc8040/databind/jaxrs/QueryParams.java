@@ -27,17 +27,17 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
-import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
-import org.opendaylight.restconf.nb.rfc8040.InsertParameter;
+import org.opendaylight.restconf.nb.rfc8040.ContentParam;
+import org.opendaylight.restconf.nb.rfc8040.DepthParam;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParam;
+import org.opendaylight.restconf.nb.rfc8040.FilterParam;
+import org.opendaylight.restconf.nb.rfc8040.InsertParam;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
-import org.opendaylight.restconf.nb.rfc8040.PointParameter;
+import org.opendaylight.restconf.nb.rfc8040.PointParam;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.StartTimeParameter;
-import org.opendaylight.restconf.nb.rfc8040.StopTimeParameter;
-import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
+import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
+import org.opendaylight.restconf.nb.rfc8040.StopTimeParam;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -45,13 +45,13 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 
 @Beta
 public final class QueryParams {
-    private static final Set<String> ALLOWED_PARAMETERS = Set.of(ContentParameter.uriName(), DepthParameter.uriName(),
-        FieldsParameter.uriName(), WithDefaultsParameter.uriName());
-    private static final List<String> POSSIBLE_CONTENT = Arrays.stream(ContentParameter.values())
-        .map(ContentParameter::uriValue)
+    private static final Set<String> ALLOWED_PARAMETERS = Set.of(ContentParam.uriName(), DepthParam.uriName(),
+        FieldsParam.uriName(), WithDefaultsParam.uriName());
+    private static final List<String> POSSIBLE_CONTENT = Arrays.stream(ContentParam.values())
+        .map(ContentParam::uriValue)
         .collect(Collectors.toUnmodifiableList());
-    private static final List<String> POSSIBLE_WITH_DEFAULTS = Arrays.stream(WithDefaultsParameter.values())
-        .map(WithDefaultsParameter::uriValue)
+    private static final List<String> POSSIBLE_WITH_DEFAULTS = Arrays.stream(WithDefaultsParam.values())
+        .map(WithDefaultsParam::uriValue)
         .collect(Collectors.toUnmodifiableList());
 
     private QueryParams() {
@@ -59,9 +59,9 @@ public final class QueryParams {
     }
 
     public static @NonNull NotificationQueryParams newNotificationQueryParams(final UriInfo uriInfo) {
-        StartTimeParameter startTime = null;
-        StopTimeParameter stopTime = null;
-        FilterParameter filter = null;
+        StartTimeParam startTime = null;
+        StopTimeParam stopTime = null;
+        FilterParam filter = null;
         boolean skipNotificationData = false;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
@@ -69,14 +69,14 @@ public final class QueryParams {
             final List<String> paramValues = entry.getValue();
 
             try {
-                if (paramName.equals(StartTimeParameter.uriName())) {
-                    startTime = optionalParam(StartTimeParameter::forUriValue, paramName, paramValues);
+                if (paramName.equals(StartTimeParam.uriName())) {
+                    startTime = optionalParam(StartTimeParam::forUriValue, paramName, paramValues);
                     break;
-                } else if (paramName.equals(StopTimeParameter.uriName())) {
-                    stopTime = optionalParam(StopTimeParameter::forUriValue, paramName, paramValues);
+                } else if (paramName.equals(StopTimeParam.uriName())) {
+                    stopTime = optionalParam(StopTimeParam::forUriValue, paramName, paramValues);
                     break;
-                } else if (paramName.equals(FilterParameter.uriName())) {
-                    filter = optionalParam(FilterParameter::forUriValue, paramName, paramValues);
+                } else if (paramName.equals(FilterParam.uriName())) {
+                    filter = optionalParam(FilterParam::forUriValue, paramName, paramValues);
                 } else if (paramName.equals("odl-skip-notification-data")) {
                     // FIXME: this should be properly encapsulated in SkipNotificatioDataParameter
                     skipNotificationData = Boolean.parseBoolean(optionalParam(paramName, paramValues));
@@ -119,18 +119,18 @@ public final class QueryParams {
         checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);
 
         // check and set content
-        final String contentStr = getSingleParameter(queryParams, ContentParameter.uriName());
-        final ContentParameter content = contentStr == null ? ContentParameter.ALL
-            : RestconfDocumentedException.throwIfNull(ContentParameter.forUriValue(contentStr),
+        final String contentStr = getSingleParameter(queryParams, ContentParam.uriName());
+        final ContentParam content = contentStr == null ? ContentParam.ALL
+            : RestconfDocumentedException.throwIfNull(ContentParam.forUriValue(contentStr),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT);
 
         // check and set depth
-        final DepthParameter depth;
-        final String depthStr = getSingleParameter(queryParams, DepthParameter.uriName());
+        final DepthParam depth;
+        final String depthStr = getSingleParameter(queryParams, DepthParam.uriName());
         if (depthStr != null) {
             try {
-                depth = DepthParameter.forUriValue(depthStr);
+                depth = DepthParam.forUriValue(depthStr);
             } catch (IllegalArgumentException e) {
                 throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                     "Invalid depth parameter: " + depthStr, null,
@@ -141,11 +141,11 @@ public final class QueryParams {
         }
 
         // check and set fields
-        final FieldsParameter fields;
-        final String fieldsStr = getSingleParameter(queryParams, FieldsParameter.uriName());
+        final FieldsParam fields;
+        final String fieldsStr = getSingleParameter(queryParams, FieldsParam.uriName());
         if (fieldsStr != null) {
             try {
-                fields = FieldsParameter.parse(fieldsStr);
+                fields = FieldsParam.parse(fieldsStr);
             } catch (ParseException e) {
                 throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                     "Invalid filds parameter: " + fieldsStr));
@@ -155,12 +155,12 @@ public final class QueryParams {
         }
 
         // check and set withDefaults parameter
-        final WithDefaultsParameter withDefaults;
+        final WithDefaultsParam withDefaults;
         final boolean tagged;
 
-        final String withDefaultsStr = getSingleParameter(queryParams, WithDefaultsParameter.uriName());
+        final String withDefaultsStr = getSingleParameter(queryParams, WithDefaultsParam.uriName());
         if (withDefaultsStr != null) {
-            final WithDefaultsParameter val = WithDefaultsParameter.forUriValue(withDefaultsStr);
+            final WithDefaultsParam val = WithDefaultsParam.forUriValue(withDefaultsStr);
             if (val == null) {
                 throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                     "Invalid with-defaults parameter: " + withDefaultsStr, null,
@@ -190,25 +190,25 @@ public final class QueryParams {
     }
 
     public static @NonNull WriteDataParams newWriteDataParams(final UriInfo uriInfo) {
-        InsertParameter insert = null;
-        PointParameter point = null;
+        InsertParam insert = null;
+        PointParam point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             final String uriName = entry.getKey();
             final List<String> paramValues = entry.getValue();
-            if (uriName.equals(InsertParameter.uriName())) {
+            if (uriName.equals(InsertParam.uriName())) {
                 final String str = optionalParam(uriName, paramValues);
                 if (str != null) {
-                    insert = InsertParameter.forUriValue(str);
+                    insert = InsertParam.forUriValue(str);
                     if (insert == null) {
                         throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
                             ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
                     }
                 }
-            } else if (PointParameter.uriName().equals(uriName)) {
+            } else if (PointParam.uriName().equals(uriName)) {
                 final String str = optionalParam(uriName, paramValues);
                 if (str != null) {
-                    point = PointParameter.forUriValue(str);
+                    point = PointParam.forUriValue(str);
                 }
             } else {
                 throw new RestconfDocumentedException("Bad parameter for post: " + uriName,

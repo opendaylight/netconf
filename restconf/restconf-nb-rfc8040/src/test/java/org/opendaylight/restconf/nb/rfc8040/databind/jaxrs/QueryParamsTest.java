@@ -28,10 +28,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.ContentParameter;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.ContentParam;
+import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -59,8 +59,8 @@ public class QueryParamsTest {
     @Test
     public void getSingleParameterTest() {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.putSingle(ContentParameter.uriName(), "all");
-        assertEquals("all", QueryParams.getSingleParameter(parameters, ContentParameter.uriName()));
+        parameters.putSingle(ContentParam.uriName(), "all");
+        assertEquals("all", QueryParams.getSingleParameter(parameters, ContentParam.uriName()));
     }
 
     /**
@@ -69,10 +69,10 @@ public class QueryParamsTest {
     @Test
     public void getSingleParameterNegativeTest() {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put(ContentParameter.uriName(), List.of("config", "nonconfig", "all"));
+        parameters.put(ContentParam.uriName(), List.of("config", "nonconfig", "all"));
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.getSingleParameter(parameters, ContentParameter.uriName()));
+            () -> QueryParams.getSingleParameter(parameters, ContentParam.uriName()));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
@@ -87,7 +87,7 @@ public class QueryParamsTest {
     @Test
     public void checkParametersTypesTest() {
         QueryParams.checkParametersTypes(Set.of("content"),
-            Set.of(ContentParameter.uriName(), DepthParameter.uriName()));
+            Set.of(ContentParam.uriName(), DepthParam.uriName()));
     }
 
     /**
@@ -97,7 +97,7 @@ public class QueryParamsTest {
     public void checkParametersTypesNegativeTest() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> QueryParams.checkParametersTypes(Set.of("not-allowed-parameter"),
-                Set.of(ContentParameter.uriName(), DepthParameter.uriName())));
+                Set.of(ContentParam.uriName(), DepthParam.uriName())));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
 
@@ -115,7 +115,7 @@ public class QueryParamsTest {
         mockQueryParameters(new MultivaluedHashMap<String, String>());
 
         final var parsedParameters = QueryParams.newReadDataParams(uriInfo);
-        assertEquals(ContentParameter.ALL, parsedParameters.content());
+        assertEquals(ContentParam.ALL, parsedParameters.content());
         assertNull(parsedParameters.depth());
         assertNull(parsedParameters.fields());
     }
@@ -232,7 +232,7 @@ public class QueryParamsTest {
         mockQueryParameter("with-defaults", "explicit");
 
         final var parsedParameters = QueryParams.newReadDataParams(uriInfo);
-        assertSame(WithDefaultsParameter.EXPLICIT, parsedParameters.withDefaults());
+        assertSame(WithDefaultsParam.EXPLICIT, parsedParameters.withDefaults());
         assertFalse(parsedParameters.tagged());
     }
 
@@ -251,10 +251,10 @@ public class QueryParamsTest {
 
         final ReadDataParams parsedParameters = QueryParams.newReadDataParams(uriInfo);
         // content
-        assertEquals(ContentParameter.CONFIG, parsedParameters.content());
+        assertEquals(ContentParam.CONFIG, parsedParameters.content());
 
         // depth
-        final DepthParameter depth = parsedParameters.depth();
+        final DepthParam depth = parsedParameters.depth();
         assertNotNull(depth);
         assertEquals(10, depth.value());
 

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -61,7 +61,7 @@ public final class QueryParameters {
         return params;
     }
 
-    public @Nullable DepthParameter depth() {
+    public @Nullable DepthParam depth() {
         return params.depth();
     }
 
