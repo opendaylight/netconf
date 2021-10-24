@@ -85,13 +85,8 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
  * </ul>
  */
 public final class ReadDataTransactionUtil {
-    private static final Set<String> ALLOWED_PARAMETERS = Set.of(
-        ContentParameter.uriName(),
-        DepthParameter.uriName(),
-        FieldsParameter.uriName(),
-        WithDefaultsParameter.uriName());
-    private static final List<String> DEFAULT_CONTENT = List.of(ContentParameter.ALL.uriValue());
-    private static final List<String> DEFAULT_DEPTH = List.of(DepthParameter.unboundedUriValue());
+    private static final Set<String> ALLOWED_PARAMETERS = Set.of(ContentParameter.uriName(), DepthParameter.uriName(),
+        FieldsParameter.uriName(), WithDefaultsParameter.uriName());
     private static final List<String> POSSIBLE_CONTENT = Arrays.stream(ContentParameter.values())
         .map(ContentParameter::uriValue)
         .collect(Collectors.toUnmodifiableList());
@@ -123,46 +118,52 @@ public final class ReadDataTransactionUtil {
         final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         checkParametersTypes(queryParams.keySet(), ALLOWED_PARAMETERS);
 
-        // read parameters from URI or set default values
-        final List<String> content = queryParams.getOrDefault(ContentParameter.uriName(), DEFAULT_CONTENT);
-        final List<String> depth = queryParams.getOrDefault(DepthParameter.uriName(), DEFAULT_DEPTH);
-        final List<String> withDefaults = queryParams.getOrDefault(WithDefaultsParameter.uriName(), List.of());
-        // fields
-        final List<String> fields = queryParams.getOrDefault(FieldsParameter.uriName(), List.of());
-
-        // parameter can be in URI at most once
-        checkParameterCount(content, ContentParameter.uriName());
-        checkParameterCount(depth, DepthParameter.uriName());
-        checkParameterCount(fields, FieldsParameter.uriName());
-        checkParameterCount(withDefaults, WithDefaultsParameter.uriName());
-
         // check and set content
-        final String contentStr = content.get(0);
-        builder.setContent(RestconfDocumentedException.throwIfNull(
-            ContentParameter.forUriValue(contentStr), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-            "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT));
+        final List<String> contentValues = queryParams.get(ContentParameter.uriName());
+        if (contentValues != null && !contentValues.isEmpty()) {
+            checkParameterCount(contentValues, ContentParameter.uriName());
 
-        final String depthStr = depth.get(0);
-        try {
-            builder.setDepth(DepthParameter.forUriValue(depthStr));
-        } catch (IllegalArgumentException e) {
-            throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                "Invalid depth parameter: " + depthStr, null,
-                "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
+            final String contentStr = contentValues.get(0);
+            builder.setContent(RestconfDocumentedException.throwIfNull(
+                ContentParameter.forUriValue(contentStr), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT));
+        }
+
+        // check and set depth
+        final List<String> depthValues = queryParams.get(DepthParameter.uriName());
+        if (depthValues != null && !depthValues.isEmpty()) {
+            checkParameterCount(depthValues, DepthParameter.uriName());
+
+            final String depthStr = depthValues.get(0);
+            try {
+                builder.setDepth(DepthParameter.forUriValue(depthStr));
+            } catch (IllegalArgumentException e) {
+                throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                    "Invalid depth parameter: " + depthStr, null,
+                    "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
+            }
         }
 
         // check and set fields
-        if (!fields.isEmpty()) {
+        final List<String> fieldsValues = queryParams.get(FieldsParameter.uriName());
+        if (fieldsValues != null && !fieldsValues.isEmpty()) {
+            checkParameterCount(fieldsValues, FieldsParameter.uriName());
+
+            final String fieldsStr = fieldsValues.get(0);
+            // FIXME: parse a FieldsParameter instead
             if (identifier.getMountPoint() != null) {
-                builder.setFieldPaths(parseFieldsPaths(identifier, fields.get(0)));
+                builder.setFieldPaths(parseFieldsPaths(identifier, fieldsStr));
             } else {
-                builder.setFields(parseFieldsParameter(identifier, fields.get(0)));
+                builder.setFields(parseFieldsParameter(identifier, fieldsStr));
             }
         }
 
         // check and set withDefaults parameter
-        if (!withDefaults.isEmpty()) {
-            final String str = withDefaults.get(0);
+        final List<String> withDefaultsValues = queryParams.get(WithDefaultsParameter.uriName());
+        if (withDefaultsValues != null && !withDefaultsValues.isEmpty()) {
+            checkParameterCount(withDefaultsValues, WithDefaultsParameter.uriName());
+
+            final String str = withDefaultsValues.get(0);
             final WithDefaultsParameter val = WithDefaultsParameter.forUriValue(str);
             if (val == null) {
                 throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
@@ -180,6 +181,7 @@ public final class ReadDataTransactionUtil {
                     builder.setWithDefault(val);
             }
         }
+
         return builder.build();
     }
 
@@ -271,8 +273,7 @@ public final class ReadDataTransactionUtil {
      * @param allowedParameters allowed parameters for operation
      */
     @VisibleForTesting
-    static void checkParametersTypes(final @NonNull Set<String> usedParameters,
-                                     final @NonNull Set<String> allowedParameters) {
+    static void checkParametersTypes(final Set<String> usedParameters, final Set<String> allowedParameters) {
         if (!allowedParameters.containsAll(usedParameters)) {
             final Set<String> notAllowedParameters = usedParameters.stream()
                 .filter(param -> !allowedParameters.contains(param))

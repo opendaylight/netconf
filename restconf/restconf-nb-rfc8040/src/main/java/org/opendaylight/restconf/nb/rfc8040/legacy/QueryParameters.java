@@ -24,9 +24,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  */
 public final class QueryParameters {
     public static final class Builder {
+        private ContentParameter content = ContentParameter.ALL;
         private List<YangInstanceIdentifier> fieldPaths;
         private List<Set<QName>> fields;
-        private ContentParameter content;
         private WithDefaultsParameter withDefault;
         private DepthParameter depth;
         private boolean prettyPrint;
