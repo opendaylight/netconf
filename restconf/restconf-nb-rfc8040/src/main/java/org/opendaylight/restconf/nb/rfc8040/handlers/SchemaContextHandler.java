@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.$YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -20,15 +21,21 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.AbstractReplayParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
+import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
-import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
@@ -69,6 +76,10 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class SchemaContextHandler implements EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
+
+    @VisibleForTesting
+    static final @NonNull QName CAPABILITY_QNAME = qnameOf("capability");
+
     private static final NodeIdentifier MODULE_CONFORMANCE_NODEID =
         NodeIdentifier.create(QName.create(IetfYangLibrary.MODULE_QNAME, "conformance-type").intern());
     private static final NodeIdentifier MODULE_FEATURE_NODEID =
@@ -113,14 +124,13 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
     public void onModelContextUpdated(final EffectiveModelContext context) {
         schemaContext = requireNonNull(context);
 
-        if (context.findModule(IetfYangLibrary.MODULE_QNAME).isPresent()) {
+        if (context.findModuleStatement(IetfYangLibrary.MODULE_QNAME).isPresent()) {
             putData(mapModulesByIetfYangLibraryYang(context.getModules(), context,
-                String.valueOf(this.moduleSetId.incrementAndGet())));
+                String.valueOf(moduleSetId.incrementAndGet())));
         }
 
-        final Module monitoringModule = schemaContext.findModule(RestconfState.QNAME.getModule()).orElse(null);
-        if (monitoringModule != null) {
-            putData(RestconfMappingNodeUtil.mapCapabilites(monitoringModule));
+        if (schemaContext.findModuleStatement(RestconfState.QNAME.getModule()).isPresent()) {
+            putData(mapCapabilites());
         }
     }
 
@@ -154,6 +164,29 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
         }
     }
 
+    /**
+     * Map capabilites by ietf-restconf-monitoring.
+     *
+     * @param monitoringModule ietf-restconf-monitoring module
+     * @return mapped capabilites
+     */
+    @VisibleForTesting
+    static ContainerNode mapCapabilites() {
+        return Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(RestconfState.QNAME))
+            .withChild(Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(Capabilities.QNAME))
+                .withChild(Builders.<String>orderedLeafSetBuilder()
+                    .withNodeIdentifier(new NodeIdentifier(CAPABILITY_QNAME))
+                    .withChildValue(DepthParameter.capabilityUri().toString())
+                    .withChildValue(FieldsParameter.capabilityUri().toString())
+                    .withChildValue(FilterParameter.capabilityUri().toString())
+                    .withChildValue(AbstractReplayParameter.capabilityUri().toString())
+                    .withChildValue(WithDefaultsParameter.capabilityUri().toString())
+                    .build())
+                .build())
+            .build();
+    }
 
     /**
      * Map data from modules to {@link NormalizedNode}.
@@ -176,7 +209,6 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
             .withChild(ImmutableNodes.leafNode(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, moduleSetId))
             .withChild(mapBuilder.build()).build();
     }
-
 
     /**
      * Map data by the specific module or submodule.

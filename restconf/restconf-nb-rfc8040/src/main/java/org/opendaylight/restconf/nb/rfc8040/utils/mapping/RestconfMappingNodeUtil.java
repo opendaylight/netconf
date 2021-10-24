@@ -18,29 +18,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.AbstractReplayParameter;
-import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
-import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
-import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
-import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
@@ -48,7 +39,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
  * Util class for mapping nodes.
  */
 public final class RestconfMappingNodeUtil {
-    private static final QName CAPABILITY_QNAME = qnameOf("capability");
     @VisibleForTesting
     static final QName DESCRIPTION_QNAME = qnameOf("description");
     @VisibleForTesting
@@ -64,29 +54,6 @@ public final class RestconfMappingNodeUtil {
 
     private RestconfMappingNodeUtil() {
         // Hidden on purpose
-    }
-
-    /**
-     * Map capabilites by ietf-restconf-monitoring.
-     *
-     * @param monitoringModule ietf-restconf-monitoring module
-     * @return mapped capabilites
-     */
-    public static ContainerNode mapCapabilites(final Module monitoringModule) {
-        return Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(RestconfState.QNAME))
-            .withChild(Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(Capabilities.QNAME))
-                .withChild(Builders.<String>orderedLeafSetBuilder()
-                    .withNodeIdentifier(new NodeIdentifier(CAPABILITY_QNAME))
-                    .withChildValue(DepthParameter.capabilityUri().toString())
-                    .withChildValue(FieldsParameter.capabilityUri().toString())
-                    .withChildValue(FilterParameter.capabilityUri().toString())
-                    .withChildValue(AbstractReplayParameter.capabilityUri().toString())
-                    .withChildValue(WithDefaultsParameter.capabilityUri().toString())
-                    .build())
-                .build())
-            .build();
     }
 
     /**

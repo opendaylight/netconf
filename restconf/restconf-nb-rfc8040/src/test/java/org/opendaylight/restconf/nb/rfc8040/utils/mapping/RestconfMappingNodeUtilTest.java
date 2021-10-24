@@ -7,9 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -19,10 +16,8 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,8 +25,6 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -39,8 +32,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -85,31 +76,6 @@ public class RestconfMappingNodeUtilTest {
         verifyLoadedModules(mods);
         // verify deviations
         verifyDeviations(mods);
-    }
-
-    @Test
-    public void restconfStateCapabilitesTest() {
-        final Module monitoringModule = schemaContextMonitoring.findModule(RestconfState.QNAME.getModule()).get();
-        final ContainerNode normNode = RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
-        assertNotNull(normNode);
-        final List<Object> listOfValues = new ArrayList<>();
-
-        for (final DataContainerChild child : normNode.body()) {
-            if (child.getIdentifier().getNodeType().equals(Capabilities.QNAME)) {
-                for (final DataContainerChild dataContainerChild : ((ContainerNode) child).body()) {
-                    for (final Object entry : ((LeafSetNode<?>) dataContainerChild).body()) {
-                        listOfValues.add(((LeafSetEntryNode<?>) entry).body());
-                    }
-                }
-            }
-        }
-
-        assertThat(listOfValues, containsInAnyOrder(
-            equalTo("urn:ietf:params:restconf:capability:depth:1.0"),
-            equalTo("urn:ietf:params:restconf:capability:fields:1.0"),
-            equalTo("urn:ietf:params:restconf:capability:filter:1.0"),
-            equalTo("urn:ietf:params:restconf:capability:replay:1.0"),
-            equalTo("urn:ietf:params:restconf:capability:with-defaults:1.0")));
     }
 
     @Test

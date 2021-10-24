@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.doReturn;
@@ -14,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.io.FileNotFoundException;
+import java.util.stream.Collectors;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -26,7 +30,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -65,9 +73,9 @@ public class SchemaContextHandlerTest {
         doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
-        this.schemaContextHandler = new SchemaContextHandler(dataBroker, mockDOMSchemaService);
+        schemaContextHandler = new SchemaContextHandler(dataBroker, mockDOMSchemaService);
 
-        this.schemaContextHandler.onModelContextUpdated(SchemaContextHandlerTest.SCHEMA_CONTEXT);
+        schemaContextHandler.onModelContextUpdated(SCHEMA_CONTEXT);
     }
 
     /**
@@ -98,7 +106,7 @@ public class SchemaContextHandlerTest {
     @Test
     public void getSchemaContextTest() {
         assertEquals("SchemaContextHandler should has reference to actual SchemaContext",
-                SCHEMA_CONTEXT, this.schemaContextHandler.get());
+                SCHEMA_CONTEXT, schemaContextHandler.get());
     }
 
     /**
@@ -113,11 +121,39 @@ public class SchemaContextHandlerTest {
         // create new SchemaContext and update SchemaContextHandler
         final EffectiveModelContext newSchemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
-        this.schemaContextHandler.onModelContextUpdated(newSchemaContext);
+        schemaContextHandler.onModelContextUpdated(newSchemaContext);
 
         assertNotEquals("SchemaContextHandler should not has reference to old SchemaContext",
-                SCHEMA_CONTEXT, this.schemaContextHandler.get());
+                SCHEMA_CONTEXT, schemaContextHandler.get());
         assertEquals("SchemaContextHandler should has reference to new SchemaContext",
-                newSchemaContext, this.schemaContextHandler.get());
+                newSchemaContext, schemaContextHandler.get());
     }
+
+    @Test
+    public void restconfStateCapabilitesTest() {
+        final ContainerNode normNode = SchemaContextHandler.mapCapabilites();
+
+        @SuppressWarnings("unchecked")
+        final LeafSetNode<String> capability = (LeafSetNode<String>) normNode.body().stream()
+            // Find 'capabilities' container
+            .filter(child -> Capabilities.QNAME.equals(child.getIdentifier().getNodeType()))
+            .findFirst()
+            .map(ContainerNode.class::cast)
+            .orElseThrow()
+            // Find 'capability' leaf-list
+            .body().stream()
+            .filter(child -> SchemaContextHandler.CAPABILITY_QNAME.equals(child.getIdentifier().getNodeType()))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(
+            capability.body().stream().map(entry -> ((LeafSetEntryNode<?>) entry).body()).collect(Collectors.toList()),
+            containsInAnyOrder(
+                equalTo("urn:ietf:params:restconf:capability:depth:1.0"),
+                equalTo("urn:ietf:params:restconf:capability:fields:1.0"),
+                equalTo("urn:ietf:params:restconf:capability:filter:1.0"),
+                equalTo("urn:ietf:params:restconf:capability:replay:1.0"),
+                equalTo("urn:ietf:params:restconf:capability:with-defaults:1.0")));
+    }
+
 }
