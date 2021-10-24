@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import static com.google.common.base.Verify.verifyNotNull;
+import static org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.UriInfoSupport.getSingleParameter;
 import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsParameter;
 import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsPaths;
 
@@ -237,24 +237,6 @@ public final class ReadDataTransactionUtil {
                 throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                         "Invalid content parameter: " + content.uriValue(), null,
                         "The content parameter value must be either config, nonconfig or all (default)"));
-        }
-    }
-
-    @VisibleForTesting
-    static @Nullable String getSingleParameter(final MultivaluedMap<String, String> params, final String name) {
-        final var values = params.get(name);
-        if (values == null) {
-            return null;
-        }
-
-        switch (values.size()) {
-            case 0:
-                return null;
-            case 1:
-                return verifyNotNull(values.get(0));
-            default:
-                throw new RestconfDocumentedException("Parameter " + name + " can appear at most once in request URI",
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
     }
 

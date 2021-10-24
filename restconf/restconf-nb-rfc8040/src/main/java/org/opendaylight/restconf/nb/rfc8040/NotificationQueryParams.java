@@ -8,13 +8,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.MoreObjects;
-import java.util.List;
-import java.util.Map.Entry;
-import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
@@ -34,69 +32,10 @@ public final class NotificationQueryParams implements Immutable {
         this.skipNotificationData = skipNotificationData;
     }
 
-    // FIXME: this is JAX-RS specific
-    public static @NonNull NotificationQueryParams fromUriInfo(final UriInfo uriInfo) {
-        StartTimeParameter startTime = null;
-        StopTimeParameter stopTime = null;
-        FilterParameter filter = null;
-        boolean skipNotificationData = false;
-
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            final String paramName = entry.getKey();
-            final List<String> paramValues = entry.getValue();
-            if (paramName.equals(StartTimeParameter.uriName())) {
-                switch (paramValues.size()) {
-                    case 0:
-                        break;
-                    case 1:
-                        final String str = paramValues.get(0);
-                        try {
-                            startTime = StartTimeParameter.forUriValue(str);
-                        } catch (IllegalArgumentException e) {
-                            throw new RestconfDocumentedException("Invalid start-time date: " + str, e);
-                        }
-                        break;
-                    default:
-                        throw new RestconfDocumentedException("Start-time parameter can be used only once.");
-                }
-            } else if (paramName.equals(StopTimeParameter.uriName())) {
-                switch (paramValues.size()) {
-                    case 0:
-                        break;
-                    case 1:
-                        final String str = paramValues.get(0);
-                        try {
-                            stopTime = StopTimeParameter.forUriValue(str);
-                        } catch (IllegalArgumentException e) {
-                            throw new RestconfDocumentedException("Invalid stop-time date: " + str, e);
-                        }
-                        break;
-                    default:
-                        throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
-                }
-            } else if (paramName.equals(FilterParameter.uriName())) {
-                if (!paramValues.isEmpty()) {
-                    filter = FilterParameter.forUriValue(paramValues.get(0));
-                }
-            } else if (paramName.equals("odl-skip-notification-data")) {
-                switch (paramValues.size()) {
-                    case 0:
-                        break;
-                    case 1:
-                        skipNotificationData = Boolean.parseBoolean(paramValues.get(0));
-                        break;
-                    default:
-                        throw new RestconfDocumentedException(
-                            "Odl-skip-notification-data parameter can be used only once.");
-                }
-            } else {
-                throw new RestconfDocumentedException("Bad parameter used with notifications: " + paramName);
-            }
-        }
-        if (startTime == null && stopTime != null) {
-            throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
-        }
-
+    public static @NonNull NotificationQueryParams of(final StartTimeParameter startTime,
+            final StopTimeParameter stopTime, final FilterParameter filter, final boolean skipNotificationData) {
+        checkArgument(stopTime == null || startTime != null,
+            "Stop-time parameter has to be used with start-time parameter.");
         return new NotificationQueryParams(startTime, stopTime, filter, skipNotificationData);
     }
 

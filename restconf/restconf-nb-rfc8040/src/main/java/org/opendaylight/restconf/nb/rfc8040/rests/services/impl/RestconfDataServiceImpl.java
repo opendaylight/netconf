@@ -54,6 +54,7 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.InsertParameter;
 import org.opendaylight.restconf.nb.rfc8040.PointParameter;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.UriInfoSupport;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
@@ -247,57 +248,52 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     private static QueryParams checkQueryParameters(final UriInfo uriInfo) {
-        boolean insertUsed = false;
-        boolean pointUsed = false;
         InsertParameter insert = null;
         PointParameter point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             final String uriName = entry.getKey();
-            if (InsertParameter.uriName().equals(uriName)) {
-                if (insertUsed) {
-                    throw new RestconfDocumentedException("Insert parameter can be used only once.",
-                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
-                }
-
-                insertUsed = true;
-                final String str = entry.getValue().get(0);
-                insert = InsertParameter.forUriValue(str);
-                if (insert == null) {
-                    throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
-                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+            final List<String> paramValues = entry.getValue();
+            if (uriName.equals(InsertParameter.uriName())) {
+                final String str = UriInfoSupport.optionalParam(uriName, paramValues);
+                if (str != null) {
+                    insert = InsertParameter.forUriValue(str);
+                    if (insert == null) {
+                        throw new RestconfDocumentedException("Unrecognized insert parameter value '" + str + "'",
+                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                    }
                 }
             } else if (PointParameter.uriName().equals(uriName)) {
-                if (pointUsed) {
-                    throw new RestconfDocumentedException("Point parameter can be used only once.",
-                        ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+                final String str = UriInfoSupport.optionalParam(uriName, paramValues);
+                if (str != null) {
+                    point = PointParameter.forUriValue(str);
                 }
-
-                pointUsed = true;
-                point = PointParameter.forUriValue(entry.getValue().get(0));
             } else {
                 throw new RestconfDocumentedException("Bad parameter for post: " + uriName,
                     ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
         }
 
-        checkQueryParams(insertUsed, pointUsed, insert);
-        return new QueryParams(insert, point);
-    }
-
-    private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed,
-            final InsertParameter insert) {
-        if (pointUsed) {
-            if (!insertUsed) {
-                throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.",
-                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
-            }
-            if (insert != InsertParameter.BEFORE && insert != InsertParameter.AFTER) {
-                throw new RestconfDocumentedException(
-                    "Point parameter can be used only with 'after' or 'before' values of Insert parameter.",
-                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
-            }
+        // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.5:
+        //        If the values "before" or "after" are used, then a "point" query
+        //        parameter for the "insert" query parameter MUST also be present, or a
+        //        "400 Bad Request" status-line is returned.
+        if ((insert == InsertParameter.BEFORE || insert == InsertParameter.AFTER) && point == null) {
+            throw new RestconfDocumentedException(
+                "Insert parameter " + insert.uriValue() + " cannot be used without a Point parameter.",
+                ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
         }
+        // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.6:
+        //        If the "insert" query parameter is not present or has a value other
+        //        than "before" or "after", then a "400 Bad Request" status-line is
+        //        returned.
+        if (point != null && insert != InsertParameter.BEFORE && insert != InsertParameter.AFTER) {
+            throw new RestconfDocumentedException(
+                "Point parameter can be used only with 'after' or 'before' values of Insert parameter.",
+                ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+        }
+
+        return new QueryParams(insert, point);
     }
 
     @Override
