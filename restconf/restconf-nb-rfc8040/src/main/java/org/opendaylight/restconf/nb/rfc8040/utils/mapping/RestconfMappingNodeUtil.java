@@ -18,7 +18,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
+import org.opendaylight.restconf.nb.rfc8040.AbstractReplayParameter;
+import org.opendaylight.restconf.nb.rfc8040.DepthParameter;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParameter;
+import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
+import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParameter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
@@ -75,11 +79,11 @@ public final class RestconfMappingNodeUtil {
                 .withNodeIdentifier(new NodeIdentifier(Capabilities.QNAME))
                 .withChild(Builders.<String>orderedLeafSetBuilder()
                     .withNodeIdentifier(new NodeIdentifier(CAPABILITY_QNAME))
-                    .withChildValue(Rfc8040.Capabilities.DEPTH)
-                    .withChildValue(Rfc8040.Capabilities.FIELDS)
-                    .withChildValue(Rfc8040.Capabilities.FILTER)
-                    .withChildValue(Rfc8040.Capabilities.REPLAY)
-                    .withChildValue(Rfc8040.Capabilities.WITH_DEFAULTS)
+                    .withChildValue(DepthParameter.capabilityUri().toString())
+                    .withChildValue(FieldsParameter.capabilityUri().toString())
+                    .withChildValue(FilterParameter.capabilityUri().toString())
+                    .withChildValue(AbstractReplayParameter.capabilityUri().toString())
+                    .withChildValue(WithDefaultsParameter.capabilityUri().toString())
                     .build())
                 .build())
             .build();

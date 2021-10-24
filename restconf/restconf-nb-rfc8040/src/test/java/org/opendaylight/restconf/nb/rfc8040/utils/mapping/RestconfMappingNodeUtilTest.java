@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -23,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -101,11 +103,13 @@ public class RestconfMappingNodeUtilTest {
                 }
             }
         }
-        assertTrue(listOfValues.contains(Rfc8040.Capabilities.DEPTH));
-        assertTrue(listOfValues.contains(Rfc8040.Capabilities.FIELDS));
-        assertTrue(listOfValues.contains(Rfc8040.Capabilities.FILTER));
-        assertTrue(listOfValues.contains(Rfc8040.Capabilities.REPLAY));
-        assertTrue(listOfValues.contains(Rfc8040.Capabilities.WITH_DEFAULTS));
+
+        assertThat(listOfValues, containsInAnyOrder(
+            equalTo("urn:ietf:params:restconf:capability:depth:1.0"),
+            equalTo("urn:ietf:params:restconf:capability:fields:1.0"),
+            equalTo("urn:ietf:params:restconf:capability:filter:1.0"),
+            equalTo("urn:ietf:params:restconf:capability:replay:1.0"),
+            equalTo("urn:ietf:params:restconf:capability:with-defaults:1.0")));
     }
 
     @Test

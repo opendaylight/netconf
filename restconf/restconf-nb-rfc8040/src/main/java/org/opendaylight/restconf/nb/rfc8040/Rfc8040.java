@@ -47,38 +47,6 @@ public final class Rfc8040 {
     }
 
     /**
-     * Constants for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-11.4">RESTCONF Capability URNs</a>.
-     */
-    public static final class Capabilities {
-        /**
-         * Support for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.2">depth</a> Query Parameter.
-         */
-        public static final String DEPTH = "urn:ietf:params:restconf:capability:depth:1.0";
-        /**
-         * Support for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3">fields</a> Query Parameter.
-         */
-        public static final String FIELDS = "urn:ietf:params:restconf:capability:fields:1.0";
-        /**
-         * Support for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.4">filter</a> Query Parameter.
-         */
-        public static final String FILTER = "urn:ietf:params:restconf:capability:filter:1.0";
-        /**
-         * Support for <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.7">start-time</a>
-         * and <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.7">stop-time</a> Query Parameters.
-         */
-        public static final String REPLAY = "urn:ietf:params:restconf:capability:replay:1.0";
-        /**
-         * Support for
-         * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.9">with-defaults</a> Query Parameter.
-         */
-        public static final String WITH_DEFAULTS = "urn:ietf:params:restconf:capability:with-defaults:1.0";
-
-        private Capabilities() {
-            // Hidden on purpose
-        }
-    }
-
-    /**
      * Constants for ietf-yang-library model.
      */
     // FIXME: split this out
