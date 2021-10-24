@@ -78,20 +78,10 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         }
     }
 
-    private DataTreeCandidateFormatter getFormatter(final String filter) throws XPathExpressionException {
-        final DataTreeCandidateFormatterFactory factory = getFormatterFactory();
-        return filter == null || filter.isEmpty() ? factory.getFormatter() : factory.getFormatter(filter);
-    }
-
     @Override
-    public void setQueryParams(final Instant startTime, final Instant stopTime, final String filter,
-                               final boolean leafNodesOnly, final boolean skipNotificationData) {
-        setQueryParams(startTime, stopTime, leafNodesOnly, skipNotificationData);
-        try {
-            formatter = getFormatter(filter);
-        } catch (final XPathExpressionException e) {
-            throw new IllegalArgumentException("Failed to get filter", e);
-        }
+    final void setFilter(final String filter) throws XPathExpressionException {
+        final DataTreeCandidateFormatterFactory factory = getFormatterFactory();
+        formatter = filter == null || filter.isEmpty() ? factory.getFormatter() : factory.getFormatter(filter);
     }
 
     @Override

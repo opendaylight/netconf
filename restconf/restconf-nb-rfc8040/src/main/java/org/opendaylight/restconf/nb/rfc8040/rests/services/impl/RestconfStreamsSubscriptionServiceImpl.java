@@ -8,21 +8,13 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -36,7 +28,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -167,33 +158,23 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * Parser and holder of query paramteres from uriInfo for notifications.
      */
     public static final class NotificationQueryParams {
-        private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
-                .appendValue(ChronoField.MONTH_OF_YEAR, 2).appendLiteral('-')
-                .appendValue(ChronoField.DAY_OF_MONTH, 2).appendLiteral('T')
-                .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':')
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2).appendLiteral(':')
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
-                .appendOffset("+HH:MM", "Z").toFormatter();
-
-        private final @NonNull Instant startTime;
-        private final Instant stopTime;
-        private final String filter;
+        private final StartTimeParameter startTime;
+        private final StopTimeParameter stopTime;
+        private final FilterParameter filter;
         private final boolean skipNotificationData;
 
-        private NotificationQueryParams(final Instant startTime, final Instant stopTime, final String filter,
-                final boolean skipNotificationData) {
-            this.startTime = requireNonNull(startTime);
+        private NotificationQueryParams(final StartTimeParameter startTime, final StopTimeParameter stopTime,
+                final FilterParameter filter, final boolean skipNotificationData) {
+            this.startTime = startTime;
             this.stopTime = stopTime;
             this.filter = filter;
             this.skipNotificationData = skipNotificationData;
         }
 
         static NotificationQueryParams fromUriInfo(final UriInfo uriInfo) {
-            Instant startTime = null;
-            Instant stopTime = null;
-            String filter = null;
+            StartTimeParameter startTime = null;
+            StopTimeParameter stopTime = null;
+            FilterParameter filter = null;
             boolean skipNotificationData = false;
 
             for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
@@ -204,7 +185,12 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                         case 0:
                             break;
                         case 1:
-                            startTime = parseDateFromQueryParam(paramValues.get(0));
+                            final String str = paramValues.get(0);
+                            try {
+                                startTime = StartTimeParameter.forUriValue(str);
+                            } catch (IllegalArgumentException e) {
+                                throw new RestconfDocumentedException("Invalid start-time date: " + str, e);
+                            }
                             break;
                         default:
                             throw new RestconfDocumentedException("Start-time parameter can be used only once.");
@@ -214,15 +200,19 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                         case 0:
                             break;
                         case 1:
-                            stopTime = parseDateFromQueryParam(paramValues.get(0));
+                            final String str = paramValues.get(0);
+                            try {
+                                stopTime = StopTimeParameter.forUriValue(str);
+                            } catch (IllegalArgumentException e) {
+                                throw new RestconfDocumentedException("Invalid stop-time date: " + str, e);
+                            }
                             break;
                         default:
                             throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
                     }
                 } else if (paramName.equals(FilterParameter.uriName())) {
                     if (!paramValues.isEmpty()) {
-                        // FIXME: use FilterParameter
-                        filter = paramValues.get(0);
+                        filter = FilterParameter.forUriValue(paramValues.get(0));
                     }
                 } else if (paramName.equals("odl-skip-notification-data")) {
                     switch (paramValues.size()) {
@@ -243,26 +233,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                 throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
             }
 
-            return new NotificationQueryParams(startTime == null ? Instant.now() : startTime, stopTime, filter,
-                skipNotificationData);
-        }
-
-
-        /**
-         * Parse input of query parameters - start-time or stop-time - from {@link DateAndTime} format
-         * to {@link Instant} format.
-         *
-         * @param uriValue Start-time or stop-time as string in {@link DateAndTime} format.
-         * @return Parsed {@link Instant} by entry.
-         */
-        private static @NonNull Instant parseDateFromQueryParam(final String uriValue) {
-            final TemporalAccessor accessor;
-            try {
-                accessor = FORMATTER.parse(new DateAndTime(uriValue).getValue());
-            } catch (final DateTimeParseException | IllegalArgumentException e) {
-                throw new RestconfDocumentedException("Cannot parse of value in date: " + uriValue, e);
-            }
-            return Instant.from(accessor);
+            return new NotificationQueryParams(startTime, stopTime, filter, skipNotificationData);
         }
 
         /**
@@ -270,7 +241,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return start-time
          */
-        public @NonNull Instant startTime() {
+        public @Nullable StartTimeParameter startTime() {
             return startTime;
         }
 
@@ -279,7 +250,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return stop-time
          */
-        public @Nullable Instant stopTime() {
+        public @Nullable StopTimeParameter stopTime() {
             return stopTime;
         }
 
@@ -288,7 +259,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return filter
          */
-        public @Nullable String filter() {
+        public @Nullable FilterParameter filter() {
             return filter;
         }
 

@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import static java.time.Instant.EPOCH;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -35,6 +34,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.StartTimeParameter;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
@@ -120,12 +120,13 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                               final NotificationOutputTypeGrouping.NotificationOutputType outputType,
                               final boolean leafNodesOnly, final boolean skipNotificationData) {
             super(path, streamName, outputType);
-            setQueryParams(EPOCH, null, null, leafNodesOnly, skipNotificationData);
+            setQueryParams(StartTimeParameter.forUriValue("1970-01-01T00:00:00Z"), null, null, leafNodesOnly,
+                skipNotificationData);
         }
 
         @Override
         protected void post(final String data) {
-            this.lastNotification = data;
+            lastNotification = data;
             notificationLatch.countDown();
         }
 
@@ -140,11 +141,11 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             LOG.info("Comparing: \n{}\n{}", json, withFakeDate);
 
             JSONAssert.assertEquals(json, withFakeDate, false);
-            this.lastNotification = null;
+            lastNotification = null;
             notificationLatch = new CountDownLatch(1);
         }
 
-        public void assertXmlSimilar(String xml) {
+        public void assertXmlSimilar(final String xml) {
             awaitUntillNotification(xml);
 
             LOG.info("lastNotification: {}", lastNotification);
@@ -152,11 +153,11 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             LOG.info("Comparing: \n{}\n{}", xml, withFakeDate);
 
             XmlAssert.assertThat(xml).and(withFakeDate).ignoreWhitespace().ignoreChildNodesOrder().areSimilar();
-            this.lastNotification = null;
+            lastNotification = null;
             notificationLatch = new CountDownLatch(1);
         }
 
-        public String awaitUntillNotification(String xml) {
+        public String awaitUntillNotification(final String xml) {
             // FIXME: use awaitility
             if (!Uninterruptibles.awaitUninterruptibly(notificationLatch, 500, TimeUnit.SECONDS)) {
                 fail("Timed out waiting for notification for: " + xml);
@@ -180,7 +181,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         return doc.toString();
     }
 
-    static String withFakeXmlDate(String in) {
+    static String withFakeXmlDate(final String in) {
         return in.replaceAll("<eventTime>.*</eventTime>", "<eventTime>someDate</eventTime>");
     }
 

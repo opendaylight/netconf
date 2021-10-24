@@ -140,7 +140,7 @@ abstract class SubscribeToStreamUtil {
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getSchemaHandler());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                     notificationListenerAdapter.getSchemaPath().lastNodeIdentifier(),
-                    schemaContext.getNotifications(), notificationQueryParams.startTime(),
+                    schemaContext.getNotifications(), notificationListenerAdapter.getStart(),
                     notificationListenerAdapter.getOutputType(), uri);
 
         // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
@@ -200,7 +200,7 @@ abstract class SubscribeToStreamUtil {
 
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.getPath(),
-                notificationQueryParams.startTime(), listener.getOutputType(), uri, schemaContext, serializedPath);
+                listener.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
         final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);

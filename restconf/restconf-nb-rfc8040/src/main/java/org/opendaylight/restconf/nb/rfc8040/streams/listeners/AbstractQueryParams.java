@@ -7,25 +7,43 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import static java.util.Objects.requireNonNull;
-
-import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import javax.xml.xpath.XPathExpressionException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.FilterParameter;
+import org.opendaylight.restconf.nb.rfc8040.StartTimeParameter;
+import org.opendaylight.restconf.nb.rfc8040.StopTimeParameter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
  * Features of query parameters part of both notifications.
  */
 abstract class AbstractQueryParams extends AbstractNotificationsData {
+    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+        .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
+        .appendValue(ChronoField.MONTH_OF_YEAR, 2).appendLiteral('-')
+        .appendValue(ChronoField.DAY_OF_MONTH, 2).appendLiteral('T')
+        .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':')
+        .appendValue(ChronoField.MINUTE_OF_HOUR, 2).appendLiteral(':')
+        .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+        .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
+        .appendOffset("+HH:MM", "Z").toFormatter();
+
     // FIXME: these should be final
-    private Instant startTime = null;
-    private Instant stopTime = null;
+    private Instant start = null;
+    private Instant stop = null;
     private boolean leafNodesOnly = false;
     private boolean skipNotificationData = false;
 
-    @VisibleForTesting
     public final Instant getStart() {
-        return startTime;
+        return start;
     }
 
     /**
@@ -36,16 +54,40 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param filter        Indicates which subset of all possible events are of interest.
      * @param leafNodesOnly If TRUE, notifications will contain changes of leaf nodes only.
      */
-    public abstract void setQueryParams(Instant startTime, Instant stopTime, String filter,
-            boolean leafNodesOnly, boolean skipNotificationData);
-
     @SuppressWarnings("checkstyle:hiddenField")
-    final void setQueryParams(final Instant startTime, final Instant stopTime, final boolean leafNodesOnly,
-            final boolean skipNotificationData) {
-        this.startTime = requireNonNull(startTime);
-        this.stopTime = stopTime;
+    public final void setQueryParams(final StartTimeParameter startTime, final StopTimeParameter stopTime,
+            final FilterParameter filter, final boolean leafNodesOnly, final boolean skipNotificationData) {
+        start = startTime == null ? Instant.now() : parseDateAndTime(startTime.value());
+        stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
         this.leafNodesOnly = leafNodesOnly;
         this.skipNotificationData = skipNotificationData;
+
+        if (filter != null) {
+            try {
+                setFilter(filter.uriValue());
+            } catch (XPathExpressionException e) {
+                throw new IllegalArgumentException("Failed to get filter", e);
+            }
+        }
+    }
+
+    abstract void setFilter(@Nullable String xpathString) throws XPathExpressionException;
+
+    /**
+     * Parse input of query parameters - start-time or stop-time - from {@link DateAndTime} format
+     * to {@link Instant} format.
+     *
+     * @param uriValue Start-time or stop-time as string in {@link DateAndTime} format.
+     * @return Parsed {@link Instant} by entry.
+     */
+    private static @NonNull Instant parseDateAndTime(final DateAndTime dateAndTime) {
+        final TemporalAccessor accessor;
+        try {
+            accessor = FORMATTER.parse(dateAndTime.getValue());
+        } catch (final DateTimeParseException e) {
+            throw new RestconfDocumentedException("Cannot parse of value in date: " + dateAndTime, e);
+        }
+        return Instant.from(accessor);
     }
 
     /**
@@ -68,20 +110,20 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     <T extends BaseListenerInterface> boolean checkStartStop(final Instant now, final T listener) {
-        if (stopTime != null) {
-            if (startTime.compareTo(now) < 0 && stopTime.compareTo(now) > 0) {
+        if (stop != null) {
+            if (start.compareTo(now) < 0 && stop.compareTo(now) > 0) {
                 return true;
             }
-            if (stopTime.compareTo(now) < 0) {
+            if (stop.compareTo(now) < 0) {
                 try {
                     listener.close();
                 } catch (final Exception e) {
                     throw new RestconfDocumentedException("Problem with unregister listener." + e);
                 }
             }
-        } else if (startTime != null) {
-            if (startTime.compareTo(now) < 0) {
-                startTime = null;
+        } else if (start != null) {
+            if (start.compareTo(now) < 0) {
+                start = null;
                 return true;
             }
         } else {

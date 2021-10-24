@@ -15,6 +15,7 @@ import com.google.common.base.MoreObjects;
 import java.time.Instant;
 import java.util.Optional;
 import javax.xml.xpath.XPathExpressionException;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -74,20 +75,10 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         }
     }
 
-    private NotificationFormatter getFormatter(final String filter) throws XPathExpressionException {
-        NotificationFormatterFactory factory = getFormatterFactory();
-        return filter == null || filter.isEmpty() ? factory.getFormatter() : factory.getFormatter(filter);
-    }
-
     @Override
-    public void setQueryParams(final Instant startTime, final Instant stopTime, final String filter,
-                               final boolean leafNodesOnly, final boolean skipNotificationData) {
-        setQueryParams(startTime, stopTime, leafNodesOnly, skipNotificationData);
-        try {
-            formatter = getFormatter(filter);
-        } catch (XPathExpressionException e) {
-            throw new IllegalArgumentException("Failed to get filter", e);
-        }
+    final void setFilter(final @Nullable String filter) throws XPathExpressionException {
+        final NotificationFormatterFactory factory = getFormatterFactory();
+        formatter = filter == null || filter.isEmpty() ? factory.getFormatter() : factory.getFormatter(filter);
     }
 
     /**
