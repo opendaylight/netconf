@@ -66,7 +66,7 @@ final class FieldsParameterParser {
     // parsers instead of ten.
     private Deque<NodeSelectorParser> parsers;
 
-    @NonNull ImmutableList<NodeSelector> parseNodeSelectors(final String str) throws ParseException {
+    @NonNull FieldsParam parse(final String str) throws ParseException {
         final var nodeSelectors = ImmutableList.<NodeSelector>builder();
 
         int idx = 0;
@@ -77,7 +77,7 @@ final class FieldsParameterParser {
 
             if (next == str.length()) {
                 // We have reached the end, we are done
-                return nodeSelectors.build();
+                return new FieldsParam(nodeSelectors.build());
             }
 
             final char ch = str.charAt(next);

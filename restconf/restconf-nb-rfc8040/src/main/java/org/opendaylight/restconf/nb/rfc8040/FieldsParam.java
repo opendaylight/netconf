@@ -41,10 +41,6 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
             checkArgument(!path.isEmpty(), "At least path segment is required");
         }
 
-        NodeSelector(final ImmutableList<ApiIdentifier> path) {
-            this(path, ImmutableList.of());
-        }
-
         /**
          * Return the path to the selected node. Guaranteed to have at least one element.
          *
@@ -72,6 +68,26 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
             }
             return helper.toString();
         }
+
+        void appendTo(final StringBuilder sb) {
+            final var it = path.iterator();
+            appendStep(sb, it.next());
+            while (it.hasNext()) {
+                appendStep(sb.append('/'), it.next());
+            }
+
+            if (!subSelectors.isEmpty()) {
+                appendSelectors(sb.append('('), subSelectors).append(')');
+            }
+        }
+
+        private static void appendStep(final StringBuilder sb, final ApiIdentifier step) {
+            final var mod = step.module();
+            if (mod != null) {
+                sb.append(mod).append(':');
+            }
+            sb.append(step.identifier().getLocalName());
+        }
     }
 
     // API consistency: must not be confused with enum constants
@@ -80,12 +96,10 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
     private static final URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:fields:1.0");
 
     private final ImmutableList<NodeSelector> nodeSelectors;
-    private final String paramValue;
 
-    private FieldsParam(final ImmutableList<NodeSelector> nodeSelectors, final String uriValue) {
+    FieldsParam(final ImmutableList<NodeSelector> nodeSelectors) {
         this.nodeSelectors = requireNonNull(nodeSelectors);
         checkArgument(!nodeSelectors.isEmpty(), "At least one selector is required");
-        paramValue = requireNonNull(uriValue);
     }
 
     /**
@@ -96,7 +110,7 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
      * @throws ParseException if {@code str} does not represent a valid {@code fields} parameter.
      */
     public static FieldsParam parse(final String str) throws ParseException {
-        return new FieldsParam(new FieldsParameterParser().parseNodeSelectors(str), str);
+        return new FieldsParameterParser().parse(str);
     }
 
     @Override
@@ -124,11 +138,20 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
 
     @Override
     public String paramValue() {
-        return paramValue;
+        return appendSelectors(new StringBuilder(), nodeSelectors).toString();
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this).add("nodeSelectors", nodeSelectors).toString();
+    }
+
+    private static StringBuilder appendSelectors(final StringBuilder sb, final ImmutableList<NodeSelector> selectors) {
+        final var it = selectors.iterator();
+        it.next().appendTo(sb);
+        while (it.hasNext()) {
+            it.next().appendTo(sb.append(';'));
+        }
+        return sb;
     }
 }

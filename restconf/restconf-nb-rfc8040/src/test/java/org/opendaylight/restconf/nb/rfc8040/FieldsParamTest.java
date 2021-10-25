@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.FieldsParam.NodeSelector;
 
-public class FieldsParameterTest {
+public class FieldsParamTest {
     // https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3:
     //    ";" is used to select multiple nodes.  For example, to retrieve only
     //    the "genre" and "year" of an album, use "fields=genre;year".
@@ -186,10 +186,14 @@ public class FieldsParameterTest {
     }
 
     private static List<NodeSelector> assertValidFields(final String str) {
+        final FieldsParam param;
         try {
-            return FieldsParam.parse(str).nodeSelectors();
+            param = FieldsParam.parse(str);
         } catch (ParseException e) {
             throw new AssertionError(e);
         }
+
+        assertEquals(str, param.paramValue());
+        return param.nodeSelectors();
     }
 }
