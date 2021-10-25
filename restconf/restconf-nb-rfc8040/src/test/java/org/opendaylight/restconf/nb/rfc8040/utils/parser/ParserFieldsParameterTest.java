@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -24,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParam;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -223,8 +225,7 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterSimplePathTest() {
-        final String input = "library";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input);
+        final List<Set<QName>> parsedFields = assertFieldsParameter(identifierJukebox, "library");
 
         assertNotNull(parsedFields);
         assertEquals(1, parsedFields.size());
@@ -237,8 +238,7 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterDoublePathTest() {
-        final String input = "library;player";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input);
+        final List<Set<QName>> parsedFields = assertFieldsParameter(identifierJukebox, "library;player");
 
         assertNotNull(parsedFields);
         assertEquals(1, parsedFields.size());
@@ -252,8 +252,7 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterSubPathTest() {
-        final String input = "library/album/name";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input);
+        final List<Set<QName>> parsedFields = assertFieldsParameter(identifierJukebox, "library/album/name");
 
         assertNotNull(parsedFields);
         assertEquals(3, parsedFields.size());
@@ -273,8 +272,7 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterChildrenPathTest() {
-        final String input = "library(album(name))";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input);
+        final List<Set<QName>> parsedFields = assertFieldsParameter(identifierJukebox, "library(album(name))");
 
         assertNotNull(parsedFields);
         assertEquals(3, parsedFields.size());
@@ -294,8 +292,8 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterNamespaceTest() {
-        final String input = "augmented-jukebox:augmented-library";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input);
+        final List<Set<QName>> parsedFields = assertFieldsParameter(identifierJukebox,
+            "augmented-jukebox:augmented-library");
 
         assertNotNull(parsedFields);
         assertEquals(1, parsedFields.size());
@@ -310,8 +308,8 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterWithMultipleChildrenTest1() {
-        final String input = "services(type-of-service;instance/instance-name;instance/provider)";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierTestServices, input);
+        final List<Set<QName>> parsedFields = assertFieldsParameter(identifierTestServices,
+            "services(type-of-service;instance/instance-name;instance/provider)");
 
         assertNotNull(parsedFields);
         assertEquals(parsedFields.size(), 3);
@@ -332,8 +330,8 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterWithMultipleChildrenTest2() {
-        final String input = "services(type-of-service;instance(instance-name;provider))";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierTestServices, input);
+        final List<Set<QName>> parsedFields = assertFieldsParameter(identifierTestServices,
+            "services(type-of-service;instance(instance-name;provider))");
 
         assertNotNull(parsedFields);
         assertEquals(parsedFields.size(), 3);
@@ -354,8 +352,8 @@ public class ParserFieldsParameterTest {
      */
     @Test
     public void parseFieldsParameterWithMultipleChildrenTest3() {
-        final String input = "services(instance/instance-name;type-of-service;next-data/next-service)";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierTestServices, input);
+        final List<Set<QName>> parsedFields = assertFieldsParameter(identifierTestServices,
+            "services(instance/instance-name;type-of-service;next-data/next-service)");
 
         assertNotNull(parsedFields);
         assertEquals(parsedFields.size(), 3);
@@ -373,68 +371,14 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter containing not expected character.
-     */
-    @Test
-    public void parseFieldsParameterNotExpectedCharacterNegativeTest() {
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, "*"));
-        // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
-    }
-
-    /**
-     * Test parse fields parameter with missing closing parenthesis.
-     */
-    @Test
-    public void parseFieldsParameterMissingParenthesisNegativeTest() {
-        final String input = "library(";
-
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
-        // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
-    }
-
-    /**
      * Test parse fields parameter when not existing child node selected.
      */
     @Test
-    public void parseFieldsParameterMissingChildNodeNegativeTest() {
-        final String input = "library(not-existing)";
+    public void parseFieldsParameterMissingChildNodeNegativeTest() throws ParseException {
+        final FieldsParam input = FieldsParam.parse("library(not-existing)");
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
-        // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
-    }
-
-    /**
-     * Test parse fields parameter with unexpected character after parenthesis.
-     */
-    @Test
-    public void parseFieldsParameterAfterParenthesisNegativeTest() {
-        final String input = "library(album);";
-
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserFieldsParameter.parseFieldsParameter(identifierJukebox, input));
-        // Bad request
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
-    }
-
-    /**
-     * Test parse fields parameter with missing semicolon after parenthesis.
-     */
-    @Test
-    public void parseFieldsParameterMissingSemicolonNegativeTest() {
-        final String input = "library(album)player";
-
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserFieldsParameter.parseFieldsParameter(this.identifierJukebox, input));
         // Bad request
         assertEquals("Error type is not correct", ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
@@ -442,9 +386,7 @@ public class ParserFieldsParameterTest {
 
     @Test
     public void parseTopLevelContainerToPathTest() {
-        final String input = "library";
-        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
-                identifierJukebox, input);
+        final List<YangInstanceIdentifier> parsedFields = assertFieldsPaths(identifierJukebox, "library");
 
         assertNotNull(parsedFields);
         assertEquals(1, parsedFields.size());
@@ -456,8 +398,7 @@ public class ParserFieldsParameterTest {
     @Test
     public void parseTwoTopLevelContainersToPathsTest() {
         final String input = "library;player";
-        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
-                identifierJukebox, input);
+        final List<YangInstanceIdentifier> parsedFields = assertFieldsPaths(identifierJukebox, input);
 
         assertNotNull(parsedFields);
         assertEquals(2, parsedFields.size());
@@ -473,9 +414,7 @@ public class ParserFieldsParameterTest {
 
     @Test
     public void parseNestedLeafToPathTest() {
-        final String input = "library/album/name";
-        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
-                identifierJukebox, input);
+        final List<YangInstanceIdentifier> parsedFields = assertFieldsPaths(identifierJukebox, "library/album/name");
 
         assertEquals(1, parsedFields.size());
         final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
@@ -488,9 +427,8 @@ public class ParserFieldsParameterTest {
 
     @Test
     public void parseAugmentedLeafToPathTest() {
-        final String input = "player/augmented-jukebox:speed";
-        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
-                identifierJukebox, input);
+        final List<YangInstanceIdentifier> parsedFields = assertFieldsPaths(identifierJukebox,
+            "player/augmented-jukebox:speed");
 
         assertEquals(1, parsedFields.size());
         final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
@@ -503,9 +441,8 @@ public class ParserFieldsParameterTest {
 
     @Test
     public void parseMultipleFieldsOnDifferentLevelsToPathsTest() {
-        final String input = "services(type-of-service;instance/instance-name;instance/provider)";
-        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
-                identifierTestServices, input);
+        final List<YangInstanceIdentifier> parsedFields = assertFieldsPaths(identifierTestServices,
+            "services(type-of-service;instance/instance-name;instance/provider)");
 
         assertEquals(3, parsedFields.size());
 
@@ -524,9 +461,8 @@ public class ParserFieldsParameterTest {
 
     @Test
     public void parseListFieldUnderListToPathTest() {
-        final String input = "services/instance";
-        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
-                identifierTestServices, input);
+        final List<YangInstanceIdentifier> parsedFields = assertFieldsPaths(identifierTestServices,
+            "services/instance");
 
         assertEquals(1, parsedFields.size());
         final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
@@ -540,9 +476,7 @@ public class ParserFieldsParameterTest {
 
     @Test
     public void parseLeafListFieldToPathTest() {
-        final String input = "protocols";
-        final List<YangInstanceIdentifier> parsedFields = ParserFieldsParameter.parseFieldsPaths(
-                identifierTestServices, input);
+        final List<YangInstanceIdentifier> parsedFields = assertFieldsPaths(identifierTestServices, "protocols");
 
         assertEquals(1, parsedFields.size());
         final List<PathArgument> pathArguments = parsedFields.get(0).getPathArguments();
@@ -556,5 +490,23 @@ public class ParserFieldsParameterTest {
         return paths.stream()
                 .filter(path -> lastPathArg.equals(path.getLastPathArgument().getNodeType()))
                 .findAny();
+    }
+
+    private static List<Set<QName>> assertFieldsParameter(final InstanceIdentifierContext<?> identifier,
+            final String input) {
+        return ParserFieldsParameter.parseFieldsParameter(identifier, assertFields(input));
+    }
+
+    private static List<YangInstanceIdentifier> assertFieldsPaths(final InstanceIdentifierContext<?> identifier,
+            final String input) {
+        return ParserFieldsParameter.parseFieldsPaths(identifier, assertFields(input));
+    }
+
+    private static FieldsParam assertFields(final String input) {
+        try {
+            return FieldsParam.parse(input);
+        } catch (ParseException e) {
+            throw new AssertionError(e);
+        }
     }
 }

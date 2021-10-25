@@ -21,6 +21,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParam;
+import org.opendaylight.restconf.nb.rfc8040.FieldsParam.NodeSelector;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -29,9 +31,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Utilities used for parsing of fields query parameter content.
@@ -53,7 +55,7 @@ public abstract class ParserFieldsParameter<T> {
      * @return {@link List} of levels; each level contains set of {@link QName}
      */
     public static @NonNull List<Set<QName>> parseFieldsParameter(final @NonNull InstanceIdentifierContext<?> identifier,
-                                                                 final @NonNull String input) {
+                                                                 final @NonNull FieldsParam input) {
         return QNAME_PARSER.parseFields(identifier, input);
     }
 
@@ -66,7 +68,7 @@ public abstract class ParserFieldsParameter<T> {
      *     of provided {@code identifier}
      */
     public static @NonNull List<YangInstanceIdentifier> parseFieldsPaths(
-            final @NonNull InstanceIdentifierContext<?> identifier, final @NonNull String input) {
+            final @NonNull InstanceIdentifierContext<?> identifier, final @NonNull FieldsParam input) {
         final List<Set<LinkedPathElement>> levels = PATH_PARSER.parseFields(identifier, input);
         final List<Map<PathArgument, LinkedPathElement>> mappedLevels = mapLevelsContentByIdentifiers(levels);
         return buildPaths(mappedLevels);
@@ -125,10 +127,7 @@ public abstract class ParserFieldsParameter<T> {
      * @return {@link List} of levels; each level contains {@link Set} of identifiers of type {@link T}
      */
     private @NonNull List<Set<T>> parseFields(final @NonNull InstanceIdentifierContext<?> identifier,
-                                              final @NonNull String input) {
-        final List<Set<T>> parsed = new ArrayList<>();
-        final SchemaContext context = identifier.getSchemaContext();
-        final QNameModule startQNameModule = identifier.getSchemaNode().getQName().getModule();
+                                              final @NonNull FieldsParam input) {
         final DataSchemaContextNode<?> startNode = DataSchemaContextNode.fromDataSchemaNode(
                 (DataSchemaNode) identifier.getSchemaNode());
 
@@ -137,117 +136,54 @@ public abstract class ParserFieldsParameter<T> {
                     "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
-        parseInput(input, startQNameModule, startNode, parsed, context);
+        final List<Set<T>> parsed = new ArrayList<>();
+        processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
+            startNode, input.nodeSelectors());
         return parsed;
     }
 
-    /**
-     * Parse input value of fields parameter and create list of sets. Each set represents one level of child nodes.
-     *
-     * @param input input value of fields parameter
-     * @param startQNameModule starting qname module
-     * @param startNode starting node
-     * @param parsed list of results
-     * @param context schema context
-     */
-    private void parseInput(final @NonNull String input, final @NonNull QNameModule startQNameModule,
-                            final @NonNull DataSchemaContextNode<?> startNode,
-                            final @NonNull List<Set<T>> parsed, final SchemaContext context) {
+    private void processSelectors(final List<Set<T>> parsed, final EffectiveModelContext context,
+            final QNameModule startNamespace, final DataSchemaContextNode<?> startNode,
+            final List<NodeSelector> selectors) {
         final Set<T> startLevel = new HashSet<>();
         parsed.add(startLevel);
 
-        int currentPosition = 0;
-        int startPosition = 0;
-        DataSchemaContextNode<?> currentNode = startNode;
-        QNameModule currentQNameModule = startQNameModule;
-        Set<T> currentLevel = startLevel;
+        for (var selector : selectors) {
+            var node = startNode;
+            var namespace = startNamespace;
+            var level = startLevel;
 
-        while (currentPosition < input.length()) {
-            final char currentChar = input.charAt(currentPosition);
 
-            if (ParserConstants.YANG_IDENTIFIER_PART.matches(currentChar)) {
-                currentPosition++;
-                continue;
+            // Note: path is guaranteed to have at least one step
+            final var it = selector.path().iterator();
+            while (true) {
+                // FIXME: The layout of this loop is rather weird, which is due to how prepareQNameLevel() operates. We
+                //        need to call it only when we know there is another identifier coming, otherwise we would end
+                //        up with empty levels sneaking into the mix.
+                //
+                //        Dealing with that weirdness requires understanding what the expected end results are and a
+                //        larger rewrite of the algorithms involved.
+                final var step = it.next();
+                final var module = step.module();
+                if (module != null) {
+                    // FIXME: this is not defensive enough, as we can fail to find the module
+                    namespace = context.findModules(module).iterator().next().getQNameModule();
+                }
+
+                // add parsed identifier to results for current level
+                node = addChildToResult(node, step.identifier().bindTo(namespace), level);
+                if (!it.hasNext()) {
+                    break;
+                }
+
+                // go one level down
+                level = prepareQNameLevel(parsed, level);
             }
 
-            switch (currentChar) {
-                case '/':
-                    // add parsed identifier to results for current level
-                    currentNode = addChildToResult(currentNode, input.substring(startPosition, currentPosition),
-                            currentQNameModule, currentLevel);
-                    // go one level down
-                    currentLevel = prepareQNameLevel(parsed, currentLevel);
-
-                    currentPosition++;
-                    break;
-                case ':':
-                    // new namespace and revision found
-                    currentQNameModule = context.findModules(
-                            input.substring(startPosition, currentPosition)).iterator().next().getQNameModule();
-                    currentPosition++;
-                    break;
-                case '(':
-                    // add current child to parsed results for current level
-                    final DataSchemaContextNode<?> child = addChildToResult(
-                            currentNode,
-                            input.substring(startPosition, currentPosition), currentQNameModule, currentLevel);
-                    // call with child node as new start node for one level down
-                    final int closingParenthesis = currentPosition
-                            + findClosingParenthesis(input.substring(currentPosition + 1));
-                    parseInput(
-                            input.substring(currentPosition + 1, closingParenthesis),
-                            currentQNameModule,
-                            child,
-                            parsed,
-                            context);
-
-                    // closing parenthesis must be at the end of input or separator and one more character is expected
-                    currentPosition = closingParenthesis + 1;
-                    if (currentPosition != input.length()) {
-                        if (currentPosition + 1 < input.length()) {
-                            if (input.charAt(currentPosition) == ';') {
-                                currentPosition++;
-                            } else {
-                                throw new RestconfDocumentedException(
-                                        "Missing semicolon character after "
-                                                + child.getIdentifier().getNodeType().getLocalName()
-                                                + " child nodes",
-                                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-                            }
-                        } else {
-                            throw new RestconfDocumentedException(
-                                    "Unexpected character '"
-                                            + input.charAt(currentPosition)
-                                            + "' found in fields parameter value",
-                                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-                        }
-                    }
-
-                    break;
-                case ';':
-                    // complete identifier found
-                    addChildToResult(
-                            currentNode,
-                            input.substring(startPosition, currentPosition), currentQNameModule, currentLevel);
-                    currentPosition++;
-
-                    // next nodes can be placed on already utilized level-s
-                    currentNode = startNode;
-                    currentQNameModule = startQNameModule;
-                    currentLevel = startLevel;
-                    break;
-                default:
-                    throw new RestconfDocumentedException(
-                            "Unexpected character '" + currentChar + "' found in fields parameter value",
-                            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            final var subs = selector.subSelectors();
+            if (!subs.isEmpty()) {
+                processSelectors(parsed, context, namespace, node, subs);
             }
-
-            startPosition = currentPosition;
-        }
-
-        // parse input to end
-        if (startPosition < input.length()) {
-            addChildToResult(currentNode, input.substring(startPosition), currentQNameModule, currentLevel);
         }
     }
 
@@ -281,43 +217,6 @@ public abstract class ParserFieldsParameter<T> {
     }
 
     /**
-     * Find position of matching parenthesis increased by one, but at most equals to input size.
-     *
-     * @param input input where to find for closing parenthesis
-     * @return int position of closing parenthesis increased by one
-     */
-    private static int findClosingParenthesis(final @NonNull String input) {
-        int position = 0;
-        int count = 1;
-
-        while (position < input.length()) {
-            final char currentChar = input.charAt(position);
-
-            if (currentChar == '(') {
-                count++;
-            }
-
-            if (currentChar == ')') {
-                count--;
-            }
-
-            if (count == 0) {
-                break;
-            }
-
-            position++;
-        }
-
-        // closing parenthesis was not found
-        if (position >= input.length()) {
-            throw new RestconfDocumentedException("Missing closing parenthesis in fields parameter",
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
-        return ++position;
-    }
-
-    /**
      * Add parsed child of current node to result for current level.
      *
      * @param currentNode current node
@@ -327,11 +226,6 @@ public abstract class ParserFieldsParameter<T> {
      */
     abstract @NonNull DataSchemaContextNode<?> addChildToResult(@NonNull DataSchemaContextNode<?> currentNode,
             @NonNull QName childQName, @NonNull Set<T> level);
-
-    private @NonNull DataSchemaContextNode<?> addChildToResult(final @NonNull DataSchemaContextNode<?> currentNode,
-            final @NonNull String localName, final @NonNull QNameModule namespace, final @NonNull Set<T> level) {
-        return addChildToResult(currentNode, QName.create(namespace, localName), level);
-    }
 
     /**
      * Fields parser that stores set of {@link QName}s in each level. Because of this fact, from the output
