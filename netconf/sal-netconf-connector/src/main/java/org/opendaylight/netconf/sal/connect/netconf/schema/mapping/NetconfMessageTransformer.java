@@ -120,7 +120,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         this.contextTree = DataSchemaContextTree.from(schemaContext);
 
         this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        this.actions = Maps.uniqueIndex(getActions(schemaContext), action -> action.getPath().asAbsolute());
+        this.actions = Maps.uniqueIndex(getActions(schemaContext), action -> Absolute.of(action.getQName()));
 
         // RFC6020 normal notifications
         this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
@@ -191,8 +191,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                    SchemaInferenceStack.ofInstantiatedPath(mountContext.getEffectiveModelContext(),
-                        mostRecentNotification.getPath()).toInference(), strictParsing);
+                    SchemaInferenceStack.of(mountContext.getEffectiveModelContext(),
+                        Absolute.of(mostRecentNotification.getQName())).toInference(), strictParsing);
             xmlParser.traverse(new DOMSource(element));
             content = (ContainerNode) resultHolder.getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException
@@ -203,7 +203,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         if (nestedNotificationInfo != null) {
             return new NetconfDeviceTreeNotification(content,
                 // FIXME: improve this to cache the path
-                mostRecentNotification.getPath().asAbsolute(),
+                Absolute.of(mostRecentNotification.getQName()),
                 stripped.getKey(), nestedNotificationInfo.domDataTreeIdentifier);
         }
 
@@ -461,8 +461,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
                         // FIXME: we should have a cached inference here
-                        SchemaInferenceStack.ofInstantiatedPath(mountContext.getEffectiveModelContext(),
-                            operationDefinition.getOutput().getPath()).toInference(), strictParsing);
+                        SchemaInferenceStack.of(mountContext.getEffectiveModelContext(),
+                                Absolute.of(operationDefinition.getOutput().getQName())).toInference(), strictParsing);
                 xmlParser.traverse(new DOMSource(element));
                 return resultHolder.getResult();
             } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {

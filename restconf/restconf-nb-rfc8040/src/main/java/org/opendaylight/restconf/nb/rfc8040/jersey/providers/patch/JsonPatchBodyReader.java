@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetExceptio
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -373,7 +374,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
-            SchemaInferenceStack.ofInstantiatedPath(path.getSchemaContext(), targetSchemaNode.getPath()).toInference())
+            SchemaInferenceStack.of(path.getSchemaContext(), Absolute.of(targetSchemaNode.getQName())).toInference())
             .parse(in);
 
         return resultHolder.getResult();

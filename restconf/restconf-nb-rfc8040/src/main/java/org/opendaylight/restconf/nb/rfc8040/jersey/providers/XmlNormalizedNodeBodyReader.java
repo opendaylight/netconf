@@ -53,6 +53,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,8 +136,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
-                pathContext.getSchemaContext(), schemaNode.getPath()).toInference());
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.of(
+                    pathContext.getSchemaContext(), Absolute.of(schemaNode.getQName())).toInference());
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult();
 

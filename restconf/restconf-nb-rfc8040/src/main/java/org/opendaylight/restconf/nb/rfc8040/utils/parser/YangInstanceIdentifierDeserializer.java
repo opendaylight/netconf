@@ -45,6 +45,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -175,7 +176,7 @@ public final class YangInstanceIdentifierDeserializer {
         }
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, schemaNode.getPath())
+            typedef = SchemaInferenceStack.of(schemaContext, Absolute.of(schemaNode.getQName()))
                 .resolveLeafref((LeafrefTypeDefinition) baseType);
         }
         decoded = RestCodec.from(typedef, null, schemaContext).deserialize(value);

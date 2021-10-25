@@ -47,6 +47,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,8 +81,8 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
 
         final EffectiveStatementInference parentSchema;
         if (isPost) {
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath()).toInference();
+            parentSchema = SchemaInferenceStack.of(path.getSchemaContext(),
+                Absolute.of(path.getSchemaNode().getQName())).toInference();
         } else if (path.getSchemaNode() instanceof SchemaContext
             || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
             parentSchema = SchemaInferenceStack.of(path.getSchemaContext()).toInference();

@@ -220,7 +220,7 @@ public class FilterContentValidator {
                         final EffectiveModelContext modelContext = schemaContext.getCurrentContext();
                         final XmlCodecFactory xmlCodecFactory = XmlCodecFactory.create(modelContext);
                         final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> typeCodec = xmlCodecFactory.codecFor(
-                            listKey, SchemaInferenceStack.ofInstantiatedPath(modelContext, listKey.getPath()));
+                                listKey, SchemaInferenceStack.ofInstantiatedPath(modelContext, listKey.getPath()));
                         final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue.get());
                         keys.put(qualifiedName, deserializedKeyValue);
                     } else {

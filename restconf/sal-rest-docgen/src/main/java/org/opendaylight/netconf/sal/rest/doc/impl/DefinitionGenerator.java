@@ -58,6 +58,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
@@ -690,7 +691,7 @@ public class DefinitionGenerator {
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
         } else if (leafTypeDef instanceof LeafrefTypeDefinition) {
-            final SchemaInferenceStack stack = SchemaInferenceStack.ofSchemaPath(schemaContext, node.getPath());
+            final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext, Absolute.of(node.getQName()));
             return processTypeDef(stack.resolveLeafref((LeafrefTypeDefinition) leafTypeDef), node, property,
                 schemaContext, definitions, definitionNames, oaversion);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {

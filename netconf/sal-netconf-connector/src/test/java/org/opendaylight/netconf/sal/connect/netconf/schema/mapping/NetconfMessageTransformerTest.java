@@ -554,7 +554,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         List<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertEquals(schemaPaths.size(), actions.size());
         for (ActionDefinition actionDefinition : actions) {
-            Absolute path = actionDefinition.getPath().asAbsolute();
+            Absolute path = Absolute.of(actionDefinition.getQName());
             assertTrue(schemaPaths.remove(path));
         }
     }
