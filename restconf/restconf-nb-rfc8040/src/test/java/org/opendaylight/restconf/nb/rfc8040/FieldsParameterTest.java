@@ -161,6 +161,7 @@ public class FieldsParameterTest {
         assertInvalidFields("a:.", "Expecting [a-ZA-Z_], not '.'", 2);
         assertInvalidFields("a:b+", "Expecting [a-zA-Z_.-/(:;], not '+'", 3);
         assertInvalidFields("a;)", "Expecting [a-ZA-Z_], not ')'", 2);
+        assertInvalidFields("*", "Expecting [a-ZA-Z_], not '*'", 0);
     }
 
     @Test
@@ -168,11 +169,14 @@ public class FieldsParameterTest {
         assertInvalidFields("a;", "Unexpected end of input", 2);
         assertInvalidFields("a(", "Unexpected end of input", 2);
         assertInvalidFields("a(a", "Unexpected end of input", 3);
+        assertInvalidFields("library(", "Unexpected end of input", 8);
+        assertInvalidFields("library(album);", "Unexpected end of input", 15);
     }
 
     @Test
     public void testUnexpectedRightParent() {
         assertInvalidFields("a)", "Expecting ';', not ')'", 1);
+        assertInvalidFields("library(album)player", "Expecting ';', not 'p'", 14);
     }
 
     private static void assertInvalidFields(final String str, final String message, final int errorOffset) {
