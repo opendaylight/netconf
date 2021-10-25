@@ -8,8 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.databind.jaxrs;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsParameter;
-import static org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter.parseFieldsPaths;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
@@ -39,6 +37,8 @@ import org.opendaylight.restconf.nb.rfc8040.StopTimeParam;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -112,8 +112,8 @@ public final class QueryParams {
         }
 
         return identifier.getMountPoint() != null
-            ? QueryParameters.ofFieldPaths(params, parseFieldsPaths(identifier, fields))
-                : QueryParameters.ofFields(params, parseFieldsParameter(identifier, fields));
+            ? QueryParameters.ofFieldPaths(params, NetconfFieldsTranslator.translate(identifier, fields))
+                : QueryParameters.ofFields(params, WriterFieldsTranslator.translate(identifier, fields));
     }
 
     /**
