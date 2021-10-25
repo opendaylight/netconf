@@ -74,6 +74,9 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
         }
     }
 
+    // API consistency: must not be confused with enum constants
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final String uriName = "fields";
     private static final URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:fields:1.0");
 
     private final ImmutableList<NodeSelector> nodeSelectors;
@@ -82,7 +85,7 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
     private FieldsParam(final ImmutableList<NodeSelector> nodeSelectors, final String uriValue) {
         this.nodeSelectors = requireNonNull(nodeSelectors);
         checkArgument(!nodeSelectors.isEmpty(), "At least one selector is required");
-        this.paramValue = requireNonNull(uriValue);
+        paramValue = requireNonNull(uriValue);
     }
 
     /**
@@ -103,11 +106,7 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
 
     @Override
     public String paramName() {
-        return uriName();
-    }
-
-    public static String uriName() {
-        return "fields";
+        return uriName;
     }
 
     public static URI capabilityUri() {

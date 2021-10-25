@@ -18,6 +18,10 @@ import org.eclipse.jdt.annotation.NonNull;
  */
 
 public final class FilterParam implements RestconfQueryParam<FilterParam> {
+    // API consistency: must not be confused with enum constants
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final @NonNull String uriName = "filter";
+
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:filter:1.0");
 
     // FIXME: can we have a parsed, but not bound version of an XPath, please?
@@ -34,7 +38,7 @@ public final class FilterParam implements RestconfQueryParam<FilterParam> {
 
     @Override
     public String paramName() {
-        return uriName();
+        return uriName;
     }
 
     @Override
@@ -44,10 +48,6 @@ public final class FilterParam implements RestconfQueryParam<FilterParam> {
 
     public static @NonNull FilterParam forUriValue(final String uriValue) {
         return new FilterParam(uriValue);
-    }
-
-    public static @NonNull String uriName() {
-        return "filter";
     }
 
     public static @NonNull URI capabilityUri() {

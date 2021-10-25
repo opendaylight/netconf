@@ -35,6 +35,10 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
      */
     TRIM("trim");
 
+    // API consistency: must not be confused with enum constants
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final @NonNull String uriName = "with-defaults";
+
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:with-defaults:1.0");
 
     private final @NonNull String uriValue;
@@ -50,16 +54,12 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
 
     @Override
     public String paramName() {
-        return uriName();
+        return uriName;
     }
 
     @Override
     public String paramValue() {
         return uriValue;
-    }
-
-    public static @NonNull String uriName() {
-        return "with-defaults";
     }
 
     public static @Nullable WithDefaultsParam forUriValue(final String uriValue) {

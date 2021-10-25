@@ -19,6 +19,10 @@ import org.eclipse.jdt.annotation.Nullable;
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.3">RFC8040 section 4.8.2</a>.
  */
 public final class DepthParam implements RestconfQueryParam<DepthParam> {
+    // API consistency: must not be confused with enum constants
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final @NonNull String uriName = "depth";
+
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:depth:1.0");
     private static final @NonNull DepthParam MIN = of(1);
     private static final @NonNull DepthParam MAX = of(65535);
@@ -41,16 +45,12 @@ public final class DepthParam implements RestconfQueryParam<DepthParam> {
 
     @Override
     public String paramName() {
-        return uriName();
+        return uriName;
     }
 
     @Override
     public String paramValue() {
         return String.valueOf(value);
-    }
-
-    public static @NonNull String uriName() {
-        return "depth";
     }
 
     @Beta

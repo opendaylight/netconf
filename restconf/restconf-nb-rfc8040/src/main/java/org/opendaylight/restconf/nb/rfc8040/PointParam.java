@@ -18,6 +18,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 public final class PointParam implements RestconfQueryParam<PointParam> {
+    // API consistency: must not be confused with enum constants
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final String uriName = "point";
+
     // FIXME: This should be ApiPath
     private final String value;
 
@@ -32,7 +36,7 @@ public final class PointParam implements RestconfQueryParam<PointParam> {
 
     @Override
     public String paramName() {
-        return uriName();
+        return uriName;
     }
 
     @Override
@@ -42,10 +46,6 @@ public final class PointParam implements RestconfQueryParam<PointParam> {
 
     public static PointParam forUriValue(final String uriValue) {
         return new PointParam(uriValue);
-    }
-
-    public static String uriName() {
-        return "point";
     }
 
     public String value() {

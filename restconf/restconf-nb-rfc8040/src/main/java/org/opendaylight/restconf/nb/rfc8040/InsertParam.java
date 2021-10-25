@@ -34,6 +34,10 @@ public enum InsertParam implements RestconfQueryParam<InsertParam> {
      */
     LAST("last");
 
+    // API consistency: must not be confused with enum constants
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final @NonNull String uriName = "insert";
+
     private @NonNull String uriValue;
 
     InsertParam(final String uriValue) {
@@ -47,16 +51,12 @@ public enum InsertParam implements RestconfQueryParam<InsertParam> {
 
     @Override
     public String paramName() {
-        return uriName();
+        return uriName;
     }
 
     @Override
     public String paramValue() {
         return uriValue;
-    }
-
-    public static @NonNull String uriName() {
-        return "insert";
     }
 
     // Note: returns null of unknowns

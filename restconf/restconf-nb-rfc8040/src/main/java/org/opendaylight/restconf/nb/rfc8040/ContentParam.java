@@ -30,6 +30,10 @@ public enum ContentParam implements RestconfQueryParam<ContentParam> {
      */
     NONCONFIG("nonconfig");
 
+    // API consistency: must not be confused with enum constants
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final @NonNull String uriName = "content";
+
     private final @NonNull String uriValue;
 
     ContentParam(final String uriValue) {
@@ -43,16 +47,12 @@ public enum ContentParam implements RestconfQueryParam<ContentParam> {
 
     @Override
     public final String paramName() {
-        return uriName();
+        return uriName;
     }
 
     @Override
     public String paramValue() {
         return uriValue;
-    }
-
-    public static @NonNull String uriName() {
-        return "content";
     }
 
     // Note: returns null of unknowns

@@ -13,6 +13,14 @@ import org.opendaylight.yangtools.concepts.Immutable;
 /**
  * Interface implemented by all Java classes which represent a
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8">RESTCONF query parameter</a>.
+ *
+ * <p>
+ * Implementations of this interface are required to expose a {@code public static @NonNull uriName} constant, which
+ * holds the well-known URI Request Query Parameter name of the associated definition.
+ *
+ * <p>
+ * This naming violates the usual Java coding style, we need it to keep API consistency as an enum can be used as an
+ * implementation, in which case users could be confused by upper-case constants which are not enum members.
  */
 // FIXME: sealed when we have JDK17+?
 public interface RestconfQueryParam<T extends RestconfQueryParam<T>> extends Immutable {

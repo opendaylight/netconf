@@ -15,6 +15,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-4.8.8">RFC8040 section 4.8.8</a>.
  */
 public final class StopTimeParam extends AbstractReplayParam<StopTimeParam> {
+    // API consistency: must not be confused with enum constants
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final @NonNull String uriName = "stop-time";
+
     private StopTimeParam(final DateAndTime value) {
         super(value);
     }
@@ -30,11 +34,7 @@ public final class StopTimeParam extends AbstractReplayParam<StopTimeParam> {
 
     @Override
     public String paramName() {
-        return uriName();
-    }
-
-    public static @NonNull String uriName() {
-        return "stop-time";
+        return uriName;
     }
 
     public static @NonNull StopTimeParam forUriValue(final String uriValue) {
