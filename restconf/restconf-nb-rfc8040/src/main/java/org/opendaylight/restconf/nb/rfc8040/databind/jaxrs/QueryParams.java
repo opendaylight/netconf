@@ -112,8 +112,8 @@ public final class QueryParams {
         }
 
         return identifier.getMountPoint() != null
-            ? QueryParameters.ofFieldPaths(params, parseFieldsPaths(identifier, fields.paramValue()))
-                : QueryParameters.ofFields(params, parseFieldsParameter(identifier, fields.paramValue()));
+            ? QueryParameters.ofFieldPaths(params, parseFieldsPaths(identifier, fields))
+                : QueryParameters.ofFields(params, parseFieldsParameter(identifier, fields));
     }
 
     /**
