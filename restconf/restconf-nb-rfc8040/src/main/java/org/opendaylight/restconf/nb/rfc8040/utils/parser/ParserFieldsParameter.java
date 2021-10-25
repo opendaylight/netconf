@@ -324,13 +324,17 @@ public abstract class ParserFieldsParameter<T> {
      * Add parsed child of current node to result for current level.
      *
      * @param currentNode current node
-     * @param identifier parsed identifier of child node
-     * @param currentQNameModule current namespace and revision in {@link QNameModule}
+     * @param childQName parsed identifier of child node
      * @param level current nodes level
      * @return {@link DataSchemaContextNode}
      */
     abstract @NonNull DataSchemaContextNode<?> addChildToResult(@NonNull DataSchemaContextNode<?> currentNode,
-            @NonNull String identifier, @NonNull QNameModule currentQNameModule, @NonNull Set<T> level);
+            @NonNull QName childQName, @NonNull Set<T> level);
+
+    private @NonNull DataSchemaContextNode<?> addChildToResult(final @NonNull DataSchemaContextNode<?> currentNode,
+            final @NonNull String localName, final @NonNull QNameModule namespace, final @NonNull Set<T> level) {
+        return addChildToResult(currentNode, QName.create(namespace, localName), level);
+    }
 
     /**
      * Fields parser that stores set of {@link QName}s in each level. Because of this fact, from the output
@@ -345,10 +349,8 @@ public abstract class ParserFieldsParameter<T> {
      */
     private static final class QNameParser extends ParserFieldsParameter<QName> {
         @Override
-        DataSchemaContextNode<?> addChildToResult(final DataSchemaContextNode<?> currentNode, final String identifier,
-                                                  final QNameModule currentQNameModule, final Set<QName> level) {
-            final QName childQName = QName.create(currentQNameModule, identifier);
-
+        DataSchemaContextNode<?> addChildToResult(final DataSchemaContextNode<?> currentNode, final QName childQName,
+                                                  final Set<QName> level) {
             // resolve parent node
             final DataSchemaContextNode<?> parentNode = resolveMixinNode(
                     currentNode, level, currentNode.getIdentifier().getNodeType());
@@ -363,7 +365,7 @@ public abstract class ParserFieldsParameter<T> {
                     parentNode.getChild(childQName), level, childQName);
             if (childNode == null) {
                 throw new RestconfDocumentedException(
-                        "Child " + identifier + " node missing in "
+                        "Child " + childQName.getLocalName() + " node missing in "
                                 + currentNode.getIdentifier().getNodeType().getLocalName(),
                         ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
             }
@@ -408,9 +410,8 @@ public abstract class ParserFieldsParameter<T> {
      */
     private static final class PathParser extends ParserFieldsParameter<LinkedPathElement> {
         @Override
-        DataSchemaContextNode<?> addChildToResult(final DataSchemaContextNode<?> currentNode, final String identifier,
-                final QNameModule currentQNameModule, final Set<LinkedPathElement> level) {
-            final QName childQName = QName.create(currentQNameModule, identifier);
+        DataSchemaContextNode<?> addChildToResult(final DataSchemaContextNode<?> currentNode, final QName childQName,
+                                                  final Set<LinkedPathElement> level) {
             final List<PathArgument> collectedMixinNodes = new ArrayList<>();
 
             DataSchemaContextNode<?> actualContextNode = currentNode.getChild(childQName);
@@ -429,7 +430,7 @@ public abstract class ParserFieldsParameter<T> {
             }
 
             if (actualContextNode == null) {
-                throw new RestconfDocumentedException("Child " + identifier + " node missing in "
+                throw new RestconfDocumentedException("Child " + childQName.getLocalName() + " node missing in "
                         + currentNode.getIdentifier().getNodeType().getLocalName(),
                         ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
             }
