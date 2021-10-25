@@ -153,17 +153,14 @@ public abstract class ParserFieldsParameter<T> {
     private void parseInput(final @NonNull String input, final @NonNull QNameModule startQNameModule,
                             final @NonNull DataSchemaContextNode<?> startNode,
                             final @NonNull List<Set<T>> parsed, final SchemaContext context) {
+        final Set<T> startLevel = new HashSet<>();
+        parsed.add(startLevel);
+
         int currentPosition = 0;
         int startPosition = 0;
         DataSchemaContextNode<?> currentNode = startNode;
         QNameModule currentQNameModule = startQNameModule;
-
-        Set<T> currentLevel = new HashSet<>();
-        parsed.add(currentLevel);
-
-        DataSchemaContextNode<?> parenthesisNode = currentNode;
-        Set<T> parenthesisLevel = currentLevel;
-        QNameModule parenthesisQNameModule = currentQNameModule;
+        Set<T> currentLevel = startLevel;
 
         while (currentPosition < input.length()) {
             final char currentChar = input.charAt(currentPosition);
@@ -235,9 +232,9 @@ public abstract class ParserFieldsParameter<T> {
                     currentPosition++;
 
                     // next nodes can be placed on already utilized level-s
-                    currentNode = parenthesisNode;
-                    currentQNameModule = parenthesisQNameModule;
-                    currentLevel = parenthesisLevel;
+                    currentNode = startNode;
+                    currentQNameModule = startQNameModule;
+                    currentLevel = startLevel;
                     break;
                 default:
                     throw new RestconfDocumentedException(
