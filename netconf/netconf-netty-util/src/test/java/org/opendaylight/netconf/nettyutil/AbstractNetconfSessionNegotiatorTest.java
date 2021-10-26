@@ -84,7 +84,6 @@ public class AbstractNetconfSessionNegotiatorTest {
         helloBase11 = NetconfHelloMessage.createClientHello(Collections
                 .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
         prefs = new NetconfSessionPreferences(helloBase11);
-        doReturn(promise).when(promise).setFailure(any());
         negotiator = new TestSessionNegotiator(prefs, promise, channel, new HashedWheelTimer(), listener, 100L);
     }
 
@@ -161,7 +160,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         final RuntimeException cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
-        verify(promise).setFailure(cause);
+        verify(promise, times(0)).setFailure(cause);
     }
 
     private static class CloseDetector extends ChannelOutboundHandlerAdapter {

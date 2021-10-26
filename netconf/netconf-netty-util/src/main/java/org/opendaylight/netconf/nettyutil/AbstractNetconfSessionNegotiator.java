@@ -123,7 +123,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
             @Override
             @SuppressWarnings("checkstyle:hiddenField")
             public void run(final Timeout timeout) {
-                synchronized (this) {
+                synchronized (AbstractNetconfSessionNegotiator.this) {
                     if (state != State.ESTABLISHED) {
 
                         LOG.debug("Connection timeout after {}, session backed by channel {} is in state {}",
@@ -290,7 +290,6 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     protected void negotiationFailed(final Throwable cause) {
         LOG.debug("Negotiation on channel {} failed", channel, cause);
         channel.close();
-        promise.setFailure(cause);
     }
 
     /**
