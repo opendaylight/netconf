@@ -16,8 +16,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
@@ -93,7 +93,6 @@ public class AbstractNetconfSessionNegotiatorTest {
         helloBase11 = NetconfHelloMessage.createClientHello(
             Set.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
         prefs = new NetconfSessionPreferences(helloBase11);
-        doReturn(promise).when(promise).setFailure(any());
         negotiator = new TestSessionNegotiator(prefs, promise, channel, timer, listener, 100L);
     }
 
@@ -175,7 +174,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         final TestingNetconfSession session = mock(TestingNetconfSession.class);
         doNothing().when(session).handleMessage(any());
         negotiator.replaceHelloMessageInboundHandler(session);
-        verify(session, times(1)).handleMessage(any());
+        verify(session).handleMessage(any());
     }
 
     @Test
@@ -185,7 +184,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         final RuntimeException cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
-        verify(promise).setFailure(cause);
+        verify(promise, never()).setFailure(cause);
     }
 
     private void enableTimerTask() {
