@@ -20,23 +20,27 @@ import org.opendaylight.yangtools.concepts.Immutable;
  */
 public final class NotificationQueryParams implements Immutable {
     private final SkipNotificationDataParam skipNotificationData;
+    private final LeafNodesOnlyParam leafNodesOnly;
     private final StartTimeParam startTime;
     private final StopTimeParam stopTime;
     private final FilterParam filter;
 
     private NotificationQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
-            final FilterParam filter, final SkipNotificationDataParam skipNotificationData) {
+            final FilterParam filter, final LeafNodesOnlyParam leafNodesOnly,
+            final SkipNotificationDataParam skipNotificationData) {
         this.startTime = startTime;
         this.stopTime = stopTime;
         this.filter = filter;
+        this.leafNodesOnly = leafNodesOnly;
         this.skipNotificationData = skipNotificationData;
     }
 
     public static @NonNull NotificationQueryParams of(final StartTimeParam startTime, final StopTimeParam stopTime,
-            final FilterParam filter, final SkipNotificationDataParam skipNotificationData) {
+            final FilterParam filter, final LeafNodesOnlyParam leafNodesOnly,
+            final SkipNotificationDataParam skipNotificationData) {
         checkArgument(stopTime == null || startTime != null,
             "Stop-time parameter has to be used with start-time parameter.");
-        return new NotificationQueryParams(startTime, stopTime, filter, skipNotificationData);
+        return new NotificationQueryParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData);
     }
 
     /**
@@ -67,6 +71,15 @@ public final class NotificationQueryParams implements Immutable {
     }
 
     /**
+     * Get odl-leaf-nodes-only query parameter.
+     *
+     * @return odl-leaf-nodes-only
+     */
+    public @Nullable LeafNodesOnlyParam leafNodesOnly() {
+        return leafNodesOnly;
+    }
+
+    /**
      * Get odl-skip-notification-data query parameter.
      *
      * @return odl-skip-notification-data
@@ -86,6 +99,9 @@ public final class NotificationQueryParams implements Immutable {
         }
         if (filter != null) {
             helper.add("filter", filter.paramValue());
+        }
+        if (leafNodesOnly != null) {
+            helper.add("leafNodesOnly", leafNodesOnly.value());
         }
         if (skipNotificationData != null) {
             helper.add("skipNotificationData", skipNotificationData.value());
