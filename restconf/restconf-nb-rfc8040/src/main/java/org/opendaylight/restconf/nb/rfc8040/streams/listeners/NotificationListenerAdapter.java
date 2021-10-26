@@ -95,7 +95,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     @SuppressWarnings("checkstyle:IllegalCatch")
     public void onNotification(final DOMNotification notification) {
         final Instant now = Instant.now();
-        if (!checkStartStop(now, this)) {
+        if (!checkStartStop(now)) {
             return;
         }
 

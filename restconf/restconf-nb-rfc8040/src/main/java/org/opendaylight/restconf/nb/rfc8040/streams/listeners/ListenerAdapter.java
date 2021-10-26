@@ -93,7 +93,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     @SuppressWarnings("checkstyle:IllegalCatch")
     public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
         final Instant now = Instant.now();
-        if (!checkStartStop(now, this)) {
+        if (!checkStartStop(now)) {
             return;
         }
 
