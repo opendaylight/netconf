@@ -17,11 +17,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.FilterParam;
-import org.opendaylight.restconf.nb.rfc8040.LeafNodesOnlyParam;
-import org.opendaylight.restconf.nb.rfc8040.SkipNotificationDataParam;
-import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
-import org.opendaylight.restconf.nb.rfc8040.StopTimeParam;
+import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
@@ -51,20 +47,22 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     /**
      * Set query parameters for listener.
      *
-     * @param startTime     Start-time of getting notification.
-     * @param stopTime      Stop-time of getting notification.
-     * @param filter        Indicates which subset of all possible events are of interest.
-     * @param leafNodesOnly If TRUE, notifications will contain changes of leaf nodes only.
+     * @param params     NotificationQueryParams to use.
      */
-    @SuppressWarnings("checkstyle:hiddenField")
-    public final void setQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
-            final FilterParam filter, final LeafNodesOnlyParam leafNodesOnly,
-            final SkipNotificationDataParam skipNotificationData) {
+    public final void setQueryParams(final NotificationQueryParams params) {
+        final var startTime = params.startTime();
         start = startTime == null ? Instant.now() : parseDateAndTime(startTime.value());
-        stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
-        this.leafNodesOnly = leafNodesOnly == null ? false : leafNodesOnly.value();
-        this.skipNotificationData = skipNotificationData == null ? false : skipNotificationData.value();
 
+        final var stopTime = params.stopTime();
+        stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
+
+        final var leafNodes = params.leafNodesOnly();
+        leafNodesOnly = leafNodes == null ? false : leafNodes.value();
+
+        final var skipData = params.skipNotificationData();
+        skipNotificationData = skipData == null ? false : skipData.value();
+
+        final var filter = params.filter();
         if (filter != null) {
             try {
                 setFilter(filter.paramValue());
