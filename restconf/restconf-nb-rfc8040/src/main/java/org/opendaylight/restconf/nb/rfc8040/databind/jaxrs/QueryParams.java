@@ -32,6 +32,7 @@ import org.opendaylight.restconf.nb.rfc8040.InsertParam;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.PointParam;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.SkipNotificationDataParam;
 import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
 import org.opendaylight.restconf.nb.rfc8040.StopTimeParam;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
@@ -67,7 +68,7 @@ public final class QueryParams {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
-        boolean skipNotificationData = false;
+        SkipNotificationDataParam skipNotificationData = null;
 
         for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             final String paramName = entry.getKey();
@@ -84,9 +85,9 @@ public final class QueryParams {
                     case StopTimeParam.uriName:
                         stopTime = optionalParam(StopTimeParam::forUriValue, paramName, paramValues);
                         break;
-                    case "odl-skip-notification-data":
-                        // FIXME: this should be properly encapsulated in SkipNotificatioDataParameter
-                        skipNotificationData = Boolean.parseBoolean(optionalParam(paramName, paramValues));
+                    case SkipNotificationDataParam.uriName:
+                        skipNotificationData = optionalParam(SkipNotificationDataParam::forUriValue, paramName,
+                            paramValues);
                         break;
                     default:
                         throw unhandledParam("notification", paramName);
