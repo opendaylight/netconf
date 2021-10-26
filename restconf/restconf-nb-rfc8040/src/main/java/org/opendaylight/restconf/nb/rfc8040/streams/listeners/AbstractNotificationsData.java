@@ -31,6 +31,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -44,16 +45,20 @@ import org.w3c.dom.Element;
 
 /**
  * Abstract class for processing and preparing data.
- *
  */
 abstract class AbstractNotificationsData {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationsData.class);
     private static final TransformerFactory TF = TransformerFactory.newInstance();
     private static final XMLOutputFactory OF = XMLOutputFactory.newInstance();
 
-    private DOMDataBroker dataBroker;
+    private final String localName;
+
     protected SchemaContextHandler schemaHandler;
-    private String localName;
+    private DOMDataBroker dataBroker;
+
+    AbstractNotificationsData(final QName lastQName) {
+        localName = lastQName.getLocalName();
+    }
 
     /**
      * Data broker for delete data in DS on close().
@@ -77,17 +82,6 @@ abstract class AbstractNotificationsData {
         final DOMDataTreeWriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
         wTx.delete(LogicalDatastoreType.OPERATIONAL, Rfc8040.restconfStateStreamPath(localName));
         return wTx.commit();
-    }
-
-    /**
-     * Set localName of last path element of specific listener.
-     *
-     * @param localName
-     *            local name
-     */
-    @SuppressWarnings("checkstyle:hiddenField")
-    protected void setLocalNameOfPath(final String localName) {
-        this.localName = localName;
     }
 
     /**

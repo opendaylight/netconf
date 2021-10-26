@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
@@ -87,7 +86,7 @@ public class RestconfInvokeOperationsServiceImplTest {
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        when(dataBroker.newWriteOnlyTransaction()).thenReturn(wTx);
+        doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(dataBroker,
             mock(DOMSchemaService.class));
@@ -179,7 +178,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         final InstanceIdentifierContext<?> context = mock(InstanceIdentifierContext.class);
         final RpcDefinition schemaNode = mock(RpcDefinition.class);
         final QName qname = QName.create("invoke:rpc:module", "2013-12-03", "rpcTest");
-        when(schemaNode.getQName()).thenReturn(qname);
+        doReturn(qname).when(schemaNode).getQName();
         doReturn(schemaNode).when(context).getSchemaNode();
         final NormalizedNode data = mock(NormalizedNode.class);
         final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);

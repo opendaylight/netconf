@@ -17,7 +17,6 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriBuilder;
@@ -47,7 +46,9 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -105,15 +106,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @BeforeClass
     public static void setUpBeforeTest() {
-        final Map<String, ListenerAdapter> listenersByStreamNameSetter = new HashMap<>();
-        final ListenerAdapter adapter = mock(ListenerAdapter.class);
-        final YangInstanceIdentifier yiid = mock(YangInstanceIdentifier.class);
-        doReturn(yiid).when(adapter).getPath();
-        doReturn("JSON").when(adapter).getOutputType();
-        listenersByStreamNameSetter.put(
-                "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
-                adapter);
-        ListenersBroker.getInstance().setDataChangeListeners(listenersByStreamNameSetter);
+        final String name =
+            "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
+        final ListenerAdapter adapter = new ListenerAdapter(YangInstanceIdentifier.create(new NodeIdentifier(
+            QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))),
+            name, NotificationOutputType.JSON);
+        ListenersBroker.getInstance().setDataChangeListeners(Map.of(name, adapter));
     }
 
     @AfterClass
