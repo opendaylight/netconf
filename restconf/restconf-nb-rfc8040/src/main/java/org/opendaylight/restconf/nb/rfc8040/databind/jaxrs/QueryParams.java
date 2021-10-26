@@ -29,6 +29,7 @@ import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.FieldsParam;
 import org.opendaylight.restconf.nb.rfc8040.FilterParam;
 import org.opendaylight.restconf.nb.rfc8040.InsertParam;
+import org.opendaylight.restconf.nb.rfc8040.LeafNodesOnlyParam;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.PointParam;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
@@ -68,6 +69,7 @@ public final class QueryParams {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
+        LeafNodesOnlyParam leafNodesOnly = null;
         SkipNotificationDataParam skipNotificationData = null;
 
         for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
@@ -85,6 +87,9 @@ public final class QueryParams {
                     case StopTimeParam.uriName:
                         stopTime = optionalParam(StopTimeParam::forUriValue, paramName, paramValues);
                         break;
+                    case LeafNodesOnlyParam.uriName:
+                        leafNodesOnly = optionalParam(LeafNodesOnlyParam::forUriValue, paramName, paramValues);
+                        break;
                     case SkipNotificationDataParam.uriName:
                         skipNotificationData = optionalParam(SkipNotificationDataParam::forUriValue, paramName,
                             paramValues);
@@ -99,7 +104,7 @@ public final class QueryParams {
         }
 
         try {
-            return NotificationQueryParams.of(startTime, stopTime, filter, skipNotificationData);
+            return NotificationQueryParams.of(startTime, stopTime, filter, leafNodesOnly, skipNotificationData);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
         }
