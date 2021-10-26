@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 
 /**
@@ -18,6 +19,8 @@ public final class SkipNotificationDataParam implements RestconfQueryParam<SkipN
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "odl-skip-notification-data";
 
+    private static final @NonNull URI CAPABILITY =
+        URI.create("urn:opendaylight:params:restconf:capability:skip-notification-data:1.0");
     private static final @NonNull SkipNotificationDataParam FALSE = new SkipNotificationDataParam(false);
     private static final @NonNull SkipNotificationDataParam TRUE = new SkipNotificationDataParam(true);
 
@@ -59,5 +62,9 @@ public final class SkipNotificationDataParam implements RestconfQueryParam<SkipN
 
     public boolean value() {
         return value;
+    }
+
+    public static @NonNull URI capabilityUri() {
+        return CAPABILITY;
     }
 }
