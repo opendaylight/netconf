@@ -7,9 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.MoreObjects;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -24,11 +26,13 @@ import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.formatters.EventFormatter;
+import org.opendaylight.restconf.common.formatters.EventFormatterFactory;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Features of subscribing part of both notifications.
  */
-abstract class AbstractCommonSubscriber extends AbstractNotificationsData implements BaseListenerInterface {
+abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData implements BaseListenerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
         .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
@@ -48,6 +52,11 @@ abstract class AbstractCommonSubscriber extends AbstractNotificationsData implem
         .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
         .appendOffset("+HH:MM", "Z").toFormatter();
 
+    private final EventFormatterFactory<T> formatterFactory;
+    private final NotificationOutputType outputType;
+    private final String streamName;
+    private final P path;
+
     @GuardedBy("this")
     private final Set<StreamSessionHandler> subscribers = new HashSet<>();
     @GuardedBy("this")
@@ -58,6 +67,28 @@ abstract class AbstractCommonSubscriber extends AbstractNotificationsData implem
     private Instant stop = null;
     private boolean leafNodesOnly = false;
     private boolean skipNotificationData = false;
+    private EventFormatter<T> formatter;
+
+    AbstractCommonSubscriber(final String streamName, final P path, final NotificationOutputType outputType,
+            final EventFormatterFactory<T> formatterFactory) {
+        this.streamName = requireNonNull(streamName);
+        checkArgument(!streamName.isEmpty());
+        this.path = requireNonNull(path);
+
+        this.outputType = requireNonNull(outputType);
+        this.formatterFactory = requireNonNull(formatterFactory);
+        formatter = formatterFactory.getFormatter();
+    }
+
+    @Override
+    public final String getStreamName() {
+        return streamName;
+    }
+
+    @Override
+    public final String getOutputType() {
+        return outputType.getName();
+    }
 
     @Override
     public final synchronized boolean hasSubscribers() {
@@ -82,7 +113,7 @@ abstract class AbstractCommonSubscriber extends AbstractNotificationsData implem
     @Override
     public synchronized void addSubscriber(final StreamSessionHandler subscriber) {
         final boolean isConnected = subscriber.isConnected();
-        Preconditions.checkState(isConnected);
+        checkState(isConnected);
         LOG.debug("Subscriber {} is added.", subscriber);
         subscribers.add(subscriber);
     }
@@ -90,7 +121,7 @@ abstract class AbstractCommonSubscriber extends AbstractNotificationsData implem
     @Override
     public synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
         final boolean isConnected = subscriber.isConnected();
-        Preconditions.checkState(isConnected);
+        checkState(isConnected);
         LOG.debug("Subscriber {} is removed", subscriber);
         subscribers.remove(subscriber);
         if (!hasSubscribers()) {
@@ -121,16 +152,21 @@ abstract class AbstractCommonSubscriber extends AbstractNotificationsData implem
         skipNotificationData = skipData == null ? false : skipData.value();
 
         final var filter = params.filter();
-        if (filter != null) {
+        final String filterValue = filter == null ? null : filter.paramValue();
+        if (filterValue != null && !filterValue.isEmpty()) {
             try {
-                setFilter(filter.paramValue());
+                formatter = formatterFactory.getFormatter(filterValue);
             } catch (XPathExpressionException e) {
                 throw new IllegalArgumentException("Failed to get filter", e);
             }
+        } else {
+            formatter = formatterFactory.getFormatter();
         }
     }
 
-    abstract void setFilter(@Nullable String xpathString) throws XPathExpressionException;
+    final P path() {
+        return path;
+    }
 
     /**
      * Check whether this query should only notify about leaf node changes.
@@ -148,6 +184,10 @@ abstract class AbstractCommonSubscriber extends AbstractNotificationsData implem
      */
     final boolean isSkipNotificationData() {
         return skipNotificationData;
+    }
+
+    final EventFormatter<T> formatter() {
+        return formatter;
     }
 
     /**
@@ -214,6 +254,15 @@ abstract class AbstractCommonSubscriber extends AbstractNotificationsData implem
             return true;
         }
         return false;
+    }
+
+    @Override
+    public final String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("path", path)
+            .add("stream-name", streamName)
+            .add("output-type", getOutputType())
+            .toString();
     }
 
     /**

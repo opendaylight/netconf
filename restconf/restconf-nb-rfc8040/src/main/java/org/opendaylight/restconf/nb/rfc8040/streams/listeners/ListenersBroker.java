@@ -174,7 +174,7 @@ public final class ListenersBroker {
         final long stamp = notificationListenersLock.writeLock();
         try {
             return notificationListeners.computeIfAbsent(streamName,
-                stream -> new NotificationListenerAdapter(schemaPath, stream, outputType.getName()));
+                stream -> new NotificationListenerAdapter(schemaPath, stream, outputType));
         } finally {
             notificationListenersLock.unlockWrite(stamp);
         }
