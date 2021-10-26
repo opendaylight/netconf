@@ -161,7 +161,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         final RuntimeException cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
-        verify(promise).setFailure(cause);
+        verify(promise, times(0)).setFailure(cause);
     }
 
     private static class CloseDetector extends ChannelOutboundHandlerAdapter {
