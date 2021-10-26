@@ -19,13 +19,13 @@ import org.opendaylight.yangtools.concepts.Immutable;
  * Parser and holder of query parameters from uriInfo for notifications.
  */
 public final class NotificationQueryParams implements Immutable {
+    private final SkipNotificationDataParam skipNotificationData;
     private final StartTimeParam startTime;
     private final StopTimeParam stopTime;
     private final FilterParam filter;
-    private final boolean skipNotificationData;
 
     private NotificationQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
-            final FilterParam filter, final boolean skipNotificationData) {
+            final FilterParam filter, final SkipNotificationDataParam skipNotificationData) {
         this.startTime = startTime;
         this.stopTime = stopTime;
         this.filter = filter;
@@ -33,7 +33,7 @@ public final class NotificationQueryParams implements Immutable {
     }
 
     public static @NonNull NotificationQueryParams of(final StartTimeParam startTime, final StopTimeParam stopTime,
-            final FilterParam filter, final boolean skipNotificationData) {
+            final FilterParam filter, final SkipNotificationDataParam skipNotificationData) {
         checkArgument(stopTime == null || startTime != null,
             "Stop-time parameter has to be used with start-time parameter.");
         return new NotificationQueryParams(startTime, stopTime, filter, skipNotificationData);
@@ -67,11 +67,11 @@ public final class NotificationQueryParams implements Immutable {
     }
 
     /**
-     * Check whether this query should notify changes without data.
+     * Get odl-skip-notification-data query parameter.
      *
-     * @return true if this query should notify about changes with  data
+     * @return odl-skip-notification-data
      */
-    public boolean isSkipNotificationData() {
+    public @Nullable SkipNotificationDataParam skipNotificationData() {
         return skipNotificationData;
     }
 
@@ -87,6 +87,9 @@ public final class NotificationQueryParams implements Immutable {
         if (filter != null) {
             helper.add("filter", filter.paramValue());
         }
-        return helper.add("skipNotificationData", skipNotificationData).toString();
+        if (skipNotificationData != null) {
+            helper.add("skipNotificationData", skipNotificationData.value());
+        }
+        return helper.toString();
     }
 }

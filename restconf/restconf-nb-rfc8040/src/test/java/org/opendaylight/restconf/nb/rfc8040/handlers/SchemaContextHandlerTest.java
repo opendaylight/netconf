@@ -153,7 +153,8 @@ public class SchemaContextHandlerTest {
                 equalTo("urn:ietf:params:restconf:capability:fields:1.0"),
                 equalTo("urn:ietf:params:restconf:capability:filter:1.0"),
                 equalTo("urn:ietf:params:restconf:capability:replay:1.0"),
-                equalTo("urn:ietf:params:restconf:capability:with-defaults:1.0")));
+                equalTo("urn:ietf:params:restconf:capability:with-defaults:1.0"),
+                equalTo("urn:opendaylight:params:restconf:capability:skip-notification-data:1.0")));
     }
 
 }

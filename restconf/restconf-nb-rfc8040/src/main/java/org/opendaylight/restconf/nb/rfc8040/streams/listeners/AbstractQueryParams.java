@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.FilterParam;
+import org.opendaylight.restconf.nb.rfc8040.SkipNotificationDataParam;
 import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
 import org.opendaylight.restconf.nb.rfc8040.StopTimeParam;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
@@ -56,11 +57,12 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      */
     @SuppressWarnings("checkstyle:hiddenField")
     public final void setQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
-            final FilterParam filter, final boolean leafNodesOnly, final boolean skipNotificationData) {
+            final FilterParam filter, final boolean leafNodesOnly,
+            final SkipNotificationDataParam skipNotificationData) {
         start = startTime == null ? Instant.now() : parseDateAndTime(startTime.value());
         stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
         this.leafNodesOnly = leafNodesOnly;
-        this.skipNotificationData = skipNotificationData;
+        this.skipNotificationData = skipNotificationData == null ? false : skipNotificationData.value();
 
         if (filter != null) {
             try {

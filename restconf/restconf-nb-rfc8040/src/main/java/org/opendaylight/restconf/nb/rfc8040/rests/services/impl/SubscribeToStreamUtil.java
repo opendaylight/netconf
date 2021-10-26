@@ -135,7 +135,7 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.startTime(),
                 notificationQueryParams.stopTime(),
                 notificationQueryParams.filter(),
-                false, notificationQueryParams.isSkipNotificationData());
+                false, notificationQueryParams.skipNotificationData());
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getSchemaHandler());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
@@ -187,7 +187,7 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.startTime(),
                 notificationQueryParams.stopTime(),
                 notificationQueryParams.filter(),
-                false, notificationQueryParams.isSkipNotificationData());
+                false, notificationQueryParams.skipNotificationData());
 
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         final SchemaContextHandler schemaHandler = handlersHolder.getSchemaHandler();
