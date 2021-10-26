@@ -35,6 +35,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.LeafNodesOnlyParam;
+import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.SkipNotificationDataParam;
 import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -42,7 +43,7 @@ import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.P
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Builder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Key;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -119,11 +120,11 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         private CountDownLatch notificationLatch = new CountDownLatch(1);
 
         ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
-                              final NotificationOutputTypeGrouping.NotificationOutputType outputType,
+                              final NotificationOutputType outputType,
                               final boolean leafNodesOnly, final boolean skipNotificationData) {
             super(path, streamName, outputType);
-            setQueryParams(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
-                LeafNodesOnlyParam.of(leafNodesOnly), SkipNotificationDataParam.of(skipNotificationData));
+            setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
+                LeafNodesOnlyParam.of(leafNodesOnly), SkipNotificationDataParam.of(skipNotificationData)));
         }
 
         @Override
@@ -201,8 +202,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifsLeaves() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.JSON, true, false);
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+            true, false);
         adapter.setCloseVars(domDataBroker, schemaContextHandler);
 
         final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -233,8 +234,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifs() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.JSON, false, false);
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+            false, false);
         adapter.setCloseVars(domDataBroker, schemaContextHandler);
 
         final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -265,8 +266,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifsWithoutData() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.JSON, false, true);
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+            false, true);
         adapter.setCloseVars(domDataBroker, schemaContextHandler);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -295,8 +296,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlNotifications() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.XML, false, false);
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
+            false, false);
         adapter.setCloseVars(domDataBroker, schemaContextHandler);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -325,8 +326,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlSkipData() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.XML, false, true);
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
+            false, true);
         adapter.setCloseVars(domDataBroker, schemaContextHandler);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
@@ -355,8 +356,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlLeavesOnly() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.XML, true, false);
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
+            true, false);
         adapter.setCloseVars(domDataBroker, schemaContextHandler);
 
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
