@@ -74,7 +74,9 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
         XMLStreamWriter xmlWriter;
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
-            if (context.getWriterParameters().prettyPrint()) {
+
+            final var prettyPrint = context.getWriterParameters().prettyPrint();
+            if (prettyPrint != null && prettyPrint.value()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
         } catch (final XMLStreamException | FactoryConfigurationError e) {

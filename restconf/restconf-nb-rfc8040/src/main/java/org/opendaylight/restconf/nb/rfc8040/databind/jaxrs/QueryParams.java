@@ -32,6 +32,7 @@ import org.opendaylight.restconf.nb.rfc8040.InsertParam;
 import org.opendaylight.restconf.nb.rfc8040.LeafNodesOnlyParam;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.PointParam;
+import org.opendaylight.restconf.nb.rfc8040.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.SkipNotificationDataParam;
 import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
@@ -133,6 +134,7 @@ public final class QueryParams {
         DepthParam depth = null;
         FieldsParam fields = null;
         WithDefaultsParam withDefaults = null;
+        PrettyPrintParam prettyPrint = null;
         boolean tagged = false;
 
         for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
@@ -194,13 +196,15 @@ public final class QueryParams {
                         }
                     }
                     break;
+                case PrettyPrintParam.uriName:
+                    prettyPrint = optionalParam(PrettyPrintParam::forUriValue, paramName, paramValues);
+                    break;
                 default:
-                    // FIXME: recognize pretty-print here
                     throw unhandledParam("read", paramName);
             }
         }
 
-        return ReadDataParams.of(content, depth, fields, withDefaults, tagged, false);
+        return ReadDataParams.of(content, depth, fields, withDefaults, tagged, prettyPrint);
     }
 
     public static @NonNull WriteDataParams newWriteDataParams(final UriInfo uriInfo) {

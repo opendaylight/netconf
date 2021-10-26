@@ -67,8 +67,9 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
         final InstanceIdentifierContext<SchemaNode> identifierCtx =
                 (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
         final SchemaPath path = identifierCtx.getSchemaNode().getPath();
+        final var pretty = context.getWriterParameters().prettyPrint();
 
-        try (JsonWriter jsonWriter = createJsonWriter(entityStream, context.getWriterParameters().prettyPrint())) {
+        try (JsonWriter jsonWriter = createJsonWriter(entityStream, pretty == null ? false : pretty.value())) {
             jsonWriter.beginObject();
             writeNormalizedNode(jsonWriter, path, identifierCtx, data,
                     context.getWriterParameters().depth(), context.getWriterParameters().fields());

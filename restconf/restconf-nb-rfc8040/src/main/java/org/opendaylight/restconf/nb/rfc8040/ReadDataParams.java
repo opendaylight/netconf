@@ -22,17 +22,17 @@ import org.opendaylight.yangtools.concepts.Immutable;
 // FIXME: this should be a record once we have JDK17+
 public final class ReadDataParams implements Immutable {
     private static final @NonNull ReadDataParams EMPTY =
-        new ReadDataParams(ContentParam.ALL, null, null, null, false, false);
+        new ReadDataParams(ContentParam.ALL, null, null, null, false, null);
 
     private final @NonNull ContentParam content;
     private final WithDefaultsParam withDefaults;
+    private final PrettyPrintParam prettyPrint;
     private final FieldsParam fields;
     private final DepthParam depth;
-    private final boolean prettyPrint;
     private final boolean tagged;
 
     private ReadDataParams(final ContentParam content,  final DepthParam depth, final FieldsParam fields,
-            final WithDefaultsParam withDefaults, final boolean tagged, final boolean prettyPrint) {
+            final WithDefaultsParam withDefaults, final boolean tagged, final PrettyPrintParam prettyPrint) {
         this.content = requireNonNull(content);
         this.depth = depth;
         this.fields = fields;
@@ -47,7 +47,7 @@ public final class ReadDataParams implements Immutable {
 
     public static @NonNull ReadDataParams of(final ContentParam content,  final DepthParam depth,
             final FieldsParam fields, final WithDefaultsParam withDefaults, final boolean tagged,
-            final boolean prettyPrint) {
+            final PrettyPrintParam prettyPrint) {
         return new ReadDataParams(content, depth, fields, withDefaults, tagged, prettyPrint);
     }
 
@@ -67,7 +67,7 @@ public final class ReadDataParams implements Immutable {
         return withDefaults;
     }
 
-    public boolean prettyPrint() {
+    public @Nullable PrettyPrintParam prettyPrint() {
         return prettyPrint;
     }
 
@@ -88,6 +88,10 @@ public final class ReadDataParams implements Immutable {
         if (withDefaults != null) {
             helper.add("withDefaults", withDefaults.paramValue());
         }
-        return helper.add("tagged", tagged).add("prettyPrint", prettyPrint).toString();
+        helper.add("tagged", tagged);
+        if (prettyPrint != null) {
+            helper.add("prettyPrint", prettyPrint.value());
+        }
+        return helper.toString();
     }
 }

@@ -33,6 +33,7 @@ import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.FieldsParam;
 import org.opendaylight.restconf.nb.rfc8040.FilterParam;
 import org.opendaylight.restconf.nb.rfc8040.LeafNodesOnlyParam;
+import org.opendaylight.restconf.nb.rfc8040.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.SkipNotificationDataParam;
 import org.opendaylight.restconf.nb.rfc8040.WithDefaultsParam;
@@ -185,6 +186,7 @@ public class SchemaContextHandler implements EffectiveModelContextListener, Auto
                     .withChildValue(FilterParam.capabilityUri().toString())
                     .withChildValue(AbstractReplayParam.capabilityUri().toString())
                     .withChildValue(WithDefaultsParam.capabilityUri().toString())
+                    .withChildValue(PrettyPrintParam.capabilityUri().toString())
                     .withChildValue(LeafNodesOnlyParam.capabilityUri().toString())
                     .withChildValue(SkipNotificationDataParam.capabilityUri().toString())
                     .build())

@@ -15,6 +15,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.nb.rfc8040.DepthParam;
+import org.opendaylight.restconf.nb.rfc8040.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -65,6 +66,9 @@ public final class QueryParameters {
         return params.depth();
     }
 
+    public @Nullable PrettyPrintParam prettyPrint() {
+        return params.prettyPrint();
+    }
 
     public @Nullable List<Set<QName>> fields() {
         return fields;
@@ -72,9 +76,5 @@ public final class QueryParameters {
 
     public @Nullable List<YangInstanceIdentifier> fieldPaths() {
         return fieldPaths;
-    }
-
-    public boolean prettyPrint() {
-        return params.prettyPrint();
     }
 }
