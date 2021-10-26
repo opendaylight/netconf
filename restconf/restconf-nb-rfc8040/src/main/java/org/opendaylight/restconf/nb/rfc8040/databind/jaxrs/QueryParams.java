@@ -11,13 +11,10 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
-import java.text.ParseException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -47,20 +44,15 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 
 @Beta
 public final class QueryParams {
-    private static final List<String> POSSIBLE_CONTENT = Arrays.stream(ContentParam.values())
-        .map(ContentParam::paramValue)
-        .collect(Collectors.toUnmodifiableList());
-    private static final List<String> POSSIBLE_WITH_DEFAULTS = Arrays.stream(WithDefaultsParam.values())
-        .map(WithDefaultsParam::paramValue)
-        .collect(Collectors.toUnmodifiableList());
     private static final Set<String> KNOWN_PARAMS = Set.of(
         // Read data
         ContentParam.uriName, DepthParam.uriName, FieldsParam.uriName, WithDefaultsParam.uriName,
+        PrettyPrintParam.uriName,
         // Modify data
         InsertParam.uriName, PointParam.uriName,
         // Notifications
-        FilterParam.uriName, StartTimeParam.uriName, StopTimeParam.uriName ,"odl-skip-notification-data");
-
+        FilterParam.uriName, StartTimeParam.uriName, StopTimeParam.uriName,
+        LeafNodesOnlyParam.uriName, SkipNotificationDataParam.uriName);
 
     private QueryParams() {
         // Utility class
@@ -141,66 +133,51 @@ public final class QueryParams {
             final String paramName = entry.getKey();
             final List<String> paramValues = entry.getValue();
 
-            switch (paramName) {
-                case ContentParam.uriName:
-                    final String contentStr = optionalParam(paramName, paramValues);
-                    if (contentStr != null) {
-                        content = RestconfDocumentedException.throwIfNull(ContentParam.forUriValue(contentStr),
-                            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                            "Invalid content parameter: %s, allowed values are %s", contentStr, POSSIBLE_CONTENT);
-                    }
-                    break;
-                case DepthParam.uriName:
-                    final String depthStr = optionalParam(paramName, paramValues);
-                    try {
-                        depth = DepthParam.forUriValue(depthStr);
-                    } catch (IllegalArgumentException e) {
-                        throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.INVALID_VALUE, "Invalid depth parameter: " + depthStr, null,
-                            "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
-                    }
-                    break;
-                case FieldsParam.uriName:
-                    final String fieldsStr = optionalParam(paramName, paramValues);
-                    if (fieldsStr != null) {
+            try {
+                switch (paramName) {
+                    case ContentParam.uriName:
+                        content = optionalParam(ContentParam::forUriValue, paramName, paramValues);
+                        break;
+                    case DepthParam.uriName:
+                        final String depthStr = optionalParam(paramName, paramValues);
                         try {
-                            fields = FieldsParam.parse(fieldsStr);
-                        } catch (ParseException e) {
+                            depth = DepthParam.forUriValue(depthStr);
+                        } catch (IllegalArgumentException e) {
                             throw new RestconfDocumentedException(e, new RestconfError(ErrorType.PROTOCOL,
-                                ErrorTag.INVALID_VALUE, "Invalid filds parameter: " + fieldsStr));
+                                ErrorTag.INVALID_VALUE, "Invalid depth parameter: " + depthStr, null,
+                                "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
                         }
-                    }
-                    break;
-                case WithDefaultsParam.uriName:
-                    final String withDefaultsStr = optionalParam(paramName, paramValues);
-                    if (withDefaultsStr != null) {
-                        final WithDefaultsParam val = WithDefaultsParam.forUriValue(withDefaultsStr);
-                        if (val == null) {
-                            throw new RestconfDocumentedException(new RestconfError(ErrorType.PROTOCOL,
-                                ErrorTag.INVALID_VALUE, "Invalid with-defaults parameter: " + withDefaultsStr, null,
-                                "The with-defaults parameter must be a string in " + POSSIBLE_WITH_DEFAULTS));
+                        break;
+                    case FieldsParam.uriName:
+                        fields = optionalParam(FieldsParam::forUriValue, paramName, paramValues);
+                        break;
+                    case WithDefaultsParam.uriName:
+                        final var defaultsVal = optionalParam(WithDefaultsParam::forUriValue, paramName, paramValues);
+                        if (defaultsVal != null) {
+                            switch (defaultsVal) {
+                                case REPORT_ALL:
+                                    withDefaults = null;
+                                    tagged = false;
+                                    break;
+                                case REPORT_ALL_TAGGED:
+                                    withDefaults = null;
+                                    tagged = true;
+                                    break;
+                                default:
+                                    withDefaults = defaultsVal;
+                                    tagged = false;
+                            }
                         }
-
-                        switch (val) {
-                            case REPORT_ALL:
-                                withDefaults = null;
-                                tagged = false;
-                                break;
-                            case REPORT_ALL_TAGGED:
-                                withDefaults = null;
-                                tagged = true;
-                                break;
-                            default:
-                                withDefaults = val;
-                                tagged = false;
-                        }
-                    }
-                    break;
-                case PrettyPrintParam.uriName:
-                    prettyPrint = optionalParam(PrettyPrintParam::forUriValue, paramName, paramValues);
-                    break;
-                default:
-                    throw unhandledParam("read", paramName);
+                        break;
+                    case PrettyPrintParam.uriName:
+                        prettyPrint = optionalParam(PrettyPrintParam::forUriValue, paramName, paramValues);
+                        break;
+                    default:
+                        throw unhandledParam("read", paramName);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new RestconfDocumentedException("Invalid " + paramName + " value: " + e.getMessage(),
+                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
             }
         }
 
@@ -212,28 +189,23 @@ public final class QueryParams {
         PointParam point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            final String uriName = entry.getKey();
+            final String paramName = entry.getKey();
             final List<String> paramValues = entry.getValue();
-            switch (uriName) {
-                case InsertParam.uriName:
-                    final String instartStr = optionalParam(uriName, paramValues);
-                    if (instartStr != null) {
-                        insert = InsertParam.forUriValue(instartStr);
-                        if (insert == null) {
-                            throw new RestconfDocumentedException(
-                                "Unrecognized insert parameter value '" + instartStr + "'", ErrorType.PROTOCOL,
-                                ErrorTag.BAD_ELEMENT);
-                        }
-                    }
-                    break;
-                case PointParam.uriName:
-                    final String pointStr = optionalParam(uriName, paramValues);
-                    if (pointStr != null) {
-                        point = PointParam.forUriValue(pointStr);
-                    }
-                    break;
-                default:
-                    throw unhandledParam("write", uriName);
+
+            try {
+                switch (paramName) {
+                    case InsertParam.uriName:
+                        insert = optionalParam(InsertParam::forUriValue, paramName, paramValues);
+                        break;
+                    case PointParam.uriName:
+                        point = optionalParam(PointParam::forUriValue, paramName, paramValues);
+                        break;
+                    default:
+                        throw unhandledParam("write", paramName);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new RestconfDocumentedException("Invalid " + paramName + " value: " + e.getMessage(),
+                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
             }
         }
 

@@ -113,6 +113,14 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
         return new FieldsParameterParser().parse(str);
     }
 
+    public static FieldsParam forUriValue(final String uriValue) {
+        try {
+            return parse(uriValue);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e.getMessage() + " [at offset " + e.getErrorOffset() + "]", e);
+        }
+    }
+
     @Override
     public Class<@NonNull FieldsParam> javaClass() {
         return FieldsParam.class;

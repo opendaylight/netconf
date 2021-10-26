@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Enumeration of possible {@code content} values as defined by
@@ -55,8 +54,7 @@ public enum ContentParam implements RestconfQueryParam<ContentParam> {
         return uriValue;
     }
 
-    // Note: returns null of unknowns
-    public static @Nullable ContentParam forUriValue(final String uriValue) {
+    public static @NonNull ContentParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "all":
                 return ALL;
@@ -65,7 +63,8 @@ public enum ContentParam implements RestconfQueryParam<ContentParam> {
             case "nonconfig":
                 return NONCONFIG;
             default:
-                return null;
+                throw new IllegalArgumentException(
+                    "Value can be 'all', 'config' or 'non-config', not '" + uriValue + "'");
         }
     }
 }

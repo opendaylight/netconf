@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Enumeration of possible {@code insert} values as defined by
@@ -59,8 +58,7 @@ public enum InsertParam implements RestconfQueryParam<InsertParam> {
         return uriValue;
     }
 
-    // Note: returns null of unknowns
-    public static @Nullable InsertParam forUriValue(final String uriValue) {
+    public static @NonNull InsertParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "after":
                 return AFTER;
@@ -71,7 +69,8 @@ public enum InsertParam implements RestconfQueryParam<InsertParam> {
             case "last":
                 return LAST;
             default:
-                return null;
+                throw new IllegalArgumentException(
+                    "Value can be 'after', 'before', 'first' or 'last', not '" + uriValue + "'");
         }
     }
 }

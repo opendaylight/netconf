@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Enumeration of possible {@code with-defaults} parameter values as defined by
@@ -62,7 +61,7 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
         return uriValue;
     }
 
-    public static @Nullable WithDefaultsParam forUriValue(final String uriValue) {
+    public static @NonNull WithDefaultsParam forUriValue(final String uriValue) {
         switch (uriValue) {
             case "explicit":
                 return EXPLICIT;
@@ -73,7 +72,8 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
             case "trim":
                 return TRIM;
             default:
-                return null;
+                throw new IllegalArgumentException(
+                    "Value can be 'explicit', 'report-all', 'report-all-tagged' or 'trim', not '" + uriValue + "'");
         }
     }
 
