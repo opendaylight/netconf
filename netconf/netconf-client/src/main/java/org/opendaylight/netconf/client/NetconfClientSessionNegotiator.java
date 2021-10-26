@@ -73,7 +73,7 @@ public class NetconfClientSessionNegotiator extends
             try {
                 startNegotiation();
             } catch (final Exception e) {
-                LOG.warn("Unexpected negotiation failure", e);
+                LOG.warn("Unexpected negotiation failure on channel {}", channel, e);
                 negotiationFailed(e);
                 return;
             }

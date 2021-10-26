@@ -126,12 +126,14 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
                 synchronized (this) {
                     if (state != State.ESTABLISHED) {
 
-                        LOG.debug("Connection timeout after {}, session is in state {}", timeout, state);
+                        LOG.debug("Connection timeout after {}, session backed by channel {} is in state {}",
+                                timeout, channel, state);
 
                         // Do not fail negotiation if promise is done or canceled
                         // It would result in setting result of the promise second time and that throws exception
                         if (!isPromiseFinished()) {
-                            LOG.warn("Netconf session was not established after {}", connectionTimeoutMillis);
+                            LOG.warn("Netconf session backed by channel {} was not established after {}",
+                                    channel, connectionTimeoutMillis);
                             changeState(State.FAILED);
 
                             channel.close().addListener((GenericFutureListener<ChannelFuture>) future -> {
@@ -235,7 +237,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     private synchronized void changeState(final State newState) {
         LOG.debug("Changing state from : {} to : {} for channel: {}", state, newState, channel);
         checkState(isStateChangePermitted(state, newState),
-                "Cannot change state from %s to %s for chanel %s", state, newState, channel);
+                "Cannot change state from %s to %s for channel %s", state, newState, channel);
         this.state = newState;
     }
 
@@ -271,7 +273,8 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     private final class ExceptionHandlingInboundChannelHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
-            LOG.warn("An exception occurred during negotiation with {}", channel.remoteAddress(), cause);
+            LOG.warn("An exception occurred during negotiation with {} on channel {}",
+                    channel.remoteAddress(), channel, cause);
             cancelTimeout();
             negotiationFailed(cause);
             changeState(State.FAILED);
@@ -299,10 +302,10 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     protected final void sendMessage(final NetconfMessage msg) {
         this.channel.writeAndFlush(msg).addListener(f -> {
             if (!f.isSuccess()) {
-                LOG.info("Failed to send message {}", msg, f.cause());
+                LOG.info("Failed to send message {} on channel {}", msg, channel, f.cause());
                 negotiationFailed(f.cause());
             } else {
-                LOG.trace("Message {} sent to socket", msg);
+                LOG.trace("Message {} sent to socket on channel {}", msg, channel);
             }
         });
     }
@@ -314,7 +317,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         try {
             startNegotiation();
         } catch (final Exception e) {
-            LOG.warn("Unexpected negotiation failure", e);
+            LOG.warn("Unexpected negotiation failure on channel {}", channel, e);
             negotiationFailed(e);
         }
     }
@@ -326,14 +329,14 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         try {
             handleMessage((NetconfHelloMessage) msg);
         } catch (final Exception e) {
-            LOG.debug("Unexpected error while handling negotiation message {}", msg, e);
+            LOG.debug("Unexpected error while handling negotiation message {} on channel {}", msg, channel, e);
             negotiationFailed(e);
         }
     }
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
-        LOG.info("Unexpected error during negotiation", cause);
+        LOG.info("Unexpected error during negotiation on channel {}", channel, cause);
         negotiationFailed(cause);
     }
 
