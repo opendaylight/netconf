@@ -131,11 +131,7 @@ abstract class SubscribeToStreamUtil {
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
-        notificationListenerAdapter.setQueryParams(
-                notificationQueryParams.startTime(),
-                notificationQueryParams.stopTime(),
-                notificationQueryParams.filter(),
-                false, notificationQueryParams.isSkipNotificationData());
+        notificationListenerAdapter.setQueryParams(notificationQueryParams);
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getSchemaHandler());
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
@@ -183,11 +179,7 @@ abstract class SubscribeToStreamUtil {
             .orElseThrow(() -> new RestconfDocumentedException("No listener found for stream " + streamName,
                 ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
 
-        listener.setQueryParams(
-                notificationQueryParams.startTime(),
-                notificationQueryParams.stopTime(),
-                notificationQueryParams.filter(),
-                false, notificationQueryParams.isSkipNotificationData());
+        listener.setQueryParams(notificationQueryParams);
 
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
         final SchemaContextHandler schemaHandler = handlersHolder.getSchemaHandler();

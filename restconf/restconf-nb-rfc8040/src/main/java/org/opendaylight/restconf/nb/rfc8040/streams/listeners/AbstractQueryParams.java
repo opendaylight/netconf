@@ -17,9 +17,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.FilterParam;
-import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
-import org.opendaylight.restconf.nb.rfc8040.StopTimeParam;
+import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 
 /**
@@ -55,13 +53,20 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param leafNodesOnly If TRUE, notifications will contain changes of leaf nodes only.
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    public final void setQueryParams(final StartTimeParam startTime, final StopTimeParam stopTime,
-            final FilterParam filter, final boolean leafNodesOnly, final boolean skipNotificationData) {
+    public final void setQueryParams(final NotificationQueryParams params) {
+        final var startTime = params.startTime();
         start = startTime == null ? Instant.now() : parseDateAndTime(startTime.value());
-        stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
-        this.leafNodesOnly = leafNodesOnly;
-        this.skipNotificationData = skipNotificationData;
 
+        final var stopTime = params.stopTime();
+        stop = stopTime == null ? null : parseDateAndTime(stopTime.value());
+
+        final var skipData = params.skipNotificationData();
+        skipNotificationData = skipData == null ? false : skipData.value();
+
+        // FIXME: this is missing!
+        leafNodesOnly = false;
+
+        final var filter = params.filter();
         if (filter != null) {
             try {
                 setFilter(filter.paramValue());
