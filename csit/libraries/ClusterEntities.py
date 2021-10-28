@@ -141,6 +141,15 @@ def get_entity_type_data(restconf_url, e_type):
         auth=("admin", "admin"),
     )
 
+    info(
+        "Response %s ",
+        resp,
+    )
+    info(
+        "Entity json %s",
+        resp.json(),
+    )
+
     return resp.json()["entity-owners:entity-type"][0]
 
 
@@ -153,12 +162,15 @@ def get_entity_data(restconf_url, e_type, e_name):
     :param e_name: entity name
     :return: entity owner & candidates
     """
+    id_templates = {
+        "org.opendaylight.mdsal.ServiceEntityType": "/odl-general-entity:entity[name='%s']",
+        "org.opendaylight.mdsal.AsyncServiceCloseEntityType": "/odl-general-entity:entity[name='%s']",
+        "ovsdb": "/network-topology:network-topology/topology[topology-id='ovsdb:1']/node[node-id='%s']",
+    }
+    id_template = id_templates[e_type]
+
     entity_type = get_entity_type_data(restconf_url, e_type)
-    entity = [
-        e
-        for e in entity_type["entity"]
-        if e["id"] == "/odl-general-entity:entity[name='%s']" % e_name
-    ][0]
+    entity = [e for e in entity_type["entity"] if e["id"] == id_template % e_name][0]
 
     result = {
         "candidates": [c["name"] for c in entity["candidate"]],
