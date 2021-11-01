@@ -8,12 +8,12 @@
 package org.opendaylight.netconf.sal.rest.doc.util;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -35,14 +35,12 @@ public final class RestDocgenUtil {
      *
      * @return name of {@code node}
      */
-    public static String resolvePathArgumentsName(final SchemaNode node, final SchemaContext schemaContext) {
-        final Iterable<QName> schemaPath = node.getPath().getPathTowardsRoot();
-        final Iterator<QName> it = schemaPath.iterator();
-        final QName nodeQName = it.next();
-
+    public static String resolvePathArgumentsName(final SchemaNode node, final SchemaNode parentNode,
+                                                  final EffectiveModelContext schemaContext) {
+        QName nodeQName = node.getQName();
         QName parentQName = null;
-        if (it.hasNext()) {
-            parentQName = it.next();
+        if (parentNode != null) {
+            parentQName = parentNode.getQName();
         }
         if (isEqualNamespaceAndRevision(parentQName, nodeQName)) {
             return node.getQName().getLocalName();
