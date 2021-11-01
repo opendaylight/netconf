@@ -8,12 +8,13 @@
 package org.opendaylight.netconf.sal.rest.doc.util;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -35,53 +36,48 @@ public final class RestDocgenUtil {
      *
      * @return name of {@code node}
      */
-    public static String resolvePathArgumentsName(final SchemaNode node, final SchemaContext schemaContext) {
-        final Iterable<QName> schemaPath = node.getPath().getPathTowardsRoot();
-        final Iterator<QName> it = schemaPath.iterator();
-        final QName nodeQName = it.next();
-
-        QName parentQName = null;
-        if (it.hasNext()) {
-            parentQName = it.next();
-        }
-        if (isEqualNamespaceAndRevision(parentQName, nodeQName)) {
-            return node.getQName().getLocalName();
+    public static String resolvePathArgumentsName(@NonNull final QName node, @NonNull final QName parent,
+                                                  @NonNull final EffectiveModelContext schemaContext) {
+        if (isEqualNamespaceAndRevision(node, parent)) {
+            return node.getLocalName();
         } else {
             return resolveFullNameFromNode(node, schemaContext);
         }
     }
 
-    private static synchronized String resolveFullNameFromNode(final SchemaNode node,
-            final SchemaContext schemaContext) {
-        final XMLNamespace namespace = node.getQName().getNamespace();
-        final Optional<Revision> revision = node.getQName().getRevision();
-
-        Map<Optional<Revision>, Module> revisionToModule =
-            NAMESPACE_AND_REVISION_TO_MODULE.computeIfAbsent(namespace, k -> new HashMap<>());
-        Module module =
-            revisionToModule.computeIfAbsent(revision, k -> schemaContext.findModule(namespace, k).orElse(null));
-        if (module != null) {
-            return module.getName() + ":" + node.getQName().getLocalName();
-        }
-        return node.getQName().getLocalName();
-    }
-
+    /*
+     * Resolve full name according to module and node namespace and revision equality.
+     *
+     * @deprecated Most likely this method is useless because when we are going from module to its direct children
+     * there is no need for reasoning if we should use full name.
+     */
+    @Deprecated(forRemoval = true)
     public static String resolveNodesName(final SchemaNode node, final Module module,
             final SchemaContext schemaContext) {
         if (node.getQName().getNamespace().equals(module.getQNameModule().getNamespace())
                 && node.getQName().getRevision().equals(module.getQNameModule().getRevision())) {
             return node.getQName().getLocalName();
         } else {
-            return resolveFullNameFromNode(node, schemaContext);
+            return resolveFullNameFromNode(node.getQName(), schemaContext);
         }
     }
 
-    private static boolean isEqualNamespaceAndRevision(final QName parentQName, final QName nodeQName) {
-        if (parentQName == null) {
-            return nodeQName == null;
-        }
-        return parentQName.getNamespace().equals(nodeQName.getNamespace())
-                && parentQName.getRevision().equals(nodeQName.getRevision());
+    private static boolean isEqualNamespaceAndRevision(final QName node, final QName parent) {
+        return parent.getNamespace().equals(node.getNamespace())
+                && parent.getRevision().equals(node.getRevision());
     }
 
+    private static String resolveFullNameFromNode(final QName node, final SchemaContext schemaContext) {
+        final XMLNamespace namespace = node.getNamespace();
+        final Optional<Revision> revision = node.getRevision();
+
+        final Map<Optional<Revision>, Module> revisionToModule =
+            NAMESPACE_AND_REVISION_TO_MODULE.computeIfAbsent(namespace, k -> new HashMap<>());
+        final Module module = revisionToModule.computeIfAbsent(revision,
+                k -> schemaContext.findModule(namespace, k).orElse(null));
+        if (module != null) {
+            return module.getName() + ":" + node.getLocalName();
+        }
+        return node.getLocalName();
+    }
 }

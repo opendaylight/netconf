@@ -329,6 +329,7 @@ public abstract class BaseYangSwaggerGenerator {
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                 LOG.debug("Is Configuration node [{}] [{}]", node.isConfiguration(), node.getQName().getLocalName());
 
+                final String localName = module.getName() + ":" + node.getQName().getLocalName();
                 ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
                 String resourcePath;
 
@@ -348,24 +349,27 @@ public abstract class BaseYangSwaggerGenerator {
                         hasAddRootPostLink = true;
                     }
 
-                    addPaths(node, deviceName, moduleName, paths, resourcePath, pathParams, schemaContext, true,
-                            module.getName(), definitionNames, uriType, oaversion);
+                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
+                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true,
+                            module.getName(), definitionNames, uriType, oaversion, resolvedPath);
                 }
                 pathParams = JsonNodeFactory.instance.arrayNode();
                 resourcePath = getResourcePath("operational", context);
 
                 if (uriType.equals(URIType.DRAFT02)
                         || uriType.equals(URIType.RFC8040) && !node.isConfiguration()) {
-                    addPaths(node, deviceName, moduleName, paths, resourcePath, pathParams, schemaContext, false,
-                            moduleName, definitionNames, uriType, oaversion);
+                    final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
+                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false,
+                            moduleName, definitionNames, uriType, oaversion, resolvedPath);
                 }
             }
         }
 
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
-            final String resourcePath = getResourcePath("operations", context);
-            addOperations(rpcDefinition, moduleName, deviceName, paths, resourcePath, module.getName(), definitionNames,
-                    schemaContext, oaversion);
+            final String resolvedPath = getResourcePath("operations", context) + "/" + moduleName + ":"
+                    + rpcDefinition.getQName().getLocalName();
+            addOperations(rpcDefinition, moduleName, deviceName, paths, module.getName(), definitionNames, oaversion,
+                    resolvedPath);
         }
 
         LOG.debug("Number of Paths found [{}]", paths.size());
@@ -440,13 +444,13 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
-                          final ObjectNode paths, final String parentPath, final ArrayNode parentPathParams,
+                          final ObjectNode paths, final ArrayNode parentPathParams,
                           final EffectiveModelContext schemaContext, final boolean isConfig, final String parentName,
-                          final DefinitionNames definitionNames, final URIType uriType, final OAversion oaversion) {
-        final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
-        final String resourcePath = parentPath + "/" + createPath(node, pathParams, schemaContext, oaversion);
+                          final DefinitionNames definitionNames, final URIType uriType, final OAversion oaversion,
+                          final String resourcePath) {
         LOG.debug("Adding path: [{}]", resourcePath);
 
+        final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
         Iterable<? extends DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
@@ -458,26 +462,29 @@ public abstract class BaseYangSwaggerGenerator {
                 uriType, oaversion));
         paths.set(resourcePath, path);
 
-
         if (uriType.equals(URIType.RFC8040)) {
-            final String operationPath = "rests/operations" + resourcePath.substring(11);
-            ((ActionNodeContainer) node).getActions().forEach(actionDef ->
-                    addOperations(actionDef, moduleName, deviceName, paths, operationPath, parentName, definitionNames,
-                            schemaContext, oaversion));
+            ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
+                final String resolvedPath = "rests/operations" + resourcePath.substring(11)
+                        + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
+                addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, oaversion,
+                        resolvedPath);
+            });
         }
-
 
         for (final DataSchemaNode childNode : childSchemaNodes) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final String newParent = parentName + "_" + node.getQName().getLocalName();
+                final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
+                final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, oaversion,
+                        localName);
                 if (uriType.equals(URIType.RFC8040)) {
                     final boolean newIsConfig = isConfig && childNode.isConfiguration();
-                    addPaths(childNode, deviceName, moduleName, paths, resourcePath, pathParams, schemaContext,
-                            newIsConfig, newParent, definitionNames, uriType, oaversion);
+                    addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
+                            newIsConfig, newParent, definitionNames, uriType, oaversion, newResourcePath);
                 } else {
                     if (!isConfig || childNode.isConfiguration()) {
-                        addPaths(childNode, deviceName, moduleName, paths, resourcePath, pathParams, schemaContext,
-                                isConfig, newParent, definitionNames, uriType, oaversion);
+                        addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
+                                isConfig, newParent, definitionNames, uriType, oaversion, newResourcePath);
                     }
                 }
             }
@@ -531,9 +538,8 @@ public abstract class BaseYangSwaggerGenerator {
     protected abstract ListPathBuilder newListPathBuilder();
 
     private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams,
-                              final EffectiveModelContext schemaContext, final OAversion oaversion) {
+                              final OAversion oaversion, final String localName) {
         final StringBuilder path = new StringBuilder();
-        final String localName = resolvePathArgumentsName(schemaNode, schemaContext);
         path.append(localName);
 
         if (schemaNode instanceof ListSchemaNode) {
@@ -610,11 +616,9 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     private static void addOperations(final OperationDefinition operDef, final String moduleName,
-            final Optional<String> deviceName, final ObjectNode paths, final String parentPath, final String parentName,
-            final DefinitionNames definitionNames, final EffectiveModelContext schemaContext,
-            final OAversion oaversion) {
+            final Optional<String> deviceName, final ObjectNode paths, final String parentName,
+            final DefinitionNames definitionNames, final OAversion oaversion, final String resourcePath) {
         final ObjectNode operations = JsonNodeFactory.instance.objectNode();
-        final String resourcePath = parentPath + "/" + resolvePathArgumentsName(operDef, schemaContext);
         operations.set("post", buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames,
                 oaversion));
         paths.set(resourcePath, operations);
