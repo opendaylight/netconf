@@ -56,8 +56,9 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
@@ -83,6 +84,7 @@ import org.opendaylight.yangtools.yang.model.api.type.Uint32TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.Uint64TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.Uint8TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
+import org.opendaylight.yangtools.yang.model.spi.DefaultSchemaTreeInference;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -690,7 +692,7 @@ public class DefinitionGenerator {
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
         } else if (leafTypeDef instanceof LeafrefTypeDefinition) {
-            final SchemaInferenceStack stack = SchemaInferenceStack.ofSchemaPath(schemaContext, node.getPath());
+            final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext, Absolute.of(node.getQName()));
             return processTypeDef(stack.resolveLeafref((LeafrefTypeDefinition) leafTypeDef), node, property,
                 schemaContext, definitions, definitionNames, oaversion);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {
@@ -895,13 +897,12 @@ public class DefinitionGenerator {
 
     private static String processInstanceIdentifierType(final DataSchemaNode node, final ObjectNode property,
                                                         final EffectiveModelContext schemaContext) {
-        SchemaPath path = node.getPath();
+        Absolute absPath =  Absolute.of(node.getQName());
+        DefaultSchemaTreeInference inferredPath = DefaultSchemaTreeInference.of(schemaContext, absPath);
+        List<SchemaTreeEffectiveStatement<?>> listOfStatements = inferredPath.statementPath();
+        SchemaTreeEffectiveStatement lastComponent = listOfStatements.get(listOfStatements.size() - 1);
 
-        while (path.getParent() != null && path.getParent().getPathFromRoot().iterator().hasNext()) {
-            path = path.getParent();
-        }
-
-        final QName rootContainer = path.getLastComponent();
+        final QName rootContainer = lastComponent.getIdentifier();
         final String rootContainerName = rootContainer.getLocalName();
         final String prefix = schemaContext.findModule(rootContainer.getModule()).get().getPrefix();
         setDefaultValue(property, String.format("/%s:%s", prefix, rootContainerName));

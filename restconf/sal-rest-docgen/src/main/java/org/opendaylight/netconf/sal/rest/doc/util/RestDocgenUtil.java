@@ -8,15 +8,20 @@
 package org.opendaylight.netconf.sal.rest.doc.util;
 
 import java.util.HashMap;
-import java.util.Iterator;
+//import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.spi.DefaultSchemaTreeInference;
 
 public final class RestDocgenUtil {
 
@@ -35,15 +40,19 @@ public final class RestDocgenUtil {
      *
      * @return name of {@code node}
      */
-    public static String resolvePathArgumentsName(final SchemaNode node, final SchemaContext schemaContext) {
-        final Iterable<QName> schemaPath = node.getPath().getPathTowardsRoot();
-        final Iterator<QName> it = schemaPath.iterator();
-        final QName nodeQName = it.next();
-
+    public static String resolvePathArgumentsName(final SchemaNode node, final EffectiveModelContext schemaContext) {
+        Absolute absPath =  Absolute.of(node.getQName());
+        DefaultSchemaTreeInference inferredPath = DefaultSchemaTreeInference.of(schemaContext, absPath);
+        List<SchemaTreeEffectiveStatement<?>> listOfStatements = inferredPath.statementPath();
+        //Get last element and its parent
+        QName nodeQName = null;
         QName parentQName = null;
-        if (it.hasNext()) {
-            parentQName = it.next();
+        if (! listOfStatements.isEmpty() && listOfStatements.size() > 2) {
+            //SchemaTreeEffectiveStatement lastNode = listOfStatements.get(listOfStatements.size()-1);
+            nodeQName = listOfStatements.get(listOfStatements.size() - 1).getIdentifier();
+            parentQName = listOfStatements.get(listOfStatements.size() - 2).getIdentifier();
         }
+
         if (isEqualNamespaceAndRevision(parentQName, nodeQName)) {
             return node.getQName().getLocalName();
         } else {
