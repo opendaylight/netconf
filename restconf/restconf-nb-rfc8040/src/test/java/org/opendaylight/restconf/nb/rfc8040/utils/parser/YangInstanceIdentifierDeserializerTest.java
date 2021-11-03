@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2021 PANTHEON.tech, s.r.o.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -7,9 +8,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.FileNotFoundException;
@@ -239,8 +241,15 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeBadCharMissingSlashOrEqualNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:cont*leaf-A"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
+            + "error-message: Could not parse Instance Identifier 'deserializer-test:cont*leaf-A'. Offset: '22' : "
+            + "Reason: Bad char '*' on the current position.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -249,8 +258,15 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void validArgIdentifierContainerEndsWithSlashNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
+            + "error-message: Could not parse Instance Identifier 'deserializer-test:contA/'. Offset: '24' : "
+            + "Reason: Identifier cannot end with '/'.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -259,8 +275,15 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void validArgIdentifierContainerEndsWithMultipleSlashesNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA///"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
+            + "error-message: Could not parse Instance Identifier 'deserializer-test:contA///'. Offset: '26' : "
+            + "Reason: Identifier cannot end with '/'.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -269,8 +292,15 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void validArgIdentifierListEndsWithSlashLNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-one-key=value/"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
+            + "error-message: Could not parse Instance Identifier 'deserializer-test:list-one-key=value/'. "
+            + "Offset: '37' : Reason: Identifier cannot end with '/'.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -279,8 +309,15 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void validArgIdentifierListEndsWithSlashesNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-one-key=value//"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
+            + "error-message: Could not parse Instance Identifier 'deserializer-test:list-one-key=value//'. "
+            + "Offset: '38' : Reason: Identifier cannot end with '/'.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -289,8 +326,15 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareQnameEmptyIdentifierNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "/"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
+            + "error-message: Could not parse Instance Identifier '/'. Offset: '0' : "
+            + "Reason: Identifier must start with character from set 'a-zA-Z_']]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -299,8 +343,15 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareQnameBuildPathNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test*contA"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
+            + "error-message: Could not parse Instance Identifier 'deserializer-test*contA'. Offset: '17' : "
+            + "Reason: Bad char '*' on the current position.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -309,8 +360,14 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareQnameNotExistingPrefixNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "not-existing:contA"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: unknown-element, "
+            + "error-message: Failed to lookup for module with name 'not-existing'.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.UNKNOWN_ELEMENT, errors.get(0).getErrorTag());
     }
 
     /**
@@ -319,8 +376,15 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareQnameNotValidPrefixAndLocalNameNegativeTest() {
-        assertThrows(RestconfDocumentedException.class, () ->
+        final var ex = assertThrows(RestconfDocumentedException.class, () ->
             YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:*not-parsable-identifier"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
+            + "error-message: Could not parse Instance Identifier 'deserializer-test:*not-parsable-identifier'. "
+            + "Offset: '18' : Reason: Identifier must start with character from set 'a-zA-Z_']]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -329,6 +393,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareQnameErrorParsingNegativeTest() {
+        // FIXME: this is just wrong
         assertThrows(StringIndexOutOfBoundsException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:"));
     }
@@ -340,10 +405,14 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareQnameNotValidContainerNameNegativeTest() {
-        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/leafB"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: data-missing, "
+            + "error-message: Schema node leafB does not exist in module.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.DATA_MISSING, errors.get(0).getErrorTag());
     }
 
     /**
@@ -353,7 +422,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareQnameNotValidListNameNegativeTest() {
-        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
                 "deserializer-test:list-no-key/disabled=false"));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
@@ -366,8 +435,16 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void prepareIdentifierNotKeyedEntryNegativeTest() {
-        assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-one-key"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: missing-attribute, "
+            + "error-message: Could not parse Instance Identifier 'deserializer-test:list-one-key'. Offset: '30' : "
+            + "Reason: Entry '(deserializer:test?revision=2016-06-06)list-one-key' requires key or value predicate "
+            + "to be present.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MISSING_ATTRIBUTE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -376,8 +453,16 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeKeysEndsWithComaNegativeTest() {
-        assertThrows(RestconfDocumentedException.class, () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "deserializer-test:list-multiple-keys=value,100,false,"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, error-message: "
+            + "Could not parse Instance Identifier 'deserializer-test:list-multiple-keys=value,100,false,'. "
+            + "Offset: '52' : Reason: Identifier must start with '/'.]]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, errors.get(0).getErrorTag());
     }
 
     /**
@@ -410,7 +495,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void notAllListKeysEncodedNegativeTest() {
-        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
                     "deserializer-test:list-multiple-keys=%3Afoo/string-value"));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
@@ -460,7 +545,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void leafListMissingKeyNegativeTest() {
-        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
+        final var ex = assertThrows(RestconfDocumentedException.class,
             () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:leaf-list-0="));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(ErrorTag.MISSING_ATTRIBUTE, ex.getErrors().get(0).getErrorTag());
@@ -495,14 +580,14 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializePathWithIdentityrefKeyValueTest() {
         final var pathArgs = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-                "refs/list-with-identityref=deserializer-test%3Aderived-identity/foo");
+            "deserializer-test-included:refs/list-with-identityref=deserializer-test%3Aderived-identity/foo");
         assertEquals(4, pathArgs.size());
 
         assertEquals("refs", pathArgs.get(0).getNodeType().getLocalName());
         assertEquals("list-with-identityref", pathArgs.get(1).getNodeType().getLocalName());
 
         final PathArgument listEntryArg = pathArgs.get(2);
-        assertTrue(listEntryArg instanceof NodeIdentifierWithPredicates);
+        assertThat(listEntryArg, instanceOf(NodeIdentifierWithPredicates.class));
         assertEquals("list-with-identityref", listEntryArg.getNodeType().getLocalName());
         final Set<QName> keys = ((NodeIdentifierWithPredicates) listEntryArg).keySet();
         assertEquals(1, keys.size());
@@ -518,7 +603,17 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializePathWithInvalidIdentityrefKeyValueTest() {
-        assertThrows(RestconfDocumentedException.class, () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "refs/list-with-identityref=deserializer-test:derived-identity/foo"));
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "deserializer-test-included:refs/list-with-identityref=deserializer-test:derived-identity/foo"));
+        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: bad-element, "
+            + "error-message: Cannot decode value 'deserializer-test' for identityref type in "
+            + "(deserializer:test:included?revision=2016-06-06)list-with-identityref. Make sure reserved characters "
+            + "such as comma, single-quote, double-quote, colon, double-quote, space, and forward slash (,'\":\" /) "
+            + "are percent-encoded, for example ':' is '%3A']]", ex.getMessage());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
+        assertEquals(ErrorTag.BAD_ELEMENT, errors.get(0).getErrorTag());
     }
 }
