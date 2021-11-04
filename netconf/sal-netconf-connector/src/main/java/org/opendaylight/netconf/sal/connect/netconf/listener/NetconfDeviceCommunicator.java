@@ -97,12 +97,12 @@ public class NetconfDeviceCommunicator
             final RemoteDeviceId id,
             final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
             final Optional<UserPreferences> overrideNetconfCapabilities, final int rpcMessageLimit) {
-        this.concurentRpcMsgs = rpcMessageLimit;
+        concurentRpcMsgs = rpcMessageLimit;
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
-        this.firstConnectionFuture = SettableFuture.create();
-        this.semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
+        firstConnectionFuture = SettableFuture.create();
+        semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
     }
 
     @Override
@@ -306,50 +306,51 @@ public class NetconfDeviceCommunicator
             sessionLock.unlock();
         }
 
-        if (request != null) {
-
-            if (FailedNetconfMessage.class.isInstance(message)) {
-                request.future.set(NetconfMessageTransformUtil.toRpcResult((FailedNetconfMessage) message));
-                return;
-            }
-
-            LOG.debug("{}: Message received {}", id, message);
-
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
-            }
-
-            try {
-                NetconfMessageTransformUtil.checkValidReply(request.request, message);
-            } catch (final NetconfDocumentedException e) {
-                LOG.warn(
-                        "{}: Invalid request-reply match,"
-                                + "reply message contains different message-id, request: {}, response: {}",
-                        id, msgToS(request.request), msgToS(message), e);
-
-                request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                        .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
-
-                //recursively processing message to eventually find matching request
-                processMessage(message);
-
-                return;
-            }
-
-            try {
-                NetconfMessageTransformUtil.checkSuccessReply(message);
-            } catch (final NetconfDocumentedException e) {
-                LOG.warn(
-                        "{}: Error reply from remote device, request: {}, response: {}",
-                        id, msgToS(request.request), msgToS(message), e);
-
-                request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                        .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
-                return;
-            }
-
-            request.future.set(RpcResultBuilder.success(message).build());
+        if (request == null) {
+            // No matching request, bail out
+            return;
         }
+
+
+        if (message instanceof FailedNetconfMessage) {
+            request.future.set(NetconfMessageTransformUtil.toRpcResult((FailedNetconfMessage) message));
+            return;
+        }
+
+        LOG.debug("{}: Message received {}", id, message);
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
+        }
+
+        try {
+            NetconfMessageTransformUtil.checkValidReply(request.request, message);
+        } catch (final NetconfDocumentedException e) {
+            LOG.warn("{}: Invalid request-reply match, reply message contains different message-id, "
+                + "request: {}, response: {}", id, msgToS(request.request), msgToS(message), e);
+
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                .withRpcError(NetconfMessageTransformUtil.toRpcError(e))
+                .build());
+
+            //recursively processing message to eventually find matching request
+            processMessage(message);
+            return;
+        }
+
+        try {
+            NetconfMessageTransformUtil.checkSuccessReply(message);
+        } catch (final NetconfDocumentedException e) {
+            LOG.warn("{}: Error reply from remote device, request: {}, response: {}",
+                id, msgToS(request.request), msgToS(message), e);
+
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                .withRpcError(NetconfMessageTransformUtil.toRpcError(e))
+                .build());
+            return;
+        }
+
+        request.future.set(RpcResultBuilder.success(message).build());
     }
 
     private static String msgToS(final NetconfMessage msg) {
