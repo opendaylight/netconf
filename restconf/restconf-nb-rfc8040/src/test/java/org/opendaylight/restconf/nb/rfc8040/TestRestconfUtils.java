@@ -137,7 +137,7 @@ public final class TestRestconfUtils {
             throw new FileNotFoundException(resourceDirectory);
         }
         for (final String fileName : fileList) {
-            if (new File(testDir, fileName).isDirectory() == false) {
+            if (!new File(testDir, fileName).isDirectory()) {
                 testFiles.add(new File(testDir, fileName));
             }
         }
