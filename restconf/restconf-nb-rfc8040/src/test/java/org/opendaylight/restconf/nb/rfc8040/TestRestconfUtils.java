@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,6 +23,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -128,7 +128,7 @@ public final class TestRestconfUtils {
         return null;
     }
 
-    public static Collection<File> loadFiles(final String resourceDirectory) throws FileNotFoundException {
+    public static List<File> loadFiles(final String resourceDirectory) throws FileNotFoundException {
         final String path = TestRestconfUtils.class.getResource(resourceDirectory).getPath();
         final File testDir = new File(path);
         final String[] fileList = testDir.list();
@@ -137,7 +137,8 @@ public final class TestRestconfUtils {
             throw new FileNotFoundException(resourceDirectory);
         }
         for (final String fileName : fileList) {
-            if (new File(testDir, fileName).isDirectory() == false) {
+            if (fileName.endsWith(YangConstants.RFC6020_YANG_FILE_EXTENSION)
+                && !new File(testDir, fileName).isDirectory()) {
                 testFiles.add(new File(testDir, fileName));
             }
         }
