@@ -80,6 +80,7 @@
                                     <excludes>
                                         <exclude>META-INF/MANIFEST.MF</exclude>
                                         <exclude>META-INF/services/**</exclude>
+                                        <exclude>.cache/formatter-maven-cache.properties</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
