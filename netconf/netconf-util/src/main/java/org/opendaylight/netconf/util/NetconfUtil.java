@@ -40,11 +40,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -357,17 +355,12 @@ public final class NetconfUtil {
             final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlCodecFactory codecs = XmlCodecFactory.create(mountContext);
-
-        // FIXME: we probably need to propagate MountPointContext here and not just the child nodes
-        final ContainerSchemaNode dataRead = new NodeContainerProxy(NETCONF_DATA_QNAME,
-            mountContext.getEffectiveModelContext().getChildNodes());
-        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead)) {
+        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, mountContext,
+                mountContext.getEffectiveModelContext())) {
             xmlParserStream.traverse(value);
         }
         return resultHolder;
     }
-
 
     // FIXME: document this interface contract. Does it support RFC8528/RFC8542? How?
     public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final EffectiveModelContext schemaContext,
