@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7919231_2d47445f",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-11-04T23:52:19Z",
+      "side": 1,
+      "message": "ugh mutable static, this is a big no-no...",
+      "range": {
+        "startLine": 36,
+        "startChar": 76,
+        "endLine": 36,
+        "endChar": 115
+      },
+      "revId": "eaaf7e2071ba8ee424cea35b89ef61dc7d4b5b76",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d67e1448_7945b437",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-11-04T23:52:19Z",
+      "side": 1,
+      "message": "... because this breaks down as soon as there are multiple threads in the picture.",
+      "range": {
+        "startLine": 61,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 43
+      },
+      "revId": "eaaf7e2071ba8ee424cea35b89ef61dc7d4b5b76",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f91c0807_fb8fd3f9",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserFieldsParameter.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2021-11-04T23:52:19Z",
+      "side": 1,
+      "message": "right-o. This really means List\u003cSet\u003cQName\u003e\u003e is inappropriate, it really is a Set\u003cList\u003cQName\u003e\u003e, where QNames need to be interpreted as YANG data tree steps, i.e. Set\u003cYangInstanceIdentifier\u003e in yang-data-api terminology.",
+      "range": {
+        "startLine": 250,
+        "startChar": 8,
+        "endLine": 250,
+        "endChar": 119
+      },
+      "revId": "eaaf7e2071ba8ee424cea35b89ef61dc7d4b5b76",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
