@@ -77,7 +77,6 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -372,12 +371,12 @@ public final class NetconfMessageTransformUtil {
                 || NETCONF_GET_QNAME.getLocalName().equals(rpc.getLocalName()));
     }
 
-    public static @NonNull ContainerSchemaNode createSchemaForDataRead(final SchemaContext schemaContext) {
-        return new NodeContainerProxy(NETCONF_DATA_QNAME, schemaContext.getChildNodes());
+    public static @NonNull ContainerSchemaNode createSchemaForDataRead(final EffectiveModelContext schemaContext) {
+        return NodeContainerProxy.ofModelContext(NETCONF_DATA_QNAME, schemaContext);
     }
 
-    public static @NonNull ContainerSchemaNode createSchemaForNotification(final NotificationDefinition next) {
-        return new NodeContainerProxy(next.getQName(), next.getChildNodes(), next.getAvailableAugmentations());
+    public static @NonNull ContainerSchemaNode createSchemaForNotification(final NotificationDefinition notification) {
+        return NodeContainerProxy.ofNotification(notification);
     }
 
     @Deprecated
