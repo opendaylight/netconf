@@ -79,7 +79,6 @@
                                     <artifact>*</artifact>
                                     <excludes>
                                         <exclude>META-INF/MANIFEST.MF</exclude>
-                                        <exclude>META-INF/services/**</exclude>
                                         <exclude>.cache/formatter-maven-cache.properties</exclude>
                                     </excludes>
                                 </filter>
@@ -89,7 +88,6 @@
                                         <exclude>META-INF/DEPENDENCIES</exclude>
                                         <exclude>META-INF/LICENSE</exclude>
                                         <exclude>META-INF/NOTICE</exclude>
-                                        <exclude>META-INF/services/**</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
@@ -103,6 +101,9 @@
                                     <shadedPattern>org.opendaylight.netconf.shaded.eddsa</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
                         </configuration>
                     </execution>
                 </executions>
