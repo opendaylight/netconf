@@ -11,9 +11,9 @@ import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
-import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -26,9 +26,10 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.SchemaTreeInference;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,15 +41,17 @@ abstract class AbstractEdit extends AbstractConfigOperation {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEdit.class);
     private static final String TARGET_KEY = "target";
 
-    protected final CurrentSchemaContext schemaContext;
+    final CurrentSchemaContext schemaContext;
 
-    protected AbstractEdit(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
+    AbstractEdit(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
         super(netconfSessionIdForReporting);
         this.schemaContext = schemaContext;
     }
 
-    protected void parseIntoNormalizedNode(final DataSchemaNode schemaNode, final XmlElement element,
-                                           final NormalizedNodeStreamWriter writer) throws DocumentedException {
+    static final void parseIntoNormalizedNode(final SchemaTreeInference inference, final XmlElement element,
+                                              final NormalizedNodeStreamWriter writer) throws DocumentedException {
+        final var path = inference.statementPath();
+        final var schemaNode = path.get(path.size() - 1);
         if (!(schemaNode instanceof ContainerSchemaNode) && !(schemaNode instanceof ListSchemaNode)) {
             // This should never happen since any edit operation on any other node type
             // should not be possible nor makes sense
@@ -56,8 +59,7 @@ abstract class AbstractEdit extends AbstractConfigOperation {
             throw new UnsupportedOperationException("implement exception if parse fails");
         }
 
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
-            schemaContext.getCurrentContext(), schemaNode.getPath()).toInference());
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
         } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {
@@ -66,18 +68,20 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         }
     }
 
-    protected DataSchemaNode getSchemaNodeFromNamespace(final String namespace, final XmlElement element)
-        throws DocumentedException {
-        final Iterator<? extends Module> it;
+    final SchemaTreeInference getSchemaNodeFromNamespace(final String namespace, final XmlElement element)
+            throws DocumentedException {
+        final XMLNamespace ns;
         try {
-            // Returns module with newest revision since findModuleByNamespace returns a set of modules and we only
-            // need the newest one
-            it = schemaContext.getCurrentContext().findModules(XMLNamespace.of(namespace)).iterator();
+            ns = XMLNamespace.of(namespace);
         } catch (final IllegalArgumentException e) {
             throw new NetconfDocumentedException("Unable to create URI for namespace : " + namespace, e,
                 ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }
 
+        // Returns module with newest revision since findModuleByNamespace returns a set of modules and we only
+        // need the newest one
+        final EffectiveModelContext ctx = schemaContext.getCurrentContext();
+        final Iterator<? extends @NonNull Module> it = ctx.findModules(ns).iterator();
         if (!it.hasNext()) {
             // No module is present with this namespace
             throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
@@ -85,19 +89,33 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         }
 
         final Module module = it.next();
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(ctx);
         final String elementName = element.getName();
-        final Optional<DataSchemaNode> schemaNode = module.findDataChildByName(QName.create(module.getQNameModule(),
-                    element.getName()));
-        if (schemaNode.isEmpty()) {
+        try {
+            // FIXME: This is a bit suspect. The element is formed using XML encoding, hence it corresponds to
+            //        enterDataTree(). But then we use the result of this method to create a NormalizedNode tree,
+            //        which contains ChoiceNode. This needs to be tested with something like to following:
+            //
+            //        module mod {
+            //          choice foo {
+            //            case bar {
+            //              leaf baz {
+            //                type string;
+            //              }
+            //            }
+            //          }
+            //        }
+            stack.enterSchemaTree(QName.create(module.getQNameModule(), elementName));
+        } catch (IllegalArgumentException e) {
             throw new DocumentedException(
-                "Unable to find node " + elementName + " with namespace: " + namespace + " in module: " + module,
+                "Unable to find node " + elementName + " with namespace: " + namespace + " in module: " + module, e,
                 ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
         }
 
-        return schemaNode.get();
+        return stack.toSchemaTreeInference();
     }
 
-    protected static XmlElement extractTargetElement(final XmlElement operationElement, final String operationName)
+    static final XmlElement extractTargetElement(final XmlElement operationElement, final String operationName)
         throws DocumentedException {
         final NodeList elementsByTagName = getElementsByTagName(operationElement, TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
