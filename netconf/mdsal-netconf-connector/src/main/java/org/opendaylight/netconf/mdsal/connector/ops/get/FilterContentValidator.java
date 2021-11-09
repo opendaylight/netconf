@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -220,7 +221,7 @@ public class FilterContentValidator {
                         final EffectiveModelContext modelContext = schemaContext.getCurrentContext();
                         final XmlCodecFactory xmlCodecFactory = XmlCodecFactory.create(modelContext);
                         final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> typeCodec = xmlCodecFactory.codecFor(
-                            listKey, SchemaInferenceStack.ofInstantiatedPath(modelContext, listKey.getPath()));
+                            listKey, SchemaInferenceStack.of(modelContext, Absolute.of(listKey.getQName())));
                         final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue.get());
                         keys.put(qualifiedName, deserializedKeyValue);
                     } else {
