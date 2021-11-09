@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -22,21 +23,22 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
-public class CurrentSchemaContext implements EffectiveModelContextListener, AutoCloseable {
+public final class CurrentSchemaContext implements EffectiveModelContextListener, AutoCloseable {
     private final AtomicReference<EffectiveModelContext> currentContext = new AtomicReference<>();
     private final ListenerRegistration<?> schemaContextListenerListenerRegistration;
     private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(new HashSet<>());
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
 
-    public EffectiveModelContext getCurrentContext() {
-        checkState(currentContext.get() != null, "Current context not received");
-        return currentContext.get();
-    }
-
     public CurrentSchemaContext(final DOMSchemaService schemaService,
                                 final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
         this.rootSchemaSourceProvider = rootSchemaSourceProvider;
         schemaContextListenerListenerRegistration = schemaService.registerSchemaContextListener(this);
+    }
+
+    public @NonNull EffectiveModelContext getCurrentContext() {
+        final var ret = currentContext.get();
+        checkState(ret != null, "Current context not received");
+        return ret;
     }
 
     @Override

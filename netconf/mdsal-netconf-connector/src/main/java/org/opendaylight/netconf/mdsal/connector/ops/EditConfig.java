@@ -67,12 +67,9 @@ public final class EditConfig extends AbstractEdit {
         final XmlElement configElement = getConfigElement(operationElement);
 
         for (final XmlElement element : configElement.getChildElements()) {
-            final String ns = element.getNamespace();
-            final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element);
-
             final SplittingNormalizedNodeMetadataStreamWriter writer = new SplittingNormalizedNodeMetadataStreamWriter(
                 defaultAction);
-            parseIntoNormalizedNode(schemaNode, element, writer);
+            parseIntoNormalizedNode(getSchemaNodeFromNamespace(element.getNamespace(), element), element, writer);
             executeOperations(writer.getDataTreeChanges());
         }
 
