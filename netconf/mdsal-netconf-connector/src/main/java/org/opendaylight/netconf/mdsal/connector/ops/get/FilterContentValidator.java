@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -167,7 +168,7 @@ public class FilterContentValidator {
             builder.node(child.getName());
             path.add(child.getName().getLocalName());
             if (child.getType() == Type.LIST) {
-                appendKeyIfPresent(child, filterContent, path, builder);
+                appendKeyIfPresent(current, child, filterContent, path, builder);
                 return builder.build();
             }
             current = child;
@@ -175,20 +176,20 @@ public class FilterContentValidator {
         return builder.build();
     }
 
-    private void appendKeyIfPresent(final FilterTree tree, final XmlElement filterContent,
-                                    final List<String> pathToList,
-                                    final InstanceIdentifierBuilder builder) {
-        Preconditions.checkArgument(tree.getSchemaNode() instanceof ListSchemaNode);
-        final ListSchemaNode listSchemaNode = (ListSchemaNode) tree.getSchemaNode();
+    private void appendKeyIfPresent(final FilterTree parent, final FilterTree list, final XmlElement filterContent,
+            final List<String> pathToList, final InstanceIdentifierBuilder builder) {
+        Preconditions.checkArgument(list.getSchemaNode() instanceof ListSchemaNode);
+        final ListSchemaNode listSchemaNode = (ListSchemaNode) list.getSchemaNode();
+        final DataSchemaNode parentSchemaNode = parent.getSchemaNode();
 
-        final Map<QName, Object> map = getKeyValues(pathToList, filterContent, listSchemaNode);
+        final Map<QName, Object> map = getKeyValues(pathToList, filterContent, parentSchemaNode, listSchemaNode);
         if (!map.isEmpty()) {
-            builder.nodeWithKey(tree.getName(), map);
+            builder.nodeWithKey(list.getName(), map);
         }
     }
 
     private Map<QName, Object> getKeyValues(final List<String> path, final XmlElement filterContent,
-                                            final ListSchemaNode listSchemaNode) {
+            final DataSchemaNode parentSchemaNode, final ListSchemaNode listSchemaNode) {
         XmlElement current = filterContent;
         //find list element
         for (final String pathElement : path) {
@@ -219,8 +220,10 @@ public class FilterContentValidator {
                         final NamespaceContext nsContext = new UniversalNamespaceContextImpl(document, false);
                         final EffectiveModelContext modelContext = schemaContext.getCurrentContext();
                         final XmlCodecFactory xmlCodecFactory = XmlCodecFactory.create(modelContext);
-                        final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> typeCodec = xmlCodecFactory.codecFor(
-                            listKey, SchemaInferenceStack.ofInstantiatedPath(modelContext, listKey.getPath()));
+                        final SchemaInferenceStack resolver = SchemaInferenceStack.of(modelContext, Absolute.of(
+                                parentSchemaNode.getQName(), listSchemaNode.getQName(), listKey.getQName()));
+                        final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> typeCodec = xmlCodecFactory
+                                .codecFor(listKey, resolver);
                         final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue.get());
                         keys.put(qualifiedName, deserializedKeyValue);
                     } else {
