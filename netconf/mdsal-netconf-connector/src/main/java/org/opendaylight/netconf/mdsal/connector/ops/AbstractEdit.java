@@ -29,6 +29,7 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +57,8 @@ abstract class AbstractEdit extends AbstractConfigOperation {
             throw new UnsupportedOperationException("implement exception if parse fails");
         }
 
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
-            schemaContext.getCurrentContext(), schemaNode.getPath()).toInference());
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.of(
+            schemaContext.getCurrentContext(), Absolute.of(schemaNode.getQName())).toInference());
         try {
             xmlParser.traverse(new DOMSource(element.getDomElement()));
         } catch (final XMLStreamException | URISyntaxException | IOException | SAXException ex) {

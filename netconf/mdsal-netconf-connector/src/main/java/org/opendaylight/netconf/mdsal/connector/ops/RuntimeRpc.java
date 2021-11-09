@@ -43,7 +43,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
@@ -161,7 +160,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             return XmlUtil.createElement(document, XmlNetconfConstants.OK,
                 Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
         }
-        return transformNormalizedNode(document, result.getResult(), rpcDefinition.getOutput().getPath());
+        return transformNormalizedNode(document, result.getResult(), Absolute.of(rpcDefinition.getOutput().getQName()));
     }
 
     @Override
@@ -200,7 +199,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     }
 
     private Element transformNormalizedNode(final Document document, final NormalizedNode data,
-                                            final SchemaPath rpcOutputPath) {
+                                            final Absolute rpcOutputPath) {
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.RPC_REPLY_KEY));
 
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
@@ -208,8 +207,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
                 schemaContext.getCurrentContext(), rpcOutputPath);
 
-        final SchemaOrderedNormalizedNodeWriter nnWriter =
-                new SchemaOrderedNormalizedNodeWriter(nnStreamWriter, schemaContext.getCurrentContext(), rpcOutputPath);
+        final SchemaOrderedNormalizedNodeWriter nnWriter = new SchemaOrderedNormalizedNodeWriter(nnStreamWriter,
+                schemaContext.getCurrentContext(), rpcOutputPath.asSchemaPath());
 
         writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
         try {
