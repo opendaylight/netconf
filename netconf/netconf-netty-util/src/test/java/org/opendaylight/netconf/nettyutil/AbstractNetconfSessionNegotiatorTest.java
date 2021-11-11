@@ -7,11 +7,16 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,12 +39,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfSessionPreferences;
@@ -64,7 +67,7 @@ public class AbstractNetconfSessionNegotiatorTest {
     @Mock
     private SslHandler sslHandler;
     private EmbeddedChannel channel;
-    private AbstractNetconfSessionNegotiator negotiator;
+    private TestSessionNegotiator negotiator;
     private NetconfHelloMessage hello;
     private NetconfHelloMessage helloBase11;
     private NetconfXMLToHelloMessageDecoder xmlToHello;
@@ -91,7 +94,7 @@ public class AbstractNetconfSessionNegotiatorTest {
     @Test
     public void testStartNegotiation() throws Exception {
         negotiator.startNegotiation();
-        Assert.assertEquals(helloBase11, channel.readOutbound());
+        assertEquals(helloBase11, channel.readOutbound());
     }
 
     @Test
@@ -101,15 +104,15 @@ public class AbstractNetconfSessionNegotiatorTest {
         doNothing().when(sslHandler).write(any(), any(), any());
         final Future<EmbeddedChannel> handshakeFuture = channel.eventLoop().newSucceededFuture(channel);
         doReturn(handshakeFuture).when(sslHandler).handshakeFuture();
+        doNothing().when(sslHandler).flush(any());
         channel.pipeline().addLast(sslHandler);
         negotiator.startNegotiation();
         verify(sslHandler, timeout(1000)).write(any(), eq(helloBase11), any());
-
     }
 
     @Test
     public void testStartNegotiationNotEstablished() throws Exception {
-        final ChannelOutboundHandler closedDetector = Mockito.spy(new CloseDetector());
+        final ChannelOutboundHandler closedDetector = spy(new CloseDetector());
         channel.pipeline().addLast("closedDetector", closedDetector);
         doReturn(false).when(promise).isDone();
         doReturn(false).when(promise).isCancelled();
@@ -119,26 +122,26 @@ public class AbstractNetconfSessionNegotiatorTest {
 
     @Test
     public void testGetSessionPreferences() throws Exception {
-        Assert.assertEquals(prefs, negotiator.getSessionPreferences());
+        assertEquals(prefs, negotiator.getSessionPreferences());
     }
 
     @Test
     public void testGetSessionForHelloMessage() throws Exception {
         negotiator.startNegotiation();
-        final AbstractNetconfSession session = negotiator.getSessionForHelloMessage(hello);
-        Assert.assertNotNull(session);
-        Assert.assertTrue(channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR) instanceof NetconfEOMAggregator);
-        Assert.assertTrue(channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER) instanceof EOMFramingMechanismEncoder);
+        final TestingNetconfSession session = negotiator.getSessionForHelloMessage(hello);
+        assertNotNull(session);
+        assertThat(channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR), instanceOf(NetconfEOMAggregator.class));
+        assertThat(channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER), instanceOf(EOMFramingMechanismEncoder.class));
     }
 
     @Test
     public void testGetSessionForHelloMessageBase11() throws Exception {
         negotiator.startNegotiation();
-        final AbstractNetconfSession session = negotiator.getSessionForHelloMessage(helloBase11);
-        Assert.assertNotNull(session);
-        Assert.assertTrue(channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR) instanceof NetconfChunkAggregator);
-        Assert.assertTrue(channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER)
-                instanceof ChunkedFramingMechanismEncoder);
+        final TestingNetconfSession session = negotiator.getSessionForHelloMessage(helloBase11);
+        assertNotNull(session);
+        assertThat(channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR), instanceOf(NetconfChunkAggregator.class));
+        assertThat(channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER),
+            instanceOf(ChunkedFramingMechanismEncoder.class));
     }
 
     @Test
@@ -150,7 +153,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         xmlToHello.decode(null, helloBuf, out);
         xmlToHello.decode(null, msgBuf, out);
-        final AbstractNetconfSession session = mock(AbstractNetconfSession.class);
+        final TestingNetconfSession session = mock(TestingNetconfSession.class);
         doNothing().when(session).handleMessage(any());
         negotiator.replaceHelloMessageInboundHandler(session);
         verify(session, times(1)).handleMessage(any());
@@ -160,13 +163,14 @@ public class AbstractNetconfSessionNegotiatorTest {
     public void testNegotiationFail() throws Exception {
         negotiator.startNegotiation();
         final RuntimeException cause = new RuntimeException("failure cause");
+        doReturn(false).when(promise).isDone();
         channel.pipeline().fireExceptionCaught(cause);
         verify(promise).setFailure(cause);
     }
 
     private static class CloseDetector extends ChannelOutboundHandlerAdapter {
         @Override
-        public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
+        public void close(final ChannelHandlerContext ctx, final ChannelPromise promise) {
             // Override needed so @Skip from superclass is not effective
         }
     }
