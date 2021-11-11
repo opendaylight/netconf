@@ -28,6 +28,25 @@ def get_entities(restconf_url):
     return resp.json()
 
 
+def get_entity_name(e_type, e_name):
+    """
+    Get the effective entity name for the given entity type.
+    If the entity type is not for odl-general-entity, entity name
+    should be the full instance identifier.
+    :param e_type: entity type
+    :param e_name: entity name
+    :return: updated entity name
+    """
+    name_templates = {
+        "ovsdb": "/network-topology:network-topology/topology[topology-id='ovsdb:1']/node[node-id='%s']",
+    }
+
+    if e_type in name_templates:
+        return name_templates[e_type] % e_name
+    else:
+        return e_name
+
+
 def get_entity(restconf_url, e_type, e_name):
     """Calls the get-entity rpc on the controller and returns the result in a
     dictionary that contains the parsed response in two keys:
@@ -43,7 +62,7 @@ def get_entity(restconf_url, e_type, e_name):
     }
     """ % (
         e_type,
-        e_name,
+        get_entity_name(e_type, e_name),
     )
 
     info("Data %s", data)
@@ -89,7 +108,7 @@ def get_entity_owner(restconf_url, e_type, e_name):
     }
     """ % (
         e_type,
-        e_name,
+        get_entity_name(e_type, e_name),
     )
 
     info("Data %s", data)
