@@ -283,14 +283,18 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
     protected final void negotiationSuccessful(final S session) {
         LOG.debug("Negotiation on channel {} successful with session {}", channel, session);
-        channel.pipeline().replace(this, "session", session);
-        promise.setSuccess(session);
+        if (!promise.isDone()) {
+            channel.pipeline().replace(this, "session", session);
+            promise.setSuccess(session);
+        }
     }
 
     protected void negotiationFailed(final Throwable cause) {
         LOG.debug("Negotiation on channel {} failed", channel, cause);
-        channel.close();
-        promise.setFailure(cause);
+        if (!promise.isDone()) {
+            channel.close();
+            promise.setFailure(cause);
+        }
     }
 
     /**
