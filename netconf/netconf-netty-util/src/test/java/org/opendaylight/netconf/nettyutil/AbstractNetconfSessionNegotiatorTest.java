@@ -185,6 +185,7 @@ public class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
         final RuntimeException cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
+        verify(promise).isDone();
         verify(promise).setFailure(cause);
     }
 

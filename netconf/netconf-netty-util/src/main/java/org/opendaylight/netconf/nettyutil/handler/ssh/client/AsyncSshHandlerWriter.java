@@ -61,7 +61,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     public void write(final ChannelHandlerContext ctx,
             final Object msg, final ChannelPromise promise) {
         if (asyncIn == null) {
-            promise.setFailure(new IllegalStateException("Channel closed"));
+            //promise.setFailure(new IllegalStateException("Channel closed"));
             return;
         }
         // synchronized block due to deadlock that happens on ssh window resize
