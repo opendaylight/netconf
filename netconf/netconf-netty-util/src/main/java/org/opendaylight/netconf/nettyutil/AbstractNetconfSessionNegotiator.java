@@ -19,11 +19,11 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
 import io.netty.util.Timer;
-import io.netty.util.TimerTask;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
@@ -44,6 +44,12 @@ import org.w3c.dom.NodeList;
 public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionPreferences,
         S extends AbstractNetconfSession<S, L>, L extends NetconfSessionListener<S>>
             extends ChannelInboundHandlerAdapter implements NetconfSessionNegotiator<S> {
+    /**
+     * Possible states for Finite State Machine.
+     */
+    protected enum State {
+        IDLE, OPEN_WAIT, FAILED, ESTABLISHED
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSessionNegotiator.class);
 
@@ -52,20 +58,15 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     protected final P sessionPreferences;
     protected final Channel channel;
 
+    private final long connectionTimeoutMillis;
     private final Promise<S> promise;
     private final L sessionListener;
-    private Timeout timeout;
-
-    /**
-     * Possible states for Finite State Machine.
-     */
-    protected enum State {
-        IDLE, OPEN_WAIT, FAILED, ESTABLISHED
-    }
-
-    private State state = State.IDLE;
     private final Timer timer;
-    private final long connectionTimeoutMillis;
+
+    private Timeout timeoutTask;
+
+    @GuardedBy("this")
+    private State state = State.IDLE;
 
     protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise,
                                                final Channel channel, final Timer timer,
@@ -119,49 +120,39 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         replaceHelloMessageOutboundHandler();
         changeState(State.OPEN_WAIT);
 
-        timeout = this.timer.newTimeout(new TimerTask() {
-            @Override
-            @SuppressWarnings("checkstyle:hiddenField")
-            public void run(final Timeout timeout) {
-                synchronized (this) {
-                    if (state != State.ESTABLISHED) {
+        timeoutTask = this.timer.newTimeout(this::timeoutExpired, connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+    }
 
-                        LOG.debug("Connection timeout after {}, session backed by channel {} is in state {}",
-                                timeout, channel, state);
+    private synchronized void timeoutExpired(final Timeout timeout) {
+        if (state != State.ESTABLISHED) {
+            LOG.debug("Connection timeout after {}, session backed by channel {} is in state {}", timeout, channel,
+                state);
 
-                        // Do not fail negotiation if promise is done or canceled
-                        // It would result in setting result of the promise second time and that throws exception
-                        if (!isPromiseFinished()) {
-                            LOG.warn("Netconf session backed by channel {} was not established after {}",
-                                    channel, connectionTimeoutMillis);
-                            changeState(State.FAILED);
+            // Do not fail negotiation if promise is done or canceled
+            // It would result in setting result of the promise second time and that throws exception
+            if (!promise.isDone() && !promise.isCancelled()) {
+                LOG.warn("Netconf session backed by channel {} was not established after {}", channel,
+                    connectionTimeoutMillis);
+                changeState(State.FAILED);
 
-                            channel.close().addListener((GenericFutureListener<ChannelFuture>) future -> {
-                                if (future.isSuccess()) {
-                                    LOG.debug("Channel {} closed: success", future.channel());
-                                } else {
-                                    LOG.warn("Channel {} closed: fail", future.channel());
-                                }
-                            });
-                        }
-                    } else if (channel.isOpen()) {
-                        channel.pipeline().remove(NAME_OF_EXCEPTION_HANDLER);
+                channel.close().addListener((GenericFutureListener<ChannelFuture>) future -> {
+                    if (future.isSuccess()) {
+                        LOG.debug("Channel {} closed: success", future.channel());
+                    } else {
+                        LOG.warn("Channel {} closed: fail", future.channel());
                     }
-                }
+                });
             }
-
-            private boolean isPromiseFinished() {
-                return promise.isDone() || promise.isCancelled();
-            }
-
-        }, connectionTimeoutMillis, TimeUnit.MILLISECONDS);
+        } else if (channel.isOpen()) {
+            channel.pipeline().remove(NAME_OF_EXCEPTION_HANDLER);
+        }
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void cancelTimeout() {
-        if (timeout != null) {
-            timeout.cancel();
+        if (timeoutTask != null) {
+            timeoutTask.cancel();
         }
     }
 
@@ -275,6 +266,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
             LOG.warn("An exception occurred during negotiation with {} on channel {}",
                     channel.remoteAddress(), channel, cause);
+            // FIXME: this is quite suspect as it is competing with timeoutExpired() without synchronization
             cancelTimeout();
             negotiationFailed(cause);
             changeState(State.FAILED);
