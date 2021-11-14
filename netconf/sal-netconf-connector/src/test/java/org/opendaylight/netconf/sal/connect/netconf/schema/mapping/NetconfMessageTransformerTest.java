@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -71,6 +72,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.datastores.datastore.locks.lock.type.partial.lock.PartialLock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.netconf.config.change.Edit;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -86,6 +89,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
@@ -174,7 +178,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @BeforeClass
     public static void beforeClass() {
         PARTIAL_SCHEMA = BindingRuntimeHelpers.createEffectiveModel(NetconfState.class);
-        SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfState.class);
+        SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfState.class,
+            NetconfConfigChange.class);
         ACTION_SCHEMA = YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
             "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang",
             "/schemas/conflicting-actions.yang", "/schemas/augmented-action.yang",
@@ -1094,6 +1099,39 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 + "</filter>\n"
                 + "</get>\n"
                 + "</rpc>");
+    }
+
+    @Test
+    // Proof that YANGTOOLS-1362 works on DOM level
+    public void testConfigChangeToNotification() throws SAXException, IOException {
+        final var message = new NetconfMessage(XmlUtil.readXmlToDocument(
+            "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">\n"
+            + " <eventTime>2021-11-11T11:26:16Z</eventTime> \n"
+            + "  <netconf-config-change xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-notifications\">\n"
+            + "     <changed-by> \n"
+            + "       <username>root</username> \n"
+            + "       <session-id>3</session-id> \n"
+            + "     </changed-by> \n"
+            + "     <datastore>running</datastore> \n"
+            + "     <edit> \n"
+            + "        <target xmlns:ncm=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">/ncm:netconf-state"
+            + "/ncm:datastores/ncm:datastore[ncm:name='running']</target>\n"
+            + "        <operation>replace</operation> \n"
+            + "     </edit> \n"
+            + "  </netconf-config-change> \n"
+            + "</notification>"));
+
+        final var change = netconfMessageTransformer.toNotification(message).getBody();
+        final var editList = change.getChildByArg(new NodeIdentifier(Edit.QNAME));
+        assertThat(editList, instanceOf(UnkeyedListNode.class));
+        final var edits = ((UnkeyedListNode) editList).body();
+        assertEquals(1, edits.size());
+        final var edit = edits.iterator().next();
+        final var target = edit.getChildByArg(new NodeIdentifier(QName.create(Edit.QNAME, "target"))).body();
+        assertThat(target, instanceOf(YangInstanceIdentifier.class));
+
+        final var args = ((YangInstanceIdentifier) target).getPathArguments();
+        assertEquals(4, args.size());
     }
 
     private static void checkAction(final QName actionQname, final Node action , final String inputLocalName,
