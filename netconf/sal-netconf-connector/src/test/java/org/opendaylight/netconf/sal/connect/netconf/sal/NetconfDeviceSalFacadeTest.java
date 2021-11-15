@@ -109,6 +109,26 @@ public class NetconfDeviceSalFacadeTest {
     }
 
     @Test
+    public void testDeviceReconnected() {
+        final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
+        final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences
+                .fromStrings(getCapabilities());
+        final DOMRpcService deviceRpc = mock(DOMRpcService.class);
+
+        // connect device
+        deviceFacade.onDeviceConnected(new EmptyMountPointContext(schemaContext),
+                netconfSessionPreferences, deviceRpc, null);
+
+        // connection failed
+        final Throwable throwable = new Throwable();
+        deviceFacade.onDeviceFailed(throwable);
+
+        // connect device again
+        deviceFacade.onDeviceConnected(new EmptyMountPointContext(schemaContext),
+                netconfSessionPreferences, deviceRpc, null);
+    }
+
+    @Test
     public void testOnDeviceNotification() throws Exception {
         final DOMNotification domNotification = mock(DOMNotification.class);
         deviceFacade.onNotification(domNotification);
