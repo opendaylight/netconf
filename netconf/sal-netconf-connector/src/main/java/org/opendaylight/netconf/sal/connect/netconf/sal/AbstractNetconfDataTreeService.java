@@ -72,6 +72,11 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             return defaultOperation == null ? netconfOps.editConfigCandidate(callback, editStructure, rollbackSupport)
                 : netconfOps.editConfigCandidate(callback, editStructure, defaultOperation, rollbackSupport);
         }
+
+        @Override
+        ListenableFuture<? extends DOMRpcResult> deleteConfig() {
+            return netconfOps.deleteConfigCandidate(rollbackSupport);
+        }
     }
 
     private static final class Running extends AbstractNetconfDataTreeService {
@@ -101,6 +106,11 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             final NetconfRpcFutureCallback callback = new NetconfRpcFutureCallback("Edit running", id);
             return defaultOperation == null ? netconfOps.editConfigRunning(callback, editStructure, rollbackSupport)
                 : netconfOps.editConfigRunning(callback, editStructure, defaultOperation, rollbackSupport);
+        }
+
+        @Override
+        ListenableFuture<? extends DOMRpcResult> deleteConfig() {
+            throw new UnsupportedOperationException("Running configuration datastore cannot be deleted!");
         }
     }
 
@@ -139,6 +149,11 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         ListenableFuture<? extends DOMRpcResult> editConfig(final DataContainerChild editStructure,
                 final ModifyAction defaultOperation) {
             return candidate.editConfig(editStructure, defaultOperation);
+        }
+
+        @Override
+        ListenableFuture<? extends DOMRpcResult> deleteConfig() {
+            return candidate.deleteConfig();
         }
     }
 
@@ -338,6 +353,8 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
 
     abstract ListenableFuture<? extends DOMRpcResult> editConfig(DataContainerChild editStructure,
         @Nullable ModifyAction defaultOperation);
+
+    abstract  ListenableFuture<? extends DOMRpcResult> deleteConfig();
 
     private static void checkEditable(final LogicalDatastoreType store) {
         checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can only edit configuration data, not %s", store);

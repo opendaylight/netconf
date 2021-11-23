@@ -17,6 +17,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DEFAULT_OPERATION_NODEID;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DELETE_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME;
@@ -392,6 +393,10 @@ public final class NetconfBaseOps {
         return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.of(modifyAction), rollback);
     }
 
+    public ListenableFuture<? extends DOMRpcResult> deleteConfigCandidate(final boolean rollback) {
+        return deleteConfig(NETCONF_CANDIDATE_QNAME, rollback);
+    }
+
     public ListenableFuture<? extends DOMRpcResult> editConfigCandidate(
             final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild editStructure,
             final boolean rollback) {
@@ -421,6 +426,10 @@ public final class NetconfBaseOps {
 
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
+    }
+
+    public ListenableFuture<? extends DOMRpcResult> deleteConfig(final QName datastore, final boolean rollback) {
+        return rpc.invokeRpc(NETCONF_EDIT_CONFIG_QNAME, getDeleteConfigContent(datastore, rollback));
     }
 
     public ChoiceNode createEditConfigStrcture(final Optional<NormalizedNode> lastChild,
@@ -456,6 +465,22 @@ public final class NetconfBaseOps {
         // Edit content
         editBuilder.withChild(editStructure);
         return editBuilder.build();
+    }
+
+    private static ContainerNode getDeleteConfigContent(final QName datastore, final boolean rollback) {
+        final DataContainerNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> builder =
+                Builders.containerBuilder().withNodeIdentifier(NETCONF_DELETE_CONFIG_NODEID);
+
+        // Target datastore
+        builder.withChild(getTargetNode(datastore));
+
+        // Error option
+        if (rollback) {
+            builder.withChild(Builders.leafBuilder().withNodeIdentifier(NETCONF_ERROR_OPTION_NODEID)
+                    .withValue(ROLLBACK_ON_ERROR_OPTION).build());
+        }
+
+        return builder.build();
     }
 
     public static @NonNull ContainerNode getSourceNode(final QName datastore) {

@@ -73,7 +73,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
@@ -164,6 +163,8 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull QName NETCONF_EDIT_CONFIG_QNAME = QName.create(NETCONF_QNAME, "edit-config").intern();
     public static final @NonNull NodeIdentifier NETCONF_EDIT_CONFIG_NODEID =
         NodeIdentifier.create(NETCONF_EDIT_CONFIG_QNAME);
+    public static final @NonNull QName NETCONF_DELETE_CONFIG_QNAME = QName.create(NETCONF_QNAME, "delete-config").intern();
+    public static final @NonNull NodeIdentifier NETCONF_DELETE_CONFIG_NODEID = NodeIdentifier.create(NETCONF_DELETE_CONFIG_QNAME);
     public static final @NonNull SchemaPath NETCONF_EDIT_CONFIG_PATH = toPath(NETCONF_EDIT_CONFIG_QNAME);
     public static final @NonNull QName NETCONF_GET_CONFIG_QNAME = QName.create(NETCONF_QNAME, "get-config");
     public static final @NonNull NodeIdentifier NETCONF_GET_CONFIG_NODEID =
