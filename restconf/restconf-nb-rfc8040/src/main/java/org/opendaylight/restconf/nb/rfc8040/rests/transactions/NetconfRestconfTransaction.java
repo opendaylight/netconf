@@ -33,15 +33,19 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
@@ -72,12 +76,31 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     @Override
     public void delete(final YangInstanceIdentifier path) {
-        enqueueOperation(() -> netconfService.delete(CONFIGURATION, path));
+        enqueueOperation(() -> netconfService.delete(CONFIGURATION, path, prepareDataToDelete(path), Optional.empty()));
     }
 
     @Override
     public void remove(final YangInstanceIdentifier path) {
-        enqueueOperation(() -> netconfService.remove(CONFIGURATION, path));
+        enqueueOperation(() -> netconfService.remove(CONFIGURATION, path, prepareDataToDelete(path), Optional.empty()));
+    }
+
+    private static NormalizedNode prepareDataToDelete(final YangInstanceIdentifier path) {
+        // TODO make this "universal"
+        assert !path.getPathArguments().isEmpty();
+        final var it = path.getPathArguments().iterator();
+        final var container = it.next();
+        final var builder = Builders.containerBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(container.getNodeType()));
+
+
+        if (it.hasNext()) {
+            final PathArgument value = it.next();
+            builder.withValue(List.of(
+                    Builders.leafBuilder().withNodeIdentifier(NodeIdentifier.create(value.getNodeType()))
+                            .withValue(Empty.getInstance()).build()));
+        }
+
+        return builder.build();
     }
 
     @Override

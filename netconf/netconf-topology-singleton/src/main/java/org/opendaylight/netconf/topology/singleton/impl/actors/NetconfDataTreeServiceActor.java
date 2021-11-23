@@ -115,10 +115,12 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
                 Optional.ofNullable(request.getDefaultOperation()));
         } else if (message instanceof DeleteEditConfigRequest) {
             final DeleteEditConfigRequest request = (DeleteEditConfigRequest) message;
-            netconfService.delete(request.getStore(), request.getPath());
+            netconfService.delete(request.getStore(), request.getNormalizedNodeMessage().getIdentifier(),
+                    request.getNormalizedNodeMessage().getNode(), Optional.of(request.getDefaultOperation()));
         } else if (message instanceof RemoveEditConfigRequest) {
             final RemoveEditConfigRequest request = (RemoveEditConfigRequest) message;
-            netconfService.remove(request.getStore(), request.getPath());
+            netconfService.remove(request.getStore(), request.getNormalizedNodeMessage().getIdentifier(),
+                    request.getNormalizedNodeMessage().getNode(), Optional.of(request.getDefaultOperation()));
         } else if (message instanceof CommitRequest) {
             submit(sender(), self());
         } else if (message instanceof DiscardChangesRequest) {

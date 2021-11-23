@@ -14,8 +14,8 @@ import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessag
 public class MergeEditConfigRequest extends EditConfigRequest {
     private static final long serialVersionUID = 1L;
 
-    public MergeEditConfigRequest(LogicalDatastoreType store, NormalizedNodeMessage data,
-                                  ModifyAction defaultOperation) {
+    public MergeEditConfigRequest(final LogicalDatastoreType store, final NormalizedNodeMessage data,
+            final ModifyAction defaultOperation) {
         super(store, data, defaultOperation);
     }
 }

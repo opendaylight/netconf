@@ -194,7 +194,7 @@ public class PatchDataTransactionUtilTest {
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .remove(LogicalDatastoreType.CONFIGURATION, targetNodeMerge);
+            .remove(LogicalDatastoreType.CONFIGURATION, targetNodeMerge, any(), Optional.empty());
 
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), false);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
@@ -210,7 +210,7 @@ public class PatchDataTransactionUtilTest {
             .create(LogicalDatastoreType.CONFIGURATION, this.instanceIdContainer, this.buildBaseContainerForTests,
                 Optional.empty());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
+            .delete(LogicalDatastoreType.CONFIGURATION, targetNodeForCreateAndDelete, any(), Optional.empty());
 
         final PatchEntity entityCreate =
                 new PatchEntity("edit1", CREATE, this.instanceIdContainer, this.buildBaseContainerForTests);
@@ -240,7 +240,7 @@ public class PatchDataTransactionUtilTest {
 
         doReturn(ret).when(this.netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
+            .delete(LogicalDatastoreType.CONFIGURATION, targetNodeForCreateAndDelete, any(), Optional.empty());
 
         final PatchEntity entityDelete = new PatchEntity("edit", DELETE, this.targetNodeForCreateAndDelete);
         final List<PatchEntity> entities = new ArrayList<>();

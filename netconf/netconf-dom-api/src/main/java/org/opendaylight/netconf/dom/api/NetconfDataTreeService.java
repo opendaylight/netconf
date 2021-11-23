@@ -93,7 +93,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> merge(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                   NormalizedNode data, Optional<ModifyAction> defaultOperation);
+            NormalizedNode data, Optional<ModifyAction> defaultOperation);
 
     /**
      * The &lt;edit-config&gt; operation with "replace" attribute.
@@ -103,7 +103,7 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> replace(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                     NormalizedNode data, Optional<ModifyAction> defaultOperation);
+            NormalizedNode data, Optional<ModifyAction> defaultOperation);
 
     /**
      * The &lt;edit-config&gt; operation with "create" attribute.
@@ -113,25 +113,27 @@ public interface NetconfDataTreeService extends DOMService {
      * @return result of &lt;edit-config&gt; operation
      */
     ListenableFuture<? extends DOMRpcResult> create(LogicalDatastoreType store, YangInstanceIdentifier path,
-                                                    NormalizedNode data, Optional<ModifyAction> defaultOperation);
+            NormalizedNode data, Optional<ModifyAction> defaultOperation);
 
     /**
-     * The &lt;edit-config&gt; operation with "create" attribute.
+     * The &lt;edit-config&gt; operation with "delete" attribute.
      * The configuration data identified by the element containing this attribute is deleted from the configuration
-     * if and only if the configuration data currently exists in the configuration datastore.
+     * if and only if the configuration data currently exists in the configuration datastore or error is returned.
      *
      * @return result of &lt;edit-config&gt; operation
      */
-    ListenableFuture<? extends DOMRpcResult> delete(LogicalDatastoreType store, YangInstanceIdentifier path);
+    ListenableFuture<? extends DOMRpcResult> delete(LogicalDatastoreType store, YangInstanceIdentifier path,
+            NormalizedNode data, Optional<ModifyAction> defaultOperation);
 
     /**
-     * The &lt;edit-config&gt; operation with "create" attribute.
-     * The configuration data identified by the element containing this attribute is deleted from the configuration
-     * if the configuration data currently exists in the configuration datastore.
+     * The &lt;edit-config&gt; operation with "remove" attribute.
+     * The configuration data identified by the element containing this attribute is removed from the configuration
+     * if the configuration data currently exists in the configuration datastore or operation is silently ignored.
      *
      * @return result of &lt;edit-config&gt; operation
      */
-    ListenableFuture<? extends DOMRpcResult> remove(LogicalDatastoreType store, YangInstanceIdentifier path);
+    ListenableFuture<? extends DOMRpcResult> remove(LogicalDatastoreType store, YangInstanceIdentifier path,
+            NormalizedNode data, Optional<ModifyAction> defaultOperation);
 
     /**
      * The &lt;commit&gt; operation.

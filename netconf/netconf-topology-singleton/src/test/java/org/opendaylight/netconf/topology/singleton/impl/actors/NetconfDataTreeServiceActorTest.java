@@ -188,17 +188,19 @@ public class NetconfDataTreeServiceActorTest {
     @Test
     public void testDelete() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .delete(STORE, PATH);
-        actorRef.tell(new DeleteEditConfigRequest(STORE, PATH), probe.ref());
-        verify(netconfService).delete(STORE, PATH);
+            .delete(STORE, PATH, NODE, Optional.empty());
+        final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
+        actorRef.tell(new DeleteEditConfigRequest(STORE, node, null), probe.ref());
+        verify(netconfService).delete(STORE, PATH, NODE, Optional.empty());
     }
 
     @Test
     public void testRemove() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
-            .remove(STORE, PATH);
-        actorRef.tell(new RemoveEditConfigRequest(STORE, PATH), probe.ref());
-        verify(netconfService).remove(STORE, PATH);
+            .remove(STORE, PATH, NODE, Optional.empty());
+        final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
+        actorRef.tell(new RemoveEditConfigRequest(STORE, node, null), probe.ref());
+        verify(netconfService).remove(STORE, PATH, NODE, Optional.empty());
     }
 
     @Test

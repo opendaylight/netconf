@@ -136,7 +136,8 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     public void delete() {
-        netconService.delete(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId().getParent());
+        netconService.delete(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
+                Optional.empty());
         verify(rpcService).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.capture());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(
@@ -146,7 +147,8 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
 
     @Test
     public void remove() {
-        netconService.remove(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId().getParent());
+        netconService.remove(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode(),
+                Optional.empty());
         verify(rpcService).invokeRpc(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), captor.capture());
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(

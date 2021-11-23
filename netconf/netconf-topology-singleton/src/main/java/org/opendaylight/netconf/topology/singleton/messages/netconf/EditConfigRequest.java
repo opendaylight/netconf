@@ -20,7 +20,7 @@ public class EditConfigRequest implements Serializable {
     private final ModifyAction defaultOperation;
 
     public EditConfigRequest(final LogicalDatastoreType store, final NormalizedNodeMessage data,
-                             final ModifyAction defaultOperation) {
+            final ModifyAction defaultOperation) {
         this.store = store;
         this.data = data;
         this.defaultOperation = defaultOperation;

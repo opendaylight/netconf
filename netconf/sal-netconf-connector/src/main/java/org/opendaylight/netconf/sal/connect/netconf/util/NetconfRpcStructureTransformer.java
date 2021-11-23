@@ -58,8 +58,7 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
 
     @Override
     public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode> data,
-                                                         final YangInstanceIdentifier dataPath,
-                                                         final Optional<ModifyAction> operation) {
+            final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation) {
         // FIXME: propagate MountPointContext
         return NetconfMessageTransformUtil.createEditConfigAnyxml(mountContext.getEffectiveModelContext(), dataPath,
             operation, data);

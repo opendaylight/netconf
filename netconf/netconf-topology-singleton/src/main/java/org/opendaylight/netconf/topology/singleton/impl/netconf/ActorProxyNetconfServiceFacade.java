@@ -199,17 +199,21 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Delete {} {} via actor {}", id, store, path, masterActor);
-        masterActor.tell(new DeleteEditConfigRequest(store, path), ActorRef.noSender());
+        masterActor.tell(new DeleteEditConfigRequest(
+                store, new NormalizedNodeMessage(path, data), defaultOperation.orElse(null)), ActorRef.noSender());
         return createResult();
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Remove {} {} via actor {}", id, store, path, masterActor);
-        masterActor.tell(new RemoveEditConfigRequest(store, path), ActorRef.noSender());
+        masterActor.tell(new RemoveEditConfigRequest(
+                store, new NormalizedNodeMessage(path, data), defaultOperation.orElse(null)), ActorRef.noSender());
         return createResult();
     }
 

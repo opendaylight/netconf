@@ -226,19 +226,21 @@ public class ProxyNetconfServiceTest {
     @Test
     public void testDelete() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        netconf.delete(STORE, PATH);
+        netconf.delete(STORE, PATH, node, Optional.empty());
         final DeleteEditConfigRequest deleteRequest = masterActor.expectMsgClass(DeleteEditConfigRequest.class);
         assertEquals(STORE, deleteRequest.getStore());
-        assertEquals(PATH, deleteRequest.getPath());
+        assertEquals(PATH, deleteRequest.getNormalizedNodeMessage().getIdentifier());
+        assertEquals(node, deleteRequest.getNormalizedNodeMessage().getNode());
     }
 
     @Test
     public void testRemove() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        netconf.remove(STORE, PATH);
+        netconf.remove(STORE, PATH, node, Optional.empty());
         final RemoveEditConfigRequest removeRequest = masterActor.expectMsgClass(RemoveEditConfigRequest.class);
         assertEquals(STORE, removeRequest.getStore());
-        assertEquals(PATH, removeRequest.getPath());
+        assertEquals(PATH, removeRequest.getNormalizedNodeMessage().getIdentifier());
+        assertEquals(node, removeRequest.getNormalizedNodeMessage().getNode());
     }
 
     @Test

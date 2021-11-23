@@ -7,26 +7,15 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages.netconf;
 
-import java.io.Serializable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 
-public class DeleteEditConfigRequest implements Serializable {
+public class DeleteEditConfigRequest extends EditConfigRequest {
     private static final long serialVersionUID = 1L;
 
-    private final LogicalDatastoreType store;
-    private final YangInstanceIdentifier path;
-
-    public DeleteEditConfigRequest(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        this.store = store;
-        this.path = path;
-    }
-
-    public LogicalDatastoreType getStore() {
-        return store;
-    }
-
-    public YangInstanceIdentifier getPath() {
-        return path;
+    public DeleteEditConfigRequest(final LogicalDatastoreType store, final NormalizedNodeMessage data,
+            final ModifyAction defaultOperation) {
+        super(store, data, defaultOperation);
     }
 }

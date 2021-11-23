@@ -158,19 +158,21 @@ public class ProxyNetconfService implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Delete {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.delete(store, path)));
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.delete(store, path, data, defaultOperation)));
         return returnFuture;
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Remove {} {}", id, store, path);
         final SettableFuture<DOMRpcResult> returnFuture = SettableFuture.create();
-        processNetconfOperation(facade -> returnFuture.setFuture(facade.remove(store, path)));
+        processNetconfOperation(facade -> returnFuture.setFuture(facade.remove(store, path, data, defaultOperation)));
         return returnFuture;
     }
 

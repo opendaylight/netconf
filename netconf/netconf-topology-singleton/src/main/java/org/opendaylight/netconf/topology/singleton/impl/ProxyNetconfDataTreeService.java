@@ -126,16 +126,18 @@ public class ProxyNetconfDataTreeService implements NetconfDataTreeService {
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Optional<ModifyAction> defaultOperation) {
         isLocked();
-        return proxyNetconfService.delete(store, path);
+        return proxyNetconfService.delete(store, path, data, defaultOperation);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Optional<ModifyAction> defaultOperation) {
         isLocked();
-        return proxyNetconfService.remove(store, path);
+        return proxyNetconfService.remove(store, path, data, defaultOperation);
     }
 
     @Override

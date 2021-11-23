@@ -656,8 +656,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         slaveNetconfService.merge(STORE, PATH, NODE, Optional.empty());
         slaveNetconfService.replace(STORE, PATH, NODE, Optional.empty());
         slaveNetconfService.create(STORE, PATH, NODE, Optional.empty());
-        slaveNetconfService.delete(STORE, PATH);
-        slaveNetconfService.remove(STORE, PATH);
+        slaveNetconfService.delete(STORE, PATH, NODE, Optional.empty());
+        slaveNetconfService.remove(STORE, PATH, NODE, Optional.empty());
         slaveNetconfService.discardChanges();
         slaveNetconfService.commit();
 
@@ -667,8 +667,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(netconfService, timeout(1000)).merge(STORE, PATH, NODE, Optional.empty());
         verify(netconfService, timeout(1000)).replace(STORE, PATH, NODE, Optional.empty());
         verify(netconfService, timeout(1000)).create(STORE, PATH, NODE, Optional.empty());
-        verify(netconfService, timeout(1000)).delete(STORE, PATH);
-        verify(netconfService, timeout(1000)).remove(STORE, PATH);
+        verify(netconfService, timeout(1000)).delete(STORE, PATH, NODE, Optional.empty());
+        verify(netconfService, timeout(1000)).remove(STORE, PATH, NODE, Optional.empty());
         verify(netconfService, timeout(1000)).discardChanges();
         verify(netconfService, timeout(1000)).commit();
     }

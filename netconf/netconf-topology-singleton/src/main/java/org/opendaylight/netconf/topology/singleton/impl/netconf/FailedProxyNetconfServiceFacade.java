@@ -107,14 +107,16 @@ public class FailedProxyNetconfServiceFacade implements ProxyNetconfServiceFacad
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Delete {} {} - failure", id, store, path, failure);
         return serviceFailed("delete");
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path, final NormalizedNode data,
+            final Optional<ModifyAction> defaultOperation) {
         LOG.debug("{}: Remove {} {} - failure", id, store, path, failure);
         return serviceFailed("remove");
     }

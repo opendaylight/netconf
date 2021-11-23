@@ -181,14 +181,14 @@ public class ProxyNetconfDataTreeServiceTest {
     @Test
     public void testDelete() {
         lock();
-        proxy.delete(STORE, PATH);
+        proxy.delete(STORE, PATH, NODE, Optional.empty());
         masterActor.expectMsgClass(DeleteEditConfigRequest.class);
     }
 
     @Test
     public void testDeleteWithoutLock() {
         try {
-            proxy.delete(STORE, PATH);
+            proxy.delete(STORE, PATH, NODE, Optional.empty());
             fail("Should throw IllegalStateException");
         } catch (final IllegalStateException e) {
             checkException(e);
@@ -198,14 +198,14 @@ public class ProxyNetconfDataTreeServiceTest {
     @Test
     public void testRemove() {
         lock();
-        proxy.remove(STORE, PATH);
+        proxy.remove(STORE, PATH, NODE, Optional.empty());
         masterActor.expectMsgClass(RemoveEditConfigRequest.class);
     }
 
     @Test
     public void testRemoveWithoutLock() {
         try {
-            proxy.remove(STORE, PATH);
+            proxy.remove(STORE, PATH, NODE, Optional.empty());
             fail("Should throw IllegalStateException");
         } catch (final IllegalStateException e) {
             checkException(e);

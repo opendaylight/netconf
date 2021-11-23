@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
@@ -16,6 +17,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
+import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.junit.Before;
@@ -60,7 +62,7 @@ public class DeleteDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
+            .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty(), any(), Optional.empty());
         doReturn(YangInstanceIdentifier.empty()).when(this.context).getInstanceIdentifier();
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
     }
