@@ -90,5 +90,12 @@ module deserializer-test {
     leaf augmented-leaf {
       type string;
     }
+
+    list augmenting-list {
+      key id;
+      leaf id {
+        type int32;
+      }
+    }
   }
 }

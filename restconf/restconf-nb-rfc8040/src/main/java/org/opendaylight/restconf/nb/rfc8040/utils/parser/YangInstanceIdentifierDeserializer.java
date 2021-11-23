@@ -212,7 +212,7 @@ public final class YangInstanceIdentifierDeserializer {
         var result = found;
         while (result.isMixin()) {
             path.add(result.getIdentifier());
-            result = verifyNotNull(found.getChild(qname), "Mixin %s is missing child for %s while resolving %s",
+            result = verifyNotNull(result.getChild(qname), "Mixin %s is missing child for %s while resolving %s",
                 result, qname, found);
         }
         return result;

@@ -641,20 +641,39 @@ public class YangInstanceIdentifierDeserializerTest {
     public void deserializePartInOtherModuleTest() {
         final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
             "deserializer-test-included:augmented-list=100/deserializer-test:augmented-leaf");
-
         assertEquals(4, result.size());
 
-        final QName list = QName.create("deserializer:test:included", "2016-06-06", "augmented-list");
-        final QName child = QName.create("deserializer:test", "2016-06-06", "augmented-leaf");
-
         // list
+        final QName list = QName.create("deserializer:test:included", "2016-06-06", "augmented-list");
         assertEquals(NodeIdentifier.create(list), result.get(0));
         assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), Uint16.valueOf(100)),
             result.get(1));
 
         // augmented leaf
-        assertEquals(new AugmentationIdentifier(Set.of(child)), result.get(2));
-        assertEquals(NodeIdentifier.create(child), result.get(3));
+        final QName augLeaf = QName.create("deserializer:test", "2016-06-06", "augmented-leaf");
+        final QName augList = QName.create("deserializer:test", "2016-06-06", "augmenting-list");
+        assertEquals(new AugmentationIdentifier(Set.of(augLeaf, augList)), result.get(2));
+        assertEquals(NodeIdentifier.create(augLeaf), result.get(3));
+    }
+
+    @Test
+    public void deserializeListInOtherModuleTest() {
+        final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "deserializer-test-included:augmented-list=100/deserializer-test:augmenting-list=0");
+        assertEquals(5, result.size());
+
+        // list
+        final QName list = QName.create("deserializer:test:included", "2016-06-06", "augmented-list");
+        assertEquals(NodeIdentifier.create(list), result.get(0));
+        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), Uint16.valueOf(100)),
+            result.get(1));
+
+        // augmented list
+        final QName augLeaf = QName.create("deserializer:test", "2016-06-06", "augmented-leaf");
+        final QName augList = QName.create("deserializer:test", "2016-06-06", "augmenting-list");
+        assertEquals(new AugmentationIdentifier(Set.of(augLeaf, augList)), result.get(2));
+        assertEquals(NodeIdentifier.create(augList), result.get(3));
+        assertEquals(NodeIdentifierWithPredicates.of(augList, QName.create(augList, "id"), 0), result.get(4));
     }
 
     /**
