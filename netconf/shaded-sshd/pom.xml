@@ -63,6 +63,9 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <outputDirectory>${project.build.directory}/classes</outputDirectory>
+
+                            <!-- FIXME: NETCONF-836: remove this part once we are ready to re-integrate SSHD with Netty -->
+                            <excludes>META-INF/services/org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactoryFactory</excludes>
                         </configuration>
                     </execution>
                     <execution>
