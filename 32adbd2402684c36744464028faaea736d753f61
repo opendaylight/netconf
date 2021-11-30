@@ -22,6 +22,30 @@
       },
       "revId": "32adbd2402684c36744464028faaea736d753f61",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a190e741_2ed7b81d",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/AbstractEdit.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-11-30T15:50:52Z",
+      "side": 1,
+      "message": "I assume - yes - because both callers are using AbstractEdit#getSchemaNodeFromNamespace to find the schemaNode.\nI expect that Module#findDataChildByName finds only direct child of the module (top level element).",
+      "parentUuid": "5a488afe_89dc5a4c",
+      "range": {
+        "startLine": 61,
+        "startChar": 47,
+        "endLine": 61,
+        "endChar": 82
+      },
+      "revId": "32adbd2402684c36744464028faaea736d753f61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
