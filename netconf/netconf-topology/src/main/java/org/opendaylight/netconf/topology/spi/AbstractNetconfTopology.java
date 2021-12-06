@@ -91,7 +91,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
     protected static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 60000L;
-    protected static final int DEFAULT_KEEPALIVE_DELAY = 0;
+    protected static final int DEFAULT_KEEPALIVE_DELAY = 120;
     protected static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
     protected static final int DEFAULT_CONCURRENT_RPC_LIMIT = 0;
     private static final boolean DEFAULT_IS_TCP_ONLY = false;
