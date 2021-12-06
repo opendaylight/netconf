@@ -26,6 +26,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import org.junit.Before;
@@ -56,7 +57,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.ProtocolBuilder;
@@ -151,7 +151,6 @@ public class NetconfTopologyImplTest {
 
     @Test
     public void testOnDataTreeChange() {
-
         final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
 
@@ -177,7 +176,6 @@ public class NetconfTopologyImplTest {
 
         when(newNode.getDataAfter()).thenReturn(nn.build());
 
-
         final Collection<DataTreeModification<Node>> changes = new HashSet<>();
         final DataTreeModification<Node> ch = mock(DataTreeModification.class);
         when(ch.getRootNode()).thenReturn(newNode);
@@ -195,83 +193,45 @@ public class NetconfTopologyImplTest {
         //one in previous creating and deleting node and one in updating
         verify(spyTopology, times(2)).disconnectNode(NetconfTopologyImpl.getNodeId(pa));
         verify(spyTopology, times(2)).connectNode(NetconfTopologyImpl.getNodeId(pa), nn.build());
-
-
     }
 
     @Test
     public void testGetClientConfig() {
         final NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-
-        final NetconfNode testingNode = new NetconfNodeBuilder()
+        final NetconfNodeBuilder nodeBuilder = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
                 .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
                 .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(true)
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
+                .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
+                .setMaxConnectionAttempts(Uint32.ZERO)
+                .setSleepFactor(new BigDecimal("1.5"))
+                .setConnectionTimeoutMillis(Uint32.valueOf(20000));
+
         final NetconfReconnectingClientConfiguration configuration =
-                spyTopology.getClientConfig(sessionListener, testingNode);
+                spyTopology.getClientConfig(sessionListener, nodeBuilder.setTcpOnly(true).build());
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TCP, configuration.getProtocol());
         assertNotNull(configuration.getAuthHandler());
         assertNull(configuration.getSslHandlerFactory());
 
-
-        final NetconfNode testingNode2 = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(false)
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
         final NetconfReconnectingClientConfiguration configuration2 =
-                spyTopology.getClientConfig(sessionListener, testingNode2);
+                spyTopology.getClientConfig(sessionListener, nodeBuilder.setTcpOnly(false).build());
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration2.getProtocol());
         assertNotNull(configuration2.getAuthHandler());
         assertNull(configuration2.getSslHandlerFactory());
 
-
-        final NetconfNode testingNode3 = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(false)
-                .setProtocol(new ProtocolBuilder().setName(Name.SSH).build())
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
         final NetconfReconnectingClientConfiguration configuration3 =
-                spyTopology.getClientConfig(sessionListener, testingNode3);
+                spyTopology.getClientConfig(sessionListener, nodeBuilder
+                        .setProtocol(new ProtocolBuilder().setName(Name.SSH).build()).build());
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration3.getProtocol());
         assertNotNull(configuration3.getAuthHandler());
         assertNull(configuration3.getSslHandlerFactory());
 
-
-        final NetconfNode testingNode4 = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(false)
-                .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
         final NetconfReconnectingClientConfiguration configuration4 =
-                spyTopology.getClientConfig(sessionListener, testingNode4);
+                spyTopology.getClientConfig(sessionListener, nodeBuilder
+                        .setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
         assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, configuration4.getProtocol());
         assertNull(configuration4.getAuthHandler());
         assertNotNull(configuration4.getSslHandlerFactory());
