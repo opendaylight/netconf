@@ -43,7 +43,7 @@
           destroy-method="close" >
         <argument ref="dataBroker" />
         <argument ref="callhomeDispatcher" />
-        <property name="port" value="6666" />
+        <property name="port" value="4334" />
     </bean>
 
     <bean id="callhomeDispatcher" class="org.opendaylight.netconf.callhome.mount.CallHomeMountDispatcher">
