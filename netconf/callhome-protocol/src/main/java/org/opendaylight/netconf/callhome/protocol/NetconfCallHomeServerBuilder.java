@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServer> {
 
     private static final long DEFAULT_SESSION_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(5);
-    private static final int DEFAULT_CALL_HOME_PORT = 6666;
+    private static final int DEFAULT_CALL_HOME_PORT = 4334;
 
     private SshClient sshClient;
     private EventLoopGroup nettyGroup;
