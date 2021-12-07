@@ -6,8 +6,8 @@ netopeer2-server:
       exec netopeer2-server -d -v3"
   environment:
      - CALL_HOME_SERVER_IP=ODL_SYSTEM_IP
-     - CALL_HOME_SSH_PORT=6666
-     - CALL_HOME_TLS_PORT=4335
+     - CALL_HOME_SSH_PORT=NETCONF_CH_SSH
+     - CALL_HOME_TLS_PORT=NETCONF_CH_TLS
   volumes:
     - ./configuration-files:/root/configuration-files
     - ./init_configuration.sh:/root/init_configuration.sh
