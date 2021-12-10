@@ -73,9 +73,9 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
     @Override
     public CallHomeAuthorization provideAuth(final SocketAddress remoteAddress, final PublicKey serverKey) {
-        Device deviceSpecific = deviceConfig.get(serverKey);
-        String sessionName;
-        Credentials deviceCred;
+        final Device deviceSpecific = deviceConfig.get(serverKey);
+        final String sessionName;
+        final Credentials deviceCred;
 
         if (deviceSpecific != null) {
             sessionName = deviceSpecific.getUniqueId();
@@ -86,7 +86,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
                 deviceCred = deviceSpecific.getCredentials();
             }
         } else {
-            String syntheticId = fromRemoteAddress(remoteAddress);
+            final String syntheticId = fromRemoteAddress(remoteAddress);
             if (globalConfig.allowedUnknownKeys()) {
                 sessionName = syntheticId;
                 deviceCred = null;
@@ -109,7 +109,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
             return CallHomeAuthorization.rejected();
         }
 
-        Builder authBuilder = CallHomeAuthorization.serverAccepted(sessionName, credentials.getUsername());
+        final Builder authBuilder = CallHomeAuthorization.serverAccepted(sessionName, credentials.getUsername());
         for (String password : credentials.getPasswords()) {
             authBuilder.addPassword(password);
         }
