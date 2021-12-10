@@ -17,7 +17,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
-import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -90,16 +89,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractNetconfTopology implements NetconfTopology {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
-    protected static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 60000L;
-    protected static final int DEFAULT_KEEPALIVE_DELAY = 120;
-    protected static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
-    protected static final int DEFAULT_CONCURRENT_RPC_LIMIT = 0;
-    private static final boolean DEFAULT_IS_TCP_ONLY = false;
-    private static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
-    private static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
-    private static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
-    private static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
-
     private final NetconfClientDispatcher clientDispatcher;
     private final EventExecutor eventExecutor;
     private final DeviceActionFactory deviceActionFactory;
@@ -116,7 +105,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected String privateKeyPassphrase;
     protected final AAAEncryptionService encryptionService;
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
-
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
@@ -214,15 +202,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
-        //setup default values since default value is not supported in mdsal
-        final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
-                ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis().toJava();
-        final long keepaliveDelay = node.getKeepaliveDelay() == null
-                ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay().toJava();
-
-        final InetSocketAddress address;
         final Host host = node.getHost();
         final IpAddress ipAddress = host.getIpAddress();
+        final InetSocketAddress address;
         if (ipAddress != null) {
             address = new InetSocketAddress(IetfInetUtil.INSTANCE.inetAddressFor(ipAddress),
                     node.getPort().getValue().toJava());
@@ -232,23 +214,21 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
+        final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = createSalFacade(remoteDeviceId);
-
         if (keepaliveDelay > 0) {
-            LOG.warn("Adding keepalive facade, for device {}", nodeId);
+            LOG.info("Adding keepalive facade, for device {}", nodeId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, this.keepaliveExecutor.getExecutor(),
-                    keepaliveDelay, defaultRequestTimeoutMillis);
+                    keepaliveDelay, node.requireDefaultRequestTimeoutMillis().toJava());
         }
 
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
         final List<SchemaSourceRegistration<?>> yanglibRegistrations;
-        if (node.getSchemaless()) {
+        if (node.requireSchemaless()) {
             device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
             yanglibRegistrations = List.of();
         } else {
-            final boolean reconnectOnChangedSchema = node.getReconnectOnChangedSchema() == null
-                ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.getReconnectOnChangedSchema();
-
+            final boolean reconnectOnChangedSchema = node.requireReconnectOnChangedSchema();
             final SchemaResourcesDTO resources = schemaManager.getSchemaResources(node, nodeId.getValue());
             device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(reconnectOnChangedSchema)
@@ -262,18 +242,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
                 .build();
-            yanglibRegistrations = registerDeviceSchemaSources(remoteDeviceId, nodeId, node, resources);
+            yanglibRegistrations = registerDeviceSchemaSources(remoteDeviceId, node, resources);
         }
 
         final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
-        final int rpcMessageLimit = node.getConcurrentRpcLimit() == null ? DEFAULT_CONCURRENT_RPC_LIMIT
-            : node.getConcurrentRpcLimit().toJava();
-
+        final int rpcMessageLimit = node.requireConcurrentRpcLimit().toJava();
         if (rpcMessageLimit < 1) {
             LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", remoteDeviceId);
         }
 
-        NetconfDeviceCommunicator netconfDeviceCommunicator =
+        final NetconfDeviceCommunicator netconfDeviceCommunicator =
              userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
                      userCapabilities.get(), rpcMessageLimit)
             : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
@@ -286,7 +264,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     private List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
-            final NodeId nodeId, final NetconfNode node, final SchemaResourcesDTO resources) {
+            final NetconfNode node, final SchemaResourcesDTO resources) {
         final YangLibrary yangLibrary = node.getYangLibrary();
         if (yangLibrary != null) {
             final Uri uri = yangLibrary.getYangLibraryUrl();
@@ -334,25 +312,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
                                                                   final NetconfNode node) {
-
-        //setup default values since default value is not supported in mdsal
-        final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null
-                ? DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis().toJava();
-        final long maxConnectionAttempts = node.getMaxConnectionAttempts() == null
-                ? DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts().toJava();
-        final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
-                ? DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis().toJava();
-        final boolean useTcp = node.getTcpOnly() == null ? DEFAULT_IS_TCP_ONLY : node.getTcpOnly();
-        final BigDecimal sleepFactor = node.getSleepFactor() == null ? DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
-
-        final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue().toJava());
-
         final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
-                maxConnectionAttempts, betweenAttemptsTimeoutMillis, sleepFactor);
-
+                node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
+                node.requireSleepFactor());
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final Protocol protocol = node.getProtocol();
-        if (useTcp) {
+        if (node.requireTcpOnly()) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
@@ -374,8 +339,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         return reconnectingClientConfigurationBuilder
-                .withAddress(socketAddress)
-                .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
+                .withAddress(getSocketAddress(node.getHost(), node.getPort().getValue().toJava()))
+                .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava())
                 .withReconnectStrategy(sf.createReconnectStrategy())
                 .withConnectStrategyFactory(sf)
                 .withSessionListener(listener)
