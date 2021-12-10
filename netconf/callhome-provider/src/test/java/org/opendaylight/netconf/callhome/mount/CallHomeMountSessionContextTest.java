@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
 import static org.junit.Assert.assertNotNull;
@@ -25,6 +24,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
+import org.opendaylight.netconf.callhome.protocol.TransportType;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 
@@ -45,6 +45,7 @@ public class CallHomeMountSessionContextTest {
         mockActivator = mock(CallHomeChannelActivator.class);
         mockCallback = mock(CallHomeMountSessionContext.CloseCallback.class);
         doReturn(someSocketAddress).when(mockProtocol).getRemoteAddress();
+        doReturn(TransportType.SSH).when(mockProtocol).getTransportType();
 
         instance = new CallHomeMountSessionContext("test",mockProtocol, mockActivator, mockCallback);
     }
