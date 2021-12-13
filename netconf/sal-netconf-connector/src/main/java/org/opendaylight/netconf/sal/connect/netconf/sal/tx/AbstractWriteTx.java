@@ -110,7 +110,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             return;
         }
 
-        final DataContainerChild editStructure = netOps.createEditConfigStrcture(Optional.ofNullable(data),
+        final DataContainerChild editStructure = netOps.createEditConfigStructure(Optional.ofNullable(data),
                         Optional.of(ModifyAction.REPLACE), path);
         editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "put");
     }
@@ -127,7 +127,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             return;
         }
 
-        final DataContainerChild editStructure =  netOps.createEditConfigStrcture(Optional.ofNullable(data),
+        final DataContainerChild editStructure =  netOps.createEditConfigStructure(Optional.ofNullable(data),
             Optional.empty(), path);
         editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "merge");
     }
@@ -144,7 +144,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     @Override
     public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         checkEditable(store);
-        final DataContainerChild editStructure = netOps.createEditConfigStrcture(Optional.empty(),
+        final DataContainerChild editStructure = netOps.createEditConfigStructure(Optional.empty(),
                         Optional.of(ModifyAction.DELETE), path);
         editConfig(path, Optional.empty(), editStructure, Optional.of(ModifyAction.NONE), "delete");
     }
