@@ -48,6 +48,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20086fe0_0cba867f",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-12-13T11:21:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9070c63e_2eea249b",
+      "range": {
+        "startLine": 76,
+        "startChar": 8,
+        "endLine": 76,
+        "endChar": 14
+      },
+      "revId": "c1b99b679032826706c77af633007456e84dc122",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0770ecdd_74844c79",
@@ -132,6 +156,30 @@
       "side": 1,
       "message": "OK, the same done with other defaults",
       "parentUuid": "95bb4c68_2c98b571",
+      "range": {
+        "startLine": 218,
+        "startChar": 41,
+        "endLine": 218,
+        "endChar": 58
+      },
+      "revId": "c1b99b679032826706c77af633007456e84dc122",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b70e46b_176dc491",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-12-13T11:21:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb59a6e9_1bb51a36",
       "range": {
         "startLine": 218,
         "startChar": 41,
