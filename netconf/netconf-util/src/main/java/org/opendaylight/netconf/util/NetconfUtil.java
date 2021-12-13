@@ -27,6 +27,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
+import org.opendaylight.yangtools.rfc7952.data.api.StreamWriterMetadataExtension;
 import org.opendaylight.yangtools.rfc7952.data.util.NormalizedMetadataWriter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
@@ -135,17 +136,14 @@ public final class NetconfUtil {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
-                                           final SchemaPath schemaPath, final EffectiveModelContext context)
-            throws IOException, XMLStreamException {
+    public static void writeNormalizedNode(final NormalizedNode data, final DOMResult result,
+            final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
-        try (
-             NormalizedNodeStreamWriter normalizedNodeStreamWriter =
-                     XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
-             NormalizedNodeWriter normalizedNodeWriter =
-                     NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter)
-        ) {
-            normalizedNodeWriter.write(normalized);
+        try (NormalizedNodeStreamWriter normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer,
+                context, schemaPath);
+             NormalizedNodeWriter normalizedNodeWriter = NormalizedNodeWriter
+                     .forStreamWriter(normalizedNodeStreamWriter)) {
+            normalizedNodeWriter.write(data);
             normalizedNodeWriter.flush();
         } finally {
             try {
@@ -159,29 +157,76 @@ public final class NetconfUtil {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static void writeNormalizedNode(final NormalizedNode normalized,
-                                           final @Nullable NormalizedMetadata metadata,
-                                           final DOMResult result, final SchemaPath schemaPath,
-                                           final EffectiveModelContext context) throws IOException, XMLStreamException {
+    public static void writeNormalizedNode(final NormalizedNode data, final @Nullable NormalizedMetadata metadata,
+            final DOMResult result, final SchemaPath schemaPath, final EffectiveModelContext context)
+            throws IOException, XMLStreamException {
         if (metadata == null) {
-            writeNormalizedNode(normalized, result, schemaPath, context);
+            writeNormalizedNode(data, result, schemaPath, context);
             return;
         }
 
-        final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
-        XML_NAMESPACE_SETTER.initializeNamespace(writer);
-        try (
-             NormalizedNodeStreamWriter normalizedNodeStreamWriter =
-                     XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
-                NormalizedMetadataWriter normalizedNodeWriter =
-                     NormalizedMetadataWriter.forStreamWriter(normalizedNodeStreamWriter)
-        ) {
-            normalizedNodeWriter.write(normalized, metadata);
-            normalizedNodeWriter.flush();
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        try (NormalizedNodeStreamWriter streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
+                context, schemaPath);
+             NormalizedMetadataWriter metadataWriter = NormalizedMetadataWriter.forStreamWriter(streamWriter)) {
+            metadataWriter.write(data, metadata);
+            metadataWriter.flush();
         } finally {
             try {
-                if (writer != null) {
-                    writer.close();
+                if (xmlWriter != null) {
+                    xmlWriter.close();
+                }
+            } catch (final Exception e) {
+                LOG.warn("Unable to close resource properly", e);
+            }
+        }
+    }
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public static void writeNormalizedNode(final YangInstanceIdentifier dataPath, final DOMResult result,
+            final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        try (NormalizedNodeStreamWriter streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
+                context, schemaPath);
+             EmptyListXmlWriter writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
+            final Iterator<PathArgument> it = dataPath.getPathArguments().iterator();
+            final PathArgument first = it.next();
+            StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
+        } finally {
+            try {
+                if (xmlWriter != null) {
+                    xmlWriter.close();
+                }
+            } catch (final Exception e) {
+                LOG.warn("Unable to close resource properly", e);
+            }
+        }
+    }
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public static void writeNormalizedNode(final YangInstanceIdentifier dataPath,
+            final @Nullable NormalizedMetadata metadata, final DOMResult result, final SchemaPath schemaPath,
+            final EffectiveModelContext context) throws IOException, XMLStreamException {
+        if (metadata == null) {
+            writeNormalizedNode(dataPath, result, schemaPath, context);
+            return;
+        }
+
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        try (NormalizedNodeStreamWriter streamWriter = XMLStreamNormalizedNodeStreamWriter
+                .create(xmlWriter, context, schemaPath);
+             EmptyListXmlMetadataWriter writer = new EmptyListXmlMetadataWriter(streamWriter, streamWriter
+                     .getExtensions().getInstance(StreamWriterMetadataExtension.class), metadata, xmlWriter)) {
+            final Iterator<PathArgument> it = dataPath.getPathArguments().iterator();
+            final PathArgument first = it.next();
+            StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
+        } finally {
+            try {
+                if (xmlWriter != null) {
+                    xmlWriter.close();
                 }
             } catch (final Exception e) {
                 LOG.warn("Unable to close resource properly", e);

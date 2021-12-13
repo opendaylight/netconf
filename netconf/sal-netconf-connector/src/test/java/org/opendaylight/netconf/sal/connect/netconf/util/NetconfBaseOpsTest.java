@@ -251,7 +251,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 .node(CONTAINER_C_QNAME)
                 .node(LEAF_A_NID)
                 .build();
-        final DataContainerChild structure = baseOps.createEditConfigStrcture(Optional.of(leaf),
+        final DataContainerChild structure = baseOps.createEditConfigStructure(Optional.of(leaf),
                 Optional.of(ModifyAction.REPLACE), leafId);
         baseOps.editConfigCandidate(callback, structure, true);
         verifyMessageSent("edit-config-test-module", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
@@ -267,7 +267,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 .node(CONTAINER_C_NID)
                 .node(LEAF_A_NID)
                 .build();
-        final DataContainerChild structure = baseOps.createEditConfigStrcture(Optional.of(leaf),
+        final DataContainerChild structure = baseOps.createEditConfigStructure(Optional.of(leaf),
                 Optional.of(ModifyAction.REPLACE), leafId);
         baseOps.editConfigRunning(callback, structure, ModifyAction.MERGE, true);
         verifyMessageSent("edit-config-test-module-running", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
