@@ -258,6 +258,31 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
+    public void testDeleteContainerNodeCandidate() throws Exception {
+        final YangInstanceIdentifier containerId = YangInstanceIdentifier.builder()
+                .node(CONTAINER_C_QNAME)
+                .build();
+        final DataContainerChild structure = baseOps.createEditConfigStrcture(Optional.empty(),
+                Optional.of(ModifyAction.DELETE), containerId);
+        baseOps.editConfigCandidate(callback, structure, true);
+        verifyMessageSent("edit-config-delete-container-node-candidate",
+                NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
+    }
+
+    @Test
+    public void testDeleteLeafNodeCandidate() throws Exception {
+        final YangInstanceIdentifier leafId = YangInstanceIdentifier.builder()
+                .node(CONTAINER_C_QNAME)
+                .node(LEAF_A_NID)
+                .build();
+        final DataContainerChild structure = baseOps.createEditConfigStrcture(Optional.empty(),
+                Optional.of(ModifyAction.DELETE), leafId);
+        baseOps.editConfigCandidate(callback, structure, true);
+        verifyMessageSent("edit-config-delete-leaf-node-candidate",
+                NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
+    }
+
+    @Test
     public void testEditConfigRunning() throws Exception {
         final LeafNode<Object> leaf = Builders.leafBuilder()
                 .withNodeIdentifier(LEAF_A_NID)

@@ -27,6 +27,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
+import org.opendaylight.yangtools.rfc7952.data.api.StreamWriterMetadataExtension;
 import org.opendaylight.yangtools.rfc7952.data.util.NormalizedMetadataWriter;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.util.EmptyMountPointContext;
@@ -182,6 +183,79 @@ public final class NetconfUtil {
             try {
                 if (writer != null) {
                     writer.close();
+                }
+            } catch (final Exception e) {
+                LOG.warn("Unable to close resource properly", e);
+            }
+        }
+    }
+
+    /**
+     * Write data specified by {@link YangInstanceIdentifier} into {@link DOMResult}.
+     *
+     * @param query      path to the root node
+     * @param result     DOM result holder
+     * @param schemaPath schema path of the parent node
+     * @param context    mountpoint schema context
+     * @throws IOException        failed to write data into {@link NormalizedNodeStreamWriter}
+     * @throws XMLStreamException failed to serialize data into XML document
+     */
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public static void writeNormalizedNode(final YangInstanceIdentifier query, final DOMResult result,
+            final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        try (NormalizedNodeStreamWriter streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
+                context, schemaPath);
+             EmptyListXmlWriter writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
+            final Iterator<PathArgument> it = query.getPathArguments().iterator();
+            final PathArgument first = it.next();
+            StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
+        } finally {
+            try {
+                if (xmlWriter != null) {
+                    xmlWriter.close();
+                }
+            } catch (final Exception e) {
+                LOG.warn("Unable to close resource properly", e);
+            }
+        }
+    }
+
+    /**
+     * Write data specified by {@link YangInstanceIdentifier} along with corresponding {@code metadata}
+     * into {@link DOMResult}.
+     *
+     * @param query      path to the root node
+     * @param metadata   metadata to be written
+     * @param result     DOM result holder
+     * @param schemaPath schema path of the parent node
+     * @param context    mountpoint schema context
+     * @throws IOException        failed to write data into {@link NormalizedNodeStreamWriter}
+     * @throws XMLStreamException failed to serialize data into XML document
+     */
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public static void writeNormalizedNode(final YangInstanceIdentifier query,
+            final @Nullable NormalizedMetadata metadata, final DOMResult result, final SchemaPath schemaPath,
+            final EffectiveModelContext context) throws IOException, XMLStreamException {
+        if (metadata == null) {
+            writeNormalizedNode(query, result, schemaPath, context);
+            return;
+        }
+
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        try (NormalizedNodeStreamWriter streamWriter = XMLStreamNormalizedNodeStreamWriter
+                .create(xmlWriter, context, schemaPath);
+             EmptyListXmlMetadataWriter writer = new EmptyListXmlMetadataWriter(streamWriter, xmlWriter, streamWriter
+                     .getExtensions().getInstance(StreamWriterMetadataExtension.class), metadata)) {
+            final Iterator<PathArgument> it = query.getPathArguments().iterator();
+            final PathArgument first = it.next();
+            StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
+        } finally {
+            try {
+                if (xmlWriter != null) {
+                    xmlWriter.close();
                 }
             } catch (final Exception e) {
                 LOG.warn("Unable to close resource properly", e);
