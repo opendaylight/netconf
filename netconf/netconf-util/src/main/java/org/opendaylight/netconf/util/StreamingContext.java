@@ -365,7 +365,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
                 final Iterator<PathArgument> others) throws IOException {
             writer.startLeafNode(getIdentifier());
-            // FIXME: why are we not emitting a value?
+            // FIXME: why are we not emitting a value? - because then it would be used in filters, too
             writer.endNode();
         }
     }
