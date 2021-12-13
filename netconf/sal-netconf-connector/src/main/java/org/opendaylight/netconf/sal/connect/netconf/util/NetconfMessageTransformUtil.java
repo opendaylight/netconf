@@ -73,7 +73,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
@@ -347,30 +346,28 @@ public final class NetconfMessageTransformUtil {
         return Builders.containerBuilder().withNodeIdentifier(name).withValue(ImmutableList.copyOf(node)).build();
     }
 
-    public static DOMSourceAnyxmlNode createEditConfigAnyxml(
-            final EffectiveModelContext ctx, final YangInstanceIdentifier dataPath,
-            final Optional<ModifyAction> operation, final Optional<NormalizedNode> lastChildOverride) {
-        final NormalizedNode configContent;
-        final NormalizedMetadata metadata;
-        if (dataPath.isEmpty()) {
-            Preconditions.checkArgument(lastChildOverride.isPresent(),
-                    "Data has to be present when creating structure for top level element");
-            Preconditions.checkArgument(lastChildOverride.get() instanceof DataContainerChild,
-                    "Data has to be either container or a list node when creating structure for top level element, "
-                            + "but was: %s", lastChildOverride.get());
-            configContent = lastChildOverride.get();
-            metadata = null;
-        } else {
-            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride);
-            metadata = operation.map(oper -> leafMetadata(dataPath, oper)).orElse(null);
-        }
-
+    /**AbstractNetconfDataTreeService
+     * Create edit-config structure to invoke {@code operation} with {@code data} on {@code dataPath}.
+     *
+     * @param ctx {@link EffectiveModelContext} device's model context
+     * @param dataPath {@link YangInstanceIdentifier} path to data in device's data-store
+     * @param operation {@link ModifyAction} action to be invoked
+     * @param data {@code NormalizedNode} data on which action will be invoked
+     * @return {@link DOMSourceAnyxmlNode} containing edit-config structure
+     */
+    public static DOMSourceAnyxmlNode createEditConfigAnyxml(final EffectiveModelContext ctx,
+            final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
+            final Optional<NormalizedNode> data) {
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
                 Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
-
+        final var metadata = operation.map(o -> leafMetadata(dataPath, o)).orElseThrow();
         try {
-            NetconfUtil.writeNormalizedNode(configContent, metadata, new DOMResult(element), SchemaPath.ROOT, ctx);
-        } catch (IOException | XMLStreamException e) {
+            if (data.isPresent()) {
+                NetconfUtil.writeNormalizedNode(data.get(), metadata, new DOMResult(element), SchemaPath.ROOT, ctx);
+            } else {
+                NetconfUtil.writeNormalizedNode(dataPath, metadata, new DOMResult(element), SchemaPath.ROOT, ctx);
+            }
+        } catch (final IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
         }
 
