@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9070c63e_2eea249b",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-12-13T11:21:17Z",
+      "side": 1,
+      "message": "No. Reverted back.",
+      "parentUuid": "2d8b2c8a_21f917ff",
+      "range": {
+        "startLine": 76,
+        "startChar": 8,
+        "endLine": 76,
+        "endChar": 14
+      },
+      "revId": "c1b99b679032826706c77af633007456e84dc122",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0770ecdd_74844c79",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContext.java",
         "patchSetId": 5
@@ -37,6 +61,30 @@
       "writtenOn": "2021-12-13T10:41:04Z",
       "side": 1,
       "message": "also add a FIXME, as these should really be tuneable, but odl-netconf-callhome-server does plain nothing in this regard.",
+      "range": {
+        "startLine": 78,
+        "startChar": 4,
+        "endLine": 78,
+        "endChar": 26
+      },
+      "revId": "c1b99b679032826706c77af633007456e84dc122",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21dfbe35_8a862ce9",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-12-13T11:21:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0770ecdd_74844c79",
       "range": {
         "startLine": 78,
         "startChar": 4,
@@ -60,6 +108,30 @@
       "writtenOn": "2021-12-13T10:37:06Z",
       "side": 1,
       "message": "requireKeepaliveDelay() to express intent and prevent nullness warnings",
+      "range": {
+        "startLine": 218,
+        "startChar": 41,
+        "endLine": 218,
+        "endChar": 58
+      },
+      "revId": "c1b99b679032826706c77af633007456e84dc122",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb59a6e9_1bb51a36",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-12-13T11:21:17Z",
+      "side": 1,
+      "message": "OK, the same done with other defaults",
+      "parentUuid": "95bb4c68_2c98b571",
       "range": {
         "startLine": 218,
         "startChar": 41,
