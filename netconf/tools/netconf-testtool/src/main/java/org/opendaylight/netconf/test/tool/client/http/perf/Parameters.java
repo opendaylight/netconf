@@ -13,7 +13,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.List;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -51,7 +51,7 @@ public class Parameters {
     public int throttle;
 
     @Arg(dest = "auth")
-    public ArrayList<String> auth;
+    public List<String> auth;
 
     @Arg(dest = "timeout")
     public long timeout;
@@ -75,8 +75,8 @@ public class Parameters {
 
         parser.addArgument("--destination")
                 .type(String.class)
-                .setDefault("/restconf/config/network-topology:network-topology/topology/topology-netconf/node/"
-                        + "{DEVICE_PORT}-sim-device/yang-ext:mount/cisco-vpp:vpp/bridge-domains/bridge-domain/a")
+                .setDefault("/rests/data/network-topology:network-topology/topology=topology-netconf/node="
+                        + "{DEVICE_PORT}-sim-device/yang-ext:mount/cisco-vpp:vpp/bridge-domains=bridge-domain/a")
                 .help("Destination to send the requests to after the ip:port part of the uri. "
                         + "Use {DEVICE_PORT} tag to use the device-port-range-start argument")
                 .dest("destination");
@@ -122,6 +122,7 @@ public class Parameters {
                 .dest("throttle");
 
         parser.addArgument("--auth")
+                .setDefault("admin", "admin")
                 .nargs(2)
                 .help("Username and password for HTTP basic authentication in order username password.")
                 .dest("auth");
