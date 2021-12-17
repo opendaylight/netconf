@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48c9c339_94084ce5",
+        "filename": "netconf/netconf-util/src/test/resources/netconfMessages/edit-config-delete-leaf-node-candidate.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2021-12-17T18:15:39Z",
+      "side": 1,
+      "message": "Why?         \u003cerror-option\u003erollback-on-error\u003c/error-option\u003e",
+      "revId": "09e49fa7ec30d458e07d06eaaa4d2a09574b50a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
