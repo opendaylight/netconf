@@ -1,0 +1,23 @@
+module foo {
+  namespace foo;
+  prefix foo;
+
+  identity foo;
+
+  list bar {
+    key baz;
+
+    leaf baz {
+      type identityref {
+        base foo;
+      }
+    }
+  }
+
+  container xyzzy {
+    leaf xyzzy {
+      type instance-identifier;
+    }
+  }
+}
+
