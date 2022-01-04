@@ -116,7 +116,8 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
                 ((ActionDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth, fields);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
-            if (SchemaPath.ROOT.equals(path)) {
+            final boolean isRoot = SchemaPath.ROOT.equals(path);
+            if (isRoot) {
                 nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path, depth, fields);
             } else {
                 nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path.getParent(), depth, fields);
@@ -129,11 +130,29 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
                     .addChild((MapEntryNode) data)
                     .build());
             } else {
-                nnWriter.write(data);
+                if (isRoot && data instanceof ContainerNode && ((ContainerNode) data).isEmpty()) {
+                    writeEmptyDataNode(xmlWriter, data);
+                } else {
+                    nnWriter.write(data);
+                }
             }
         }
 
         nnWriter.flush();
+    }
+
+    private static void writeEmptyDataNode(final XMLStreamWriter xmlWriter, final NormalizedNode data)
+            throws IOException {
+        final QName nodeType = data.getIdentifier().getNodeType();
+        final String namespace = nodeType.getNamespace().toString();
+        try {
+            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
+            xmlWriter.writeDefaultNamespace(namespace);
+            xmlWriter.writeEndElement();
+            xmlWriter.flush();
+        } catch (XMLStreamException e) {
+            throw new IOException("Failed to write elements", e);
+        }
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
