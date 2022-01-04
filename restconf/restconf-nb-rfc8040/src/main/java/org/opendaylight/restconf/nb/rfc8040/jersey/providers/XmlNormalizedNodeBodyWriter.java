@@ -32,6 +32,7 @@ import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -129,11 +130,33 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
                     .addChild((MapEntryNode) data)
                     .build());
             } else {
-                nnWriter.write(data);
+                if (data instanceof ContainerNode) {
+                    if (SchemaPath.ROOT.equals(path) && ((ContainerNode) data).body().isEmpty()) {
+                        writeEmptyDataNode(xmlWriter, data);
+                    } else {
+                        nnWriter.write(data);
+                    }
+                } else {
+                    nnWriter.write(data);
+                }
             }
         }
 
         nnWriter.flush();
+    }
+
+    private static void writeEmptyDataNode(final XMLStreamWriter xmlWriter, final NormalizedNode data)
+            throws IOException {
+        try {
+            final QName nodeType = data.getIdentifier().getNodeType();
+            final XMLNamespace namespace = nodeType.getNamespace();
+            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace.toString());
+            xmlWriter.writeDefaultNamespace(namespace.toString());
+            xmlWriter.writeEndElement();
+            xmlWriter.flush();
+        } catch (XMLStreamException e) {
+            throw new IOException("Failed to write elements", e);
+        }
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,

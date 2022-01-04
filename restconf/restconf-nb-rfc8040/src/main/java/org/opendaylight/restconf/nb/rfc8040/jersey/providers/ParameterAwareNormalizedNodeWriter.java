@@ -273,8 +273,8 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
                         write(child);
                     }
                     currentDepth--;
-                    processedAsCompositeNode = true;
                 }
+                processedAsCompositeNode = true;
             }
         } else if (node instanceof MapEntryNode) {
             processedAsCompositeNode = writeMapEntryNode((MapEntryNode) node);
