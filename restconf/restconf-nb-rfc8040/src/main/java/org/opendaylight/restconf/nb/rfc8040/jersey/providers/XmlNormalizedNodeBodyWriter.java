@@ -129,11 +129,33 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
                     .addChild((MapEntryNode) data)
                     .build());
             } else {
-                nnWriter.write(data);
+                if (data instanceof ContainerNode) {
+                    if (SchemaPath.ROOT.equals(path) && ((ContainerNode) data).body().isEmpty()) {
+                        writeEmptyDataNode(xmlWriter, data);
+                    } else {
+                        nnWriter.write(data);
+                    }
+                } else {
+                    nnWriter.write(data);
+                }
             }
         }
 
         nnWriter.flush();
+    }
+
+    private static void writeEmptyDataNode(final XMLStreamWriter xmlWriter, final NormalizedNode data)
+            throws IOException {
+        try {
+            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,
+                    data.getIdentifier().getNodeType().getLocalName(),
+                    data.getIdentifier().getNodeType().getNamespace().toString());
+            xmlWriter.writeDefaultNamespace(data.getIdentifier().getNodeType().getNamespace().toString());
+            xmlWriter.writeEndElement();
+            xmlWriter.flush();
+        } catch (XMLStreamException e) {
+            throw new IOException("Failed to write elements", e);
+        }
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
