@@ -93,10 +93,19 @@ public final class ScaleUtil {
                     status = CharStreams.toString(new BufferedReader(new InputStreamReader(exec.getInputStream())));
                     root.warn("Current status: {}", status);
                 } while (!status.startsWith("Running ..."));
+                do {
+                    final Process list = runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/client feature:list");
+                    try {
+                        Thread.sleep(2000L);
+                    } catch (InterruptedException e) {
+                        root.warn("Failed to sleep", e);
+                    }
+                    status = CharStreams.toString(new BufferedReader(new InputStreamReader(list.getInputStream())));
+                } while (!status.startsWith("Name"));
                 root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                    + "/bin/client -u karaf feature:install odl-restconf-nb-rfc8040 odl-netconf-connector-all");
                 final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                    + "/bin/client -u karaf feature:install odl-restconf-nb-rfc8040 odl-netconf-connector-all");
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
                 root.warn(
