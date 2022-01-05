@@ -56,6 +56,8 @@ public final class ScaleUtil {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
 
         setUpLoggers(params);
+        root.warn("Test string");
+        root.warn("The params {}", params.distroFolder.getAbsolutePath());
 
         // cleanup at the start in case controller was already running
         final Runtime runtime = Runtime.getRuntime();
@@ -94,9 +96,9 @@ public final class ScaleUtil {
                     root.warn("Current status: {}", status);
                 } while (!status.startsWith("Running ..."));
                 root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                    + "/bin/client -u karaf feature:install odl-restconf-nb-rfc8040 odl-netconf-connector-all");
                 final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                    + "/bin/client -u karaf feature:install odl-restconf-nb-rfc8040 odl-netconf-connector-all");
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
                 root.warn(
