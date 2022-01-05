@@ -56,6 +56,8 @@ public final class ScaleUtil {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
 
         setUpLoggers(params);
+        root.warn("Test string");
+        root.warn("The params {}", params.distroFolder.getAbsolutePath());
 
         // cleanup at the start in case controller was already running
         final Runtime runtime = Runtime.getRuntime();
@@ -64,7 +66,7 @@ public final class ScaleUtil {
         while (true) {
             root.warn("Starting scale test with {} devices", params.deviceCount);
             final ScheduledFuture<?> timeoutGuardFuture = EXECUTOR.schedule(new TimeoutGuard(), TIMEOUT,
-                TimeUnit.MINUTES);
+                    TimeUnit.MINUTES);
             final Configuration configuration = new ConfigurationBuilder().from(params).build();
             final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(configuration);
 
@@ -94,13 +96,13 @@ public final class ScaleUtil {
                     root.warn("Current status: {}", status);
                 } while (!status.startsWith("Running ..."));
                 root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                        + "/bin/client -u karaf feature:install odl-restconf-nb-rfc8040 odl-netconf-connector-all");
                 final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                        + "/bin/client -u karaf feature:install odl-restconf-nb-rfc8040 odl-netconf-connector-all");
                 root.warn(
-                    CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
+                        CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
                 root.warn(
-                    CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getErrorStream()))));
+                        CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getErrorStream()))));
 
             } catch (IOException e) {
                 root.warn("Failed to start karaf", e);
@@ -112,7 +114,7 @@ public final class ScaleUtil {
 
             try {
                 EXECUTOR.schedule(
-                    new ScaleVerifyCallable(netconfDeviceSimulator, params.deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
+                        new ScaleVerifyCallable(netconfDeviceSimulator, params.deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
                 root.warn("First callable scheduled");
                 SEMAPHORE.acquire();
                 root.warn("semaphore released");
@@ -221,10 +223,10 @@ public final class ScaleUtil {
                         count++;
                     }
                     resultsLog.info("Currently connected devices : {} out of {}, time elapsed: {}",
-                        count, deviceCount + 1, STOPWATCH);
+                            count, deviceCount + 1, STOPWATCH);
                     if (count != deviceCount + 1) {
                         EXECUTOR.schedule(
-                            new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
+                                new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
                     } else {
                         STOPWATCH.stop();
                         resultsLog.info("All devices connected in {}", STOPWATCH);
