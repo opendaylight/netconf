@@ -132,6 +132,7 @@ public final class TesttoolParameters {
 
         parser.addArgument("--controller-ip")
                 .type(String.class)
+                .setDefault("127.0.0.1")
                 .help("Ip of controller if available it will be used for spawning netconf connectors via topology"
                         + " configuration as a part of"
                         + " URI(http://<controller-ip>:<controller-port>/rests/data/...)"
@@ -140,6 +141,7 @@ public final class TesttoolParameters {
 
         parser.addArgument("--controller-port")
                 .type(Integer.class)
+                .setDefault(8181)
                 .help("Port of controller if available it will be used for spawning netconf connectors via topology "
                         + "configuration as a part of"
                         + " URI(http://<controller-ip>:<controller-port>/rests/data/...) "
