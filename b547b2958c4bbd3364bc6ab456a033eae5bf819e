@@ -16,6 +16,29 @@
       "message": "Please remove. This is not necessary.",
       "revId": "b547b2958c4bbd3364bc6ab456a033eae5bf819e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd48a6af_b370b1fd",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-05T13:36:46Z",
+      "side": 1,
+      "message": "Please remove \"-u karaf\" - its is not necessary and it make the installation to fail.",
+      "range": {
+        "startLine": 99,
+        "startChar": 35,
+        "endLine": 99,
+        "endChar": 43
+      },
+      "revId": "b547b2958c4bbd3364bc6ab456a033eae5bf819e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
