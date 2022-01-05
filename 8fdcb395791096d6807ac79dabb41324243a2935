@@ -16,6 +16,23 @@
       "message": "multipatch-fast:netconf\u003d86/99186/2",
       "revId": "8fdcb395791096d6807ac79dabb41324243a2935",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcd05951_c9842d04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2022-01-05T12:03:16Z",
+      "side": 1,
+      "message": "multipatch-build-fast:netconf\u003d86/99186/2",
+      "revId": "8fdcb395791096d6807ac79dabb41324243a2935",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
