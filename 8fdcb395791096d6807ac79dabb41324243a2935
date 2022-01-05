@@ -33,6 +33,52 @@
       "message": "multipatch-build-fast:netconf\u003d86/99186/2",
       "revId": "8fdcb395791096d6807ac79dabb41324243a2935",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdc545e8_cce6ed4c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlNormalizedNodeBodyWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-01-05T12:26:53Z",
+      "side": 1,
+      "message": "accessed three times: use a local variable",
+      "range": {
+        "startLine": 151,
+        "startChar": 20,
+        "endLine": 151,
+        "endChar": 54
+      },
+      "revId": "8fdcb395791096d6807ac79dabb41324243a2935",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28cd91bf_1ecfc0fa",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlNormalizedNodeBodyWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-01-05T12:26:53Z",
+      "side": 1,
+      "message": "accessed twice: use a local variable",
+      "range": {
+        "startLine": 153,
+        "startChar": 79,
+        "endLine": 153,
+        "endChar": 104
+      },
+      "revId": "8fdcb395791096d6807ac79dabb41324243a2935",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
