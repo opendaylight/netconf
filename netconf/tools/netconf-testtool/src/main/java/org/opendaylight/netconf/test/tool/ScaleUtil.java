@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import ch.qos.logback.classic.Level;
@@ -16,7 +15,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.Authenticator;
 import java.net.ConnectException;
+import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -84,35 +85,39 @@ public final class ScaleUtil {
                 runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/start");
                 String status;
                 do {
-                    final Process exec = runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/status");
+                    final Process list = runtime.exec(params.distroFolder.getAbsolutePath()
+                        + "/bin/client feature:list");
                     try {
                         Thread.sleep(2000L);
                     } catch (InterruptedException e) {
                         root.warn("Failed to sleep", e);
                     }
-                    status = CharStreams.toString(new BufferedReader(new InputStreamReader(exec.getInputStream())));
-                    root.warn("Current status: {}", status);
-                } while (!status.startsWith("Running ..."));
+                    status = CharStreams.toString(new BufferedReader(new InputStreamReader(list.getErrorStream())));
+                    root.warn(status);
+                } while (status.startsWith("Failed to get the session"));
                 root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                    + "/bin/client feature:install odl-restconf-nb-rfc8040 odl-netconf-topology");
                 final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                    + "/bin/client feature:install odl-restconf-nb-rfc8040 odl-netconf-topology");
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getErrorStream()))));
 
             } catch (IOException e) {
-                root.warn("Failed to start karaf", e);
+                root.error("Failed to start karaf", e);
                 System.exit(1);
             }
+
+            final Execution ex = new Execution(openDevices, params);
+            ex.call();
 
             root.warn("Karaf started, starting stopwatch");
             STOPWATCH.start();
 
             try {
                 EXECUTOR.schedule(
-                    new ScaleVerifyCallable(netconfDeviceSimulator, params.deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
+                    new ScaleVerifyCallable(params), RETRY_DELAY, TimeUnit.SECONDS);
                 root.warn("First callable scheduled");
                 SEMAPHORE.acquire();
                 root.warn("semaphore released");
@@ -177,7 +182,7 @@ public final class ScaleUtil {
                 }
             }
         }
-        if (!folder.delete()) {
+        if (folder.exists() && !folder.delete()) {
             root.warn("Failed to delete {}", folder);
         }
     }
@@ -185,20 +190,29 @@ public final class ScaleUtil {
     private static class ScaleVerifyCallable implements Callable<Void> {
         private static final Logger LOG = LoggerFactory.getLogger(ScaleVerifyCallable.class);
 
-        private static final String RESTCONF_URL = "http://127.0.0.1:8181/restconf/operational/"
-                + "network-topology:network-topology/topology/topology-netconf/";
+        private static final String RESTCONF_URL = "http://%s:%d/rests/data/"
+                + "network-topology:network-topology?content=nonconfig";
         private static final Pattern PATTERN = Pattern.compile("connected");
 
-        private final HttpClient httpClient = HttpClient.newBuilder().build();
-        private final NetconfDeviceSimulator simulator;
+        private final HttpClient httpClient;
+
         private final int deviceCount;
         private final HttpRequest request;
 
-        ScaleVerifyCallable(final NetconfDeviceSimulator simulator, final int deviceCount) {
+        ScaleVerifyCallable(final TesttoolParameters params) {
             LOG.info("New callable created");
-            this.simulator = simulator;
-            this.deviceCount = deviceCount;
-            request = HttpRequest.newBuilder(URI.create(RESTCONF_URL))
+            this.deviceCount = params.deviceCount;
+            this.httpClient = HttpClient.newBuilder()
+                    .authenticator(new Authenticator() {
+                        @Override
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(params.controllerAuthUsername,
+                                params.controllerAuthPassword.toCharArray());
+                        }
+                    })
+                    .build();
+            request = HttpRequest.newBuilder(URI.create(String.format(RESTCONF_URL, params.controllerIp,
+                            params.controllerPort)))
                     .GET()
                     .header("Content-Type", "application/xml")
                     .header("Accept", "application/xml")
@@ -212,7 +226,7 @@ public final class ScaleUtil {
 
                 if (response.statusCode() != 200 && response.statusCode() != 204) {
                     LOG.warn("Request failed, status code: {}", response.statusCode());
-                    EXECUTOR.schedule(new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
+                    EXECUTOR.schedule(this, RETRY_DELAY, TimeUnit.SECONDS);
                 } else {
                     final String body = response.body();
                     final Matcher matcher = PATTERN.matcher(body);
@@ -221,10 +235,10 @@ public final class ScaleUtil {
                         count++;
                     }
                     resultsLog.info("Currently connected devices : {} out of {}, time elapsed: {}",
-                        count, deviceCount + 1, STOPWATCH);
-                    if (count != deviceCount + 1) {
+                        count, deviceCount, STOPWATCH);
+                    if (count != deviceCount) {
                         EXECUTOR.schedule(
-                            new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
+                            this, RETRY_DELAY, TimeUnit.SECONDS);
                     } else {
                         STOPWATCH.stop();
                         resultsLog.info("All devices connected in {}", STOPWATCH);
@@ -233,7 +247,7 @@ public final class ScaleUtil {
                 }
             } catch (ConnectException e) {
                 LOG.warn("Failed to connect to Restconf, is the controller running?", e);
-                EXECUTOR.schedule(new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
+                EXECUTOR.schedule(this, RETRY_DELAY, TimeUnit.SECONDS);
             }
             return null;
         }
