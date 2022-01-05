@@ -93,10 +93,19 @@ public final class ScaleUtil {
                     status = CharStreams.toString(new BufferedReader(new InputStreamReader(exec.getInputStream())));
                     root.warn("Current status: {}", status);
                 } while (!status.startsWith("Running ..."));
+                do {
+                    final Process list = runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/client feature:list");
+                    try {
+                        Thread.sleep(2000L);
+                    } catch (InterruptedException e) {
+                        root.warn("Failed to sleep", e);
+                    }
+                    status = CharStreams.toString(new BufferedReader(new InputStreamReader(list.getInputStream())));
+                } while (!status.startsWith("Name"));
                 root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                    + "/bin/client -u karaf feature:install odl-restconf-nb-rfc8040 odl-netconf-connector-all");
                 final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
-                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                    + "/bin/client feature:install odl-restconf-nb-rfc8040 odl-netconf-connector-all");
                 root.warn(
                     CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
                 root.warn(
@@ -185,7 +194,7 @@ public final class ScaleUtil {
     private static class ScaleVerifyCallable implements Callable<Void> {
         private static final Logger LOG = LoggerFactory.getLogger(ScaleVerifyCallable.class);
 
-        private static final String RESTCONF_URL = "http://127.0.0.1:8181/restconf/operational/"
+        private static final String RESTCONF_URL = "http://127.0.0.1:8181/rests/data/"
                 + "network-topology:network-topology/topology/topology-netconf/";
         private static final Pattern PATTERN = Pattern.compile("connected");
 
