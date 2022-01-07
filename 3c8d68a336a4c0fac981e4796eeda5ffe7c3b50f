@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c244aa85_21bd40b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2022-01-07T12:18:09Z",
+      "side": 1,
+      "message": "multipatch-build-fast:netconf\u003d86/99186/4",
+      "revId": "3c8d68a336a4c0fac981e4796eeda5ffe7c3b50f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
