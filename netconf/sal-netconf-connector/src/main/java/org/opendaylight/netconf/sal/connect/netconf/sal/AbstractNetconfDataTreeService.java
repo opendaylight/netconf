@@ -284,7 +284,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             final Optional<ModifyAction> defaultOperation) {
         checkEditable(store);
         return editConfig(
-            netconfOps.createEditConfigStrcture(Optional.ofNullable(data), Optional.of(ModifyAction.MERGE), path),
+            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(ModifyAction.MERGE), path),
             defaultOperation.orElse(null));
     }
 
@@ -294,7 +294,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             final Optional<ModifyAction> defaultOperation) {
         checkEditable(store);
         return editConfig(
-            netconfOps.createEditConfigStrcture(Optional.ofNullable(data), Optional.of(ModifyAction.REPLACE), path),
+            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(ModifyAction.REPLACE), path),
             defaultOperation.orElse(null));
     }
 
@@ -304,22 +304,22 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
             final Optional<ModifyAction> defaultOperation) {
         checkEditable(store);
         return editConfig(
-            netconfOps.createEditConfigStrcture(Optional.ofNullable(data), Optional.of(ModifyAction.CREATE), path),
+            netconfOps.createEditConfigStructure(Optional.ofNullable(data), Optional.of(ModifyAction.CREATE), path),
             defaultOperation.orElse(null));
     }
 
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> delete(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
-        return editConfig(netconfOps.createEditConfigStrcture(Optional.empty(), Optional.of(ModifyAction.DELETE), path),
-            null);
+        return editConfig(netconfOps.createEditConfigStructure(Optional.empty(),
+                Optional.of(ModifyAction.DELETE), path), null);
     }
 
     @Override
     public synchronized ListenableFuture<? extends DOMRpcResult> remove(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
-        return editConfig(netconfOps.createEditConfigStrcture(Optional.empty(), Optional.of(ModifyAction.REMOVE), path),
-            null);
+        return editConfig(netconfOps.createEditConfigStructure(Optional.empty(),
+                Optional.of(ModifyAction.REMOVE), path), null);
     }
 
     @Override

@@ -423,9 +423,9 @@ public final class NetconfBaseOps {
         return future;
     }
 
-    public ChoiceNode createEditConfigStrcture(final Optional<NormalizedNode> lastChild,
-                                               final Optional<ModifyAction> operation,
-                                               final YangInstanceIdentifier dataPath) {
+    public ChoiceNode createEditConfigStructure(final Optional<NormalizedNode> lastChild,
+                                                final Optional<ModifyAction> operation,
+                                                final YangInstanceIdentifier dataPath) {
         return Builders.choiceBuilder()
                 .withNodeIdentifier(EDIT_CONTENT_NODEID)
                 .withChild(transformer.createEditConfigStructure(lastChild, dataPath, operation))
