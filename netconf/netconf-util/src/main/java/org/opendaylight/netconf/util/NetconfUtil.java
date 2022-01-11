@@ -134,6 +134,16 @@ public final class NetconfUtil {
                 + XmlUtil.toString(response));
     }
 
+    /**
+     * Write {@code normalized} data into {@link DOMResult}.
+     *
+     * @param normalized data to be written
+     * @param result     DOM result holder
+     * @param schemaPath schema path of the parent node
+     * @param context    mountpoint schema context
+     * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
+     * @throws XMLStreamException when failed to serialize data into XML document
+     */
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
                                            final SchemaPath schemaPath, final EffectiveModelContext context)
@@ -158,6 +168,17 @@ public final class NetconfUtil {
         }
     }
 
+    /**
+     * Write {@code normalized} data along with corresponding {@code metadata} into {@link DOMResult}.
+     *
+     * @param normalized data to be written
+     * @param metadata   metadata to be written
+     * @param result     DOM result holder
+     * @param schemaPath schema path of the parent node
+     * @param context    mountpoint schema context
+     * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
+     * @throws XMLStreamException when failed to serialize data into XML document
+     */
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedNode(final NormalizedNode normalized,
                                            final @Nullable NormalizedMetadata metadata,
@@ -330,7 +351,7 @@ public final class NetconfUtil {
      *
      * @param query  path to parent element
      * @param fields subpaths relative to parent path that identify specific fields
-     * @return created {@link TreeNode} structure
+     * @return created {@link PathNode} structure
      */
     private static PathNode constructPathArgumentTree(final YangInstanceIdentifier query,
             final List<YangInstanceIdentifier> fields) {
