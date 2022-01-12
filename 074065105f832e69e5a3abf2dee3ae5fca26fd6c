@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49ccc986_71ab3aa6",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/EmptyListXmlMetadataWriter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-01-12T15:14:47Z",
+      "side": 1,
+      "message": "hmm... so we are calling this from startXXXNode(), but we are not decrementing on endNode()?\nthat means that once we enter an unknown subtree, we will keep ignoring siblings, no?",
+      "range": {
+        "startLine": 139,
+        "startChar": 12,
+        "endLine": 139,
+        "endChar": 26
+      },
+      "revId": "074065105f832e69e5a3abf2dee3ae5fca26fd6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
