@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * to data-change-event or notification listener, and sending of data over established web-socket session.
  */
 @WebSocket
-final class WebSocketSessionHandler implements StreamSessionHandler {
+public final class WebSocketSessionHandler implements StreamSessionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketSessionHandler.class);
     private static final byte[] PING_PAYLOAD = "ping".getBytes(Charset.defaultCharset());
 
@@ -81,7 +81,7 @@ final class WebSocketSessionHandler implements StreamSessionHandler {
     @OnWebSocketConnect
     public synchronized void onWebSocketConnected(final Session webSocketSession) {
         if (session == null || !session.isOpen()) {
-            this.session = webSocketSession;
+            session = webSocketSession;
             listener.addSubscriber(this);
             LOG.debug("A new web-socket session {} has been successfully registered.", webSocketSession);
             if (heartbeatInterval != 0) {
