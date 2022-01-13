@@ -22,6 +22,30 @@
       },
       "revId": "074065105f832e69e5a3abf2dee3ae5fca26fd6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f07a288_8e30bfba",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/EmptyListXmlMetadataWriter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-13T09:28:32Z",
+      "side": 1,
+      "message": "Fixed endNode, startAnyxmlNode, and order of methods to be the same as in NormalizedNodeStreamWriterMetadataDecorator.",
+      "parentUuid": "49ccc986_71ab3aa6",
+      "range": {
+        "startLine": 139,
+        "startChar": 12,
+        "endLine": 139,
+        "endChar": 26
+      },
+      "revId": "074065105f832e69e5a3abf2dee3ae5fca26fd6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
