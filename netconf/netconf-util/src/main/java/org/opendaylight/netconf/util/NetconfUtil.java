@@ -146,17 +146,13 @@ public final class NetconfUtil {
      */
     public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
             final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
-        final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
-        try (
-             NormalizedNodeStreamWriter normalizedNodeStreamWriter =
-                     XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
-             NormalizedNodeWriter normalizedNodeWriter =
-                     NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter)
-        ) {
-            normalizedNodeWriter.write(normalized);
-            normalizedNodeWriter.flush();
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+             var writer = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
+            writer.write(normalized);
+            writer.flush();
         } finally {
-            writer.close();
+            xmlWriter.close();
         }
     }
 
@@ -179,18 +175,14 @@ public final class NetconfUtil {
             return;
         }
 
-        final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
-        XML_NAMESPACE_SETTER.initializeNamespace(writer);
-        try (
-             NormalizedNodeStreamWriter normalizedNodeStreamWriter =
-                     XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
-                NormalizedMetadataWriter normalizedNodeWriter =
-                     NormalizedMetadataWriter.forStreamWriter(normalizedNodeStreamWriter)
-        ) {
-            normalizedNodeWriter.write(normalized, metadata);
-            normalizedNodeWriter.flush();
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+             var writer = NormalizedMetadataWriter.forStreamWriter(streamWriter)) {
+            writer.write(normalized, metadata);
+            writer.flush();
         } finally {
-            writer.close();
+            xmlWriter.close();
         }
     }
 
@@ -208,9 +200,8 @@ public final class NetconfUtil {
             final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
-        try (NormalizedNodeStreamWriter streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-                context, schemaPath);
-             EmptyListXmlWriter writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+             var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
             final PathArgument first = it.next();
             StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
@@ -241,10 +232,9 @@ public final class NetconfUtil {
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         XML_NAMESPACE_SETTER.initializeNamespace(xmlWriter);
-        try (NormalizedNodeStreamWriter streamWriter = XMLStreamNormalizedNodeStreamWriter
-                .create(xmlWriter, context, schemaPath);
-             EmptyListXmlMetadataWriter writer = new EmptyListXmlMetadataWriter(streamWriter, xmlWriter, streamWriter
-                     .getExtensions().getInstance(StreamWriterMetadataExtension.class), metadata)) {
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+             var writer = new EmptyListXmlMetadataWriter(streamWriter, xmlWriter,
+                 streamWriter.getExtensions().getInstance(StreamWriterMetadataExtension.class), metadata)) {
             final Iterator<PathArgument> it = query.getPathArguments().iterator();
             final PathArgument first = it.next();
             StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
@@ -271,15 +261,11 @@ public final class NetconfUtil {
         }
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
-        try {
-            try (NormalizedNodeStreamWriter streamWriter =
-                    XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
-                 EmptyListXmlWriter writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
-                final Iterator<PathArgument> it = query.getPathArguments().iterator();
-                final PathArgument first = it.next();
-                StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first,
-                    it);
-            }
+        try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+             var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
+            final Iterator<PathArgument> it = query.getPathArguments().iterator();
+            final PathArgument first = it.next();
+            StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
         } finally {
             xmlWriter.close();
         }
@@ -305,14 +291,14 @@ public final class NetconfUtil {
             // No query at all
             return;
         }
+
         final List<YangInstanceIdentifier> aggregatedFields = aggregateFields(fields);
         final PathNode rootNode = constructPathArgumentTree(query, aggregatedFields);
 
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
         try {
-            try (NormalizedNodeStreamWriter streamWriter =
-                    XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
-                 EmptyListXmlWriter writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
+            try (var streamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath);
+                 var writer = new EmptyListXmlWriter(streamWriter, xmlWriter)) {
                 final PathArgument first = rootNode.element();
                 StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType())
                         .streamToWriter(writer, first, rootNode);
