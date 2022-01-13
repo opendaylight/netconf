@@ -9,11 +9,11 @@ package org.opendaylight.netconf.util;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLOutputFactory;
@@ -73,8 +73,7 @@ public final class NetconfUtil {
 
         static NamespaceSetter forFactory(final XMLOutputFactory xmlFactory) {
             final String netconfNamespace = NETCONF_QNAME.getNamespace().toString();
-            final AnyXmlNamespaceContext namespaceContext = new AnyXmlNamespaceContext(ImmutableMap.of(
-                "op", netconfNamespace));
+            final AnyXmlNamespaceContext namespaceContext = new AnyXmlNamespaceContext(Map.of("op", netconfNamespace));
 
             try {
                 final XMLStreamWriter testWriter = xmlFactory.createXMLStreamWriter(new DOMResult(
