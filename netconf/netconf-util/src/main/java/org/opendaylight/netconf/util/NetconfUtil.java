@@ -82,7 +82,7 @@ public final class NetconfUtil {
                 testWriter.setNamespaceContext(namespaceContext);
             } catch (final UnsupportedOperationException e) {
                 // This happens with JDK's DOM writer, which we may be using
-                LOG.warn("Unable to set namespace context, falling back to setPrefix()", e);
+                LOG.debug("Unable to set namespace context, falling back to setPrefix()", e);
                 return writer -> writer.setPrefix("op", netconfNamespace);
             } catch (XMLStreamException e) {
                 throw new ExceptionInInitializerError(e);
