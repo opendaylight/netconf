@@ -144,10 +144,8 @@ public final class NetconfUtil {
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedNode(final NormalizedNode normalized, final DOMResult result,
-                                           final SchemaPath schemaPath, final EffectiveModelContext context)
-            throws IOException, XMLStreamException {
+            final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
         try (
              NormalizedNodeStreamWriter normalizedNodeStreamWriter =
@@ -158,13 +156,7 @@ public final class NetconfUtil {
             normalizedNodeWriter.write(normalized);
             normalizedNodeWriter.flush();
         } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (final Exception e) {
-                LOG.warn("Unable to close resource properly", e);
-            }
+            writer.close();
         }
     }
 
@@ -179,11 +171,9 @@ public final class NetconfUtil {
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    public static void writeNormalizedNode(final NormalizedNode normalized,
-                                           final @Nullable NormalizedMetadata metadata,
-                                           final DOMResult result, final SchemaPath schemaPath,
-                                           final EffectiveModelContext context) throws IOException, XMLStreamException {
+    public static void writeNormalizedNode(final NormalizedNode normalized, final @Nullable NormalizedMetadata metadata,
+            final DOMResult result, final SchemaPath schemaPath, final EffectiveModelContext context)
+                throws IOException, XMLStreamException {
         if (metadata == null) {
             writeNormalizedNode(normalized, result, schemaPath, context);
             return;
@@ -200,13 +190,7 @@ public final class NetconfUtil {
             normalizedNodeWriter.write(normalized, metadata);
             normalizedNodeWriter.flush();
         } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (final Exception e) {
-                LOG.warn("Unable to close resource properly", e);
-            }
+            writer.close();
         }
     }
 
@@ -220,7 +204,6 @@ public final class NetconfUtil {
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedNode(final YangInstanceIdentifier query, final DOMResult result,
             final SchemaPath schemaPath, final EffectiveModelContext context) throws IOException, XMLStreamException {
         final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
@@ -232,13 +215,7 @@ public final class NetconfUtil {
             final PathArgument first = it.next();
             StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
         } finally {
-            try {
-                if (xmlWriter != null) {
-                    xmlWriter.close();
-                }
-            } catch (final Exception e) {
-                LOG.warn("Unable to close resource properly", e);
-            }
+            xmlWriter.close();
         }
     }
 
@@ -254,7 +231,6 @@ public final class NetconfUtil {
      * @throws IOException        when failed to write data into {@link NormalizedNodeStreamWriter}
      * @throws XMLStreamException when failed to serialize data into XML document
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedNode(final YangInstanceIdentifier query,
             final @Nullable NormalizedMetadata metadata, final DOMResult result, final SchemaPath schemaPath,
             final EffectiveModelContext context) throws IOException, XMLStreamException {
@@ -273,13 +249,7 @@ public final class NetconfUtil {
             final PathArgument first = it.next();
             StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first, it);
         } finally {
-            try {
-                if (xmlWriter != null) {
-                    xmlWriter.close();
-                }
-            } catch (final Exception e) {
-                LOG.warn("Unable to close resource properly", e);
-            }
+            xmlWriter.close();
         }
     }
 
