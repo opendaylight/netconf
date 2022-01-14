@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ea92edf_3076c3cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-14T18:42:34Z",
+      "side": 1,
+      "message": "I think that you have changed the logic.\n\nIt looks that scale util was designed to start iteration with initial amount of devices. It starts them, connects to Netconf topology (with PATCH) and verify they are connected (with GET).\n\nThen it iterates again - in infinite loop. It increases device count by DEVICE_STEP and again, It starts them, connects to Netconf topology (with PATCH) and verify they are connected (with GET).\n\nBut with your change the amount of devices connected is the same forever..",
+      "revId": "01e032d3359c682b04532de8ac937ad6cc50f6e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5861f239_bdded471",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-14T18:42:34Z",
+      "side": 1,
+      "message": "Personally, I would use status.startsWith(\"Failed to get session\") - for me its more understandable.",
+      "revId": "01e032d3359c682b04532de8ac937ad6cc50f6e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b226fa62_3497269e",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-14T18:42:34Z",
+      "side": 1,
+      "message": "Remove -u karaf also from here :D",
+      "range": {
+        "startLine": 99,
+        "startChar": 35,
+        "endLine": 99,
+        "endChar": 43
+      },
+      "revId": "01e032d3359c682b04532de8ac937ad6cc50f6e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
