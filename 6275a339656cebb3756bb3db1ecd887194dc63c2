@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad19b4b9_bf5a9229",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2022-01-17T10:33:44Z",
+      "side": 1,
+      "message": "you can also change this to odl-netconf-topology since thats the preffered feature nowadays",
+      "range": {
+        "startLine": 100,
+        "startChar": 75,
+        "endLine": 100,
+        "endChar": 100
+      },
+      "revId": "6275a339656cebb3756bb3db1ecd887194dc63c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c420ffdc_508c4936",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2022-01-17T10:33:44Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 102,
+        "startChar": 75,
+        "endLine": 102,
+        "endChar": 99
+      },
+      "revId": "6275a339656cebb3756bb3db1ecd887194dc63c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
