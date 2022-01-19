@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4568a659_f3af88ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-19T12:19:06Z",
+      "side": 1,
+      "message": "The deletion of data directory does not work.",
+      "revId": "2f92e200a70fa58d8cf963664f57fbe6afe86c4f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
