@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb7fc83e_53ac5978",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bce2d8a0_c76e4b50",
+      "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7842f4d6_f4986a03",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-01-18T18:33:15Z",
       "side": 1,
       "message": "Just delete that comment, please.",
+      "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08e2f804_16384d60",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7842f4d6_f4986a03",
       "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e8e49fe_56999b17",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10e72137_1d6b8967",
+      "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1db4db09_76979f86",
@@ -65,6 +119,24 @@
       "writtenOn": "2022-01-18T18:33:15Z",
       "side": 1,
       "message": "It looks scale-util was hard-coded originally.\nCreate new patch where you will:\n1. parametrize also RESTCONF_URL with controller-ip and controller-port\n2. set default controller-ip to 127.0.0.1 and controller-port to 8181",
+      "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3372fb38_4a861193",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1db4db09_76979f86",
       "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2aeb19f7_a31f5ffc",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83a5a518_2ca7c3c7",
+      "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f913c2a8_0ed7bef5",
@@ -99,6 +189,24 @@
       "writtenOn": "2022-01-18T18:33:15Z",
       "side": 1,
       "message": "admin:admin is already set as default in TesttoolParameters.java.\nRemove this..",
+      "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "460df3b0_a2d8a114",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f913c2a8_0ed7bef5",
       "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d458f65_6efa2ea9",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3b82fde_491eb73e",
+      "revId": "b547b2958c4bbd3364bc6ab456a033eae5bf819e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd48a6af_b370b1fd",
@@ -31,6 +49,30 @@
       "writtenOn": "2022-01-05T13:36:46Z",
       "side": 1,
       "message": "Please remove \"-u karaf\" - its is not necessary and it make the installation to fail.",
+      "range": {
+        "startLine": 99,
+        "startChar": 35,
+        "endLine": 99,
+        "endChar": 43
+      },
+      "revId": "b547b2958c4bbd3364bc6ab456a033eae5bf819e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55bba5a7_6860a8b3",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd48a6af_b370b1fd",
       "range": {
         "startLine": 99,
         "startChar": 35,

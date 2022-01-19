@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74014e4f_87de41e7",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5861f239_bdded471",
+      "revId": "01e032d3359c682b04532de8ac937ad6cc50f6e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b226fa62_3497269e",
@@ -48,6 +66,30 @@
       "writtenOn": "2022-01-14T18:42:34Z",
       "side": 1,
       "message": "Remove -u karaf also from here :D",
+      "range": {
+        "startLine": 99,
+        "startChar": 35,
+        "endLine": 99,
+        "endChar": 43
+      },
+      "revId": "01e032d3359c682b04532de8ac937ad6cc50f6e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8f73dd2_0cc7fc6a",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-19T12:15:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b226fa62_3497269e",
       "range": {
         "startLine": 99,
         "startChar": 35,
