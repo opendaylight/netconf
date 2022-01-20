@@ -121,11 +121,12 @@ public final class NetconfFieldsTranslator extends AbstractFieldsTranslator<Netc
 
         DataSchemaContextNode<?> actualContextNode = currentNode.getChild(childQName);
         while (actualContextNode != null && actualContextNode.isMixin()) {
-            if (actualContextNode.getDataSchemaNode() instanceof ListSchemaNode) {
-                // we need just a single node identifier from list in the path (key is not available)
+            final var actualDataSchemaNode = actualContextNode.getDataSchemaNode();
+            if (actualDataSchemaNode instanceof ListSchemaNode listSchema && listSchema.getKeyDefinition().isEmpty()) {
+                // we need just a single node identifier from list in the path IFF it is an unkeyed list, otherwise
+                // we need both (which is the default case)
                 actualContextNode = actualContextNode.getChild(childQName);
-                break;
-            } else if (actualContextNode.getDataSchemaNode() instanceof LeafListSchemaNode) {
+            } else if (actualDataSchemaNode instanceof LeafListSchemaNode) {
                 // NodeWithValue is unusable - stop parsing
                 break;
             } else {
