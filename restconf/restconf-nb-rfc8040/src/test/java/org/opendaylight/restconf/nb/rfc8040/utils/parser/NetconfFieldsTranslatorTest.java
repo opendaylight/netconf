@@ -42,6 +42,11 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
     }
 
     @Override
+    protected void assertKeyedList(List<YangInstanceIdentifier> result) {
+        assertEquals(1, result.size());
+    }
+
+    @Override
     protected void assertDoublePath(final List<YangInstanceIdentifier> result) {
         assertEquals(2, result.size());
 
@@ -54,7 +59,12 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
 
     @Override
     protected void assertSubPath(final List<YangInstanceIdentifier> result) {
-        // FIXME: NETCONF-820: add assertions
+        assertEquals(1, result.size());
+        final var pathArguments = result.get(0).getPathArguments();
+        assertEquals(3, pathArguments.size());
+        assertEquals(LIBRARY_Q_NAME, pathArguments.get(0).getNodeType());
+        assertEquals(ALBUM_Q_NAME, pathArguments.get(1).getNodeType());
+        assertEquals(NAME_Q_NAME, pathArguments.get(2).getNodeType());
     }
 
     @Override
@@ -69,7 +79,9 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
 
     @Override
     protected void assertNamespace(final List<YangInstanceIdentifier> result) {
-        // FIXME: add assertions
+        assertEquals(1, result.size());
+        final var augmentedLibraryPath = assertPath(result, AUGMENTED_LIBRARY_Q_NAME);
+        assertEquals(1, augmentedLibraryPath.getPathArguments().size());
     }
 
     @Override
@@ -88,12 +100,30 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
 
     @Override
     protected void assertMultipleChildren2(final List<YangInstanceIdentifier> result) {
-        // FIXME: add assertions
+        assertEquals(3, result.size());
+
+        final var tosPath = assertPath(result, TYPE_OF_SERVICE_Q_NAME);
+        assertEquals(2, tosPath.getPathArguments().size());
+
+        final var instanceNamePath = assertPath(result, INSTANCE_NAME_Q_NAME);
+        assertEquals(3, instanceNamePath.getPathArguments().size());
+
+        final var providerPath = assertPath(result, PROVIDER_Q_NAME);
+        assertEquals(3, providerPath.getPathArguments().size());
     }
 
     @Override
     protected void assertMultipleChildren3(final List<YangInstanceIdentifier> result) {
-        // FIXME: add assertions
+        assertEquals(3, result.size());
+
+        final var instanceNamePath = assertPath(result, INSTANCE_NAME_Q_NAME);
+        assertEquals(3, instanceNamePath.getPathArguments().size());
+
+        final var tosPath = assertPath(result, TYPE_OF_SERVICE_Q_NAME);
+        assertEquals(2, tosPath.getPathArguments().size());
+
+        final var nextServicePath = assertPath(result, NEXT_SERVICE_Q_NAME);
+        assertEquals(3, nextServicePath.getPathArguments().size());
     }
 
     @Override

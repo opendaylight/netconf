@@ -62,6 +62,11 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     private ContainerSchemaNode containerPlayer;
     protected static final QName PLAYER_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "player");
 
+    // list artist
+    @Mock
+    private ListSchemaNode libraryArtist;
+    protected static final QName ARTIST_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "artist");
+
     // container library
     @Mock
     private ContainerSchemaNode containerLibrary;
@@ -165,6 +170,11 @@ public abstract class AbstractFieldsTranslatorTest<T> {
 
         when(listAlbum.getQName()).thenReturn(ALBUM_Q_NAME);
         when(containerLibrary.dataChildByName(ALBUM_Q_NAME)).thenReturn(listAlbum);
+
+        when(libraryArtist.getKeyDefinition()).thenReturn(List.of(NAME_Q_NAME));
+        when(libraryArtist.getQName()).thenReturn(ARTIST_Q_NAME);
+        when(containerLibrary.dataChildByName(ARTIST_Q_NAME)).thenReturn(libraryArtist);
+        when(libraryArtist.dataChildByName(NAME_Q_NAME)).thenReturn(leafName);
 
         when(leafName.getQName()).thenReturn(NAME_Q_NAME);
         when(listAlbum.dataChildByName(NAME_Q_NAME)).thenReturn(leafName);
@@ -336,6 +346,15 @@ public abstract class AbstractFieldsTranslatorTest<T> {
         assertNotNull(result);
         assertLeafList(result);
     }
+
+    @Test
+    public void testKeyedList() {
+        final var result = translateFields(identifierJukebox, assertFields("library/artist(name)"));
+        assertNotNull(result);
+        assertKeyedList(result);
+    }
+
+    protected abstract void assertKeyedList(List<T> result);
 
     protected abstract void assertLeafList(@NonNull List<T> result);
 
