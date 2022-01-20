@@ -88,16 +88,29 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
 
     @Override
     protected void assertAugmentedChild(final List<Set<QName>> result) {
-        // FIXME: add assertions
+        assertEquals(result.size(), 2);
+        assertEquals(Set.of(PLAYER_Q_NAME), result.get(0));
+        assertEquals(Set.of(SPEED_Q_NAME), result.get(1));
     }
 
     @Override
     protected void assertListFieldUnderList(final List<Set<QName>> result) {
-        // FIXME: add assertions
+        assertEquals(2, result.size());
+        assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
+        assertEquals(Set.of(INSTANCE_Q_NAME), result.get(1));
+    }
+
+    @Override
+    protected void assertKeyedList(List<Set<QName>> result) {
+        assertEquals(3, result.size());
+        assertEquals(Set.of(LIBRARY_Q_NAME), result.get(0));
+        assertEquals(Set.of(ARTIST_Q_NAME), result.get(1));
+        assertEquals(Set.of(NAME_Q_NAME), result.get(2));
     }
 
     @Override
     protected void assertLeafList(final List<Set<QName>> result) {
-        // FIXME: add assertions
+        assertEquals(1, result.size());
+        assertEquals(Set.of(PROTOCOLS_Q_NAME), result.get(0));
     }
 }

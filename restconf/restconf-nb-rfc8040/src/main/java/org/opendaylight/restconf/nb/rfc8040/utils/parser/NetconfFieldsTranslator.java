@@ -122,9 +122,10 @@ public final class NetconfFieldsTranslator extends AbstractFieldsTranslator<Netc
         DataSchemaContextNode<?> actualContextNode = currentNode.getChild(childQName);
         while (actualContextNode != null && actualContextNode.isMixin()) {
             if (actualContextNode.getDataSchemaNode() instanceof ListSchemaNode) {
-                // we need just a single node identifier from list in the path (key is not available)
+                if (((ListSchemaNode) actualContextNode.getDataSchemaNode()).getKeyDefinition().size() > 0) {
+                    collectedMixinNodes.add(actualContextNode.getIdentifier());
+                }
                 actualContextNode = actualContextNode.getChild(childQName);
-                break;
             } else if (actualContextNode.getDataSchemaNode() instanceof LeafListSchemaNode) {
                 // NodeWithValue is unusable - stop parsing
                 break;
@@ -139,8 +140,18 @@ public final class NetconfFieldsTranslator extends AbstractFieldsTranslator<Netc
                     + currentNode.getIdentifier().getNodeType().getLocalName(),
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
-        final LinkedPathElement linkedPathElement = new LinkedPathElement(currentNode.getIdentifier(),
-                collectedMixinNodes, actualContextNode.getIdentifier());
+
+        final LinkedPathElement linkedPathElement;
+        if (actualContextNode instanceof ListSchemaNode && currentNode.isKeyedEntry()) {
+            collectedMixinNodes.add(actualContextNode.getIdentifier());
+            final YangInstanceIdentifier.NodeIdentifierWithPredicates id =
+                YangInstanceIdentifier.NodeIdentifierWithPredicates
+                    .of(actualContextNode.getIdentifier().getNodeType());
+            linkedPathElement = new LinkedPathElement(currentNode.getIdentifier(), collectedMixinNodes, id);
+        } else {
+            linkedPathElement = new LinkedPathElement(currentNode.getIdentifier(),
+                    collectedMixinNodes, actualContextNode.getIdentifier());
+        }
         level.add(linkedPathElement);
         return actualContextNode;
     }
