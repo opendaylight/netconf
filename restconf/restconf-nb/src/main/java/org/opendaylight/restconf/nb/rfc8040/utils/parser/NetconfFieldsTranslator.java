@@ -120,12 +120,18 @@ public final class NetconfFieldsTranslator extends AbstractFieldsTranslator<Netc
         final List<PathArgument> collectedMixinNodes = new ArrayList<>();
 
         DataSchemaContextNode<?> actualContextNode = currentNode.getChild(childQName);
+        if (actualContextNode == null) {
+            actualContextNode = resolveMixinNode(currentNode, currentNode.getIdentifier().getNodeType());
+            actualContextNode = actualContextNode.getChild(childQName);
+        }
+
         while (actualContextNode != null && actualContextNode.isMixin()) {
-            if (actualContextNode.getDataSchemaNode() instanceof ListSchemaNode) {
-                // we need just a single node identifier from list in the path (key is not available)
+            final var actualDataSchemaNode = actualContextNode.getDataSchemaNode();
+            if (actualDataSchemaNode instanceof ListSchemaNode listSchema && listSchema.getKeyDefinition().isEmpty()) {
+                // we need just a single node identifier from list in the path IFF it is an unkeyed list, otherwise
+                // we need both (which is the default case)
                 actualContextNode = actualContextNode.getChild(childQName);
-                break;
-            } else if (actualContextNode.getDataSchemaNode() instanceof LeafListSchemaNode) {
+            } else if (actualDataSchemaNode instanceof LeafListSchemaNode) {
                 // NodeWithValue is unusable - stop parsing
                 break;
             } else {
@@ -143,6 +149,15 @@ public final class NetconfFieldsTranslator extends AbstractFieldsTranslator<Netc
                 collectedMixinNodes, actualContextNode.getIdentifier());
         level.add(linkedPathElement);
         return actualContextNode;
+    }
+
+    private static DataSchemaContextNode<?> resolveMixinNode(
+            final DataSchemaContextNode<?> node, final @NonNull QName qualifiedName) {
+        DataSchemaContextNode<?> currentNode = node;
+        while (currentNode != null && currentNode.isMixin()) {
+            currentNode = currentNode.getChild(qualifiedName);
+        }
+        return currentNode;
     }
 
     /**

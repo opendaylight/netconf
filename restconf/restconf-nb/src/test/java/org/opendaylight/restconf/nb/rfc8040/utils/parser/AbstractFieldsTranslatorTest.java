@@ -257,6 +257,15 @@ public abstract class AbstractFieldsTranslatorTest<T> {
         assertLeafList(result);
     }
 
+    @Test
+    public void testKeyedList() {
+        final var result = translateFields(identifierJukebox, assertFields("library/artist(name)"));
+        assertNotNull(result);
+        assertKeyedList(result);
+    }
+
+    protected abstract void assertKeyedList(List<T> result);
+
     protected abstract void assertLeafList(@NonNull List<T> result);
 
     /**
