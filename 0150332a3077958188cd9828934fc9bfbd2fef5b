@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94c07e5d_486f94e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-20T18:26:34Z",
+      "side": 1,
+      "message": "Credentials were here even before.",
+      "revId": "0150332a3077958188cd9828934fc9bfbd2fef5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40ff0aa2_f4b5a18a",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-20T18:26:34Z",
+      "side": 1,
+      "message": "Comment is still here! 😄",
+      "revId": "0150332a3077958188cd9828934fc9bfbd2fef5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a66c1300_d5454288",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-20T18:26:34Z",
+      "side": 1,
+      "message": "Its still not changed to error.",
+      "revId": "0150332a3077958188cd9828934fc9bfbd2fef5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbd77c1b_0ea804eb",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-20T18:26:34Z",
+      "side": 1,
+      "message": "Still hard coded. Where is new patch with parametrized URI?",
+      "revId": "0150332a3077958188cd9828934fc9bfbd2fef5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ee86ebf_cabc27bf",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-20T18:26:34Z",
+      "side": 1,
+      "message": "Still here 😊",
+      "revId": "0150332a3077958188cd9828934fc9bfbd2fef5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
