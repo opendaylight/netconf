@@ -18,18 +18,25 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWri
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalServiceImpl;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.StatisticsRestconfServiceWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
+@Deprecated(since = "2.0.12")
 public class RestconfApplication extends Application {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfApplication.class);
 
     private final ControllerContext controllerContext;
     private final StatisticsRestconfServiceWrapper statsServiceWrapper;
 
     @Inject
-    public RestconfApplication(ControllerContext controllerContext,
-            StatisticsRestconfServiceWrapper statsServiceWrapper) {
+    public RestconfApplication(final ControllerContext controllerContext,
+            final StatisticsRestconfServiceWrapper statsServiceWrapper) {
         this.controllerContext = controllerContext;
         this.statsServiceWrapper = statsServiceWrapper;
+        LOG.warn("Pre-standard version of RESTCONF activated. Please note that this implementation is superseded "
+            + "by the standard-compliant implementation. This code is no longer actively maintained and will be "
+            + "removed in a future release.");
     }
 
     @Override
