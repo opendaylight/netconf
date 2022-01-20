@@ -122,9 +122,12 @@ public final class NetconfFieldsTranslator extends AbstractFieldsTranslator<Netc
         DataSchemaContextNode<?> actualContextNode = currentNode.getChild(childQName);
         while (actualContextNode != null && actualContextNode.isMixin()) {
             if (actualContextNode.getDataSchemaNode() instanceof ListSchemaNode) {
-                // we need just a single node identifier from list in the path (key is not available)
+                // we need just a single node identifier from list in the path (if key is not available)
+                // for keyed list nodes we need to also provide YangInstanceIdentifierWithPredicate
+                if (!((ListSchemaNode) actualContextNode.getDataSchemaNode()).getKeyDefinition().isEmpty()) {
+                    collectedMixinNodes.add(actualContextNode.getIdentifier());
+                }
                 actualContextNode = actualContextNode.getChild(childQName);
-                break;
             } else if (actualContextNode.getDataSchemaNode() instanceof LeafListSchemaNode) {
                 // NodeWithValue is unusable - stop parsing
                 break;
@@ -139,8 +142,9 @@ public final class NetconfFieldsTranslator extends AbstractFieldsTranslator<Netc
                     + currentNode.getIdentifier().getNodeType().getLocalName(),
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
+
         final LinkedPathElement linkedPathElement = new LinkedPathElement(currentNode.getIdentifier(),
-                collectedMixinNodes, actualContextNode.getIdentifier());
+                    collectedMixinNodes, actualContextNode.getIdentifier());
         level.add(linkedPathElement);
         return actualContextNode;
     }
