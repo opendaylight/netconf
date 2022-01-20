@@ -66,7 +66,7 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
 
     @Override
     protected void assertMultipleChildren1(final List<Set<QName>> result) {
-        assertEquals(result.size(), 3);
+        assertEquals(3, result.size());
         assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
         assertEquals(Set.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME), result.get(1));
         assertEquals(Set.of(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME), result.get(2));
@@ -74,7 +74,7 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
 
     @Override
     protected void assertMultipleChildren2(final List<Set<QName>> result) {
-        assertEquals(result.size(), 3);
+        assertEquals(3, result.size());
         assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
         assertEquals(Set.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME), result.get(1));
         assertEquals(Set.of(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME), result.get(2));
@@ -82,7 +82,7 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
 
     @Override
     protected void assertMultipleChildren3(final List<Set<QName>> result) {
-        assertEquals(result.size(), 3);
+        assertEquals(3, result.size());
         assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
         assertEquals(Set.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME, NEXT_DATA_Q_NAME), result.get(1));
         assertEquals(Set.of(INSTANCE_NAME_Q_NAME, NEXT_SERVICE_Q_NAME), result.get(2));
@@ -90,7 +90,7 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
 
     @Override
     protected void assertMultipleChildren4(final List<Set<QName>> result) {
-        assertEquals(result.size(), 3);
+        assertEquals(3, result.size());
         assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
         assertEquals(Set.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME, NEXT_DATA_Q_NAME), result.get(1));
         assertEquals(Set.of(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME, NEXT_SERVICE_Q_NAME), result.get(2));
@@ -98,7 +98,7 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
 
     @Override
     protected void assertMultipleChildren5(final List<Set<QName>> result) {
-        assertEquals(result.size(), 3);
+        assertEquals(3, result.size());
         assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
         assertEquals(Set.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME, NEXT_DATA_Q_NAME), result.get(1));
         assertEquals(Set.of(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME, NEXT_SERVICE_Q_NAME), result.get(2));
@@ -106,16 +106,29 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
 
     @Override
     protected void assertAugmentedChild(final List<Set<QName>> result) {
-        // FIXME: add assertions
+        assertEquals(2, result.size());
+        assertEquals(Set.of(PLAYER_Q_NAME), result.get(0));
+        assertEquals(Set.of(SPEED_Q_NAME), result.get(1));
     }
 
     @Override
     protected void assertListFieldUnderList(final List<Set<QName>> result) {
-        // FIXME: add assertions
+        assertEquals(2, result.size());
+        assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
+        assertEquals(Set.of(INSTANCE_Q_NAME), result.get(1));
+    }
+
+    @Override
+    protected void assertKeyedList(final List<Set<QName>> result) {
+        assertEquals(3, result.size());
+        assertEquals(Set.of(LIBRARY_Q_NAME), result.get(0));
+        assertEquals(Set.of(ARTIST_Q_NAME), result.get(1));
+        assertEquals(Set.of(NAME_Q_NAME), result.get(2));
     }
 
     @Override
     protected void assertLeafList(final List<Set<QName>> result) {
-        // FIXME: add assertions
+        assertEquals(1, result.size());
+        assertEquals(Set.of(PROTOCOLS_Q_NAME), result.get(0));
     }
 }
