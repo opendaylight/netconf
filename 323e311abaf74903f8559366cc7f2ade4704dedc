@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "884c5044_2b162fc4",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-21T17:52:41Z",
+      "side": 1,
+      "message": "This solves nothing.",
+      "revId": "323e311abaf74903f8559366cc7f2ade4704dedc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fea4ceff_521c6974",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-21T17:52:41Z",
+      "side": 1,
+      "message": "I think this.params is useless..",
+      "revId": "323e311abaf74903f8559366cc7f2ade4704dedc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
