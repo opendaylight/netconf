@@ -323,6 +323,26 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     protected abstract void assertMultipleChildren3(@NonNull List<T> result);
 
     @Test
+    public void testMultipleChildren4() {
+        final var result = translateFields(identifierTestServices,
+                assertFields("services(type-of-service;instance(instance-name;provider);next-data(next-service))"));
+        assertNotNull(result);
+        assertMultipleChildren4(result);
+    }
+
+    protected abstract void assertMultipleChildren4(@NonNull List<T> result);
+
+    @Test
+    public void testMultipleChildren5() {
+        final var result = translateFields(identifierTestServices,
+                assertFields("services(type-of-service;instance(instance-name;provider);next-data/next-service)"));
+        assertNotNull(result);
+        assertMultipleChildren5(result);
+    }
+
+    protected abstract void assertMultipleChildren5(@NonNull List<T> result);
+
+    @Test
     public void testAugmentedChild() {
         final var result = translateFields(identifierJukebox, assertFields("player/augmented-jukebox:speed"));
         assertNotNull(result);
