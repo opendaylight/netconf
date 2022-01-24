@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "969b1cb6_66f5d0fa",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-24T17:49:40Z",
+      "side": 1,
+      "message": "Please remove this empty line",
+      "revId": "0dc0f73892719bfc58afeefd9bf22b91ae0f7db9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6977de9_1e576540",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-24T17:49:40Z",
+      "side": 1,
+      "message": "Change signature to:\n\nScaleVerifyCallable(final TesttoolParameters params)\n\nand now you can remove this.params :)",
+      "revId": "0dc0f73892719bfc58afeefd9bf22b91ae0f7db9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fa6db58_55c5e6f0",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-24T17:49:40Z",
+      "side": 1,
+      "message": "We can reuse already existing object 😊\nEXECUTOR.schedule(this, ...",
+      "revId": "0dc0f73892719bfc58afeefd9bf22b91ae0f7db9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8183376_cd445283",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-24T17:49:40Z",
+      "side": 1,
+      "message": "We can reuse already existing object 😊\nEXECUTOR.schedule(this, ...",
+      "revId": "0dc0f73892719bfc58afeefd9bf22b91ae0f7db9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5716256_7ff6cb78",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-24T17:49:40Z",
+      "side": 1,
+      "message": "We can reuse already existing object 😊\nEXECUTOR.schedule(this, ...",
+      "revId": "0dc0f73892719bfc58afeefd9bf22b91ae0f7db9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
