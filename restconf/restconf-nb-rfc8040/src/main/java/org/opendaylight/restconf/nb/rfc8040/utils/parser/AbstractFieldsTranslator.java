@@ -54,7 +54,7 @@ public abstract class AbstractFieldsTranslator<T> {
 
         final List<Set<T>> parsed = new ArrayList<>();
         processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
-            startNode, input.nodeSelectors());
+            startNode, input.nodeSelectors(), 0);
         return parsed;
     }
 
@@ -71,15 +71,19 @@ public abstract class AbstractFieldsTranslator<T> {
 
     private void processSelectors(final List<Set<T>> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final DataSchemaContextNode<?> startNode,
-            final List<NodeSelector> selectors) {
-        final Set<T> startLevel = new HashSet<>();
-        parsed.add(startLevel);
-
+            final List<NodeSelector> selectors, final int index) {
+        Set<T> startLevel;
+        if (parsed.size() <= index) {
+            startLevel = new HashSet<>();
+            parsed.add(startLevel);
+        } else {
+            startLevel = parsed.get(index);
+        }
         for (var selector : selectors) {
             var node = startNode;
             var namespace = startNamespace;
             var level = startLevel;
-
+            var levelIndex = index;
 
             // Note: path is guaranteed to have at least one step
             final var it = selector.path().iterator();
@@ -105,11 +109,12 @@ public abstract class AbstractFieldsTranslator<T> {
 
                 // go one level down
                 level = prepareQNameLevel(parsed, level);
+                levelIndex++;
             }
 
             final var subs = selector.subSelectors();
             if (!subs.isEmpty()) {
-                processSelectors(parsed, context, namespace, node, subs);
+                processSelectors(parsed, context, namespace, node, subs, levelIndex + 1);
             }
         }
     }
