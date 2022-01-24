@@ -143,6 +143,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ea64e964_d6a0239a",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-24T11:38:35Z",
+      "side": 1,
+      "message": ".",
+      "parentUuid": "3372fb38_4a861193",
+      "revId": "4cf7962fa5d3c8f3734a4bc0a72379711117cdb8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "83a5a518_2ca7c3c7",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
         "patchSetId": 19
