@@ -87,6 +87,22 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
     }
 
     @Override
+    protected void assertMultipleChildren4(final List<Set<QName>> result) {
+        assertEquals(result.size(), 3);
+        assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
+        assertEquals(Set.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME, NEXT_DATA_Q_NAME), result.get(1));
+        assertEquals(Set.of(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME, NEXT_SERVICE_Q_NAME), result.get(2));
+    }
+
+    @Override
+    protected void assertMultipleChildren5(final List<Set<QName>> result) {
+        assertEquals(result.size(), 3);
+        assertEquals(Set.of(SERVICES_Q_NAME), result.get(0));
+        assertEquals(Set.of(TYPE_OF_SERVICE_Q_NAME, INSTANCE_Q_NAME, NEXT_DATA_Q_NAME), result.get(1));
+        assertEquals(Set.of(INSTANCE_NAME_Q_NAME, PROVIDER_Q_NAME, NEXT_SERVICE_Q_NAME), result.get(2));
+    }
+
+    @Override
     protected void assertAugmentedChild(final List<Set<QName>> result) {
         assertEquals(result.size(), 2);
         assertEquals(Set.of(PLAYER_Q_NAME), result.get(0));

@@ -127,6 +127,40 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
     }
 
     @Override
+    protected void assertMultipleChildren4(final List<YangInstanceIdentifier> result) {
+        assertEquals(4, result.size());
+
+        final var instanceNamePath = assertPath(result, INSTANCE_NAME_Q_NAME);
+        assertEquals(3, instanceNamePath.getPathArguments().size());
+
+        final var tosPath = assertPath(result, TYPE_OF_SERVICE_Q_NAME);
+        assertEquals(2, tosPath.getPathArguments().size());
+
+        final var nextServicePath = assertPath(result, NEXT_SERVICE_Q_NAME);
+        assertEquals(3, nextServicePath.getPathArguments().size());
+
+        final var providerPath = assertPath(result, PROVIDER_Q_NAME);
+        assertEquals(3, providerPath.getPathArguments().size());
+    }
+
+    @Override
+    protected void assertMultipleChildren5(final List<YangInstanceIdentifier> result) {
+        assertEquals(4, result.size());
+
+        final var instanceNamePath = assertPath(result, INSTANCE_NAME_Q_NAME);
+        assertEquals(3, instanceNamePath.getPathArguments().size());
+
+        final var tosPath = assertPath(result, TYPE_OF_SERVICE_Q_NAME);
+        assertEquals(2, tosPath.getPathArguments().size());
+
+        final var nextServicePath = assertPath(result, NEXT_SERVICE_Q_NAME);
+        assertEquals(3, nextServicePath.getPathArguments().size());
+
+        final var providerPath = assertPath(result, PROVIDER_Q_NAME);
+        assertEquals(3, providerPath.getPathArguments().size());
+    }
+
+    @Override
     protected void assertAugmentedChild(final List<YangInstanceIdentifier> result) {
         assertEquals(1, result.size());
         final var pathArguments = result.get(0).getPathArguments();
