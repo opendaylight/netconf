@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3035b2a_55184b57",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-25T10:00:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "884c5044_2b162fc4",
+      "revId": "323e311abaf74903f8559366cc7f2ade4704dedc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fea4ceff_521c6974",
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "It used in call() method",
       "parentUuid": "fea4ceff_521c6974",
+      "revId": "323e311abaf74903f8559366cc7f2ade4704dedc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ece765d_c1707b83",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-01-25T10:00:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11f4d9b0_0ab446db",
       "revId": "323e311abaf74903f8559366cc7f2ade4704dedc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
