@@ -37,30 +37,6 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
     private final Bootstrap bootstrap;
     private final PipelineInitializer<S> initializer;
     private final Promise<Empty> firstSessionFuture;
-    /**
-     * Channel handler that responds to channelInactive event and reconnects the session unless the promise is
-     * cancelled.
-     */
-    private final ChannelInboundHandlerAdapter inboundHandler = new ChannelInboundHandlerAdapter() {
-        @Override
-        public void channelInactive(final ChannelHandlerContext ctx) {
-            // This is the ultimate channel inactive handler, not forwarding
-            if (isCancelled()) {
-                return;
-            }
-
-            synchronized (ReconnectPromise.this) {
-                final Future<?> attempt = pending;
-                if (!attempt.isDone() || !attempt.isSuccess()) {
-                    // Connection refused, negotiation failed, or similar
-                    LOG.debug("Connection to {} was dropped during negotiation, reattempting", address);
-                }
-
-                LOG.debug("Reconnecting after connection to {} was dropped", address);
-                lockedConnect();
-            }
-        }
-    };
 
     @GuardedBy("this")
     private Future<?> pending;
@@ -111,7 +87,12 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
             // reconnect will not work
             // This handler is last so all handlers in front of it can handle channel inactive (to e.g. resource
             // cleanup) before a new connection is started
-            channel.pipeline().addLast(inboundHandler);
+            channel.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+                @Override
+                public void channelInactive(final ChannelHandlerContext ctx) {
+                    onChannelInactive();
+                }
+            });
         });
 
         if (!firstSessionFuture.isDone()) {
@@ -120,6 +101,24 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
                     firstSessionFuture.setFailure(future.cause());
                 }
             });
+        }
+    }
+
+    private void onChannelInactive() {
+        // This is the ultimate channel inactive handler, not forwarding
+        if (isCancelled()) {
+            return;
+        }
+
+        synchronized (this) {
+            final Future<?> attempt = pending;
+            if (!attempt.isDone() || !attempt.isSuccess()) {
+                // Connection refused, negotiation failed, or similar
+                LOG.debug("Connection to {} was dropped during negotiation, reattempting", address);
+            }
+
+            LOG.debug("Reconnecting after connection to {} was dropped", address);
+            lockedConnect();
         }
     }
 }
