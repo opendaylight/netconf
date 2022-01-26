@@ -11,13 +11,13 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>restconf-parent</artifactId>
-    <version>1.13.8-SNAPSHOT</version>
+    <version>1.13.8</version>
     <relativePath>../restconf-parent</relativePath>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>sal-rest-docgen</artifactId>
-  <version>1.13.8-SNAPSHOT</version>
+  <version>1.13.8</version>
   <packaging>bundle</packaging>
 
   <dependencies>
