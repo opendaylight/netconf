@@ -559,9 +559,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertEquals(schemaPaths.size(), actions.size());
 
         for (var path : schemaPaths) {
-            final var action = actions.get(path);
-            assertNotNull("Action for " + path + " not found", action);
-            assertEquals(path.asSchemaPath(), action.getPath());
+            assertNotNull("Action for " + path + " not found", actions.get(path));
         }
     }
 

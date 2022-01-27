@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public class RestPutListDataTest {
     private static EffectiveModelContext schemaContextTestModule;
@@ -202,8 +203,9 @@ public class RestPutListDataTest {
         }
 
         final NormalizedNodeContext testCompositeContext = new NormalizedNodeContext(
-                InstanceIdentifierContext.ofDataSchemaNode(schemaContextTestModule, testNodeSchemaNode),
-                testNodeContainer.build());
+            InstanceIdentifierContext.ofStack(
+                SchemaInferenceStack.ofDataTreePath(schemaContextTestModule, lstWithCompositeKey)),
+            testNodeContainer.build());
 
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
         restconfImpl.updateConfigurationData(toUri(uriKey1, uriKey2), testCompositeContext, uriInfo);

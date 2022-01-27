@@ -77,7 +77,6 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.InputEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.OutputEffectiveStatement;
@@ -161,7 +160,6 @@ public class RestconfImplTest {
         final NormalizedNodeContext ctx = mock(NormalizedNodeContext.class);
         final RpcDefinition rpc = mock(RpcDefinition.class,
             withSettings().extraInterfaces(RpcEffectiveStatement.class));
-        doReturn(mock(SchemaPath.class)).when(rpc).getPath();
         doReturn(qname).when(rpc).getQName();
 
         final InputSchemaNode input = mock(InputSchemaNode.class,
@@ -284,9 +282,9 @@ public class RestconfImplTest {
         final String identifier = "create-notification-stream/toaster:toastDone";
 
         // register test notification stream
-        final Absolute path = Absolute.of(
-                QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(List.of(path), identifier, "XML", controllerContext);
+        Notificator.createNotificationListener(
+            List.of(Absolute.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"))),
+            identifier, "XML", controllerContext);
 
         final UriInfo uriInfo = mock(UriInfo.class);
         final UriBuilder uriBuilder = mock(UriBuilder.class);

@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.common.context;
 
+import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -18,8 +19,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -156,17 +155,23 @@ public abstract class InstanceIdentifierContext {
     }
 
     // Invocations of various identifier-less details
-    public static @NonNull InstanceIdentifierContext ofDataSchemaNode(final EffectiveModelContext context,
-            final DataSchemaNode schemaNode) {
-        return new WithoutDataPath(schemaNode, null,
-            SchemaInferenceStack.ofInstantiatedPath(context, schemaNode.getPath()));
+    public static @NonNull InstanceIdentifierContext ofStack(final SchemaInferenceStack stack) {
+        return ofStack(stack, null);
     }
 
     // Invocations of various identifier-less details, potentially having a mount point
-    public static @NonNull InstanceIdentifierContext ofDataSchemaNode(final EffectiveModelContext context,
-            final DataSchemaNode schemaNode, final @Nullable DOMMountPoint mountPoint) {
-        return new WithoutDataPath(schemaNode, mountPoint,
-            SchemaInferenceStack.ofSchemaPath(context, schemaNode.getPath()));
+    public static @NonNull InstanceIdentifierContext ofStack(final SchemaInferenceStack stack,
+            final @Nullable DOMMountPoint mountPoint) {
+        final SchemaNode schemaNode;
+        if (!stack.isEmpty()) {
+            final var stmt = stack.currentStatement();
+            verify(stmt instanceof SchemaNode, "Unexpected statement %s", stmt);
+            schemaNode = (SchemaNode) stmt;
+        } else {
+            schemaNode = stack.getEffectiveModelContext();
+        }
+
+        return new WithoutDataPath(schemaNode, mountPoint, stack);
     }
 
     public static @NonNull InstanceIdentifierContext ofLocalRpcInput(final EffectiveModelContext context,
@@ -185,12 +190,6 @@ public abstract class InstanceIdentifierContext {
         stack.enterSchemaTree(rpc.getQName());
         stack.enterSchemaTree(rpc.getOutput().getQName());
         return new WithoutDataPath(rpc, null, stack);
-    }
-
-    public static @NonNull InstanceIdentifierContext ofAction(final SchemaInferenceStack stack,
-            final ActionDefinition schemaNode, final YangInstanceIdentifier path,
-            final @Nullable DOMMountPoint mountPoint) {
-        return new DataPath(schemaNode, mountPoint, stack, path);
     }
 
     public static @NonNull InstanceIdentifierContext ofPath(final SchemaInferenceStack stack,

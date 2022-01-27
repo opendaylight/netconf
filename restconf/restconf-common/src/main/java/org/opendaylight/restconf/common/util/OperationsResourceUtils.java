@@ -25,6 +25,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 
 // FIXME: remove this class
@@ -60,8 +61,10 @@ public final class OperationsResourceUtils {
             operationsBuilder.withChild(ImmutableNodes.leafNode(leaf.getQName(), Empty.value()));
         }
 
-        return Map.entry(InstanceIdentifierContext.ofDataSchemaNode(
-            new OperationsEffectiveModuleContext(ImmutableSet.copyOf(modules)), operatationsSchema, mountPoint),
-            operationsBuilder.build());
+        final var opContext = new OperationsEffectiveModuleContext(ImmutableSet.copyOf(modules));
+        final var stack = SchemaInferenceStack.of(opContext);
+        stack.enterSchemaTree(operatationsSchema.getQName());
+
+        return Map.entry(InstanceIdentifierContext.ofStack(stack, mountPoint), operationsBuilder.build());
     }
 }

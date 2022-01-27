@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import java.util.Arrays;
+import com.google.common.collect.ImmutableSet;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -154,7 +154,7 @@ public class NetconfConnectDeviceCommand implements Action {
             if (!Strings.isNullOrEmpty(excludedTlsVersions)) {
                 tlsCase = new TlsCaseBuilder()
                             .setTls(new TlsBuilder()
-                                    .setExcludedVersions(Arrays.asList(excludedTlsVersions.split(","))).build())
+                                    .setExcludedVersions(ImmutableSet.copyOf(excludedTlsVersions.split(","))).build())
                             .build();
             }
             netconfNodeBuilder.setProtocol(new ProtocolBuilder()

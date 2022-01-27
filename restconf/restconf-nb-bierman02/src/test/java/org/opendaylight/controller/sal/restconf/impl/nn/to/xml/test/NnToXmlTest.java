@@ -46,6 +46,7 @@ import org.opendaylight.yangtools.yang.model.ri.type.BaseTypes;
 import org.opendaylight.yangtools.yang.model.ri.type.BitsTypeBuilder;
 import org.opendaylight.yangtools.yang.model.ri.type.EnumerationTypeBuilder;
 import org.opendaylight.yangtools.yang.model.ri.type.UnionTypeBuilder;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public class NnToXmlTest extends AbstractBodyReaderTest {
     private static EffectiveModelContext schemaContext;
@@ -304,7 +305,8 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue(object).build());
 
-        return new NormalizedNodeContext(InstanceIdentifierContext.ofDataSchemaNode(schemaContext, contSchema),
+        return new NormalizedNodeContext(
+            InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(schemaContext, cont)),
                 contData.build());
     }
 
@@ -340,10 +342,9 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue("true").build());
 
-        final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                InstanceIdentifierContext.ofDataSchemaNode(schemaContext, contSchema), contData.build());
-
-        return testNormalizedNodeContext;
+        return new NormalizedNodeContext(
+                InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(schemaContext, cont)),
+                contData.build());
     }
 
     private static NormalizedNodeContext prepareLeafrefNegativeData() {
@@ -361,7 +362,8 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue("value").build());
 
         return new NormalizedNodeContext(
-                InstanceIdentifierContext.ofDataSchemaNode(schemaContext, contSchema), contData.build());
+            InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(schemaContext, cont)),
+            contData.build());
     }
 
     private static NormalizedNodeContext prepareIdrefData(final String prefix, final boolean valueAsQName) {
@@ -395,7 +397,8 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(cont1Data.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                InstanceIdentifierContext.ofDataSchemaNode(schemaContext, contSchema), contData.build());
+                InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(schemaContext, cont)),
+                contData.build());
         return testNormalizedNodeContext;
     }
 

@@ -198,11 +198,8 @@ public class NotificationListenerTest {
     }
 
     private String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi) {
-        final List<Absolute> paths = new ArrayList<>();
-        paths.add(schemaPathNotifi);
-        final List<NotificationListenerAdapter> listNotifi =
-                Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString(),
-                        controllerContext);
+        final List<NotificationListenerAdapter> listNotifi = Notificator.createNotificationListener(
+            List.of(schemaPathNotifi), "stream-name", NotificationOutputType.JSON.toString(), controllerContext);
         final NotificationListenerAdapter notifi = listNotifi.get(0);
         return requireNonNull(notifi.prepareJson(schemaContext, notificationData));
     }

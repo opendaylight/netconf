@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map.Entry;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.yangtools.concepts.Serializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -185,7 +184,7 @@ public final class YangInstanceIdentifierSerializer {
         }
 
         public DataSchemaContextNode<?> getCurrent() {
-            return this.current;
+            return current;
         }
 
         public void setCurrent(final DataSchemaContextNode<?> current) {
