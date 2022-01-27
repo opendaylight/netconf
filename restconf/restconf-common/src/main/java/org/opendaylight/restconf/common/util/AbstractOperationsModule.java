@@ -14,7 +14,8 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.concepts.SemVer;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.UnqualifiedQName;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 import org.opendaylight.yangtools.yang.common.YangVersion;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Deviation;
@@ -53,7 +54,7 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final <K, V, N extends IdentifierNamespace<K, V>> Optional<? extends V> get(final Class<N> namespace,
+    public final <K, V, N extends IdentifierNamespace<K, V>> Optional<V> get(final Class<N> namespace,
             final K identifier) {
         return Optional.empty();
     }
@@ -64,8 +65,8 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     }
 
     @Override
-    public final UnqualifiedQName argument() {
-        return UnqualifiedQName.of(getName());
+    public final Unqualified argument() {
+        return UnresolvedQName.unqualified(getName());
     }
 
     @Override
@@ -166,6 +167,11 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
 
     @Override
     public final ModuleEffectiveStatement asEffectiveStatement() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public final ConformanceType conformance() {
         throw new UnsupportedOperationException();
     }
 }

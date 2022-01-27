@@ -16,7 +16,6 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
@@ -76,7 +75,6 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -397,8 +395,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return RestconfInvokeOperationsServiceImpl.checkedGet(Futures.catching(actionService.invokeAction(
             schemaPath, new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent()), data),
             DOMActionException.class,
-            cause -> new SimpleDOMActionResult(ImmutableList.of(RpcResultBuilder.newError(
-                RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))),
+            cause -> new SimpleDOMActionResult(List.of(RpcResultBuilder.newError(
+                ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage()))),
             MoreExecutors.directExecutor()));
     }
 
