@@ -92,9 +92,8 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
         LOG.debug("Removing keypairs: {}", input);
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final List<String> ids = input.getKeyId();
 
-        for (final String id : ids) {
+        for (final String id : input.getKeyId()) {
             writeTransaction.delete(LogicalDatastoreType.CONFIGURATION,
                     keystoreIid.child(KeyCredential.class, new KeyCredentialKey(id)));
         }
@@ -187,9 +186,8 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     public ListenableFuture<RpcResult<RemoveTrustedCertificateOutput>> removeTrustedCertificate(
             final RemoveTrustedCertificateInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final List<String> names = input.getName();
 
-        for (final String name : names) {
+        for (final String name : input.getName()) {
             writeTransaction.delete(LogicalDatastoreType.CONFIGURATION,
                     keystoreIid.child(TrustedCertificate.class, new TrustedCertificateKey(name)));
         }
@@ -244,9 +242,8 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     @Override
     public ListenableFuture<RpcResult<RemovePrivateKeyOutput>> removePrivateKey(final RemovePrivateKeyInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final List<String> names = input.getName();
 
-        for (final String name : names) {
+        for (final String name : input.getName()) {
             writeTransaction.delete(LogicalDatastoreType.CONFIGURATION,
                     keystoreIid.child(PrivateKey.class, new PrivateKeyKey(name)));
         }

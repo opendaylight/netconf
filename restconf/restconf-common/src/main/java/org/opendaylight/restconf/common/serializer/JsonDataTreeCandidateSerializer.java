@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -35,9 +35,9 @@ public class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer
         this.jsonWriter = jsonWriter;
     }
 
-    void serializeData(Collection<YangInstanceIdentifier.PathArgument> nodePath, DataTreeCandidateNode candidate,
-                       boolean skipData)
-            throws IOException {
+    @Override
+    void serializeData(final Collection<YangInstanceIdentifier.PathArgument> nodePath,
+                       final DataTreeCandidateNode candidate, final boolean skipData) throws IOException {
         final SchemaPath path = SchemaPath.create(nodePath.stream()
                 .filter(p -> !(p instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
                 .map(YangInstanceIdentifier.PathArgument::getNodeType).collect(Collectors.toList()), true);
@@ -69,7 +69,7 @@ public class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer
     }
 
     @Override
-    void serializePath(Collection<YangInstanceIdentifier.PathArgument> pathArguments)
+    void serializePath(final Collection<YangInstanceIdentifier.PathArgument> pathArguments)
             throws IOException {
         jsonWriter.name("path").value(convertPath(pathArguments));
     }

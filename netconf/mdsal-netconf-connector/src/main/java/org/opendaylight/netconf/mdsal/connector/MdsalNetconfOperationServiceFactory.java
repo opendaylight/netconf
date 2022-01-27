@@ -41,11 +41,11 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
+public final class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MdsalNetconfOperationServiceFactory.class);
     private static final BasicCapability VALIDATE_CAPABILITY =
-        new BasicCapability("urn:ietf:params:netconf:capability:validate:1.0");
+            new BasicCapability("urn:ietf:params:netconf:capability:validate:1.0");
 
     private final DOMDataBroker dataBroker;
     private final DOMRpcService rpcService;
@@ -54,7 +54,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
-    public MdsalNetconfOperationServiceFactory(
+    private MdsalNetconfOperationServiceFactory(
             final DOMSchemaService schemaService,
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
             final DOMDataBroker dataBroker,
@@ -65,10 +65,23 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
         this.rootSchemaSourceProviderDependency = schemaService.getExtensions()
                 .getInstance(DOMYangTextSourceProvider.class);
-        this.currentSchemaContext = new CurrentSchemaContext(requireNonNull(schemaService),
+        this.currentSchemaContext = CurrentSchemaContext.create(requireNonNull(schemaService),
                 rootSchemaSourceProviderDependency);
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
-        this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
+    }
+
+    // keep spotbugs from complaining about overridable method in constructor
+    public static MdsalNetconfOperationServiceFactory create(
+            final DOMSchemaService schemaService,
+            final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
+            final DOMDataBroker dataBroker,
+            final DOMRpcService rpcService) {
+
+        var factory = new MdsalNetconfOperationServiceFactory(schemaService, netconfOperationServiceFactoryListener,
+                dataBroker, rpcService);
+        netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(factory);
+
+        return factory;
     }
 
     @Override

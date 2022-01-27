@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +76,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     private NetconfCapabilityMonitoringService monitoringService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         doReturn(XMLNamespace.of(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
         doReturn(Optional.of(TEST_MODULE_DATE)).when(moduleMock).getRevision();
@@ -112,7 +111,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     }
 
     @Test
-    public void testListeners() throws Exception {
+    public void testListeners() {
         HashSet<Capability> added = new HashSet<>();
         added.add(new BasicCapability("toAdd"));
         monitoringService.onCapabilitiesChanged(added, Set.of());
@@ -122,7 +121,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     }
 
     @Test
-    public void testGetSchemas() throws Exception {
+    public void testGetSchemas() {
         Schemas schemas = monitoringService.getSchemas();
         Schema schema = schemas.getSchema().values().iterator().next();
         assertEquals(TEST_MODULE_NAMESPACE, schema.getNamespace());
@@ -131,7 +130,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     }
 
     @Test
-    public void testGetSchemaForCapability() throws Exception {
+    public void testGetSchemaForCapability() {
         //test multiple revisions of the same capability
         monitoringService.onCapabilitiesChanged(Set.of(moduleCapability2), Set.of());
         final String schema =
@@ -148,8 +147,8 @@ public class NetconfCapabilityMonitoringServiceTest {
     }
 
     @Test
-    public void testGetCapabilities() throws Exception {
-        List<Uri> exp = new ArrayList<>();
+    public void testGetCapabilities() {
+        Set<Uri> exp = new HashSet<>();
         for (Capability capability : capabilities) {
             exp.add(new Uri(capability.getCapabilityUri()));
         }
@@ -162,14 +161,14 @@ public class NetconfCapabilityMonitoringServiceTest {
     }
 
     @Test
-    public void testClose() throws Exception {
+    public void testClose() {
         assertEquals(6, monitoringService.getCapabilities().getCapability().size());
         monitoringService.close();
-        assertEquals(List.of(), monitoringService.getCapabilities().getCapability());
+        assertEquals(Set.of(), monitoringService.getCapabilities().getCapability());
     }
 
     @Test
-    public void testOnCapabilitiesChanged() throws Exception {
+    public void testOnCapabilitiesChanged() {
         final String capUri = "test";
         final Uri uri = new Uri(capUri);
         final HashSet<Capability> testCaps = new HashSet<>();
@@ -187,9 +186,9 @@ public class NetconfCapabilityMonitoringServiceTest {
 
         //verify listener calls
         final List<Capabilities> listenerValues = monitoringListenerCaptor.getAllValues();
-        final List<Uri> afterRegisterState = listenerValues.get(0).getCapability();
-        final List<Uri> afterAddState = listenerValues.get(1).getCapability();
-        final List<Uri> afterRemoveState = listenerValues.get(2).getCapability();
+        final Set<Uri> afterRegisterState = listenerValues.get(0).getCapability();
+        final Set<Uri> afterAddState = listenerValues.get(1).getCapability();
+        final Set<Uri> afterRemoveState = listenerValues.get(2).getCapability();
 
         assertEquals(capabilitiesSize, afterRegisterState.size());
         assertEquals(capabilitiesSize + 1, afterAddState.size());
@@ -203,9 +202,9 @@ public class NetconfCapabilityMonitoringServiceTest {
         final NetconfCapabilityChange afterAdd = publisherValues.get(0);
         final NetconfCapabilityChange afterRemove = publisherValues.get(1);
 
-        assertEquals(Set.of(uri), Set.copyOf(afterAdd.getAddedCapability()));
-        assertEquals(List.of(), afterAdd.getDeletedCapability());
-        assertEquals(Set.of(uri), Set.copyOf(afterRemove.getDeletedCapability()));
-        assertEquals(List.of(), afterRemove.getAddedCapability());
+        assertEquals(Set.of(uri), afterAdd.getAddedCapability());
+        assertEquals(Set.of(), afterAdd.getDeletedCapability());
+        assertEquals(Set.of(uri), afterRemove.getDeletedCapability());
+        assertEquals(Set.of(), afterRemove.getAddedCapability());
     }
 }

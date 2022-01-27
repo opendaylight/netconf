@@ -55,7 +55,7 @@ final class OperationsRestconfModule extends AbstractOperationsModule {
     }
 
     @Override
-    public Collection<? extends EffectiveStatement<?, ?>> effectiveSubstatements() {
+    public List<? extends EffectiveStatement<?, ?>> effectiveSubstatements() {
         // This is not accurate, but works for now
         return List.of();
     }

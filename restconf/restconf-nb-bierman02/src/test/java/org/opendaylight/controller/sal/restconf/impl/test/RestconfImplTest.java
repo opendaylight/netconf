@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.io.FileNotFoundException;
 import java.net.URI;
@@ -75,7 +74,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
@@ -165,8 +164,8 @@ public class RestconfImplTest {
         doReturn(Optional.of(rpcService)).when(mount).getService(DOMRpcService.class);
         doReturn(immediateFluentFuture(mock(DOMRpcResult.class))).when(rpcService)
                 .invokeRpc(any(QName.class), any(NormalizedNode.class));
-        this.restconfImpl.invokeRpc("randomId", ctx, uriInfo);
-        this.restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
+        restconfImpl.invokeRpc("randomId", ctx, uriInfo);
+        restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
         verify(rpcService, times(2)).invokeRpc(any(QName.class), any());
     }
 
@@ -202,7 +201,7 @@ public class RestconfImplTest {
         doReturn(children).when(normalizedNode).body();
 
         // register notification
-        final NormalizedNodeContext context = this.restconfImpl
+        final NormalizedNodeContext context = restconfImpl
                 .invokeRpc("sal-remote:create-notification-stream", payload, null);
         assertNotNull(context);
     }
@@ -212,8 +211,8 @@ public class RestconfImplTest {
      */
     @Test
     public void toStreamEntryNodeTest() {
-        final Module restconfModule = this.controllerContext.getRestconfModule();
-        final DataSchemaNode streamSchemaNode = this.controllerContext
+        final Module restconfModule = controllerContext.getRestconfModule();
+        final DataSchemaNode streamSchemaNode = controllerContext
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.STREAM_LIST_SCHEMA_NODE);
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) streamSchemaNode;
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeValues =
@@ -258,9 +257,9 @@ public class RestconfImplTest {
         final String identifier = "create-notification-stream/toaster:toastDone";
 
         // register test notification stream
-        final SchemaPath path = SchemaPath.create(
-                true, QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML", controllerContext);
+        Notificator.createNotificationListener(
+            List.of(Absolute.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"))),
+            identifier, "XML", controllerContext);
 
         final UriInfo uriInfo = mock(UriInfo.class);
         final UriBuilder uriBuilder = mock(UriBuilder.class);
@@ -275,7 +274,7 @@ public class RestconfImplTest {
         when(uriInfo.getQueryParameters()).thenReturn(map);
 
         // subscribe to stream and verify response
-        final NormalizedNodeContext response = this.restconfImpl.subscribeToStream(identifier, uriInfo);
+        final NormalizedNodeContext response = restconfImpl.subscribeToStream(identifier, uriInfo);
 
         // remove test notification stream
         Notificator.removeAllListeners();

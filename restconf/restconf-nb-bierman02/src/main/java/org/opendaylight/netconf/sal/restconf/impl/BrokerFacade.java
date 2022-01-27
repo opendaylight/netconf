@@ -92,8 +92,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,7 +154,7 @@ public class BrokerFacade implements Closeable {
      * @return read date
      */
     public NormalizedNode readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
-        try (DOMDataTreeReadTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
+        try (DOMDataTreeReadTransaction tx = domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
         }
     }
@@ -204,7 +202,7 @@ public class BrokerFacade implements Closeable {
      * @return read data
      */
     public NormalizedNode readOperationalData(final YangInstanceIdentifier path) {
-        try (DOMDataTreeReadTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
+        try (DOMDataTreeReadTransaction tx = domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, OPERATIONAL, path);
         }
     }
@@ -254,7 +252,7 @@ public class BrokerFacade implements Closeable {
         requireNonNull(payload);
 
         isMounted.set(false);
-        final DOMDataTreeReadWriteTransaction newReadWriteTransaction = this.domDataBroker.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction newReadWriteTransaction = domDataBroker.newReadWriteTransaction();
         final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null ? Status.OK
                 : Status.CREATED;
         final FluentFuture<? extends CommitInfo> future = putDataViaTransaction(
@@ -314,7 +312,7 @@ public class BrokerFacade implements Closeable {
         final DOMDataTreeReadWriteTransaction patchTransaction;
         if (mountPoint == null) {
             schemaContext = patchContext.getInstanceIdentifierContext().getSchemaContext();
-            patchTransaction = this.domDataBroker.newReadWriteTransaction();
+            patchTransaction = domDataBroker.newReadWriteTransaction();
         } else {
             schemaContext = modelContext(mountPoint);
 
@@ -464,7 +462,7 @@ public class BrokerFacade implements Closeable {
             final NormalizedNode payload, final String insert, final String point) {
         isMounted.set(false);
         FluentFuture<? extends CommitInfo> future =
-                postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
+                postDataViaTransaction(domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
                                        globalSchema, insert, point);
         isMounted.remove();
         return future;
@@ -488,7 +486,7 @@ public class BrokerFacade implements Closeable {
 
     // DELETE configuration
     public FluentFuture<? extends CommitInfo> commitConfigurationDataDelete(final YangInstanceIdentifier path) {
-        return deleteDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path);
+        return deleteDataViaTransaction(domDataBroker.newReadWriteTransaction(), CONFIGURATION, path);
     }
 
     public FluentFuture<? extends CommitInfo> commitConfigurationDataDelete(
@@ -503,11 +501,11 @@ public class BrokerFacade implements Closeable {
     // RPC
     public ListenableFuture<? extends DOMRpcResult> invokeRpc(final @NonNull QName type,
             final @NonNull NormalizedNode input) {
-        if (this.rpcService == null) {
+        if (rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
         LOG.trace("Invoke RPC {} with input: {}", type, input);
-        return this.rpcService.invokeRpc(type, input);
+        return rpcService.invokeRpc(type, input);
     }
 
     public void registerToListenDataChanges(final LogicalDatastoreType datastore, final Scope scope,
@@ -517,11 +515,11 @@ public class BrokerFacade implements Closeable {
         }
 
         final YangInstanceIdentifier path = listener.getPath();
-        DOMDataTreeChangeService changeService = this.domDataBroker.getExtensions()
+        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
         if (changeService == null) {
             throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService"
-                                                        + this.domDataBroker);
+                                                        + domDataBroker);
         }
         DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(datastore, path);
         ListenerRegistration<ListenerAdapter> registration =
@@ -1219,9 +1217,8 @@ public class BrokerFacade implements Closeable {
             return;
         }
 
-        final SchemaPath path = listener.getSchemaPath();
-        final ListenerRegistration<DOMNotificationListener> registration = this.domNotification
-                .registerNotificationListener(listener, Absolute.of(ImmutableList.copyOf(path.getPathFromRoot())));
+        final ListenerRegistration<DOMNotificationListener> registration = domNotification
+                .registerNotificationListener(listener, listener.getSchemaPath());
 
         listener.setRegistration(registration);
     }
@@ -1269,7 +1266,7 @@ public class BrokerFacade implements Closeable {
         PatchStatusContext status;
 
         public PatchStatusContext getStatus() {
-            return this.status;
+            return status;
         }
 
         public void setStatus(final PatchStatusContext status) {
