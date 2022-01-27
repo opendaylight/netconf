@@ -92,36 +92,33 @@ public class RestconfErrorTest {
     public void testRestConfErrorWithRpcError() {
 
         // All fields set
-        RpcError rpcError = RpcResultBuilder.newError(
-                RpcError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE.elementBody(), "mock error-message",
+        RpcError rpcError = RpcResultBuilder.newError(ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, "mock error-message",
                 "mock app-tag", "mock error-info", new Exception("mock cause"));
 
         validateRestConfError("mock error-message", ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, "mock app-tag",
                 "mock error-info", new RestconfError(rpcError));
 
         // All fields set except 'info' - expect error-info set to 'cause'
-        rpcError = RpcResultBuilder.newError(
-                RpcError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE.elementBody(), "mock error-message",
+        rpcError = RpcResultBuilder.newError(ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, "mock error-message",
                 "mock app-tag", null, new Exception("mock cause"));
 
         validateRestConfError("mock error-message", ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, "mock app-tag",
                 new Contains("mock cause"), new RestconfError(rpcError));
 
         // Some fields set - expect error-info set to ErrorSeverity
-        rpcError = RpcResultBuilder.newError(
-                RpcError.ErrorType.RPC, ErrorTag.ACCESS_DENIED.elementBody(), null, null, null, null);
+        rpcError = RpcResultBuilder.newError(ErrorType.RPC, ErrorTag.ACCESS_DENIED, null, null, null, null);
 
         validateRestConfError(null, ErrorType.RPC, ErrorTag.ACCESS_DENIED, null, "<severity>error</severity>",
                 new RestconfError(rpcError));
 
         // 'tag' field not mapped to ErrorTag - expect error-tag set to OPERATION_FAILED
-        rpcError = RpcResultBuilder.newWarning(RpcError.ErrorType.TRANSPORT, "not mapped", null, null, null, null);
+        rpcError = RpcResultBuilder.newWarning(ErrorType.TRANSPORT, new ErrorTag("not mapped"), null, null, null, null);
 
         validateRestConfError(null, ErrorType.TRANSPORT, new ErrorTag("not mapped"), null,
                 "<severity>warning</severity>", new RestconfError(rpcError));
 
         // No fields set - edge case
-        rpcError = RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, null, null, null, null, null);
+        rpcError = RpcResultBuilder.newError(ErrorType.APPLICATION, null, null, null, null, null);
 
         validateRestConfError(null, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                 null, "<severity>error</severity>", new RestconfError(rpcError));

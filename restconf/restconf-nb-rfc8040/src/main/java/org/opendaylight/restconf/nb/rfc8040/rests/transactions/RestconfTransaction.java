@@ -13,7 +13,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * A handle to a set of operations being executed atomically on top of some backing store.
@@ -68,7 +68,7 @@ public abstract class RestconfTransaction {
      * @param data          the data object to be merged to the specified path
      * @param schemaContext static view of compiled yang files
      */
-    public abstract void create(YangInstanceIdentifier path, NormalizedNode data, SchemaContext schemaContext);
+    public abstract void create(YangInstanceIdentifier path, NormalizedNode data, EffectiveModelContext schemaContext);
 
     /**
      * Replace a piece of data at the specified path.
@@ -77,5 +77,5 @@ public abstract class RestconfTransaction {
      * @param data          the data object to be merged to the specified path
      * @param schemaContext static view of compiled yang files
      */
-    public abstract void replace(YangInstanceIdentifier path, NormalizedNode data, SchemaContext schemaContext);
+    public abstract void replace(YangInstanceIdentifier path, NormalizedNode data, EffectiveModelContext schemaContext);
 }

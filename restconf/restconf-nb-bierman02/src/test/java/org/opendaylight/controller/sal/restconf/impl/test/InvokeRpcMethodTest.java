@@ -22,7 +22,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -160,7 +159,7 @@ public class InvokeRpcMethodTest {
             .when(brokerFacade).invokeRpc(eq(qname), any());
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
         verifyRestconfDocumentedException(ex, 0, ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
             Optional.empty(), Optional.empty());
     }
@@ -189,17 +188,16 @@ public class InvokeRpcMethodTest {
 
     @Test
     public void testInvokeRpcWithNoPayloadRpc_FailWithRpcError() {
-        final List<RpcError> rpcErrors = Arrays.asList(
-                RpcResultBuilder.newError(RpcError.ErrorType.TRANSPORT, "bogusTag", "foo"),
-                RpcResultBuilder.newWarning(RpcError.ErrorType.RPC, "in-use", "bar",
-                        "app-tag", null, null));
+        final List<RpcError> rpcErrors = List.of(
+                RpcResultBuilder.newError(ErrorType.TRANSPORT, new ErrorTag("bogusTag"), "foo"),
+                RpcResultBuilder.newWarning(ErrorType.RPC, ErrorTag.IN_USE, "bar", "app-tag", null, null));
 
         final DOMRpcResult result = new DefaultDOMRpcResult(rpcErrors);
         final QName path = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(path), any());
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
 
         // We are performing pass-through here of error-tag, hence the tag remains as specified, but we want to make
         // sure the HTTP status remains the same as
@@ -220,7 +218,7 @@ public class InvokeRpcMethodTest {
 
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(qname), any());
 
-        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
+        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
         assertNotNull(output);
         assertEquals(null, output.getData());
         // additional validation in the fact that the restconfImpl does not
@@ -238,14 +236,14 @@ public class InvokeRpcMethodTest {
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(qname), any());
 
         WebApplicationException exceptionToBeThrown = assertThrows(WebApplicationException.class,
-            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), exceptionToBeThrown.getResponse().getStatus());
     }
 
     @Test
     public void testInvokeRpcMethodWithBadMethodName() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> this.restconfImpl.invokeRpc("toaster:bad-method", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster:bad-method", null, uriInfo));
         verifyRestconfDocumentedException(ex, 0, ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT,
             Optional.empty(), Optional.empty());
     }
@@ -281,7 +279,7 @@ public class InvokeRpcMethodTest {
 
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), any(NormalizedNode.class));
 
-        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:make-toast", payload, uriInfo);
+        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:make-toast", payload, uriInfo);
         assertNotNull(output);
         assertEquals(null, output.getData());
         // additional validation in the fact that the restconfImpl does not
@@ -291,7 +289,7 @@ public class InvokeRpcMethodTest {
     @Test
     public void testThrowExceptionWhenSlashInModuleName() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> this.restconfImpl.invokeRpc("toaster/slash", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster/slash", null, uriInfo));
         verifyRestconfDocumentedException(ex, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
             Optional.empty(), Optional.empty());
     }
@@ -330,7 +328,7 @@ public class InvokeRpcMethodTest {
 
         doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(rpcDef.getQName()), any());
 
-        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:testOutput", null, uriInfo);
+        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:testOutput", null, uriInfo);
         assertNotNull(output);
         assertNotNull(output.getData());
         assertSame(container, output.getData());
