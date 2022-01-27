@@ -33,6 +33,8 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRe
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
@@ -96,7 +98,7 @@ public abstract class WriteTransactionActorTestAdapter {
     @Test
     public void testSubmitFail() {
         final RpcError rpcError =
-                RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "fail", "fail");
+                RpcResultBuilder.newError(ErrorType.APPLICATION, new ErrorTag("fail"), "fail");
         final TransactionCommitFailedException cause = new TransactionCommitFailedException("fail", rpcError);
         when(mockWriteTx.commit()).thenReturn(FluentFutures.immediateFailedFluentFuture(cause));
         actorRef.tell(new SubmitRequest(), probe.ref());

@@ -27,7 +27,7 @@ import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfCallHomeTlsServer {
+public final class NetconfCallHomeTlsServer {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeTlsServer.class);
 
     private final String host;
