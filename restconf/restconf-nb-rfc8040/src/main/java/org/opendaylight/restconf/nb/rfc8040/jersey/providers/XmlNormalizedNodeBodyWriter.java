@@ -130,8 +130,24 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
                     .addChild((MapEntryNode) data)
                     .build());
             } else {
-                if (isRoot && data instanceof ContainerNode && ((ContainerNode) data).isEmpty()) {
-                    writeEmptyDataNode(xmlWriter, data);
+                if (isRoot) {
+                    if (data instanceof ContainerNode && ((ContainerNode) data).isEmpty()) {
+                        writeEmptyDataNode(xmlWriter, data);
+                    } else {
+                        final QName nodeType = data.getIdentifier().getNodeType();
+                        final String namespace = nodeType.getNamespace().toString();
+                        try {
+                            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,
+                                    nodeType.getLocalName(), namespace);
+                            xmlWriter.writeDefaultNamespace(namespace);
+
+                            nnWriter.write(data);
+                            xmlWriter.writeEndElement();
+                            xmlWriter.flush();
+                        } catch (XMLStreamException e) {
+                            throw new IOException("Failed to write elements", e);
+                        }
+                    }
                 } else {
                     nnWriter.write(data);
                 }
