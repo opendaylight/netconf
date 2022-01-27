@@ -35,7 +35,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
@@ -129,16 +128,40 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
                 nnWriter.write(ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
                     .addChild((MapEntryNode) data)
                     .build());
-            } else {
-                if (isRoot && data instanceof ContainerNode && ((ContainerNode) data).isEmpty()) {
+            } else if (isRoot) {
+                if (data instanceof ContainerNode && ((ContainerNode) data).isEmpty()) {
                     writeEmptyDataNode(xmlWriter, data);
                 } else {
-                    nnWriter.write(data);
+                    writeAndWrapInDataNode(xmlWriter, nnWriter, data);
                 }
+            } else {
+                nnWriter.write(data);
             }
         }
 
         nnWriter.flush();
+    }
+
+    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
+            final EffectiveModelContext schemaContext, final SchemaPath schemaPath, final DepthParam depth,
+            final List<Set<QName>> fields) {
+        return ParameterAwareNormalizedNodeWriter.forStreamWriter(
+            XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath), depth, fields);
+    }
+
+    private static void writeAndWrapInDataNode(final XMLStreamWriter xmlWriter,
+            final RestconfNormalizedNodeWriter nnWriter, final NormalizedNode data) throws IOException {
+        final QName nodeType = data.getIdentifier().getNodeType();
+        final String namespace = nodeType.getNamespace().toString();
+        try {
+            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
+            xmlWriter.writeDefaultNamespace(namespace);
+            nnWriter.write(data);
+            xmlWriter.writeEndElement();
+            xmlWriter.flush();
+        } catch (XMLStreamException e) {
+            throw new IOException("Failed to write elements", e);
+        }
     }
 
     private static void writeEmptyDataNode(final XMLStreamWriter xmlWriter, final NormalizedNode data)
@@ -155,21 +178,13 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
         }
     }
 
-    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-            final EffectiveModelContext schemaContext, final SchemaPath schemaPath, final DepthParam depth,
-            final List<Set<QName>> fields) {
-        final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter
-                .create(xmlWriter, schemaContext, schemaPath);
-        return ParameterAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth, fields);
-    }
-
     private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
             final ContainerNode data) throws IOException {
-        final QName name = data.getIdentifier().getNodeType();
+        final QName nodeType = data.getIdentifier().getNodeType();
+        final String namespace = nodeType.getNamespace().toString();
         try {
-            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,
-                    name.getLocalName(), name.getNamespace().toString());
-            xmlWriter.writeDefaultNamespace(name.getNamespace().toString());
+            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
+            xmlWriter.writeDefaultNamespace(namespace);
             for (final NormalizedNode child : data.body()) {
                 nnWriter.write(child);
             }
