@@ -21,7 +21,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.restconf.common.serializer.XmlDataTreeCandidateSerializer;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
@@ -49,9 +49,8 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
     }
 
     @Override
-    String createText(EffectiveModelContext schemaContext, Collection<DataTreeCandidate> input, Instant now,
-                      boolean leafNodesOnly, boolean skipData)
-            throws Exception {
+    String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
+                      final Instant now, final boolean leafNodesOnly, final boolean skipData) throws Exception {
         StringWriter writer = new StringWriter();
 
         final XMLStreamWriter xmlStreamWriter;

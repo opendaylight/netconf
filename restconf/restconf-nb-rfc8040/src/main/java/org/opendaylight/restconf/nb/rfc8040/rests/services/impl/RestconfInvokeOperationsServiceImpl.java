@@ -11,11 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
@@ -38,7 +38,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOpe
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -158,8 +157,8 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             final DOMRpcService rpcService) {
         return Futures.catching(rpcService.invokeRpc(rpc, nonnullInput(rpc, data)),
             DOMRpcException.class,
-            cause -> new DefaultDOMRpcResult(ImmutableList.of(RpcResultBuilder.newError(
-                RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))),
+            cause -> new DefaultDOMRpcResult(List.of(RpcResultBuilder.newError(ErrorType.RPC, ErrorTag.OPERATION_FAILED,
+                cause.getMessage()))),
             MoreExecutors.directExecutor());
     }
 

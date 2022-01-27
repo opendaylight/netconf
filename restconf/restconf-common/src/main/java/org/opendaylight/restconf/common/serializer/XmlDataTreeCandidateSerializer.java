@@ -9,6 +9,7 @@ package org.opendaylight.restconf.common.serializer;
 
 import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
@@ -17,8 +18,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -27,14 +28,14 @@ public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     private final EffectiveModelContext context;
     private final XMLStreamWriter xmlWriter;
 
-    public XmlDataTreeCandidateSerializer(EffectiveModelContext context, XMLStreamWriter xmlWriter) {
+    public XmlDataTreeCandidateSerializer(final EffectiveModelContext context, final XMLStreamWriter xmlWriter) {
         this.context = context;
         this.xmlWriter = xmlWriter;
     }
 
     @Override
-    void serializeData(Collection<PathArgument> nodePath, DataTreeCandidateNode candidate, boolean skipData)
-            throws Exception {
+    void serializeData(final Collection<PathArgument> nodePath, final DataTreeCandidateNode candidate,
+            final boolean skipData) throws IOException, XMLStreamException {
         final SchemaPath path = SchemaPath.create(nodePath.stream()
                 .filter(p -> !(p instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
                 .map(PathArgument::getNodeType).collect(Collectors.toList()), true);
@@ -58,14 +59,14 @@ public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     }
 
     @Override
-    public void serializePath(Collection<PathArgument> pathArguments) throws XMLStreamException {
+    public void serializePath(final Collection<PathArgument> pathArguments) throws XMLStreamException {
         xmlWriter.writeStartElement("path");
         xmlWriter.writeCharacters(convertPath(pathArguments));
         xmlWriter.writeEndElement();
     }
 
     @Override
-    public void serializeOperation(DataTreeCandidateNode candidate) throws XMLStreamException {
+    public void serializeOperation(final DataTreeCandidateNode candidate) throws XMLStreamException {
         xmlWriter.writeStartElement("operation");
         xmlWriter.writeCharacters(modificationTypeToOperation(candidate, candidate.getModificationType()));
         xmlWriter.writeEndElement();
