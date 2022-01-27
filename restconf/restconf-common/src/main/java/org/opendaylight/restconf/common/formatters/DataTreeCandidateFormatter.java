@@ -22,8 +22,8 @@ import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
@@ -34,17 +34,16 @@ import org.w3c.dom.Element;
  */
 @Beta
 public abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<DataTreeCandidate>> {
-
     protected DataTreeCandidateFormatter() {
     }
 
-    public DataTreeCandidateFormatter(String xpathFilter) throws XPathExpressionException {
+    public DataTreeCandidateFormatter(final String xpathFilter) throws XPathExpressionException {
         super(xpathFilter);
     }
 
     @Override
-    final void fillDocument(Document doc, EffectiveModelContext schemaContext, Collection<DataTreeCandidate> input)
-            throws IOException {
+    final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
+            final Collection<DataTreeCandidate> input) throws IOException {
         final Element notificationElement = doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
                 "notification");
         final Element eventTimeElement = doc.createElement("eventTime");
