@@ -15,7 +15,6 @@ import akka.dispatch.OnComplete;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -205,8 +204,6 @@ public class ProxyNetconfService implements NetconfDataTreeService {
         }
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void executePriorNetconfOperations(final ProxyNetconfServiceFacade newNetconfFacade) {
         while (true) {
             // Access to queuedOperations and netconfFacade must be protected and atomic

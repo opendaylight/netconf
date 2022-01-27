@@ -54,7 +54,7 @@ public class NetconfClientConfiguration {
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
         this.sessionListener = sessionListener;
-        this.clientProtocol = protocol;
+        clientProtocol = protocol;
         this.reconnectStrategy = reconnectStrategy;
         this.authHandler = authHandler;
         this.sslHandlerFactory = sslHandlerFactory;
@@ -122,15 +122,15 @@ public class NetconfClientConfiguration {
         }
     }
 
-    protected void validateTlsConfiguration() {
+    protected final void validateTlsConfiguration() {
         requireNonNull(sslHandlerFactory, "sslHandlerFactory");
     }
 
-    protected void validateSshConfiguration() {
+    protected final void validateSshConfiguration() {
         requireNonNull(authHandler, "authHandler");
     }
 
-    protected void validateTcpConfiguration() {
+    protected final void validateTcpConfiguration() {
         requireNonNull(address, "address");
         requireNonNull(clientProtocol, "clientProtocol");
         requireNonNull(connectionTimeoutMillis, "connectionTimeoutMillis");

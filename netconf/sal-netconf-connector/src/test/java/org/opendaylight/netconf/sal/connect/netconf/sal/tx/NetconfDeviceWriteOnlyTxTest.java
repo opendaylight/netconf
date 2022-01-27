@@ -21,7 +21,8 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
@@ -42,8 +43,9 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -62,11 +64,11 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() {
-        final FluentFuture<DefaultDOMRpcResult> successFuture =
-                FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null));
+        final ListenableFuture<DefaultDOMRpcResult> successFuture =
+                Futures.immediateFuture(new DefaultDOMRpcResult((NormalizedNode) null));
 
         doReturn(successFuture)
-                .doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("Failed tx")))
+                .doReturn(Futures.immediateFailedFuture(new IllegalStateException("Failed tx")))
                 .doReturn(successFuture)
                 .when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
 
@@ -114,11 +116,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testFailedCommit() throws Exception {
-        final FluentFuture<DefaultDOMRpcResult> rpcErrorFuture = FluentFutures.immediateFluentFuture(
-                new DefaultDOMRpcResult(RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "a", "m")));
-
-        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
-                .doReturn(rpcErrorFuture).when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((NormalizedNode) null)))
+            .doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(RpcResultBuilder.newError(ErrorType.APPLICATION,
+                new ErrorTag("a"), "m")))).when(rpc).invokeRpc(any(QName.class), any(ContainerNode.class));
 
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
                 false);

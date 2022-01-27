@@ -17,7 +17,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,7 +42,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +86,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     @Override
     public void create(final YangInstanceIdentifier path, final NormalizedNode data,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
             merge(YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
@@ -103,7 +102,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     @Override
     public void replace(final YangInstanceIdentifier path, final NormalizedNode data,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
             merge(YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
@@ -176,8 +175,6 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         return FluentFuture.from(commitResult);
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private List<ListenableFuture<?>> discardAndUnlock() {
         // execute discard & unlock operations only if lock operation was completed successfully
         if (isLocked) {
@@ -245,8 +242,6 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         }, MoreExecutors.directExecutor());
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static TransactionCommitFailedException toCommitFailedException(
             final Collection<? extends RpcError> errors) {
         ErrorType errType = ErrorType.APPLICATION;
@@ -254,11 +249,11 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         StringJoiner msgBuilder = new StringJoiner(" ");
         ErrorTag errorTag = ErrorTag.OPERATION_FAILED;
         for (final RpcError error : errors) {
-            errType = error.getErrorType().toNetconf();
-            errSeverity = error.getSeverity().toNetconf();
+            errType = error.getErrorType();
+            errSeverity = error.getSeverity();
             msgBuilder.add(error.getMessage());
             msgBuilder.add(error.getInfo());
-            errorTag = new ErrorTag(error.getTag());
+            errorTag = error.getTag();
         }
 
         return new TransactionCommitFailedException("Netconf transaction commit failed",
@@ -284,9 +279,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         }, MoreExecutors.directExecutor());
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static boolean allWarnings(final Collection<? extends @NonNull RpcError> errors) {
-        return errors.stream().allMatch(error -> error.getSeverity() == RpcError.ErrorSeverity.WARNING);
+        return errors.stream().allMatch(error -> error.getSeverity() == ErrorSeverity.WARNING);
     }
 }
