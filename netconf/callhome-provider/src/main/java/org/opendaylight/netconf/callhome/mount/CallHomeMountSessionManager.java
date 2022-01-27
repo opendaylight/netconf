@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.PublicKey;
@@ -63,8 +62,6 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
         contextByPublicKey.remove(session.getRemoteServerKey(), deviceContext);
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void onClosed(final CallHomeMountSessionContext deviceContext, final CloseCallback onCloseHandler) {
         onClosed(deviceContext);
         onCloseHandler.onClosed(deviceContext);

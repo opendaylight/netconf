@@ -490,7 +490,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
     private static final class Augmentation extends AbstractDataContainer<AugmentationIdentifier> {
         Augmentation(final AugmentationSchemaNode augmentation, final DataNodeContainer schema) {
             super(DataSchemaContextNode.augmentationIdentifierFrom(augmentation),
-                    EffectiveAugmentationSchema.create(augmentation, schema));
+                    new EffectiveAugmentationSchema(augmentation, schema));
         }
 
         @Override

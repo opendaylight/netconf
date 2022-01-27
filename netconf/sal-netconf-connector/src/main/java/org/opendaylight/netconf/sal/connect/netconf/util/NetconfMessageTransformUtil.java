@@ -313,10 +313,9 @@ public final class NetconfMessageTransformUtil {
         }
 
         return ex.getErrorSeverity() == ErrorSeverity.ERROR
-                ? RpcResultBuilder.newError(ex.getErrorType().toLegacy(), ex.getErrorTag().elementBody(),
+                ? RpcResultBuilder.newError(ex.getErrorType(), ex.getErrorTag(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause())
-                : RpcResultBuilder.newWarning(
-                        ex.getErrorType().toLegacy(), ex.getErrorTag().elementBody(),
+                : RpcResultBuilder.newWarning(ex.getErrorType(), ex.getErrorTag(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
     }
 

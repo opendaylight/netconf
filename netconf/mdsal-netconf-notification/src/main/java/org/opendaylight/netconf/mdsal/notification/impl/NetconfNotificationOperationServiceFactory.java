@@ -17,8 +17,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 
-public class NetconfNotificationOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
-
+public final class NetconfNotificationOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
     private final NetconfNotificationRegistry netconfNotificationRegistry;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
@@ -42,7 +41,7 @@ public class NetconfNotificationOperationServiceFactory implements NetconfOperat
     }
 
     @Override
-    public NetconfOperationService createService(String netconfSessionIdForReporting) {
+    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
         return new NetconfNotificationOperationService(netconfSessionIdForReporting, netconfNotificationRegistry);
     }
 
@@ -53,6 +52,6 @@ public class NetconfNotificationOperationServiceFactory implements NetconfOperat
 
     @Override
     public void close() {
-        this.netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
+        netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
     }
 }

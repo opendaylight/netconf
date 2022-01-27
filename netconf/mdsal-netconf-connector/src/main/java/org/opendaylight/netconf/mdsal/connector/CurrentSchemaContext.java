@@ -24,16 +24,29 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 // Non-final for mocking
+@SuppressWarnings("checkstyle:FinalClass")
 public class CurrentSchemaContext implements EffectiveModelContextListener, AutoCloseable {
     private final AtomicReference<EffectiveModelContext> currentContext = new AtomicReference<>();
-    private final ListenerRegistration<?> schemaContextListenerListenerRegistration;
+    private ListenerRegistration<?> schemaContextListenerListenerRegistration;
     private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(new HashSet<>());
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
 
-    public CurrentSchemaContext(final DOMSchemaService schemaService,
-                                final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
+    private CurrentSchemaContext(final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
         this.rootSchemaSourceProvider = rootSchemaSourceProvider;
-        schemaContextListenerListenerRegistration = schemaService.registerSchemaContextListener(this);
+    }
+
+    // keep spotbugs from complaining about overridable method in constructor
+    public static CurrentSchemaContext create(final DOMSchemaService schemaService,
+                         final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
+        var context = new CurrentSchemaContext(rootSchemaSourceProvider);
+        final ListenerRegistration<EffectiveModelContextListener> registration =
+                schemaService.registerSchemaContextListener(context);
+        context.setRegistration(registration);
+        return context;
+    }
+
+    private void setRegistration(ListenerRegistration<EffectiveModelContextListener> registration) {
+        schemaContextListenerListenerRegistration = registration;
     }
 
     public @NonNull EffectiveModelContext getCurrentContext() {
