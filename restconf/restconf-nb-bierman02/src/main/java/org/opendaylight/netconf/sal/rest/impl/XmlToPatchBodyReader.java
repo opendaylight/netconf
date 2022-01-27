@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import static com.google.common.base.Verify.verify;
-import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -62,6 +61,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -153,20 +153,25 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             // target can be also empty (only slash)
             YangInstanceIdentifier targetII;
             final SchemaNode targetNode;
+            final Inference inference;
             if (target.equals("/")) {
                 targetII = pathContext.getInstanceIdentifier();
                 targetNode = pathContext.getSchemaContext();
+                inference = SchemaInferenceStack.of(pathContext.getSchemaContext()).toInference();
             } else {
                 targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
                         .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
                                 namespace,
                                 module.getQNameModule().getRevision().map(Revision::toString).orElse(null))));
                 // move schema node
-                schemaNode = verifyNotNull(codec.getDataContextTree().findChild(targetII).orElseThrow()
-                    .getDataSchemaNode());
+                final var result = codec.getDataContextTree().enterPath(targetII).orElseThrow();
+                schemaNode = result.node().getDataSchemaNode();
 
-                final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();
+                final var stack = result.stack();
+                inference = stack.toInference();
+
+                stack.exit();
+                final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
                 verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                 targetNode = (SchemaNode) parentStmt;
             }
@@ -179,12 +184,10 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
 
             if (oper.isWithValue()) {
                 final NormalizedNode parsed;
-                if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
+                if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
                     final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer,
-                        SchemaInferenceStack.ofInstantiatedPath(pathContext.getSchemaContext(), schemaNode.getPath())
-                            .toInference());
+                    final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
                     xmlParser.traverse(new DOMSource(firstValueElement));
                     parsed = resultHolder.getResult();
                 } else {

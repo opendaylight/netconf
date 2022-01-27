@@ -43,7 +43,8 @@ import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
@@ -64,12 +65,11 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
         }
 
         final InstanceIdentifierContext identifierCtx = context.getInstanceIdentifierContext();
-        final SchemaPath path = identifierCtx.getSchemaNode().getPath();
         final var pretty = context.getWriterParameters().prettyPrint();
 
         try (JsonWriter jsonWriter = createJsonWriter(entityStream, pretty == null ? false : pretty.value())) {
             jsonWriter.beginObject();
-            writeNormalizedNode(jsonWriter, path, identifierCtx, data,
+            writeNormalizedNode(jsonWriter, identifierCtx, data,
                     context.getWriterParameters().depth(), context.getWriterParameters().fields());
             jsonWriter.endObject();
             jsonWriter.flush();
@@ -82,47 +82,54 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
         }
     }
 
-    private static void writeNormalizedNode(final JsonWriter jsonWriter,
-            final SchemaPath path, final InstanceIdentifierContext context, final NormalizedNode data,
-            final DepthParam depth, final List<Set<QName>> fields) throws IOException {
+    private static void writeNormalizedNode(final JsonWriter jsonWriter, final InstanceIdentifierContext context,
+            final NormalizedNode data, final DepthParam depth, final List<Set<QName>> fields) throws IOException {
+        final SchemaNode schemaNode = context.getSchemaNode();
         final RestconfNormalizedNodeWriter nnWriter;
+        if (schemaNode instanceof RpcDefinition) {
+            final var rpc = (RpcDefinition) schemaNode;
+            final var stack = SchemaInferenceStack.of(context.getSchemaContext());
+            stack.enterSchemaTree(rpc.getQName());
+            stack.enterSchemaTree(rpc.getOutput().getQName());
 
-        if (context.getSchemaNode() instanceof RpcDefinition) {
             /*
-             *  RpcDefinition is not supported as initial codec in JSONStreamWriter,
-             *  so we need to emit initial output declaration..
+             * RpcDefinition is not supported as initial codec in JSONStreamWriter,
+             * so we need to emit initial output declaration..
              */
             nnWriter = createNormalizedNodeWriter(
                     context,
-                    ((RpcDefinition) context.getSchemaNode()).getOutput().getPath(),
+                    stack.toInference(),
                     jsonWriter,
                     depth,
                     fields);
             final Module module = context.getSchemaContext().findModule(data.getIdentifier().getNodeType().getModule())
-                .get();
+                .orElseThrow();
             jsonWriter.name(module.getName() + ":output");
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
             jsonWriter.endObject();
-        } else if (context.getSchemaNode() instanceof ActionDefinition) {
+        } else if (schemaNode instanceof ActionDefinition) {
             /*
-             *  ActionDefinition is not supported as initial codec in JSONStreamWriter,
-             *  so we need to emit initial output declaration..
+             * ActionDefinition is not supported as initial codec in JSONStreamWriter,
+             * so we need to emit initial output declaration..
              */
-            nnWriter = createNormalizedNodeWriter(context,
-                ((ActionDefinition) context.getSchemaNode()).getOutput().getPath(), jsonWriter, depth, fields);
+            final var action = (ActionDefinition) schemaNode;
+            final var stack = context.inference().toSchemaInferenceStack();
+            stack.enterSchemaTree(action.getOutput().getQName());
+
+            nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields);
             final Module module = context.getSchemaContext().findModule(data.getIdentifier().getNodeType().getModule())
-                .get();
+                .orElseThrow();
             jsonWriter.name(module.getName() + ":output");
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
             jsonWriter.endObject();
         } else {
-            if (SchemaPath.ROOT.equals(path)) {
-                nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth, fields);
-            } else {
-                nnWriter = createNormalizedNodeWriter(context, path.getParent(), jsonWriter, depth, fields);
+            final var stack = context.inference().toSchemaInferenceStack();
+            if (!stack.isEmpty()) {
+                stack.exit();
             }
+            nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth, fields);
 
             if (data instanceof MapEntryNode) {
                 // Restconf allows returning one list item. We need to wrap it
@@ -146,14 +153,14 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
-            final InstanceIdentifierContext context, final SchemaPath path, final JsonWriter jsonWriter,
+            final InstanceIdentifierContext context, final Inference inference, final JsonWriter jsonWriter,
             final DepthParam depth, final List<Set<QName>> fields) {
 
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
 
         final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
-                codecs, path, initialNamespaceFor(schema), jsonWriter);
+                codecs, inference, initialNamespaceFor(schema), jsonWriter);
 
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
     }

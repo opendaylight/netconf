@@ -27,6 +27,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractFieldsTranslatorTest<T> {
@@ -98,13 +99,13 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     public void setUp() throws Exception {
         final EffectiveModelContext schemaContextJukebox =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
-        identifierJukebox = InstanceIdentifierContext.ofDataSchemaNode(schemaContextJukebox,
-            schemaContextJukebox.getDataChildByName(JUKEBOX_Q_NAME));
+        identifierJukebox = InstanceIdentifierContext.ofStack(
+            SchemaInferenceStack.ofDataTreePath(schemaContextJukebox, JUKEBOX_Q_NAME));
 
         final EffectiveModelContext schemaContextTestServices =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/test-services"));
-        identifierTestServices = InstanceIdentifierContext.ofDataSchemaNode(schemaContextTestServices,
-            schemaContextTestServices.getDataChildByName(TEST_DATA_Q_NAME));
+        identifierTestServices = InstanceIdentifierContext.ofStack(
+            SchemaInferenceStack.ofDataTreePath(schemaContextTestServices, TEST_DATA_Q_NAME));
     }
 
     protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields);

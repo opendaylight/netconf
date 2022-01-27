@@ -18,10 +18,8 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 @Path("/")
 public class RestconfImpl implements RestconfService {
@@ -37,20 +35,13 @@ public class RestconfImpl implements RestconfService {
     public NormalizedNodePayload getLibraryVersion() {
         final EffectiveModelContext context = schemaContextHandler.get();
 
-        // FIXME: why are we going through a grouping here?!
-        final GroupingDefinition grouping = context
-            .findModule(Restconf.QNAME.getModule())
-            .orElseThrow(() -> new IllegalStateException("Failed to find restcibf module"))
-            .getGroupings().stream()
-            .filter(grp -> Restconf.QNAME.equals(grp.getQName()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("Failed to find restconf grouping"));
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(context);
+        // FIXME: use rc:data instantiation once the stack supports it
+        stack.enterGrouping(Restconf.QNAME);
+        stack.enterDataTree(Restconf.QNAME);
+        stack.enterDataTree(YANG_LIBRARY_VERSION);
 
-        final LeafSchemaNode schemaNode =
-            (LeafSchemaNode) ((ContainerSchemaNode) grouping.getDataChildByName(Restconf.QNAME))
-            .getDataChildByName(YANG_LIBRARY_VERSION);
-
-        return NormalizedNodePayload.of(InstanceIdentifierContext.ofDataSchemaNode(context, schemaNode, null),
+        return NormalizedNodePayload.of(InstanceIdentifierContext.ofStack(stack),
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, IetfYangLibrary.REVISION.toString()));
     }
 }
