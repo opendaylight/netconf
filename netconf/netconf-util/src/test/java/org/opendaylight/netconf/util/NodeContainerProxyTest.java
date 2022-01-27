@@ -26,7 +26,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NodeContainerProxyTest {
@@ -46,19 +45,13 @@ public class NodeContainerProxyTest {
 
     @Before
     public void setUp() {
-        proxy = new NodeContainerProxy(QNAME, SchemaPath.SAME,
-            Map.of(NODE_1_QNAME, schemaNode1, NODE_2_QNAME, schemaNode2), Set.of(augSchema1, augSchema2));
+        proxy = new NodeContainerProxy(QNAME, Map.of(NODE_1_QNAME, schemaNode1, NODE_2_QNAME, schemaNode2),
+            Set.of(augSchema1, augSchema2));
     }
 
     @Test
     public void testGetQName() {
         assertSame(QNAME, proxy.getQName());
-    }
-
-    @Test
-    @Deprecated
-    public void testGetPath() {
-        assertSame(SchemaPath.SAME, proxy.getPath());
     }
 
     @Test
