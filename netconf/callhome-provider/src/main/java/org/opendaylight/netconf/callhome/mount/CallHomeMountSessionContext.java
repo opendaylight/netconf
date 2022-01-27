@@ -10,7 +10,6 @@ package org.opendaylight.netconf.callhome.mount;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.Future;
 import java.math.BigDecimal;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -149,8 +148,6 @@ class CallHomeMountSessionContext {
         };
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void removeSelf() {
         onClose.onClosed(this);
     }
