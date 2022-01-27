@@ -23,7 +23,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
 import org.opendaylight.yangtools.yang.model.api.MustDefinition;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
@@ -31,7 +30,6 @@ import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatemen
 final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNode implements ContainerSchemaNode {
     // There is no need to intern this nor add a revision, as we are providing the corresponding context anyway
     static final @NonNull QName QNAME = QName.create(OperationsRestconfModule.NAMESPACE, "operations");
-    static final @NonNull SchemaPath PATH = SchemaPath.create(true, QNAME);
 
     private final Map<QName, OperationsLeafSchemaNode> children;
 
@@ -42,12 +40,6 @@ final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNod
     @Override
     public QName getQName() {
         return QNAME;
-    }
-
-    @Override
-    @Deprecated
-    public SchemaPath getPath() {
-        return PATH;
     }
 
     @Override

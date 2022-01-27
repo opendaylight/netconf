@@ -14,7 +14,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.MustDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.LeafEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.ri.type.BaseTypes;
@@ -23,7 +22,7 @@ final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode imp
     private final QName qname;
 
     OperationsLeafSchemaNode(final RpcDefinition rpc) {
-        this.qname = rpc.getQName();
+        qname = rpc.getQName();
     }
 
     @Override
@@ -34,12 +33,6 @@ final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode imp
     @Override
     public QName getQName() {
         return qname;
-    }
-
-    @Override
-    @Deprecated
-    public SchemaPath getPath() {
-        return OperationsContainerSchemaNode.PATH.createChild(getQName());
     }
 
     @Override

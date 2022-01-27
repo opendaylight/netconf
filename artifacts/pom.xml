@@ -14,7 +14,7 @@
     <parent>
       <groupId>org.opendaylight.odlparent</groupId>
       <artifactId>odlparent-lite</artifactId>
-      <version>9.0.13</version>
+      <version>10.0.0</version>
       <relativePath/>
     </parent>
 
@@ -466,17 +466,7 @@
             <!-- RESTCONF -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>ietf-restconf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>ietf-restconf-monitoring</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>ietf-yang-patch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

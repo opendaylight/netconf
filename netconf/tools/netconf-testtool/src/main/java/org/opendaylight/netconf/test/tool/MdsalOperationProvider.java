@@ -127,7 +127,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         public Set<NetconfOperation> getNetconfOperations() {
             TransactionProvider transactionProvider = new TransactionProvider(
                 dataBroker, String.valueOf(currentSessionId));
-            CurrentSchemaContext currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
+            CurrentSchemaContext currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
 
             ContainerNode netconf = createNetconfState();
 
