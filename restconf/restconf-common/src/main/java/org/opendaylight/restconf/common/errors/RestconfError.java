@@ -134,13 +134,13 @@ public class RestconfError implements Serializable {
      */
     public RestconfError(final RpcError rpcError) {
 
-        this.errorType = rpcError.getErrorType().toNetconf();
+        errorType = rpcError.getErrorType();
 
-        final String tag = rpcError.getTag();
-        this.errorTag = tag == null ? ErrorTag.OPERATION_FAILED : new ErrorTag(tag);
+        final ErrorTag tag = rpcError.getTag();
+        errorTag = tag != null ? tag : ErrorTag.OPERATION_FAILED;
 
-        this.errorMessage = rpcError.getMessage();
-        this.errorAppTag = rpcError.getApplicationTag();
+        errorMessage = rpcError.getMessage();
+        errorAppTag = rpcError.getApplicationTag();
 
         String localErrorInfo = null;
         if (rpcError.getInfo() == null) {
@@ -154,8 +154,8 @@ public class RestconfError implements Serializable {
             localErrorInfo = rpcError.getInfo();
         }
 
-        this.errorInfo = localErrorInfo;
-        this.errorPath = null;
+        errorInfo = localErrorInfo;
+        errorPath = null;
     }
 
     public ErrorType getErrorType() {

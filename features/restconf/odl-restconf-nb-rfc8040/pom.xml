@@ -22,6 +22,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc8072</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-controller-exp-netty-config</artifactId>
             <type>xml</type>

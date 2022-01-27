@@ -254,11 +254,11 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
         StringJoiner msgBuilder = new StringJoiner(" ");
         ErrorTag errorTag = ErrorTag.OPERATION_FAILED;
         for (final RpcError error : errors) {
-            errType = error.getErrorType().toNetconf();
-            errSeverity = error.getSeverity().toNetconf();
+            errType = error.getErrorType();
+            errSeverity = error.getSeverity();
             msgBuilder.add(error.getMessage());
             msgBuilder.add(error.getInfo());
-            errorTag = new ErrorTag(error.getTag());
+            errorTag = error.getTag();
         }
 
         return new TransactionCommitFailedException("Netconf transaction commit failed",
@@ -287,6 +287,6 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
         justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static boolean allWarnings(final Collection<? extends @NonNull RpcError> errors) {
-        return errors.stream().allMatch(error -> error.getSeverity() == RpcError.ErrorSeverity.WARNING);
+        return errors.stream().allMatch(error -> error.getSeverity() == ErrorSeverity.WARNING);
     }
 }
