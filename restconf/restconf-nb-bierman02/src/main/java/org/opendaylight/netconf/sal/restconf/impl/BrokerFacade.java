@@ -91,7 +91,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -790,7 +789,7 @@ public class BrokerFacade implements Closeable {
 
     private void insertWithPointLeafListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
-            final SchemaContext schemaContext, final String point, final UserLeafSetNode<?> readLeafList,
+            final EffectiveModelContext schemaContext, final String point, final UserLeafSetNode<?> readLeafList,
             final boolean before) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext instanceIdentifier = controllerContext.toInstanceIdentifier(point);
@@ -821,7 +820,7 @@ public class BrokerFacade implements Closeable {
 
     private void insertWithPointListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode payload, final SchemaContext schemaContext,
+            final YangInstanceIdentifier path, final NormalizedNode payload, final EffectiveModelContext schemaContext,
             final String point, final MapNode readList, final boolean before) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext instanceIdentifier = controllerContext.toInstanceIdentifier(point);
@@ -875,7 +874,7 @@ public class BrokerFacade implements Closeable {
 
     private void makeNormalPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         final Collection<? extends NormalizedNode> children;
         if (payload instanceof MapNode) {
             children = ((MapNode) payload).body();
@@ -937,7 +936,7 @@ public class BrokerFacade implements Closeable {
 
     private void simplePostPut(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         checkItemDoesNotExists(rwTransaction, datastore, path);
         if (isMounted != null && !isMounted.get()) {
             ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
@@ -1106,7 +1105,7 @@ public class BrokerFacade implements Closeable {
 
     private void insertWithPointLeafListPut(final DOMDataTreeWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
-            final SchemaContext schemaContext, final String point, final UserLeafSetNode<?> readLeafList,
+            final EffectiveModelContext schemaContext, final String point, final UserLeafSetNode<?> readLeafList,
             final boolean before) {
         tx.delete(datastore, path.getParent());
         final InstanceIdentifierContext instanceIdentifier = controllerContext.toInstanceIdentifier(point);
@@ -1134,7 +1133,7 @@ public class BrokerFacade implements Closeable {
     }
 
     private void insertWithPointListPut(final DOMDataTreeWriteTransaction tx, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode payload, final SchemaContext schemaContext,
+            final YangInstanceIdentifier path, final NormalizedNode payload, final EffectiveModelContext schemaContext,
             final String point, final UserMapNode readList, final boolean before) {
         tx.delete(datastore, path.getParent());
         final InstanceIdentifierContext instanceIdentifier = controllerContext.toInstanceIdentifier(point);
@@ -1162,7 +1161,8 @@ public class BrokerFacade implements Closeable {
     }
 
     private void makePut(final DOMDataTreeWriteTransaction tx, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode payload, final SchemaContext schemaContext) {
+            final YangInstanceIdentifier path, final NormalizedNode payload,
+            final EffectiveModelContext schemaContext) {
         if (payload instanceof MapNode) {
             final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             if (isMounted != null && !isMounted.get()) {
@@ -1179,7 +1179,8 @@ public class BrokerFacade implements Closeable {
     }
 
     private void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-            final DOMDataTreeWriteTransaction tx, final SchemaContext schemaContext, final NormalizedNode payload) {
+            final DOMDataTreeWriteTransaction tx, final EffectiveModelContext schemaContext,
+            final NormalizedNode payload) {
         if (isMounted != null && !isMounted.get()) {
             ensureParentsByMerge(datastore, path, tx, schemaContext);
         }
@@ -1203,7 +1204,7 @@ public class BrokerFacade implements Closeable {
 
     private static void mergeDataWithinTransaction(final DOMDataTreeWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode payload,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
         ensureParentsByMerge(datastore, path, tx, schemaContext);
 
@@ -1225,7 +1226,7 @@ public class BrokerFacade implements Closeable {
 
     private static void ensureParentsByMerge(final LogicalDatastoreType store,
             final YangInstanceIdentifier normalizedPath, final DOMDataTreeWriteTransaction tx,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
         YangInstanceIdentifier rootNormalizedPath = null;
 

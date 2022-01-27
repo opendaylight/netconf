@@ -15,7 +15,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +31,8 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -333,7 +332,7 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
     }
 
     final void setLockAllowed(final boolean isLockAllowedOrig) {
-        this.isLockAllowed = isLockAllowedOrig;
+        isLockAllowed = isLockAllowedOrig;
     }
 
     abstract ListenableFuture<? extends DOMRpcResult> editConfig(DataContainerChild editStructure,
@@ -360,8 +359,6 @@ public abstract class AbstractNetconfDataTreeService implements NetconfDataTreeS
         }, MoreExecutors.directExecutor());
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static boolean allWarnings(final Collection<? extends @NonNull RpcError> errors) {
         return errors.stream().allMatch(error -> error.getSeverity() == ErrorSeverity.WARNING);
     }

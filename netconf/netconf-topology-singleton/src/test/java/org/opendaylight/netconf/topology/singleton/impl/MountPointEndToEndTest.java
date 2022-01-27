@@ -139,9 +139,10 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.common.RpcError.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -505,8 +506,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         testPutTopRpc(domRpcService, new DefaultDOMRpcResult((NormalizedNode)null));
         testPutTopRpc(domRpcService, null);
         testPutTopRpc(domRpcService, new DefaultDOMRpcResult(ImmutableList.of(
-                RpcResultBuilder.newError(ErrorType.APPLICATION, "tag1", "error1"),
-                RpcResultBuilder.newError(ErrorType.APPLICATION, "tag2", "error2"))));
+                RpcResultBuilder.newError(ErrorType.APPLICATION, new ErrorTag("tag1"), "error1"),
+                RpcResultBuilder.newError(ErrorType.APPLICATION, new ErrorTag("tag2"), "error2"))));
 
         testGetTopRpc(domRpcService, new DefaultDOMRpcResult(bindingToNormalized.toNormalizedNodeRpcData(
                 new GetTopOutputBuilder().setTopLevelList(oneTopLevelList()).build())));

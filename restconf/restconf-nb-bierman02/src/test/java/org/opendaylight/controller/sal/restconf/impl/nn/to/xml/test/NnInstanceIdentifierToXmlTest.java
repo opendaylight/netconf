@@ -42,6 +42,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
     private static EffectiveModelContext schemaContext;
@@ -137,8 +138,9 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
                 .withValue("/instanceidentifier/").build());
         dataCont.withChild(dataCont1.build());
 
-        return new NormalizedNodeContext(InstanceIdentifierContext.ofDataSchemaNode(schemaContext, schemaCont),
-                dataCont.build());
+        return new NormalizedNodeContext(
+            InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(schemaContext, cont)),
+            dataCont.build());
     }
 
     @Test
@@ -233,7 +235,8 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         dataCont1.withChild(dataLst11.build());
         dataCont.withChild(dataCont1.build());
 
-        return new NormalizedNodeContext(InstanceIdentifierContext.ofDataSchemaNode(schemaContext, schemaCont),
+        return new NormalizedNodeContext(
+            InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(schemaContext, cont)),
             dataCont.build());
     }
 

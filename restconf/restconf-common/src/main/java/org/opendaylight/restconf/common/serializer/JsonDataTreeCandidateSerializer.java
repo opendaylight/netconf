@@ -16,11 +16,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 public class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<IOException> {
     private final JSONCodecFactorySupplier codecSupplier;
@@ -34,11 +34,10 @@ public class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer
     }
 
     @Override
-    void serializeData(final EffectiveModelContext context, final SchemaPath schemaPath,
-            final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate, final boolean skipData)
-                throws IOException {
+    void serializeData(final Inference parent, final Collection<PathArgument> dataPath,
+            final DataTreeCandidateNode candidate, final boolean skipData) throws IOException {
         NormalizedNodeStreamWriter nestedWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
-            codecSupplier.getShared(context), schemaPath.getParent(), null, jsonWriter);
+            codecSupplier.getShared(parent.getEffectiveModelContext()), parent, null, jsonWriter);
         jsonWriter.beginObject();
         serializePath(dataPath);
 

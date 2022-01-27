@@ -22,24 +22,24 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yangtools.yang.binding.DataObject;
+import org.opendaylight.yangtools.yang.binding.ChildOf;
+import org.opendaylight.yangtools.yang.binding.DataRoot;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class OperationalDatastoreListenerTest {
-
     @Mock
     private DataBroker dataBroker;
 
     @Test
     public void testDataStoreListener() {
-        final InstanceIdentifier<DataObject> instanceIdentifier = InstanceIdentifier.create(DataObject.class);
-        final DataTreeIdentifier<DataObject> testId =
+        final InstanceIdentifier<TestInterface> instanceIdentifier = InstanceIdentifier.create(TestInterface.class);
+        final DataTreeIdentifier<TestInterface> testId =
                 DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, instanceIdentifier);
 
         final var op = new OperationalDatastoreListener<>(instanceIdentifier) {
             @Override
-            public void onDataTreeChanged(final Collection<DataTreeModification<DataObject>> collection) {
+            public void onDataTreeChanged(final Collection<DataTreeModification<TestInterface>> collection) {
                 // no-op
             }
         };
@@ -51,5 +51,12 @@ public class OperationalDatastoreListenerTest {
 
         assertEquals(testId, argumentId.getValue());
 
+    }
+
+    interface TestInterface extends ChildOf<DataRoot> {
+        @Override
+        default Class<TestInterface> implementedInterface() {
+            return TestInterface.class;
+        }
     }
 }

@@ -21,12 +21,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.ModificationType;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
+import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,19 +91,24 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
             final boolean skipData) throws T {
+        var stack = SchemaInferenceStack.of(context);
         var current = DataSchemaContextTree.from(context).getRoot();
         for (var arg : dataPath) {
-            final var next = verifyNotNull(current.getChild(arg),
+            final var next = verifyNotNull(current.enterChild(stack, arg),
                 "Failed to resolve %s: cannot find %s in %s", dataPath, arg, current);
             current = next;
         }
-        final var schemaPath = verifyNotNull(current.getDataSchemaNode(),
-            "Path %s resolved to non-data %s", dataPath, current).getPath();
-        serializeData(context, schemaPath, dataPath, candidate, skipData);
+
+        // Exit to parent if needed
+        if (!stack.isEmpty()) {
+            stack.exit();
+        }
+
+        serializeData(stack.toInference(), dataPath, candidate, skipData);
     }
 
-    abstract void serializeData(EffectiveModelContext context, SchemaPath schemaPath, Collection<PathArgument> dataPath,
-            DataTreeCandidateNode candidate, boolean skipData) throws T;
+    abstract void serializeData(Inference parent, Collection<PathArgument> dataPath, DataTreeCandidateNode candidate,
+        boolean skipData) throws T;
 
     abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
 

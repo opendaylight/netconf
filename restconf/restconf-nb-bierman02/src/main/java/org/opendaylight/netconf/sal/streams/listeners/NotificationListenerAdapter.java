@@ -38,12 +38,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * {@link NotificationListenerAdapter} is responsible to track events on
- * notifications.
- *
+ * {@link NotificationListenerAdapter} is responsible to track events on notifications.
  */
-public class NotificationListenerAdapter extends AbstractCommonSubscriber implements DOMNotificationListener {
-
+public final class NotificationListenerAdapter extends AbstractCommonSubscriber implements DOMNotificationListener {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationListenerAdapter.class);
 
     private final ControllerContext controllerContext;
@@ -169,7 +166,6 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private void addValuesToNotificationEventElement(final Document doc, final Element element,
             final EffectiveModelContext schemaContext, final DOMNotification notification) {
         try {
-
             final DOMResult domResult = writeNormalizedNode(notification.getBody(),
                 SchemaInferenceStack.of(schemaContext, path).toInference());
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
