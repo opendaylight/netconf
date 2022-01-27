@@ -9,10 +9,8 @@ package org.opendaylight.controller.sal.restconf.impl.nn.to.xml.test;
 
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Iterables;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,6 +31,7 @@ import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
 
@@ -85,10 +84,10 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
         final DataContainerNodeBuilder<NodeIdentifier, ChoiceNode> dataChoice = SchemaAwareBuilders
                 .choiceBuilder((ChoiceSchemaNode) choiceSchemaNode);
 
-        final List<DataSchemaNode> instanceLf = ControllerContext
+        final var instanceLf = ControllerContext
                 .findInstanceDataChildrenByName(
                         (DataNodeContainer) contSchemaNode, lf.getLocalName());
-        final DataSchemaNode schemaLf = Iterables.getFirst(instanceLf, null);
+        final DataSchemaNode schemaLf = instanceLf.get(0).child;
 
         dataChoice.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf)
                 .withValue(value).build());
@@ -96,7 +95,7 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
         dataContainerNodeAttrBuilder.withChild(dataChoice.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                InstanceIdentifierContext.ofDataSchemaNode(schemaContext, contSchemaNode),
+                InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(schemaContext, contQname)),
                 dataContainerNodeAttrBuilder.build());
 
         return testNormalizedNodeContext;

@@ -7,10 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import java.net.URI;
-import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -26,10 +23,8 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,14 +87,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @return InstanceIdentifier of Location leaf.
      */
     private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
-        final var context = schemaHandler.get();
-        final Optional<Module> module = context.findModule(NOTIFI_QNAME.getModule());
-        checkState(module.isPresent());
-        final DataSchemaNode notify = module.get().dataChildByName(NOTIFI_QNAME);
-        checkState(notify instanceof ContainerSchemaNode, "Unexpected non-container %s", notify);
-        final DataSchemaNode location = ((ContainerSchemaNode) notify).getDataChildByName(LOCATION_QNAME);
-
-        return InstanceIdentifierContext.ofDataSchemaNode(context, location);
+        return InstanceIdentifierContext.ofStack(
+            SchemaInferenceStack.ofDataTreePath(schemaHandler.get(), NOTIFI_QNAME, LOCATION_QNAME));
     }
 
     /**

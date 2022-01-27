@@ -8,13 +8,13 @@
 package org.opendaylight.controller.sal.restconf.impl.input.to.cnsn.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FluentFuture;
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public class RestPutListDataTest {
     private static EffectiveModelContext schemaContextTestModule;
@@ -177,10 +178,10 @@ public class RestPutListDataTest {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> testNodeContainer =
             SchemaAwareBuilders.mapEntryBuilder((ListSchemaNode) testNodeSchemaNode);
 
-        List<DataSchemaNode> testChildren = ControllerContext.findInstanceDataChildrenByName(
+        var testChildren = ControllerContext.findInstanceDataChildrenByName(
                 (ListSchemaNode) testNodeSchemaNode, key1.getLocalName());
         assertTrue(testChildren != null);
-        final DataSchemaNode testLeafKey1SchemaNode = Iterables.getFirst(testChildren, null);
+        final DataSchemaNode testLeafKey1SchemaNode = testChildren.get(0).child;
         assertTrue(testLeafKey1SchemaNode != null);
         assertTrue(testLeafKey1SchemaNode instanceof LeafSchemaNode);
         final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafKey1 =
@@ -192,8 +193,8 @@ public class RestPutListDataTest {
             testChildren = ControllerContext.findInstanceDataChildrenByName(
                     (ListSchemaNode) testNodeSchemaNode, key2.getLocalName());
             assertTrue(testChildren != null);
-            final DataSchemaNode testLeafKey2SchemaNode = Iterables.getFirst(testChildren, null);
-            assertTrue(testLeafKey2SchemaNode != null);
+            final DataSchemaNode testLeafKey2SchemaNode = testChildren.get(0).child;
+            assertNotNull(testLeafKey2SchemaNode);
             assertTrue(testLeafKey2SchemaNode instanceof LeafSchemaNode);
             final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafKey2 =
                 SchemaAwareBuilders.leafBuilder((LeafSchemaNode) testLeafKey2SchemaNode);
@@ -202,8 +203,9 @@ public class RestPutListDataTest {
         }
 
         final NormalizedNodeContext testCompositeContext = new NormalizedNodeContext(
-                InstanceIdentifierContext.ofDataSchemaNode(schemaContextTestModule, testNodeSchemaNode),
-                testNodeContainer.build());
+            InstanceIdentifierContext.ofStack(
+                SchemaInferenceStack.ofDataTreePath(schemaContextTestModule, lstWithCompositeKey)),
+            testNodeContainer.build());
 
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
         restconfImpl.updateConfigurationData(toUri(uriKey1, uriKey2), testCompositeContext, uriInfo);

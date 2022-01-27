@@ -3,7 +3,7 @@ module augment-module {
 
   prefix "amodule";
 
-  import instance-identifier-module {prefix imodule; revision-date 2014-01-17;}
+  import instance-identifier-module { prefix imodule; }
 
   revision 2014-01-17 {
   }

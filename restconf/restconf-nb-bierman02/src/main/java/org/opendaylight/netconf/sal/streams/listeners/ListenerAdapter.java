@@ -10,9 +10,11 @@ package org.opendaylight.netconf.sal.streams.listeners;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
@@ -30,12 +32,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,14 +71,15 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @param outputType
      *            Type of output on notification (JSON, XML)
      */
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "non-final for testing")
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType, final ControllerContext controllerContext) {
-        register(this);
         this.outputType = requireNonNull(outputType);
         this.path = requireNonNull(path);
         checkArgument(streamName != null && !streamName.isEmpty());
         this.streamName = streamName;
         this.controllerContext = controllerContext;
+        register(this);
     }
 
     @Override
@@ -86,7 +88,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
+    public void onDataTreeChanged(final List<DataTreeCandidate> dataTreeCandidates) {
         final Instant now = Instant.now();
         if (!checkStartStop(now, this)) {
             return;
@@ -324,15 +326,13 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         operationElement.setTextContent(operation.value);
         dataChangeEventElement.appendChild(operationElement);
 
-        final SchemaPath nodePath;
-        if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
-            nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath();
-        } else {
-            nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath()
-                .getParent();
+        final SchemaInferenceStack stack = dataSchemaContextTree.enterPath(eventPath).orElseThrow().stack();
+        if (!(normalized instanceof MapEntryNode) && !(normalized instanceof UnkeyedListEntryNode)
+            && !stack.isEmpty()) {
+            stack.exit();
         }
 
-        final var inference = SchemaInferenceStack.ofInstantiatedPath(schemaContext, nodePath).toInference();
+        final var inference = stack.toInference();
 
         try {
             final DOMResult domResult = writeNormalizedNode(normalized, inference);

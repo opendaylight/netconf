@@ -22,8 +22,9 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.common.YangError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -163,11 +164,16 @@ public class RestconfDocumentedException extends WebApplicationException {
         status = null;
     }
 
+    public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
+        super(cause, ErrorTags.statusOf(errors.get(0).getErrorTag()));
+        this.errors = ImmutableList.copyOf(errors);
+        status = null;
+    }
+
     public static RestconfDocumentedException decodeAndThrow(final String message,
             final OperationFailedException cause) {
         for (final RpcError error : cause.getErrorList()) {
-            if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
-                    && error.getTag().equals(ErrorTag.RESOURCE_DENIED.elementBody())) {
+            if (error.getErrorType() == ErrorType.TRANSPORT && error.getTag().equals(ErrorTag.RESOURCE_DENIED)) {
                 throw new RestconfDocumentedException(error.getMessage(), ErrorType.TRANSPORT,
                     ErrorTags.RESOURCE_DENIED_TRANSPORT, cause);
             }
@@ -230,16 +236,17 @@ public class RestconfDocumentedException extends WebApplicationException {
     }
 
     /**
-     * Throw an instance of this exception if the specified exception has a {@link YangError} attachment.
+     * Throw an instance of this exception if the specified exception has a {@link YangNetconfError} attachment.
      *
      * @param cause Proposed cause of a RestconfDocumented exception
      */
     public static void throwIfYangError(final Throwable cause) {
-        if (cause instanceof YangError) {
-            final YangError error = (YangError) cause;
-            throw new RestconfDocumentedException(cause, new RestconfError(error.getErrorType().toNetconf(),
-                new ErrorTag(error.getErrorTag()), error.getErrorMessage().orElse(null),
-                error.getErrorAppTag().orElse(null)));
+        if (cause instanceof YangNetconfErrorAware) {
+            throw new RestconfDocumentedException(cause, ((YangNetconfErrorAware) cause).getNetconfErrors().stream()
+                .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),
+                    // FIXME: pass down error info
+                    null, error.path()))
+                .collect(ImmutableList.toImmutableList()));
         }
     }
 

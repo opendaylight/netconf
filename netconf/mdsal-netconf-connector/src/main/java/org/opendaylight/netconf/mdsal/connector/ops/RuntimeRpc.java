@@ -209,7 +209,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
                 schemaContext.getCurrentContext(), rpcOutputPath);
 
         final SchemaOrderedNormalizedNodeWriter nnWriter = new SchemaOrderedNormalizedNodeWriter(nnStreamWriter,
-                schemaContext.getCurrentContext(), rpcOutputPath.asSchemaPath());
+                schemaContext.getCurrentContext(), rpcOutputPath);
 
         writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
         try {

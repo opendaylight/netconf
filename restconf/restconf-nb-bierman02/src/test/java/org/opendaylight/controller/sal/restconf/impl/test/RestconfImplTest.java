@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
-import com.google.common.collect.Iterables;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.text.ParseException;
@@ -77,7 +76,6 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.InputEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.OutputEffectiveStatement;
@@ -161,7 +159,6 @@ public class RestconfImplTest {
         final NormalizedNodeContext ctx = mock(NormalizedNodeContext.class);
         final RpcDefinition rpc = mock(RpcDefinition.class,
             withSettings().extraInterfaces(RpcEffectiveStatement.class));
-        doReturn(mock(SchemaPath.class)).when(rpc).getPath();
         doReturn(qname).when(rpc).getQName();
 
         final InputSchemaNode input = mock(InputSchemaNode.class,
@@ -244,33 +241,33 @@ public class RestconfImplTest {
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) streamSchemaNode;
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeValues =
             SchemaAwareBuilders.mapEntryBuilder(listStreamSchemaNode);
-        List<DataSchemaNode> instanceDataChildrenByName =
+        var instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "name");
-        final DataSchemaNode nameSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
+        final DataSchemaNode nameSchemaNode = instanceDataChildrenByName.get(0).child;
         streamNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) nameSchemaNode)
             .withValue("")
             .build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "description");
-        final DataSchemaNode descriptionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
+        final DataSchemaNode descriptionSchemaNode = instanceDataChildrenByName.get(0).child;
         streamNodeValues.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) nameSchemaNode)
             .withValue("DESCRIPTION_PLACEHOLDER")
             .build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-support");
-        final DataSchemaNode replaySupportSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
+        final DataSchemaNode replaySupportSchemaNode = instanceDataChildrenByName.get(0).child;
         streamNodeValues.withChild(
             SchemaAwareBuilders.leafBuilder((LeafSchemaNode) replaySupportSchemaNode).withValue(Boolean.TRUE).build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-log-creation-time");
-        final DataSchemaNode replayLogCreationTimeSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
+        final DataSchemaNode replayLogCreationTimeSchemaNode = instanceDataChildrenByName.get(0).child;
         streamNodeValues.withChild(
             SchemaAwareBuilders.leafBuilder((LeafSchemaNode) replayLogCreationTimeSchemaNode).withValue("").build());
         instanceDataChildrenByName = ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "events");
-        final DataSchemaNode eventsSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
+        final DataSchemaNode eventsSchemaNode = instanceDataChildrenByName.get(0).child;
         streamNodeValues.withChild(
             SchemaAwareBuilders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue(Empty.value()).build());
         assertNotNull(streamNodeValues.build());
@@ -284,9 +281,9 @@ public class RestconfImplTest {
         final String identifier = "create-notification-stream/toaster:toastDone";
 
         // register test notification stream
-        final Absolute path = Absolute.of(
-                QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(List.of(path), identifier, "XML", controllerContext);
+        Notificator.createNotificationListener(
+            List.of(Absolute.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"))),
+            identifier, "XML", controllerContext);
 
         final UriInfo uriInfo = mock(UriInfo.class);
         final UriBuilder uriBuilder = mock(UriBuilder.class);

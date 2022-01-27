@@ -91,11 +91,11 @@ public class NetconfDeviceSimulator implements Closeable {
 
     public NetconfDeviceSimulator(final Configuration configuration) {
         this.configuration = configuration;
-        this.nettyThreadgroup = new NioEventLoopGroup();
-        this.hashedWheelTimer = new HashedWheelTimer();
-        this.minaTimerExecutor = Executors.newScheduledThreadPool(configuration.getThreadPoolSize(),
+        nettyThreadgroup = new NioEventLoopGroup();
+        hashedWheelTimer = new HashedWheelTimer();
+        minaTimerExecutor = Executors.newScheduledThreadPool(configuration.getThreadPoolSize(),
                 new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build());
-        this.nioExecutor = ThreadUtils
+        nioExecutor = ThreadUtils
                 .newFixedThreadPool("netconf-ssh-server-nio-group", configuration.getThreadPoolSize());
     }
 
@@ -172,8 +172,9 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     public List<Integer> start() {
+        final var proto = configuration.isSsh() ? "SSH" : "TCP";
         LOG.info("Starting {}, {} simulated devices starting on port {}",
-                configuration.getDeviceCount(), configuration.isSsh() ? "SSH" : "TCP", configuration.getStartingPort());
+                configuration.getDeviceCount(), proto, configuration.getStartingPort());
 
         final SharedSchemaRepository schemaRepo = new SharedSchemaRepository("netconf-simulator");
         final Set<Capability> capabilities = parseSchemasToModuleCapabilities(schemaRepo);
@@ -327,7 +328,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
         try {
             //necessary for creating mdsal data stores and operations
-            this.schemaContext = consumer.createEffectiveModelContextFactory()
+            schemaContext = consumer.createEffectiveModelContextFactory()
                     .createEffectiveModelContext(loadedSources).get();
         } catch (final InterruptedException | ExecutionException e) {
             throw new RuntimeException("Cannot parse schema context. "

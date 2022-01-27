@@ -10,12 +10,10 @@ package org.opendaylight.controller.sal.restconf.impl.nn.to.xml.test;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
@@ -127,11 +125,9 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
                 .containerBuilder((ContainerSchemaNode) contSchemaNode);
 
         Preconditions.checkState(contSchemaNode instanceof ContainerSchemaNode);
-        final List<DataSchemaNode> instanceLf1_m1 = ControllerContext
-                .findInstanceDataChildrenByName(
-                        (DataNodeContainer) contSchemaNode,
-                        lf1Qname.getLocalName());
-        final DataSchemaNode schemaLf1_m1 = Iterables.getFirst(instanceLf1_m1, null);
+        final var instanceLf1_m1 = ControllerContext.findInstanceDataChildrenByName(
+                (DataNodeContainer) contSchemaNode, lf1Qname.getLocalName());
+        final DataSchemaNode schemaLf1_m1 = instanceLf1_m1.get(0).child;
 
         dataContainerNodeAttrBuilder.withChild(SchemaAwareBuilders
                 .leafBuilder((LeafSchemaNode) schemaLf1_m1)

@@ -14,6 +14,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -22,20 +23,25 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response.Status;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -50,6 +56,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -183,16 +190,14 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
-        final InstanceIdentifierBuilder builder = YangInstanceIdentifier.builder();
         final Collection<? extends Module> latestModule = globalSchema.findModules(startModule);
-
         if (latestModule.isEmpty()) {
             throw new RestconfDocumentedException("The module named '" + startModule + "' does not exist.",
                     ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        final InstanceIdentifierContext iiWithSchemaNode =
-                collectPathArguments(builder, pathArgs, latestModule.iterator().next(), null, toMountPointIdentifier);
+        final InstanceIdentifierContext iiWithSchemaNode = collectPathArguments(YangInstanceIdentifier.builder(),
+            new ArrayDeque<>(), pathArgs, latestModule.iterator().next(), null, toMountPointIdentifier);
 
         if (iiWithSchemaNode == null) {
             throw new RestconfDocumentedException("URI has bad format", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -322,7 +327,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     public String findModuleNameByNamespace(final XMLNamespace namespace) {
         checkPreconditions();
 
-        final Module module = this.findModuleByNamespace(namespace);
+        final Module module = findModuleByNamespace(namespace);
         return module == null ? null : module.getName();
     }
 
@@ -332,7 +337,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     public XMLNamespace findNamespaceByModuleName(final String moduleName) {
-        final Module module = this.findModuleByName(moduleName);
+        final Module module = findModuleByName(moduleName);
         return module == null ? null : module.getNamespace();
     }
 
@@ -377,22 +382,21 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return findModuleByNameAndRevision(Draft02.RestConfModule.NAME, Revision.of(Draft02.RestConfModule.REVISION));
     }
 
-    public DataSchemaNode getRestconfModuleErrorsSchemaNode() {
-        final Module restconfModule = getRestconfModule();
-        if (restconfModule == null) {
+    public Entry<SchemaInferenceStack, ContainerSchemaNode> getRestconfModuleErrorsSchemaNode() {
+        checkPreconditions();
+
+        final var schema = globalSchema;
+        final var namespace = QNameModule.create(XMLNamespace.of(Draft02.RestConfModule.NAMESPACE),
+            Revision.of(Draft02.RestConfModule.REVISION));
+        if (schema.findModule(namespace).isEmpty()) {
             return null;
         }
 
-        final Collection<? extends GroupingDefinition> groupings = restconfModule.getGroupings();
-
-        final Iterable<? extends GroupingDefinition> filteredGroups = Iterables.filter(groupings,
-            g -> RestConfModule.ERRORS_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
-
-        final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
-
-        final List<DataSchemaNode> instanceDataChildrenByName = findInstanceDataChildrenByName(restconfGrouping,
-                RestConfModule.ERRORS_CONTAINER_SCHEMA_NODE);
-        return Iterables.getFirst(instanceDataChildrenByName, null);
+        final var stack = SchemaInferenceStack.of(globalSchema);
+        stack.enterGrouping(RestConfModule.ERRORS_QNAME);
+        final var stmt = stack.enterSchemaTree(RestConfModule.ERRORS_QNAME);
+        verify(stmt instanceof ContainerSchemaNode, "Unexpected statement %s", stmt);
+        return Map.entry(stack, (ContainerSchemaNode) stmt);
     }
 
     public DataSchemaNode getRestconfModuleRestConfSchemaNode(final Module inRestconfModule,
@@ -411,43 +415,43 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             g -> RestConfModule.RESTCONF_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
         final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
 
-        final List<DataSchemaNode> instanceDataChildrenByName = findInstanceDataChildrenByName(restconfGrouping,
+        final var instanceDataChildrenByName = findInstanceDataChildrenByName(restconfGrouping,
                 RestConfModule.RESTCONF_CONTAINER_SCHEMA_NODE);
-        final DataSchemaNode restconfContainer = Iterables.getFirst(instanceDataChildrenByName, null);
+        final DataSchemaNode restconfContainer = getFirst(instanceDataChildrenByName);
 
-        if (RestConfModule.OPERATIONS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
-            final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
-                    (DataNodeContainer) restconfContainer, RestConfModule.OPERATIONS_CONTAINER_SCHEMA_NODE);
-            return Iterables.getFirst(instances, null);
-        } else if (RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
-            final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
+        if (RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
+            final var instances = findInstanceDataChildrenByName(
                     (DataNodeContainer) restconfContainer, RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
-            return Iterables.getFirst(instances, null);
+            return getFirst(instances);
         } else if (RestConfModule.STREAM_LIST_SCHEMA_NODE.equals(schemaNodeName)) {
-            List<DataSchemaNode> instances = findInstanceDataChildrenByName(
+            var instances = findInstanceDataChildrenByName(
                     (DataNodeContainer) restconfContainer, RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
-            final DataSchemaNode modules = Iterables.getFirst(instances, null);
+            final DataSchemaNode modules = getFirst(instances);
             instances = findInstanceDataChildrenByName((DataNodeContainer) modules,
                     RestConfModule.STREAM_LIST_SCHEMA_NODE);
-            return Iterables.getFirst(instances, null);
+            return getFirst(instances);
         } else if (RestConfModule.MODULES_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
-            final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
+            final var instances = findInstanceDataChildrenByName(
                     (DataNodeContainer) restconfContainer, RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
-            return Iterables.getFirst(instances, null);
+            return getFirst(instances);
         } else if (RestConfModule.MODULE_LIST_SCHEMA_NODE.equals(schemaNodeName)) {
-            List<DataSchemaNode> instances = findInstanceDataChildrenByName(
+            var instances = findInstanceDataChildrenByName(
                     (DataNodeContainer) restconfContainer, RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
-            final DataSchemaNode modules = Iterables.getFirst(instances, null);
+            final DataSchemaNode modules = getFirst(instances);
             instances = findInstanceDataChildrenByName((DataNodeContainer) modules,
                     RestConfModule.MODULE_LIST_SCHEMA_NODE);
-            return Iterables.getFirst(instances, null);
+            return getFirst(instances);
         } else if (RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
-            final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
+            final var instances = findInstanceDataChildrenByName(
                     (DataNodeContainer) restconfContainer, RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
-            return Iterables.getFirst(instances, null);
+            return getFirst(instances);
         }
 
         return null;
+    }
+
+    public static @Nullable DataSchemaNode getFirst(final List<FoundChild> children) {
+        return children.isEmpty() ? null : children.get(0).child;
     }
 
     private static DataSchemaNode childByQName(final ChoiceSchemaNode container, final QName name) {
@@ -525,8 +529,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
     @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification = "Unrecognised NullableDecl")
     private InstanceIdentifierContext collectPathArguments(final InstanceIdentifierBuilder builder,
-            final List<String> strings, final DataNodeContainer parentNode, final DOMMountPoint mountPoint,
-            final boolean returnJustMountPoint) {
+            final Deque<QName> schemaPath, final List<String> strings, final DataNodeContainer parentNode,
+            final DOMMountPoint mountPoint, final boolean returnJustMountPoint) {
         requireNonNull(strings);
 
         if (parentNode == null) {
@@ -542,7 +546,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
         if (head.isEmpty()) {
             final List<String> remaining = strings.subList(1, strings.size());
-            return collectPathArguments(builder, remaining, parentNode, mountPoint, returnJustMountPoint);
+            return collectPathArguments(builder, schemaPath, remaining, parentNode, mountPoint, returnJustMountPoint);
         }
 
         final String nodeName = toNodeName(head);
@@ -596,8 +600,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
 
                 final List<String> subList = strings.subList(1, strings.size());
-                return collectPathArguments(YangInstanceIdentifier.builder(), subList, it.next(), mount,
-                        returnJustMountPoint);
+                return collectPathArguments(YangInstanceIdentifier.builder(), new ArrayDeque<>(), subList, it.next(),
+                        mount, returnJustMountPoint);
             }
 
             Module module = null;
@@ -621,34 +625,35 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
             }
 
-            targetNode = findInstanceDataChildByNameAndNamespace(parentNode, nodeName, module.getNamespace());
-
-            if (targetNode == null && parentNode instanceof Module) {
-                final RpcDefinition rpc;
-                if (mountPoint == null) {
-                    rpc = getRpcDefinition(head, module.getRevision());
-                } else {
-                    final String rpcName = toNodeName(head);
-                    rpc = getRpcDefinition(module, rpcName);
+            final var found = findInstanceDataChildByNameAndNamespace(parentNode, nodeName, module.getNamespace());
+            if (found == null) {
+                if (parentNode instanceof Module) {
+                    final RpcDefinition rpc;
+                    if (mountPoint == null) {
+                        rpc = getRpcDefinition(head, module.getRevision());
+                    } else {
+                        rpc = getRpcDefinition(module, toNodeName(head));
+                    }
+                    if (rpc != null) {
+                        final var ctx = mountPoint == null ? globalSchema : getModelContext(mountPoint);
+                        return InstanceIdentifierContext.ofRpcInput(ctx, rpc, mountPoint);
+                    }
                 }
-                if (rpc != null) {
-                    final var ctx = mountPoint == null ? globalSchema : getModelContext(mountPoint);
-                    return InstanceIdentifierContext.ofRpcInput(ctx, rpc, mountPoint);
-                }
-            }
-
-            if (targetNode == null) {
                 throw new RestconfDocumentedException("URI has bad format. Possible reasons:\n" + " 1. \"" + head
-                        + "\" was not found in parent data node.\n" + " 2. \"" + head
-                        + "\" is behind mount point. Then it should be in format \"/" + MOUNT + "/" + head + "\".",
-                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+                    + "\" was not found in parent data node.\n" + " 2. \"" + head
+                    + "\" is behind mount point. Then it should be in format \"/" + MOUNT + "/" + head + "\".",
+                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
             }
+
+            targetNode = found.child;
+            schemaPath.addAll(found.intermediate);
+            schemaPath.add(targetNode.getQName());
         } else {
-            final List<DataSchemaNode> potentialSchemaNodes = findInstanceDataChildrenByName(parentNode, nodeName);
+            final var potentialSchemaNodes = findInstanceDataChildrenByName(parentNode, nodeName);
             if (potentialSchemaNodes.size() > 1) {
                 final StringBuilder strBuilder = new StringBuilder();
-                for (final DataSchemaNode potentialNodeSchema : potentialSchemaNodes) {
-                    strBuilder.append("   ").append(potentialNodeSchema.getQName().getNamespace()).append("\n");
+                for (var potentialNodeSchema : potentialSchemaNodes) {
+                    strBuilder.append("   ").append(potentialNodeSchema.child.getQName().getNamespace()).append("\n");
                 }
 
                 throw new RestconfDocumentedException(
@@ -665,7 +670,10 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                         ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
             }
 
-            targetNode = potentialSchemaNodes.iterator().next();
+            final var found = potentialSchemaNodes.get(0);
+            targetNode = found.child;
+            schemaPath.addAll(found.intermediate);
+            schemaPath.add(targetNode.getQName());
         }
 
         if (!isListOrContainer(targetNode)) {
@@ -686,17 +694,18 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             final HashMap<QName, Object> keyValues = new HashMap<>();
             int index = 0;
             for (final QName key : listNode.getKeyDefinition()) {
-                {
-                    final String uriKeyValue = uriKeyValues.get(index);
-                    if (uriKeyValue.equals(NULL_VALUE)) {
-                        throw new RestconfDocumentedException("URI has bad format. List \""
-                                + listNode.getQName().getLocalName() + "\" cannot contain \"null\" value as a key.",
-                                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-                    }
-
-                    addKeyValue(keyValues, listNode.getDataChildByName(key), uriKeyValue, mountPoint);
-                    index++;
+                final String uriKeyValue = uriKeyValues.get(index);
+                if (uriKeyValue.equals(NULL_VALUE)) {
+                    throw new RestconfDocumentedException("URI has bad format. List \""
+                        + listNode.getQName().getLocalName() + "\" cannot contain \"null\" value as a key.",
+                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                 }
+
+                final var keyChild = listNode.getDataChildByName(key);
+                schemaPath.addLast(keyChild.getQName());
+                addKeyValue(keyValues, schemaPath, keyChild, uriKeyValue, mountPoint);
+                schemaPath.removeLast();
+                index++;
             }
 
             consumed = consumed + index;
@@ -707,7 +716,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
 
         if (targetNode instanceof DataNodeContainer) {
             final List<String> remaining = strings.subList(consumed, strings.size());
-            return collectPathArguments(builder, remaining, (DataNodeContainer) targetNode, mountPoint,
+            return collectPathArguments(builder, schemaPath, remaining, (DataNodeContainer) targetNode, mountPoint,
                     returnJustMountPoint);
         }
 
@@ -719,57 +728,47 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             final DataSchemaNode dataSchemaNode, final DOMMountPoint mountPoint,
             final EffectiveModelContext schemaContext) {
         final var normalized = new DataNormalizer(schemaContext).toNormalized(instance);
-
-        // FIXME: Verification before we trust this
-        final var stack = normalized.getValue();
-        if (!stack.isEmpty()) {
-            final var stackPath = stack.toSchemaPath();
-            final var nodePath = dataSchemaNode.getPath();
-            verify(stackPath.equals(nodePath), "Mismatched path: expected %s got %s", nodePath, stackPath);
-        } else {
-            verify(dataSchemaNode.equals(schemaContext), "Unexpected node %s", dataSchemaNode);
-        }
-
         return InstanceIdentifierContext.ofPath(normalized.getValue(), dataSchemaNode, normalized.getKey(), mountPoint);
     }
 
-    public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
+    public static @Nullable FoundChild findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
             final String name, final XMLNamespace namespace) {
         requireNonNull(namespace);
 
-        final Iterable<DataSchemaNode> result = Iterables.filter(findInstanceDataChildrenByName(container, name),
-            node -> namespace.equals(node.getQName().getNamespace()));
-        return Iterables.getFirst(result, null);
+        for (var node : findInstanceDataChildrenByName(container, name)) {
+            if (namespace.equals(node.child.getQName().getNamespace())) {
+                return node;
+            }
+        }
+        return null;
     }
 
-    public static List<DataSchemaNode> findInstanceDataChildrenByName(final DataNodeContainer container,
+    public static List<FoundChild> findInstanceDataChildrenByName(final DataNodeContainer container,
             final String name) {
-        final List<DataSchemaNode> instantiatedDataNodeContainers = new ArrayList<>();
+        final List<FoundChild> instantiatedDataNodeContainers = new ArrayList<>();
         collectInstanceDataNodeContainers(instantiatedDataNodeContainers, requireNonNull(container),
-            requireNonNull(name));
+            requireNonNull(name), List.of());
         return instantiatedDataNodeContainers;
     }
 
-    private static void collectInstanceDataNodeContainers(final List<DataSchemaNode> potentialSchemaNodes,
-            final DataNodeContainer container, final String name) {
-
-        final Iterable<? extends DataSchemaNode> nodes = Iterables.filter(container.getChildNodes(),
-            node -> name.equals(node.getQName().getLocalName()));
-
-        // Can't combine this loop with the filter above because the filter is
-        // lazily-applied by Iterables.filter.
-        for (final DataSchemaNode potentialNode : nodes) {
-            if (isInstantiatedDataSchema(potentialNode)) {
-                potentialSchemaNodes.add(potentialNode);
+    private static void collectInstanceDataNodeContainers(final List<FoundChild> potentialSchemaNodes,
+            final DataNodeContainer container, final String name, final List<QName> intermediate) {
+        // We perform two iterations to retain breadth-first ordering
+        for (var child : container.getChildNodes()) {
+            if (name.equals(child.getQName().getLocalName()) && isInstantiatedDataSchema(child)) {
+                potentialSchemaNodes.add(new FoundChild(child, intermediate));
             }
         }
 
-        final Iterable<ChoiceSchemaNode> choiceNodes = Iterables.filter(container.getChildNodes(),
-            ChoiceSchemaNode.class);
-        final Iterable<Collection<? extends CaseSchemaNode>> map = Iterables.transform(choiceNodes,
-            ChoiceSchemaNode::getCases);
-        for (final CaseSchemaNode caze : Iterables.concat(map)) {
-            collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
+        for (var child : container.getChildNodes()) {
+            if (child instanceof ChoiceSchemaNode) {
+                for (var caze : ((ChoiceSchemaNode) child).getCases()) {
+                    collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name,
+                        ImmutableList.<QName>builderWithExpectedSize(intermediate.size() + 2)
+                            .addAll(intermediate).add(child.getQName()).add(caze.getQName())
+                            .build());
+                }
+            }
         }
     }
 
@@ -779,8 +778,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 || node instanceof AnyxmlSchemaNode;
     }
 
-    private void addKeyValue(final HashMap<QName, Object> map, final DataSchemaNode node, final String uriValue,
-            final DOMMountPoint mountPoint) {
+    private void addKeyValue(final HashMap<QName, Object> map, final Deque<QName> schemaPath, final DataSchemaNode node,
+            final String uriValue, final DOMMountPoint mountPoint) {
         checkArgument(node instanceof LeafSchemaNode);
 
         final EffectiveModelContext schemaContext = mountPoint == null ? globalSchema : getModelContext(mountPoint);
@@ -788,8 +787,9 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, node.getPath())
-                .resolveLeafref((LeafrefTypeDefinition) baseType);
+            final var stack = SchemaInferenceStack.of(schemaContext);
+            schemaPath.forEach(stack::enterSchemaTree);
+            typedef = stack.resolveLeafref((LeafrefTypeDefinition) baseType);
         }
         final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(typedef, mountPoint, this);
         Object decoded = codec.deserialize(urlDecoded);
@@ -911,7 +911,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return URLDecoder.decode(pathArg, StandardCharsets.UTF_8);
     }
 
-    private CharSequence convertToRestconfIdentifier(final PathArgument argument, final DataSchemaNode node,
+    private String convertToRestconfIdentifier(final PathArgument argument, final DataSchemaNode node,
             final DOMMountPoint mount) {
         if (argument instanceof NodeIdentifier) {
             return convertToRestconfIdentifier((NodeIdentifier) argument, mount);
@@ -925,14 +925,14 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         }
     }
 
-    private CharSequence convertToRestconfIdentifier(final NodeIdentifier argument, final DOMMountPoint node) {
-        return "/" + toRestconfIdentifier(argument.getNodeType(),node);
+    private String convertToRestconfIdentifier(final NodeIdentifier argument, final DOMMountPoint node) {
+        return "/" + toRestconfIdentifier(argument.getNodeType(), node);
     }
 
-    private CharSequence convertToRestconfIdentifierWithPredicates(final NodeIdentifierWithPredicates argument,
+    private String convertToRestconfIdentifierWithPredicates(final NodeIdentifierWithPredicates argument,
             final ListSchemaNode node, final DOMMountPoint mount) {
         final QName nodeType = argument.getNodeType();
-        final CharSequence nodeIdentifier = this.toRestconfIdentifier(nodeType, mount);
+        final String nodeIdentifier = toRestconfIdentifier(nodeType, mount);
 
         final StringBuilder builder = new StringBuilder().append('/').append(nodeIdentifier).append('/');
 
@@ -966,10 +966,12 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     public YangInstanceIdentifier toXpathRepresentation(final YangInstanceIdentifier instanceIdentifier) {
+        if (dataNormalizer == null) {
+            throw new RestconfDocumentedException("Data normalizer isn't set. Normalization isn't possible");
+        }
+
         try {
             return dataNormalizer.toLegacy(instanceIdentifier);
-        } catch (final NullPointerException e) {
-            throw new RestconfDocumentedException("Data normalizer isn't set. Normalization isn't possible", e);
         } catch (final DataNormalizationException e) {
             throw new RestconfDocumentedException("Data normalizer failed. Normalization isn't possible", e);
         }
@@ -989,5 +991,16 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return mountPoint.getService(DOMSchemaService.class)
             .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
             .orElse(null);
+    }
+
+    public static final class FoundChild {
+        // Intermediate schema tree children, usually empty
+        public final @NonNull List<QName> intermediate;
+        public final @NonNull DataSchemaNode child;
+
+        private FoundChild(final DataSchemaNode child, final List<QName> intermediate) {
+            this.child = requireNonNull(child);
+            this.intermediate = requireNonNull(intermediate);
+        }
     }
 }

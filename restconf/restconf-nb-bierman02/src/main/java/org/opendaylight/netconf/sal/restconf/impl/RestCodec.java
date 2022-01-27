@@ -88,6 +88,7 @@ public final class RestCodec {
 
         @SuppressWarnings("unchecked")
         @Override
+        @SuppressFBWarnings(value = "NP_NONNULL_RETURN_VIOLATION", justification = "Legacy code")
         public Object deserialize(final Object input) {
             try {
                 if (type instanceof IdentityrefTypeDefinition) {
@@ -100,6 +101,7 @@ public final class RestCodec {
                                     + "Therefore NULL is used as translation of  - {}",
                             input == null ? "null" : input.getClass(), String.valueOf(input));
                     }
+                    // FIXME: this should be a hard error
                     return null;
                 } else if (type instanceof InstanceIdentifierTypeDefinition) {
                     if (input instanceof IdentityValuesDTO) {
@@ -119,17 +121,20 @@ public final class RestCodec {
                         return typeAwarecodec.deserialize(String.valueOf(input));
                     } else {
                         LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
+                        // FIXME: this should be a hard error
                         return null;
                     }
                 }
             } catch (final ClassCastException e) { // TODO remove this catch when everyone use codecs
                 LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
+                // FIXME: this should be a hard error
                 return null;
             }
         }
 
         @SuppressWarnings("unchecked")
         @Override
+        @SuppressFBWarnings(value = "NP_NONNULL_RETURN_VIOLATION", justification = "legacy code")
         public Object serialize(final Object input) {
             try {
                 if (type instanceof IdentityrefTypeDefinition) {
@@ -148,8 +153,10 @@ public final class RestCodec {
                         return null;
                     }
                 }
-            } catch (final ClassCastException e) { // TODO remove this catch when everyone use codecs
+            } catch (final ClassCastException e) {
+                // FIXME: remove this catch when everyone use codecs
                 LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
+                // FIXME: this should be a hard error
                 return input;
             }
         }
@@ -157,7 +164,6 @@ public final class RestCodec {
     }
 
     public static class IdentityrefCodecImpl implements IdentityrefCodec<IdentityValuesDTO> {
-
         private static final Logger LOG = LoggerFactory.getLogger(IdentityrefCodecImpl.class);
 
         private final DOMMountPoint mountPoint;
@@ -174,11 +180,13 @@ public final class RestCodec {
         }
 
         @Override
+        @SuppressFBWarnings(value = "NP_NONNULL_RETURN_VIOLATION", justification = "See FIXME below")
         public QName deserialize(final IdentityValuesDTO data) {
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
             final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint,
                     controllerContext);
             if (module == null) {
+                // FIXME: this should be a hard error
                 LOG.info("Module was not found for namespace {}", valueWithNamespace.getNamespace());
                 LOG.info("Idenetityref will be translated as NULL for data - {}", String.valueOf(valueWithNamespace));
                 return null;
@@ -186,7 +194,6 @@ public final class RestCodec {
 
             return QName.create(module.getNamespace(), module.getRevision(), valueWithNamespace.getValue());
         }
-
     }
 
     public static class LeafrefCodecImpl implements LeafrefCodec<String> {
@@ -235,7 +242,7 @@ public final class RestCodec {
             return identityValuesDTO;
         }
 
-        @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE",
+        @SuppressFBWarnings(value = { "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", "NP_NONNULL_RETURN_VIOLATION" },
                 justification = "Unrecognised NullableDecl")
         @Override
         public YangInstanceIdentifier deserialize(final IdentityValuesDTO data) {
@@ -248,6 +255,7 @@ public final class RestCodec {
                         valueWithNamespace.getNamespace());
                 LOG.info("Instance-identifier will be translated as NULL for data - {}",
                         String.valueOf(valueWithNamespace.getValue()));
+                // FIXME: this should be a hard error
                 return null;
             }
 
@@ -257,14 +265,16 @@ public final class RestCodec {
                 final IdentityValue identityValue = identities.get(i);
                 XMLNamespace validNamespace = resolveValidNamespace(identityValue.getNamespace(), mountPoint,
                         controllerContext);
-                final DataSchemaNode node = ControllerContext.findInstanceDataChildByNameAndNamespace(
-                        parentContainer, identityValue.getValue(), validNamespace);
-                if (node == null) {
+                final var found = ControllerContext.findInstanceDataChildByNameAndNamespace(
+                    parentContainer, identityValue.getValue(), validNamespace);
+                if (found == null) {
                     LOG.info("'{}' node was not found in {}", identityValue, parentContainer.getChildNodes());
                     LOG.info("Instance-identifier will be translated as NULL for data - {}",
                             String.valueOf(identityValue.getValue()));
+                    // FIXME: this should be a hard error
                     return null;
                 }
+                final DataSchemaNode node = found.child;
                 final QName qName = node.getQName();
                 PathArgument pathArgument = null;
                 if (identityValue.getPredicates().isEmpty()) {
@@ -276,6 +286,7 @@ public final class RestCodec {
                             LOG.info("Predicate's data is not type of leaf-list. It should be in format \".='value'\"");
                             LOG.info("Instance-identifier will be translated as NULL for data - {}",
                                     String.valueOf(identityValue.getValue()));
+                            // FIXME: this should be a hard error
                             return null;
                         }
                         pathArgument = new NodeWithValue<>(qName, leafListPredicate.getValue());
@@ -285,16 +296,17 @@ public final class RestCodec {
                         for (final Predicate predicate : identityValue.getPredicates()) {
                             validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), mountPoint,
                                     controllerContext);
-                            final DataSchemaNode listKey = ControllerContext
+                            final var listKey = ControllerContext
                                     .findInstanceDataChildByNameAndNamespace(listNode, predicate.getName().getValue(),
                                             validNamespace);
-                            predicatesMap.put(listKey.getQName(), predicate.getValue());
+                            predicatesMap.put(listKey.child.getQName(), predicate.getValue());
                         }
                         pathArgument = NodeIdentifierWithPredicates.of(qName, predicatesMap);
                     } else {
                         LOG.info("Node {} is not List or Leaf-list.", node);
                         LOG.info("Instance-identifier will be translated as NULL for data - {}",
                                 String.valueOf(identityValue.getValue()));
+                        // FIXME: this should be a hard error
                         return null;
                     }
                 }
@@ -307,6 +319,7 @@ public final class RestCodec {
                         LOG.info("Node {} isn't instance of DataNodeContainer", node);
                         LOG.info("Instance-identifier will be translated as NULL for data - {}",
                                 String.valueOf(identityValue.getValue()));
+                        // FIXME: this should be a hard error
                         return null;
                     }
                 }
@@ -333,8 +346,6 @@ public final class RestCodec {
         }
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static Module getModuleByNamespace(final String namespace, final DOMMountPoint mountPoint,
             final ControllerContext controllerContext) {
         final XMLNamespace validNamespace = resolveValidNamespace(namespace, mountPoint, controllerContext);
@@ -366,5 +377,4 @@ public final class RestCodec {
 
         return validNamespace;
     }
-
 }
