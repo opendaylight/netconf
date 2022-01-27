@@ -99,15 +99,15 @@ public class ConcurrentClientsTest {
 
     @Parameterized.Parameters()
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{4, TestingNetconfClientRunnable.class,
-                NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
-            {1, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
+        return Arrays.asList(new Object[][]{
+            { 4, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
+            { 1, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
             // empty set of capabilities = only base 1.0 netconf capability
-            {4, TestingNetconfClientRunnable.class, Collections.emptySet()},
-            {4, TestingNetconfClientRunnable.class, getOnlyExiServerCaps()},
-            {4, TestingNetconfClientRunnable.class, getOnlyChunkServerCaps()},
-            {4, BlockingClientRunnable.class, getOnlyExiServerCaps()},
-            {1, BlockingClientRunnable.class, getOnlyExiServerCaps()},
+            { 4, TestingNetconfClientRunnable.class, Collections.emptySet()},
+            { 4, TestingNetconfClientRunnable.class, getOnlyExiServerCaps()},
+            { 4, TestingNetconfClientRunnable.class, getOnlyChunkServerCaps()},
+            { 4, BlockingClientRunnable.class, getOnlyExiServerCaps()},
+            { 1, BlockingClientRunnable.class, getOnlyExiServerCaps()},
         });
     }
 
@@ -127,8 +127,7 @@ public class ConcurrentClientsTest {
 
         }).when(monitoring).registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
         doReturn(sessionListener).when(monitoring).getSessionListener();
-        doReturn(new CapabilitiesBuilder().setCapability(Collections.emptyList()).build()).when(monitoring)
-                .getCapabilities();
+        doReturn(new CapabilitiesBuilder().setCapability(Set.of()).build()).when(monitoring).getCapabilities();
         return monitoring;
     }
 
@@ -308,10 +307,10 @@ public class ConcurrentClientsTest {
     /**
      * Pure socket based blocking client.
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
     public final class BlockingClientRunnable implements Runnable {
 
         @Override
+        @SuppressWarnings("checkstyle:IllegalCatch")
         public void run() {
             try {
                 run2();

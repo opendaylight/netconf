@@ -83,11 +83,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>osgi.core</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.opendaylight.aaa.web</groupId>
       <artifactId>web-api</artifactId>
     </dependency>
