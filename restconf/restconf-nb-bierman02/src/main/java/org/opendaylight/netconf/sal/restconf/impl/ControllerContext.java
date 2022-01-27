@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.PreDestroy;
@@ -50,6 +51,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -377,22 +379,21 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return findModuleByNameAndRevision(Draft02.RestConfModule.NAME, Revision.of(Draft02.RestConfModule.REVISION));
     }
 
-    public DataSchemaNode getRestconfModuleErrorsSchemaNode() {
-        final Module restconfModule = getRestconfModule();
-        if (restconfModule == null) {
+    public Entry<SchemaInferenceStack, ContainerSchemaNode> getRestconfModuleErrorsSchemaNode() {
+        checkPreconditions();
+
+        final var schema = globalSchema;
+        final var namespace = QNameModule.create(XMLNamespace.of(Draft02.RestConfModule.NAMESPACE),
+            Revision.of(Draft02.RestConfModule.REVISION));
+        if (schema.findModule(namespace).isEmpty()) {
             return null;
         }
 
-        final Collection<? extends GroupingDefinition> groupings = restconfModule.getGroupings();
-
-        final Iterable<? extends GroupingDefinition> filteredGroups = Iterables.filter(groupings,
-            g -> RestConfModule.ERRORS_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
-
-        final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
-
-        final List<DataSchemaNode> instanceDataChildrenByName = findInstanceDataChildrenByName(restconfGrouping,
-                RestConfModule.ERRORS_CONTAINER_SCHEMA_NODE);
-        return Iterables.getFirst(instanceDataChildrenByName, null);
+        final var stack = SchemaInferenceStack.of(globalSchema);
+        stack.enterGrouping(RestConfModule.ERRORS_QNAME);
+        final var stmt = stack.enterSchemaTree(RestConfModule.ERRORS_QNAME);
+        verify(stmt instanceof ContainerSchemaNode, "Unexpected statement %s", stmt);
+        return Map.entry(stack, (ContainerSchemaNode) stmt);
     }
 
     public DataSchemaNode getRestconfModuleRestConfSchemaNode(final Module inRestconfModule,
@@ -415,11 +416,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 RestConfModule.RESTCONF_CONTAINER_SCHEMA_NODE);
         final DataSchemaNode restconfContainer = Iterables.getFirst(instanceDataChildrenByName, null);
 
-        if (RestConfModule.OPERATIONS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
-            final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
-                    (DataNodeContainer) restconfContainer, RestConfModule.OPERATIONS_CONTAINER_SCHEMA_NODE);
-            return Iterables.getFirst(instances, null);
-        } else if (RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
+        if (RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
             final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
                     (DataNodeContainer) restconfContainer, RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
             return Iterables.getFirst(instances, null);
@@ -686,17 +683,15 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             final HashMap<QName, Object> keyValues = new HashMap<>();
             int index = 0;
             for (final QName key : listNode.getKeyDefinition()) {
-                {
-                    final String uriKeyValue = uriKeyValues.get(index);
-                    if (uriKeyValue.equals(NULL_VALUE)) {
-                        throw new RestconfDocumentedException("URI has bad format. List \""
-                                + listNode.getQName().getLocalName() + "\" cannot contain \"null\" value as a key.",
-                                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-                    }
-
-                    addKeyValue(keyValues, listNode.getDataChildByName(key), uriKeyValue, mountPoint);
-                    index++;
+                final String uriKeyValue = uriKeyValues.get(index);
+                if (uriKeyValue.equals(NULL_VALUE)) {
+                    throw new RestconfDocumentedException("URI has bad format. List \""
+                        + listNode.getQName().getLocalName() + "\" cannot contain \"null\" value as a key.",
+                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                 }
+
+                addKeyValue(keyValues, listNode.getDataChildByName(key), uriKeyValue, mountPoint);
+                index++;
             }
 
             consumed = consumed + index;
@@ -719,17 +714,6 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             final DataSchemaNode dataSchemaNode, final DOMMountPoint mountPoint,
             final EffectiveModelContext schemaContext) {
         final var normalized = new DataNormalizer(schemaContext).toNormalized(instance);
-
-        // FIXME: Verification before we trust this
-        final var stack = normalized.getValue();
-        if (!stack.isEmpty()) {
-            final var stackPath = stack.toSchemaPath();
-            final var nodePath = dataSchemaNode.getPath();
-            verify(stackPath.equals(nodePath), "Mismatched path: expected %s got %s", nodePath, stackPath);
-        } else {
-            verify(dataSchemaNode.equals(schemaContext), "Unexpected node %s", dataSchemaNode);
-        }
-
         return InstanceIdentifierContext.ofPath(normalized.getValue(), dataSchemaNode, normalized.getKey(), mountPoint);
     }
 
@@ -966,10 +950,12 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     public YangInstanceIdentifier toXpathRepresentation(final YangInstanceIdentifier instanceIdentifier) {
+        if (dataNormalizer == null) {
+            throw new RestconfDocumentedException("Data normalizer isn't set. Normalization isn't possible");
+        }
+
         try {
             return dataNormalizer.toLegacy(instanceIdentifier);
-        } catch (final NullPointerException e) {
-            throw new RestconfDocumentedException("Data normalizer isn't set. Normalization isn't possible", e);
         } catch (final DataNormalizationException e) {
             throw new RestconfDocumentedException("Data normalizer failed. Normalization isn't possible", e);
         }

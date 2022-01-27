@@ -157,7 +157,6 @@ public final class RestCodec {
     }
 
     public static class IdentityrefCodecImpl implements IdentityrefCodec<IdentityValuesDTO> {
-
         private static final Logger LOG = LoggerFactory.getLogger(IdentityrefCodecImpl.class);
 
         private final DOMMountPoint mountPoint;
@@ -174,11 +173,13 @@ public final class RestCodec {
         }
 
         @Override
+        @SuppressFBWarnings(value = "NP_NONNULL_RETURN_VIOLATION", justification = "See FIXME below")
         public QName deserialize(final IdentityValuesDTO data) {
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
             final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint,
                     controllerContext);
             if (module == null) {
+                // FIXME: this should be a hard error
                 LOG.info("Module was not found for namespace {}", valueWithNamespace.getNamespace());
                 LOG.info("Idenetityref will be translated as NULL for data - {}", String.valueOf(valueWithNamespace));
                 return null;
@@ -186,7 +187,6 @@ public final class RestCodec {
 
             return QName.create(module.getNamespace(), module.getRevision(), valueWithNamespace.getValue());
         }
-
     }
 
     public static class LeafrefCodecImpl implements LeafrefCodec<String> {
@@ -333,8 +333,6 @@ public final class RestCodec {
         }
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static Module getModuleByNamespace(final String namespace, final DOMMountPoint mountPoint,
             final ControllerContext controllerContext) {
         final XMLNamespace validNamespace = resolveValidNamespace(namespace, mountPoint, controllerContext);

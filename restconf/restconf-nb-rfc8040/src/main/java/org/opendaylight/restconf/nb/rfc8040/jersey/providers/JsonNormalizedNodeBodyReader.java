@@ -29,6 +29,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -41,12 +42,9 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
-import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,16 +75,15 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final EffectiveStatementInference parentSchema;
+        final Inference parentSchema;
         if (isPost) {
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath()).toInference();
-        } else if (path.getSchemaNode() instanceof SchemaContext
-            || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
-            parentSchema = SchemaInferenceStack.of(path.getSchemaContext()).toInference();
+            parentSchema = path.inference();
         } else {
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath().getParent()).toInference();
+            final var stack = path.inference().toSchemaInferenceStack();
+            if (!stack.isEmpty()) {
+                stack.exit();
+            }
+            parentSchema = stack.toInference();
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
@@ -97,7 +94,6 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
 
         NormalizedNode result = resultHolder.getResult();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
-        InstanceIdentifierContext newIIContext;
 
         while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
             final Object childNode = ((DataContainerNode) result).body().iterator().next();
@@ -109,7 +105,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
 
         if (isPost) {
             if (result instanceof MapEntryNode) {
-                iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(result.getIdentifier().getNodeType()));
+                iiToDataList.add(new NodeIdentifier(result.getIdentifier().getNodeType()));
                 iiToDataList.add(result.getIdentifier());
             } else {
                 final List<? extends @NonNull EffectiveStatement<?, ?>> parentPath = parentSchema.statementPath();

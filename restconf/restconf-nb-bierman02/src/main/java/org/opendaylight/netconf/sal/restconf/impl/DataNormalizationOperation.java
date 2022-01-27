@@ -12,8 +12,6 @@ import static com.google.common.base.Verify.verifyNotNull;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +24,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
@@ -45,17 +44,17 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 abstract class DataNormalizationOperation<T extends PathArgument> implements Identifiable<T> {
     private final T identifier;
 
-    @Override
-    public T getIdentifier() {
-        return identifier;
-    }
-
     DataNormalizationOperation(final T identifier) {
         this.identifier = identifier;
     }
 
     static DataNormalizationOperation<?> from(final EffectiveModelContext ctx) {
         return new ContainerNormalization(ctx);
+    }
+
+    @Override
+    public T getIdentifier() {
+        return identifier;
     }
 
     boolean isMixin() {
@@ -307,16 +306,8 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             extends DataContainerNormalizationOperation<AugmentationIdentifier> {
 
         AugmentationNormalization(final AugmentationSchemaNode augmentation, final DataNodeContainer schema) {
-            super(augmentationIdentifierFrom(augmentation), augmentationProxy(augmentation,schema));
-        }
-
-        private static DataNodeContainer augmentationProxy(final AugmentationSchemaNode augmentation,
-                final DataNodeContainer schema) {
-            final Set<DataSchemaNode> children = new HashSet<>();
-            for (final DataSchemaNode augNode : augmentation.getChildNodes()) {
-                children.add(schema.getDataChildByName(augNode.getQName()));
-            }
-            return new EffectiveAugmentationSchema(augmentation, children);
+            super(DataSchemaContextNode.augmentationIdentifierFrom(augmentation),
+                new EffectiveAugmentationSchema(augmentation, schema));
         }
 
         @Override
@@ -346,14 +337,6 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         @Override
         void pushToStack(final SchemaInferenceStack stack) {
             // No-op
-        }
-
-        private static AugmentationIdentifier augmentationIdentifierFrom(final AugmentationSchemaNode augmentation) {
-            final ImmutableSet.Builder<QName> potentialChildren = ImmutableSet.builder();
-            for (final DataSchemaNode child : augmentation.getChildNodes()) {
-                potentialChildren.add(child.getQName());
-            }
-            return new AugmentationIdentifier(potentialChildren.build());
         }
     }
 
@@ -507,8 +490,6 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
      * otherwise returns a DataNormalizationOperation for child as
      * call for {@link #fromDataSchemaNode(DataSchemaNode)}.
      */
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static DataNormalizationOperation<?> fromAugmentation(final DataNodeContainer parent,
             final AugmentationTarget parentAug, final DataSchemaNode child) {
         for (final AugmentationSchemaNode aug : parentAug.getAvailableAugmentations()) {

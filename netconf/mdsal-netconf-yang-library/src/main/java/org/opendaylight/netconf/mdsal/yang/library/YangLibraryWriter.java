@@ -13,7 +13,7 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(immediate = true, service = {})
-public class YangLibraryWriter implements EffectiveModelContextListener, AutoCloseable {
+public final class YangLibraryWriter implements EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibraryWriter.class);
     private static final String MODULE_SET_NAME = "state-modules";
     private static final String SCHEMA_NAME = "state-schema";
@@ -195,7 +195,7 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
                 .build()))
             .setSchema(BindingMap.of(new SchemaBuilder()
                 .setName(SCHEMA_NAME)
-                .setModuleSet(List.of(MODULE_SET_NAME))
+                .setModuleSet(Set.of(MODULE_SET_NAME))
                 .build()))
             .setDatastore(BindingMap.of(new DatastoreBuilder()
                 .setName(Operational.class)
@@ -241,7 +241,7 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
             .build();
     }
 
-    private static List<YangIdentifier> extractFeatures(final ModuleLike module) {
+    private static Set<YangIdentifier> extractFeatures(final ModuleLike module) {
         final var namespace = module.getQNameModule();
 
         return module.getFeatures().stream()
@@ -249,6 +249,6 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
             // belt-and-suspenders: make sure the feature namespace matches
             .filter(featureName -> namespace.equals(featureName.getModule()))
             .map(featureName -> new YangIdentifier(featureName.getLocalName()))
-            .collect(Collectors.toUnmodifiableList());
+            .collect(Collectors.toUnmodifiableSet());
     }
 }

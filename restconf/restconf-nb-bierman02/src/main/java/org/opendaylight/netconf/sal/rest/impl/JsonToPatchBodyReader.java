@@ -56,6 +56,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -251,17 +252,15 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                     final String target = in.nextString();
                     if (target.equals("/")) {
                         edit.setTarget(path.getInstanceIdentifier());
-                        edit.setTargetSchemaNode(path.getSchemaContext());
+                        edit.setTargetSchemaNode(SchemaInferenceStack.of(path.getSchemaContext()).toInference());
                     } else {
                         edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()).concat(target)));
 
-                        final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                            path.getSchemaContext(),
-                            codec.getDataContextTree().findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
-                                .getPath().getParent())
-                            .currentStatement();
+                        final var stack = codec.getDataContextTree().enterPath(edit.getTarget()).orElseThrow().stack();
+                        stack.exit();
+                        final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
                         verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
-                        edit.setTargetSchemaNode((SchemaNode) parentStmt);
+                        edit.setTargetSchemaNode(stack.toInference());
                     }
 
                     break;
@@ -378,12 +377,12 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @return NormalizedNode representing data
      */
     private static NormalizedNode readEditData(final @NonNull JsonReader in,
-            final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext path) {
+            final @NonNull Inference targetSchemaNode, final @NonNull InstanceIdentifierContext path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final EffectiveModelContext context = path.getSchemaContext();
         JsonParserStream.create(writer, JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(context),
-            SchemaInferenceStack.ofInstantiatedPath(context,  targetSchemaNode.getPath()).toInference())
+            targetSchemaNode)
             .parse(in);
 
         return resultHolder.getResult();
@@ -433,7 +432,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         private String id;
         private PatchEditOperation operation;
         private YangInstanceIdentifier target;
-        private SchemaNode targetSchemaNode;
+        private Inference targetSchemaNode;
         private NormalizedNode data;
 
         public String getId() {
@@ -460,11 +459,11 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
             this.target = target;
         }
 
-        public SchemaNode getTargetSchemaNode() {
+        public Inference getTargetSchemaNode() {
             return targetSchemaNode;
         }
 
-        public void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
+        public void setTargetSchemaNode(final Inference targetSchemaNode) {
             this.targetSchemaNode = targetSchemaNode;
         }
 

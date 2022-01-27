@@ -12,8 +12,8 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.google.common.collect.ImmutableList;
-import java.util.List;
+import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev131019.RevisionIdentifier;
@@ -28,7 +28,7 @@ public class ModuleBuilderTest {
         final YangIdentifier yangIdentifierOne = new YangIdentifier("YangIdentifier1");
         final YangIdentifier yangIdentifierTwo = new YangIdentifier("YangIdentifier2");
         final Uri namespace = new Uri("namespace");
-        final List<YangIdentifier> yangIdentifierList = ImmutableList.of(yangIdentifierOne, yangIdentifierTwo);
+        final Set<YangIdentifier> yangIdentifierList = ImmutableSet.of(yangIdentifierOne, yangIdentifierTwo);
         final ModuleKey moduleKeyOne = new ModuleKey(yangIdentifierOne, revision);
         final ModuleKey moduleKeyTwo = new ModuleKey(moduleKeyOne);
         moduleBuilder.setRevision(revision);

@@ -198,8 +198,8 @@ public final class YangInstanceIdentifierDeserializer {
                 final var values = ((ListInstance) step).keyValues();
                 final var schema = childNode.getDataSchemaNode();
                 pathArg = schema instanceof ListSchemaNode
-                    ? prepareNodeWithPredicates(qname, (ListSchemaNode) schema, values)
-                        : prepareNodeWithValue(qname, schema, values);
+                    ? prepareNodeWithPredicates(stack, qname, (ListSchemaNode) schema, values)
+                        : prepareNodeWithValue(stack, qname, schema, values);
             } else {
                 RestconfDocumentedException.throwIf(childNode.isKeyedEntry(),
                     ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
@@ -227,7 +227,7 @@ public final class YangInstanceIdentifierDeserializer {
         return new Result(path, stack, node);
     }
 
-    private NodeIdentifierWithPredicates prepareNodeWithPredicates(final QName qname,
+    private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,
             final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) {
         final var keyDef = schema.getKeyDefinition();
         final var keySize = keyDef.size();
@@ -239,15 +239,20 @@ public final class YangInstanceIdentifierDeserializer {
         }
 
         final var values = ImmutableMap.<QName, Object>builderWithExpectedSize(keySize);
+        final var tmp = stack.copy();
         for (int i = 0; i < keySize; ++i) {
             final QName keyName = keyDef.get(i);
-            values.put(keyName, prepareValueByType(schema.getDataChildByName(keyName), keyValues.get(i)));
+            final var child = schema.getDataChildByName(keyName);
+            tmp.enterSchemaTree(keyName);
+            values.put(keyName, prepareValueByType(tmp, child, keyValues.get(i)));
+            tmp.exit();
         }
 
         return NodeIdentifierWithPredicates.of(qname, values.build());
     }
 
-    private Object prepareValueByType(final DataSchemaNode schemaNode, final @NonNull String value) {
+    private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
+            final @NonNull String value) {
 
         TypeDefinition<? extends TypeDefinition<?>> typedef;
         if (schemaNode instanceof LeafListSchemaNode) {
@@ -257,8 +262,7 @@ public final class YangInstanceIdentifierDeserializer {
         }
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, schemaNode.getPath())
-                .resolveLeafref((LeafrefTypeDefinition) baseType);
+            typedef = stack.resolveLeafref((LeafrefTypeDefinition) baseType);
         }
 
         if (typedef instanceof IdentityrefTypeDefinition) {
@@ -272,10 +276,10 @@ public final class YangInstanceIdentifierDeserializer {
         }
     }
 
-    private NodeWithValue<?> prepareNodeWithValue(final QName qname, final DataSchemaNode schema,
-            final List<String> keyValues) {
+    private NodeWithValue<?> prepareNodeWithValue(final SchemaInferenceStack stack, final QName qname,
+            final DataSchemaNode schema, final List<String> keyValues) {
         // TODO: qname should be always equal to schema.getQName(), right?
-        return new NodeWithValue<>(qname, prepareValueByType(schema,
+        return new NodeWithValue<>(qname, prepareValueByType(stack, schema,
             // FIXME: ahem: we probably want to do something differently here
             keyValues.get(0)));
     }

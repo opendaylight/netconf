@@ -13,9 +13,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -28,7 +28,6 @@ import com.google.common.io.Resources;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.Response.Status;
@@ -36,7 +35,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -139,8 +137,8 @@ public class JSONRestconfServiceImplTest {
     @Test
     public void testPut() throws Exception {
         final PutResult result = mock(PutResult.class);
-        when(brokerFacade.commitConfigurationDataPut(notNull(EffectiveModelContext.class),
-                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), isNull(), isNull()))
+        when(brokerFacade.commitConfigurationDataPut(any(EffectiveModelContext.class),
+                any(YangInstanceIdentifier.class), any(NormalizedNode.class), isNull(), isNull()))
                 .thenReturn(result);
         doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
@@ -151,7 +149,7 @@ public class JSONRestconfServiceImplTest {
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
-        verify(brokerFacade).commitConfigurationDataPut(notNull(EffectiveModelContext.class), capturedPath.capture(),
+        verify(brokerFacade).commitConfigurationDataPut(any(EffectiveModelContext.class), capturedPath.capture(),
                 capturedNode.capture(), isNull(), isNull());
 
         verifyPath(capturedPath.getValue(), INTERFACES_QNAME, INTERFACE_QNAME,
@@ -170,8 +168,8 @@ public class JSONRestconfServiceImplTest {
     @Test
     public void testPutBehindMountPoint() throws Exception {
         final PutResult result = mock(PutResult.class);
-        when(brokerFacade.commitMountPointDataPut(notNull(DOMMountPoint.class),
-                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), isNull(), isNull()))
+        when(brokerFacade.commitMountPointDataPut(any(DOMMountPoint.class),
+                any(YangInstanceIdentifier.class), any(NormalizedNode.class), isNull(), isNull()))
                 .thenReturn(result);
         doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
@@ -203,9 +201,9 @@ public class JSONRestconfServiceImplTest {
         doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock"))).when(result)
         .getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
-        when(brokerFacade.commitConfigurationDataPut(notNull(EffectiveModelContext.class),
-                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), Mockito.anyString(),
-                Mockito.anyString())).thenReturn(result);
+        when(brokerFacade.commitConfigurationDataPut(any(EffectiveModelContext.class),
+                any(YangInstanceIdentifier.class), any(NormalizedNode.class), anyString(),
+                anyString())).thenReturn(result);
 
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
@@ -227,7 +225,7 @@ public class JSONRestconfServiceImplTest {
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
-        verify(brokerFacade).commitConfigurationDataPost(notNull(EffectiveModelContext.class), capturedPath.capture(),
+        verify(brokerFacade).commitConfigurationDataPost(any(EffectiveModelContext.class), capturedPath.capture(),
                 capturedNode.capture(), isNull(), isNull());
 
         verifyPath(capturedPath.getValue(), INTERFACES_QNAME);
@@ -256,7 +254,7 @@ public class JSONRestconfServiceImplTest {
     @Test
     public void testPostBehindMountPoint() throws Exception {
         doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade).commitConfigurationDataPost(
-                notNull(DOMMountPoint.class), notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class),
+                any(DOMMountPoint.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
                 isNull(), isNull());
 
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont";
@@ -300,18 +298,11 @@ public class JSONRestconfServiceImplTest {
     @Test
     public void testPatch() throws Exception {
         final PatchStatusContext result = mock(PatchStatusContext.class);
-        when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PatchContext.class)))
+        when(brokerFacade.patchConfigurationDataWithinTransaction(any(PatchContext.class)))
             .thenReturn(result);
 
-        List<PatchStatusEntity> patchSTatus = new ArrayList<>();
-
-        PatchStatusEntity entity = new PatchStatusEntity("edit1", true, null);
-
-        patchSTatus.add(entity);
-
-        when(result.getEditCollection())
-                .thenReturn(patchSTatus);
-        when(result.getGlobalErrors()).thenReturn(new ArrayList<>());
+        when(result.getEditCollection()).thenReturn(List.of(new PatchStatusEntity("edit1", true, null)));
+        when(result.getGlobalErrors()).thenReturn(List.of());
         when(result.getPatchId()).thenReturn("1");
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces_patch.json");
@@ -323,18 +314,10 @@ public class JSONRestconfServiceImplTest {
     @Test
     public void testPatchBehindMountPoint() throws Exception {
         final PatchStatusContext result = mock(PatchStatusContext.class);
-        when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PatchContext.class)))
-            .thenReturn(result);
+        when(brokerFacade.patchConfigurationDataWithinTransaction(any(PatchContext.class))).thenReturn(result);
 
-        List<PatchStatusEntity> patchSTatus = new ArrayList<>();
-
-        PatchStatusEntity entity = new PatchStatusEntity("edit1", true, null);
-
-        patchSTatus.add(entity);
-
-        when(result.getEditCollection())
-                .thenReturn(patchSTatus);
-        when(result.getGlobalErrors()).thenReturn(new ArrayList<>());
+        when(result.getEditCollection()).thenReturn(List.of(new PatchStatusEntity("edit1", true, null)));
+        when(result.getGlobalErrors()).thenReturn(List.of());
         when(result.getPatchId()).thenReturn("1");
 
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
@@ -349,7 +332,7 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("checkstyle:IllegalThrows")
     public void testPatchFailure() throws Throwable {
         final PatchStatusContext result = mock(PatchStatusContext.class);
-        when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PatchContext.class)))
+        when(brokerFacade.patchConfigurationDataWithinTransaction(any(PatchContext.class)))
             .thenThrow(new TransactionCommitFailedException("Transaction failed"));
 
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
@@ -365,7 +348,7 @@ public class JSONRestconfServiceImplTest {
     @Test
     public void testDelete() throws Exception {
         doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade)
-                .commitConfigurationDataDelete(notNull(YangInstanceIdentifier.class));
+                .commitConfigurationDataDelete(any(YangInstanceIdentifier.class));
 
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
 
@@ -398,8 +381,7 @@ public class JSONRestconfServiceImplTest {
 
     @Test
     public void testGetWithNoData() throws OperationFailedException {
-        doReturn(null).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class),
-                Mockito.anyString());
+        doReturn(null).when(brokerFacade).readConfigurationData(any(YangInstanceIdentifier.class), anyString());
         final String uriPath = "ietf-interfaces:interfaces";
         service.get(uriPath, LogicalDatastoreType.CONFIGURATION);
     }
@@ -486,10 +468,10 @@ public class JSONRestconfServiceImplTest {
                 .build();
 
         if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
-            doReturn(entryNode).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class),
+            doReturn(entryNode).when(brokerFacade).readConfigurationData(any(YangInstanceIdentifier.class),
                     isNull());
         } else {
-            doReturn(entryNode).when(brokerFacade).readOperationalData(notNull(YangInstanceIdentifier.class));
+            doReturn(entryNode).when(brokerFacade).readOperationalData(any(YangInstanceIdentifier.class));
         }
 
         final String uriPath = "/ietf-interfaces:interfaces/interface/eth0";
