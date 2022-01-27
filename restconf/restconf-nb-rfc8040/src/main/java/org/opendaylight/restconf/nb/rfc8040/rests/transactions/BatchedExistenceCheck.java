@@ -73,8 +73,6 @@ final class BatchedExistenceCheck {
         }
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void complete(final YangInstanceIdentifier childPath, final boolean present) {
         final int count = UPDATER.decrementAndGet(this);
         if (present) {
@@ -84,8 +82,6 @@ final class BatchedExistenceCheck {
         }
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void complete(final YangInstanceIdentifier childPath, final ReadFailedException cause) {
         UPDATER.decrementAndGet(this);
         future.set(new SimpleImmutableEntry<>(childPath, cause));

@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -22,8 +23,8 @@ import org.opendaylight.restconf.common.formatters.JSONDataTreeCandidateFormatte
 import org.opendaylight.restconf.common.formatters.XMLDataTreeCandidateFormatter;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber<YangInstanceIdenti
 
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
+    public void onDataTreeChanged(final List<DataTreeCandidate> dataTreeCandidates) {
         final Instant now = Instant.now();
         if (!checkStartStop(now)) {
             return;

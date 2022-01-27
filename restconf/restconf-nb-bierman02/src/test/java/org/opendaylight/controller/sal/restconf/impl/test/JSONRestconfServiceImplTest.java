@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
@@ -28,7 +29,6 @@ import com.google.common.io.Resources;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.Response.Status;
@@ -36,7 +36,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -147,7 +146,7 @@ public class JSONRestconfServiceImplTest {
         when(result.getStatus()).thenReturn(Status.OK);
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
-        this.service.put(uriPath, payload);
+        service.put(uriPath, payload);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
@@ -180,7 +179,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
         final String payload = loadData("/full-versions/testCont1Data.json");
 
-        this.service.put(uriPath, payload);
+        service.put(uriPath, payload);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
@@ -206,13 +205,13 @@ public class JSONRestconfServiceImplTest {
         .getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
         when(brokerFacade.commitConfigurationDataPut(notNull(EffectiveModelContext.class),
-                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), Mockito.anyString(),
-                Mockito.anyString())).thenReturn(result);
+                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), anyString(),
+                anyString())).thenReturn(result);
 
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
 
-        this.service.put(uriPath, payload);
+        service.put(uriPath, payload);
     }
 
     @SuppressWarnings("rawtypes")
@@ -225,7 +224,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = null;
         final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
 
-        this.service.post(uriPath, payload);
+        service.post(uriPath, payload);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
@@ -266,7 +265,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont";
         final String payload = loadData("/full-versions/testCont1Data.json");
 
-        this.service.post(uriPath, payload);
+        service.post(uriPath, payload);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
@@ -294,7 +293,7 @@ public class JSONRestconfServiceImplTest {
         final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
 
         try {
-            this.service.post(uriPath, payload);
+            service.post(uriPath, payload);
         } catch (final OperationFailedException e) {
             assertNotNull(e.getCause());
             throw e.getCause();
@@ -307,19 +306,12 @@ public class JSONRestconfServiceImplTest {
         when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PatchContext.class)))
             .thenReturn(result);
 
-        List<PatchStatusEntity> patchSTatus = new ArrayList<>();
-
-        PatchStatusEntity entity = new PatchStatusEntity("edit1", true, null);
-
-        patchSTatus.add(entity);
-
-        when(result.getEditCollection())
-                .thenReturn(patchSTatus);
-        when(result.getGlobalErrors()).thenReturn(new ArrayList<>());
+        when(result.getEditCollection()).thenReturn(List.of(new PatchStatusEntity("edit1", true, null)));
+        when(result.getGlobalErrors()).thenReturn(List.of());
         when(result.getPatchId()).thenReturn("1");
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces_patch.json");
-        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+        final Optional<String> patchResult = service.patch(uriPath, payload);
 
         assertTrue(patchResult.get().contains("\"ok\":[null]"));
     }
@@ -327,24 +319,16 @@ public class JSONRestconfServiceImplTest {
     @Test
     public void testPatchBehindMountPoint() throws Exception {
         final PatchStatusContext result = mock(PatchStatusContext.class);
-        when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PatchContext.class)))
-            .thenReturn(result);
+        when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PatchContext.class))).thenReturn(result);
 
-        List<PatchStatusEntity> patchSTatus = new ArrayList<>();
-
-        PatchStatusEntity entity = new PatchStatusEntity("edit1", true, null);
-
-        patchSTatus.add(entity);
-
-        when(result.getEditCollection())
-                .thenReturn(patchSTatus);
-        when(result.getGlobalErrors()).thenReturn(new ArrayList<>());
+        when(result.getEditCollection()).thenReturn(List.of(new PatchStatusEntity("edit1", true, null)));
+        when(result.getGlobalErrors()).thenReturn(List.of());
         when(result.getPatchId()).thenReturn("1");
 
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
         final String payload = loadData("/full-versions/testCont1DataPatch.json");
 
-        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+        final Optional<String> patchResult = service.patch(uriPath, payload);
 
         assertTrue(patchResult.get().contains("\"ok\":[null]"));
     }
@@ -359,7 +343,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces_patch.json");
 
-        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+        final Optional<String> patchResult = service.patch(uriPath, payload);
 
         assertTrue("Patch output is not null", patchResult.isPresent());
         String patch = patchResult.get();
@@ -373,7 +357,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
 
-        this.service.delete(uriPath);
+        service.delete(uriPath);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
@@ -387,7 +371,7 @@ public class JSONRestconfServiceImplTest {
     public void testDeleteFailure() throws Exception {
         final String invalidUriPath = "ietf-interfaces:interfaces/invalid";
 
-        this.service.delete(invalidUriPath);
+        service.delete(invalidUriPath);
     }
 
     @Test
@@ -402,16 +386,15 @@ public class JSONRestconfServiceImplTest {
 
     @Test
     public void testGetWithNoData() throws OperationFailedException {
-        doReturn(null).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class),
-                Mockito.anyString());
+        doReturn(null).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class), anyString());
         final String uriPath = "ietf-interfaces:interfaces";
-        this.service.get(uriPath, LogicalDatastoreType.CONFIGURATION);
+        service.get(uriPath, LogicalDatastoreType.CONFIGURATION);
     }
 
     @Test(expected = OperationFailedException.class)
     public void testGetFailure() throws Exception {
         final String invalidUriPath = "/ietf-interfaces:interfaces/invalid";
-        this.service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION);
+        service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION);
     }
 
     @SuppressWarnings("rawtypes")
@@ -424,7 +407,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = "toaster:make-toast";
         final String input = loadData("/full-versions/make-toast-rpc-input.json");
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.of(input));
+        final Optional<String> output = service.invokeRpc(uriPath, Optional.of(input));
 
         assertEquals("Output present", false, output.isPresent());
 
@@ -445,7 +428,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:cancel-toast";
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.empty());
+        final Optional<String> output = service.invokeRpc(uriPath, Optional.empty());
 
         assertEquals("Output present", false, output.isPresent());
 
@@ -462,7 +445,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:testOutput";
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.empty());
+        final Optional<String> output = service.invokeRpc(uriPath, Optional.empty());
 
         assertEquals("Output present", true, output.isPresent());
         assertNotNull("Returned null response", output.get());
@@ -479,7 +462,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:cancel-toast";
 
-        this.service.invokeRpc(uriPath, Optional.empty());
+        service.invokeRpc(uriPath, Optional.empty());
     }
 
     void testGet(final LogicalDatastoreType datastoreType) throws OperationFailedException {
@@ -499,7 +482,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "/ietf-interfaces:interfaces/interface/eth0";
 
-        final Optional<String> optionalResp = this.service.get(uriPath, datastoreType);
+        final Optional<String> optionalResp = service.get(uriPath, datastoreType);
         assertEquals("Response present", true, optionalResp.isPresent());
         final String jsonResp = optionalResp.get();
 

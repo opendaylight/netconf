@@ -18,14 +18,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.ModificationType;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
+import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractWebsocketSerializer<T extends Exception> {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
 
     public void serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly, final boolean skipData)
@@ -90,7 +89,7 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
 
         for (PathArgument pathArgument : path) {
             pathBuilder.append("/");
-            pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replaceAll(":", "-"));
+            pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replace(':', '-'));
             pathBuilder.append(":");
             pathBuilder.append(pathArgument.getNodeType().getLocalName());
 
@@ -99,7 +98,7 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
                 final Set<Map.Entry<QName, Object>> keys =
                         ((YangInstanceIdentifier.NodeIdentifierWithPredicates) pathArgument).entrySet();
                 for (Map.Entry<QName, Object> key : keys) {
-                    pathBuilder.append(key.getKey().getNamespace().toString().replaceAll(":", "-"));
+                    pathBuilder.append(key.getKey().getNamespace().toString().replace(':', '-'));
                     pathBuilder.append(":");
                     pathBuilder.append(key.getKey().getLocalName());
                     pathBuilder.append("='");
