@@ -13,7 +13,7 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -191,7 +191,7 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
                 .build()))
             .setSchema(BindingMap.of(new SchemaBuilder()
                 .setName(SCHEMA_NAME)
-                .setModuleSet(List.of(MODULE_SET_NAME))
+                .setModuleSet(Set.of(MODULE_SET_NAME))
                 .build()))
             .setDatastore(BindingMap.of(new DatastoreBuilder()
                 .setName(Operational.class)
