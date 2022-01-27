@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -314,7 +315,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                                                   final NetconfNode node) {
         final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
                 node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
-                node.requireSleepFactor());
+                node.requireSleepFactor().decimalValue());
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final Protocol protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
@@ -334,8 +335,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         if (node.getOdlHelloMessageCapabilities() != null) {
-            reconnectingClientConfigurationBuilder
-                    .withOdlHelloCapabilities(node.getOdlHelloMessageCapabilities().getCapability());
+            reconnectingClientConfigurationBuilder.withOdlHelloCapabilities(
+                    Lists.newArrayList(node.getOdlHelloMessageCapabilities().getCapability()));
         }
 
         return reconnectingClientConfigurationBuilder

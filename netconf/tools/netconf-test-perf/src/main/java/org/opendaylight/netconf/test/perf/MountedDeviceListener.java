@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 
 @Singleton
 @Component(immediate = true)
-public class MountedDeviceListener implements DOMMountPointListener {
+public final class MountedDeviceListener implements DOMMountPointListener {
     private static final Logger LOG = LoggerFactory.getLogger(MountedDeviceListener.class);
     private static final String TEST_NODE_PREFIX = "perf-";
     private static final String STREAM_DEFAULT_NAME = "STREAM-PERF-DEFAULT";
