@@ -175,7 +175,7 @@ public final class PostDataTransactionUtil {
     }
 
     private static void makePost(final YangInstanceIdentifier path, final NormalizedNode data,
-                                 final SchemaContext schemaContext, final RestconfTransaction transaction) {
+                                 final EffectiveModelContext schemaContext, final RestconfTransaction transaction) {
         try {
             transaction.create(path, data, schemaContext);
         } catch (RestconfDocumentedException e) {
