@@ -9,7 +9,6 @@ package org.opendaylight.netconf.nettyutil;
 
 import static java.util.Objects.requireNonNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -105,8 +104,6 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
         }
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void onChannelInactive() {
         // This is the ultimate channel inactive handler, not forwarding
         if (isCancelled()) {

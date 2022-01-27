@@ -249,9 +249,9 @@ public class RestconfImplTest {
         final String identifier = "create-notification-stream/toaster:toastDone";
 
         // register test notification stream
-        final Absolute path = Absolute.of(
-                QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(List.of(path), identifier, "XML", controllerContext);
+        Notificator.createNotificationListener(
+            List.of(Absolute.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"))),
+            identifier, "XML", controllerContext);
 
         final UriInfo uriInfo = mock(UriInfo.class);
         final UriBuilder uriBuilder = mock(UriBuilder.class);

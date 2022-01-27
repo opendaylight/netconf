@@ -14,7 +14,6 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -207,8 +206,6 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
         return FluentFuture.from(settableFuture);
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private Throwable processFailure(final Throwable failure) {
         return failure instanceof AskTimeoutException
                 ? NetconfTopologyUtils.createMasterIsDownException(id, (Exception)failure) : failure;

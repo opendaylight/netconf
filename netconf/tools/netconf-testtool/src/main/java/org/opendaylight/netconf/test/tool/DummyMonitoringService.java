@@ -12,9 +12,8 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +48,7 @@ public class DummyMonitoringService implements NetconfMonitoringService {
             .setNamespace(new Uri(capability.getModuleNamespace().get()))
             .setFormat(Yang.class)
             .setVersion(capability.getRevision().orElse(""))
-            .setLocation(Collections.singletonList(new Location(Enumeration.NETCONF)))
+            .setLocation(Set.of(new Location(Enumeration.NETCONF)))
             .withKey(new SchemaKey(Yang.class, capability.getModuleName().get(),
                 capability.getRevision().orElse("")))
             .build();
@@ -61,10 +60,10 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     public DummyMonitoringService(final Set<Capability> capabilities) {
 
         this.capabilities = new CapabilitiesBuilder().setCapability(
-                new ArrayList<>(Collections2.transform(capabilities, CAPABILITY_URI_FUNCTION))).build();
+                ImmutableSet.copyOf(Collections2.transform(capabilities, CAPABILITY_URI_FUNCTION))).build();
 
         Set<Capability> moduleCapabilities = new HashSet<>();
-        this.capabilityMultiMap = ArrayListMultimap.create();
+        capabilityMultiMap = ArrayListMultimap.create();
         for (Capability cap : capabilities) {
             if (cap.getModuleName().isPresent()) {
                 capabilityMultiMap.put(cap.getModuleName().get(), cap);
@@ -72,7 +71,7 @@ public class DummyMonitoringService implements NetconfMonitoringService {
             }
         }
 
-        this.schemas = new SchemasBuilder()
+        schemas = new SchemasBuilder()
                 .setSchema(Maps.uniqueIndex(Collections2.transform(moduleCapabilities, CAPABILITY_SCHEMA_FUNCTION),
                     Schema::key))
                 .build();

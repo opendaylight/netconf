@@ -16,10 +16,10 @@ import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<Exception> {
     private final XMLStreamWriter xmlWriter;
@@ -30,11 +30,9 @@ public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     }
 
     @Override
-    void serializeData(final EffectiveModelContext context, final SchemaPath schemaPath,
-            final Collection<PathArgument> nodePath, final DataTreeCandidateNode candidate, final boolean skipData)
-                throws Exception {
-        NormalizedNodeStreamWriter nodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context,
-            schemaPath.getParent());
+    void serializeData(final Inference parent, final Collection<PathArgument> nodePath,
+            final DataTreeCandidateNode candidate, final boolean skipData) throws Exception {
+        NormalizedNodeStreamWriter nodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, parent);
         xmlWriter.writeStartElement(DATA_CHANGE_EVENT_ELEMENT);
         serializePath(nodePath);
 

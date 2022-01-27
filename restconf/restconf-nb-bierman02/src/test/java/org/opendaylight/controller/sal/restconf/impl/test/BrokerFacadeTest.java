@@ -164,9 +164,7 @@ public class BrokerFacadeTest {
 
     @Test
     public void test503() throws Exception {
-        final RpcError error = RpcResultBuilder.newError(
-                RpcError.ErrorType.TRANSPORT,
-                ErrorTag.RESOURCE_DENIED.elementBody(),
+        final RpcError error = RpcResultBuilder.newError(ErrorType.TRANSPORT, ErrorTag.RESOURCE_DENIED,
                 "Master is down. Please try again.");
         doReturn(immediateFailedFluentFuture(new ReadFailedException("Read from transaction failed", error)))
                 .when(readTransaction).read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class));
@@ -326,9 +324,9 @@ public class BrokerFacadeTest {
     public void testRegisterToListenNotificationChanges() throws Exception {
         // create test notification listener
         final String identifier = "create-notification-stream/toaster:toastDone";
-        final Absolute path = Absolute.of(
-                QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(List.of(path), identifier, "XML", controllerContext);
+        Notificator.createNotificationListener(
+            List.of(Absolute.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"))),
+            identifier, "XML", controllerContext);
         final NotificationListenerAdapter listener = Notificator.getNotificationListenerFor(identifier).get(0);
 
         // mock registration

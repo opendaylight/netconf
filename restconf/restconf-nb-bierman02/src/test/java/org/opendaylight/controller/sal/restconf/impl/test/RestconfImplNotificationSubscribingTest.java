@@ -7,25 +7,26 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.FileNotFoundException;
 import java.time.Instant;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
@@ -40,7 +41,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -75,171 +75,94 @@ public class RestconfImplNotificationSubscribingTest {
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
         restconfImpl = RestconfImpl.newInstance(broker, controllerContext);
 
-        final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
-        Notificator.createListener(path, this.identifier, NotificationOutputType.XML, controllerContext);
+        final YangInstanceIdentifier path = mock(YangInstanceIdentifier.class);
+        Notificator.createListener(path, identifier, NotificationOutputType.XML, controllerContext);
     }
 
     @Test
     public void startTimeTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T10:02:00Z");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("start-time",  List.of("2014-10-25T10:02:00Z"))));
         Notificator.removeAllListeners();
     }
 
     @Test
     public void milisecsTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T10:02:00.12345Z");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("start-time", List.of("2014-10-25T10:02:00.12345Z"))));
         Notificator.removeAllListeners();
     }
 
     @Test
     public void zonesPlusTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T10:02:00+01:00");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("start-time", List.of("2014-10-25T10:02:00+01:00"))));
         Notificator.removeAllListeners();
     }
 
     @Test
     public void zonesMinusTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T10:02:00-01:00");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("start-time", List.of("2014-10-25T10:02:00-01:00"))));
         Notificator.removeAllListeners();
     }
 
     @Test
     public void startAndStopTimeTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T10:02:00Z");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-
-        final List<String> time2 = new ArrayList<>();
-        time2.add("2014-10-25T12:31:00Z");
-        final Entry<String, List<String>> entry2 = new SimpleImmutableEntry<>("stop-time", time2);
-
-        list.add(entry);
-        list.add(entry2);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("start-time", List.of("2014-10-25T10:02:00Z")),
+            Map.entry("stop-time", List.of("2014-10-25T12:31:00Z"))));
         Notificator.removeAllListeners();
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void stopTimeTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T12:31:00Z");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("stop-time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("stop-time", List.of("2014-10-25T12:31:00Z"))));
         Notificator.removeAllListeners();
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void badParamTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T12:31:00Z");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("time", List.of("2014-10-25T12:31:00Z"))));
         Notificator.removeAllListeners();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void badValueTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("badvalue");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("start-time", List.of("badvalue"))));
         Notificator.removeAllListeners();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void badZonesTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T10:02:00Z+1:00");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("start-time", List.of("2014-10-25T10:02:00Z+1:00"))));
         Notificator.removeAllListeners();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void badMilisecsTest() {
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T10:02:00:0026Z");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-        list.add(entry);
-
-        subscribe(list);
+        subscribe(Set.of(Map.entry("start-time", List.of("2014-10-25T10:02:00:0026Z"))));
         Notificator.removeAllListeners();
     }
 
     @Test
     public void onNotifiTest() throws Exception {
-        final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
+        final YangInstanceIdentifier path = mock(YangInstanceIdentifier.class);
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
-        final ListenerAdapter listener = Notificator.createListener(path, this.identifier, NotificationOutputType.XML,
+        final ListenerAdapter listener = Notificator.createListener(path, identifier, NotificationOutputType.XML,
                 controllerContext);
 
-        final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final List<String> time = new ArrayList<>();
-        time.add("2014-10-25T10:02:00Z");
-        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
-        list.add(entry);
+        subscribe(Set.of(Map.entry("start-time", List.of("2014-10-25T10:02:00Z"))));
 
-        subscribe(list);
-
-        ArrayList<DataTreeCandidate> candidates = new ArrayList<>(0);
         Instant startOrig = listener.getStart();
-        Assert.assertNotNull(startOrig);
-        listener.onDataTreeChanged(candidates);
+        assertNotNull(startOrig);
+        listener.onDataTreeChanged(List.of());
 
         startOrig = listener.getStart();
-        Assert.assertNull(startOrig);
+        assertNull(startOrig);
     }
 
-    private void subscribe(final List<Entry<String, List<String>>> entries) {
-        final MultivaluedMap<String, String> map = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(this.uriInfo.getQueryParameters()).thenReturn(map);
-        final UriBuilder uriBuilder = UriBuilder.fromPath("http://localhost:8181/" + this.identifier);
-        Mockito.when(this.uriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
-        final Set<Entry<String, List<String>>> set = new HashSet<>();
-        for (final Entry<String, List<String>> entry : entries) {
-            set.add(entry);
-        }
-        Mockito.when(map.entrySet()).thenReturn(set);
-        restconfImpl.subscribeToStream(this.identifier, this.uriInfo);
+    private void subscribe(final Set<Entry<String, List<String>>> entries) {
+        final MultivaluedMap<String, String> map = mock(MultivaluedMap.class);
+        when(uriInfo.getQueryParameters()).thenReturn(map);
+        final UriBuilder uriBuilder = UriBuilder.fromPath("http://localhost:8181/" + identifier);
+        when(uriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
+        when(map.entrySet()).thenReturn(entries);
+        restconfImpl.subscribeToStream(identifier, uriInfo);
     }
-
 }

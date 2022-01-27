@@ -28,12 +28,12 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.RevisionUtils;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesStateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.CommonLeafsRevisionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yanglib.api.YangLibService;
@@ -73,7 +73,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
             final YangParserFactory parserFactory) {
         this.yanglibConfig = requireNonNull(yanglibConfig);
         this.dataBroker = requireNonNull(dataBroker);
-        this.schemaRepository = new SharedSchemaRepository("yang-library", parserFactory);
+        schemaRepository = new SharedSchemaRepository("yang-library", parserFactory);
     }
 
     @Override
@@ -116,7 +116,8 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
             final Module newModule = new ModuleBuilder()
                     .setName(moduleName)
-                    .setRevision(RevisionUtils.fromYangCommon(potentialYangSource.getSourceIdentifier().getRevision()))
+                    .setRevision(CommonLeafsRevisionBuilder.fromYangCommon(
+                        potentialYangSource.getSourceIdentifier().getRevision()))
                     .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
                     .build();
 
@@ -156,7 +157,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(ModulesState.class)
             .child(Module.class, new ModuleKey(new YangIdentifier(source.getSourceIdentifier().getName()),
-                RevisionUtils.fromYangCommon(source.getSourceIdentifier().getRevision()))));
+                CommonLeafsRevisionBuilder.fromYangCommon(source.getSourceIdentifier().getRevision()))));
 
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
