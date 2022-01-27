@@ -28,11 +28,8 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -83,7 +80,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
@@ -111,9 +107,9 @@ public class BrokerFacadeTest {
 
     private BrokerFacade brokerFacade;
     private final NormalizedNode dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
-    private final FluentFuture<Optional<NormalizedNode>> dummyNodeInFuture = wrapDummyNode(this.dummyNode);
+    private final FluentFuture<Optional<NormalizedNode>> dummyNodeInFuture = wrapDummyNode(dummyNode);
     private final QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
-    private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(this.qname).build();
+    private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(qname).build();
     private ControllerContext controllerContext;
 
     @Before
@@ -123,9 +119,9 @@ public class BrokerFacadeTest {
 
         brokerFacade = BrokerFacade.newInstance(mockRpcService, domDataBroker, domNotification, controllerContext);
 
-        when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.readTransaction);
-        when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
-        when(this.domDataBroker.getExtensions()).thenReturn(ImmutableClassToInstanceMap.of(
+        when(domDataBroker.newReadOnlyTransaction()).thenReturn(readTransaction);
+        when(domDataBroker.newReadWriteTransaction()).thenReturn(rwTransaction);
+        when(domDataBroker.getExtensions()).thenReturn(ImmutableClassToInstanceMap.of(
             DOMDataTreeChangeService.class, Mockito.mock(DOMDataTreeChangeService.class)));
     }
 
@@ -148,35 +144,33 @@ public class BrokerFacadeTest {
 
     @Test
     public void testReadConfigurationData() {
-        when(this.readTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
-                this.dummyNodeInFuture);
+        when(readTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
+                dummyNodeInFuture);
 
-        final NormalizedNode actualNode = this.brokerFacade.readConfigurationData(this.instanceID);
+        final NormalizedNode actualNode = brokerFacade.readConfigurationData(instanceID);
 
-        assertSame("readConfigurationData", this.dummyNode, actualNode);
+        assertSame("readConfigurationData", dummyNode, actualNode);
     }
 
     @Test
     public void testReadOperationalData() {
-        when(this.readTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
-                this.dummyNodeInFuture);
+        when(readTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
+                dummyNodeInFuture);
 
-        final NormalizedNode actualNode = this.brokerFacade.readOperationalData(this.instanceID);
+        final NormalizedNode actualNode = brokerFacade.readOperationalData(instanceID);
 
-        assertSame("readOperationalData", this.dummyNode, actualNode);
+        assertSame("readOperationalData", dummyNode, actualNode);
     }
 
     @Test
     public void test503() throws Exception {
-        final RpcError error = RpcResultBuilder.newError(
-                RpcError.ErrorType.TRANSPORT,
-                ErrorTag.RESOURCE_DENIED.elementBody(),
+        final RpcError error = RpcResultBuilder.newError(ErrorType.TRANSPORT, ErrorTag.RESOURCE_DENIED,
                 "Master is down. Please try again.");
         doReturn(immediateFailedFluentFuture(new ReadFailedException("Read from transaction failed", error)))
                 .when(readTransaction).read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class));
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> brokerFacade.readConfigurationData(this.instanceID, "explicit"));
+            () -> brokerFacade.readConfigurationData(instanceID, "explicit"));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals("getErrorTag", ErrorTags.RESOURCE_DENIED_TRANSPORT, errors.get(0).getErrorTag());
@@ -187,10 +181,10 @@ public class BrokerFacadeTest {
     @Test
     public void testInvokeRpc() throws Exception {
         final DOMRpcResult expResult = mock(DOMRpcResult.class);
-        doReturn(immediateFluentFuture(expResult)).when(this.mockRpcService).invokeRpc(this.qname, this.dummyNode);
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(qname, dummyNode);
 
-        final ListenableFuture<? extends DOMRpcResult> actualFuture = this.brokerFacade.invokeRpc(this.qname,
-            this.dummyNode);
+        final ListenableFuture<? extends DOMRpcResult> actualFuture = brokerFacade.invokeRpc(qname,
+            dummyNode);
         assertNotNull("Future is null", actualFuture);
         final DOMRpcResult actualResult = actualFuture.get();
         assertSame("invokeRpc", expResult, actualResult);
@@ -198,49 +192,49 @@ public class BrokerFacadeTest {
 
     @Test
     public void testCommitConfigurationDataPut() throws Exception {
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(rwTransaction).commit();
 
-        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(this.rwTransaction)
-        .read(LogicalDatastoreType.CONFIGURATION, this.instanceID);
+        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(rwTransaction)
+        .read(LogicalDatastoreType.CONFIGURATION, instanceID);
 
-        final PutResult result = this.brokerFacade.commitConfigurationDataPut(mock(EffectiveModelContext.class),
-                this.instanceID, this.dummyNode, null, null);
+        final PutResult result = brokerFacade.commitConfigurationDataPut(mock(EffectiveModelContext.class),
+                instanceID, dummyNode, null, null);
 
         assertSame("commitConfigurationDataPut", CommitInfo.emptyFluentFuture(), result.getFutureOfPutData());
 
-        final InOrder inOrder = inOrder(this.domDataBroker, this.rwTransaction);
-        inOrder.verify(this.domDataBroker).newReadWriteTransaction();
-        inOrder.verify(this.rwTransaction).put(LogicalDatastoreType.CONFIGURATION, this.instanceID, this.dummyNode);
-        inOrder.verify(this.rwTransaction).commit();
+        final InOrder inOrder = inOrder(domDataBroker, rwTransaction);
+        inOrder.verify(domDataBroker).newReadWriteTransaction();
+        inOrder.verify(rwTransaction).put(LogicalDatastoreType.CONFIGURATION, instanceID, dummyNode);
+        inOrder.verify(rwTransaction).commit();
     }
 
     @Test
     public void testCommitConfigurationDataPost() {
-        when(this.rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, this.instanceID))
+        when(rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, instanceID))
                 .thenReturn(wrapExistence(false));
 
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(rwTransaction).commit();
 
-        final FluentFuture<? extends CommitInfo> actualFuture = this.brokerFacade
-                .commitConfigurationDataPost(mock(EffectiveModelContext.class), this.instanceID, this.dummyNode, null,
+        final FluentFuture<? extends CommitInfo> actualFuture = brokerFacade
+                .commitConfigurationDataPost(mock(EffectiveModelContext.class), instanceID, dummyNode, null,
                         null);
 
         assertSame("commitConfigurationDataPost", CommitInfo.emptyFluentFuture(), actualFuture);
 
-        final InOrder inOrder = inOrder(this.domDataBroker, this.rwTransaction);
-        inOrder.verify(this.domDataBroker).newReadWriteTransaction();
-        inOrder.verify(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.instanceID);
-        inOrder.verify(this.rwTransaction).put(LogicalDatastoreType.CONFIGURATION, this.instanceID, this.dummyNode);
-        inOrder.verify(this.rwTransaction).commit();
+        final InOrder inOrder = inOrder(domDataBroker, rwTransaction);
+        inOrder.verify(domDataBroker).newReadWriteTransaction();
+        inOrder.verify(rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, instanceID);
+        inOrder.verify(rwTransaction).put(LogicalDatastoreType.CONFIGURATION, instanceID, dummyNode);
+        inOrder.verify(rwTransaction).commit();
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testCommitConfigurationDataPostAlreadyExists() {
-        when(this.rwTransaction.exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class)))
+        when(rwTransaction.exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class)))
                 .thenReturn(immediateTrueFluentFuture());
         try {
             // Schema context is only necessary for ensuring parent structure
-            this.brokerFacade.commitConfigurationDataPost((EffectiveModelContext) null, this.instanceID, this.dummyNode,
+            brokerFacade.commitConfigurationDataPost((EffectiveModelContext) null, instanceID, dummyNode,
                     null, null);
         } catch (final RestconfDocumentedException e) {
             assertEquals("getErrorTag", ErrorTag.DATA_EXISTS, e.getErrors().get(0).getErrorTag());
@@ -257,20 +251,20 @@ public class BrokerFacadeTest {
         prepareDataForDelete(true);
 
         // expected result
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(rwTransaction).commit();
 
         // test
-        final FluentFuture<? extends CommitInfo> actualFuture = this.brokerFacade
-                .commitConfigurationDataDelete(this.instanceID);
+        final FluentFuture<? extends CommitInfo> actualFuture = brokerFacade
+                .commitConfigurationDataDelete(instanceID);
 
         // verify result and interactions
         assertSame("commitConfigurationDataDelete", CommitInfo.emptyFluentFuture(), actualFuture);
 
         // check exists, delete, submit
-        final InOrder inOrder = inOrder(this.domDataBroker, this.rwTransaction);
-        inOrder.verify(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.instanceID);
-        inOrder.verify(this.rwTransaction).delete(LogicalDatastoreType.CONFIGURATION, this.instanceID);
-        inOrder.verify(this.rwTransaction).commit();
+        final InOrder inOrder = inOrder(domDataBroker, rwTransaction);
+        inOrder.verify(rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, instanceID);
+        inOrder.verify(rwTransaction).delete(LogicalDatastoreType.CONFIGURATION, instanceID);
+        inOrder.verify(rwTransaction).commit();
     }
 
     /**
@@ -283,7 +277,7 @@ public class BrokerFacadeTest {
 
         // try to delete and expect DATA_MISSING error
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> brokerFacade.commitConfigurationDataDelete(this.instanceID));
+            () -> brokerFacade.commitConfigurationDataDelete(instanceID));
         final List<RestconfError> errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -296,30 +290,30 @@ public class BrokerFacadeTest {
      * @param assumeDataExists boolean to assume if data exists
      */
     private void prepareDataForDelete(final boolean assumeDataExists) {
-        when(this.rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, this.instanceID))
+        when(rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, instanceID))
                 .thenReturn(immediateBooleanFluentFuture(assumeDataExists));
     }
 
     @Test
     public void testRegisterToListenDataChanges() {
-        final ListenerAdapter listener = Notificator.createListener(this.instanceID, "stream",
+        final ListenerAdapter listener = Notificator.createListener(instanceID, "stream",
                 NotificationOutputType.XML, controllerContext);
 
         @SuppressWarnings("unchecked")
         final ListenerRegistration<ListenerAdapter> mockRegistration = mock(ListenerRegistration.class);
 
-        DOMDataTreeChangeService changeService = this.domDataBroker.getExtensions()
+        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
-        DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, this.instanceID);
+        DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, instanceID);
         when(changeService.registerDataTreeChangeListener(eq(loc), eq(listener))).thenReturn(mockRegistration);
 
-        this.brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, Scope.BASE, listener);
+        brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, Scope.BASE, listener);
 
         verify(changeService).registerDataTreeChangeListener(loc, listener);
 
         assertEquals("isListening", true, listener.isListening());
 
-        this.brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, Scope.BASE, listener);
+        brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, Scope.BASE, listener);
         verifyNoMoreInteractions(changeService);
     }
 
@@ -330,28 +324,26 @@ public class BrokerFacadeTest {
     public void testRegisterToListenNotificationChanges() throws Exception {
         // create test notification listener
         final String identifier = "create-notification-stream/toaster:toastDone";
-        final SchemaPath path = SchemaPath.create(true,
-                QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML", controllerContext);
+        Notificator.createNotificationListener(
+            List.of(Absolute.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"))),
+            identifier, "XML", controllerContext);
         final NotificationListenerAdapter listener = Notificator.getNotificationListenerFor(identifier).get(0);
 
         // mock registration
         final ListenerRegistration<NotificationListenerAdapter> registration = mock(ListenerRegistration.class);
-        when(this.domNotification.registerNotificationListener(listener,
-            Absolute.of(ImmutableList.copyOf(listener.getSchemaPath().getPathFromRoot()))))
+        when(domNotification.registerNotificationListener(listener, listener.getSchemaPath()))
                 .thenReturn(registration);
 
         // test to register listener for the first time
-        this.brokerFacade.registerToListenNotification(listener);
+        brokerFacade.registerToListenNotification(listener);
         assertEquals("Registration was not successful", true, listener.isListening());
 
         // try to register for the second time
-        this.brokerFacade.registerToListenNotification(listener);
+        brokerFacade.registerToListenNotification(listener);
         assertEquals("Registration was not successful", true, listener.isListening());
 
         // registrations should be invoked only once
-        verify(this.domNotification, times(1)).registerNotificationListener(listener,
-            Absolute.of(ImmutableList.copyOf(listener.getSchemaPath().getPathFromRoot())));
+        verify(domNotification, times(1)).registerNotificationListener(listener, listener.getSchemaPath());
 
         final DOMTransactionChain transactionChain = mock(DOMTransactionChain.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
@@ -368,15 +360,15 @@ public class BrokerFacadeTest {
         final PatchContext patchContext = mock(PatchContext.class);
         final InstanceIdentifierContext<?> identifierContext = mock(InstanceIdentifierContext.class);
 
-        when(patchContext.getData()).thenReturn(new ArrayList<>());
+        when(patchContext.getData()).thenReturn(List.of());
         doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
 
         // no mount point
         when(identifierContext.getMountPoint()).thenReturn(null);
 
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(rwTransaction).commit();
 
-        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert success
         assertTrue("Patch operation should be successful on server", status.isOk());
@@ -393,7 +385,7 @@ public class BrokerFacadeTest {
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeReadWriteTransaction transaction = mock(DOMDataTreeReadWriteTransaction.class);
 
-        when(patchContext.getData()).thenReturn(new ArrayList<>());
+        when(patchContext.getData()).thenReturn(List.of());
         doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
 
         // return mount point with broker
@@ -403,7 +395,7 @@ public class BrokerFacadeTest {
         when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
         doReturn(CommitInfo.emptyFluentFuture()).when(transaction).commit();
 
-        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert success
         assertTrue("Patch operation should be successful on mounted device", status.isOk());
@@ -429,7 +421,7 @@ public class BrokerFacadeTest {
         when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.empty());
 
 
-        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert not successful operation with error
         assertNotNull(status.getGlobalErrors());
