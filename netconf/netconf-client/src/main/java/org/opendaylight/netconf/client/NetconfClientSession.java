@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.client;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -32,6 +33,7 @@ public class NetconfClientSession extends AbstractNetconfSession<NetconfClientSe
      * @param sessionId    Session Id.
      * @param capabilities    Set of advertised capabilities. Expected to be immutable.
      */
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "'this' passed to logger")
     public NetconfClientSession(final NetconfClientSessionListener sessionListener, final Channel channel,
                                 final long sessionId, final Collection<String> capabilities) {
         super(sessionListener, channel, sessionId);
