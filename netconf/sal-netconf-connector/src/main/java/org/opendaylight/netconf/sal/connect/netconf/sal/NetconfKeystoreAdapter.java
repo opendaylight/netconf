@@ -45,8 +45,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<Keystore> {
-
+public final class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<Keystore> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfKeystoreAdapter.class);
 
     private final InstanceIdentifier<Keystore> keystoreIid = InstanceIdentifier.create(Keystore.class);

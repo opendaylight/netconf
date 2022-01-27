@@ -9,9 +9,9 @@ package org.opendaylight.netconf.mdsal.notification.impl.ops;
 
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Set;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -59,8 +59,8 @@ public class NotificationsTransformUtilTest {
     public void testTransform() throws Exception {
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
 
-        netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(new Uri("uri1"), new Uri("uri1")));
-        netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(new Uri("uri4"), new Uri("uri3")));
+        netconfCapabilityChangeBuilder.setAddedCapability(Set.of(new Uri("uri1")));
+        netconfCapabilityChangeBuilder.setDeletedCapability(Set.of(new Uri("uri4"), new Uri("uri3")));
 
         final NetconfCapabilityChange capabilityChange = netconfCapabilityChangeBuilder.build();
         final NetconfNotification transform = UTIL.transform(capabilityChange, DATE,
