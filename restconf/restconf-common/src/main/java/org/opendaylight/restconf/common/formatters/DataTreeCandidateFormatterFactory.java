@@ -9,7 +9,7 @@ package org.opendaylight.restconf.common.formatters;
 
 import java.util.Collection;
 import javax.xml.xpath.XPathExpressionException;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 
 public interface DataTreeCandidateFormatterFactory extends EventFormatterFactory<Collection<DataTreeCandidate>> {
 

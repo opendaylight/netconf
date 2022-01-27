@@ -23,7 +23,8 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.UnqualifiedQName;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
 /**
  * Intermediate representation of a parsed {@code api-path} string as defined in
@@ -38,15 +39,15 @@ public final class ApiPath implements Immutable {
      */
     public abstract static class Step implements Immutable {
         private final @Nullable String module;
-        private final UnqualifiedQName identifier;
+        private final Unqualified identifier;
 
         Step(final @Nullable String module, final String identifier) {
-            this.identifier = verifyNotNull(UnqualifiedQName.tryCreate(identifier), "Unexpected invalid identifier %s",
-                identifier);
+            this.identifier = verifyNotNull(UnresolvedQName.tryLocalName(identifier),
+                "Unexpected invalid identifier %s", identifier);
             this.module = module;
         }
 
-        public UnqualifiedQName identifier() {
+        public Unqualified identifier() {
             return identifier;
         }
 
