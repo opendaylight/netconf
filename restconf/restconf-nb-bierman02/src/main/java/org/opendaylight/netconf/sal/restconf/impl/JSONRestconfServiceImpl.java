@@ -283,8 +283,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         final RpcError[] to = new RpcError[from.size()];
         int index = 0;
         for (final RestconfError e: from) {
-            to[index++] = RpcResultBuilder.newError(e.getErrorType().toLegacy(), e.getErrorTag().elementBody(),
-                    e.getErrorMessage());
+            to[index++] = RpcResultBuilder.newError(e.getErrorType(), e.getErrorTag(), e.getErrorMessage());
         }
 
         return to;

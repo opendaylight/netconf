@@ -31,13 +31,13 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class MdsalRestconfTransaction extends RestconfTransaction {
     private DOMDataTreeReadWriteTransaction rwTx;
 
     MdsalRestconfTransaction(final DOMDataBroker dataBroker) {
-        this.rwTx = dataBroker.newReadWriteTransaction();
+        rwTx = dataBroker.newReadWriteTransaction();
     }
 
     @Override
@@ -67,7 +67,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     public void create(final YangInstanceIdentifier path, final NormalizedNode data,
-                       final SchemaContext schemaContext) {
+                       final EffectiveModelContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final NormalizedNode emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
             merge(YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
@@ -93,7 +93,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     public void replace(final YangInstanceIdentifier path, final NormalizedNode data,
-                        final SchemaContext schemaContext) {
+                        final EffectiveModelContext schemaContext) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             merge(YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);

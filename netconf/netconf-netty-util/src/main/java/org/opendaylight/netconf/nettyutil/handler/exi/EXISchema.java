@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Suppliers;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Supplier;
@@ -57,10 +58,12 @@ public enum EXISchema {
     private String option;
     private Supplier<Grammars> grammarsSupplier;
 
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+        justification = "https://github.com/spotbugs/spotbugs/issues/1867")
     EXISchema(final String option) {
         this.option = requireNonNull(option);
         // Grammar instantiation can be CPU-intensive, hence we instantiate it lazily through a memoizing supplier
-        this.grammarsSupplier = Suppliers.memoize(this::createGrammar);
+        grammarsSupplier = Suppliers.memoize(this::createGrammar);
     }
 
     final String getOption() {

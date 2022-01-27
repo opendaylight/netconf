@@ -10,6 +10,7 @@ package org.opendaylight.netconf.callhome.protocol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
@@ -32,6 +33,7 @@ import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// Non-final for testing
 class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeSessionContext.class);
@@ -48,15 +50,16 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     private final InetSocketAddress remoteAddress;
     private final PublicKey serverKey;
 
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "Passing 'this' around")
     CallHomeSessionContext(final ClientSession sshSession, final CallHomeAuthorization authorization,
                            final SocketAddress remoteAddress, final Factory factory) {
         this.authorization = requireNonNull(authorization, "authorization");
         checkArgument(this.authorization.isServerAllowed(), "Server was not allowed.");
-        this.factory = requireNonNull(factory, "factory");
-        this.sshSession = requireNonNull(sshSession, "sshSession");
+        this.factory = requireNonNull(factory);
+        this.sshSession = requireNonNull(sshSession);
         this.sshSession.setAttribute(SESSION_KEY, this);
         this.remoteAddress = (InetSocketAddress) this.sshSession.getIoSession().getRemoteAddress();
-        this.serverKey = this.sshSession.getServerKey();
+        serverKey = this.sshSession.getServerKey();
     }
 
     static CallHomeSessionContext getFrom(final ClientSession sshSession) {
@@ -171,7 +174,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         }
 
         CallHomeNetconfSubsystemListener getChannelOpenListener() {
-            return this.subsystemListener;
+            return subsystemListener;
         }
 
         @Nullable CallHomeSessionContext createIfNotExists(final ClientSession sshSession,
