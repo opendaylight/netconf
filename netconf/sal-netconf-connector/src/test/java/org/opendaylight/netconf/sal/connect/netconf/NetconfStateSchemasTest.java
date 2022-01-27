@@ -8,9 +8,11 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -18,13 +20,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -46,6 +45,8 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -66,7 +67,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemasTest.class);
 
-    private static final NetconfSessionPreferences CAPS = NetconfSessionPreferences.fromStrings(Collections.singleton(
+    private static final NetconfSessionPreferences CAPS = NetconfSessionPreferences.fromStrings(Set.of(
         "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04"));
     private final RemoteDeviceId deviceId = new RemoteDeviceId("device", new InetSocketAddress(99));
     private final int numberOfSchemas = 73;
@@ -119,7 +120,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
                         .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
                 .withChild(data)
                 .build();
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcReply))).when(rpc)
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcReply))).when(rpc)
             .invokeRpc(eq(NETCONF_GET_QNAME), any());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
@@ -131,7 +132,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testCreateMonitoringNotSupported() throws Exception {
-        final NetconfSessionPreferences caps = NetconfSessionPreferences.fromStrings(Collections.emptySet());
+        final NetconfSessionPreferences caps = NetconfSessionPreferences.fromStrings(Set.of());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, caps, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertTrue(availableYangSchemasQNames.isEmpty());
@@ -140,7 +141,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     @Test
     public void testCreateFail() throws Exception {
         when(rpc.invokeRpc(eq(NETCONF_GET_QNAME), any())).thenReturn(
-                immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("not available")));
+                Futures.immediateFailedFuture(new DOMRpcImplementationNotAvailableException("not available")));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertTrue(availableYangSchemasQNames.isEmpty());
@@ -148,35 +149,30 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testCreateRpcError() throws Exception {
-        final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, "fail", "fail");
-        doReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcError))).when(rpc)
+        final RpcError rpcError = RpcResultBuilder.newError(ErrorType.RPC, new ErrorTag("fail"), "fail");
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(rpc)
             .invokeRpc(eq(NETCONF_GET_QNAME), any());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertTrue(availableYangSchemasQNames.isEmpty());
     }
 
-    @SuppressWarnings({ "checkstyle:IllegalThrows", "checkstyle:avoidHidingCauseException" })
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testCreateInterrupted() throws Throwable {
         //NetconfStateSchemas.create calls Thread.currentThread().interrupt(), so it must run in its own thread
         final Future<?> testFuture = Executors.newSingleThreadExecutor().submit(() -> {
             final ListenableFuture<DOMRpcResult> interruptedFuture = mock(ListenableFuture.class);
             try {
                 when(interruptedFuture.get()).thenThrow(new InterruptedException("interrupted"));
-                doReturn(FluentFuture.from(interruptedFuture)).when(rpc)
-                    .invokeRpc(eq(NETCONF_GET_QNAME), any());
+                doReturn(interruptedFuture).when(rpc).invokeRpc(eq(NETCONF_GET_QNAME), any());
                 NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
             } catch (final InterruptedException | ExecutionException e) {
                 LOG.info("Operation failed.", e);
             }
-
         });
-        try {
-            testFuture.get(3, TimeUnit.SECONDS);
-        } catch (final ExecutionException e) {
-            throw e.getCause();
-        }
+
+        assertThat(assertThrows(ExecutionException.class, () -> testFuture.get(3, TimeUnit.SECONDS)).getCause(),
+            instanceOf(RuntimeException.class));
     }
 
     @Test

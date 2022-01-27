@@ -28,6 +28,7 @@ import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// Non-final for testing
 class MinaSshNettyChannel extends AbstractServerChannel {
     private static final Logger LOG = LoggerFactory.getLogger(MinaSshNettyChannel.class);
     private static final ChannelMetadata METADATA = new ChannelMetadata(false);
@@ -46,9 +47,9 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         this.context = requireNonNull(context);
         this.session = requireNonNull(session);
         this.sshChannel = requireNonNull(sshChannel);
-        this.sshReadHandler = new AsyncSshHandlerReader(
+        sshReadHandler = new AsyncSshHandlerReader(
             new ConnectionClosedDuringRead(), new FireReadMessage(), "netconf", sshChannel.getAsyncOut());
-        this.sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());
+        sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());
         pipeline().addFirst(createChannelAdapter());
     }
 
