@@ -13,15 +13,11 @@ import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARA
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -46,10 +42,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
 import org.opendaylight.yangtools.yang.common.Empty;
 
-class NetconfCapabilityMonitoringService implements CapabilityListener, AutoCloseable {
-
+final class NetconfCapabilityMonitoringService implements CapabilityListener, AutoCloseable {
     private static final Schema.Location NETCONF_LOCATION = new Schema.Location(Schema.Location.Enumeration.NETCONF);
-    private static final List<Schema.Location> NETCONF_LOCATIONS = ImmutableList.of(NETCONF_LOCATION);
+    private static final Set<Schema.Location> NETCONF_LOCATIONS = Set.of(NETCONF_LOCATION);
     private static final BasicCapability CANDIDATE_CAPABILITY =
             new BasicCapability(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
     private static final BasicCapability URL_CAPABILITY =
@@ -59,7 +54,6 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     private final NetconfOperationServiceFactory netconfOperationProvider;
     private final Map<Uri, Capability> capabilities = new HashMap<>();
     private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = new HashMap<>();
-
 
     private final Set<NetconfMonitoringService.CapabilitiesListener> listeners = new HashSet<>();
     private volatile BaseNotificationPublisherRegistration notificationPublisher;
@@ -130,7 +124,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     }
 
     synchronized Capabilities getCapabilities() {
-        return new CapabilitiesBuilder().setCapability(Lists.newArrayList(capabilities.keySet())).build();
+        return new CapabilitiesBuilder().setCapability(Set.copyOf(capabilities.keySet())).build();
     }
 
     synchronized AutoCloseable registerListener(final NetconfMonitoringService.CapabilitiesListener listener) {
@@ -161,12 +155,12 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         return new SchemasBuilder().setSchema(schemas).build();
     }
 
-    private static List<Schema.Location> transformLocations(final Collection<String> locations) {
+    private static Set<Schema.Location> transformLocations(final Collection<String> locations) {
         if (locations.isEmpty()) {
             return NETCONF_LOCATIONS;
         }
 
-        final Builder<Schema.Location> b = ImmutableList.builder();
+        final var b = ImmutableSet.<Schema.Location>builder();
         b.add(NETCONF_LOCATION);
 
         for (final String location : locations) {
@@ -214,22 +208,20 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
 
 
     private static NetconfCapabilityChange computeDiff(final Set<Capability> added, final Set<Capability> removed) {
-        final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
-        netconfCapabilityChangeBuilder
-                .setChangedBy(new ChangedByBuilder().setServerOrUser(
-                    new ServerBuilder().setServer(Empty.value()).build()).build());
-        netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(Collections2
-                .transform(removed, CAPABILITY_TO_URI)));
-        netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(Collections2
-                .transform(added, CAPABILITY_TO_URI)));
-        // TODO modified should be computed ... but why ?
-        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.emptyList());
-        return netconfCapabilityChangeBuilder.build();
+        return new NetconfCapabilityChangeBuilder()
+            .setChangedBy(new ChangedByBuilder()
+                .setServerOrUser(new ServerBuilder().setServer(Empty.value()).build())
+                .build())
+            .setDeletedCapability(Set.copyOf(Collections2.transform(removed, CAPABILITY_TO_URI)))
+            .setAddedCapability(Set.copyOf(Collections2.transform(added, CAPABILITY_TO_URI)))
+            // TODO modified should be computed ... but why ?
+            .setModifiedCapability(Set.of())
+            .build();
     }
 
 
     private void onCapabilitiesAdded(final Set<Capability> addedCaps) {
-        this.capabilities.putAll(Maps.uniqueIndex(setupCapabilities(addedCaps), CAPABILITY_TO_URI));
+        capabilities.putAll(Maps.uniqueIndex(setupCapabilities(addedCaps), CAPABILITY_TO_URI));
     }
 
     private void onCapabilitiesRemoved(final Set<Capability> removedCaps) {
