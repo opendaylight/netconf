@@ -66,6 +66,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -167,8 +168,8 @@ public class NetconfDeviceCommunicatorTest {
 
         communicator.onSessionDown(mockSession, new Exception("mock ex"));
 
-        verifyErrorRpcResult(resultFuture1.get(), RpcError.ErrorType.TRANSPORT, "operation-failed");
-        verifyErrorRpcResult(resultFuture2.get(), RpcError.ErrorType.TRANSPORT, "operation-failed");
+        verifyErrorRpcResult(resultFuture1.get(), ErrorType.TRANSPORT, "operation-failed");
+        verifyErrorRpcResult(resultFuture2.get(), ErrorType.TRANSPORT, "operation-failed");
 
         verify(mockDevice).onRemoteSessionDown();
 
@@ -295,7 +296,7 @@ public class NetconfDeviceCommunicatorTest {
         // Should have an immediate result
         RpcResult<NetconfMessage> rpcResult = resultFuture.get(3, TimeUnit.MILLISECONDS);
 
-        RpcError rpcError = verifyErrorRpcResult(rpcResult, RpcError.ErrorType.TRANSPORT, "operation-failed");
+        RpcError rpcError = verifyErrorRpcResult(rpcResult,.ErrorType.TRANSPORT, "operation-failed");
         assertEquals("RpcError message contains \"mock error\"", true,
                 rpcError.getMessage().contains("mock error"));
     }
@@ -545,7 +546,7 @@ public class NetconfDeviceCommunicatorTest {
         assertNotNull("RpcResult errors is null", rpcResult.getErrors());
         assertEquals("Errors size", 1, rpcResult.getErrors().size());
         RpcError rpcError = rpcResult.getErrors().iterator().next();
-        assertEquals("getErrorSeverity", RpcError.ErrorSeverity.ERROR, rpcError.getSeverity());
+        assertEquals("getErrorSeverity", ErrorSeverity.ERROR, rpcError.getSeverity());
         assertEquals("getErrorType", expErrorType, rpcError.getErrorType());
         assertEquals("getErrorTag", expErrorTag, rpcError.getTag());
 

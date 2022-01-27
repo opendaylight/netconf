@@ -7,7 +7,6 @@
  */
 package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
-import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -17,13 +16,10 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 
-public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
-
+public final class MdsalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
     private final MonitoringToMdsalWriter monitoringToMdsalWriter;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
     private final NetconfMonitoringService netconfMonitoringService;
-
-    private static final Set<Capability> CAPABILITIES = Collections.emptySet();
 
     public MdsalMonitoringMapperFactory(
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
@@ -41,7 +37,7 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
         return new NetconfOperationService() {
             @Override
             public Set<NetconfOperation> getNetconfOperations() {
-                return Collections.singleton(new GetSchema(netconfSessionIdForReporting, netconfMonitoringService));
+                return Set.of(new GetSchema(netconfSessionIdForReporting, netconfMonitoringService));
             }
 
             @Override
@@ -56,7 +52,7 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
         // TODO No capabilities exposed to prevent clashes with schemas from mdsal-netconf-connector (it exposes all the
         // schemas). If the schemas exposed by mdsal-netconf-connector are filtered, this class would expose monitoring
         // related models.
-        return CAPABILITIES;
+        return Set.of();
     }
 
     @Override

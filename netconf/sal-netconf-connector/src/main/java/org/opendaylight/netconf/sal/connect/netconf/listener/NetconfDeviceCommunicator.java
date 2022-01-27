@@ -40,8 +40,8 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -222,7 +222,7 @@ public class NetconfDeviceCommunicator
             if (Strings.isNullOrEmpty(reason)) {
                 future.set(createSessionDownRpcResult());
             } else {
-                future.set(createErrorRpcResult(RpcError.ErrorType.TRANSPORT, reason));
+                future.set(createErrorRpcResult(ErrorType.TRANSPORT, reason));
             }
         }
 
@@ -230,12 +230,11 @@ public class NetconfDeviceCommunicator
     }
 
     private RpcResult<NetconfMessage> createSessionDownRpcResult() {
-        return createErrorRpcResult(RpcError.ErrorType.TRANSPORT,
+        return createErrorRpcResult(ErrorType.TRANSPORT,
                 String.format("The netconf session to %1$s is disconnected", id.getName()));
     }
 
-    private static RpcResult<NetconfMessage> createErrorRpcResult(final RpcError.ErrorType errorType,
-            final String message) {
+    private static RpcResult<NetconfMessage> createErrorRpcResult(final ErrorType errorType, final String message) {
         return RpcResultBuilder.<NetconfMessage>failed()
             .withError(errorType, ErrorTag.OPERATION_FAILED.elementBody(), message).build();
     }
@@ -398,8 +397,7 @@ public class NetconfDeviceCommunicator
                         future.cause());
 
                 if (future.cause() != null) {
-                    req.future.set(createErrorRpcResult(RpcError.ErrorType.TRANSPORT,
-                            future.cause().getLocalizedMessage()));
+                    req.future.set(createErrorRpcResult(ErrorType.TRANSPORT, future.cause().getLocalizedMessage()));
                 } else {
                     req.future.set(createSessionDownRpcResult()); // assume session is down
                 }
