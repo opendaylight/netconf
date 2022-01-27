@@ -53,7 +53,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
-import org.opendaylight.yangtools.yang.common.RpcError.ErrorType;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
@@ -118,7 +118,7 @@ public class NcmountServiceImpl implements NcmountService {
             InstanceIdentifier.create(RouterStatic.class).child(Vrfs.class).child(Vrf.class, vrf.key()), vrf);
 
         return writeTransaction.commit().transform(
-            info -> RpcResultBuilder.success(new WriteRoutesOutputBuilder()).build(), MoreExecutors.directExecutor());
+            info -> RpcResultBuilder.success(new WriteRoutesOutputBuilder().build()).build(), MoreExecutors.directExecutor());
     }
 
     @Override

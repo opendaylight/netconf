@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * NetconfOperationService aggregator. Makes a collection of operation services accessible as one.
  */
-public class AggregatedNetconfOperationServiceFactory
+public final class AggregatedNetconfOperationServiceFactory
         implements NetconfOperationServiceFactory, NetconfOperationServiceFactoryListener, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregatedNetconfOperationServiceFactory.class);
@@ -49,7 +49,7 @@ public class AggregatedNetconfOperationServiceFactory
     }
 
     @Override
-    public synchronized void onAddNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
+    public synchronized void onAddNetconfOperationServiceFactory(final NetconfOperationServiceFactory service) {
         factories.add(service);
 
         for (final CapabilityListener listener : listeners) {
@@ -60,7 +60,7 @@ public class AggregatedNetconfOperationServiceFactory
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public synchronized void onRemoveNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
+    public synchronized void onRemoveNetconfOperationServiceFactory(final NetconfOperationServiceFactory service) {
         factories.remove(service);
 
         for (final AutoCloseable autoCloseable : registrations.get(service)) {
@@ -129,7 +129,7 @@ public class AggregatedNetconfOperationServiceFactory
             for (final NetconfOperationServiceFactory factory : factories) {
                 b.add(factory.createService(netconfSessionIdForReporting));
             }
-            this.services = b.build();
+            services = b.build();
         }
 
         @Override
