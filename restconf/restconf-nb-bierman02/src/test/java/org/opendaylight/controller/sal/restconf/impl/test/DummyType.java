@@ -10,7 +10,6 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.Status;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
@@ -21,12 +20,6 @@ public class DummyType implements TypeDefinition<DummyType> {
     @Override
     public QName getQName() {
         return dummyQName;
-    }
-
-    @Override
-    public SchemaPath getPath() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

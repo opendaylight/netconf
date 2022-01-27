@@ -49,6 +49,8 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -144,8 +146,8 @@ public class RestconfInvokeOperationsServiceImplTest {
         assertEquals(1, errorList.size());
         final RpcError actual = errorList.iterator().next();
         assertEquals("No implementation of RPC " + errorRpc + " available.", actual.getMessage());
-        assertEquals("operation-failed", actual.getTag());
-        assertEquals(RpcError.ErrorType.RPC, actual.getErrorType());
+        assertEquals(ErrorTag.OPERATION_FAILED, actual.getTag());
+        assertEquals(ErrorType.RPC, actual.getErrorType());
     }
 
     @Test

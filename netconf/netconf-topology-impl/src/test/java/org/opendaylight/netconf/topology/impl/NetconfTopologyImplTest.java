@@ -26,7 +26,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import org.junit.Before;
@@ -75,6 +74,7 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
@@ -207,7 +207,7 @@ public class NetconfTopologyImplTest {
                 .setKeepaliveDelay(Uint32.valueOf(1000))
                 .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
                 .setMaxConnectionAttempts(Uint32.ZERO)
-                .setSleepFactor(new BigDecimal("1.5"))
+                .setSleepFactor(Decimal64.valueOf("1.5"))
                 .setConnectionTimeoutMillis(Uint32.valueOf(20000));
 
         final NetconfReconnectingClientConfiguration configuration =

@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import com.google.common.collect.ImmutableList;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.text.ParseException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -88,8 +87,6 @@ final class FieldsParameterParser {
         }
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private @NonNull NodeSelectorParser getParser() {
         final var local = parsers;
         if (local != null) {
@@ -101,8 +98,6 @@ final class FieldsParameterParser {
         return new NodeSelectorParser();
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void putParser(final NodeSelectorParser parser) {
         var local = parsers;
         if (local == null) {
@@ -112,8 +107,6 @@ final class FieldsParameterParser {
         local.push(parser);
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static void expectIdentifierStart(final String str, final int offset) throws ParseException {
         final char ch = charAt(str, offset);
         if (!YangNames.IDENTIFIER_START.matches(ch)) {
@@ -121,8 +114,6 @@ final class FieldsParameterParser {
         }
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static char charAt(final String str, final int offset) throws ParseException {
         if (str.length() == offset) {
             throw new ParseException("Unexpected end of input", offset);
