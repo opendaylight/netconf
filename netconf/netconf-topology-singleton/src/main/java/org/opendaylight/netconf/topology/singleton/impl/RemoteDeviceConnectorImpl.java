@@ -15,7 +15,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -68,6 +67,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -99,9 +99,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
-        this.privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
-        this.privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
-        this.encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
+        privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
+        privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
+        encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
         keystoreAdapter = new NetconfKeystoreAdapter(netconfTopologyDeviceSetup.getDataBroker());
     }
 
@@ -113,7 +113,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getPort());
 
-        this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
+        deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
         final NetconfReconnectingClientConfiguration clientConfig =
@@ -282,7 +282,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 : node.getBetweenAttemptsTimeoutMillis().toJava();
         final boolean isTcpOnly = node.getTcpOnly() == null
                 ? NetconfTopologyUtils.DEFAULT_IS_TCP_ONLY : node.getTcpOnly();
-        final BigDecimal sleepFactor = node.getSleepFactor() == null
+        final Decimal64 sleepFactor = node.getSleepFactor() == null
                 ? NetconfTopologyUtils.DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 
         final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue().toJava());

@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -76,7 +76,7 @@ abstract class AbstractNotificationsData {
      * @return {@link DOMResult}
      */
     protected DOMResult writeNormalizedNode(final NormalizedNode normalized, final EffectiveModelContext context,
-            final SchemaPath schemaPath) throws IOException, XMLStreamException {
+            final Absolute schemaPath) throws IOException, XMLStreamException {
         final Document doc = UntrustedXML.newDocumentBuilder().newDocument();
         final DOMResult result = new DOMResult(doc);
         NormalizedNodeWriter normalizedNodeWriter = null;

@@ -10,9 +10,11 @@ package org.opendaylight.netconf.sal.streams.listeners;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
@@ -28,11 +30,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -82,7 +84,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
+    public void onDataTreeChanged(final List<DataTreeCandidate> dataTreeCandidates) {
         final Instant now = Instant.now();
         if (!checkStartStop(now, this)) {
             return;
@@ -101,12 +103,12 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     @Override
     public String getStreamName() {
-        return this.streamName;
+        return streamName;
     }
 
     @Override
     public String getOutputType() {
-        return this.outputType.getName();
+        return outputType.getName();
     }
 
     /**
@@ -115,7 +117,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @return Path pointed to data in data store.
      */
     public YangInstanceIdentifier getPath() {
-        return this.path;
+        return path;
     }
 
     /**
@@ -125,7 +127,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
-        if (this.outputType.equals(NotificationOutputType.JSON)) {
+        if (outputType.equals(NotificationOutputType.JSON)) {
             event.setData(XML.toJSONObject(xml).toString());
         } else {
             event.setData(xml);
@@ -318,12 +320,12 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         dataChangeEventElement.appendChild(operationElement);
 
         try {
-            final var stack = SchemaInferenceStack.of(schemaContext);
-            eventPath.getParent().getPathArguments().stream()
+            final DOMResult domResult = writeNormalizedNode(normalized, schemaContext, Absolute.of(eventPath.getParent()
+                .getPathArguments().stream()
                     .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
                     .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
-                    .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
-            final DOMResult domResult = writeNormalizedNode(normalized, schemaContext, stack.toSchemaPath());
+                    .map(PathArgument::getNodeType)
+                    .collect(ImmutableList.toImmutableList())));
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("data");
             dataElement.appendChild(result);
