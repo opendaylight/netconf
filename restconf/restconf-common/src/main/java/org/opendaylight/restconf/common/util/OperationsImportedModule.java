@@ -50,7 +50,7 @@ final class OperationsImportedModule extends AbstractOperationsModule {
     }
 
     @Override
-    public Collection<? extends EffectiveStatement<?, ?>> effectiveSubstatements() {
+    public List<EffectiveStatement<?, ?>> effectiveSubstatements() {
         return List.of();
     }
 }

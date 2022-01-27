@@ -8,11 +8,7 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +21,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
@@ -43,11 +40,6 @@ import org.opendaylight.yangtools.yang.model.util.EffectiveAugmentationSchema;
 abstract class DataNormalizationOperation<T extends PathArgument> implements Identifiable<T> {
     private final T identifier;
 
-    @Override
-    public T getIdentifier() {
-        return identifier;
-    }
-
     DataNormalizationOperation(final T identifier) {
         this.identifier = identifier;
     }
@@ -56,12 +48,17 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         return new ContainerNormalization(ctx);
     }
 
+    @Override
+    public T getIdentifier() {
+        return identifier;
+    }
+
     boolean isMixin() {
         return false;
     }
 
     Set<QName> getQNameIdentifiers() {
-        return Collections.singleton(identifier.getNodeType());
+        return Set.of(identifier.getNodeType());
     }
 
     abstract DataNormalizationOperation<?> getChild(PathArgument child) throws DataNormalizationException;
@@ -232,16 +229,8 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             extends DataContainerNormalizationOperation<AugmentationIdentifier> {
 
         AugmentationNormalization(final AugmentationSchemaNode augmentation, final DataNodeContainer schema) {
-            super(augmentationIdentifierFrom(augmentation), augmentationProxy(augmentation,schema));
-        }
-
-        private static DataNodeContainer augmentationProxy(final AugmentationSchemaNode augmentation,
-                final DataNodeContainer schema) {
-            final Set<DataSchemaNode> children = new HashSet<>();
-            for (final DataSchemaNode augNode : augmentation.getChildNodes()) {
-                children.add(schema.getDataChildByName(augNode.getQName()));
-            }
-            return new EffectiveAugmentationSchema(augmentation, children);
+            super(DataSchemaContextNode.augmentationIdentifierFrom(augmentation),
+                new EffectiveAugmentationSchema(augmentation, schema));
         }
 
         @Override
@@ -267,14 +256,6 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         Set<QName> getQNameIdentifiers() {
             return getIdentifier().getPossibleChildNames();
         }
-
-        private static AugmentationIdentifier augmentationIdentifierFrom(final AugmentationSchemaNode augmentation) {
-            final ImmutableSet.Builder<QName> potentialChildren = ImmutableSet.builder();
-            for (final DataSchemaNode child : augmentation.getChildNodes()) {
-                potentialChildren.add(child.getQName());
-            }
-            return new AugmentationIdentifier(potentialChildren.build());
-        }
     }
 
     private static final class MapMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
@@ -282,8 +263,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
 
         MapMixinNormalization(final ListSchemaNode list) {
             super(new NodeIdentifier(list.getQName()));
-            this.innerNode = new ListItemNormalization(NodeIdentifierWithPredicates.of(list.getQName(),
-                    Collections.<QName, Object>emptyMap()), list);
+            innerNode = new ListItemNormalization(NodeIdentifierWithPredicates.of(list.getQName(), Map.of()), list);
         }
 
         @Override
@@ -308,7 +288,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
 
         UnkeyedListMixinNormalization(final ListSchemaNode list) {
             super(new NodeIdentifier(list.getQName()));
-            this.innerNode = new UnkeyedListItemNormalization(list);
+            innerNode = new UnkeyedListItemNormalization(list);
         }
 
         @Override
@@ -393,8 +373,6 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
      * otherwise returns a DataNormalizationOperation for child as
      * call for {@link #fromDataSchemaNode(DataSchemaNode)}.
      */
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static DataNormalizationOperation<?> fromAugmentation(final DataNodeContainer parent,
             final AugmentationTarget parentAug, final DataSchemaNode child) {
         for (final AugmentationSchemaNode aug : parentAug.getAvailableAugmentations()) {

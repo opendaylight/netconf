@@ -22,7 +22,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -189,10 +188,9 @@ public class InvokeRpcMethodTest {
 
     @Test
     public void testInvokeRpcWithNoPayloadRpc_FailWithRpcError() {
-        final List<RpcError> rpcErrors = Arrays.asList(
-                RpcResultBuilder.newError(RpcError.ErrorType.TRANSPORT, "bogusTag", "foo"),
-                RpcResultBuilder.newWarning(RpcError.ErrorType.RPC, "in-use", "bar",
-                        "app-tag", null, null));
+        final List<RpcError> rpcErrors = List.of(
+                RpcResultBuilder.newError(ErrorType.TRANSPORT, new ErrorTag("bogusTag"), "foo"),
+                RpcResultBuilder.newWarning(ErrorType.RPC, ErrorTag.IN_USE, "bar", "app-tag", null, null));
 
         final DOMRpcResult result = new DefaultDOMRpcResult(rpcErrors);
         final QName path = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");

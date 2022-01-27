@@ -17,7 +17,6 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -284,8 +283,6 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
         return settableFuture;
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private Throwable processFailure(final Throwable failure) {
         return failure instanceof AskTimeoutException
             ? NetconfTopologyUtils.createMasterIsDownException(id, (Exception) failure) : failure;
@@ -297,8 +294,6 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
         return settableFuture;
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static DOMRpcResult mapInvokeRpcMessageReplyToDOMRpcResult(final InvokeRpcMessageReply reply) {
         if (reply.getNormalizedNodeMessage() == null) {
             return new DefaultDOMRpcResult(new ArrayList<>(reply.getRpcErrors()));
