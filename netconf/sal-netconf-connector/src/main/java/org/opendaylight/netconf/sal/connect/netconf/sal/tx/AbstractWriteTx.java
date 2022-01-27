@@ -18,7 +18,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -57,9 +56,10 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     protected volatile boolean finished = false;
     protected final boolean isLockAllowed;
 
-    public AbstractWriteTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "Behavior-only subclasses")
+    AbstractWriteTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {
-        this.netOps = netconfOps;
+        netOps = netconfOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
         this.isLockAllowed = isLockAllowed;
@@ -89,6 +89,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         return true;
     }
 
+    // FIXME: only called from ctor which needs @SuppressDBWarnings. Refactor class hierarchy without this method (here)
     protected abstract void init();
 
     protected abstract void cleanup();
@@ -156,10 +157,9 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
                 if (!result.isSuccessful()) {
-                    final Collection<RpcError> errors = result.getErrors();
                     resultFuture.setException(new TransactionCommitFailedException(
                         String.format("Commit of transaction %s failed", getIdentifier()),
-                            errors.toArray(new RpcError[errors.size()])));
+                        result.getErrors().toArray(new RpcError[0])));
                     return;
                 }
 
@@ -240,23 +240,21 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         return transformed;
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void extractResult(final List<DOMRpcResult> domRpcResults,
                                final SettableFuture<RpcResult<Void>> transformed) {
         ErrorType errType = ErrorType.APPLICATION;
         ErrorSeverity errSeverity = ErrorSeverity.ERROR;
         StringBuilder msgBuilder = new StringBuilder();
         boolean errorsEncouneterd = false;
-        String errorTag = "operation-failed";
+        ErrorTag errorTag = ErrorTag.OPERATION_FAILED;
 
         for (final DOMRpcResult domRpcResult : domRpcResults) {
             if (!domRpcResult.getErrors().isEmpty()) {
                 errorsEncouneterd = true;
                 final RpcError error = domRpcResult.getErrors().iterator().next();
 
-                errType = error.getErrorType().toNetconf();
-                errSeverity = error.getSeverity().toNetconf();
+                errType = error.getErrorType();
+                errSeverity = error.getSeverity();
                 msgBuilder.append(error.getMessage());
                 msgBuilder.append(error.getInfo());
                 errorTag = error.getTag();
@@ -264,7 +262,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         }
         if (errorsEncouneterd) {
             final NetconfDocumentedException exception = new NetconfDocumentedException(
-                    id + ":RPC during tx failed. " + msgBuilder, errType, new ErrorTag(errorTag), errSeverity);
+                    id + ":RPC during tx failed. " + msgBuilder, errType, errorTag, errSeverity);
             transformed.setException(exception);
             return;
         }

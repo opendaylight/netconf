@@ -13,8 +13,9 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMServiceExtension;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
 /**
@@ -49,7 +50,7 @@ public interface DOMDataTransactionValidator extends DOMDataBrokerExtension {
         private static final long serialVersionUID = 1L;
 
         public ValidationFailedException(final String message, final Throwable cause) {
-            super(message, cause, RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "invalid-value", message,
+            super(message, cause, RpcResultBuilder.newError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, message,
                 null, null, cause));
         }
 

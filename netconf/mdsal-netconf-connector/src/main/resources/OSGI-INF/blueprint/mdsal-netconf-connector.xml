@@ -20,6 +20,7 @@
 
     <bean id="mdsalNetconfOperationServiceFactory"
           class="org.opendaylight.netconf.mdsal.connector.MdsalNetconfOperationServiceFactory"
+          factory-method="create"
           destroy-method="close">
         <argument ref="schemaService"/>
         <argument ref="netconfOperationServiceFactoryListener"/>
