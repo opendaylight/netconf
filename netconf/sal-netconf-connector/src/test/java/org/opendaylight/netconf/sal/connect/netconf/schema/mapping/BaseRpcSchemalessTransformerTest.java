@@ -90,7 +90,7 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
                 new YangInstanceIdentifier.NodeIdentifier(ConfigTarget.QNAME))
                 .withChild(Builders.leafBuilder().withNodeIdentifier(
                         new YangInstanceIdentifier.NodeIdentifier(Candidate.QNAME))
-                    .withValue(Empty.getInstance()).build())
+                    .withValue(Empty.value()).build())
                 .build();
         final ContainerNode target = Builders.containerBuilder()
                 .withNodeIdentifier(

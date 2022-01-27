@@ -126,7 +126,7 @@ public class CapabilityChangeNotificationProducerTest {
     private static NetconfCapabilityChange changedCapabilitesFrom(final List<Uri> added, final List<Uri> deleted) {
         NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(
-                new ServerBuilder().setServer(Empty.getInstance()).build()).build());
+                new ServerBuilder().setServer(Empty.value()).build()).build());
 
         netconfCapabilityChangeBuilder.setModifiedCapability(Collections.emptyList());
         netconfCapabilityChangeBuilder.setAddedCapability(added);

@@ -463,7 +463,7 @@ public final class NetconfBaseOps {
                 .withNodeIdentifier(NETCONF_SOURCE_NODEID)
                 .withChild(Builders.choiceBuilder()
                     .withNodeIdentifier(CONFIG_SOURCE_NODEID)
-                    .withChild(ImmutableNodes.leafNode(datastore, Empty.getInstance()))
+                    .withChild(ImmutableNodes.leafNode(datastore, Empty.value()))
                     .build())
                 .build();
     }
@@ -476,7 +476,7 @@ public final class NetconfBaseOps {
     public static @NonNull ContainerNode getTargetNode(final QName datastore) {
         return Builders.containerBuilder().withNodeIdentifier(NETCONF_TARGET_NODEID)
                 .withChild(Builders.choiceBuilder().withNodeIdentifier(CONFIG_TARGET_NODEID).withChild(
-                    Builders.leafBuilder().withNodeIdentifier(toId(datastore)).withValue(Empty.getInstance()).build())
+                    Builders.leafBuilder().withNodeIdentifier(toId(datastore)).withValue(Empty.value()).build())
                     .build()).build();
     }
 

@@ -1487,7 +1487,7 @@ public final class RestconfImpl implements RestconfService {
         final DataSchemaNode eventsSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         checkState(eventsSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(
-            SchemaAwareBuilders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue(Empty.getInstance()).build());
+            SchemaAwareBuilders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue(Empty.value()).build());
 
         return streamNodeValues.build();
     }

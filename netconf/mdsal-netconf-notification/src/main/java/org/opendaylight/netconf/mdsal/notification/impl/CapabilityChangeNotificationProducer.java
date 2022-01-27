@@ -87,7 +87,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     private void publishNotification(final Set<Uri> added, final Set<Uri> removed) {
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder()
-                .setServer(Empty.getInstance()).build()).build());
+                .setServer(Empty.value()).build()).build());
         netconfCapabilityChangeBuilder.setAddedCapability(ImmutableList.copyOf(added));
         netconfCapabilityChangeBuilder.setDeletedCapability(ImmutableList.copyOf(removed));
         // TODO modified should be computed ... but why ?

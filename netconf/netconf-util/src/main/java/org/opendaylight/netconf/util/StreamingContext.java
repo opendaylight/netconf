@@ -372,7 +372,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
     private static final class LeafListEntry extends AbstractSimple<NodeWithValue<?>> {
         LeafListEntry(final LeafListSchemaNode potential) {
-            super(new NodeWithValue<>(potential.getQName(), Empty.getInstance()));
+            super(new NodeWithValue<>(potential.getQName(), Empty.value()));
         }
 
         @Override

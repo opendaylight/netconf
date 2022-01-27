@@ -27,7 +27,7 @@ final class SingleReconnectFuture extends DefaultPromise<Empty> implements Recon
                 if (future.isCancelled()) {
                     cancel(false);
                 } else if (future.isSuccess()) {
-                    setSuccess(Empty.getInstance());
+                    setSuccess(Empty.value());
                 } else {
                     setFailure(future.cause());
                 }

@@ -93,7 +93,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
 
     private static final class LeafListEntryNormalization extends SimpleTypeNormalization<NodeWithValue> {
         LeafListEntryNormalization(final LeafListSchemaNode potential) {
-            super(new NodeWithValue<>(potential.getQName(), Empty.getInstance()));
+            super(new NodeWithValue<>(potential.getQName(), Empty.value()));
         }
     }
 

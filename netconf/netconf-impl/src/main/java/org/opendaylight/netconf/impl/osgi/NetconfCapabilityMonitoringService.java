@@ -217,7 +217,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder
                 .setChangedBy(new ChangedByBuilder().setServerOrUser(
-                    new ServerBuilder().setServer(Empty.getInstance()).build()).build());
+                    new ServerBuilder().setServer(Empty.value()).build()).build());
         netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(Collections2
                 .transform(removed, CAPABILITY_TO_URI)));
         netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(Collections2

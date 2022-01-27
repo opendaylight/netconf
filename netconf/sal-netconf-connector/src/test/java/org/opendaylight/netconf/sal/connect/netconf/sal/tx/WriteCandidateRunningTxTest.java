@@ -82,7 +82,7 @@ public class WriteCandidateRunningTxTest extends AbstractTestModelTest {
 
     private static ContainerNode getLockContent(final QName op, final QName datastore) {
         final LeafNode<Object> datastoreLeaf = Builders.leafBuilder().withNodeIdentifier(toId(datastore))
-                .withValue(Empty.getInstance()).build();
+                .withValue(Empty.value()).build();
         final ChoiceNode choice = Builders.choiceBuilder()
                 .withNodeIdentifier(toId(ConfigTarget.QNAME))
                 .withChild(datastoreLeaf)

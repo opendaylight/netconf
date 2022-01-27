@@ -57,7 +57,7 @@ public final class OperationsResourceUtils {
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> operationsBuilder = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(OperationsContainerSchemaNode.QNAME));
         for (final OperationsLeafSchemaNode leaf : rpcLeafSchemas) {
-            operationsBuilder.withChild(ImmutableNodes.leafNode(leaf.getQName(), Empty.getInstance()));
+            operationsBuilder.withChild(ImmutableNodes.leafNode(leaf.getQName(), Empty.value()));
         }
 
         return Map.entry(new InstanceIdentifierContext<>(null, operatationsSchema, mountPoint,
