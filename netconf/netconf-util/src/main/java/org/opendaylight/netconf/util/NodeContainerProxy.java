@@ -25,7 +25,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
 import org.opendaylight.yangtools.yang.model.api.MustDefinition;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.Status;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
@@ -41,24 +40,22 @@ import org.opendaylight.yangtools.yang.xpath.api.YangXPathExpression.QualifiedBo
 public final class NodeContainerProxy implements ContainerSchemaNode {
     private final Collection<? extends AugmentationSchemaNode> availableAugmentations;
     private final @NonNull Map<QName, ? extends DataSchemaNode> childNodes;
-    private final @NonNull SchemaPath path;
     private final @NonNull QName qname;
 
     @VisibleForTesting
-    NodeContainerProxy(final QName qname, final SchemaPath path, final Map<QName, ? extends DataSchemaNode> childNodes,
+    NodeContainerProxy(final QName qname, final Map<QName, ? extends DataSchemaNode> childNodes,
                        final Collection<? extends AugmentationSchemaNode> availableAugmentations) {
         this.qname = requireNonNull(qname);
-        this.path = requireNonNull(path);
         this.childNodes = requireNonNull(childNodes);
         this.availableAugmentations = availableAugmentations;
     }
 
     public static @NonNull NodeContainerProxy ofModelContext(final QName qname, final EffectiveModelContext context) {
-        return new NodeContainerProxy(qname, SchemaPath.ROOT, asMap(context.getChildNodes()), Set.of());
+        return new NodeContainerProxy(qname, asMap(context.getChildNodes()), Set.of());
     }
 
     public static @NonNull NodeContainerProxy ofNotification(final NotificationDefinition notification) {
-        return new NodeContainerProxy(notification.getQName(), notification.getPath(),
+        return new NodeContainerProxy(notification.getQName(),
             asMap(notification.getChildNodes()), notification.getAvailableAugmentations());
     }
 
@@ -121,12 +118,6 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     @Override
     public QName getQName() {
         return qname;
-    }
-
-    @Override
-    @Deprecated
-    public SchemaPath getPath() {
-        return path;
     }
 
     @Override
