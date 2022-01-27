@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.yang.library;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Collections;
+import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -64,7 +63,7 @@ public class YangLibraryTest extends AbstractYangLibraryWriterTest {
 
 
         Schema schema = new SchemaBuilder().setName("state-schema")
-                .setModuleSet(Collections.singletonList(modulesSet.getName()))
+                .setModuleSet(Set.of(modulesSet.getName()))
                 .build();
 
         Datastore datastore = new DatastoreBuilder().setName(Operational.class)

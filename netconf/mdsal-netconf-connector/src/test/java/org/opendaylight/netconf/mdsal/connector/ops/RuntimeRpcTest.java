@@ -176,7 +176,7 @@ public class RuntimeRpcTest {
             return immediateFluentFuture(yangTextSchemaSource);
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
-        this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
+        this.currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
     }
 
     @After
