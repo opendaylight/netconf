@@ -113,11 +113,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBui
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
+import org.opendaylight.yangtools.yang.data.tree.api.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -130,7 +130,6 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -1546,7 +1545,7 @@ public final class RestconfImpl implements RestconfService {
         }
 
         final Collection<LeafSetEntryNode<?>> entryNodes = leafSet.body();
-        final List<SchemaPath> paths = new ArrayList<>();
+        final List<Absolute> paths = new ArrayList<>();
         String streamName = CREATE_NOTIFICATION_STREAM + "/";
 
         StringBuilder streamNameBuilder = new StringBuilder(streamName);
@@ -1565,7 +1564,7 @@ public final class RestconfImpl implements RestconfService {
             }
             final String moduleName = module.getName();
             checkNotNull(notifiDef, "Notification %s does not exist in module %s", valueQName, moduleName);
-            paths.add(SchemaPath.of(Absolute.of(notifiDef.getQName())));
+            paths.add(Absolute.of(notifiDef.getQName()));
             streamNameBuilder.append(moduleName).append(':').append(valueQName.getLocalName());
             if (iterator.hasNext()) {
                 streamNameBuilder.append(',');

@@ -52,6 +52,8 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditC
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -212,7 +214,7 @@ public class NetconfDataTreeServiceActorTest {
 
     @Test
     public void testCommitFail() {
-        final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "fail", "fail");
+        final RpcError rpcError = RpcResultBuilder.newError(ErrorType.APPLICATION, new ErrorTag("fail"), "fail");
         final TransactionCommitFailedException failure = new TransactionCommitFailedException("fail", rpcError);
         final NetconfServiceFailedException cause = new NetconfServiceFailedException(
             String.format("%s: Commit of operation failed", 1), failure);
