@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static com.google.common.base.Verify.verify;
-import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
@@ -113,11 +112,16 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 targetII = ParserIdentifier.parserPatchTarget(pathContext, target);
 
                 // move schema node
-                schemaNode = verifyNotNull(DataSchemaContextTree.from(pathContext.getSchemaContext())
-                    .findChild(targetII).orElseThrow().getDataSchemaNode());
+                final var lookup = DataSchemaContextTree.from(pathContext.getSchemaContext())
+                    .enterPath(targetII).orElseThrow();
 
-                final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();
+                schemaNode = lookup.node().getDataSchemaNode();
+                final var stack = lookup.stack();
+                if (!stack.isEmpty()) {
+                    stack.exit();
+                }
+
+                final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
                 verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                 targetNode = (SchemaNode) parentStmt;
             }

@@ -171,7 +171,7 @@ public final class PutDataTransactionUtil {
     }
 
     private static FluentFuture<? extends CommitInfo> makePut(final YangInstanceIdentifier path,
-                                                              final SchemaContext schemaContext,
+                                                              final EffectiveModelContext schemaContext,
                                                               final RestconfTransaction transaction,
                                                               final NormalizedNode data) {
         transaction.replace(path, data, schemaContext);

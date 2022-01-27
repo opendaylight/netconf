@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
-import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -23,6 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -36,7 +36,7 @@ public final class NetconfTopologyUtils {
     public static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
     public static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
     public static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
-    public static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
+    public static final Decimal64 DEFAULT_SLEEP_FACTOR = Decimal64.valueOf("1.5");
 
     private NetconfTopologyUtils() {
 
@@ -55,7 +55,7 @@ public final class NetconfTopologyUtils {
     }
 
     public static String createMasterActorName(final String name, final String masterAddress) {
-        return masterAddress.replaceAll("//", "") + "_" + name;
+        return masterAddress.replace("//", "") + "_" + name;
     }
 
     public static NodeId getNodeId(final InstanceIdentifier.PathArgument pathArgument) {
