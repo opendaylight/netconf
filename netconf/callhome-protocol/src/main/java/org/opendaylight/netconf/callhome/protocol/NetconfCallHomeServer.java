@@ -10,7 +10,6 @@ package org.opendaylight.netconf.callhome.protocol;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -30,8 +29,7 @@ import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
-
+public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeServer.class);
 
     private final CallHomeAuthorizationProvider authProvider;
@@ -52,10 +50,10 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     NetconfCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
             final Factory factory, final InetSocketAddress socketAddress, final StatusRecorder recorder,
             final IoServiceFactory serviceFactory) {
-        this.client = requireNonNull(sshClient);
+        client = requireNonNull(sshClient);
         this.authProvider = requireNonNull(authProvider);
-        this.sessionFactory = requireNonNull(factory);
-        this.bindAddress = socketAddress;
+        sessionFactory = requireNonNull(factory);
+        bindAddress = socketAddress;
         this.recorder = recorder;
         this.serviceFactory = requireNonNull(serviceFactory);
 
@@ -113,12 +111,10 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
         };
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession session) {
         final PublicKey serverKey = session.getServerKey();
 
-        return new SshFutureListener<AuthFuture>() {
+        return new SshFutureListener<>() {
             @Override
             public void operationComplete(final AuthFuture authFuture) {
                 if (authFuture.isSuccess()) {

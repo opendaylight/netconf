@@ -8,9 +8,9 @@
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -25,6 +25,8 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -33,8 +35,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.YangInstanceIdentifierWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
@@ -67,20 +71,35 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
 
+        final SchemaPath schemaPath = getSchemaPath(dataRoot);
         final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-                schemaContext.getCurrentContext(), getSchemaPath(dataRoot));
+                schemaContext.getCurrentContext(), schemaPath);
 
-        final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true);
-
-        if (data instanceof ContainerNode) {
-            writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
-        } else if (data instanceof MapNode) {
-            writeRootElement(xmlWriter, nnWriter, (MapNode) data);
+        final DataSchemaNode dataSchemaNode;
+        if (dataRoot.isEmpty()) {
+            dataSchemaNode = schemaContext.getCurrentContext();
         } else {
-            throw new IllegalArgumentException("Unable to transform node of type: " +  data.getClass().toString()
-                    + " offending node: " + data.toString());
+            final Optional<DataSchemaNode> dataTreeChild =
+                    schemaContext.getCurrentContext().findDataTreeChild(schemaPath.getPathFromRoot());
+            dataSchemaNode = dataTreeChild.orElseThrow(
+                    () -> new IllegalArgumentException("Unable to find schema node for " + dataRoot));
         }
 
+        try (var yiidWriter = YangInstanceIdentifierWriter.open(nnStreamWriter,
+                (DataNodeContainer) dataSchemaNode, dataRoot)) {
+            try (var nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true)) {
+                if (data instanceof ContainerNode) {
+                    writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
+                } else if (data instanceof MapNode) {
+                    writeRootElement(xmlWriter, nnWriter, (MapNode) data);
+                } else {
+                    throw new IllegalArgumentException("Unable to transform node of type: "
+                            + data.getClass().toString() + " offending node: " + data);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return result.getNode();
     }
 
@@ -93,50 +112,40 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     }
 
     private static SchemaPath getSchemaPath(final YangInstanceIdentifier dataRoot) {
-        return SchemaPath.create(
-                Iterables.transform(dataRoot.getPathArguments(), PathArgument::getNodeType), dataRoot.equals(ROOT));
+
+        return SchemaPath.create(dataRoot.getPathArguments().stream()
+                .filter(p -> !(p instanceof NodeIdentifierWithPredicates))
+                .filter(p -> !(p instanceof AugmentationIdentifier))
+                .map(PathArgument::getNodeType)
+                .collect(Collectors.toList()), true);
     }
 
     private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
-                                         final ContainerNode data) {
-        try {
-            if (data.getIdentifier().getNodeType().equals(SchemaContext.NAME)) {
-                for (final DataContainerChild child : data.body()) {
-                    nnWriter.write(child);
-                }
-            } else {
-                nnWriter.write(data);
+                                         final ContainerNode data) throws IOException {
+        if (data.getIdentifier().getNodeType().equals(SchemaContext.NAME)) {
+            for (final DataContainerChild child : data.body()) {
+                nnWriter.write(child);
             }
-            nnWriter.flush();
-            xmlWriter.flush();
-        } catch (XMLStreamException | IOException e) {
-            throw new RuntimeException(e);
+        } else {
+            nnWriter.write(data);
         }
     }
 
     private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
-                                         final MapNode data) {
-        try {
-            if (data.getIdentifier().getNodeType().equals(SchemaContext.NAME)) {
-                for (final MapEntryNode child : data.body()) {
-                    nnWriter.write(child);
-                }
-            } else {
-                nnWriter.write(data);
+                                         final MapNode data) throws IOException {
+        if (data.getIdentifier().getNodeType().equals(SchemaContext.NAME)) {
+            for (final MapEntryNode child : data.body()) {
+                nnWriter.write(child);
             }
-            nnWriter.flush();
-            xmlWriter.flush();
-        } catch (XMLStreamException | IOException e) {
-            throw new RuntimeException(e);
+        } else {
+            nnWriter.write(data);
         }
     }
 
     protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot,
                                                        final NormalizedNode node) {
         if (!dataRoot.equals(ROOT)) {
-            return (Element) transformNormalizedNode(document,
-                    ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
-                    ROOT);
+            return (Element) transformNormalizedNode(document, node, dataRoot);
         }
         return (Element) transformNormalizedNode(document, node, ROOT);
     }

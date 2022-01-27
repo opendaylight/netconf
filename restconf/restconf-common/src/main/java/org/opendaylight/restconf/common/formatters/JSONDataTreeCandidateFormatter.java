@@ -17,14 +17,11 @@ import java.time.Instant;
 import java.util.Collection;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.restconf.common.serializer.JsonDataTreeCandidateSerializer;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
-    private static final Logger LOG = LoggerFactory.getLogger(JSONDataTreeCandidateFormatter.class);
     public static final String SAL_REMOTE_NAMESPACE = "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote";
     public static final String NETCONF_NOTIFICATION_NAMESPACE = "urn-ietf-params-xml-ns-netconf-notification-1.0";
     private final JSONCodecFactorySupplier codecSupplier;

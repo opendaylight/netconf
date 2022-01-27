@@ -91,7 +91,7 @@ public abstract class AbstractNetconfOperationTest {
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
-        currentSchemaContext = new CurrentSchemaContext(schemaService, sourceIdentifier -> {
+        currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceIdentifier -> {
             final YangTextSchemaSource yangTextSchemaSource =
                 YangTextSchemaSource.delegateForByteSource(sourceIdentifier, ByteSource.wrap("module test".getBytes()));
             return Futures.immediateFuture(yangTextSchemaSource);
