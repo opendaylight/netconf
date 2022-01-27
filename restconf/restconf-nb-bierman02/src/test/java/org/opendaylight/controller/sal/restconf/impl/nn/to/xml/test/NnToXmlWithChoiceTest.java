@@ -33,6 +33,7 @@ import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
 
@@ -96,7 +97,7 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
         dataContainerNodeAttrBuilder.withChild(dataChoice.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                InstanceIdentifierContext.ofDataSchemaNode(schemaContext, contSchemaNode),
+                InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(schemaContext, contQname)),
                 dataContainerNodeAttrBuilder.build());
 
         return testNormalizedNodeContext;

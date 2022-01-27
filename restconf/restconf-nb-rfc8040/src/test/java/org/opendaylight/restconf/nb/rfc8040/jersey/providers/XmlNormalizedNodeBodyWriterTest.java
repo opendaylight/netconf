@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayOutputStream;
@@ -32,7 +31,6 @@ public class XmlNormalizedNodeBodyWriterTest {
     @Test
     public void testWriteEmptyRootContainer() throws IOException {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
-        doCallRealMethod().when(schemaContext).getPath();
 
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
             InstanceIdentifierContext.ofLocalRoot(schemaContext),

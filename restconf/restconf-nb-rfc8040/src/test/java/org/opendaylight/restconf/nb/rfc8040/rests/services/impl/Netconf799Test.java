@@ -82,7 +82,7 @@ public class Netconf799Test {
         stack.enterSchemaTree(RESET_QNAME);
 
         final var response = dataService.invokeAction(NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofAction(stack, actionNode, ACTION_YII, null),
+            InstanceIdentifierContext.ofPath(stack, actionNode, ACTION_YII, null),
             Builders.containerBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(INPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(DELAY_QNAME, Uint32.TEN))

@@ -45,18 +45,12 @@ public class Draft02 {
 
         String STREAM_LIST_SCHEMA_NODE = "stream";
 
-        String OPERATIONS_CONTAINER_SCHEMA_NODE = "operations";
-
-        String ERRORS_GROUPING_SCHEMA_NODE = "errors";
-
-        String ERRORS_CONTAINER_SCHEMA_NODE = "errors";
-
         String ERROR_LIST_SCHEMA_NODE = "error";
 
         QName IETF_RESTCONF_QNAME = QName.create(Draft02.RestConfModule.NAMESPACE, Draft02.RestConfModule.REVISION,
                 Draft02.RestConfModule.NAME);
 
-        QName ERRORS_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE);
+        QName ERRORS_QNAME = QName.create(IETF_RESTCONF_QNAME, "errors");
 
         QName ERROR_LIST_QNAME = QName.create(IETF_RESTCONF_QNAME, ERROR_LIST_SCHEMA_NODE);
 
@@ -70,6 +64,4 @@ public class Draft02 {
 
         QName ERROR_INFO_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-info");
     }
-
-    public interface Paths {}
 }

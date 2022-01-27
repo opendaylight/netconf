@@ -45,7 +45,8 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.xml.sax.SAXException;
 
 /**
@@ -104,14 +105,15 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     private static void writeNormalizedNode(final JsonWriter jsonWriter, final InstanceIdentifierContext context,
             // Note: mutable argument
             NormalizedNode data, final @Nullable Integer depth) throws IOException {
-        SchemaPath path = context.getSchemaNode().getPath();
+
+        final var stack = context.inference().toSchemaInferenceStack();
         final RestconfNormalizedNodeWriter nnWriter;
-        if (SchemaPath.ROOT.equals(path)) {
+        if (stack.isEmpty()) {
             /*
              *  Creates writer without initialNs and we write children of root data container
              *  which is not visible in restconf
              */
-            nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context, context.inference(), jsonWriter, depth);
             if (data instanceof ContainerNode) {
                 writeChildren(nnWriter,(ContainerNode) data);
             } else if (data instanceof DOMSourceAnyxmlNode) {
@@ -129,21 +131,24 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  so we need to emit initial output declaratation..
              */
             final var rpc = (RpcDefinition) context.getSchemaNode();
-            path = SchemaPath.create(true, rpc.getQName(), rpc.getOutput().getQName());
-            nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
+            final var tmp = SchemaInferenceStack.of(context.getSchemaContext());
+            tmp.enterSchemaTree(rpc.getQName());
+            tmp.enterSchemaTree(rpc.getOutput().getQName());
+
+            nnWriter = createNormalizedNodeWriter(context, tmp.toInference(), jsonWriter, depth);
             jsonWriter.name("output");
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
             jsonWriter.endObject();
         } else {
-            path = path.getParent();
+            stack.exit();
 
             if (data instanceof MapEntryNode) {
                 data = ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
                     .withChild((MapEntryNode) data)
                     .build();
             }
-            nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context, stack.toInference(), jsonWriter, depth);
             nnWriter.write(data);
         }
         nnWriter.flush();
@@ -157,7 +162,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
-            final InstanceIdentifierContext context, final SchemaPath path, final JsonWriter jsonWriter,
+            final InstanceIdentifierContext context, final Inference inference, final JsonWriter jsonWriter,
             final @Nullable Integer depth) {
 
         final SchemaNode schema = context.getSchemaNode();
@@ -171,7 +176,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             initialNs = null;
         }
         final NormalizedNodeStreamWriter streamWriter =
-                JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, path, initialNs, jsonWriter);
+                JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, inference, initialNs, jsonWriter);
         if (depth != null) {
             return DepthAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth);
         }

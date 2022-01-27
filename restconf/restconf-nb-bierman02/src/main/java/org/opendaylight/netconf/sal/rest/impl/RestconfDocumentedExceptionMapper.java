@@ -57,13 +57,10 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,15 +117,14 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
 
         final Status status = ErrorTags.statusOf(errors.iterator().next().getErrorTag());
-        final DataNodeContainer errorsSchemaNode =
-                (DataNodeContainer) controllerContext.getRestconfModuleErrorsSchemaNode();
-        if (errorsSchemaNode == null) {
+        final var errorsEntry = controllerContext.getRestconfModuleErrorsSchemaNode();
+        if (errorsEntry == null) {
             return Response.status(status).type(MediaType.TEXT_PLAIN_TYPE).entity(exception.getMessage()).build();
         }
 
-        checkState(errorsSchemaNode instanceof ContainerSchemaNode, "Found Errors SchemaNode isn't ContainerNode");
+        final var errorsSchemaNode = errorsEntry.getValue();
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> errContBuild =
-                SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) errorsSchemaNode);
+                SchemaAwareBuilders.containerBuilder(errorsSchemaNode);
 
         final List<DataSchemaNode> schemaList = ControllerContext.findInstanceDataChildrenByName(errorsSchemaNode,
                 Draft02.RestConfModule.ERROR_LIST_SCHEMA_NODE);
@@ -143,14 +139,14 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
         errContBuild.withChild(listErorsBuilder.build());
 
-        final NormalizedNodeContext errContext = new NormalizedNodeContext(InstanceIdentifierContext.ofDataSchemaNode(
-            controllerContext.getGlobalSchema(), (DataSchemaNode) errorsSchemaNode, null), errContBuild.build());
+        final NormalizedNodeContext errContext = new NormalizedNodeContext(
+            InstanceIdentifierContext.ofStack(errorsEntry.getKey(), null), errContBuild.build());
 
-        Object responseBody;
+        final String responseBody;
         if (mediaType.getSubtype().endsWith("json")) {
-            responseBody = toJsonResponseBody(errContext, errorsSchemaNode);
+            responseBody = toJsonResponseBody(errContext);
         } else {
-            responseBody = toXMLResponseBody(errContext, errorsSchemaNode);
+            responseBody = toXMLResponseBody(errContext);
         }
 
         return Response.status(status).type(mediaType).entity(responseBody).build();
@@ -206,35 +202,36 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         return errNodeValues.build();
     }
 
-    private static Object toJsonResponseBody(final NormalizedNodeContext errorsNode,
-                                             final DataNodeContainer errorsSchemaNode) {
+    private static String toJsonResponseBody(final NormalizedNodeContext errorsNode) {
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         NormalizedNode data = errorsNode.getData();
         final InstanceIdentifierContext context = errorsNode.getInstanceIdentifierContext();
         final DataSchemaNode schema = (DataSchemaNode) context.getSchemaNode();
 
-        SchemaPath path = context.getSchemaNode().getPath();
         final OutputStreamWriter outputWriter = new OutputStreamWriter(outStream, StandardCharsets.UTF_8);
         if (data == null) {
             throw new RestconfDocumentedException(Response.Status.NOT_FOUND);
         }
 
-        boolean isDataRoot = false;
-        XMLNamespace initialNs = null;
-        if (SchemaPath.ROOT.equals(path)) {
+        final boolean isDataRoot;
+        final var stack = context.inference().toSchemaInferenceStack();
+        if (stack.isEmpty()) {
             isDataRoot = true;
         } else {
-            path = path.getParent();
+            isDataRoot = false;
+            stack.exit();
             // FIXME: Add proper handling of reading root.
         }
+
+        XMLNamespace initialNs = null;
         if (!schema.isAugmenting() && !(schema instanceof SchemaContext)) {
             initialNs = schema.getQName().getNamespace();
         }
 
         final JsonWriter jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter);
         final NormalizedNodeStreamWriter jsonStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(context.getSchemaContext()), path,
-            initialNs, jsonWriter);
+            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(context.getSchemaContext()),
+            stack.toInference(), initialNs, jsonWriter);
 
         // We create a delegating writer to special-case error-info as error-info is defined as an empty
         // container in the restconf yang schema but we create a leaf node so we can output it. The delegate
@@ -305,8 +302,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         return outStream.toString(StandardCharsets.UTF_8);
     }
 
-    private static Object toXMLResponseBody(final NormalizedNodeContext errorsNode,
-                                            final DataNodeContainer errorsSchemaNode) {
+    private static String toXMLResponseBody(final NormalizedNodeContext errorsNode) {
         final InstanceIdentifierContext pathContext = errorsNode.getInstanceIdentifierContext();
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
@@ -317,17 +313,18 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             throw new IllegalStateException(e);
         }
         NormalizedNode data = errorsNode.getData();
-        SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
-        boolean isDataRoot = false;
-        if (SchemaPath.ROOT.equals(schemaPath)) {
+        final boolean isDataRoot;
+        final var stack = pathContext.inference().toSchemaInferenceStack();
+        if (stack.isEmpty()) {
             isDataRoot = true;
         } else {
-            schemaPath = schemaPath.getParent();
+            isDataRoot = false;
+            stack.exit();
         }
 
         final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-                pathContext.getSchemaContext(), schemaPath);
+                stack.toInference());
 
         // We create a delegating writer to special-case error-info as error-info is defined as an empty
         // container in the restconf yang schema but we create a leaf node so we can output it. The delegate

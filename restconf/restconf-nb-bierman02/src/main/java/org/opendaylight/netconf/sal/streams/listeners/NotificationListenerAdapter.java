@@ -169,7 +169,6 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private void addValuesToNotificationEventElement(final Document doc, final Element element,
             final EffectiveModelContext schemaContext, final DOMNotification notification) {
         try {
-
             final DOMResult domResult = writeNormalizedNode(notification.getBody(),
                 SchemaInferenceStack.of(schemaContext, path).toInference());
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);

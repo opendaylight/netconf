@@ -39,6 +39,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -123,7 +125,8 @@ public class CreateStreamUtilTest {
                 .withValue(o).build();
         container.withChild(lfNode);
 
-        return NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofDataSchemaNode(SCHEMA_CTX, rpcInputSchemaNode, null), container.build());
+        return NormalizedNodePayload.of(InstanceIdentifierContext.ofStack(
+            SchemaInferenceStack.of(SCHEMA_CTX, Absolute.of(rpcQName, rpcInputSchemaNode.getQName()))),
+            container.build());
     }
 }

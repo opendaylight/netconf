@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
@@ -124,20 +123,25 @@ public final class TestRestconfUtils {
     }
 
     private static NormalizedNode parse(final InstanceIdentifierContext iiContext, final Document doc)
-            throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
+            throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = iiContext.getSchemaNode();
+        final SchemaInferenceStack stack;
         DataSchemaNode schemaNode = null;
         if (schemaNodeContext instanceof RpcDefinition) {
+            final var rpc = (RpcDefinition) schemaNodeContext;
+            stack = SchemaInferenceStack.of(iiContext.getSchemaContext());
+            stack.enterSchemaTree(rpc.getQName());
             if ("input".equalsIgnoreCase(doc.getDocumentElement().getLocalName())) {
-                schemaNode = ((RpcDefinition) schemaNodeContext).getInput();
+                schemaNode = rpc.getInput();
             } else if ("output".equalsIgnoreCase(doc.getDocumentElement().getLocalName())) {
-                schemaNode = ((RpcDefinition) schemaNodeContext).getOutput();
+                schemaNode = rpc.getOutput();
             } else {
                 throw new IllegalStateException("Unknown Rpc input node");
             }
-
+            stack.enterSchemaTree(schemaNode.getQName());
         } else if (schemaNodeContext instanceof DataSchemaNode) {
             schemaNode = (DataSchemaNode) schemaNodeContext;
+            stack = iiContext.inference().toSchemaInferenceStack();
         } else {
             throw new IllegalStateException("Unknow SchemaNode");
         }
@@ -149,6 +153,7 @@ public final class TestRestconfUtils {
             for (final DataSchemaNode child : ((DataNodeContainer) schemaNode).getChildNodes()) {
                 if (child.getQName().getLocalName().equalsIgnoreCase(docRootElm)) {
                     schemaNode = child;
+                    stack.enterSchemaTree(child.getQName());
                     break;
                 }
             }
@@ -156,8 +161,7 @@ public final class TestRestconfUtils {
 
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
-            iiContext.getSchemaContext(), schemaNode.getPath()).toInference());
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, stack.toInference());
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode) {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
