@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
@@ -61,6 +62,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
@@ -71,12 +73,17 @@ import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.YangInstanceIdentifierWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -313,10 +320,9 @@ public final class NetconfMessageTransformUtil {
         }
 
         return ex.getErrorSeverity() == ErrorSeverity.ERROR
-                ? RpcResultBuilder.newError(ex.getErrorType().toLegacy(), ex.getErrorTag().elementBody(),
+                ? RpcResultBuilder.newError(ex.getErrorType(), ex.getErrorTag(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause())
-                : RpcResultBuilder.newWarning(
-                        ex.getErrorType().toLegacy(), ex.getErrorTag().elementBody(),
+                : RpcResultBuilder.newWarning(ex.getErrorType(), ex.getErrorTag(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
     }
 
@@ -372,9 +378,26 @@ public final class NetconfMessageTransformUtil {
         final var metadata = operation.map(o -> leafMetadata(dataPath, o)).orElse(null);
         try {
             if (lastChildOverride.isPresent()) {
-                // FIXME remove ImmutableNodes.fromInstanceId usage
-                final var configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride.get());
-                NetconfUtil.writeNormalizedNode(configContent, metadata, new DOMResult(element), SchemaPath.ROOT, ctx);
+                final DataSchemaNode dataSchemaNode = ctx.findDataTreeChild(
+                                dataPath.getPathArguments().stream()
+                                        .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
+                                        .filter(arg -> !(arg instanceof AugmentationIdentifier))
+                                        .map(PathArgument::getNodeType)
+                                        .collect(Collectors.toList()))
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Unable to locate schema node for " + dataPath));
+
+                var result = new NormalizedNodeResult();
+                try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(result)) {
+                    try (var iidWriter = YangInstanceIdentifierWriter.open(streamWriter,
+                            ctx, dataPath);
+                         var nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
+                        nnWriter.write(lastChildOverride.get());
+                    }
+                }
+
+                NetconfUtil.writeNormalizedNode(result.getResult(), metadata, new DOMResult(element),
+                        SchemaPath.ROOT, ctx);
             } else {
                 NetconfUtil.writeNormalizedNode(dataPath, metadata, new DOMResult(element), SchemaPath.ROOT, ctx);
             }
@@ -527,7 +550,7 @@ public final class NetconfMessageTransformUtil {
                 throws IOException, XMLStreamException {
         final QName inputQName = YangConstants.operationInputQName(operationPath.lastNodeIdentifier().getModule());
         // FIXME: eliminate this conversion
-        final SchemaPath inputPath = operationPath.asSchemaPath().createChild(inputQName);
+        final SchemaPath inputPath = SchemaPath.of(operationPath).createChild().createChild(inputQName);
 
         final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
         try {
