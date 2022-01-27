@@ -10,9 +10,7 @@ package org.opendaylight.netconf.callhome.mount;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.Future;
-import java.math.BigDecimal;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
@@ -27,6 +25,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
@@ -48,10 +47,10 @@ class CallHomeMountSessionContext {
                                 final CallHomeChannelActivator activator, final CloseCallback callback) {
 
         this.nodeId = new NodeId(requireNonNull(nodeId, "nodeId"));
-        this.key = ContextKey.from(protocol.getRemoteAddress());
+        key = ContextKey.from(protocol.getRemoteAddress());
         this.protocol = requireNonNull(protocol, "protocol");
         this.activator = requireNonNull(activator, "activator");
-        this.onClose = requireNonNull(callback, "callback");
+        onClose = requireNonNull(callback, "callback");
     }
 
     CallHomeProtocolSessionContext getProtocol() {
@@ -92,7 +91,7 @@ class CallHomeMountSessionContext {
                         .setDefaultRequestTimeoutMillis(Uint32.valueOf(60000))
                         .setMaxConnectionAttempts(Uint32.ZERO)
                         .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(2000))
-                        .setSleepFactor(new BigDecimal("1.5"))
+                        .setSleepFactor(Decimal64.valueOf("1.5"))
                         .setKeepaliveDelay(Uint32.valueOf(120))
                         .setConcurrentRpcLimit(Uint16.ZERO)
                         .setActorResponseWaitTime(Uint16.valueOf(5))
@@ -149,8 +148,6 @@ class CallHomeMountSessionContext {
         };
     }
 
-    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
-            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void removeSelf() {
         onClose.onClosed(this);
     }
