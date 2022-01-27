@@ -43,9 +43,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class QueryParamsTest {
@@ -172,7 +172,6 @@ public class QueryParamsTest {
             withSettings().extraInterfaces(ContainerEffectiveStatement.class));
         final var containerQName = QName.create(containerChild, "container");
         doReturn(containerQName).when(containerSchema).getQName();
-        doReturn(SchemaPath.create(true, containerQName)).when(containerSchema).getPath();
         final var containerChildSchema = mock(LeafSchemaNode.class);
         doReturn(containerChild).when(containerChildSchema).getQName();
         doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
@@ -182,8 +181,11 @@ public class QueryParamsTest {
         final var context = mock(EffectiveModelContext.class);
         doReturn(Map.of(containerQName.getModule(), module)).when(context).getModuleStatements();
 
+        final var stack = SchemaInferenceStack.of(context);
+        stack.enterSchemaTree(containerQName);
+
         final QueryParameters queryParameters = QueryParams.newQueryParameters(params,
-            InstanceIdentifierContext.ofDataSchemaNode(context, containerSchema));
+            InstanceIdentifierContext.ofStack(stack));
         final List<Set<QName>> fields = queryParameters.fields();
         assertNotNull(fields);
         assertEquals(1, fields.size());

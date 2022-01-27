@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static com.google.common.base.Verify.verify;
-import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
@@ -50,6 +49,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -105,19 +105,27 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             // target can be also empty (only slash)
             YangInstanceIdentifier targetII;
             final SchemaNode targetNode;
+            final Inference inference;
             if (target.equals("/")) {
                 targetII = pathContext.getInstanceIdentifier();
                 targetNode = pathContext.getSchemaContext();
+                inference = SchemaInferenceStack.of(pathContext.getSchemaContext()).toInference();
             } else {
                 // interpret as simple context
                 targetII = ParserIdentifier.parserPatchTarget(pathContext, target);
 
                 // move schema node
-                schemaNode = verifyNotNull(DataSchemaContextTree.from(pathContext.getSchemaContext())
-                    .findChild(targetII).orElseThrow().getDataSchemaNode());
+                final var lookup = DataSchemaContextTree.from(pathContext.getSchemaContext())
+                    .enterPath(targetII).orElseThrow();
 
-                final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();
+                schemaNode = lookup.node().getDataSchemaNode();
+                final var stack = lookup.stack();
+                inference = stack.toInference();
+                if (!stack.isEmpty()) {
+                    stack.exit();
+                }
+
+                final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
                 verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                 targetNode = (SchemaNode) parentStmt;
             }
@@ -133,9 +141,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
                     final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer,
-                        SchemaInferenceStack.ofInstantiatedPath(pathContext.getSchemaContext(), schemaNode.getPath())
-                            .toInference());
+                    final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
                     xmlParser.traverse(new DOMSource(firstValueElement));
                     parsed = resultHolder.getResult();
                 } else {

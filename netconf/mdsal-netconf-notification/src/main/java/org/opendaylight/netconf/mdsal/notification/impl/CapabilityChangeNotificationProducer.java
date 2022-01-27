@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -47,8 +46,8 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     public CapabilityChangeNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
                                                 final DataBroker dataBroker) {
         super(CAPABILITIES_INSTANCE_IDENTIFIER);
-        this.baseNotificationPublisherRegistration = netconfNotificationCollector.registerBaseNotificationPublisher();
-        this.capabilityChangeListenerRegistration = registerOnChanges(dataBroker);
+        baseNotificationPublisherRegistration = netconfNotificationCollector.registerBaseNotificationPublisher();
+        capabilityChangeListenerRegistration = registerOnChanges(dataBroker);
     }
 
     @Override
@@ -85,14 +84,15 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     }
 
     private void publishNotification(final Set<Uri> added, final Set<Uri> removed) {
-        final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
-        netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder()
-                .setServer(Empty.value()).build()).build());
-        netconfCapabilityChangeBuilder.setAddedCapability(ImmutableList.copyOf(added));
-        netconfCapabilityChangeBuilder.setDeletedCapability(ImmutableList.copyOf(removed));
-        // TODO modified should be computed ... but why ?
-        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.emptyList());
-        baseNotificationPublisherRegistration.onCapabilityChanged(netconfCapabilityChangeBuilder.build());
+        baseNotificationPublisherRegistration.onCapabilityChanged(new NetconfCapabilityChangeBuilder()
+            .setChangedBy(new ChangedByBuilder()
+                .setServerOrUser(new ServerBuilder().setServer(Empty.value()).build())
+                .build())
+            .setAddedCapability(Set.copyOf(added))
+            .setDeletedCapability(Set.copyOf(removed))
+            // TODO modified should be computed ... but why ?
+            .setModifiedCapability(Set.of())
+            .build());
     }
 
     /**

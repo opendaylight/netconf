@@ -15,6 +15,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -34,7 +35,8 @@ public final class TransactionUtil {
      */
     // FIXME: this method should only be invoked in MdsalRestconfStrategy, and even then only if we are crossing
     //        an implicit list.
-    public static void ensureParentsByMerge(final YangInstanceIdentifier path, final SchemaContext schemaContext,
+    public static void ensureParentsByMerge(final YangInstanceIdentifier path,
+                                            final EffectiveModelContext schemaContext,
                                             final RestconfTransaction transaction) {
         final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
         YangInstanceIdentifier rootNormalizedPath = null;

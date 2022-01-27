@@ -55,7 +55,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusRecorder, AutoCloseable {
+final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusRecorder, AutoCloseable {
     private static final InstanceIdentifier<Topology> NETCONF_TOPO_IID =
             InstanceIdentifier.create(NetworkTopology.class).child(Topology.class,
                     new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));

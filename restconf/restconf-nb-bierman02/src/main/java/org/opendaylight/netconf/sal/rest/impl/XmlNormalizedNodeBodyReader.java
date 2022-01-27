@@ -37,7 +37,8 @@ import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -119,19 +120,20 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
-        boolean isRpc = false;
+        final boolean isRpc;
         if (schemaNodeContext instanceof RpcDefinition) {
             schemaNode = ((RpcDefinition) schemaNodeContext).getInput();
             isRpc = true;
         } else if (schemaNodeContext instanceof DataSchemaNode) {
             schemaNode = (DataSchemaNode) schemaNodeContext;
+            isRpc = false;
         } else {
             throw new IllegalStateException("Unknown SchemaNode");
         }
 
         final String docRootElm = doc.getDocumentElement().getLocalName();
         final String docRootNamespace = doc.getDocumentElement().getNamespaceURI();
-        final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
+        final List<PathArgument> iiToDataList = new ArrayList<>();
 
         if (isPost() && !isRpc) {
             final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm, docRootNamespace);
@@ -146,7 +148,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
                     iiToDataList.add(DataSchemaContextNode.augmentationIdentifierFrom(augmentSchemaNode));
                 } else if (child instanceof DataSchemaNode) {
                     schemaNode = (DataSchemaNode) child;
-                    iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(schemaNode.getQName()));
+                    iiToDataList.add(new NodeIdentifier(schemaNode.getQName()));
                 }
             }
         // PUT
@@ -180,7 +182,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
                 parsed = mapNode.body().iterator().next();
             }
 
-            if (schemaNode instanceof  ListSchemaNode && isPost()) {
+            if (schemaNode instanceof ListSchemaNode && isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
         } else {
