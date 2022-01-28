@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0feb2ee3_5f4216db",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlNormalizedNodeBodyWriterTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-01-28T10:20:14Z",
+      "side": 1,
+      "message": "So this test is for the non-mountpoint case. I think this namespace should actually be ietf-restconf.yang\u0027s",
+      "range": {
+        "startLine": 76,
+        "startChar": 36,
+        "endLine": 76,
+        "endChar": 75
+      },
+      "revId": "3f981d761effa664e31eca1d7658c5055b732c61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
