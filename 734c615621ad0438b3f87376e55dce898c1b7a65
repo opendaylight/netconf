@@ -37,6 +37,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d5671909_0e47167c",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:39:55Z",
+      "side": 1,
+      "message": "1. delete this line",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a28ac0fb_d2d3d9e0",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:39:55Z",
+      "side": 1,
+      "message": "2. we do not need additional check here",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "22e38b10_c093a0ca",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
         "patchSetId": 27
