@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbcc2cfe_88cf4264",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 27
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:23:02Z",
+      "side": 1,
+      "message": "Added default controller-ip and controller-port in parameters.",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a58d7ee_6637de2d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:23:02Z",
+      "side": 1,
+      "message": "Move RESTCONF_URL just after STOPWATCH.",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22e38b10_c093a0ca",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:23:02Z",
+      "side": 1,
+      "message": "info",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0807e7a2_614dbd8d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:23:02Z",
+      "side": 1,
+      "message": "warn",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12b0605b_fb9f3a4f",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:23:02Z",
+      "side": 1,
+      "message": "warn",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7414ccc6_6a32edaa",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:23:02Z",
+      "side": 1,
+      "message": "info",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb3cbb55_997e4b23",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-01-31T14:23:02Z",
+      "side": 1,
+      "message": "Usually we order:\n\nprivate static final\n\nprivate static\n\nprivate objects\n\nprivate primitives\n\nThe expected result is:\n```\n        private static final Logger LOG \u003d LoggerFactory.getLogger(ScaleVerifyCallable.class);\n        private static final Pattern PATTERN \u003d Pattern.compile(\"connected\");\n\n        private final HttpClient httpClient;\n        private final HttpRequest request;\n\n        private final int deviceCount;\n```",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
