@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd5e5f68_a98dd122",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 27
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:46:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbcc2cfe_88cf4264",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a58d7ee_6637de2d",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-01-31T14:23:02Z",
       "side": 1,
       "message": "Move RESTCONF_URL just after STOPWATCH.",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a541f2b_1c97e60d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:46:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a58d7ee_6637de2d",
       "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
