@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63f3ca64_add6dd90",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:45:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5671909_0e47167c",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a28ac0fb_d2d3d9e0",
@@ -65,6 +83,24 @@
       "writtenOn": "2022-01-31T14:39:55Z",
       "side": 1,
       "message": "2. we do not need additional check here",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcb0fa06_e80f65db",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:45:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a28ac0fb_d2d3d9e0",
       "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +122,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2148359_6602982d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:45:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22e38b10_c093a0ca",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0807e7a2_614dbd8d",
@@ -99,6 +153,24 @@
       "writtenOn": "2022-01-31T14:23:02Z",
       "side": 1,
       "message": "warn",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46254905_9bbf9f86",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:45:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0807e7a2_614dbd8d",
       "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +192,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "844d4d09_ac15f42f",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:45:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12b0605b_fb9f3a4f",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7414ccc6_6a32edaa",
@@ -137,6 +227,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54a0c47c_f623e7bd",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:45:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7414ccc6_6a32edaa",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb3cbb55_997e4b23",
@@ -150,6 +258,24 @@
       "writtenOn": "2022-01-31T14:23:02Z",
       "side": 1,
       "message": "Usually we order:\n\nprivate static final\n\nprivate static\n\nprivate objects\n\nprivate primitives\n\nThe expected result is:\n```\n        private static final Logger LOG \u003d LoggerFactory.getLogger(ScaleVerifyCallable.class);\n        private static final Pattern PATTERN \u003d Pattern.compile(\"connected\");\n\n        private final HttpClient httpClient;\n        private final HttpRequest request;\n\n        private final int deviceCount;\n```",
+      "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8024608_5ed5ee26",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-01T10:45:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb3cbb55_997e4b23",
       "revId": "734c615621ad0438b3f87376e55dce898c1b7a65",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
