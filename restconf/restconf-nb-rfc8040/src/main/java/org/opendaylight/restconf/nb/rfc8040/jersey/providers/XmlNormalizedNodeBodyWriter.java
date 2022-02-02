@@ -82,7 +82,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             throw new IllegalStateException(e);
         }
         final NormalizedNode data = context.getData();
-        final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
+        final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();//here
 
         writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().depth(),
                 context.getWriterParameters().fields());
@@ -102,7 +102,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
             nnWriter = createNormalizedNodeWriter(
                     xmlWriter,
                     schemaCtx,
-                    ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(),
+                    ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(),//here
                     depth,
                     fields);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
@@ -112,7 +112,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
              *  so we need to emit initial output declaration..
              */
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx,
-                ((ActionDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth, fields);
+                ((ActionDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth, fields);//here
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
             final boolean isRoot = SchemaPath.ROOT.equals(path);
