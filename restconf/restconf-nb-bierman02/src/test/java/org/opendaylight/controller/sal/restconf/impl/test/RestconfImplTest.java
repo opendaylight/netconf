@@ -183,7 +183,7 @@ public class RestconfImplTest {
         final SchemaNode schemaNode = mock(SchemaNode.class,
                 Mockito.withSettings().extraInterfaces(RpcDefinition.class));
         doReturn(schemaNode).when(iiCtx).getSchemaNode();
-        doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();
+        doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();//here
 
         doReturn(QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",
                 "2014-01-14", "create-notification-stream")).when(schemaNode).getQName();
