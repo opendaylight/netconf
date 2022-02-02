@@ -106,7 +106,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     private static void writeNormalizedNode(final JsonWriter jsonWriter,
             final InstanceIdentifierContext<SchemaNode> context, NormalizedNode data,
             final @Nullable Integer depth) throws IOException {
-        SchemaPath path = context.getSchemaNode().getPath();
+        SchemaPath path = context.getSchemaNode().getPath();//here
         final RestconfNormalizedNodeWriter nnWriter;
         if (SchemaPath.ROOT.equals(path)) {
             /*
@@ -130,7 +130,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  RpcDefinition is not supported as initial codec in JSONStreamWriter,
              *  so we need to emit initial output declaratation..
              */
-            path = ((RpcDefinition) context.getSchemaNode()).getOutput().getPath();
+            path = ((RpcDefinition) context.getSchemaNode()).getOutput().getPath();//here
             nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
             jsonWriter.name("output");
             jsonWriter.beginObject();
