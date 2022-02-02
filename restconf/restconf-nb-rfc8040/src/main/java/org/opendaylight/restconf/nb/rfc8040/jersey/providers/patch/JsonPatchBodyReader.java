@@ -236,7 +236,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                         final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
                             path.getSchemaContext(),
                             schemaTree.findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
-                                .getPath().getParent())
+                                .getPath().getParent())//here
                             .currentStatement();
                         verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                         edit.setTargetSchemaNode((SchemaNode) parentStmt);

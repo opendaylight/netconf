@@ -81,13 +81,13 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final EffectiveStatementInference parentSchema;
         if (isPost) {
             parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath()).toInference();
+                path.getSchemaNode().getPath()).toInference();//here
         } else if (path.getSchemaNode() instanceof SchemaContext
-            || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
+            || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {//here
             parentSchema = SchemaInferenceStack.of(path.getSchemaContext()).toInference();
         } else {
             parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath().getParent()).toInference();
+                path.getSchemaNode().getPath().getParent()).toInference();//here
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
