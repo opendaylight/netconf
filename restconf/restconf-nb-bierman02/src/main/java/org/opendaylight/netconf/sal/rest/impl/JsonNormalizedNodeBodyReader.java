@@ -49,6 +49,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetExceptio
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,17 @@ public class JsonNormalizedNodeBodyReader
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws
         WebApplicationException {
         try {
-            return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
+            InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
+            final SchemaInferenceStack stack = SchemaInferenceStack.of(path.getSchemaContext());
+
+            path.getInstanceIdentifier().getPathArguments().stream()
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                    .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+            if(isPost()) {
+                stack.exit();
+            }
+            return readFrom(path, stack, entityStream, isPost());
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op
@@ -89,18 +100,18 @@ public class JsonNormalizedNodeBodyReader
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static NormalizedNodeContext readFrom(final String uriPath, final InputStream entityStream,
+    public static NormalizedNodeContext readFrom(final String uriPath, final InputStream entityStream, final SchemaInferenceStack stack,
             final boolean isPost, final ControllerContext controllerContext) throws RestconfDocumentedException {
 
         try {
-            return readFrom(controllerContext.toInstanceIdentifier(uriPath), entityStream, isPost);
+            return readFrom(controllerContext.toInstanceIdentifier(uriPath), stack, entityStream, isPost);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op
         }
     }
 
-    private static NormalizedNodeContext readFrom(final InstanceIdentifierContext<?> path,
+    private static NormalizedNodeContext readFrom(final InstanceIdentifierContext<?> path, final SchemaInferenceStack stack,
                                                   final InputStream entityStream, final boolean isPost)
             throws IOException {
         final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
@@ -110,21 +121,9 @@ public class JsonNormalizedNodeBodyReader
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final SchemaInferenceStack parentSchema;
-        if (isPost) {
-            // FIXME: We need dispatch for RPC.
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(), path.getSchemaNode().getPath());
-        } else if (path.getSchemaNode() instanceof SchemaContext
-                || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
-            parentSchema = SchemaInferenceStack.of(path.getSchemaContext());
-        } else {
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath().getParent());
-        }
-
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
             JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(path.getSchemaContext()),
-            parentSchema.toInference());
+            stack.toInference());
         final JsonReader reader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get(),
                 StandardCharsets.UTF_8));
         jsonParser.parse(reader);
