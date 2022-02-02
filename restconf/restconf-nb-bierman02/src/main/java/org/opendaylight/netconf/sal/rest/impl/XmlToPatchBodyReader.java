@@ -166,7 +166,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                     .getDataSchemaNode());
 
                 final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();
+                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();//here
                 verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                 targetNode = (SchemaNode) parentStmt;
             }
