@@ -74,6 +74,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         LOG.debug("put: uriPath: {}, payload: {}", uriPath, payload);
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
+
         final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, false,
                 controllerContext);
 
@@ -95,6 +96,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         LOG.debug("post: uriPath: {}, payload: {}", uriPath, payload);
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
+
         final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true,
                 controllerContext);
 
@@ -166,8 +168,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
             NormalizedNodeContext outputContext;
             if (actualInput != null) {
                 final InputStream entityStream = new ByteArrayInputStream(actualInput.getBytes(StandardCharsets.UTF_8));
-                final NormalizedNodeContext inputContext =
-                        JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true, controllerContext);
+                final NormalizedNodeContext inputContext = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream,
+                        true, controllerContext);
 
                 LOG.debug("Parsed YangInstanceIdentifier: {}", inputContext.getInstanceIdentifierContext()
                         .getInstanceIdentifier());

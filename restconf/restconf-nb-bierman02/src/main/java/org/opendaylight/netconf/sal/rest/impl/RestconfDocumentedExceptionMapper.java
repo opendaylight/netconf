@@ -213,7 +213,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final InstanceIdentifierContext<?> context = errorsNode.getInstanceIdentifierContext();
         final DataSchemaNode schema = (DataSchemaNode) context.getSchemaNode();
 
-        SchemaPath path = context.getSchemaNode().getPath();
+        SchemaPath path = context.getSchemaNode().getPath();//here
         final OutputStreamWriter outputWriter = new OutputStreamWriter(outStream, StandardCharsets.UTF_8);
         if (data == null) {
             throw new RestconfDocumentedException(Response.Status.NOT_FOUND);
@@ -317,7 +317,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             throw new IllegalStateException(e);
         }
         NormalizedNode data = errorsNode.getData();
-        SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
+        SchemaPath schemaPath = pathContext.getSchemaNode().getPath();//here
 
         boolean isDataRoot = false;
         if (SchemaPath.ROOT.equals(schemaPath)) {
