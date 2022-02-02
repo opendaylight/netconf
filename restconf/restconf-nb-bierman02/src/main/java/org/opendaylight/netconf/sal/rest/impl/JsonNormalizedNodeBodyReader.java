@@ -113,13 +113,14 @@ public class JsonNormalizedNodeBodyReader
         final SchemaInferenceStack parentSchema;
         if (isPost) {
             // FIXME: We need dispatch for RPC.
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(), path.getSchemaNode().getPath());
+            parentSchema = SchemaInferenceStack.ofDataTreePath(path.getSchemaContext(),
+                path.getSchemaNode().getQName());
         } else if (path.getSchemaNode() instanceof SchemaContext
-                || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
+                || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) { //here
             parentSchema = SchemaInferenceStack.of(path.getSchemaContext());
         } else {
             parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath().getParent());
+                path.getSchemaNode().getPath().getParent());//here
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
