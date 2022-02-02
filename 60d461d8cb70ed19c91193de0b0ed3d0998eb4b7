@@ -22,6 +22,30 @@
       },
       "revId": "60d461d8cb70ed19c91193de0b0ed3d0998eb4b7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92f6c6d6_bc220d0a",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-02T19:38:33Z",
+      "side": 1,
+      "message": "I will take care of it :)",
+      "parentUuid": "868b0efe_14563e37",
+      "range": {
+        "startLine": 699,
+        "startChar": 12,
+        "endLine": 699,
+        "endChar": 18
+      },
+      "revId": "60d461d8cb70ed19c91193de0b0ed3d0998eb4b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
