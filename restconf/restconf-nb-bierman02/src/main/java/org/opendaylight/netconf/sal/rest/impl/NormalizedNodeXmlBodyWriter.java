@@ -103,7 +103,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             throw new IllegalStateException(e);
         }
         final NormalizedNode data = context.getData();
-        final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
+        final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();//here
 
         writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().getDepth());
     }
@@ -128,7 +128,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             }
         }  else if (pathContext.getSchemaNode() instanceof RpcDefinition) {
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx,
-                    ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth);
+                    ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth);//here
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath.getParent(), depth);

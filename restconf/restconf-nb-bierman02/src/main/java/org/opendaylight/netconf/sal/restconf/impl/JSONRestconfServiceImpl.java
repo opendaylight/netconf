@@ -32,6 +32,7 @@ import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.PatchJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.api.JSONRestconfService;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
@@ -41,6 +42,8 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,8 +77,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         LOG.debug("put: uriPath: {}, payload: {}", uriPath, payload);
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, false,
-                controllerContext);
+
+        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, false, controllerContext);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
@@ -95,8 +98,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         LOG.debug("post: uriPath: {}, payload: {}", uriPath, payload);
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true,
-                controllerContext);
+
+        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true, controllerContext);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
@@ -166,8 +169,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
             NormalizedNodeContext outputContext;
             if (actualInput != null) {
                 final InputStream entityStream = new ByteArrayInputStream(actualInput.getBytes(StandardCharsets.UTF_8));
-                final NormalizedNodeContext inputContext =
-                        JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true, controllerContext);
+                final NormalizedNodeContext inputContext = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true, controllerContext);
 
                 LOG.debug("Parsed YangInstanceIdentifier: {}", inputContext.getInstanceIdentifierContext()
                         .getInstanceIdentifier());

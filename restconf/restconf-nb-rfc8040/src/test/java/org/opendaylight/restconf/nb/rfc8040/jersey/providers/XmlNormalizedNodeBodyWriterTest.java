@@ -33,7 +33,7 @@ public class XmlNormalizedNodeBodyWriterTest {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
         final SchemaNode schemaNode = mock(SchemaNode.class);
-        doReturn(SchemaPath.ROOT).when(schemaNode).getPath();
+        doReturn(SchemaPath.ROOT).when(schemaNode).getPath();//here
 
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
             new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
@@ -53,7 +53,7 @@ public class XmlNormalizedNodeBodyWriterTest {
                 TestRestconfUtils.loadSchemaContext("/instanceidentifier/yang", null);
 
         final SchemaNode schemaNode = mock(SchemaNode.class);
-        doReturn(SchemaPath.ROOT).when(schemaNode).getPath();
+        doReturn(SchemaPath.ROOT).when(schemaNode).getPath();//here
 
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
             new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
