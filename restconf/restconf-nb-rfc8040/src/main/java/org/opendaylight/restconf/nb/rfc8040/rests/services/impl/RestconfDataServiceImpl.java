@@ -319,7 +319,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response invokeAction(final NormalizedNodePayload payload) {
         final InstanceIdentifierContext<?> context = payload.getInstanceIdentifierContext();
         final DOMMountPoint mountPoint = context.getMountPoint();
-        final Absolute schemaPath = Absolute.of(ImmutableList.copyOf(context.getSchemaNode().getPath()
+        final Absolute schemaPath = Absolute.of(ImmutableList.copyOf(context.getSchemaNode().getPath()//here
             .getPathFromRoot()));
         final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
         final NormalizedNode data = payload.getData();
