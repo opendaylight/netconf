@@ -66,7 +66,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
         @SuppressWarnings("unchecked")
         final InstanceIdentifierContext<SchemaNode> identifierCtx =
                 (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
-        final SchemaPath path = identifierCtx.getSchemaNode().getPath();
+        final SchemaPath path = identifierCtx.getSchemaNode().getPath();//here
         final var pretty = context.getWriterParameters().prettyPrint();
 
         try (JsonWriter jsonWriter = createJsonWriter(entityStream, pretty == null ? false : pretty.value())) {
@@ -96,7 +96,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
              */
             nnWriter = createNormalizedNodeWriter(
                     context,
-                    ((RpcDefinition) context.getSchemaNode()).getOutput().getPath(),
+                    ((RpcDefinition) context.getSchemaNode()).getOutput().getPath(),//here
                     jsonWriter,
                     depth,
                     fields);
@@ -112,7 +112,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
              *  so we need to emit initial output declaration..
              */
             nnWriter = createNormalizedNodeWriter(context,
-                ((ActionDefinition) context.getSchemaNode()).getOutput().getPath(), jsonWriter, depth, fields);
+                ((ActionDefinition) context.getSchemaNode()).getOutput().getPath(), jsonWriter, depth, fields);//here
             final Module module = context.getSchemaContext().findModule(data.getIdentifier().getNodeType().getModule())
                 .get();
             jsonWriter.name(module.getName() + ":output");

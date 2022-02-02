@@ -256,10 +256,10 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                         edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()).concat(target)));
 
                         final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                            path.getSchemaContext(),
-                            codec.getDataContextTree().findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
-                                .getPath().getParent())
-                            .currentStatement();
+                                path.getSchemaContext(),
+                                codec.getDataContextTree().findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
+                                    .getPath().getParent())
+                                .currentStatement();
                         verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                         edit.setTargetSchemaNode((SchemaNode) parentStmt);
                     }
