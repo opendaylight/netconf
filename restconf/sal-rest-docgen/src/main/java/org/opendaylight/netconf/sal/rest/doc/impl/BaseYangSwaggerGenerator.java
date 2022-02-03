@@ -368,7 +368,7 @@ public abstract class BaseYangSwaggerGenerator {
 
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             final String operPath = getResourcePath("operations", context) + "/"
-                    + resolvePathArgumentsName(rpcDefinition, null, schemaContext);
+                    + resolvePathArgumentsName(rpcDefinition.getQName(), null, schemaContext);
             addOperations(rpcDefinition, moduleName, deviceName, paths, module.getName(), definitionNames, oaversion,
                     operPath);
         }
@@ -466,7 +466,7 @@ public abstract class BaseYangSwaggerGenerator {
         if (uriType.equals(URIType.RFC8040)) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
                 final String operPath = "rests/operations" + nodePath.substring(11)
-                        + "/" + resolvePathArgumentsName(actionDef, node, schemaContext);
+                        + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
                 addOperations(actionDef, moduleName, deviceName, paths, parentName, definitionNames, oaversion,
                         operPath);
             });
@@ -541,7 +541,7 @@ public abstract class BaseYangSwaggerGenerator {
                               final EffectiveModelContext schemaContext, final OAversion oaversion,
                               final DataSchemaNode parentNode) {
         final StringBuilder path = new StringBuilder();
-        final String localName = resolvePathArgumentsName(schemaNode, parentNode, schemaContext);
+        final String localName = resolvePathArgumentsName(schemaNode.getQName(), parentNode.getQName(), schemaContext);
         path.append(localName);
 
         if (schemaNode instanceof ListSchemaNode) {

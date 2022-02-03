@@ -18,7 +18,6 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class RestDocgenUtil {
 
@@ -37,51 +36,45 @@ public final class RestDocgenUtil {
      *
      * @return name of {@code node}
      */
-    public static String resolvePathArgumentsName(@NonNull final SchemaNode node, @Nullable final SchemaNode parentNode,
+    public static String resolvePathArgumentsName(@NonNull final QName node, @Nullable final QName parent,
                                                   @NonNull final EffectiveModelContext schemaContext) {
-        QName nodeQName = node.getQName();
-        QName parentQName = null;
-        if (parentNode != null) {
-            parentQName = parentNode.getQName();
-        }
-        if (isEqualNamespaceAndRevision(parentQName, nodeQName)) {
-            return node.getQName().getLocalName();
+        if (isEqualNamespaceAndRevision(node, parent)) {
+            return node.getLocalName();
         } else {
             return resolveFullNameFromNode(node, schemaContext);
         }
     }
 
-    private static synchronized String resolveFullNameFromNode(final SchemaNode node,
+    @Deprecated(forRemoval = true)
+    public static String resolveNodesName(final QName node, final Module module,
             final SchemaContext schemaContext) {
-        final XMLNamespace namespace = node.getQName().getNamespace();
-        final Optional<Revision> revision = node.getQName().getRevision();
+        if (node.getNamespace().equals(module.getQNameModule().getNamespace())
+                && node.getRevision().equals(module.getQNameModule().getRevision())) {
+            return node.getLocalName();
+        } else {
+            return resolveFullNameFromNode(node, schemaContext);
+        }
+    }
 
-        Map<Optional<Revision>, Module> revisionToModule =
+    private static boolean isEqualNamespaceAndRevision(final QName node, final QName parent) {
+        if (parent == null) {
+            return node == null;
+        }
+        return parent.getNamespace().equals(node.getNamespace())
+                && parent.getRevision().equals(node.getRevision());
+    }
+
+    private static String resolveFullNameFromNode(final QName node, final SchemaContext schemaContext) {
+        final XMLNamespace namespace = node.getNamespace();
+        final Optional<Revision> revision = node.getRevision();
+
+        final Map<Optional<Revision>, Module> revisionToModule =
             NAMESPACE_AND_REVISION_TO_MODULE.computeIfAbsent(namespace, k -> new HashMap<>());
-        Module module =
-            revisionToModule.computeIfAbsent(revision, k -> schemaContext.findModule(namespace, k).orElse(null));
+        final Module module = revisionToModule.computeIfAbsent(revision,
+                k -> schemaContext.findModule(namespace, k).orElse(null));
         if (module != null) {
-            return module.getName() + ":" + node.getQName().getLocalName();
+            return module.getName() + ":" + node.getLocalName();
         }
-        return node.getQName().getLocalName();
+        return node.getLocalName();
     }
-
-    public static String resolveNodesName(final SchemaNode node, final Module module,
-            final SchemaContext schemaContext) {
-        if (node.getQName().getNamespace().equals(module.getQNameModule().getNamespace())
-                && node.getQName().getRevision().equals(module.getQNameModule().getRevision())) {
-            return node.getQName().getLocalName();
-        } else {
-            return resolveFullNameFromNode(node, schemaContext);
-        }
-    }
-
-    private static boolean isEqualNamespaceAndRevision(final QName parentQName, final QName nodeQName) {
-        if (parentQName == null) {
-            return nodeQName == null;
-        }
-        return parentQName.getNamespace().equals(nodeQName.getNamespace())
-                && parentQName.getRevision().equals(nodeQName.getRevision());
-    }
-
 }
