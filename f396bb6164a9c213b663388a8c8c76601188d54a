@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0079fdc6_732f24b5",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/PointParam.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-04T08:30:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6280ebfa_5a5d2847",
+      "revId": "f396bb6164a9c213b663388a8c8c76601188d54a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "716f9e33_a197c89e",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-02-04T06:31:51Z",
       "side": 1,
       "message": "I don\u0027t think it is a big deal to directly inject dataBroker to required services:\n\n- RestconfDataServiceImpl already contains dataBroker\n- RestconfSchemaServiceImpl - it can be null\n\nso we need to inject dataBroker only into AbstractIdentifierAwareJaxRsProvider and RestconfOperationsServiceImpl",
+      "revId": "f396bb6164a9c213b663388a8c8c76601188d54a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58d43580_ebdd724b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-04T08:30:52Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "716f9e33_a197c89e",
       "revId": "f396bb6164a9c213b663388a8c8c76601188d54a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -58,6 +94,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "078b4083_345d8145",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-04T08:30:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05c934cc_4792af2a",
+      "range": {
+        "startLine": 107,
+        "startChar": 94,
+        "endLine": 107,
+        "endChar": 110
+      },
+      "revId": "f396bb6164a9c213b663388a8c8c76601188d54a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c777a62_b28645a8",
@@ -71,6 +131,30 @@
       "writtenOn": "2022-02-04T06:31:51Z",
       "side": 1,
       "message": "probably it is not needed to inject dataBroker here - because this operation doesn\u0027t work behind mountpoint (not sure)",
+      "range": {
+        "startLine": 264,
+        "startChar": 0,
+        "endLine": 269,
+        "endChar": 45
+      },
+      "revId": "f396bb6164a9c213b663388a8c8c76601188d54a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08e22161_b07960ea",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-04T08:30:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c777a62_b28645a8",
       "range": {
         "startLine": 264,
         "startChar": 0,
