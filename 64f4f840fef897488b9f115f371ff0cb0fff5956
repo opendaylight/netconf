@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ec3cfb4_0a7c9cfe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-04T11:16:29Z",
+      "side": 1,
+      "message": "Clarified in the updated commit message.",
+      "parentUuid": "8e64a90f_7d685698",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 14
+      },
+      "revId": "64f4f840fef897488b9f115f371ff0cb0fff5956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22a45673_2dbd569b",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-01-20T14:38:44Z",
       "side": 1,
       "message": "!isEmpty()\n\nAlso, do not just remove code comments, but update them to explain what is going on.\nIn this particular example, why is a keyed list being treated differently from a normal list?",
+      "range": {
+        "startLine": 125,
+        "startChar": 96,
+        "endLine": 125,
+        "endChar": 106
+      },
+      "revId": "64f4f840fef897488b9f115f371ff0cb0fff5956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eef33cb5_4ed37356",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/NetconfFieldsTranslator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-04T11:16:29Z",
+      "side": 1,
+      "message": "Okay clarified in the added comment",
+      "parentUuid": "22a45673_2dbd569b",
       "range": {
         "startLine": 125,
         "startChar": 96,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e805825a_8324255e",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/NetconfFieldsTranslator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-04T11:16:29Z",
+      "side": 1,
+      "message": "I think this special case is unnecessary looking at it",
+      "parentUuid": "f82d5341_6e900a67",
+      "range": {
+        "startLine": 145,
+        "startChar": 12,
+        "endLine": 145,
+        "endChar": 85
+      },
+      "revId": "64f4f840fef897488b9f115f371ff0cb0fff5956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3202a73_5f161fb2",
@@ -83,6 +155,30 @@
       "writtenOn": "2022-01-20T14:38:44Z",
       "side": 1,
       "message": "pretty much duplicate code except the last argument to eliminate duplication",
+      "range": {
+        "startLine": 152,
+        "startChar": 12,
+        "endLine": 152,
+        "endChar": 82
+      },
+      "revId": "64f4f840fef897488b9f115f371ff0cb0fff5956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e81f12dc_261464ee",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/NetconfFieldsTranslator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-04T11:16:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3202a73_5f161fb2",
       "range": {
         "startLine": 152,
         "startChar": 12,
