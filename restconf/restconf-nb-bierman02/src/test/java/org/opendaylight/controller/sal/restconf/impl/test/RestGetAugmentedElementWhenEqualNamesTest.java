@@ -7,19 +7,19 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import java.io.FileNotFoundException;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class RestGetAugmentedElementWhenEqualNamesTest {
@@ -27,9 +27,6 @@ public class RestGetAugmentedElementWhenEqualNamesTest {
     private static EffectiveModelContext schemaContext;
 
     private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
     public static void init() throws FileNotFoundException {
@@ -40,19 +37,16 @@ public class RestGetAugmentedElementWhenEqualNamesTest {
     public void augmentedNodesInUri() {
         InstanceIdentifierContext<?> iiWithData =
                 controllerContext.toInstanceIdentifier("main:cont/augment-main-a:cont1");
-        assertEquals("ns:augment:main:a", iiWithData.getSchemaNode().getQName().getNamespace().toString());
+        assertEquals(XMLNamespace.of("ns:augment:main:a"), iiWithData.getSchemaNode().getQName().getNamespace());
         iiWithData = controllerContext.toInstanceIdentifier("main:cont/augment-main-b:cont1");
-        assertEquals("ns:augment:main:b", iiWithData.getSchemaNode().getQName().getNamespace().toString());
+        assertEquals(XMLNamespace.of("ns:augment:main:b"), iiWithData.getSchemaNode().getQName().getNamespace());
     }
 
     @Test
     public void nodeWithoutNamespaceHasMoreAugments() {
-        try {
-            controllerContext.toInstanceIdentifier("main:cont/cont1");
-            fail("Expected exception");
-        } catch (final RestconfDocumentedException e) {
-            assertTrue(e.getErrors().get(0).getErrorMessage()
-                    .contains("is added as augment from more than one module"));
-        }
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("main:cont/cont1"));
+        assertThat(ex.getErrors().get(0).getErrorMessage(),
+            containsString("is added as augment from more than one module"));
     }
 }

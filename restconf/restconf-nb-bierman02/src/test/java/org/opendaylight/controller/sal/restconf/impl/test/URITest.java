@@ -8,6 +8,7 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -18,9 +19,7 @@ import java.io.FileNotFoundException;
 import java.util.Optional;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -40,9 +39,6 @@ public class URITest {
     private final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
     private final ControllerContext controllerContext =
             TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
@@ -84,14 +80,14 @@ public class URITest {
 
     @Test
     public void testToInstanceIdentifierListWithNullKey() {
-        this.exception.expect(RestconfDocumentedException.class);
-        controllerContext.toInstanceIdentifier("simple-nodes:user/null/boo");
+        assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("simple-nodes:user/null/boo"));
     }
 
     @Test
     public void testToInstanceIdentifierListWithMissingKey() {
-        this.exception.expect(RestconfDocumentedException.class);
-        controllerContext.toInstanceIdentifier("simple-nodes:user/foo");
+        assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("simple-nodes:user/foo"));
     }
 
     @Test
@@ -114,26 +110,26 @@ public class URITest {
 
     @Test
     public void testToInstanceIdentifierChoiceException() {
-        this.exception.expect(RestconfDocumentedException.class);
-        controllerContext.toInstanceIdentifier("simple-nodes:food/snack");
+        assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("simple-nodes:food/snack"));
     }
 
     @Test
     public void testToInstanceIdentifierCaseException() {
-        this.exception.expect(RestconfDocumentedException.class);
-        controllerContext.toInstanceIdentifier("simple-nodes:food/sports-arena");
+        assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("simple-nodes:food/sports-arena"));
     }
 
     @Test
     public void testToInstanceIdentifierChoiceCaseException() {
-        this.exception.expect(RestconfDocumentedException.class);
-        controllerContext.toInstanceIdentifier("simple-nodes:food/snack/sports-arena");
+        assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("simple-nodes:food/snack/sports-arena"));
     }
 
     @Test
     public void testToInstanceIdentifierWithoutNode() {
-        this.exception.expect(RestconfDocumentedException.class);
-        controllerContext.toInstanceIdentifier("simple-nodes");
+        assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("simple-nodes"));
     }
 
     @Test
@@ -159,12 +155,11 @@ public class URITest {
 
     @Test
     public void testMountPointWithoutMountPointSchema() throws FileNotFoundException, ReactorException {
-        this.exception.expect(RestconfDocumentedException.class);
-
-        controllerContext.toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class");
+        assertThrows(RestconfDocumentedException.class,
+            () -> controllerContext.toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class"));
     }
 
-    public void initSchemaService() {
+    private void initSchemaService() {
         doReturn(Optional.of(FixedDOMSchemaService.of(mountSchemaContext))).when(mountInstance)
             .getService(DOMSchemaService.class);
     }
