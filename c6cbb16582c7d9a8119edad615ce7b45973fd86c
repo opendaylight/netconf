@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69f788e2_24632143",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPatchBodyReader.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-08T19:45:27Z",
+      "side": 1,
+      "message": "`edit.getTarget().getPathArguments().stream()`",
+      "revId": "c6cbb16582c7d9a8119edad615ce7b45973fd86c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea416ffc_7a7ee5c7",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPatchBodyReader.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-08T19:45:27Z",
+      "side": 1,
+      "message": "remove this `if` - Its no more necessary when you apply the above comment.",
+      "revId": "c6cbb16582c7d9a8119edad615ce7b45973fd86c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
