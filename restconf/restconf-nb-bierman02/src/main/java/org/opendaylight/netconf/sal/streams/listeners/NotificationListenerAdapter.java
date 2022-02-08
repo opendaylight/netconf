@@ -131,9 +131,8 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     @VisibleForTesting
     String prepareJson(final EffectiveModelContext schemaContext, final DOMNotification notification) {
-        final JsonParser jsonParser = new JsonParser();
         final JsonObject json = new JsonObject();
-        json.add("ietf-restconf:notification", jsonParser.parse(writeBodyToString(schemaContext, notification)));
+        json.add("ietf-restconf:notification", JsonParser.parseString(writeBodyToString(schemaContext, notification)));
         json.addProperty("event-time", ListenerAdapter.toRFC3339(Instant.now()));
         return json.toString();
     }

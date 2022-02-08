@@ -685,11 +685,9 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
         LOG.info("JSON: {}", bos);
 
-        final JsonParser parser = new JsonParser();
         JsonElement rootElement;
-
         try {
-            rootElement = parser.parse(new InputStreamReader(new ByteArrayInputStream(bos.toByteArray())));
+            rootElement = JsonParser.parseReader(new InputStreamReader(new ByteArrayInputStream(bos.toByteArray())));
         } catch (final Exception e) {
             throw new IllegalArgumentException("Invalid JSON response:\n" + bos.toString(), e);
         }
