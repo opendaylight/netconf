@@ -18,7 +18,6 @@ import com.google.common.collect.Iterables;
 import java.io.FileNotFoundException;
 import java.util.Optional;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -47,7 +46,7 @@ public class URITest {
     }
 
     @Test
-    public void testToInstanceIdentifierList() throws FileNotFoundException {
+    public void testToInstanceIdentifierList() {
         InstanceIdentifierContext<?> instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:userWithoutClass/foo");
         assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "userWithoutClass");
@@ -91,7 +90,7 @@ public class URITest {
     }
 
     @Test
-    public void testToInstanceIdentifierContainer() throws FileNotFoundException {
+    public void testToInstanceIdentifierContainer() {
         final InstanceIdentifierContext<?> instanceIdentifier =
                 controllerContext.toInstanceIdentifier("simple-nodes:users");
         assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "users");
@@ -100,9 +99,7 @@ public class URITest {
     }
 
     @Test
-    @Ignore //jenkins has problem with JerseyTest
-    // - we expecting problems with singletons ControllerContext as schemaContext holder
-    public void testToInstanceIdentifierChoice() throws FileNotFoundException {
+    public void testToInstanceIdentifierChoice() {
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:food/nonalcoholic");
         assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "nonalcoholic");
@@ -133,7 +130,7 @@ public class URITest {
     }
 
     @Test
-    public void testMountPointWithExternModul() throws FileNotFoundException, ReactorException {
+    public void testMountPointWithExternModul() {
         initSchemaService();
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class/student/name");
@@ -146,7 +143,7 @@ public class URITest {
     }
 
     @Test
-    public void testMountPointWithoutExternModul() throws FileNotFoundException, ReactorException {
+    public void testMountPointWithoutExternModul() {
         initSchemaService();
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/");
@@ -154,7 +151,7 @@ public class URITest {
     }
 
     @Test
-    public void testMountPointWithoutMountPointSchema() throws FileNotFoundException, ReactorException {
+    public void testMountPointWithoutMountPointSchema() {
         assertThrows(RestconfDocumentedException.class,
             () -> controllerContext.toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class"));
     }
