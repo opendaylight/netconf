@@ -15,7 +15,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -29,7 +31,10 @@ import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -46,6 +51,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.xml.sax.SAXException;
 
 /**
@@ -106,21 +112,20 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     private static void writeNormalizedNode(final JsonWriter jsonWriter,
             final InstanceIdentifierContext<SchemaNode> context, NormalizedNode data,
             final @Nullable Integer depth) throws IOException {
-        SchemaPath path = context.getSchemaNode().getPath();
         final RestconfNormalizedNodeWriter nnWriter;
-        if (SchemaPath.ROOT.equals(path)) {
+        if (context.getSchemaNode() instanceof SchemaContext) {
             /*
              *  Creates writer without initialNs and we write children of root data container
              *  which is not visible in restconf
              */
-            nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context, SchemaPath.ROOT, jsonWriter, depth);
             if (data instanceof ContainerNode) {
-                writeChildren(nnWriter,(ContainerNode) data);
+                writeChildren(nnWriter, (ContainerNode) data);
             } else if (data instanceof DOMSourceAnyxmlNode) {
                 try {
                     writeChildren(nnWriter,
                             (ContainerNode) NetconfUtil.transformDOMSourceToNormalizedNode(
-                                    context.getSchemaContext(), ((DOMSourceAnyxmlNode)data).body()).getResult());
+                                    context.getSchemaContext(), ((DOMSourceAnyxmlNode) data).body()).getResult());
                 } catch (XMLStreamException | URISyntaxException | SAXException e) {
                     throw new IOException("Cannot write anyxml.", e);
                 }
@@ -130,19 +135,25 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  RpcDefinition is not supported as initial codec in JSONStreamWriter,
              *  so we need to emit initial output declaratation..
              */
-            path = ((RpcDefinition) context.getSchemaNode()).getOutput().getPath();
+            final RpcDefinition rpc = (RpcDefinition) context.getSchemaNode();
+            final SchemaPath path = SchemaPath.of(Absolute.of(rpc.getQName(), rpc.getOutput().getQName()));
             nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
             jsonWriter.name("output");
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
             jsonWriter.endObject();
         } else {
-            path = path.getParent();
+            final List<QName> qnames = context.getInstanceIdentifier().getPathArguments().stream()
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                    .map(PathArgument::getNodeType)
+                    .collect(Collectors.toList());
+            final SchemaPath path = SchemaPath.of(Absolute.of(qnames)).getParent();
 
             if (data instanceof MapEntryNode) {
                 data = ImmutableNodes.mapNodeBuilder(data.getIdentifier().getNodeType())
-                    .withChild((MapEntryNode) data)
-                    .build();
+                        .withChild((MapEntryNode) data)
+                        .build();
             }
             nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
             nnWriter.write(data);
