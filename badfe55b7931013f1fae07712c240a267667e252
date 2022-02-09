@@ -16,6 +16,24 @@
       "message": "IMHO: This is not true.",
       "revId": "badfe55b7931013f1fae07712c240a267667e252",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb865f3e_c61c78e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-09T12:52:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa681d63_196d756d",
+      "revId": "badfe55b7931013f1fae07712c240a267667e252",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
