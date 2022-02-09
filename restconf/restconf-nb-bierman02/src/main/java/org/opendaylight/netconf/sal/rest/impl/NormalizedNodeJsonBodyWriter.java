@@ -46,6 +46,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.xml.sax.SAXException;
 
 /**
@@ -106,7 +107,12 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     private static void writeNormalizedNode(final JsonWriter jsonWriter,
             final InstanceIdentifierContext<SchemaNode> context, NormalizedNode data,
             final @Nullable Integer depth) throws IOException {
-        SchemaPath path = context.getSchemaNode().getPath();
+        final SchemaPath path;
+        if (context.getSchemaNode() instanceof SchemaContext) {
+            path = SchemaPath.ROOT;
+        } else {
+            path = SchemaPath.of(Absolute.of(context.getSchemaNode().getQName()));
+        }
         final RestconfNormalizedNodeWriter nnWriter;
         if (SchemaPath.ROOT.equals(path)) {
             /*
@@ -130,7 +136,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  RpcDefinition is not supported as initial codec in JSONStreamWriter,
              *  so we need to emit initial output declaratation..
              */
-            path = ((RpcDefinition) context.getSchemaNode()).getOutput().getPath();
+            final RpcDefinition rpc = (RpcDefinition) context.getSchemaNode();
+            path = SchemaPath.of(Absolute.of(rpc.getQName(), rpc.getOutput().getQName()));
             nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
             jsonWriter.name("output");
             jsonWriter.beginObject();
