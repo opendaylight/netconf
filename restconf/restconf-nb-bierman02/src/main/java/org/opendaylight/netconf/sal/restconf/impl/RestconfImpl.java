@@ -11,6 +11,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule.MODULES_CONTAINER_QNAME;
+import static org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule.MODULE_LIST_QNAME;
+import static org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule.STREAMS_CONTAINER_QNAME;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicates;
@@ -66,7 +69,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
+import org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
@@ -186,6 +189,23 @@ public final class RestconfImpl implements RestconfService {
             .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
             .appendOffset("+HH:MM", "Z").toFormatter();
 
+    private static final YangInstanceIdentifier MODULES = YangInstanceIdentifier.builder()
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(MODULES_CONTAINER_QNAME)
+            .build();
+    private static final YangInstanceIdentifier MODULE = YangInstanceIdentifier.builder()
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(MODULES_CONTAINER_QNAME)
+            .node(MODULE_LIST_QNAME)
+            .build();
+    private static final YangInstanceIdentifier STREAMS = YangInstanceIdentifier.builder()
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(STREAMS_CONTAINER_QNAME)
+            .build();
+
     private final BrokerFacade broker;
 
     private final ControllerContext controllerContext;
@@ -215,15 +235,15 @@ public final class RestconfImpl implements RestconfService {
 
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode modulesSchemaNode = controllerContext.getRestconfModuleRestConfSchemaNode(
-                restconfModule, Draft02.RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
+                restconfModule, RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
         checkState(modulesSchemaNode instanceof ContainerSchemaNode);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> moduleContainerBuilder =
                 SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
         moduleContainerBuilder.withChild(allModuleMap);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, modulesSchemaNode, null, schemaContext),
-                moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(MODULES, modulesSchemaNode, null,
+                schemaContext), moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     /**
@@ -246,7 +266,7 @@ public final class RestconfImpl implements RestconfService {
 
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode modulesSchemaNode = controllerContext.getRestconfModuleRestConfSchemaNode(
-                restconfModule, Draft02.RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
+                restconfModule, RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
         checkState(modulesSchemaNode instanceof ContainerSchemaNode);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> moduleContainerBuilder =
@@ -254,7 +274,7 @@ public final class RestconfImpl implements RestconfService {
         moduleContainerBuilder.withChild(mountPointModulesMap);
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, modulesSchemaNode, mountPoint,
+                new InstanceIdentifierContext<>(MODULES, modulesSchemaNode, mountPoint,
                         controllerContext.getGlobalSchema()),
                 moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
@@ -289,11 +309,11 @@ public final class RestconfImpl implements RestconfService {
         final MapNode moduleMap = makeModuleMapNode(modules);
 
         final DataSchemaNode moduleSchemaNode = controllerContext
-                .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.MODULE_LIST_SCHEMA_NODE);
+                .getRestconfModuleRestConfSchemaNode(restconfModule, RestConfModule.MODULE_LIST_SCHEMA_NODE);
         checkState(moduleSchemaNode instanceof ListSchemaNode);
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, moduleSchemaNode, mountPoint, schemaContext), moduleMap,
+                new InstanceIdentifierContext<>(MODULE, moduleSchemaNode, mountPoint, schemaContext), moduleMap,
                 QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -304,7 +324,7 @@ public final class RestconfImpl implements RestconfService {
         final Set<String> availableStreams = Notificator.getStreamNames();
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode streamSchemaNode = controllerContext
-                .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.STREAM_LIST_SCHEMA_NODE);
+                .getRestconfModuleRestConfSchemaNode(restconfModule, RestConfModule.STREAM_LIST_SCHEMA_NODE);
         checkState(streamSchemaNode instanceof ListSchemaNode);
 
         final CollectionNodeBuilder<MapEntryNode, SystemMapNode> listStreamsBuilder =
@@ -315,15 +335,16 @@ public final class RestconfImpl implements RestconfService {
         }
 
         final DataSchemaNode streamsContainerSchemaNode = controllerContext.getRestconfModuleRestConfSchemaNode(
-                restconfModule, Draft02.RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
+                restconfModule, RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
         checkState(streamsContainerSchemaNode instanceof ContainerSchemaNode);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> streamsContainerBuilder =
                 SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) streamsContainerSchemaNode);
         streamsContainerBuilder.withChild(listStreamsBuilder.build());
 
+        // FIXME add QNAME for Streams container
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, streamsContainerSchemaNode, null, schemaContext),
+                new InstanceIdentifierContext<>(STREAMS, streamsContainerSchemaNode, null, schemaContext),
                 streamsContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -1389,7 +1410,7 @@ public final class RestconfImpl implements RestconfService {
         requireNonNull(modules);
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode moduleSchemaNode = controllerContext
-                .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.MODULE_LIST_SCHEMA_NODE);
+                .getRestconfModuleRestConfSchemaNode(restconfModule, RestConfModule.MODULE_LIST_SCHEMA_NODE);
         checkState(moduleSchemaNode instanceof ListSchemaNode);
 
         final CollectionNodeBuilder<MapEntryNode, SystemMapNode> listModuleBuilder =
