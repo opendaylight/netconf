@@ -16,6 +16,24 @@
       "message": "I know that this is wrong. I\u0027m searching for right way.",
       "revId": "e1d775f5db5d91f04f4450ccd23693b85c5f00ab",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69e8a87f_feed8c69",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/NormalizedNodeXmlBodyWriter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-10T14:49:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de7b9795_e831043b",
+      "revId": "e1d775f5db5d91f04f4450ccd23693b85c5f00ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
