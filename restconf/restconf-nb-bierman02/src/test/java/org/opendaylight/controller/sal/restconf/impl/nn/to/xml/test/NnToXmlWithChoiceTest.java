@@ -22,6 +22,7 @@ import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -73,6 +74,10 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
         final QName lf = QName.create("module:with:choice", "2013-12-18", name);
         final QName choA = QName.create("module:with:choice", "2013-12-18", "choA");
 
+        final YangInstanceIdentifier yII = YangInstanceIdentifier.builder()
+                .node(contQname)
+                .build();
+
         final DataSchemaNode contSchemaNode = schemaContext
                 .getDataChildByName(contQname);
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataContainerNodeAttrBuilder = SchemaAwareBuilders
@@ -96,7 +101,7 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
         dataContainerNodeAttrBuilder.withChild(dataChoice.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null,
+                new InstanceIdentifierContext<>(yII,
                         contSchemaNode, null, schemaContext),
                 dataContainerNodeAttrBuilder.build());
 
