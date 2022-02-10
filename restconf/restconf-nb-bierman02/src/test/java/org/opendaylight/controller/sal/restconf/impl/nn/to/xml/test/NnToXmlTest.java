@@ -30,6 +30,7 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
@@ -293,6 +294,10 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final QName cont = QName.create("basic:module", "2013-12-02", "cont");
         final QName lf = QName.create("basic:module", "2013-12-02", name);
 
+        final YangInstanceIdentifier yII = YangInstanceIdentifier.builder()
+                .node(cont)
+                .build();
+
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = SchemaAwareBuilders
@@ -305,7 +310,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue(object).build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+                new InstanceIdentifierContext<>(yII, contSchema, null, schemaContext), contData.build());
 
         return testNormalizedNodeContext;
     }
@@ -325,6 +330,10 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final QName lfBoolean = QName.create("basic:module", "2013-12-02", "lfBoolean");
         final QName lfLfref = QName.create("basic:module", "2013-12-02", "lfLfref");
 
+        final YangInstanceIdentifier yII = YangInstanceIdentifier.builder()
+                .node(cont)
+                .build();
+
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = SchemaAwareBuilders
@@ -343,7 +352,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue("true").build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+                new InstanceIdentifierContext<>(yII, contSchema, null, schemaContext), contData.build());
 
         return testNormalizedNodeContext;
     }
@@ -351,6 +360,10 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     private static NormalizedNodeContext prepareLeafrefNegativeData() {
         final QName cont = QName.create("basic:module", "2013-12-02", "cont");
         final QName lfLfref = QName.create("basic:module", "2013-12-02", "lfLfrefNegative");
+
+        final YangInstanceIdentifier yII = YangInstanceIdentifier.builder()
+                .node(cont)
+                .build();
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contData = SchemaAwareBuilders
@@ -363,13 +376,17 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue("value").build());
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+                new InstanceIdentifierContext<>(yII, contSchema, null, schemaContext), contData.build());
     }
 
     private static NormalizedNodeContext prepareIdrefData(final String prefix, final boolean valueAsQName) {
         final QName cont = QName.create("basic:module", "2013-12-02", "cont");
         final QName cont1 = QName.create("basic:module", "2013-12-02", "cont1");
         final QName lf11 = QName.create("basic:module", "2013-12-02", "lf11");
+
+        final YangInstanceIdentifier yII = YangInstanceIdentifier.builder()
+                .node(cont)
+                .build();
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
@@ -397,7 +414,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(cont1Data.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+                new InstanceIdentifierContext<>(yII, contSchema, null, schemaContext), contData.build());
         return testNormalizedNodeContext;
     }
 
