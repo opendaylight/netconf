@@ -24,6 +24,7 @@ import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -104,6 +105,10 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         final QName lf11 = QName.create("augment:module:leaf:list", "2014-01-17",
                 "lf11");
 
+        final YangInstanceIdentifier yII = YangInstanceIdentifier.builder()
+                .node(cont)
+                .build();
+
         final DataSchemaNode schemaCont = schemaContext.getDataChildByName(cont);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont = SchemaAwareBuilders
@@ -138,7 +143,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         dataCont.withChild(dataCont1.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, schemaCont,
+                new InstanceIdentifierContext<>(yII, schemaCont,
                         null, schemaContext), dataCont.build());
 
         return testNormalizedNodeContext;
@@ -201,6 +206,10 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         final QName keyvalue112 = QName.create("augment:module", "2014-01-17",
                 "keyvalue112");
 
+        final YangInstanceIdentifier yII = YangInstanceIdentifier.builder()
+                .node(cont)
+                .build();
+
         final DataSchemaNode schemaCont = schemaContext.getDataChildByName(cont);
 
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataCont = SchemaAwareBuilders
@@ -236,7 +245,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         dataCont1.withChild(dataLst11.build());
         dataCont.withChild(dataCont1.build());
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, schemaCont, null, schemaContext),
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(yII, schemaCont, null, schemaContext),
             dataCont.build());
     }
 
