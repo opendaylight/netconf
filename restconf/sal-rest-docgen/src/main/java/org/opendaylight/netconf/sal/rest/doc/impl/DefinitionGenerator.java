@@ -56,8 +56,9 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
@@ -690,7 +691,7 @@ public class DefinitionGenerator {
         } else if (leafTypeDef instanceof EmptyTypeDefinition) {
             jsonType = OBJECT_TYPE;
         } else if (leafTypeDef instanceof LeafrefTypeDefinition) {
-            final SchemaInferenceStack stack = SchemaInferenceStack.ofSchemaPath(schemaContext, node.getPath());
+            final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
             return processTypeDef(stack.resolveLeafref((LeafrefTypeDefinition) leafTypeDef), node, property,
                 schemaContext, definitions, definitionNames, oaversion);
         } else if (leafTypeDef instanceof BooleanTypeDefinition) {
@@ -895,16 +896,13 @@ public class DefinitionGenerator {
 
     private static String processInstanceIdentifierType(final DataSchemaNode node, final ObjectNode property,
                                                         final EffectiveModelContext schemaContext) {
-        SchemaPath path = node.getPath();
-
-        while (path.getParent() != null && path.getParent().getPathFromRoot().iterator().hasNext()) {
-            path = path.getParent();
-        }
-
-        final QName rootContainer = path.getLastComponent();
-        final String rootContainerName = rootContainer.getLocalName();
-        final String prefix = schemaContext.findModule(rootContainer.getModule()).get().getPrefix();
-        setDefaultValue(property, String.format("/%s:%s", prefix, rootContainerName));
+        // create example instance-identifier to the first child of node's module if exists or leave it empty
+        final var value = schemaContext.findModule(node.getQName().getModule())
+                .filter(m -> !m.getChildNodes().isEmpty())
+                .map(m -> String.format("/%s:%s", m.getPrefix(),
+                        m.getChildNodes().iterator().next().getQName().getLocalName()))
+                .orElse("");
+        setDefaultValue(property, value);
         return STRING_TYPE;
     }
 
