@@ -165,8 +165,13 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                 schemaNode = verifyNotNull(codec.getDataContextTree().findChild(targetII).orElseThrow()
                     .getDataSchemaNode());
 
-                final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();
+                final SchemaInferenceStack stack = SchemaInferenceStack.of(pathContext.getSchemaContext());
+                targetII.getPathArguments().stream()
+                        .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                        .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                        .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+                stack.exit();
+                final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
                 verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                 targetNode = (SchemaNode) parentStmt;
             }
@@ -182,9 +187,12 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                 if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
                     final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer,
-                        SchemaInferenceStack.ofInstantiatedPath(pathContext.getSchemaContext(), schemaNode.getPath())
-                            .toInference());
+                    final SchemaInferenceStack stack = SchemaInferenceStack.of(pathContext.getSchemaContext());
+                    targetII.getPathArguments().stream()
+                            .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                            .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                            .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+                    final XmlParserStream xmlParser = XmlParserStream.create(writer, stack.toInference());
                     xmlParser.traverse(new DOMSource(firstValueElement));
                     parsed = resultHolder.getResult();
                 } else {
