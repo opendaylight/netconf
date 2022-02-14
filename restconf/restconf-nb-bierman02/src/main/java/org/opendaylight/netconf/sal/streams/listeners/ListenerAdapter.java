@@ -13,8 +13,10 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.json.XML;
@@ -36,6 +38,7 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -324,12 +327,16 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         dataChangeEventElement.appendChild(operationElement);
 
         try {
+            final List<QName> qNames = eventPath.getPathArguments().stream()
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                    .map(PathArgument::getNodeType)
+                    .collect(Collectors.toList());
             SchemaPath nodePath;
             if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
-                nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath();
+                nodePath = SchemaPath.of(Absolute.of(qNames));
             } else {
-                nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath()
-                    .getParent();
+                nodePath = SchemaPath.of(Absolute.of(qNames)).getParent();
             }
             final DOMResult domResult = writeNormalizedNode(normalized, schemaContext, nodePath);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
