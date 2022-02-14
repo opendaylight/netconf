@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.common.serializer;
 
+import static com.google.common.base.Verify.verifyNotNull;
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -21,14 +24,22 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ModificationType;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractWebsocketSerializer<T extends Exception> {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
 
-    public void serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly, final boolean skipData)
+    private final EffectiveModelContext context;
+
+    protected AbstractWebsocketSerializer(final EffectiveModelContext context) {
+        this.context = requireNonNull(context);
+    }
+
+    public final void serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly, final boolean skipData)
             throws T {
         final Deque<PathArgument> path = new ArrayDeque<>();
         path.addAll(candidate.getRootPath().getPathArguments());
@@ -78,8 +89,21 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
         }
     }
 
-    abstract void serializeData(Collection<PathArgument> path, DataTreeCandidateNode candidate, boolean skipData)
-            throws T;
+    private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
+            final boolean skipData) throws T {
+        var current = DataSchemaContextTree.from(context).getRoot();
+        for (var arg : dataPath) {
+            final var next = verifyNotNull(current.getChild(arg),
+                "Failed to resolve %s: cannot find %s in %s", dataPath, arg, current);
+            current = next;
+        }
+        final var schemaPath = verifyNotNull(current.getDataSchemaNode(),
+            "Path %s resolved to non-data %s", dataPath, current).getPath();
+        serializeData(context, schemaPath, dataPath, candidate, skipData);
+    }
+
+    abstract void serializeData(EffectiveModelContext context, SchemaPath schemaPath, Collection<PathArgument> dataPath,
+            DataTreeCandidateNode candidate, boolean skipData) throws T;
 
     abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
 
@@ -89,8 +113,11 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
         final StringBuilder pathBuilder = new StringBuilder();
 
         for (PathArgument pathArgument : path) {
+            if (pathArgument instanceof YangInstanceIdentifier.AugmentationIdentifier) {
+                continue;
+            }
             pathBuilder.append("/");
-            pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replaceAll(":", "-"));
+            pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replace(':', '-'));
             pathBuilder.append(":");
             pathBuilder.append(pathArgument.getNodeType().getLocalName());
 
@@ -99,7 +126,7 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
                 final Set<Map.Entry<QName, Object>> keys =
                         ((YangInstanceIdentifier.NodeIdentifierWithPredicates) pathArgument).entrySet();
                 for (Map.Entry<QName, Object> key : keys) {
-                    pathBuilder.append(key.getKey().getNamespace().toString().replaceAll(":", "-"));
+                    pathBuilder.append(key.getKey().getNamespace().toString().replace(':', '-'));
                     pathBuilder.append(":");
                     pathBuilder.append(key.getKey().getLocalName());
                     pathBuilder.append("='");
