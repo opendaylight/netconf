@@ -43,10 +43,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
 import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,16 +79,20 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         final EffectiveStatementInference parentSchema;
-        if (isPost) {
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath()).toInference();
-        } else if (path.getSchemaNode() instanceof SchemaContext
-            || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
-            parentSchema = SchemaInferenceStack.of(path.getSchemaContext()).toInference();
+        final SchemaInferenceStack stack;
+        if (path.getSchemaNode() instanceof RpcEffectiveStatement) {
+            stack = SchemaInferenceStack.of(path.getSchemaContext(), Absolute.of(path.getSchemaNode().getQName()));
         } else {
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath().getParent()).toInference();
+            stack = SchemaInferenceStack.of(path.getSchemaContext());
+            path.getInstanceIdentifier().getPathArguments().stream()
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                    .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
         }
+        if (!isPost) {
+            stack.exit();
+        }
+        parentSchema = stack.toInference();
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
             JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()), parentSchema);
