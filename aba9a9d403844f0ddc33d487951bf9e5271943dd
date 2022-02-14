@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3185e5b4_bfe3fa3b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-02-14T12:30:17Z",
+      "side": 1,
+      "message": "DataBroker is an implementation detail, please do not increase coupling",
+      "range": {
+        "startLine": 339,
+        "startChar": 4,
+        "endLine": 339,
+        "endChar": 42
+      },
+      "revId": "aba9a9d403844f0ddc33d487951bf9e5271943dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c583fa3_129997b8",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-02-14T12:30:17Z",
+      "side": 1,
+      "message": "okay ... so is this requiring some configuration and ... which component is creating that?\n\nfurthermore, this is a blocking operation -- and what happens if the datastore has issues?",
+      "range": {
+        "startLine": 128,
+        "startChar": 26,
+        "endLine": 128,
+        "endChar": 91
+      },
+      "revId": "aba9a9d403844f0ddc33d487951bf9e5271943dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "351b9d92_142f40ec",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaServiceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-02-14T12:30:17Z",
+      "side": 1,
+      "message": "a @Test for @Before? what exactly is the point?",
+      "range": {
+        "startLine": 111,
+        "startChar": 4,
+        "endLine": 111,
+        "endChar": 9
+      },
+      "revId": "aba9a9d403844f0ddc33d487951bf9e5271943dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
