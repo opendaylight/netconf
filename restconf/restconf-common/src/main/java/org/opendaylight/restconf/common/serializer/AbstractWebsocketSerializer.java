@@ -89,6 +89,9 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
         final StringBuilder pathBuilder = new StringBuilder();
 
         for (PathArgument pathArgument : path) {
+            if (pathArgument instanceof YangInstanceIdentifier.AugmentationIdentifier) {
+                continue;
+            }
             pathBuilder.append("/");
             pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replaceAll(":", "-"));
             pathBuilder.append(":");

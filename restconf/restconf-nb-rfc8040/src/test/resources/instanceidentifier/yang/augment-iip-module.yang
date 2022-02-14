@@ -1,0 +1,30 @@
+module augment-iip-module {
+  namespace "augment:instance:identifier:patch:module";
+  prefix "aiipmodule";
+
+  import instance-identifier-patch-module {
+   prefix imodule; revision-date 2015-11-21;
+  }
+
+  revision 2022-02-18 {
+  }
+
+  augment "/imodule:patch-cont" {
+      choice patch-choice1 {
+        case patch-case1 {
+          leaf case-leaf1 {
+            type string;
+          }
+        }
+        case patch-case2 {
+          leaf case-leaf2 {
+            type int64;
+          }
+        }
+      }
+      leaf leaf1 {
+        type string;
+      }
+  }
+
+}

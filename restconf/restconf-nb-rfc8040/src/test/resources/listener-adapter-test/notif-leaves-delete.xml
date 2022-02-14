@@ -1,39 +1,33 @@
 <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
-    <eventTime>2022-02-18T18:04:25.214583+01:00</eventTime>
+    <eventTime>2022-02-18T18:07:48.662524+01:00</eventTime>
     <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
+        <data-change-event>
+            <path>
+                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11
+            </path>
+            <operation>deleted</operation>
+        </data-change-event>
         <data-change-event>
             <path>
                 /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name
             </path>
-            <data>
-                <name xmlns="instance:identifier:patch:module">Althea</name>
-            </data>
-            <operation>updated</operation>
+            <operation>deleted</operation>
         </data-change-event>
         <data-change-event>
             <path>
                 /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12
             </path>
-            <data>
-                <my-leaf12 xmlns="instance:identifier:patch:module">Bertha</my-leaf12>
-            </data>
-            <operation>created</operation>
+            <operation>deleted</operation>
         </data-change-event>
         <data-change-event>
             <path>
                 /instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:case-leaf1
             </path>
-            <data>
-                <case-leaf1 xmlns="augment:instance:identifier:patch:module">ChoiceUpdate</case-leaf1>
-            </data>
-            <operation>updated</operation>
+            <operation>deleted</operation>
         </data-change-event>
         <data-change-event>
             <path>/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1</path>
-            <data>
-                <leaf1 xmlns="augment:instance:identifier:patch:module">AugmentLeaf</leaf1>
-            </data>
-            <operation>updated</operation>
+            <operation>deleted</operation>
         </data-change-event>
     </data-changed-notification>
 </notification>

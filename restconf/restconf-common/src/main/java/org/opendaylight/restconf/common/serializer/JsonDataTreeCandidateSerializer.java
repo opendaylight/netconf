@@ -38,13 +38,22 @@ public class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer
     void serializeData(Collection<YangInstanceIdentifier.PathArgument> nodePath, DataTreeCandidateNode candidate,
                        boolean skipData)
             throws IOException {
-        final SchemaPath path = SchemaPath.create(nodePath.stream()
+        SchemaPath path = SchemaPath.create(nodePath.stream()
                 .filter(p -> !(p instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                .filter(p -> !(p instanceof YangInstanceIdentifier.AugmentationIdentifier))
                 .map(YangInstanceIdentifier.PathArgument::getNodeType).collect(Collectors.toList()), true);
-        final NormalizedNodeStreamWriter nestedWriter =
-                JSONNormalizedNodeStreamWriter
-                        .createNestedWriter(codecSupplier.getShared(context), path.getParent(), null, jsonWriter);
-
+        NormalizedNodeStreamWriter nestedWriter = null;
+        boolean successful = false;
+        // This loop is here because of choice-nodes -> we cannot initialize on them
+        while (!successful && path != null) {
+            try {
+                nestedWriter = JSONNormalizedNodeStreamWriter
+                            .createNestedWriter(codecSupplier.getShared(context), path.getParent(), null, jsonWriter);
+                successful = true;
+            } catch (IllegalArgumentException e) {
+                path = path.getParent();
+            }
+        }
         jsonWriter.beginObject();
         serializePath(nodePath);
 

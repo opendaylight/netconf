@@ -35,12 +35,22 @@ public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     @Override
     void serializeData(Collection<PathArgument> nodePath, DataTreeCandidateNode candidate, boolean skipData)
             throws Exception {
-        final SchemaPath path = SchemaPath.create(nodePath.stream()
+        SchemaPath path = SchemaPath.create(nodePath.stream()
                 .filter(p -> !(p instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                .filter(p -> !(p instanceof YangInstanceIdentifier.AugmentationIdentifier))
                 .map(PathArgument::getNodeType).collect(Collectors.toList()), true);
-        final NormalizedNodeStreamWriter nodeStreamWriter =
-                XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path.getParent());
-
+        NormalizedNodeStreamWriter nodeStreamWriter = null;
+        boolean successful = false;
+        // This loop is here because of choice-nodes -> we cannot initialize on them
+        while (!successful && path != null) {
+            try {
+                nodeStreamWriter = XMLStreamNormalizedNodeStreamWriter
+                    .create(xmlWriter, context, path.getParent());
+                successful = true;
+            } catch (IllegalArgumentException e) {
+                path = path.getParent();
+            }
+        }
         xmlWriter.writeStartElement(DATA_CHANGE_EVENT_ELEMENT);
         serializePath(nodePath);
 
