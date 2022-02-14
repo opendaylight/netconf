@@ -153,9 +153,11 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             // target can be also empty (only slash)
             YangInstanceIdentifier targetII;
             final SchemaNode targetNode;
+            final SchemaInferenceStack stack = SchemaInferenceStack.of(pathContext.getSchemaContext());
             if (target.equals("/")) {
                 targetII = pathContext.getInstanceIdentifier();
                 targetNode = pathContext.getSchemaContext();
+                stack.enterSchemaTree(schemaNode.getQName());
             } else {
                 targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
                         .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
@@ -165,8 +167,12 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                 schemaNode = verifyNotNull(codec.getDataContextTree().findChild(targetII).orElseThrow()
                     .getDataSchemaNode());
 
-                final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();
+                targetII.getPathArguments().stream()
+                        .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                        .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                        .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+                stack.exit();
+                final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
                 verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                 targetNode = (SchemaNode) parentStmt;
             }
@@ -182,9 +188,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                 if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
                     final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer,
-                        SchemaInferenceStack.ofInstantiatedPath(pathContext.getSchemaContext(), schemaNode.getPath())
-                            .toInference());
+                    final XmlParserStream xmlParser = XmlParserStream.create(writer, stack.toInference());
                     xmlParser.traverse(new DOMSource(firstValueElement));
                     parsed = resultHolder.getResult();
                 } else {
