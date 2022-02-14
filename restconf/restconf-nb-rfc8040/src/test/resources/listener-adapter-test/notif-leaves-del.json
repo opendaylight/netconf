@@ -1,21 +1,29 @@
 {
-    "urn-ietf-params-xml-ns-netconf-notification-1.0:notification":{
-        "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification":{
-            "data-change-event": [
-                {
-                    "operation": "deleted",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11"
-                },
-                {
-                    "operation": "deleted",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name"
-                },
-                {
-                    "operation": "deleted",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12"
-                }
-            ],
+  "urn-ietf-params-xml-ns-netconf-notification-1.0:notification": {
+    "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification": {
+      "data-change-event": [
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11",
+          "operation": "deleted"
         },
-        "event-time": "2017-09-18T15:30:16.099+03:00",
-    }
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name",
+          "operation": "deleted"
+        },
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12",
+          "operation": "deleted"
+        },
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:case-leaf1",
+          "operation": "deleted"
+        },
+        {
+          "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1",
+          "operation": "deleted"
+        }
+      ]
+    },
+    "event-time": "2022-02-18T18:07:48.662524+01:00"
+  }
 }
