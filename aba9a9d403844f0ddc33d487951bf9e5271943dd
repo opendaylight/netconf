@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8cbfec5d_22a9ed49",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-14T13:33:37Z",
+      "side": 1,
+      "message": "I would like to inject DOMDataBroker directly into ParserIdentifier but that would mean it would need to be transformed into service, something that we tried to do but it seemed as not so good idea and that change is now abandoned.",
+      "parentUuid": "3185e5b4_bfe3fa3b",
+      "range": {
+        "startLine": 339,
+        "startChar": 4,
+        "endLine": 339,
+        "endChar": 42
+      },
+      "revId": "aba9a9d403844f0ddc33d487951bf9e5271943dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8c583fa3_129997b8",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
         "patchSetId": 3
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f8748d29_6098ab44",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-14T13:33:37Z",
+      "side": 1,
+      "message": "The intention here is to read from Config Datastore and check if this mount point exists.\nCan you clarify what potential issues could datastore have? \nI think the catch clauses are enough and the transaction should otherwise fail.\nIf we wanted to have this operation async, we would also need to return Future\nfrom toInstanceIdentifier.",
+      "parentUuid": "8c583fa3_129997b8",
+      "range": {
+        "startLine": 128,
+        "startChar": 26,
+        "endLine": 128,
+        "endChar": 91
+      },
+      "revId": "aba9a9d403844f0ddc33d487951bf9e5271943dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "351b9d92_142f40ec",
         "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaServiceTest.java",
         "patchSetId": 3
@@ -60,6 +108,30 @@
       "writtenOn": "2022-02-14T12:30:17Z",
       "side": 1,
       "message": "a @Test for @Before? what exactly is the point?",
+      "range": {
+        "startLine": 111,
+        "startChar": 4,
+        "endLine": 111,
+        "endChar": 9
+      },
+      "revId": "aba9a9d403844f0ddc33d487951bf9e5271943dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8043a3f0_b607966a",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaServiceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-14T13:33:37Z",
+      "side": 1,
+      "message": "I missed this while rebasing, it does not make sense to me as well, will remove.",
+      "parentUuid": "351b9d92_142f40ec",
       "range": {
         "startLine": 111,
         "startChar": 4,
