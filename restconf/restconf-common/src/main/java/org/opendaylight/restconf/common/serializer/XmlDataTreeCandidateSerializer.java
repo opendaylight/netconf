@@ -37,6 +37,7 @@ public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
             throws Exception {
         final SchemaPath path = SchemaPath.create(nodePath.stream()
                 .filter(p -> !(p instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                .filter(p -> !(p instanceof YangInstanceIdentifier.AugmentationIdentifier))
                 .map(PathArgument::getNodeType).collect(Collectors.toList()), true);
         final NormalizedNodeStreamWriter nodeStreamWriter =
                 XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, path.getParent());
