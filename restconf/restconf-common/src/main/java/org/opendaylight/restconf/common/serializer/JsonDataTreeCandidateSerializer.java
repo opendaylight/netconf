@@ -40,6 +40,7 @@ public class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer
             throws IOException {
         final SchemaPath path = SchemaPath.create(nodePath.stream()
                 .filter(p -> !(p instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                .filter(p -> !(p instanceof YangInstanceIdentifier.AugmentationIdentifier))
                 .map(YangInstanceIdentifier.PathArgument::getNodeType).collect(Collectors.toList()), true);
         final NormalizedNodeStreamWriter nestedWriter =
                 JSONNormalizedNodeStreamWriter
