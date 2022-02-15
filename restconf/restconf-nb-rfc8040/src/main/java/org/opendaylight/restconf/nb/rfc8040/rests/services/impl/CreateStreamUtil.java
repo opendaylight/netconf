@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
@@ -211,8 +210,9 @@ final class CreateStreamUtil {
                 requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()));
         final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
                 .getNotificationListenerFor(streamName);
+        //FIXME Find way to get QNames elements that above
         return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
-                Absolute.of(ImmutableList.copyOf(notificationDefinition.getPath().getPathFromRoot())), streamName,
+                Absolute.of(notificationDefinition.getQName()), streamName,
                 outputType));
     }
 
