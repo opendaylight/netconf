@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
@@ -212,8 +211,7 @@ final class CreateStreamUtil {
         final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
                 .getNotificationListenerFor(streamName);
         return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
-                Absolute.of(ImmutableList.copyOf(notificationDefinition.getPath().getPathFromRoot())), streamName,
-                outputType));
+                Absolute.of(notificationDefinition.getQName()), streamName, outputType));
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,
