@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -319,8 +320,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response invokeAction(final NormalizedNodePayload payload) {
         final InstanceIdentifierContext<?> context = payload.getInstanceIdentifierContext();
         final DOMMountPoint mountPoint = context.getMountPoint();
-        final Absolute schemaPath = Absolute.of(ImmutableList.copyOf(context.getSchemaNode().getPath()
-            .getPathFromRoot()));
+        final List<QName> qNames = context.getInstanceIdentifier().getPathArguments().stream()
+                .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                .map(PathArgument::getNodeType)
+                .collect(Collectors.toList());
+        qNames.add(context.getSchemaNode().getQName());
+        final Absolute schemaPath = Absolute.of(qNames);
         final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
         final NormalizedNode data = payload.getData();
 
