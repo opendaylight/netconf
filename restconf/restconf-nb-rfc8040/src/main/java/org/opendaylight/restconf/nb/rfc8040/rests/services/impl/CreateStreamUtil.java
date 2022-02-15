@@ -212,7 +212,7 @@ final class CreateStreamUtil {
         final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
                 .getNotificationListenerFor(streamName);
         return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
-                Absolute.of(ImmutableList.copyOf(notificationDefinition.getPath().getPathFromRoot())), streamName,
+                Absolute.of(notificationDefinition.getQName()), streamName,
                 outputType));
     }
 
