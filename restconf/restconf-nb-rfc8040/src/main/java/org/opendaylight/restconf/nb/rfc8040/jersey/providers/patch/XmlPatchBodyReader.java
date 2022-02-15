@@ -50,6 +50,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -105,9 +106,11 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
             // target can be also empty (only slash)
             YangInstanceIdentifier targetII;
             final SchemaNode targetNode;
+            final Inference inference;
             if (target.equals("/")) {
                 targetII = pathContext.getInstanceIdentifier();
                 targetNode = pathContext.getSchemaContext();
+                inference = Inference.ofDataTreePath(pathContext.getSchemaContext(), schemaNode.getQName());
             } else {
                 // interpret as simple context
                 targetII = ParserIdentifier.parserPatchTarget(pathContext, target);
@@ -116,10 +119,15 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 schemaNode = verifyNotNull(DataSchemaContextTree.from(pathContext.getSchemaContext())
                     .findChild(targetII).orElseThrow().getDataSchemaNode());
 
-                final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                    pathContext.getSchemaContext(), schemaNode.getPath().getParent()).currentStatement();
+                final SchemaInferenceStack stack = SchemaInferenceStack.of(pathContext.getSchemaContext());
+                targetII.getPathArguments().stream()
+                        .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                        .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                        .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+                final EffectiveStatement<?, ?> parentStmt = stack.exit();
                 verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                 targetNode = (SchemaNode) parentStmt;
+                inference = stack.toInference();
             }
 
             if (targetNode == null) {
@@ -133,9 +141,8 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                 if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
                     final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer,
-                        SchemaInferenceStack.ofInstantiatedPath(pathContext.getSchemaContext(), schemaNode.getPath())
-                            .toInference());
+
+                    final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
                     xmlParser.traverse(new DOMSource(firstValueElement));
                     parsed = resultHolder.getResult();
                 } else {
