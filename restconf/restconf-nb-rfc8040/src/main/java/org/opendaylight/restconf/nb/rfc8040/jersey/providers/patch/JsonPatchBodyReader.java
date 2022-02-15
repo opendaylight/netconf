@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Throwables;
@@ -50,9 +49,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,7 +138,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                 case END_DOCUMENT:
                     break;
                 case NAME:
-                    parseByName(in.nextName(), edit, in, path, schemaTree, resultCollection, patchId);
+                    parseByName(in.nextName(), edit, in, path, resultCollection, patchId);
                     break;
                 case END_OBJECT:
                     in.endObject();
@@ -164,13 +162,12 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @param edit PatchEdit instance
      * @param in JsonReader reader
      * @param path InstanceIdentifierContext context
-     * @param codec Draft11StringModuleInstanceIdentifierCodec codec
      * @param resultCollection collection of parsed edits
+     * @param patchId id of edit patch
      * @throws IOException if operation fails
      */
     private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
                              final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext<?> path,
-                             final @NonNull DataSchemaContextTree schemaTree,
                              final @NonNull List<PatchEntity> resultCollection,
                              final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
@@ -179,14 +176,14 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                     in.beginArray();
 
                     while (in.hasNext()) {
-                        readEditDefinition(edit, in, path, schemaTree);
+                        readEditDefinition(edit, in, path);
                         resultCollection.add(prepareEditOperation(edit));
                         edit.clear();
                     }
 
                     in.endArray();
                 } else {
-                    readEditDefinition(edit, in, path, schemaTree);
+                    readEditDefinition(edit, in, path);
                     resultCollection.add(prepareEditOperation(edit));
                     edit.clear();
                 }
@@ -206,12 +203,10 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @param edit PatchEdit instance to be filled with read data
      * @param in JsonReader reader
      * @param path InstanceIdentifierContext path context
-     * @param codec Draft11StringModuleInstanceIdentifierCodec codec
      * @throws IOException if operation fails
      */
     private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
-                                    final @NonNull InstanceIdentifierContext<?> path,
-                                    final @NonNull DataSchemaContextTree schemaTree) throws IOException {
+                                    final @NonNull InstanceIdentifierContext<?> path) throws IOException {
         String deferredValue = null;
         in.beginObject();
 
@@ -229,30 +224,28 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                     final String target = in.nextString();
                     if (target.equals("/")) {
                         edit.setTarget(path.getInstanceIdentifier());
-                        edit.setTargetSchemaNode(path.getSchemaContext());
                     } else {
                         edit.setTarget(ParserIdentifier.parserPatchTarget(path, target));
-
-                        final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                            path.getSchemaContext(),
-                            schemaTree.findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
-                                .getPath().getParent())
-                            .currentStatement();
-                        verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
-                        edit.setTargetSchemaNode((SchemaNode) parentStmt);
                     }
+                    final SchemaInferenceStack stack = SchemaInferenceStack.of(path.getSchemaContext());
+                    edit.getTarget().getPathArguments().stream()
+                        .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                        .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                        .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+                    stack.exit();
+                    edit.setTargetInference(stack.toInference());
 
                     break;
                 case "value":
                     checkArgument(edit.getData() == null && deferredValue == null, "Multiple value entries found");
 
-                    if (edit.getTargetSchemaNode() == null) {
+                    if (edit.getTargetInference() == null) {
                         // save data defined in value node for next (later) processing, because target needs to be read
                         // always first and there is no ordering in Json input
                         deferredValue = readValueNode(in);
                     } else {
                         // We have a target schema node, reuse this reader without buffering the value.
-                        edit.setData(readEditData(in, edit.getTargetSchemaNode(), path));
+                        edit.setData(readEditData(in, edit.getTargetInference(), path));
                     }
                     break;
                 default:
@@ -265,14 +258,12 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
 
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
-            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
-                path));
+            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetInference(), path));
         }
     }
 
     /**
      * Parse data defined in value node and saves it to buffer.
-     * @param sb Buffer to read value node
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
@@ -369,11 +360,10 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @return NormalizedNode representing data
      */
     private static NormalizedNode readEditData(final @NonNull JsonReader in,
-             final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
+             final @NonNull Inference inference, final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
-            SchemaInferenceStack.ofInstantiatedPath(path.getSchemaContext(), targetSchemaNode.getPath()).toInference())
+        JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()), inference)
             .parse(in);
 
         return resultHolder.getResult();
@@ -385,7 +375,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @return PatchEntity Patch entity
      */
     private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
-        if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
+        if (edit.getOperation() != null && edit.getTargetInference() != null
                 && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (!edit.getOperation().isWithValue()) {
                 return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
@@ -423,7 +413,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
         private String id;
         private PatchEditOperation operation;
         private YangInstanceIdentifier target;
-        private SchemaNode targetSchemaNode;
+        private Inference targetInference;
         private NormalizedNode data;
 
         String getId() {
@@ -450,12 +440,12 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
             this.target = requireNonNull(target);
         }
 
-        SchemaNode getTargetSchemaNode() {
-            return targetSchemaNode;
+        Inference getTargetInference() {
+            return targetInference;
         }
 
-        void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
-            this.targetSchemaNode = requireNonNull(targetSchemaNode);
+        void setTargetInference(final Inference targetInference) {
+            this.targetInference = requireNonNull(targetInference);
         }
 
         NormalizedNode getData() {
@@ -470,7 +460,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
             id = null;
             operation = null;
             target = null;
-            targetSchemaNode = null;
+            targetInference = null;
             data = null;
         }
     }
