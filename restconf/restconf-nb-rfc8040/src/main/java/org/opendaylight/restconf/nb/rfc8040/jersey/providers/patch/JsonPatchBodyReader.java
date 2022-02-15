@@ -233,11 +233,13 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                     } else {
                         edit.setTarget(ParserIdentifier.parserPatchTarget(path, target));
 
-                        final EffectiveStatement<?, ?> parentStmt = SchemaInferenceStack.ofInstantiatedPath(
-                            path.getSchemaContext(),
-                            schemaTree.findChild(edit.getTarget()).orElseThrow().getDataSchemaNode()
-                                .getPath().getParent())
-                            .currentStatement();
+                        final SchemaInferenceStack stack = SchemaInferenceStack.of(path.getSchemaContext());
+                        edit.getTarget().getPathArguments().stream()
+                                .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                                .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                                .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+                        stack.exit();
+                        final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
                         verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                         edit.setTargetSchemaNode((SchemaNode) parentStmt);
                     }
@@ -252,7 +254,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                         deferredValue = readValueNode(in);
                     } else {
                         // We have a target schema node, reuse this reader without buffering the value.
-                        edit.setData(readEditData(in, edit.getTargetSchemaNode(), path));
+                        edit.setData(readEditData(in, edit, path));
                     }
                     break;
                 default:
@@ -265,7 +267,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
 
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
-            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
+            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit,
                 path));
         }
     }
@@ -369,11 +371,17 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @return NormalizedNode representing data
      */
     private static NormalizedNode readEditData(final @NonNull JsonReader in,
-             final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
+             final @NonNull PatchEdit edit, final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(path.getSchemaContext());
+        edit.getTarget().getPathArguments().stream()
+                .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+        stack.exit();
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
-            SchemaInferenceStack.ofInstantiatedPath(path.getSchemaContext(), targetSchemaNode.getPath()).toInference())
+            stack.toInference())
             .parse(in);
 
         return resultHolder.getResult();
