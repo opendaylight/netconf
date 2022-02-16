@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36d17088_8538a44c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-16T14:00:09Z",
+      "side": 1,
+      "message": "IMO: We can create inference just once and to with it what is needed here and above (with parent).",
+      "revId": "684a84869785c5c8f5093f5f14c7255e416ce125",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
