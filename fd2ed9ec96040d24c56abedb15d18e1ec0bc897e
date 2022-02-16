@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "810b8be1_668e8e76",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-16T13:19:32Z",
+      "side": 1,
+      "message": "We have already create inference - do not create it once again.",
+      "revId": "fd2ed9ec96040d24c56abedb15d18e1ec0bc897e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
