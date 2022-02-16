@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd4a5d47_6fbf3c4c",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPatchBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-16T14:01:09Z",
+      "side": 1,
+      "message": "We can create inference just once - try to rework it.",
+      "revId": "203829271e752f23cf305a69b08c226050543e8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
