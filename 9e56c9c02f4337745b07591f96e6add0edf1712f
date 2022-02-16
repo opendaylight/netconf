@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21ce6c72_28ac6e08",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-16T11:37:28Z",
+      "side": 1,
+      "message": "Its OK, if you search for usages you can see that we are always getting notifications from schema root. Remove FIXME..",
+      "revId": "9e56c9c02f4337745b07591f96e6add0edf1712f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
