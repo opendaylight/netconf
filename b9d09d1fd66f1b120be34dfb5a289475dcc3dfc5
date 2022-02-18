@@ -34,6 +34,24 @@
       "parentUuid": "ae22e468_59158741",
       "revId": "b9d09d1fd66f1b120be34dfb5a289475dcc3dfc5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04368a14_c77396d0",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-18T10:24:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f2376c3_3df29171",
+      "revId": "b9d09d1fd66f1b120be34dfb5a289475dcc3dfc5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
