@@ -16,6 +16,24 @@
       "message": "We can create inference just once - try to rework it.",
       "revId": "203829271e752f23cf305a69b08c226050543e8b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f8bbedd_4b1836f7",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPatchBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-18T11:34:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd4a5d47_6fbf3c4c",
+      "revId": "203829271e752f23cf305a69b08c226050543e8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
