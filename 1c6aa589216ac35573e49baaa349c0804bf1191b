@@ -16,6 +16,24 @@
       "message": "Please complete FIXME comments.",
       "revId": "1c6aa589216ac35573e49baaa349c0804bf1191b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e5f1cf6_fff5e92a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-18T11:41:19Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "10ee69be_26eb7391",
+      "revId": "1c6aa589216ac35573e49baaa349c0804bf1191b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
