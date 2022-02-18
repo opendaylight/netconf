@@ -52,6 +52,41 @@
       "parentUuid": "5f2376c3_3df29171",
       "revId": "b9d09d1fd66f1b120be34dfb5a289475dcc3dfc5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58ec8590_d1b05027",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-18T17:46:32Z",
+      "side": 1,
+      "message": "if (context.getSchemaNode() instanceof SchemaContext) is TRUE\nthen Absolute.of(qNames) above would already failed - becasue it cannot contain empty list.\n\nYou need to move that logic here.",
+      "parentUuid": "04368a14_c77396d0",
+      "revId": "b9d09d1fd66f1b120be34dfb5a289475dcc3dfc5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6c47d17_10c9a8ce",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-18T17:46:32Z",
+      "side": 1,
+      "message": "The same problem here.",
+      "revId": "b9d09d1fd66f1b120be34dfb5a289475dcc3dfc5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
