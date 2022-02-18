@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36d0c0ed_52b715a6",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-18T18:15:05Z",
+      "side": 1,
+      "message": "We do not need to have special case for list entries when we look for a parent\nbecause NodeIdentifierWithPredicates are already filtered from the stack.",
+      "revId": "866de6de0b398de62b4bcfbf9b5b74440bee8c72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
