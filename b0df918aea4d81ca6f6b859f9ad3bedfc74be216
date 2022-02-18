@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5aa6cf24_7ad76aea",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPatchBodyReader.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-18T17:33:20Z",
+      "side": 1,
+      "message": "I would prefer to care here: SchemaInference not SchemaInferenceStack",
+      "revId": "b0df918aea4d81ca6f6b859f9ad3bedfc74be216",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
