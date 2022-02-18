@@ -16,6 +16,24 @@
       "message": "Use the following concept:\n\n```\n            stack \u003d SchemaInferenceStack.of(path.getSchemaContext());\n            path.getInstanceIdentifier().getPathArguments().stream()\n                    .filter(arg -\u003e !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))\n                    .filter(arg -\u003e !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))\n                    .forEach(p -\u003e stack.enterSchemaTree(p.getNodeType()));\n```\nas much as possible becuase when InstanceIdentifier is empty, then Absolute.of(emptyList) fails.",
       "revId": "47c1bb821f3464c7b6ac34cf9d69516129c9ab76",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "520399a7_af355bb5",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/JsonNormalizedNodeBodyWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-18T19:50:19Z",
+      "side": 1,
+      "message": "When we check for root, or for /, or if node is instanceof schemaContext, or when we deal with RPC or actions - then its OK to use it. But here we are not sure whats the input.",
+      "parentUuid": "22753650_18d1f3e0",
+      "revId": "47c1bb821f3464c7b6ac34cf9d69516129c9ab76",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
