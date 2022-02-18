@@ -320,20 +320,21 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response invokeAction(final NormalizedNodePayload payload) {
         final InstanceIdentifierContext<?> context = payload.getInstanceIdentifierContext();
         final DOMMountPoint mountPoint = context.getMountPoint();
-        final List<QName> qNames = context.getInstanceIdentifier().getPathArguments().stream()
+
+        final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
+        final NormalizedNode data = payload.getData();
+        if (yangIIdContext.isEmpty() && !NETCONF_BASE_QNAME.equals(data.getIdentifier().getNodeType())) {
+            throw new RestconfDocumentedException("Instance identifier need to contain at least one path argument",
+                    ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        }
+
+        final List<QName> qNames = yangIIdContext.getPathArguments().stream()
                 .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
                 .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
                 .map(PathArgument::getNodeType)
                 .collect(Collectors.toList());
         qNames.add(context.getSchemaNode().getQName());
         final Absolute schemaPath = Absolute.of(qNames);
-        final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
-        final NormalizedNode data = payload.getData();
-
-        if (yangIIdContext.isEmpty() && !NETCONF_BASE_QNAME.equals(data.getIdentifier().getNodeType())) {
-            throw new RestconfDocumentedException("Instance identifier need to contain at least one path argument",
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-        }
 
         final DOMActionResult response;
         final EffectiveModelContext schemaContextRef;
@@ -366,7 +367,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 resultData))
             .build();
     }
-
 
     /**
      * Invoking Action via mount point.
