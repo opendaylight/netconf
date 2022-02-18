@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f5efda7_43fdb15b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlNormalizedNodeBodyWriter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-18T10:51:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3ff02c4_2690a5db",
+      "revId": "001eb3d444a2cc1f600d34cab1790b51785a3a7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06612dac_aa9470bc",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-02-17T19:48:21Z",
       "side": 1,
       "message": "Probably we have YII.empty or something else to make this comparison.\nCan you find it?",
+      "revId": "001eb3d444a2cc1f600d34cab1790b51785a3a7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb66bf56_883bbc52",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/XmlNormalizedNodeBodyWriter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-18T10:51:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06612dac_aa9470bc",
       "revId": "001eb3d444a2cc1f600d34cab1790b51785a3a7e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
