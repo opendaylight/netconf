@@ -16,6 +16,24 @@
       "message": "Too long first line.",
       "revId": "bda9bc38b7d1aab8687d105d252d0ea2fc45c716",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "892fd995_cf103287",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-18T11:40:31Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "480539f0_cda6e884",
+      "revId": "bda9bc38b7d1aab8687d105d252d0ea2fc45c716",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
