@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6d76d6f_b53a9ae6",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPatchBodyReader.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-18T17:29:05Z",
+      "side": 1,
+      "message": "Here we have just empty stack - we are at root - /",
+      "revId": "f7456b7e5669ca1a62a9f1762329ce4894f261d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
