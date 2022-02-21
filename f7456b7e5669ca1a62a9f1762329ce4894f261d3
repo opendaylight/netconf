@@ -16,6 +16,24 @@
       "message": "Here we have just empty stack - we are at root - /",
       "revId": "f7456b7e5669ca1a62a9f1762329ce4894f261d3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd0cdb1d_bb8ab0c9",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPatchBodyReader.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-21T17:36:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6d76d6f_b53a9ae6",
+      "revId": "f7456b7e5669ca1a62a9f1762329ce4894f261d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
