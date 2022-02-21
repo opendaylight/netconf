@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15f63e92_7ee9f3da",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/ListenerAdapterTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-02-21T11:57:42Z",
+      "side": 0,
+      "message": "Interesting that this does not work in Jenkins job, on my local install\nopenjdk 11.0.13 2021-10-19\nOpenJDK Runtime Environment (build 11.0.13+8-Ubuntu-0ubuntu1.20.04)\nOpenJDK 64-Bit Server VM (build 11.0.13+8-Ubuntu-0ubuntu1.20.04, mixed mode, sharing)\nIt builds and compares the delete notification without problems too.",
+      "revId": "6696d2502769636c3926d4df8126d3716a4344fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
