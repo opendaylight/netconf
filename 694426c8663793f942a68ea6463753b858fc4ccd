@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a14441b_20601b47",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-22T10:37:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fba817e_8391df61",
+      "revId": "694426c8663793f942a68ea6463753b858fc4ccd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1475254_f2ec799c",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-02-18T18:00:05Z",
       "side": 1,
       "message": "Use SchemaInference instead of ..Stack\n\nWe once set immutable inference and never change it again for this edit.",
+      "revId": "694426c8663793f942a68ea6463753b858fc4ccd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86d40216_a9aa8393",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-22T10:37:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1475254_f2ec799c",
       "revId": "694426c8663793f942a68ea6463753b858fc4ccd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
