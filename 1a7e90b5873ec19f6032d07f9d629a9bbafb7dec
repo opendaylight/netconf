@@ -16,6 +16,24 @@
       "message": "Here we have just empty stack.",
       "revId": "1a7e90b5873ec19f6032d07f9d629a9bbafb7dec",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c79287f2_7e53a6c4",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/XmlPatchBodyReader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-22T10:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "355b9f2b_705e709c",
+      "revId": "1a7e90b5873ec19f6032d07f9d629a9bbafb7dec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
