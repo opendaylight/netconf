@@ -16,6 +16,24 @@
       "message": "We do not need to have special case for list entries when we look for a parent\nbecause NodeIdentifierWithPredicates are already filtered from the stack.",
       "revId": "866de6de0b398de62b4bcfbf9b5b74440bee8c72",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98678ee8_52b8db42",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-22T10:40:35Z",
+      "side": 1,
+      "message": "Maybe I did something wrong but it doesn\u0027t work without this check. I tried investigate it and seems like it similar to root path check. So basically, if root \u003d get path, if not root \u003d take patent path.",
+      "parentUuid": "36d0c0ed_52b715a6",
+      "revId": "866de6de0b398de62b4bcfbf9b5b74440bee8c72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
