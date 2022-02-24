@@ -21,7 +21,7 @@
         </data-change-event>
         <data-change-event>
             <path>
-                /instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:case-leaf1
+                /instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:patch-sub-choice1/augment-instance-identifier-patch-module:patch-sub-sub-choice1/augment-instance-identifier-patch-module:case-leaf1
             </path>
             <operation>deleted</operation>
         </data-change-event>

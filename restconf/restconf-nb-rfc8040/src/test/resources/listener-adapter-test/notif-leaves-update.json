@@ -10,7 +10,7 @@
           "operation": "created"
         },
         {
-          "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:case-leaf1",
+          "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:patch-sub-choice1/augment-instance-identifier-patch-module:patch-sub-sub-choice1/augment-instance-identifier-patch-module:case-leaf1",
           "data": {
             "augment-iip-module:case-leaf1": "ChoiceUpdate"
           },
