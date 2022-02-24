@@ -80,6 +80,6 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
         // notification
         jsonWriter.endObject();
 
-        return writer.toString();
+        return serializer.isEmptyDataChangedEvent() ? null : writer.toString();
     }
 }

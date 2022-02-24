@@ -3,15 +3,6 @@
     <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
         <data-change-event>
             <path>
-                /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name
-            </path>
-            <data>
-                <name xmlns="instance:identifier:patch:module">Althea</name>
-            </data>
-            <operation>updated</operation>
-        </data-change-event>
-        <data-change-event>
-            <path>
                 /instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12
             </path>
             <data>
@@ -25,13 +16,6 @@
             </path>
             <data>
                 <case-leaf1 xmlns="augment:instance:identifier:patch:module">ChoiceUpdate</case-leaf1>
-            </data>
-            <operation>updated</operation>
-        </data-change-event>
-        <data-change-event>
-            <path>/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1</path>
-            <data>
-                <leaf1 xmlns="augment:instance:identifier:patch:module">AugmentLeaf</leaf1>
             </data>
             <operation>updated</operation>
         </data-change-event>

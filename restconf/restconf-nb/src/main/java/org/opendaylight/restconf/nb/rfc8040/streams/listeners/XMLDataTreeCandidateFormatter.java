@@ -52,6 +52,7 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
     String createText(final EffectiveModelContext schemaContext, final Collection<DataTreeCandidate> input,
                       final Instant now, final boolean leafNodesOnly, final boolean skipData) throws Exception {
         StringWriter writer = new StringWriter();
+        boolean emptyDataChangeEvent;
 
         final XMLStreamWriter xmlStreamWriter;
         try {
@@ -81,11 +82,11 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
             // notification
             xmlStreamWriter.writeEndElement();
             xmlStreamWriter.close();
+            emptyDataChangeEvent = serializer.isEmptyDataChangedEvent();
         } catch (XMLStreamException e) {
             throw new IOException("Failed to write notification content", e);
         }
 
-
-        return writer.toString();
+        return emptyDataChangeEvent ? null : writer.toString();
     }
 }
