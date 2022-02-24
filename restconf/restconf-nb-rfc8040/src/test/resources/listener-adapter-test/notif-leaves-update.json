@@ -3,13 +3,6 @@
     "urn-opendaylight-params-xml-ns-yang-controller-md-sal-remote:data-changed-notification": {
       "data-change-event": [
         {
-          "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name",
-          "data": {
-            "instance-identifier-patch-module:name": "Althea"
-          },
-          "operation": "updated"
-        },
-        {
           "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12",
           "data": {
             "instance-identifier-patch-module:my-leaf12": "Bertha"
@@ -17,16 +10,9 @@
           "operation": "created"
         },
         {
-        "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:case-leaf1",
-        "data": {
-          "augment-iip-module:case-leaf1": "ChoiceUpdate"
-        },
-          "operation": "updated"
-        },
-        {
-          "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:leaf1",
+          "path": "/instance-identifier-patch-module:patch-cont/augment-instance-identifier-patch-module:patch-choice1/augment-instance-identifier-patch-module:case-leaf1",
           "data": {
-            "augment-iip-module:leaf1": "AugmentLeaf"
+            "augment-iip-module:case-leaf1": "ChoiceUpdate"
           },
           "operation": "updated"
         }
