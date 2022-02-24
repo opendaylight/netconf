@@ -86,6 +86,10 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
             throw new IOException("Failed to write notification content", e);
         }
 
+        final String EVENT_TAG = "<data-change-event>";
+        if (!writer.toString().contains(EVENT_TAG)) {
+            return null;
+        }
 
         return writer.toString();
     }
