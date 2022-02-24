@@ -42,6 +42,8 @@ import org.opendaylight.restconf.nb.rfc8040.StartTimeParam;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.PatchCont1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice1.PatchCase1Builder;
+import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice1.patch.case1.patch.sub.choice1.PatchSubCase1Builder;
+import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice1.patch.case1.patch.sub.choice1.patch.sub.case1.patch.sub.sub.choice1.PatchSubSubCase1Builder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchContBuilder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
@@ -222,7 +224,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                 new PatchContBuilder()
                         .addAugmentation(
                                 new PatchCont1Builder()
-                            .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceLeaf").build())
+                                        .setPatchChoice1(
+                                                new PatchCase1Builder().setPatchSubChoice1(
+                                                        new PatchSubCase1Builder().setPatchSubSubChoice1(
+                                                                new PatchSubSubCase1Builder().setCaseLeaf1("ChoiceLeaf")
+                                                                        .build()
+                                                        ).build()
+                                                ).build()
+                                        )
                                         .setLeaf1("AugmentLeaf").build())
                         .setMyList1(
                                 Map.of(new MyList1Key("Althea"),
@@ -236,7 +245,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         builder = new PatchContBuilder()
                 .addAugmentation(
                         new PatchCont1Builder()
-                                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceUpdate").build())
+                                .setPatchChoice1(
+                                        new PatchCase1Builder().setPatchSubChoice1(
+                                                new PatchSubCase1Builder().setPatchSubSubChoice1(
+                                                        new PatchSubSubCase1Builder().setCaseLeaf1("ChoiceUpdate")
+                                                                .build()
+                                                ).build()
+                                        ).build()
+                                )
                                 .setLeaf1("AugmentLeaf").build())
                 .setMyList1(
                         Map.of(new MyList1Key("Althea"),
@@ -389,7 +405,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         PatchContBuilder builder = new PatchContBuilder()
                 .addAugmentation(
                         new PatchCont1Builder()
-                                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceLeaf").build())
+                                .setPatchChoice1(
+                                        new PatchCase1Builder().setPatchSubChoice1(
+                                                new PatchSubCase1Builder().setPatchSubSubChoice1(
+                                                        new PatchSubSubCase1Builder().setCaseLeaf1("ChoiceLeaf")
+                                                                .build()
+                                                ).build()
+                                        ).build()
+                                )
                                 .setLeaf1("AugmentLeaf").build())
                                 .setMyList1(
                                         Map.of(new MyList1Key("Althea"),
@@ -403,7 +426,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         builder = new PatchContBuilder()
                 .addAugmentation(
                         new PatchCont1Builder()
-                                .setPatchChoice1(new PatchCase1Builder().setCaseLeaf1("ChoiceUpdate").build())
+                                .setPatchChoice1(
+                                        new PatchCase1Builder().setPatchSubChoice1(
+                                            new PatchSubCase1Builder().setPatchSubSubChoice1(
+                                                new PatchSubSubCase1Builder().setCaseLeaf1("ChoiceUpdate")
+                                                .build()
+                                            ).build()
+                                        ).build()
+                                )
                                 .setLeaf1("AugmentLeaf").build())
                                 .setMyList1(
                                     Map.of(new MyList1Key("Althea"),
