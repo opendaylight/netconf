@@ -34,6 +34,7 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
 
     private final EffectiveModelContext context;
+    protected boolean emptyDataChangedEvent = true;
 
     protected AbstractWebsocketSerializer(final EffectiveModelContext context) {
         this.context = requireNonNull(context);
@@ -60,9 +61,11 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
                         candidate);
                 break;
             case SUBTREE_MODIFIED:
-            case WRITE:
             case APPEARED:
                 node = candidate.getDataAfter().get();
+                break;
+            case WRITE:
+                node = isNotUpdate(candidate) ? null : candidate.getDataAfter().get();
                 break;
             case DELETE:
             case DISAPPEARED:
@@ -103,6 +106,11 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     abstract void serializeData(EffectiveModelContext context, SchemaPath schemaPath, Collection<PathArgument> dataPath,
             DataTreeCandidateNode candidate, boolean skipData) throws T;
+
+    private static boolean isNotUpdate(DataTreeCandidateNode node) {
+        return node.getDataBefore().isPresent() && node.getDataAfter().isPresent()
+                && node.getDataBefore().get().body().equals(node.getDataAfter().get().body());
+    }
 
     abstract void serializePath(Collection<PathArgument> pathArguments) throws T;
 
@@ -161,5 +169,9 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
                         candidate.getModificationType());
                 throw new IllegalStateException("Unknown modification type");
         }
+    }
+
+    public boolean isEmptyDataChangedEvent() {
+        return emptyDataChangedEvent;
     }
 }

@@ -33,6 +33,7 @@ public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     void serializeData(final EffectiveModelContext context, final SchemaPath schemaPath,
             final Collection<PathArgument> nodePath, final DataTreeCandidateNode candidate, final boolean skipData)
                 throws Exception {
+        this.emptyDataChangedEvent = false;
         NormalizedNodeStreamWriter nodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context,
             schemaPath.getParent());
         xmlWriter.writeStartElement(DATA_CHANGE_EVENT_ELEMENT);

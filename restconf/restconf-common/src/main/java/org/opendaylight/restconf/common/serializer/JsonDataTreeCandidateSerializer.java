@@ -37,6 +37,7 @@ public class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer
     void serializeData(final EffectiveModelContext context, final SchemaPath schemaPath,
             final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate, final boolean skipData)
                 throws IOException {
+        this.emptyDataChangedEvent = false;
         NormalizedNodeStreamWriter nestedWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
             codecSupplier.getShared(context), schemaPath.getParent(), null, jsonWriter);
         jsonWriter.beginObject();
