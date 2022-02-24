@@ -84,6 +84,11 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
         // notification
         jsonWriter.endObject();
 
+        final String EMPTY_EVENT = "\"data-change-event\":[]";
+        if (writer.toString().contains(EMPTY_EVENT)) {
+            return null;
+        }
+
         return writer.toString();
     }
 }

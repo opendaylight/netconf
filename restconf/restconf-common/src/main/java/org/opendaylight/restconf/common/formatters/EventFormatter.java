@@ -73,7 +73,7 @@ public abstract class EventFormatter<T> implements Immutable {
         if (!filterMatches(schemaContext, input, now)) {
             return Optional.empty();
         }
-        return Optional.of(createText(schemaContext, input, now, leafNodesOnly, skipData));
+        return Optional.ofNullable(createText(schemaContext, input, now, leafNodesOnly, skipData));
     }
 
     /**
