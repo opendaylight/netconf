@@ -53,6 +53,9 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
             case WRITE:
             case APPEARED:
                 node = candidate.getDataAfter().get();
+                if (isBothDataPresent(candidate) && isNotUpdate(candidate)) {
+                    node = null;
+                }
                 break;
             case DELETE:
             case DISAPPEARED:
@@ -76,6 +79,14 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
             serializeLeafNodesOnly(path, childNode, skipData);
             path.removeLast();
         }
+    }
+
+    private static boolean isBothDataPresent(DataTreeCandidateNode node) {
+        return node.getDataBefore().isPresent() && node.getDataAfter().isPresent();
+    }
+
+    private static boolean isNotUpdate(DataTreeCandidateNode node) {
+        return node.getDataBefore().get().body().equals(node.getDataAfter().get().body());
     }
 
     abstract void serializeData(Collection<PathArgument> path, DataTreeCandidateNode candidate, boolean skipData)
