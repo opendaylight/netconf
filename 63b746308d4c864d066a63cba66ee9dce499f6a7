@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "ae770bdc_584875c2",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
@@ -20,10 +21,34 @@
         "endChar": 47
       },
       "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f002f03e_c7b182d0",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-28T10:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae770bdc_584875c2",
+      "range": {
+        "startLine": 52,
+        "startChar": 32,
+        "endLine": 52,
+        "endChar": 47
+      },
+      "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "463bcc17_b4b45530",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
@@ -43,10 +68,10 @@
         "endChar": 75
       },
       "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "17a1e6bd_87880b6d",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
@@ -67,10 +92,10 @@
         "endChar": 75
       },
       "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "4cff4efe_b9001711",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
@@ -91,10 +116,10 @@
         "endChar": 75
       },
       "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "8c29ffc9_919aef24",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
@@ -115,8 +140,31 @@
         "endChar": 75
       },
       "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
-      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
-      "unresolved": true
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55f934d4_d42e3441",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-02-28T10:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c29ffc9_919aef24",
+      "range": {
+        "startLine": 312,
+        "startChar": 61,
+        "endLine": 312,
+        "endChar": 75
+      },
+      "revId": "63b746308d4c864d066a63cba66ee9dce499f6a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
