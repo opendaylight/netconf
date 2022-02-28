@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d22db06d_d081641c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-02-28T15:21:02Z",
+      "side": 1,
+      "message": "Whats the inference here?\n\nWe need to set it here - the later null checking has different meaning.",
+      "revId": "3fcb5482c97aa7f758e00aeee2f04f122db2551a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
