@@ -16,6 +16,24 @@
       "message": "Whats the inference here?\n\nWe need to set it here - the later null checking has different meaning.",
       "revId": "3fcb5482c97aa7f758e00aeee2f04f122db2551a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c6eddab_9344aa68",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-01T10:33:24Z",
+      "side": 1,
+      "message": "Here it is null. Inside else case it also null. I\u0027m setting inference AFTER if-else. Here we just setting YII. And after if-else we using it to create inference.",
+      "parentUuid": "d22db06d_d081641c",
+      "revId": "3fcb5482c97aa7f758e00aeee2f04f122db2551a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
