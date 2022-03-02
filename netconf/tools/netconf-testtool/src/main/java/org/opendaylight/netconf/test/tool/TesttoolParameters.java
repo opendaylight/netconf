@@ -8,18 +8,10 @@
 package org.opendaylight.netconf.test.tool;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +29,6 @@ import org.opendaylight.yangtools.yang.common.YangConstants;
 public final class TesttoolParameters {
     private static final Pattern YANG_FILENAME_PATTERN = Pattern
             .compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
-    private static final Pattern REVISION_DATE_PATTERN = Pattern.compile("revision\\s+\"?(\\d{4}-\\d{2}-\\d{2})\"?");
 
     @Arg(dest = "async")
     public boolean async;
@@ -293,17 +284,11 @@ public final class TesttoolParameters {
             final File[] filesArray = schemasDir.listFiles();
             final List<File> files = filesArray != null ? Arrays.asList(filesArray) : Collections.emptyList();
             for (final File file : files) {
+                checkArgument(file.canRead(), "Files in schemas dir has to be readable");
                 final Matcher matcher = YANG_FILENAME_PATTERN.matcher(file.getName());
                 if (!matcher.matches()) {
-                    try {
-                        final String correctName = correctedName(file);
-                        if (correctName != null) {
-                            Files.move(file.toPath(), Paths.get(correctName), StandardCopyOption.ATOMIC_MOVE);
-                        }
-                    } catch (final IOException e) {
-                        // print error to console (test tool is running from console)
-                        e.printStackTrace();
-                    }
+                    throw new RuntimeException("Cannot parse schema context - "
+                            + "invalid files detected in schemas directory");
                 }
             }
         }
@@ -312,26 +297,6 @@ public final class TesttoolParameters {
             checkArgument(!rpcConfig.isDirectory(), "Rpc config file can't be a directory");
             checkArgument(rpcConfig.canRead(), "Rpc config file to be readable");
         }
-    }
-
-    private static String correctedName(final File file) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            String line = reader.readLine();
-            while (line != null && !REVISION_DATE_PATTERN.matcher(line).find()) {
-                line = reader.readLine();
-            }
-            if (line != null) {
-                final Matcher m = REVISION_DATE_PATTERN.matcher(line);
-                checkState(m.find(), "Revision pattern %s did not match line %s", REVISION_DATE_PATTERN, line);
-                String moduleName = file.getAbsolutePath();
-                if (file.getName().endsWith(YangConstants.RFC6020_YANG_FILE_EXTENSION)) {
-                    moduleName = moduleName.substring(0, moduleName.length() - 5);
-                }
-
-                return moduleName + "@" + m.group(1) + YangConstants.RFC6020_YANG_FILE_EXTENSION;
-            }
-        }
-        return null;
     }
 
     @Override
