@@ -330,7 +330,8 @@ public class NetconfDeviceSimulator implements Closeable {
             this.schemaContext = consumer.createEffectiveModelContextFactory()
                     .createEffectiveModelContext(loadedSources).get();
         } catch (final InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Cannot parse schema context", e);
+            throw new RuntimeException("Cannot parse schema context."
+                    + "Please read stack trace and check YANG files in schema directory.", e);
         }
 
         final Set<Capability> capabilities = new HashSet<>();
