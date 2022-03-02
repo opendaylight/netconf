@@ -293,17 +293,10 @@ public final class TesttoolParameters {
             final File[] filesArray = schemasDir.listFiles();
             final List<File> files = filesArray != null ? Arrays.asList(filesArray) : Collections.emptyList();
             for (final File file : files) {
+                checkArgument(file.canRead(), "Files in schemas dir has to be readable");
                 final Matcher matcher = YANG_FILENAME_PATTERN.matcher(file.getName());
                 if (!matcher.matches()) {
-                    try {
-                        final String correctName = correctedName(file);
-                        if (correctName != null) {
-                            Files.move(file.toPath(), Paths.get(correctName), StandardCopyOption.ATOMIC_MOVE);
-                        }
-                    } catch (final IOException e) {
-                        // print error to console (test tool is running from console)
-                        e.printStackTrace();
-                    }
+                    throw new RuntimeException("Cannot parse schema context - invalid files detected in schemas directory");
                 }
             }
         }
@@ -312,26 +305,6 @@ public final class TesttoolParameters {
             checkArgument(!rpcConfig.isDirectory(), "Rpc config file can't be a directory");
             checkArgument(rpcConfig.canRead(), "Rpc config file to be readable");
         }
-    }
-
-    private static String correctedName(final File file) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            String line = reader.readLine();
-            while (line != null && !REVISION_DATE_PATTERN.matcher(line).find()) {
-                line = reader.readLine();
-            }
-            if (line != null) {
-                final Matcher m = REVISION_DATE_PATTERN.matcher(line);
-                checkState(m.find(), "Revision pattern %s did not match line %s", REVISION_DATE_PATTERN, line);
-                String moduleName = file.getAbsolutePath();
-                if (file.getName().endsWith(YangConstants.RFC6020_YANG_FILE_EXTENSION)) {
-                    moduleName = moduleName.substring(0, moduleName.length() - 5);
-                }
-
-                return moduleName + "@" + m.group(1) + YangConstants.RFC6020_YANG_FILE_EXTENSION;
-            }
-        }
-        return null;
     }
 
     @Override
