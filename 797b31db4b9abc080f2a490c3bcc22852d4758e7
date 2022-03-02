@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cce8e2f_dd9c2cc6",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/NetconfDeviceSimulator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-02T21:03:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d008c8eb_604eedb1",
+      "revId": "797b31db4b9abc080f2a490c3bcc22852d4758e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "86ea71f3_be4a0113",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-03-02T16:13:49Z",
       "side": 1,
       "message": "Not readable file {} in schema directory, file.name",
+      "revId": "797b31db4b9abc080f2a490c3bcc22852d4758e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34d05fbe_56f24bc8",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-02T21:03:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86ea71f3_be4a0113",
       "revId": "797b31db4b9abc080f2a490c3bcc22852d4758e7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
