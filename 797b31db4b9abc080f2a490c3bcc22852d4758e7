@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d008c8eb_604eedb1",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/NetconfDeviceSimulator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-02T16:13:49Z",
+      "side": 1,
+      "message": "Instead of:\ninvalid files detected in schemas directory\n\nwould be better:\nPlease read stack trace and check YANG files in schema directory.",
+      "revId": "797b31db4b9abc080f2a490c3bcc22852d4758e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86ea71f3_be4a0113",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-02T16:13:49Z",
+      "side": 1,
+      "message": "Not readable file {} in schema directory, file.name",
+      "revId": "797b31db4b9abc080f2a490c3bcc22852d4758e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
