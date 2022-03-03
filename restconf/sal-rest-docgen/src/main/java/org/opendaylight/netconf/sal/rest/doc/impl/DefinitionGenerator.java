@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -836,6 +837,7 @@ public class DefinitionGenerator {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
             String regex = pattern.getJavaPatternString();
             regex = regex.substring(1, regex.length() - 1);
+            regex = escapeAutomatonSpecialCharacters(regex);
             String defaultValue = "";
             try {
                 final Generex generex = new Generex(regex);
@@ -848,6 +850,12 @@ public class DefinitionGenerator {
             setDefaultValue(property, "Some " + nodeName);
         }
         return STRING_TYPE;
+    }
+
+    //Prevent issues inside Generex due to special characters of used automaton.
+    private static String escapeAutomatonSpecialCharacters(final String regex) {
+        final Pattern patternSpecial = Pattern.compile("[@&\"<>#~]");
+        return patternSpecial.matcher(regex).replaceAll("\\\\$0");
     }
 
     private static String processNumberType(final RangeRestrictedTypeDefinition<?, ?> leafTypeDef,
