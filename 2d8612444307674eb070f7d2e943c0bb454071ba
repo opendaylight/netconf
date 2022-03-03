@@ -16,6 +16,24 @@
       "message": "`edit.setTargetInference(stack.toInference());`",
       "revId": "2d8612444307674eb070f7d2e943c0bb454071ba",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbc38859_0a890a37",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPatchBodyReader.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-03T17:43:07Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "be927e24_99aa908b",
+      "revId": "2d8612444307674eb070f7d2e943c0bb454071ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

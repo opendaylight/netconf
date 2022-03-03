@@ -16,6 +16,24 @@
       "message": "with SchemaInference.",
       "revId": "091b137d6572d6281c56be5c3e315969210b638e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c17b653d_9198a261",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-03T17:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2b7920c_b9223c27",
+      "revId": "091b137d6572d6281c56be5c3e315969210b638e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
