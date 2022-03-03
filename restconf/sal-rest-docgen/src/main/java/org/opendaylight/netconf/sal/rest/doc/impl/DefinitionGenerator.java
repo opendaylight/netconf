@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -121,6 +122,8 @@ public class DefinitionGenerator {
     private static final String INT32_FORMAT = "int32";
     private static final String INT64_FORMAT = "int64";
     private static final String BOOLEAN_TYPE = "boolean";
+    // Special characters used in automaton inside Generex.
+    private static final Pattern AUTOMATON_SPECIAL_CHARACTERS = Pattern.compile("[@&\"<>#~]");
 
     private Module topLevelModule;
 
@@ -836,6 +839,8 @@ public class DefinitionGenerator {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
             String regex = pattern.getJavaPatternString();
             regex = regex.substring(1, regex.length() - 1);
+            // Escape special characters to prevent issues inside Generex.
+            regex = AUTOMATON_SPECIAL_CHARACTERS.matcher(regex).replaceAll("\\\\$0");
             String defaultValue = "";
             try {
                 final Generex generex = new Generex(regex);
