@@ -34,6 +34,24 @@
       "parentUuid": "36d0c0ed_52b715a6",
       "revId": "866de6de0b398de62b4bcfbf9b5b74440bee8c72",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "daea3d1f_25c42ab6",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-03T09:20:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98678ee8_52b8db42",
+      "revId": "866de6de0b398de62b4bcfbf9b5b74440bee8c72",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
