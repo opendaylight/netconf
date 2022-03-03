@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0f89ab1_9df27256",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-03T11:42:05Z",
+      "side": 1,
+      "message": "The order is as follows:\n```\nJIRA:\nChange-Id:\nSigned-off-by:\n```",
+      "revId": "3cbd30a66cd6273f29dc37ab8fb67e2b304b70b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f36f57f_0f4f9ea5",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-03T11:42:05Z",
+      "side": 1,
+      "message": "`final String regex`",
+      "revId": "3cbd30a66cd6273f29dc37ab8fb67e2b304b70b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
