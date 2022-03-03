@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be927e24_99aa908b",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPatchBodyReader.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-03T15:41:12Z",
+      "side": 0,
+      "message": "`edit.setTargetInference(stack.toInference());`",
+      "revId": "2d8612444307674eb070f7d2e943c0bb454071ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
