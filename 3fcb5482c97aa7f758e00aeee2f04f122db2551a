@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f237c09c_c8f0e588",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-03T07:32:05Z",
+      "side": 1,
+      "message": "with SchemaInference.",
+      "revId": "3fcb5482c97aa7f758e00aeee2f04f122db2551a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d22db06d_d081641c",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
         "patchSetId": 9
@@ -32,6 +49,24 @@
       "side": 1,
       "message": "Here it is null. Inside else case it also null. I\u0027m setting inference AFTER if-else. Here we just setting YII. And after if-else we using it to create inference.",
       "parentUuid": "d22db06d_d081641c",
+      "revId": "3fcb5482c97aa7f758e00aeee2f04f122db2551a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bcfa569_96c505a6",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/patch/JsonPatchBodyReader.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-03T07:32:05Z",
+      "side": 1,
+      "message": "We can have an empty inference here:\n`edit.setTargetInference(SchemaInferenceStack.of(path.getSchemaContext()).toInference());`",
+      "parentUuid": "7c6eddab_9344aa68",
       "revId": "3fcb5482c97aa7f758e00aeee2f04f122db2551a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
