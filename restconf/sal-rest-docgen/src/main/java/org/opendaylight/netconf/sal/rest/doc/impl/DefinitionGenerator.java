@@ -836,6 +836,7 @@ public class DefinitionGenerator {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
             String regex = pattern.getJavaPatternString();
             regex = regex.substring(1, regex.length() - 1);
+            regex = escapeAtSign(regex);
             String defaultValue = "";
             try {
                 final Generex generex = new Generex(regex);
@@ -848,6 +849,11 @@ public class DefinitionGenerator {
             setDefaultValue(property, "Some " + nodeName);
         }
         return STRING_TYPE;
+    }
+
+    //Escapes "@" to prevent StackOverflowError inside generex: https://github.com/mifmif/Generex/issues/21
+    private static String escapeAtSign(final String regex) {
+        return regex.replaceAll("(?<!\\\\)@", "\\\\@");
     }
 
     private static String processNumberType(final RangeRestrictedTypeDefinition<?, ?> leafTypeDef,
