@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e944abd5_93cdacb1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-03T09:24:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fc5e07d_c388b40a",
+      "revId": "6c1a6f3521c2c7d577c169c2d7b7d6c58ac08b3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d527c46e_4736fb3b",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-03-03T07:12:24Z",
       "side": 1,
       "message": "We need one empty space in the middle of sentences.",
+      "revId": "6c1a6f3521c2c7d577c169c2d7b7d6c58ac08b3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d303b709_7ffe770e",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/NetconfDeviceSimulator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-03T09:24:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d527c46e_4736fb3b",
       "revId": "6c1a6f3521c2c7d577c169c2d7b7d6c58ac08b3b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0500bf4a_81f0efb2",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-03T09:24:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe50fe2b_16314577",
+      "revId": "6c1a6f3521c2c7d577c169c2d7b7d6c58ac08b3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "928cf17f_96720493",
@@ -65,6 +119,24 @@
       "writtenOn": "2022-03-03T07:12:24Z",
       "side": 1,
       "message": "Aha, we can use something like: `checkArgument(file.name.endswith(YangConstants.RFC6020_YANG_FILE_EXTENSION), \"Files in schemas dir has to be YANG files\")`",
+      "revId": "6c1a6f3521c2c7d577c169c2d7b7d6c58ac08b3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08b3100c_41afd67c",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-03-03T09:24:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "928cf17f_96720493",
       "revId": "6c1a6f3521c2c7d577c169c2d7b7d6c58ac08b3b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
