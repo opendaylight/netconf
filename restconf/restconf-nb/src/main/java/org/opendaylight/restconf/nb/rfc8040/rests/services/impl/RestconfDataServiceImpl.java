@@ -68,6 +68,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -83,7 +84,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -97,7 +97,6 @@ import org.slf4j.LoggerFactory;
 public class RestconfDataServiceImpl implements RestconfDataService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
-    private static final QName NETCONF_BASE_QNAME = SchemaContext.NAME;
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
     private final DatabindProvider databindProvider;
@@ -335,7 +334,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
         final NormalizedNode data = payload.getData();
 
-        if (yangIIdContext.isEmpty() && !NETCONF_BASE_QNAME.equals(data.name().getNodeType())) {
+        if (yangIIdContext.isEmpty() && !Data.QNAME.equals(data.name().getNodeType())) {
             throw new RestconfDocumentedException("Instance identifier need to contain at least one path argument",
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -451,7 +450,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodePayload payload) {
         final QName dataNodeType = payload.getData().name().getNodeType();
         if (path.isEmpty()) {
-            if (!NETCONF_BASE_QNAME.equals(dataNodeType)) {
+            if (!Data.QNAME.equals(dataNodeType)) {
                 throw new RestconfDocumentedException("Instance identifier has to contain at least one path argument",
                         ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
