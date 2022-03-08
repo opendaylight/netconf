@@ -556,10 +556,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         schemaPaths.add(CHECK_WITH_OUTPUT_INTERFACE_PATH);
         schemaPaths.add(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH);
 
-        List<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
+        final Map<Absolute, ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertEquals(schemaPaths.size(), actions.size());
-        for (ActionDefinition actionDefinition : actions) {
-            Absolute path = actionDefinition.getPath().asAbsolute();
+        for (Map.Entry<Absolute, ActionDefinition> entry : actions.entrySet()) {
+            Absolute path = entry.getKey();
             assertTrue(schemaPaths.remove(path));
         }
     }
