@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -120,7 +119,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         this.contextTree = DataSchemaContextTree.from(schemaContext);
 
         this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        this.actions = Maps.uniqueIndex(getActions(schemaContext), action -> action.getPath().asAbsolute());
+
+        this.actions = getActions(schemaContext);
 
         // RFC6020 normal notifications
         this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
@@ -130,26 +130,33 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @VisibleForTesting
-    // FIXME: return Map<Absolute, ActionDefinition> by using only
-    static List<ActionDefinition> getActions(final SchemaContext schemaContext) {
-        final List<ActionDefinition> builder = new ArrayList<>();
-        findAction(schemaContext, builder);
-        return builder;
+    static ImmutableMap<Absolute, ActionDefinition> getActions(final SchemaContext schemaContext) {
+        Map<Absolute, ActionDefinition> values = new HashMap<>();
+        final SchemaInferenceStack stack = SchemaInferenceStack.of((EffectiveModelContext) schemaContext);
+        findAction(schemaContext, values, stack);
+        return ImmutableMap.copyOf(values);
     }
 
-    private static void findAction(final DataSchemaNode dataSchemaNode, final List<ActionDefinition> builder) {
+    private static void findAction(final DataSchemaNode dataSchemaNode, final Map<Absolute, ActionDefinition> builder,
+                                   final SchemaInferenceStack stack) {
         if (dataSchemaNode instanceof ActionNodeContainer) {
             for (ActionDefinition actionDefinition : ((ActionNodeContainer) dataSchemaNode).getActions()) {
-                builder.add(actionDefinition);
+                stack.enterSchemaTree(actionDefinition.getQName());
+                builder.put(stack.toSchemaNodeIdentifier(), actionDefinition);
+                stack.exit();
             }
         }
         if (dataSchemaNode instanceof DataNodeContainer) {
             for (DataSchemaNode innerDataSchemaNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
-                findAction(innerDataSchemaNode, builder);
+                stack.enterSchemaTree(innerDataSchemaNode.getQName());
+                findAction(innerDataSchemaNode, builder, stack);
+                stack.exit();
             }
         } else if (dataSchemaNode instanceof ChoiceSchemaNode) {
             for (CaseSchemaNode caze : ((ChoiceSchemaNode) dataSchemaNode).getCases()) {
-                findAction(caze, builder);
+                stack.enterSchemaTree(caze.getQName());
+                findAction(caze, builder, stack);
+                stack.exit();
             }
         }
     }
@@ -187,12 +194,26 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final NotificationDefinition mostRecentNotification = getMostRecentNotification(notificationDefinitions);
 
         final ContainerNode content;
+        final SchemaInferenceStack stack;
+        List<QName> qnames;
+        if (nestedNotificationInfo != null) {
+            qnames = nestedNotificationInfo.domDataTreeIdentifier.getRootIdentifier().getPathArguments().stream()
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                    .map(YangInstanceIdentifier.PathArgument::getNodeType)
+                    .map(qName -> QName.create(mostRecentNotification.getQName(), qName.getLocalName()))
+                    .collect(Collectors.toList());
+            stack = SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), Absolute.of(qnames));
+        } else {
+            stack = SchemaInferenceStack.of(mountContext.getEffectiveModelContext());
+            stack.enterSchemaTree(mostRecentNotification.getQName());
+        }
+
         try {
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                    SchemaInferenceStack.ofInstantiatedPath(mountContext.getEffectiveModelContext(),
-                        mostRecentNotification.getPath()).toInference(), strictParsing);
+                    stack.toInference(), strictParsing);
             xmlParser.traverse(new DOMSource(element));
             content = (ContainerNode) resultHolder.getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException
@@ -202,8 +223,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         if (nestedNotificationInfo != null) {
             return new NetconfDeviceTreeNotification(content,
-                // FIXME: improve this to cache the path
-                mostRecentNotification.getPath().asAbsolute(),
+                stack.toSchemaNodeIdentifier(),
                 stripped.getKey(), nestedNotificationInfo.domDataTreeIdentifier);
         }
 
@@ -422,9 +442,13 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             final RpcDefinition rpcDefinition = currentMappedRpcs.get(rpc);
             Preconditions.checkArgument(rpcDefinition != null,
                     "Unable to parse response of %s, the rpc is unknown", rpc);
-
+            final SchemaInferenceStack stack = SchemaInferenceStack.of(mountContext.getEffectiveModelContext());
+            if (!isBaseOrNotificationRpc(rpc)) {
+                stack.enterSchemaTree(rpcDefinition.getQName());
+                stack.enterSchemaTree(rpcDefinition.getOutput().getQName());
+            }
             // In case no input for rpc is defined, we can simply construct the payload here
-            normalizedNode = parseResult(message, rpcDefinition);
+            normalizedNode = parseResult(message, rpcDefinition, stack);
         }
         return new DefaultDOMRpcResult(normalizedNode);
     }
@@ -432,8 +456,10 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     @Override
     public DOMActionResult toActionResult(final Absolute action, final NetconfMessage message) {
         final ActionDefinition actionDefinition = actions.get(action);
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), action);
+        stack.enterSchemaTree(actionDefinition.getOutput().getQName());
         Preconditions.checkArgument(actionDefinition != null, "Action does not exist: %s", action);
-        final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
+        final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition, stack);
 
         if (normalizedNode == null) {
             return new SimpleDOMActionResult(Collections.emptyList());
@@ -442,7 +468,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         }
     }
 
-    private NormalizedNode parseResult(final NetconfMessage message, final OperationDefinition operationDefinition) {
+    private NormalizedNode parseResult(final NetconfMessage message, final OperationDefinition operationDefinition,
+                                       final SchemaInferenceStack stack) {
         final Optional<XmlElement> okResponseElement = XmlElement.fromDomDocument(message.getDocument())
                 .getOnlyChildElementWithSameNamespaceOptionally("ok");
         if (operationDefinition.getOutput().getChildNodes().isEmpty()) {
@@ -460,9 +487,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                        // FIXME: we should have a cached inference here
-                        SchemaInferenceStack.ofInstantiatedPath(mountContext.getEffectiveModelContext(),
-                            operationDefinition.getOutput().getPath()).toInference(), strictParsing);
+                        stack.toInference(), strictParsing);
                 xmlParser.traverse(new DOMSource(element));
                 return resultHolder.getResult();
             } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {

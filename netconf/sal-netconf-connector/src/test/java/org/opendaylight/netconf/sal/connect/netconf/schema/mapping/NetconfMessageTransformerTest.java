@@ -29,6 +29,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.io.IOException;
@@ -556,10 +557,10 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         schemaPaths.add(CHECK_WITH_OUTPUT_INTERFACE_PATH);
         schemaPaths.add(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH);
 
-        List<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
+        ImmutableMap<Absolute, ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertEquals(schemaPaths.size(), actions.size());
-        for (ActionDefinition actionDefinition : actions) {
-            Absolute path = actionDefinition.getPath().asAbsolute();
+        for (Map.Entry<Absolute, ActionDefinition> entry : actions.entrySet()) {
+            Absolute path = entry.getKey();
             assertTrue(schemaPaths.remove(path));
         }
     }
