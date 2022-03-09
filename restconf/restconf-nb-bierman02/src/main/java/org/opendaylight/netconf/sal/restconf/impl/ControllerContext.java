@@ -72,6 +72,8 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -166,7 +168,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         checkPreconditions();
 
         if (restconfInstance == null) {
-            return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), globalSchema, null,
+            return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), null, globalSchema, null,
                     globalSchema);
         }
 
@@ -192,7 +194,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         }
 
         final InstanceIdentifierContext<?> iiWithSchemaNode =
-                collectPathArguments(builder, pathArgs, latestModule.iterator().next(), null, toMountPointIdentifier);
+                collectPathArguments(builder, pathArgs, new ArrayList<>(), latestModule.iterator().next(), null,
+                        toMountPointIdentifier);
 
         if (iiWithSchemaNode == null) {
             throw new RestconfDocumentedException("URI has bad format", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -523,10 +526,14 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return object == null ? "" : URLEncoder.encode(codec.serialize(object).toString(), StandardCharsets.UTF_8);
     }
 
+    private SchemaNodeIdentifier schemaNodeIdentifierFromPath(final List<QName> qnames) {
+        return qnames.isEmpty() ? null : Absolute.of(qnames);
+    }
+
     @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification = "Unrecognised NullableDecl")
     private InstanceIdentifierContext<?> collectPathArguments(final InstanceIdentifierBuilder builder,
-            final List<String> strings, final DataNodeContainer parentNode, final DOMMountPoint mountPoint,
-            final boolean returnJustMountPoint) {
+            final List<String> strings, final List<QName> qnames, final DataNodeContainer parentNode,
+            final DOMMountPoint mountPoint, final boolean returnJustMountPoint) {
         requireNonNull(strings);
 
         if (parentNode == null) {
@@ -534,15 +541,15 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         }
 
         if (strings.isEmpty()) {
-            return createContext(builder.build(), (DataSchemaNode) parentNode, mountPoint,
-                mountPoint != null ? getModelContext(mountPoint) : globalSchema);
+            return createContext(builder.build(), schemaNodeIdentifierFromPath(qnames), (DataSchemaNode) parentNode,
+                    mountPoint, mountPoint != null ? getModelContext(mountPoint) : globalSchema);
         }
 
         final String head = strings.iterator().next();
 
         if (head.isEmpty()) {
             final List<String> remaining = strings.subList(1, strings.size());
-            return collectPathArguments(builder, remaining, parentNode, mountPoint, returnJustMountPoint);
+            return collectPathArguments(builder, remaining, qnames, parentNode, mountPoint, returnJustMountPoint);
         }
 
         final String nodeName = toNodeName(head);
@@ -578,7 +585,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
 
                 if (returnJustMountPoint || strings.size() == 1) {
-                    return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), mountPointSchema, mount,
+                    return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), null,
+                            mountPointSchema, mount,
                         mountPointSchema);
                 }
 
@@ -597,8 +605,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
 
                 final List<String> subList = strings.subList(1, strings.size());
-                return collectPathArguments(YangInstanceIdentifier.builder(), subList, it.next(), mount,
-                        returnJustMountPoint);
+                return collectPathArguments(YangInstanceIdentifier.builder(), subList, new ArrayList<>(), it.next(),
+                        mount, returnJustMountPoint);
             }
 
             Module module = null;
@@ -633,7 +641,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     rpc = getRpcDefinition(module, rpcName);
                 }
                 if (rpc != null) {
-                    return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint,
+                    return new InstanceIdentifierContext<>(builder.build(), null, rpc, mountPoint,
                             mountPoint != null ? getModelContext(mountPoint) : globalSchema);
                 }
             }
@@ -706,21 +714,24 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             builder.node(targetNode.getQName());
         }
 
+        qnames.add(targetNode.getQName());
+
         if (targetNode instanceof DataNodeContainer) {
             final List<String> remaining = strings.subList(consumed, strings.size());
-            return collectPathArguments(builder, remaining, (DataNodeContainer) targetNode, mountPoint,
+            return collectPathArguments(builder, remaining, qnames, (DataNodeContainer) targetNode, mountPoint,
                     returnJustMountPoint);
         }
 
-        return createContext(builder.build(), targetNode, mountPoint,
+        return createContext(builder.build(), Absolute.of(qnames), targetNode, mountPoint,
             mountPoint != null ? getModelContext(mountPoint) : globalSchema);
     }
 
     private static InstanceIdentifierContext<?> createContext(final YangInstanceIdentifier instance,
-            final DataSchemaNode dataSchemaNode, final DOMMountPoint mountPoint,
-            final EffectiveModelContext schemaContext) {
+            final SchemaNodeIdentifier schemaNodeIdentifier, final DataSchemaNode dataSchemaNode,
+            final DOMMountPoint mountPoint, final EffectiveModelContext schemaContext) {
         final YangInstanceIdentifier instanceIdentifier = new DataNormalizer(schemaContext).toNormalized(instance);
-        return new InstanceIdentifierContext<>(instanceIdentifier, dataSchemaNode, mountPoint, schemaContext);
+        return new InstanceIdentifierContext<>(instanceIdentifier, schemaNodeIdentifier, dataSchemaNode, mountPoint,
+                schemaContext);
     }
 
     public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
