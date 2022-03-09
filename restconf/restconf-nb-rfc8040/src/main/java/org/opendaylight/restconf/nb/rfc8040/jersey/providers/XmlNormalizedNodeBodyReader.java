@@ -35,6 +35,10 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -103,8 +107,9 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
         final String docRootElm = doc.getDocumentElement().getLocalName();
         final String docRootNamespace = doc.getDocumentElement().getNamespaceURI();
-        final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
+        final List<PathArgument> iiToDataList = new ArrayList<>();
 
+        final List<QName> pathToSchemaNode = new ArrayList<>();
         if (isPost() && !isOperation) {
             final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm, docRootNamespace);
             if (foundSchemaNodes.isEmpty()) {
@@ -119,6 +124,9 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                 } else if (child instanceof DataSchemaNode) {
                     schemaNode = (DataSchemaNode) child;
                     iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(schemaNode.getQName()));
+                    if (!(child instanceof ChoiceSchemaNode) && !(child instanceof MapEntryNode)) {
+                        pathToSchemaNode.add(schemaNode.getQName());
+                    }
                 }
             }
         // PUT
@@ -135,8 +143,16 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
-                pathContext.getSchemaContext(), schemaNode.getPath()).toInference());
+            final SchemaInferenceStack stack = SchemaInferenceStack.of(pathContext.getSchemaContext());
+            pathContext.getInstanceIdentifier().getPathArguments().stream()
+                    .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
+                    .filter(arg -> !(arg instanceof AugmentationIdentifier))
+                    .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+            pathToSchemaNode.forEach(stack::enterSchemaTree);
+            if (isOperation) {
+                stack.enterSchemaTree(schemaNode.getQName());
+            }
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, stack.toInference());
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult();
 
