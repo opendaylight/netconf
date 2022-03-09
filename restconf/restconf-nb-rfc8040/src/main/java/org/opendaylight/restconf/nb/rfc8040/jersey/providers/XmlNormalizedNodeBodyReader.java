@@ -35,6 +35,9 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -103,10 +106,17 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
         final String docRootElm = doc.getDocumentElement().getLocalName();
         final String docRootNamespace = doc.getDocumentElement().getNamespaceURI();
-        final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
+        final List<PathArgument> iiToDataList = new ArrayList<>();
+
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(pathContext.getSchemaContext());
+        pathContext.getInstanceIdentifier().getPathArguments().stream()
+                .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
+                .filter(arg -> !(arg instanceof AugmentationIdentifier))
+                .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
 
         if (isPost() && !isOperation) {
-            final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm, docRootNamespace);
+            final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm,
+                    docRootNamespace, stack);
             if (foundSchemaNodes.isEmpty()) {
                 throw new IllegalStateException(String.format("Child \"%s\" was not found in parent schema node \"%s\"",
                         docRootElm, schemaNode.getQName()));
@@ -135,8 +145,10 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
-                pathContext.getSchemaContext(), schemaNode.getPath()).toInference());
+            if (isOperation) {
+                stack.enterSchemaTree(schemaNode.getQName());
+            }
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, stack.toInference());
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult();
 
@@ -169,7 +181,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
     }
 
     private static Deque<Object> findPathToSchemaNodeByName(final DataSchemaNode schemaNode, final String elementName,
-                                                            final String namespace) {
+            final String namespace, final SchemaInferenceStack stack) {
         final Deque<Object> result = new ArrayDeque<>();
         final ArrayList<ChoiceSchemaNode> choiceSchemaNodes = new ArrayList<>();
         for (final DataSchemaNode child : ((DataNodeContainer) schemaNode).getChildNodes()) {
@@ -179,6 +191,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                     && child.getQName().getNamespace().toString().equalsIgnoreCase(namespace)) {
                 // add child to result
                 result.push(child);
+                stack.enterSchemaTree(child.getQName());
 
                 // find augmentation
                 if (child.isAugmenting()) {
@@ -194,8 +207,11 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         }
 
         for (final ChoiceSchemaNode choiceNode : choiceSchemaNodes) {
+            stack.enterChoice(choiceNode.getQName());
             for (final CaseSchemaNode caseNode : choiceNode.getCases()) {
-                final Deque<Object> resultFromRecursion = findPathToSchemaNodeByName(caseNode, elementName, namespace);
+                stack.enterSchemaTree(caseNode.getQName());
+                final Deque<Object> resultFromRecursion = findPathToSchemaNodeByName(caseNode, elementName,
+                        namespace, stack);
                 if (!resultFromRecursion.isEmpty()) {
                     resultFromRecursion.push(choiceNode);
                     if (choiceNode.isAugmenting()) {
@@ -206,7 +222,9 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                     }
                     return resultFromRecursion;
                 }
+                stack.exit();
             }
+            stack.exit();
         }
         return result;
     }
