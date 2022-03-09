@@ -131,6 +131,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1551,7 +1552,7 @@ public final class RestconfImpl implements RestconfService {
             }
             final String moduleName = module.getName();
             checkNotNull(notifiDef, "Notification %s does not exist in module %s", valueQName, moduleName);
-            paths.add(notifiDef.getPath());
+            paths.add(SchemaPath.of(SchemaNodeIdentifier.Absolute.of(notifiDef.getQName())));
             streamNameBuilder.append(moduleName).append(':').append(valueQName.getLocalName());
             if (iterator.hasNext()) {
                 streamNameBuilder.append(',');
