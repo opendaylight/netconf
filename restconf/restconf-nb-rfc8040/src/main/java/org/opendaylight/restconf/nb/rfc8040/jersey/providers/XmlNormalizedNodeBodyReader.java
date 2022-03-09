@@ -136,7 +136,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode
                 || schemaNode instanceof LeafSchemaNode) {
             final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
-                pathContext.getSchemaContext(), schemaNode.getPath()).toInference());
+                pathContext.getSchemaContext(), schemaNode.getPath()).toInference());//?
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult();
 

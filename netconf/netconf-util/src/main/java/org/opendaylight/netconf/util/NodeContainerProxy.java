@@ -58,7 +58,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     public static @NonNull NodeContainerProxy ofNotification(final NotificationDefinition notification) {
-        return new NodeContainerProxy(notification.getQName(), notification.getPath(),
+        return new NodeContainerProxy(notification.getQName(), notification.getPath(),//?
             asMap(notification.getChildNodes()), notification.getAvailableAugmentations());
     }
 

@@ -164,7 +164,7 @@ public final class YangInstanceIdentifierDeserializer {
         }
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, schemaNode.getPath())
+            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, schemaNode.getPath())//?
                 .resolveLeafref((LeafrefTypeDefinition) baseType);
         }
 

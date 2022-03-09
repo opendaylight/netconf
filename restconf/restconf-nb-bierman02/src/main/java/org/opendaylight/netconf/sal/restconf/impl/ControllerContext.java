@@ -778,7 +778,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, node.getPath())
+            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, node.getPath())//?
                 .resolveLeafref((LeafrefTypeDefinition) baseType);
         }
         final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(typedef, mountPoint, this);

@@ -1551,7 +1551,7 @@ public final class RestconfImpl implements RestconfService {
             }
             final String moduleName = module.getName();
             checkNotNull(notifiDef, "Notification %s does not exist in module %s", valueQName, moduleName);
-            paths.add(notifiDef.getPath());
+            paths.add(notifiDef.getPath());//?
             streamNameBuilder.append(moduleName).append(':').append(valueQName.getLocalName());
             if (iterator.hasNext()) {
                 streamNameBuilder.append(',');

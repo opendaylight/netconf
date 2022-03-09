@@ -118,7 +118,7 @@ public final class TestRestconfUtils {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final XmlParserStream xmlParser = XmlParserStream.create(writer,
-            SchemaInferenceStack.ofInstantiatedPath(iiContext.getSchemaContext(), schemaNode.getPath()).toInference());
+            SchemaInferenceStack.ofInstantiatedPath(iiContext.getSchemaContext(), schemaNode.getPath()).toInference());//?
 
         if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
