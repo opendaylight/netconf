@@ -105,8 +105,8 @@ module odl-netconf-callhome-server {
             }
           }
         }
-        unique certificate-id;
-        unique host-key;
+        unique transport/ssh/ssh-client-params/host-key;
+        unique transport/tls/tls-client-params/certificate-id;
       }
     }
   }
