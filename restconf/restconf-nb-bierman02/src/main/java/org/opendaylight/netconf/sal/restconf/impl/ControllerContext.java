@@ -533,9 +533,10 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             return null;
         }
 
+        final EffectiveModelContext modelContext = mountPoint != null ? getModelContext(mountPoint) : globalSchema;
+
         if (strings.isEmpty()) {
-            return createContext(builder.build(), (DataSchemaNode) parentNode, mountPoint,
-                mountPoint != null ? getModelContext(mountPoint) : globalSchema);
+            return createContext(builder.build(), (DataSchemaNode) parentNode, mountPoint, modelContext);
         }
 
         final String head = strings.iterator().next();
@@ -633,8 +634,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     rpc = getRpcDefinition(module, rpcName);
                 }
                 if (rpc != null) {
-                    return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint,
-                            mountPoint != null ? getModelContext(mountPoint) : globalSchema);
+                    return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint, modelContext);
                 }
             }
 
@@ -695,7 +695,12 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                     }
 
-                    addKeyValue(keyValues, listNode.getDataChildByName(key), uriKeyValue, mountPoint);
+                    final SchemaInferenceStack stack = SchemaInferenceStack.of(modelContext);
+                    final YangInstanceIdentifier identifier = builder.build();
+                    identifier.getPathArguments().forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+                    stack.enterSchemaTree(targetNode.getQName());
+                    stack.enterSchemaTree(key);
+                    addKeyValue(keyValues, listNode.getDataChildByName(key), uriKeyValue, mountPoint, stack);
                     index++;
                 }
             }
@@ -712,8 +717,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     returnJustMountPoint);
         }
 
-        return createContext(builder.build(), targetNode, mountPoint,
-            mountPoint != null ? getModelContext(mountPoint) : globalSchema);
+        return createContext(builder.build(), targetNode, mountPoint, modelContext);
     }
 
     private static InstanceIdentifierContext<?> createContext(final YangInstanceIdentifier instance,
@@ -770,7 +774,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     private void addKeyValue(final HashMap<QName, Object> map, final DataSchemaNode node, final String uriValue,
-            final DOMMountPoint mountPoint) {
+            final DOMMountPoint mountPoint, final SchemaInferenceStack stack) {
         checkArgument(node instanceof LeafSchemaNode);
 
         final EffectiveModelContext schemaContext = mountPoint == null ? globalSchema : getModelContext(mountPoint);
@@ -778,8 +782,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, node.getPath())
-                .resolveLeafref((LeafrefTypeDefinition) baseType);
+            typedef = stack.resolveLeafref((LeafrefTypeDefinition) baseType);
         }
         final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(typedef, mountPoint, this);
         Object decoded = codec.deserialize(urlDecoded);
