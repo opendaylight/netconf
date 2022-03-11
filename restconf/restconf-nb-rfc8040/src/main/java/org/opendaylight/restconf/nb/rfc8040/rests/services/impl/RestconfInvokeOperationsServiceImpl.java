@@ -42,12 +42,14 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,8 +117,10 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                 if (resultData == null || ((ContainerNode) resultData).isEmpty()) {
                     ar.resume(new WebApplicationException(Status.NO_CONTENT));
                 } else {
-                    ar.resume(NormalizedNodePayload.of(new InstanceIdentifierContext<>(null, (RpcDefinition) schema,
-                        mountPoint, schemaContextRef), resultData));
+                    ar.resume(NormalizedNodePayload.of(new InstanceIdentifierContext<>(
+                            YangInstanceIdentifier.of(schema.getQName()), Absolute.of(schema.getQName()),
+                                    (RpcDefinition) schema, mountPoint, schemaContextRef),
+                            resultData));
                 }
             }
 
