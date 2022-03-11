@@ -15,6 +15,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -61,7 +62,6 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -116,17 +116,17 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing,
                                      final BaseSchema baseSchema) {
-        this.counter = new MessageCounter();
+        counter = new MessageCounter();
         this.mountContext = requireNonNull(mountContext);
 
         final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
-        this.contextTree = DataSchemaContextTree.from(schemaContext);
+        contextTree = DataSchemaContextTree.from(schemaContext);
 
-        this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        this.actions = getActions(schemaContext);
+        mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
+        actions = getActions(schemaContext);
 
         // RFC6020 normal notifications
-        this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
+        mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
             node -> node.getQName().withoutRevision());
         this.baseSchema = baseSchema;
         this.strictParsing = strictParsing;
@@ -186,7 +186,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             Optional<NestedNotificationInfo> nestedNotificationOptional = findNestedNotification(message, element);
             if (nestedNotificationOptional.isPresent()) {
                 nestedNotificationInfo = nestedNotificationOptional.get();
-                notificationDefinitions = Collections.singletonList(nestedNotificationInfo.notificationDefinition);
+                notificationDefinitions = List.of(nestedNotificationInfo.notificationDefinition);
                 element = (Element) nestedNotificationInfo.notificationNode;
             }
         }
@@ -196,27 +196,23 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         final NotificationDefinition mostRecentNotification = getMostRecentNotification(notificationDefinitions);
 
-        final ContainerNode content;
-        final SchemaInferenceStack stack;
-        final List<QName> qnames;
+        final SchemaInferenceStack stack = SchemaInferenceStack.of(mountContext.getEffectiveModelContext());
         if (nestedNotificationInfo != null) {
-            qnames = nestedNotificationInfo.domDataTreeIdentifier.getRootIdentifier().getPathArguments().stream()
-                    .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
-                    .filter(arg -> !(arg instanceof AugmentationIdentifier))
-                    .map(PathArgument::getNodeType)
-                    .map(qName -> QName.create(mostRecentNotification.getQName(), qName.getLocalName()))
-                    .collect(Collectors.toList());
-            stack = SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), Absolute.of(qnames));
+            nestedNotificationInfo.domDataTreeIdentifier.getRootIdentifier().getPathArguments().stream()
+                .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
+                .filter(arg -> !(arg instanceof AugmentationIdentifier))
+                .map(arg -> arg.getNodeType().bindTo(mostRecentNotification.getQName().getModule()))
+                .forEach(stack::enterSchemaTree);
         } else {
-            stack = SchemaInferenceStack.of(mountContext.getEffectiveModelContext(),
-                    Absolute.of(mostRecentNotification.getQName()));
+            stack.enterSchemaTree(mostRecentNotification.getQName());
         }
 
+        final ContainerNode content;
         try {
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                    stack.toInference(), strictParsing);
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext, stack.toInference(),
+                strictParsing);
             xmlParser.traverse(new DOMSource(element));
             content = (ContainerNode) resultHolder.getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException
@@ -447,8 +443,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                     "Unable to parse response of %s, the rpc is unknown", rpc);
 
             // In case no input for rpc is defined, we can simply construct the payload here
-            final Absolute rpcPath = Absolute.of(rpcDefinition.getQName(), rpcDefinition.getOutput().getQName());
-            normalizedNode = parseResult(message, rpcDefinition, rpcPath);
+            normalizedNode = parseResult(message, rpcDefinition,
+                Absolute.of(rpcDefinition.getQName(), rpcDefinition.getOutput().getQName()));
         }
         return new DefaultDOMRpcResult(normalizedNode);
     }
@@ -458,15 +454,15 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final ActionDefinition actionDefinition = actions.get(action);
         Preconditions.checkArgument(actionDefinition != null, "Action does not exist: %s", action);
 
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), action);
-        stack.enterSchemaTree(actionDefinition.getOutput().getQName());
-        final Absolute actionPath = stack.toSchemaNodeIdentifier();
-
-        final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition, actionPath);
+        final List<QName> actionIds = action.getNodeIdentifiers();
+        final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition,
+            Absolute.of(ImmutableList.<QName>builderWithExpectedSize(actionIds.size() + 1)
+                .addAll(actionIds).add(actionDefinition.getOutput().getQName())
+                .build()));
         if (normalizedNode == null) {
-            return new SimpleDOMActionResult(Collections.emptyList());
+            return new SimpleDOMActionResult(List.of());
         } else {
-            return new SimpleDOMActionResult(normalizedNode, Collections.emptyList());
+            return new SimpleDOMActionResult(normalizedNode, List.of());
         }
     }
 
@@ -509,7 +505,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         NetconfDeviceNotification(final ContainerNode content, final Instant eventTime) {
             this.content = content;
             this.eventTime = eventTime;
-            this.schemaPath = Absolute.of(content.getIdentifier().getNodeType());
+            schemaPath = Absolute.of(content.getIdentifier().getNodeType());
         }
 
         NetconfDeviceNotification(final ContainerNode content, final Absolute schemaPath, final Instant eventTime) {
