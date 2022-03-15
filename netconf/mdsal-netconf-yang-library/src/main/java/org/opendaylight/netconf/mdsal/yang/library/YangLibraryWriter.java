@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -214,6 +215,9 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
                             .getRevision()))
                         .build())
                     .collect(BindingMap.toMap());
+                final var featuresList = module.getFeatures().stream()
+                        .map(featureDefinition -> new YangIdentifier(featureDefinition.getQName().getLocalName()))
+                        .collect(Collectors.toList());
 
                 return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
                     .rev190104.module.list.ModuleBuilder()
@@ -224,7 +228,8 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
                     .setConformanceType(ConformanceType.Implement)
                     // FIXME: inline this once it's disambiguated
                     .setSubmodule(submoduleMap)
-                    // FIXME: Add also deviations and features lists to module entries
+                    .setFeature(featuresList)
+                    // FIXME: Add also deviations to module entries
                     .build();
             })
             .collect(BindingMap.toMap());
