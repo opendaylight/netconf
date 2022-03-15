@@ -10,6 +10,7 @@ package org.opendaylight.netconf.callhome.protocol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.PublicKey;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.Nullable;
@@ -157,6 +159,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
         private final CallHomeNetconfSubsystemListener subsystemListener;
         private final ConcurrentMap<String, CallHomeSessionContext> sessions = new ConcurrentHashMap<>();
+        private final Map<String, Boolean> existingSessions = new ConcurrentHashMap<>();
 
         Factory(final EventLoopGroup nettyGroup, final NetconfClientSessionNegotiatorFactory negotiatorFactory,
                 final CallHomeNetconfSubsystemListener subsystemListener) {
@@ -167,6 +170,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
         void remove(final CallHomeSessionContext session) {
             sessions.remove(session.getSessionId(), session);
+            existingSessions.remove(session.getSessionId());
         }
 
         ReverseSshChannelInitializer getChannelInitializer(final NetconfClientSessionListener listener) {
@@ -182,9 +186,18 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
             CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
                     remoteAddress, this);
             CallHomeSessionContext preexisting = sessions.putIfAbsent(session.getSessionId(), session);
-            // If preexisting is null - session does not exist, so we can safely create new one, otherwise we return
-            // null and incoming connection will be rejected.
-            return preexisting == null ? session : null;
+            existingSessions.put(session.getSessionId(), preexisting != null);
+            // If preexisting is null - session does not exist, so we can safely create new one.
+            // If session ID equals preexisting ID, session with same name exists (case of key re-exchange),
+            // otherwise we return null and incoming connection will be rejected.
+            if (preexisting == null) {
+                return session;
+            }
+            return session.getSessionId().equals(preexisting.getSessionId()) ? preexisting : null;
+        }
+
+        Map<String, Boolean> getExistingSessions() {
+            return ImmutableMap.copyOf(existingSessions);
         }
 
         EventLoopGroup getNettyGroup() {
