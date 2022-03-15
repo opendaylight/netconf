@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15caa84c_78047ef3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-03-15T17:04:21Z",
+      "side": 1,
+      "message": "Can you rebase it before the other patch, please?",
+      "revId": "0d2b37e1864f44f77e602fe2626e22d98d9be9e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
