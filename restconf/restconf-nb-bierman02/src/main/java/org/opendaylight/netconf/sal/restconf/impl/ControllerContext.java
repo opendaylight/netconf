@@ -643,6 +643,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     rpc = getRpcDefinition(module, rpcName);
                 }
                 if (rpc != null) {
+                    builder.node(rpc.getQName()).node(rpc.getOutput().getQName());
                     return new InstanceIdentifierContext<>(builder.build(), null, rpc, mountPoint, modelContext);
                 }
             }
