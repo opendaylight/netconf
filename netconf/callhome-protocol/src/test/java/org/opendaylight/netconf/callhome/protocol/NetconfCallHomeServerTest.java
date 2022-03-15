@@ -24,6 +24,8 @@ import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -111,8 +113,14 @@ public class NetconfCallHomeServerTest {
             AuthFuture mockAuthFuture = mock(AuthFuture.class);
             doReturn(null).when(mockAuthFuture).addListener(any(SshFutureListener.class));
             CallHomeSessionContext mockContext = mock(CallHomeSessionContext.class);
+            ConcurrentMap<String, CallHomeSessionContext> sessions = new ConcurrentHashMap<>();
+
             doNothing().when(mockContext).openNetconfChannel();
             doReturn(mockContext).when(mockSession).getAttribute(any(Session.AttributeKey.class));
+            doReturn("mockSessionId").when(mockContext).getSessionId();
+            doReturn(sessions).when(mockFactory).getSessions();
+            doReturn(false).when(mockContext).isActivated();
+            sessions.put(mockContext.getSessionId(), mockContext);
 
             final PublicKey serverKey = mock(PublicKey.class);
             doReturn(serverKey).when(mockSession).getServerKey();

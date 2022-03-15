@@ -147,6 +147,10 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         return authorization.getSessionName();
     }
 
+    public boolean isActivated() {
+        return activated;
+    }
+
     void removeSelf() {
         factory.remove(this);
     }
@@ -182,9 +186,13 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
             CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
                     remoteAddress, this);
             CallHomeSessionContext preexisting = sessions.putIfAbsent(session.getSessionId(), session);
-            // If preexisting is null - session does not exist, so we can safely create new one, otherwise we return
-            // null and incoming connection will be rejected.
-            return preexisting == null ? session : null;
+            // If preexisting is null - session does not exist, so we can safely create new one.
+            // otherwise we return null and incoming connection will be rejected.
+            return (preexisting == null || preexisting.activated) ? session : null;
+        }
+
+        ConcurrentMap<String, CallHomeSessionContext> getSessions() {
+            return sessions;
         }
 
         EventLoopGroup getNettyGroup() {
