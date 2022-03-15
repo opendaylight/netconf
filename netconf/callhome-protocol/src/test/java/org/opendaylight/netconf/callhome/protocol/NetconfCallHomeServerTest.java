@@ -111,8 +111,10 @@ public class NetconfCallHomeServerTest {
             AuthFuture mockAuthFuture = mock(AuthFuture.class);
             doReturn(null).when(mockAuthFuture).addListener(any(SshFutureListener.class));
             CallHomeSessionContext mockContext = mock(CallHomeSessionContext.class);
+
             doNothing().when(mockContext).openNetconfChannel();
             doReturn(mockContext).when(mockSession).getAttribute(any(Session.AttributeKey.class));
+            doReturn(false).when(mockSession).isAuthenticated();
 
             final PublicKey serverKey = mock(PublicKey.class);
             doReturn(serverKey).when(mockSession).getServerKey();
@@ -142,6 +144,7 @@ public class NetconfCallHomeServerTest {
         Mockito.doReturn(mockAuth).when(mockCallHomeAuthProv).provideAuth(mockSocketAddr, mockPublicKey);
 
         Mockito.doReturn(null).when(mockFactory).createIfNotExists(mockClientSession, mockAuth, mockSocketAddr);
+        Mockito.doReturn(false).when(mockClientSession).isAuthenticated();
 
         // expect
         instance.verifyServerKey(mockClientSession, mockSocketAddr, mockPublicKey);
