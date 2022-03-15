@@ -22,6 +22,30 @@
       },
       "revId": "595205d11bb8790034a419f3ccfb61d4b0abe14a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eeaf7594_0f1c441c",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/ControllerContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-15T13:28:20Z",
+      "side": 1,
+      "message": "OK, we can enter RPC definition in TestRestconfUtils.",
+      "parentUuid": "a5e1d8c1_c9bea8ec",
+      "range": {
+        "startLine": 646,
+        "startChar": 20,
+        "endLine": 646,
+        "endChar": 49
+      },
+      "revId": "595205d11bb8790034a419f3ccfb61d4b0abe14a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
