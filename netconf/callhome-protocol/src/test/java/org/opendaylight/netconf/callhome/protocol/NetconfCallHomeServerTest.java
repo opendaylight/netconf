@@ -24,6 +24,7 @@ import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -94,6 +95,7 @@ public class NetconfCallHomeServerTest {
     @Test
     public void sessionListenerShouldHandleEventsOfKeyEstablishedAndAuthenticated() throws IOException {
         // Weird - IJ was ok but command line compile failed using the usual array initializer syntax ????
+        Map<String, Boolean> existingSessions = new ConcurrentHashMap<>();
         SessionListener.Event[] evt = new SessionListener.Event[2];
         evt[0] = SessionListener.Event.KeyEstablished;
         evt[1] = SessionListener.Event.Authenticated;
@@ -113,6 +115,9 @@ public class NetconfCallHomeServerTest {
             CallHomeSessionContext mockContext = mock(CallHomeSessionContext.class);
             doNothing().when(mockContext).openNetconfChannel();
             doReturn(mockContext).when(mockSession).getAttribute(any(Session.AttributeKey.class));
+            doReturn("mockContextId").when(mockContext).getSessionId();
+            existingSessions.put(mockContext.getSessionId(), false);
+            doReturn(existingSessions).when(mockFactory).getExistingSessions();
 
             final PublicKey serverKey = mock(PublicKey.class);
             doReturn(serverKey).when(mockSession).getServerKey();
