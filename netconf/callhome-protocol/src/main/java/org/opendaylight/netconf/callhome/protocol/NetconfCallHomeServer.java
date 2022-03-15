@@ -76,7 +76,12 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
                 LOG.debug("SSH session {} event {}", session, event);
                 switch (event) {
                     case KeyEstablished:
-                        doAuth(clientSession);
+                        final String currentSessionId = CallHomeSessionContext.getFrom(clientSession).getSessionId();
+                        final CallHomeSessionContext currentSession = sessionFactory.getSessions()
+                                .get(currentSessionId);
+                        if (!currentSession.isActivated()) {
+                            doAuth(clientSession);
+                        }
                         break;
                     case Authenticated:
                         CallHomeSessionContext.getFrom(clientSession).openNetconfChannel();
@@ -155,7 +160,7 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
         }
         CallHomeSessionContext session = sessionFactory.createIfNotExists(
             sshClientSession, authorization, remoteAddress);
-        // Session was created, session with same name does not exists
+        // Session was created, session with same name does not exist
         if (session != null) {
             return true;
         }
