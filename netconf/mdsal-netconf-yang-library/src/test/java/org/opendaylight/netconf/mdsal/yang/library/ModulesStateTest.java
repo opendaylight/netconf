@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.mdsal.yang.library;
 
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -38,11 +39,13 @@ public class ModulesStateTest extends AbstractYangLibraryWriterTest {
                     .setRevision(CommonLeafsRevisionBuilder.emptyRevision())
                     .build()))
                 .setConformanceType(Module.ConformanceType.Implement)
+                .setFeature(List.of())
                 .build(), new ModuleBuilder()
                 .setName(new YangIdentifier("ietf-yang-library"))
                 .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-yang-library"))
                 .setRevision(new Revision(new RevisionIdentifier("2019-01-04")))
                 .setConformanceType(Module.ConformanceType.Implement)
+                .setFeature(List.of())
                 .build()))
             .build());
     }

@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -44,7 +45,9 @@ import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
+import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -177,6 +180,7 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
                     .setRevision(ImportOnlyModuleRevisionBuilder.fromYangCommon(module.getQNameModule().getRevision())
                         .getRevisionIdentifier())
                     .setNamespace(new Uri(module.getNamespace().toString()))
+                    .setFeature(extractFeatures(module))
                     // FIXME: inline this once it's disambiguated
                     .setSubmodule(submoduleMap)
                     .build();
@@ -224,7 +228,8 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
                     .setConformanceType(ConformanceType.Implement)
                     // FIXME: inline this once it's disambiguated
                     .setSubmodule(submoduleMap)
-                    // FIXME: Add also deviations and features lists to module entries
+                    .setFeature(extractFeatures(module))
+                    // FIXME: Add also deviations to module entries
                     .build();
             })
             .collect(BindingMap.toMap());
@@ -234,5 +239,16 @@ public class YangLibraryWriter implements EffectiveModelContextListener, AutoClo
             .setModule(moduleMap)
             .setModuleSetId(String.valueOf(moduleSetId))
             .build();
+    }
+
+    private static List<YangIdentifier> extractFeatures(final ModuleLike module) {
+        final var namespace = module.getQNameModule();
+
+        return module.getFeatures().stream()
+            .map(FeatureDefinition::getQName)
+            // belt-and-suspenders: make sure the feature namespace matches
+            .filter(featureName -> namespace.equals(featureName.getModule()))
+            .map(featureName -> new YangIdentifier(featureName.getLocalName()))
+            .collect(Collectors.toUnmodifiableList());
     }
 }

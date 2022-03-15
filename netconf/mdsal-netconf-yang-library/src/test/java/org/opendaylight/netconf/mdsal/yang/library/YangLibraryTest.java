@@ -10,6 +10,7 @@ package org.opendaylight.netconf.mdsal.yang.library;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -50,11 +51,13 @@ public class YangLibraryTest extends AbstractYangLibraryWriterTest {
                 .setNamespace(new Uri("test:namespace"))
                 .setRevision(new RevisionIdentifier("2013-07-22"))
                 .setSubmodule(ImmutableMap.of(sub.key(), sub))
+                .setFeature(List.of())
                 .build();
 
         Module yangLibrary = new ModuleBuilder().setName(new YangIdentifier("ietf-yang-library_2019-01-04"))
                 .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-yang-library"))
                 .setRevision(new RevisionIdentifier("2019-01-04"))
+                .setFeature(List.of())
                 .build();
 
         ModuleSet modulesSet = new ModuleSetBuilder()
