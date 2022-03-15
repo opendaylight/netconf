@@ -78,7 +78,10 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
                 LOG.debug("SSH session {} event {}", session, event);
                 switch (event) {
                     case KeyEstablished:
-                        doAuth(clientSession);
+                        String currentSessionId =  CallHomeSessionContext.getFrom(clientSession).getSessionId();
+                        if (!sessionFactory.getExistingSessions().get(currentSessionId)) {
+                            doAuth(clientSession);
+                        }
                         break;
                     case Authenticated:
                         CallHomeSessionContext.getFrom(clientSession).openNetconfChannel();
@@ -159,11 +162,11 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
         }
         CallHomeSessionContext session = sessionFactory.createIfNotExists(
             sshClientSession, authorization, remoteAddress);
-        // Session was created, session with same name does not exists
+        // Session was created, session with same name does not exist
         if (session != null) {
             return true;
         }
-        // Session was not created, session with same name exists
+        // Session was not created.
         LOG.info("Incoming session {} was rejected. Session with same name {} is already active.",
             sshClientSession, authorization.getSessionName());
         return false;
