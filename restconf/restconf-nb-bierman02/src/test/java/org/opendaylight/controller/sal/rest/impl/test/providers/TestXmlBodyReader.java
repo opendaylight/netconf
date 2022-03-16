@@ -177,15 +177,17 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
                 schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final Module augmentModule = schemaContext.findModules(XMLNamespace.of("augment:module")).iterator().next();
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
+        final QName case1QName = QName.create(augmentChoice1QName, "case1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
+        final QName case11QName = QName.create(augmentChoice1QName, "case11");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");
         final YangInstanceIdentifier.AugmentationIdentifier augChoice1II =
                 new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice1QName));
         final YangInstanceIdentifier.AugmentationIdentifier augChoice2II =
                 new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice2QName));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
-                .node(augChoice1II).node(augmentChoice1QName).node(augChoice2II).node(augmentChoice2QName)
-                .node(containerQName);
+                .node(augChoice1II).node(augmentChoice1QName).node(case1QName).node(augChoice2II)
+                .node(augmentChoice2QName).node(case11QName).node(containerQName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, this.xmlBodyReader, true);
         final InputStream inputStream = TestXmlBodyReader.class

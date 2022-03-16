@@ -227,6 +227,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             for (final CaseSchemaNode caseNode : choiceNode.getCases()) {
                 final Deque<Object> resultFromRecursion = findPathToSchemaNodeByName(caseNode, elementName, namespace);
                 if (!resultFromRecursion.isEmpty()) {
+                    resultFromRecursion.push(caseNode);
                     resultFromRecursion.push(choiceNode);
                     if (choiceNode.isAugmenting()) {
                         final AugmentationSchemaNode augment = findCorrespondingAugment(schemaNode, choiceNode);
