@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d81742f_16b4314d",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-16T10:35:35Z",
+      "side": 1,
+      "message": "What is the difference between sessions and existing sessions?",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f91e166a_effe7e16",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-16T10:35:35Z",
+      "side": 1,
+      "message": "Has this to be public?",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ace556e0_fdab656e",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-16T10:35:35Z",
+      "side": 1,
+      "message": "Check style violation here.\n\nIt needs empty line.",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cae6652c_b3b43486",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-16T10:35:35Z",
+      "side": 1,
+      "message": "final",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
