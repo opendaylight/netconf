@@ -22,6 +22,30 @@
       },
       "revId": "61d6c38c4fc4ff6fed15f371e38d5f81100259b0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f801c23e_6edbc0c5",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-16T09:48:08Z",
+      "side": 1,
+      "message": "My problem was that resulting deque was missing case nodes - so it cannot be used to fill stack correctly with path to schema node.\n\nIts possible to rework it - but it depends on https://git.opendaylight.org/gerrit/c/netconf/+/100134 correctness.\n\nThen we do not need to add stack as parameter to findPathToSchemaNodeByName method.",
+      "parentUuid": "d3eaddce_15b48096",
+      "range": {
+        "startLine": 252,
+        "startChar": 20,
+        "endLine": 252,
+        "endChar": 47
+      },
+      "revId": "61d6c38c4fc4ff6fed15f371e38d5f81100259b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
