@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5ea11692_ca558143",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-03-16T12:24:39Z",
+      "side": 1,
+      "message": "For the first time, I wanted to use a map of sessions, but I faced a problem. Due to key re-exchange, I need to know if is certain session already running or not. \nA session is inserted to map sessions immediately, so I cannot verify when it was null. It uses the putIfAbsent method, which returns null when the session was not created, as an indicator that the session is created for first. If it is already in the map, it throws value (session object).\n\nSo, I created existingSessions, when I store returned value of this method  (null\u003dfalse, object\u003dtrue) with an associated session ID. \nBased on this map, in method NetconfCallhomeServer.createSessionListener(), I can call doAuth(), only in case of creating a new session, not call it again when the session is running (it was the method that was causing this issue).",
+      "parentUuid": "0d81742f_16b4314d",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f91e166a_effe7e16",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 4
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2999779_35a7b914",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-03-16T12:24:39Z",
+      "side": 1,
+      "message": "No, it does not need to be. If you mean there should be a DEFAULT access modifier, \nas it is in the case of other methods in Factory.java, I will make a change.",
+      "parentUuid": "f91e166a_effe7e16",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ace556e0_fdab656e",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 4
@@ -48,6 +84,24 @@
       "writtenOn": "2022-03-16T10:35:35Z",
       "side": 1,
       "message": "Check style violation here.\n\nIt needs empty line.",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9188d437_3b2aeec0",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-03-16T12:24:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ace556e0_fdab656e",
       "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
