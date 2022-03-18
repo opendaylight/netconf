@@ -140,7 +140,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
                 Futures.addCallback(netconfService.commit(), new FutureCallback<DOMRpcResult>() {
                     @Override
                     public void onSuccess(final DOMRpcResult rpcResult) {
-                        final Collection<? extends RpcError> errors = result.getErrors();
+                        final Collection<? extends RpcError> errors = rpcResult.getErrors();
                         if (errors.isEmpty()) {
                             Futures.whenAllComplete(netconfService.unlock()).run(
                                 () -> commitResult.set(CommitInfo.empty()),
