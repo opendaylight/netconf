@@ -22,6 +22,30 @@
       },
       "revId": "3cb6f559af26f50966ab658db707439897ecba3d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "209dfa75_d66317e4",
+        "filename": "restconf/restconf-nb-bierman02/src/test/java/org/opendaylight/controller/sal/rest/impl/test/providers/TestXmlBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-18T09:42:19Z",
+      "side": 1,
+      "message": "It represent a path to case-choice-case-container1 which is used in `/instanceidentifier/xml/xml_augment_choice_container.xml` payload.",
+      "parentUuid": "9b3ad23e_35bdf0b0",
+      "range": {
+        "startLine": 189,
+        "startChar": 62,
+        "endLine": 189,
+        "endChar": 78
+      },
+      "revId": "3cb6f559af26f50966ab658db707439897ecba3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
