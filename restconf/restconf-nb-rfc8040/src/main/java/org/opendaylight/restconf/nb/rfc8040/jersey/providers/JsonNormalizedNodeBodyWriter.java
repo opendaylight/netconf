@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -30,8 +29,6 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormali
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -47,8 +44,6 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
@@ -71,12 +66,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
         @SuppressWarnings("unchecked")
         final InstanceIdentifierContext<SchemaNode> identifierCtx =
                 (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(identifierCtx.getSchemaContext());
-        identifierCtx.getInstanceIdentifier().getPathArguments().stream()
-                .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
-                .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
-                .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
-        final SchemaPath path = stack.toSchemaPath();
+        final SchemaPath path = identifierCtx.getSchemaNode().getPath();
         final var pretty = context.getWriterParameters().prettyPrint();
 
         try (JsonWriter jsonWriter = createJsonWriter(entityStream, pretty == null ? false : pretty.value())) {
@@ -104,9 +94,12 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
              *  RpcDefinition is not supported as initial codec in JSONStreamWriter,
              *  so we need to emit initial output declaration..
              */
-            final RpcDefinition rpc = (RpcDefinition) context.getSchemaNode();
-            final SchemaPath rpcPath = SchemaPath.of(Absolute.of(rpc.getQName(), rpc.getOutput().getQName()));
-            nnWriter = createNormalizedNodeWriter(context, rpcPath, jsonWriter, depth, fields);
+            nnWriter = createNormalizedNodeWriter(
+                    context,
+                    ((RpcDefinition) context.getSchemaNode()).getOutput().getPath(),
+                    jsonWriter,
+                    depth,
+                    fields);
             final Module module = context.getSchemaContext().findModule(data.getIdentifier().getNodeType().getModule())
                 .get();
             jsonWriter.name(module.getName() + ":output");
@@ -118,16 +111,8 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
              *  ActionDefinition is not supported as initial codec in JSONStreamWriter,
              *  so we need to emit initial output declaration..
              */
-            final ActionDefinition actDef = (ActionDefinition) context.getSchemaNode();
-            final List<QName> qNames = context.getInstanceIdentifier().getPathArguments().stream()
-                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
-                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
-                    .map(PathArgument::getNodeType)
-                    .collect(Collectors.toList());
-            qNames.add(actDef.getQName());
-            qNames.add(actDef.getOutput().getQName());
-            final SchemaPath actPath = SchemaPath.of(Absolute.of(qNames));
-            nnWriter = createNormalizedNodeWriter(context, actPath, jsonWriter, depth, fields);
+            nnWriter = createNormalizedNodeWriter(context,
+                ((ActionDefinition) context.getSchemaNode()).getOutput().getPath(), jsonWriter, depth, fields);
             final Module module = context.getSchemaContext().findModule(data.getIdentifier().getNodeType().getModule())
                 .get();
             jsonWriter.name(module.getName() + ":output");
