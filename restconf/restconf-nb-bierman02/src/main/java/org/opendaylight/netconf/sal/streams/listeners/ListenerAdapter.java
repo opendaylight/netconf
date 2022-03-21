@@ -23,11 +23,14 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -319,10 +322,20 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
         try {
             final var stack = SchemaInferenceStack.of(schemaContext);
-            eventPath.getParent().getPathArguments().stream()
-                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
-                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+            eventPath.getPathArguments().stream()
+                    .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
+                    .filter(arg -> !(arg instanceof AugmentationIdentifier))
                     .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
+            /*
+            Find parent path:
+            1. for list entries we already have found parent path because we omitted NodeIdentifierWithPredicates
+            2. for other nodes we have to exit one level up
+             */
+            if (!(normalized instanceof MapEntryNode) && !(normalized instanceof UnkeyedListEntryNode)) {
+                if (!stack.isEmpty()) {
+                    stack.exit();
+                }
+            }
             final DOMResult domResult = writeNormalizedNode(normalized, schemaContext, stack.toSchemaPath());
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("data");
@@ -351,7 +364,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         final StringBuilder textContent = new StringBuilder();
 
         for (final PathArgument pathArgument : normalizedPath.getPathArguments()) {
-            if (pathArgument instanceof YangInstanceIdentifier.AugmentationIdentifier) {
+            if (pathArgument instanceof AugmentationIdentifier) {
                 continue;
             }
             textContent.append("/");
