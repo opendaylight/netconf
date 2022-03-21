@@ -45,7 +45,6 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -114,10 +113,9 @@ public final class YangInstanceIdentifierDeserializer {
             if (step instanceof ListInstance) {
                 final var values = ((ListInstance) step).keyValues();
                 final var schema = childNode.getDataSchemaNode();
-                final var absolute = Absolute.of(parentNode.getIdentifier().getNodeType(), qname);
                 pathArg = schema instanceof ListSchemaNode
-                    ? prepareNodeWithPredicates(qname, (ListSchemaNode) schema, absolute, values)
-                        : prepareNodeWithValue(qname, schema, absolute, values);
+                    ? prepareNodeWithPredicates(qname, (ListSchemaNode) schema, values)
+                        : prepareNodeWithValue(qname, schema, values);
             } else if (childNode != null) {
                 RestconfDocumentedException.throwIf(childNode.isKeyedEntry(),
                     ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
@@ -137,7 +135,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final QName qname,
-            final @NonNull ListSchemaNode schema, final Absolute absolute, final List<@NonNull String> keyValues) {
+            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) {
         final var keyDef = schema.getKeyDefinition();
         final var keySize = keyDef.size();
         final var varSize = keyValues.size();
@@ -150,17 +148,14 @@ public final class YangInstanceIdentifierDeserializer {
         final var values = ImmutableMap.<QName, Object>builderWithExpectedSize(keySize);
         for (int i = 0; i < keySize; ++i) {
             final QName keyName = keyDef.get(i);
-            final List<QName> qNames = new ArrayList<>(absolute.getNodeIdentifiers());
-            qNames.add(keyName);
-            final Absolute path = Absolute.of(qNames);
-            values.put(keyName, prepareValueByType(schema.getDataChildByName(keyName), path, keyValues.get(i)));
+            values.put(keyName, prepareValueByType(schema.getDataChildByName(keyName), keyValues.get(i)));
         }
 
         return NodeIdentifierWithPredicates.of(qname, values.build());
     }
 
-    private Object prepareValueByType(final DataSchemaNode schemaNode, final Absolute absolute,
-            final @NonNull String value) {
+    private Object prepareValueByType(final DataSchemaNode schemaNode, final @NonNull String value) {
+
         TypeDefinition<? extends TypeDefinition<?>> typedef;
         if (schemaNode instanceof LeafListSchemaNode) {
             typedef = ((LeafListSchemaNode) schemaNode).getType();
@@ -169,7 +164,8 @@ public final class YangInstanceIdentifierDeserializer {
         }
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaInferenceStack.of(schemaContext, absolute).resolveLeafref((LeafrefTypeDefinition) baseType);
+            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, schemaNode.getPath())
+                .resolveLeafref((LeafrefTypeDefinition) baseType);
         }
 
         if (typedef instanceof IdentityrefTypeDefinition) {
@@ -184,9 +180,9 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private NodeWithValue<?> prepareNodeWithValue(final QName qname, final DataSchemaNode schema,
-            final Absolute absolute, final List<String> keyValues) {
+            final List<String> keyValues) {
         // TODO: qname should be always equal to schema.getQName(), right?
-        return new NodeWithValue<>(qname, prepareValueByType(schema, absolute,
+        return new NodeWithValue<>(qname, prepareValueByType(schema,
             // FIXME: ahem: we probably want to do something differently here
             keyValues.get(0)));
     }
