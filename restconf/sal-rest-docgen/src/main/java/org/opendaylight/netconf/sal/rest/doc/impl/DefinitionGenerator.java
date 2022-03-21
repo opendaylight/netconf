@@ -56,6 +56,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
@@ -894,16 +895,16 @@ public class DefinitionGenerator {
 
     private static String processInstanceIdentifierType(final DataSchemaNode node, final ObjectNode property,
                                                         final EffectiveModelContext schemaContext) {
-        // create example instance-identifier to the first container of node's module if exists or leave it empty
-        final var module = schemaContext.findModule(node.getQName().getModule());
-        if (module.isPresent()) {
-            final var container = module.get().getChildNodes().stream()
-                    .filter(n -> n instanceof ContainerSchemaNode)
-                    .findFirst();
-            container.ifPresent(c -> setDefaultValue(property, String.format("/%s:%s", module.get().getPrefix(),
-                    c.getQName().getLocalName())));
+        SchemaPath path = node.getPath();
+
+        while (path.getParent() != null && path.getParent().getPathFromRoot().iterator().hasNext()) {
+            path = path.getParent();
         }
 
+        final QName rootContainer = path.getLastComponent();
+        final String rootContainerName = rootContainer.getLocalName();
+        final String prefix = schemaContext.findModule(rootContainer.getModule()).get().getPrefix();
+        setDefaultValue(property, String.format("/%s:%s", prefix, rootContainerName));
         return STRING_TYPE;
     }
 
