@@ -34,9 +34,9 @@ public class RestconfApplication extends Application {
             final StatisticsRestconfServiceWrapper statsServiceWrapper) {
         this.controllerContext = controllerContext;
         this.statsServiceWrapper = statsServiceWrapper;
-        LOG.warn("Pre-standard version of RESTCONF activated. Please note that this implementation is superseded "
-            + "by the standard-compliant implementation. This code is no longer actively maintained and will be "
-            + "removed in a future release.");
+        LOG.warn("Pre-standard version of RESTCONF activated. Please note that this implementation is considered "
+            + "obsoleve and WILL BE REMOVED IN THE NEXT MAJOR RELEASE. Please use the RFC8040-compliant "
+            + "implementation instead.")
     }
 
     @Override
