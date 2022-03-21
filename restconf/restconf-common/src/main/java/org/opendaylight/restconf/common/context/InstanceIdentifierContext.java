@@ -7,32 +7,40 @@
  */
 package org.opendaylight.restconf.common.context;
 
+import static com.google.common.base.Verify.verify;
+import static java.util.Objects.requireNonNull;
+
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
-public class InstanceIdentifierContext<T extends SchemaNode> {
-
+public class InstanceIdentifierContext {
     private final YangInstanceIdentifier instanceIdentifier;
-    private final T schemaNode;
+    private final EffectiveStatementInference inference;
     private final DOMMountPoint mountPoint;
-    private final EffectiveModelContext schemaContext;
 
-    public InstanceIdentifierContext(final YangInstanceIdentifier instanceIdentifier, final T schemaNode,
-            final DOMMountPoint mountPoint, final EffectiveModelContext context) {
+    public InstanceIdentifierContext(final EffectiveStatementInference inference,
+            final YangInstanceIdentifier instanceIdentifier, final DOMMountPoint mountPoint) {
+        this.inference = requireNonNull(inference);
         this.instanceIdentifier = instanceIdentifier;
-        this.schemaNode = schemaNode;
         this.mountPoint = mountPoint;
-        this.schemaContext = context;
     }
 
     public YangInstanceIdentifier getInstanceIdentifier() {
         return instanceIdentifier;
     }
 
-    public T getSchemaNode() {
-        return schemaNode;
+    public SchemaNode getSchemaNode() {
+        final var stack = SchemaInferenceStack.ofInference(inference);
+        if (stack.isEmpty()) {
+            return inference.getEffectiveModelContext();
+        }
+        final var current = stack.currentStatement();
+        verify(current instanceof SchemaNode, "Unexpected statement %s", current);
+        return (SchemaNode) current;
     }
 
     public DOMMountPoint getMountPoint() {
@@ -40,6 +48,6 @@ public class InstanceIdentifierContext<T extends SchemaNode> {
     }
 
     public EffectiveModelContext getSchemaContext() {
-        return schemaContext;
+        return inference.getEffectiveModelContext();
     }
 }
