@@ -27,12 +27,15 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -144,6 +147,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     private String prepareXml(final Collection<DataTreeCandidate> candidates) {
         final EffectiveModelContext schemaContext = controllerContext.getGlobalSchema();
+        final DataSchemaContextTree dataContextTree = DataSchemaContextTree.from(schemaContext);
         final Document doc = createDocument();
         final Element notificationElement = basePartDoc(doc);
 
@@ -151,7 +155,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                 "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "data-changed-notification");
 
         addValuesToDataChangedNotificationEventElement(doc, dataChangedNotificationEventElement, candidates,
-            schemaContext);
+            schemaContext, dataContextTree);
         notificationElement.appendChild(dataChangedNotificationEventElement);
         return transformDoc(doc);
     }
@@ -169,7 +173,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     private void addValuesToDataChangedNotificationEventElement(final Document doc,
             final Element dataChangedNotificationEventElement,
             final Collection<DataTreeCandidate> dataTreeCandidates,
-            final EffectiveModelContext schemaContext) {
+            final EffectiveModelContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
 
         for (DataTreeCandidate dataTreeCandidate : dataTreeCandidates) {
             DataTreeCandidateNode candidateNode = dataTreeCandidate.getRootNode();
@@ -184,14 +188,15 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                         dataChangedNotificationEventElement, dataTreeCandidate.getRootNode());
             } else {
                 addNodeToDataChangeNotificationEventElement(doc, dataChangedNotificationEventElement, candidateNode,
-                        yiid.getParent(), schemaContext);
+                        yiid.getParent(), schemaContext, dataSchemaContextTree);
             }
         }
     }
 
     private void addNodeToDataChangeNotificationEventElement(final Document doc,
             final Element dataChangedNotificationEventElement, final DataTreeCandidateNode candidateNode,
-            final YangInstanceIdentifier parentYiid, final EffectiveModelContext schemaContext) {
+            final YangInstanceIdentifier parentYiid, final EffectiveModelContext schemaContext,
+            final DataSchemaContextTree dataSchemaContextTree) {
 
         Optional<NormalizedNode> optionalNormalizedNode = Optional.empty();
         switch (candidateNode.getModificationType()) {
@@ -227,7 +232,8 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                 case SUBTREE_MODIFIED:
                 case WRITE:
                     Operation op = candidateNode.getDataBefore().isPresent() ? Operation.UPDATED : Operation.CREATED;
-                    node = createCreatedChangedDataChangeEventElement(doc, yiid, normalizedNode, op, schemaContext);
+                    node = createCreatedChangedDataChangeEventElement(doc, yiid, normalizedNode, op,
+                            schemaContext, dataSchemaContextTree);
                     break;
                 case DELETE:
                 case DISAPPEARED:
@@ -244,7 +250,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
         for (DataTreeCandidateNode childNode : candidateNode.getChildNodes()) {
             addNodeToDataChangeNotificationEventElement(doc, dataChangedNotificationEventElement, childNode,
-                    yiid, schemaContext);
+                                                                        yiid, schemaContext, dataSchemaContextTree);
         }
     }
 
@@ -307,7 +313,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
     private Node createCreatedChangedDataChangeEventElement(final Document doc,
             final YangInstanceIdentifier eventPath, final NormalizedNode normalized, final Operation operation,
-            final EffectiveModelContext schemaContext) {
+            final EffectiveModelContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
         final Element dataChangeEventElement = doc.createElement(DATA_CHANGE_EVENT);
         final Element pathElement = doc.createElement(PATH);
         addPathAsValueToElement(eventPath, pathElement);
@@ -318,12 +324,14 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         dataChangeEventElement.appendChild(operationElement);
 
         try {
-            final var stack = SchemaInferenceStack.of(schemaContext);
-            eventPath.getParent().getPathArguments().stream()
-                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
-                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
-                    .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
-            final DOMResult domResult = writeNormalizedNode(normalized, schemaContext, stack.toSchemaPath());
+            SchemaPath nodePath;
+            if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
+                nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath();
+            } else {
+                nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath()
+                    .getParent();
+            }
+            final DOMResult domResult = writeNormalizedNode(normalized, schemaContext, nodePath);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("data");
             dataElement.appendChild(result);
