@@ -24,8 +24,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.YangConstants;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -119,14 +117,8 @@ public final class TestRestconfUtils {
 
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(iiContext.getSchemaContext());
-        iiContext.getInstanceIdentifier().getPathArguments().stream()
-                .filter(p -> !(p instanceof NodeIdentifierWithPredicates))
-                .filter(p -> !(p instanceof AugmentationIdentifier))
-                .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
-
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, stack.toInference());
+        final XmlParserStream xmlParser = XmlParserStream.create(writer,
+            SchemaInferenceStack.ofInstantiatedPath(iiContext.getSchemaContext(), schemaNode.getPath()).toInference());
 
         if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
