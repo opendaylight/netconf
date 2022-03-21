@@ -533,10 +533,9 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             return null;
         }
 
-        final EffectiveModelContext modelContext = mountPoint != null ? getModelContext(mountPoint) : globalSchema;
-
         if (strings.isEmpty()) {
-            return createContext(builder.build(), (DataSchemaNode) parentNode, mountPoint, modelContext);
+            return createContext(builder.build(), (DataSchemaNode) parentNode, mountPoint,
+                mountPoint != null ? getModelContext(mountPoint) : globalSchema);
         }
 
         final String head = strings.iterator().next();
@@ -634,7 +633,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     rpc = getRpcDefinition(module, rpcName);
                 }
                 if (rpc != null) {
-                    return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint, modelContext);
+                    return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint,
+                            mountPoint != null ? getModelContext(mountPoint) : globalSchema);
                 }
             }
 
@@ -695,12 +695,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                     }
 
-                    final SchemaInferenceStack stack = SchemaInferenceStack.of(modelContext);
-                    final YangInstanceIdentifier identifier = builder.build();
-                    identifier.getPathArguments().forEach(p -> stack.enterSchemaTree(p.getNodeType()));
-                    stack.enterSchemaTree(targetNode.getQName());
-                    stack.enterSchemaTree(key);
-                    addKeyValue(keyValues, listNode.getDataChildByName(key), uriKeyValue, mountPoint, stack);
+                    addKeyValue(keyValues, listNode.getDataChildByName(key), uriKeyValue, mountPoint);
                     index++;
                 }
             }
@@ -717,7 +712,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     returnJustMountPoint);
         }
 
-        return createContext(builder.build(), targetNode, mountPoint, modelContext);
+        return createContext(builder.build(), targetNode, mountPoint,
+            mountPoint != null ? getModelContext(mountPoint) : globalSchema);
     }
 
     private static InstanceIdentifierContext<?> createContext(final YangInstanceIdentifier instance,
@@ -774,21 +770,23 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     private void addKeyValue(final HashMap<QName, Object> map, final DataSchemaNode node, final String uriValue,
-            final DOMMountPoint mountPoint, final SchemaInferenceStack stack) {
+            final DOMMountPoint mountPoint) {
         checkArgument(node instanceof LeafSchemaNode);
 
+        final EffectiveModelContext schemaContext = mountPoint == null ? globalSchema : getModelContext(mountPoint);
         final String urlDecoded = urlPathArgDecode(requireNonNull(uriValue));
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = stack.resolveLeafref((LeafrefTypeDefinition) baseType);
+            typedef = SchemaInferenceStack.ofInstantiatedPath(schemaContext, node.getPath())
+                .resolveLeafref((LeafrefTypeDefinition) baseType);
         }
         final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(typedef, mountPoint, this);
         Object decoded = codec.deserialize(urlDecoded);
         String additionalInfo = "";
         if (decoded == null) {
             if (typedef instanceof IdentityrefTypeDefinition) {
-                decoded = toQName(stack.getEffectiveModelContext(), urlDecoded);
+                decoded = toQName(schemaContext, urlDecoded);
                 additionalInfo =
                         "For key which is of type identityref it should be in format module_name:identity_name.";
             }
