@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
@@ -174,48 +175,38 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                     "Unable to parse notification " + message + ", cannot find namespace", e);
         }
 
-        Collection<? extends NotificationDefinition> notificationDefinitions =
-                mappedNotifications.get(notificationNoRev);
-        Element element = stripped.getValue().getDomElement();
-
-        NestedNotificationInfo nestedNotificationInfo = null;
-        if (notificationDefinitions.isEmpty()) {
-            // check if notification is nested notification
-            Optional<NestedNotificationInfo> nestedNotificationOptional = findNestedNotification(message, element);
-            if (nestedNotificationOptional.isPresent()) {
-                nestedNotificationInfo = nestedNotificationOptional.get();
-                notificationDefinitions = List.of(nestedNotificationInfo.notificationDefinition);
-                element = (Element) nestedNotificationInfo.notificationNode;
-            }
+        final var matchingTopLevel = mappedNotifications.get(notificationNoRev);
+        final var element = stripped.getValue().getDomElement();
+        if (!matchingTopLevel.isEmpty()) {
+            final var notification = getMostRecentNotification(matchingTopLevel);
+            // FIXME: we really should have a pre-constructed identifier here
+            return new NetconfDeviceNotification(toNotification(Absolute.of(notification.getQName()), element),
+                stripped.getKey());
         }
-        checkArgument(!notificationDefinitions.isEmpty(),
-                "Unable to parse notification %s, unknown notification. Available notifications: %s",
-                notificationDefinitions, mappedNotifications.keySet());
 
-        final NotificationDefinition mostRecentNotification = getMostRecentNotification(notificationDefinitions);
+        final var nestedInfo = findNestedNotification(message, element)
+            .orElseThrow(() -> new IllegalArgumentException("Unable to parse notification for " + element
+                + ". Available notifications: " + mappedNotifications.keySet()));
+        // FIXME: we should receive the absolute path just as we do for domDataTreeIdentifier
+        final var path = nestedInfo.notificationDefinition.getPath().asAbsolute();
+        return new NetconfDeviceTreeNotification(toNotification(path, (Element) nestedInfo.notificationNode), path,
+            stripped.getKey(), nestedInfo.domDataTreeIdentifier);
+    }
 
-        final ContainerNode content;
+    @GuardedBy("this")
+    private ContainerNode toNotification(final Absolute notificationPath, final Element element) {
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         try {
-            final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                    SchemaInferenceStack.ofInstantiatedPath(mountContext.getEffectiveModelContext(),
-                        mostRecentNotification.getPath()).toInference(), strictParsing);
+                    SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), notificationPath).toInference(),
+                    strictParsing);
             xmlParser.traverse(new DOMSource(element));
-            content = (ContainerNode) resultHolder.getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException
                 | UnsupportedOperationException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
         }
-
-        if (nestedNotificationInfo != null) {
-            return new NetconfDeviceTreeNotification(content,
-                // FIXME: improve this to cache the path
-                mostRecentNotification.getPath().asAbsolute(),
-                stripped.getKey(), nestedNotificationInfo.domDataTreeIdentifier);
-        }
-
-        return new NetconfDeviceNotification(content, stripped.getKey());
+        return (ContainerNode) resultHolder.getResult();
     }
 
     private Optional<NestedNotificationInfo> findNestedNotification(final NetconfMessage message,
