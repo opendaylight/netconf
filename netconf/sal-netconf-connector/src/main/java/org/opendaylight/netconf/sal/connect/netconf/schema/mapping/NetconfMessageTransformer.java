@@ -45,6 +45,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
@@ -64,6 +65,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -187,10 +189,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final var nestedInfo = findNestedNotification(message, element)
             .orElseThrow(() -> new IllegalArgumentException("Unable to parse notification for " + element
                 + ". Available notifications: " + mappedNotifications.keySet()));
-        // FIXME: we should receive the absolute path just as we do for domDataTreeIdentifier
-        final var path = nestedInfo.notificationDefinition.getPath().asAbsolute();
-        return new NetconfDeviceTreeNotification(toNotification(path, (Element) nestedInfo.notificationNode), path,
-            stripped.getKey(), nestedInfo.domDataTreeIdentifier);
+        final var schemaPath = nestedInfo.schemaPath;
+        return new NetconfDeviceTreeNotification(toNotification(schemaPath, nestedInfo.element), schemaPath,
+            stripped.getKey(), nestedInfo.instancePath);
     }
 
     @GuardedBy("this")
@@ -229,30 +230,33 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     private NestedNotificationInfo traverseXmlNodeContainingNotification(final Node xmlNode,
-            final SchemaNode schemaNode, final YangInstanceIdentifier.InstanceIdentifierBuilder builder) {
+            final SchemaNode schemaNode, final InstanceIdentifierBuilder instanceBuilder) {
         if (schemaNode instanceof ContainerSchemaNode) {
             ContainerSchemaNode dataContainerNode = (ContainerSchemaNode) schemaNode;
-            builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+            instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
 
             Entry<Node, SchemaNode> xmlContainerChildPair = findXmlContainerChildPair(xmlNode, dataContainerNode);
             return traverseXmlNodeContainingNotification(xmlContainerChildPair.getKey(),
-                    xmlContainerChildPair.getValue(), builder);
+                    xmlContainerChildPair.getValue(), instanceBuilder);
         } else if (schemaNode instanceof ListSchemaNode) {
             ListSchemaNode listSchemaNode = (ListSchemaNode) schemaNode;
-            builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+            instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
 
             Map<QName, Object> listKeys = findXmlListKeys(xmlNode, listSchemaNode);
-            builder.nodeWithKey(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()), listKeys);
+            instanceBuilder.nodeWithKey(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()), listKeys);
 
             Entry<Node, SchemaNode> xmlListChildPair = findXmlListChildPair(xmlNode, listSchemaNode);
             return traverseXmlNodeContainingNotification(xmlListChildPair.getKey(),
-                    xmlListChildPair.getValue(), builder);
+                    xmlListChildPair.getValue(), instanceBuilder);
         } else if (schemaNode instanceof NotificationDefinition) {
-            builder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+            // FIXME: this should not be here: it does not form a valid YangInstanceIdentifier
+            instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
 
-            NotificationDefinition notificationDefinition = (NotificationDefinition) schemaNode;
-            return new NestedNotificationInfo(notificationDefinition,
-                    new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, builder.build()), xmlNode);
+            final var notificationDefinition = (NotificationDefinition) schemaNode;
+            // FIXME: do not use SchemaNode.getPath() here. We should have a companion project to 'builder' to carry
+            //        the same things
+            return new NestedNotificationInfo(notificationDefinition.getPath().asAbsolute(),
+                    new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, instanceBuilder.build()), xmlNode);
         }
         throw new IllegalStateException("No notification found");
     }
@@ -527,15 +531,16 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     private static final class NestedNotificationInfo {
-        private final NotificationDefinition notificationDefinition;
-        private final DOMDataTreeIdentifier domDataTreeIdentifier;
-        private final Node notificationNode;
+        final @NonNull DOMDataTreeIdentifier instancePath;
+        final @NonNull Absolute schemaPath;
+        final @NonNull Element element;
 
-        NestedNotificationInfo(final NotificationDefinition notificationDefinition,
-                final DOMDataTreeIdentifier domDataTreeIdentifier, final Node notificationNode) {
-            this.notificationDefinition = notificationDefinition;
-            this.domDataTreeIdentifier = domDataTreeIdentifier;
-            this.notificationNode = notificationNode;
+        NestedNotificationInfo(final Absolute schemaPath, final DOMDataTreeIdentifier instancePath,
+                final Node documentNode) {
+            this.schemaPath = requireNonNull(schemaPath);
+            this.instancePath = requireNonNull(instancePath);
+            checkArgument(documentNode instanceof Element, "Unexpected document node %s", documentNode);
+            element = (Element) documentNode;
         }
     }
 }
