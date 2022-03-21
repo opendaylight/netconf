@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.rest.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule.ERRORS_CONTAINER_QNAME;
 
 import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonWriter;
@@ -20,7 +19,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -33,7 +31,7 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule;
+import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -41,11 +39,8 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -69,7 +64,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,11 +79,6 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
 
     private static final XMLOutputFactory XML_FACTORY;
-
-    private static final YangInstanceIdentifier ERRORS = YangInstanceIdentifier.builder()
-            .node(ERRORS_CONTAINER_QNAME)
-            .node(ERRORS_CONTAINER_QNAME)
-            .build();
 
     static {
         XML_FACTORY = XMLOutputFactory.newFactory();
@@ -142,7 +131,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
                 SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) errorsSchemaNode);
 
         final List<DataSchemaNode> schemaList = ControllerContext.findInstanceDataChildrenByName(errorsSchemaNode,
-                RestConfModule.ERROR_LIST_SCHEMA_NODE);
+                Draft02.RestConfModule.ERROR_LIST_SCHEMA_NODE);
         final DataSchemaNode errListSchemaNode = Iterables.getFirst(schemaList, null);
         checkState(errListSchemaNode instanceof ListSchemaNode, "Found Error SchemaNode isn't ListSchemaNode");
         final CollectionNodeBuilder<MapEntryNode, SystemMapNode> listErorsBuilder = SchemaAwareBuilders
@@ -154,7 +143,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
         errContBuild.withChild(listErorsBuilder.build());
 
-        final NormalizedNodeContext errContext =  new NormalizedNodeContext(new InstanceIdentifierContext<>(ERRORS,
+        final NormalizedNodeContext errContext =  new NormalizedNodeContext(new InstanceIdentifierContext<>(null,
                 (DataSchemaNode) errorsSchemaNode, null, controllerContext.getGlobalSchema()), errContBuild.build());
 
         Object responseBody;
@@ -208,7 +197,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             // Oddly, error-info is defined as an empty container in the restconf yang. Apparently the
             // intention is for implementors to define their own data content so we'll just treat it as a leaf
             // with string data.
-            errNodeValues.withChild(ImmutableNodes.leafNode(RestConfModule.ERROR_INFO_QNAME,
+            errNodeValues.withChild(ImmutableNodes.leafNode(Draft02.RestConfModule.ERROR_INFO_QNAME,
                     error.getErrorInfo()));
         }
 
@@ -224,6 +213,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final InstanceIdentifierContext<?> context = errorsNode.getInstanceIdentifierContext();
         final DataSchemaNode schema = (DataSchemaNode) context.getSchemaNode();
 
+        SchemaPath path = context.getSchemaNode().getPath();
         final OutputStreamWriter outputWriter = new OutputStreamWriter(outStream, StandardCharsets.UTF_8);
         if (data == null) {
             throw new RestconfDocumentedException(Response.Status.NOT_FOUND);
@@ -231,17 +221,11 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         boolean isDataRoot = false;
         XMLNamespace initialNs = null;
-        SchemaPath path;
-        if (context.getSchemaNode() instanceof SchemaContext) {
+        if (SchemaPath.ROOT.equals(path)) {
             isDataRoot = true;
-            path = SchemaPath.ROOT;
         } else {
-            final List<QName> qNames = context.getInstanceIdentifier().getPathArguments().stream()
-                    .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
-                    .filter(arg -> !(arg instanceof AugmentationIdentifier))
-                    .map(PathArgument::getNodeType)
-                    .collect(Collectors.toList());
-            path = SchemaPath.of(Absolute.of(qNames)).getParent();
+            path = path.getParent();
+            // FIXME: Add proper handling of reading root.
         }
         if (!schema.isAugmenting() && !(schema instanceof SchemaContext)) {
             initialNs = schema.getQName().getNamespace();
@@ -267,9 +251,9 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
             @Override
             public void startLeafNode(final NodeIdentifier name) throws IOException {
-                if (name.getNodeType().equals(RestConfModule.ERROR_INFO_QNAME)) {
+                if (name.getNodeType().equals(Draft02.RestConfModule.ERROR_INFO_QNAME)) {
                     inOurLeaf = true;
-                    jsonWriter.name(RestConfModule.ERROR_INFO_QNAME.getLocalName());
+                    jsonWriter.name(Draft02.RestConfModule.ERROR_INFO_QNAME.getLocalName());
                 } else {
                     super.startLeafNode(name);
                 }
@@ -333,18 +317,13 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             throw new IllegalStateException(e);
         }
         NormalizedNode data = errorsNode.getData();
-        SchemaPath schemaPath;
+        SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
+
         boolean isDataRoot = false;
-        if (pathContext.getSchemaNode() instanceof SchemaContext) {
+        if (SchemaPath.ROOT.equals(schemaPath)) {
             isDataRoot = true;
-            schemaPath = SchemaPath.ROOT;
         } else {
-            final List<QName> qNames = pathContext.getInstanceIdentifier().getPathArguments().stream()
-                    .filter(arg -> !(arg instanceof NodeIdentifierWithPredicates))
-                    .filter(arg -> !(arg instanceof AugmentationIdentifier))
-                    .map(PathArgument::getNodeType)
-                    .collect(Collectors.toList());
-            schemaPath = SchemaPath.of(Absolute.of(qNames)).getParent();
+            schemaPath = schemaPath.getParent();
         }
 
         final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
@@ -365,11 +344,11 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
             @Override
             public void startLeafNode(final NodeIdentifier name) throws IOException {
-                if (name.getNodeType().equals(RestConfModule.ERROR_INFO_QNAME)) {
-                    String ns = RestConfModule.ERROR_INFO_QNAME.getNamespace().toString();
+                if (name.getNodeType().equals(Draft02.RestConfModule.ERROR_INFO_QNAME)) {
+                    String ns = Draft02.RestConfModule.ERROR_INFO_QNAME.getNamespace().toString();
                     try {
                         xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,
-                                RestConfModule.ERROR_INFO_QNAME.getLocalName(), ns);
+                                Draft02.RestConfModule.ERROR_INFO_QNAME.getLocalName(), ns);
                     } catch (XMLStreamException e) {
                         throw new IOException("Error writing error-info", e);
                     }
