@@ -131,7 +131,6 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,31 +190,22 @@ public final class RestconfImpl implements RestconfService {
             .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
             .appendOffset("+HH:MM", "Z").toFormatter();
 
-    private static final @NonNull QName RESTCONF = QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf");
-
     private static final YangInstanceIdentifier MODULES = YangInstanceIdentifier.builder()
-            .node(RESTCONF)
-            .node(RESTCONF)
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
             .node(MODULES_CONTAINER_QNAME)
             .build();
     private static final YangInstanceIdentifier MODULE = YangInstanceIdentifier.builder()
-            .node(RESTCONF)
-            .node(RESTCONF)
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
             .node(MODULES_CONTAINER_QNAME)
             .node(MODULE_LIST_QNAME)
             .build();
     private static final YangInstanceIdentifier STREAMS = YangInstanceIdentifier.builder()
-            .node(RESTCONF)
-            .node(RESTCONF)
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
+            .node(QName.create(RestConfModule.IETF_RESTCONF_QNAME, "restconf"))
             .node(STREAMS_CONTAINER_QNAME)
             .build();
-
-    private static final SchemaNodeIdentifier MODULES_SCHEMA_IDENTIFIER =
-            Absolute.of(RESTCONF, RESTCONF, MODULES_CONTAINER_QNAME);
-    private static final SchemaNodeIdentifier MODULE_SCHEMA_IDENTIFIER =
-            Absolute.of(RESTCONF, RESTCONF, MODULES_CONTAINER_QNAME, MODULE_LIST_QNAME);
-    private static final SchemaNodeIdentifier STREAMS_SCHEMA_IDENTIFIER =
-            Absolute.of(RESTCONF, RESTCONF, STREAMS_CONTAINER_QNAME);
 
     private final BrokerFacade broker;
 
@@ -253,9 +243,8 @@ public final class RestconfImpl implements RestconfService {
                 SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
         moduleContainerBuilder.withChild(allModuleMap);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(MODULES, MODULES_SCHEMA_IDENTIFIER,
-                modulesSchemaNode, null, schemaContext), moduleContainerBuilder.build(),
-                QueryParametersParser.parseWriterParameters(uriInfo));
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(MODULES, modulesSchemaNode, null,
+                schemaContext), moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     /**
@@ -286,7 +275,7 @@ public final class RestconfImpl implements RestconfService {
         moduleContainerBuilder.withChild(mountPointModulesMap);
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(MODULES, MODULES_SCHEMA_IDENTIFIER, modulesSchemaNode, mountPoint,
+                new InstanceIdentifierContext<>(MODULES, modulesSchemaNode, mountPoint,
                         controllerContext.getGlobalSchema()),
                 moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
@@ -325,8 +314,7 @@ public final class RestconfImpl implements RestconfService {
         checkState(moduleSchemaNode instanceof ListSchemaNode);
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(MODULE, MODULE_SCHEMA_IDENTIFIER, moduleSchemaNode, mountPoint,
-                        schemaContext), moduleMap,
+                new InstanceIdentifierContext<>(MODULE, moduleSchemaNode, mountPoint, schemaContext), moduleMap,
                 QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -356,8 +344,7 @@ public final class RestconfImpl implements RestconfService {
         streamsContainerBuilder.withChild(listStreamsBuilder.build());
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(STREAMS, STREAMS_SCHEMA_IDENTIFIER, streamsContainerSchemaNode,
-                        null, schemaContext),
+                new InstanceIdentifierContext<>(STREAMS, streamsContainerSchemaNode, null, schemaContext),
                 streamsContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 

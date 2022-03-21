@@ -13,7 +13,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -33,6 +35,8 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -133,12 +137,12 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path, depth);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
-            final SchemaPath path;
-            if (pathContext.getSchemaNodeIdentifier() == null) {
-                path = SchemaPath.ROOT;
-            } else {
-                path = SchemaPath.of(pathContext.getSchemaNodeIdentifier()).getParent();
-            }
+            final List<QName> qNames = pathContext.getInstanceIdentifier().getPathArguments().stream()
+                .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                .map(PathArgument::getNodeType)
+                .collect(Collectors.toList());
+            final SchemaPath path = SchemaPath.of(Absolute.of(qNames)).getParent();
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path, depth);
             if (data instanceof MapEntryNode) {
                 // Restconf allows returning one list item. We need to wrap it
