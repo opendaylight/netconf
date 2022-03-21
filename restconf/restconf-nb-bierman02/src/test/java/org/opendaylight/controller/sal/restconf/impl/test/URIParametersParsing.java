@@ -51,6 +51,7 @@ import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class URIParametersParsing {
@@ -165,6 +166,7 @@ public class URIParametersParsing {
         container.withChild(augmentationBuilder.build());
 
         when(rpcDef.getInput()).thenReturn((InputSchemaNode) rpcInputSchemaNode);
+        when(rpcDef.getPath()).thenReturn(SchemaPath.create(true, rpcQName));
         when(rpcDef.getQName()).thenReturn(rpcQName);
 
         return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcDef, null, schema),
