@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -222,40 +223,42 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final QName topLevelNodeQName = QName.create(element.getNamespaceURI(), element.getLocalName());
         for (DataSchemaNode childNode : module.getChildNodes()) {
             if (topLevelNodeQName.isEqualWithoutRevision(childNode.getQName())) {
-                return Optional.of(traverseXmlNodeContainingNotification(element, childNode,
+                return Optional.of(traverseXmlNodeContainingNotification(element, childNode, new ArrayList<>(),
                     YangInstanceIdentifier.builder()));
             }
         }
         return Optional.empty();
     }
 
+    // FIXME: this method is using QNames which are not bound to a Revision. Why is that?
     private NestedNotificationInfo traverseXmlNodeContainingNotification(final Node xmlNode,
-            final SchemaNode schemaNode, final InstanceIdentifierBuilder instanceBuilder) {
+            final SchemaNode schemaNode, final List<QName> schemaBuilder,
+            final InstanceIdentifierBuilder instanceBuilder) {
         if (schemaNode instanceof ContainerSchemaNode) {
-            ContainerSchemaNode dataContainerNode = (ContainerSchemaNode) schemaNode;
+            final var containerSchema = (ContainerSchemaNode) schemaNode;
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+            schemaBuilder.add(containerSchema.getQName());
 
-            Entry<Node, SchemaNode> xmlContainerChildPair = findXmlContainerChildPair(xmlNode, dataContainerNode);
+            Entry<Node, SchemaNode> xmlContainerChildPair = findXmlContainerChildPair(xmlNode, containerSchema);
             return traverseXmlNodeContainingNotification(xmlContainerChildPair.getKey(),
-                    xmlContainerChildPair.getValue(), instanceBuilder);
+                    xmlContainerChildPair.getValue(), schemaBuilder, instanceBuilder);
         } else if (schemaNode instanceof ListSchemaNode) {
-            ListSchemaNode listSchemaNode = (ListSchemaNode) schemaNode;
+            final var listSchema = (ListSchemaNode) schemaNode;
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+            schemaBuilder.add(listSchema.getQName());
 
-            Map<QName, Object> listKeys = findXmlListKeys(xmlNode, listSchemaNode);
+            Map<QName, Object> listKeys = findXmlListKeys(xmlNode, listSchema);
             instanceBuilder.nodeWithKey(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()), listKeys);
 
-            Entry<Node, SchemaNode> xmlListChildPair = findXmlListChildPair(xmlNode, listSchemaNode);
+            Entry<Node, SchemaNode> xmlListChildPair = findXmlListChildPair(xmlNode, listSchema);
             return traverseXmlNodeContainingNotification(xmlListChildPair.getKey(),
-                    xmlListChildPair.getValue(), instanceBuilder);
+                    xmlListChildPair.getValue(), schemaBuilder, instanceBuilder);
         } else if (schemaNode instanceof NotificationDefinition) {
             // FIXME: this should not be here: it does not form a valid YangInstanceIdentifier
             instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+            schemaBuilder.add(schemaNode.getQName());
 
-            final var notificationDefinition = (NotificationDefinition) schemaNode;
-            // FIXME: do not use SchemaNode.getPath() here. We should have a companion project to 'builder' to carry
-            //        the same things
-            return new NestedNotificationInfo(notificationDefinition.getPath().asAbsolute(),
+            return new NestedNotificationInfo(Absolute.of(schemaBuilder),
                     new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, instanceBuilder.build()), xmlNode);
         }
         throw new IllegalStateException("No notification found");
@@ -274,7 +277,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 QName currentNodeQName = QName.create(currentNode.getNamespaceURI(), currentNode.getLocalName());
                 SchemaNode schemaChildNode = childrenWithoutRevision.get(currentNodeQName);
                 if (schemaChildNode != null) {
-                    return new AbstractMap.SimpleEntry<>(currentNode, schemaChildNode);
+                    return Map.entry(currentNode, schemaChildNode);
                 }
             }
         }
