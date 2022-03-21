@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "507dc546_af7db9cd",
+        "filename": "netconf/mdsal-netconf-yang-library/src/main/java/org/opendaylight/netconf/mdsal/yang/library/YangLibraryWriter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-03-21T05:40:57Z",
+      "side": 1,
+      "message": "Fixed through updated expected data.",
+      "parentUuid": "9a748133_95cd7c1f",
+      "revId": "fef84740e529b378d20588311904538fe232517d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa83a06b_982dfc33",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-03-16T11:47:20Z",
       "side": 1,
       "message": "Setting it null because it cause failure of ModulesStateTest when it is empty list. Don\u0027t know how fix test yet so now it like this.",
+      "revId": "fef84740e529b378d20588311904538fe232517d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66469b14_84b8d5bb",
+        "filename": "netconf/mdsal-netconf-yang-library/src/main/java/org/opendaylight/netconf/mdsal/yang/library/YangLibraryWriter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-03-21T05:40:57Z",
+      "side": 1,
+      "message": "That indicates the test needs to be updated",
+      "parentUuid": "aa83a06b_982dfc33",
       "revId": "fef84740e529b378d20588311904538fe232517d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
