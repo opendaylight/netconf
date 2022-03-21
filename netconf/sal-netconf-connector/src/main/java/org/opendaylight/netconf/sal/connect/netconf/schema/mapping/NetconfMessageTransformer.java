@@ -26,12 +26,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.AbstractMap;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -82,7 +82,6 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -113,43 +112,49 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing,
                                      final BaseSchema baseSchema) {
-        this.counter = new MessageCounter();
+        counter = new MessageCounter();
         this.mountContext = requireNonNull(mountContext);
 
         final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
-        this.contextTree = DataSchemaContextTree.from(schemaContext);
+        contextTree = DataSchemaContextTree.from(schemaContext);
 
-        this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        this.actions = Maps.uniqueIndex(getActions(schemaContext), action -> action.getPath().asAbsolute());
+        mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
+        actions = getActions(schemaContext);
 
         // RFC6020 normal notifications
-        this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
+        mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
             node -> node.getQName().withoutRevision());
         this.baseSchema = baseSchema;
         this.strictParsing = strictParsing;
     }
 
     @VisibleForTesting
-    // FIXME: return Map<Absolute, ActionDefinition> by using only
-    static List<ActionDefinition> getActions(final SchemaContext schemaContext) {
-        final List<ActionDefinition> builder = new ArrayList<>();
-        findAction(schemaContext, builder);
-        return builder;
+    static ImmutableMap<Absolute, ActionDefinition> getActions(final EffectiveModelContext schemaContext) {
+        final var builder = ImmutableMap.<Absolute, ActionDefinition>builder();
+        findAction(schemaContext, new ArrayDeque<QName>(), builder);
+        return builder.build();
     }
 
-    private static void findAction(final DataSchemaNode dataSchemaNode, final List<ActionDefinition> builder) {
+    private static void findAction(final DataSchemaNode dataSchemaNode, final Deque<QName> path,
+            final ImmutableMap.Builder<Absolute, ActionDefinition> builder) {
         if (dataSchemaNode instanceof ActionNodeContainer) {
             for (ActionDefinition actionDefinition : ((ActionNodeContainer) dataSchemaNode).getActions()) {
-                builder.add(actionDefinition);
+                path.addLast(actionDefinition.getQName());
+                builder.put(Absolute.of(path), actionDefinition);
+                path.removeLast();
             }
         }
         if (dataSchemaNode instanceof DataNodeContainer) {
             for (DataSchemaNode innerDataSchemaNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
-                findAction(innerDataSchemaNode, builder);
+                path.addLast(innerDataSchemaNode.getQName());
+                findAction(innerDataSchemaNode, path, builder);
+                path.removeLast();
             }
         } else if (dataSchemaNode instanceof ChoiceSchemaNode) {
             for (CaseSchemaNode caze : ((ChoiceSchemaNode) dataSchemaNode).getCases()) {
-                findAction(caze, builder);
+                path.addLast(caze.getQName());
+                findAction(caze, path, builder);
+                path.removeLast();
             }
         }
     }
@@ -480,7 +485,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         NetconfDeviceNotification(final ContainerNode content, final Instant eventTime) {
             this.content = content;
             this.eventTime = eventTime;
-            this.schemaPath = Absolute.of(content.getIdentifier().getNodeType());
+            schemaPath = Absolute.of(content.getIdentifier().getNodeType());
         }
 
         NetconfDeviceNotification(final ContainerNode content, final Absolute schemaPath, final Instant eventTime) {

@@ -94,7 +94,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -556,11 +555,13 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         schemaPaths.add(CHECK_WITH_OUTPUT_INTERFACE_PATH);
         schemaPaths.add(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH);
 
-        List<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
+        var actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertEquals(schemaPaths.size(), actions.size());
-        for (ActionDefinition actionDefinition : actions) {
-            Absolute path = actionDefinition.getPath().asAbsolute();
-            assertTrue(schemaPaths.remove(path));
+
+        for (var path : schemaPaths) {
+            final var action = actions.get(path);
+            assertNotNull("Action for " + path + " not found", action);
+            assertEquals(path.asSchemaPath(), action.getPath());
         }
     }
 
