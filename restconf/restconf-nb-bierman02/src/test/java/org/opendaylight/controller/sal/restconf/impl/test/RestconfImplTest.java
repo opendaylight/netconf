@@ -153,7 +153,7 @@ public class RestconfImplTest {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters(anyBoolean());
 
         final NormalizedNodeContext ctx = mock(NormalizedNodeContext.class);
-        final InstanceIdentifierContext<?> iiCtx = mock(InstanceIdentifierContext.class);
+        final InstanceIdentifierContext iiCtx = mock(InstanceIdentifierContext.class);
         doReturn(iiCtx).when(ctx).getInstanceIdentifierContext();
         final SchemaNode schemaNode = mock(SchemaNode.class);
         doReturn(schemaNode).when(iiCtx).getSchemaNode();
@@ -166,8 +166,8 @@ public class RestconfImplTest {
         doReturn(Optional.of(rpcService)).when(mount).getService(DOMRpcService.class);
         doReturn(immediateFluentFuture(mock(DOMRpcResult.class))).when(rpcService)
                 .invokeRpc(any(QName.class), any(NormalizedNode.class));
-        this.restconfImpl.invokeRpc("randomId", ctx, uriInfo);
-        this.restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
+        restconfImpl.invokeRpc("randomId", ctx, uriInfo);
+        restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
         verify(rpcService, times(2)).invokeRpc(any(QName.class), any());
     }
 
@@ -177,7 +177,7 @@ public class RestconfImplTest {
     @Test
     public void createNotificationStreamTest() {
         final NormalizedNodeContext payload = mock(NormalizedNodeContext.class);
-        final InstanceIdentifierContext<?> iiCtx = mock(InstanceIdentifierContext.class);
+        final InstanceIdentifierContext iiCtx = mock(InstanceIdentifierContext.class);
         doReturn(iiCtx).when(payload).getInstanceIdentifierContext();
 
         final SchemaNode schemaNode = mock(SchemaNode.class,
@@ -204,7 +204,7 @@ public class RestconfImplTest {
         doReturn(children).when(normalizedNode).body();
 
         // register notification
-        final NormalizedNodeContext context = this.restconfImpl
+        final NormalizedNodeContext context = restconfImpl
                 .invokeRpc("sal-remote:create-notification-stream", payload, null);
         assertNotNull(context);
     }
@@ -214,8 +214,8 @@ public class RestconfImplTest {
      */
     @Test
     public void toStreamEntryNodeTest() {
-        final Module restconfModule = this.controllerContext.getRestconfModule();
-        final DataSchemaNode streamSchemaNode = this.controllerContext
+        final Module restconfModule = controllerContext.getRestconfModule();
+        final DataSchemaNode streamSchemaNode = controllerContext
                 .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.STREAM_LIST_SCHEMA_NODE);
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) streamSchemaNode;
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeValues =
@@ -277,7 +277,7 @@ public class RestconfImplTest {
         when(uriInfo.getQueryParameters()).thenReturn(map);
 
         // subscribe to stream and verify response
-        final NormalizedNodeContext response = this.restconfImpl.subscribeToStream(identifier, uriInfo);
+        final NormalizedNodeContext response = restconfImpl.subscribeToStream(identifier, uriInfo);
 
         // remove test notification stream
         Notificator.removeAllListeners();

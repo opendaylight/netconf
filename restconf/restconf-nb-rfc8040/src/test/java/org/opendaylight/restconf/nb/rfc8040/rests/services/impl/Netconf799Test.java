@@ -77,7 +77,7 @@ public class Netconf799Test {
 
         final var schemaNode = loadAction(contextRef, RESET_QNAME, ACTION_YII).orElseThrow();
         final var response = dataService.invokeAction(NormalizedNodePayload.of(
-            new InstanceIdentifierContext<>(ACTION_YII, schemaNode, null, contextRef),
+            new InstanceIdentifierContext(ACTION_YII, schemaNode, null, contextRef),
             Builders.containerBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(INPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(DELAY_QNAME, Uint32.TEN))

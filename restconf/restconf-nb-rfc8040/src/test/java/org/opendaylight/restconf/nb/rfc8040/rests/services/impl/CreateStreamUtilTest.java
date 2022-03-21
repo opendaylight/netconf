@@ -114,7 +114,7 @@ public class CreateStreamUtilTest {
                 .withValue(o).build();
         container.withChild(lfNode);
 
-        return NormalizedNodePayload.of(new InstanceIdentifierContext<>(null, rpcInputSchemaNode, null, schema),
+        return NormalizedNodePayload.of(new InstanceIdentifierContext(null, rpcInputSchemaNode, null, schema),
                 container.build());
     }
 }

@@ -104,7 +104,7 @@ public final class QueryParams {
     }
 
     public static QueryParameters newQueryParameters(final ReadDataParams params,
-            final InstanceIdentifierContext<?> identifier) {
+            final InstanceIdentifierContext identifier) {
         final var fields = params.fields();
         if (fields == null) {
             return QueryParameters.of(params);

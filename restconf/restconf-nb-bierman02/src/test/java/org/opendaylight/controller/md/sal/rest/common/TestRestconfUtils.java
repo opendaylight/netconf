@@ -111,7 +111,7 @@ public final class TestRestconfUtils {
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static NormalizedNodeContext loadNormalizedContextFromXmlFile(final String pathToInputFile,
             final String uri, final ControllerContext controllerContext) {
-        final InstanceIdentifierContext<?> iiContext = controllerContext.toInstanceIdentifier(uri);
+        final InstanceIdentifierContext iiContext = controllerContext.toInstanceIdentifier(uri);
         final InputStream inputStream = TestJsonBodyWriter.class.getResourceAsStream(pathToInputFile);
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
@@ -123,7 +123,7 @@ public final class TestRestconfUtils {
         return null;
     }
 
-    private static NormalizedNode parse(final InstanceIdentifierContext<?> iiContext, final Document doc)
+    private static NormalizedNode parse(final InstanceIdentifierContext iiContext, final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = iiContext.getSchemaNode();
         DataSchemaNode schemaNode = null;

@@ -71,7 +71,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected NormalizedNodePayload readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+    protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
@@ -86,7 +86,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         }
     }
 
-    private NormalizedNodePayload parse(final InstanceIdentifierContext<?> pathContext, final Document doc)
+    private NormalizedNodePayload parse(final InstanceIdentifierContext pathContext, final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
@@ -161,7 +161,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
                 pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));
 
-        final InstanceIdentifierContext<? extends SchemaNode> outIIContext = new InstanceIdentifierContext<>(
+        final InstanceIdentifierContext outIIContext = new InstanceIdentifierContext(
                 fullIIToData, pathContext.getSchemaNode(), pathContext.getMountPoint(), pathContext.getSchemaContext());
 
         // FIXME: can result really be null?

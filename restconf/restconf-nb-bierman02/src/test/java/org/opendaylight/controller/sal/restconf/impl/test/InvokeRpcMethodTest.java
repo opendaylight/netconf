@@ -149,7 +149,7 @@ public class InvokeRpcMethodTest {
         container.withChild(contNode.build());
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, rpcInputSchemaNode, null, schema), container.build());
+                new InstanceIdentifierContext(null, rpcInputSchemaNode, null, schema), container.build());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class InvokeRpcMethodTest {
             .when(brokerFacade).invokeRpc(eq(qname), any());
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
         verifyRestconfDocumentedException(ex, 0, ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
             Optional.empty(), Optional.empty());
     }
@@ -199,7 +199,7 @@ public class InvokeRpcMethodTest {
         doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(path), any());
 
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
 
         // We are performing pass-through here of error-tag, hence the tag remains as specified, but we want to make
         // sure the HTTP status remains the same as
@@ -220,7 +220,7 @@ public class InvokeRpcMethodTest {
 
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(qname), any());
 
-        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
+        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
         assertNotNull(output);
         assertEquals(null, output.getData());
         // additional validation in the fact that the restconfImpl does not
@@ -238,14 +238,14 @@ public class InvokeRpcMethodTest {
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(qname), any());
 
         WebApplicationException exceptionToBeThrown = assertThrows(WebApplicationException.class,
-            () -> this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo));
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), exceptionToBeThrown.getResponse().getStatus());
     }
 
     @Test
     public void testInvokeRpcMethodWithBadMethodName() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> this.restconfImpl.invokeRpc("toaster:bad-method", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster:bad-method", null, uriInfo));
         verifyRestconfDocumentedException(ex, 0, ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT,
             Optional.empty(), Optional.empty());
     }
@@ -276,12 +276,12 @@ public class InvokeRpcMethodTest {
                 SchemaAwareBuilders.containerBuilder(rpcInputSchemaNode);
 
         final NormalizedNodeContext payload =
-                new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode,
+                new NormalizedNodeContext(new InstanceIdentifierContext(null, rpcInputSchemaNode,
                 null, schemaContext), containerBuilder.build());
 
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), any(NormalizedNode.class));
 
-        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:make-toast", payload, uriInfo);
+        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:make-toast", payload, uriInfo);
         assertNotNull(output);
         assertEquals(null, output.getData());
         // additional validation in the fact that the restconfImpl does not
@@ -291,7 +291,7 @@ public class InvokeRpcMethodTest {
     @Test
     public void testThrowExceptionWhenSlashInModuleName() {
         final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> this.restconfImpl.invokeRpc("toaster/slash", null, uriInfo));
+            () -> restconfImpl.invokeRpc("toaster/slash", null, uriInfo));
         verifyRestconfDocumentedException(ex, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
             Optional.empty(), Optional.empty());
     }
@@ -330,7 +330,7 @@ public class InvokeRpcMethodTest {
 
         doReturn(immediateFluentFuture(result)).when(brokerFacade).invokeRpc(eq(rpcDef.getQName()), any());
 
-        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:testOutput", null, uriInfo);
+        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:testOutput", null, uriInfo);
         assertNotNull(output);
         assertNotNull(output.getData());
         assertSame(container, output.getData());

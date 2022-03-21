@@ -47,7 +47,7 @@ public final class WriterFieldsTranslator extends AbstractFieldsTranslator<QName
      * @param input input value of fields parameter
      * @return {@link List} of levels; each level contains set of {@link QName}
      */
-    public static @NonNull List<Set<QName>> translate(final @NonNull InstanceIdentifierContext<?> identifier,
+    public static @NonNull List<Set<QName>> translate(final @NonNull InstanceIdentifierContext identifier,
                                                       final @NonNull FieldsParam input) {
         return INSTANCE.parseFields(identifier, input);
     }

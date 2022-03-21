@@ -22,47 +22,45 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
  * messy details needed to deal with the payload.
  */
 public final class NormalizedNodePayload {
-    private final InstanceIdentifierContext<?> context;
+    private final InstanceIdentifierContext context;
     private final ImmutableMap<String, Object> headers;
     private final QueryParameters writerParameters;
     private final NormalizedNode data;
 
-    private NormalizedNodePayload(final InstanceIdentifierContext<?> context,
-            final NormalizedNode data, final QueryParameters writerParameters,
-            final ImmutableMap<String, Object> headers) {
+    private NormalizedNodePayload(final InstanceIdentifierContext context, final NormalizedNode data,
+            final QueryParameters writerParameters, final ImmutableMap<String, Object> headers) {
         this.context = context;
         this.data = data;
         this.writerParameters = requireNonNull(writerParameters);
         this.headers = requireNonNull(headers);
     }
 
-    public static @NonNull NormalizedNodePayload empty(final InstanceIdentifierContext<?> path) {
+    public static @NonNull NormalizedNodePayload empty(final InstanceIdentifierContext path) {
         return new NormalizedNodePayload(requireNonNull(path), null, QueryParameters.empty(), ImmutableMap.of());
     }
 
-    public static @NonNull NormalizedNodePayload of(final InstanceIdentifierContext<?> path,
-            final NormalizedNode data) {
+    public static @NonNull NormalizedNodePayload of(final InstanceIdentifierContext path, final NormalizedNode data) {
         return new NormalizedNodePayload(requireNonNull(path), requireNonNull(data), QueryParameters.empty(),
             ImmutableMap.of());
     }
 
-    public static @NonNull NormalizedNodePayload ofNullable(final InstanceIdentifierContext<?> path,
+    public static @NonNull NormalizedNodePayload ofNullable(final InstanceIdentifierContext path,
             final NormalizedNode data) {
         return data == null ? empty(path) : of(path, data);
     }
 
-    public static @NonNull NormalizedNodePayload ofLocation(final InstanceIdentifierContext<?> path,
+    public static @NonNull NormalizedNodePayload ofLocation(final InstanceIdentifierContext path,
             final NodeIdentifier leafId, final URI location) {
         return new NormalizedNodePayload(requireNonNull(path), ImmutableNodes.leafNode(leafId, location.toString()),
             QueryParameters.empty(), ImmutableMap.of("Location", location));
     }
 
-    public static Object ofReadData(final InstanceIdentifierContext<?> path, final NormalizedNode data,
+    public static Object ofReadData(final InstanceIdentifierContext path, final NormalizedNode data,
             final QueryParameters parameters) {
         return new NormalizedNodePayload(requireNonNull(path), requireNonNull(data), parameters, ImmutableMap.of());
     }
 
-    public InstanceIdentifierContext<?> getInstanceIdentifierContext() {
+    public InstanceIdentifierContext getInstanceIdentifierContext() {
         return context;
     }
 

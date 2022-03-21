@@ -73,7 +73,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
                     ErrorTag.INVALID_VALUE);
         }
 
-        final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+        final InstanceIdentifierContext mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             schemaContextHandler.get(), Optional.of(mountPointService));
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final var entry = OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);

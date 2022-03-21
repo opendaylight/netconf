@@ -101,7 +101,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             throws WebApplicationException {
 
         try {
-            final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
+            final InstanceIdentifierContext path = getInstanceIdentifierContext();
             final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
             if (nonEmptyInputStreamOptional.isEmpty()) {
                 // represent empty nopayload input
@@ -120,7 +120,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         }
     }
 
-    private static PatchContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc)
+    private static PatchContext parse(final InstanceIdentifierContext pathContext, final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final String patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();

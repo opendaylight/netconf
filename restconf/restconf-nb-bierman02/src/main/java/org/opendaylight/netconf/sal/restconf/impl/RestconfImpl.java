@@ -223,7 +223,7 @@ public final class RestconfImpl implements RestconfService {
                 SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
         moduleContainerBuilder.withChild(allModuleMap);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, modulesSchemaNode, null, schemaContext),
+        return new NormalizedNodeContext(new InstanceIdentifierContext(null, modulesSchemaNode, null, schemaContext),
                 moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -240,7 +240,7 @@ public final class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
-        final InstanceIdentifierContext<?> mountPointIdentifier =
+        final InstanceIdentifierContext mountPointIdentifier =
                 controllerContext.toMountPointIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final MapNode mountPointModulesMap = makeModuleMapNode(controllerContext.getAllModules(mountPoint));
@@ -255,7 +255,7 @@ public final class RestconfImpl implements RestconfService {
         moduleContainerBuilder.withChild(mountPointModulesMap);
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, modulesSchemaNode, mountPoint,
+                new InstanceIdentifierContext(null, modulesSchemaNode, mountPoint,
                         controllerContext.getGlobalSchema()),
                 moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
@@ -268,7 +268,7 @@ public final class RestconfImpl implements RestconfService {
         DOMMountPoint mountPoint = null;
         final EffectiveModelContext schemaContext;
         if (identifier.contains(ControllerContext.MOUNT)) {
-            final InstanceIdentifierContext<?> mountPointIdentifier =
+            final InstanceIdentifierContext mountPointIdentifier =
                     controllerContext.toMountPointIdentifier(identifier);
             mountPoint = mountPointIdentifier.getMountPoint();
             module = controllerContext.findModuleByNameAndRevision(mountPoint, nameRev.getKey(),
@@ -294,7 +294,7 @@ public final class RestconfImpl implements RestconfService {
         checkState(moduleSchemaNode instanceof ListSchemaNode);
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, moduleSchemaNode, mountPoint, schemaContext), moduleMap,
+                new InstanceIdentifierContext(null, moduleSchemaNode, mountPoint, schemaContext), moduleMap,
                 QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -324,7 +324,7 @@ public final class RestconfImpl implements RestconfService {
         streamsContainerBuilder.withChild(listStreamsBuilder.build());
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, streamsContainerSchemaNode, null, schemaContext),
+                new InstanceIdentifierContext(null, streamsContainerSchemaNode, null, schemaContext),
                 streamsContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -350,8 +350,7 @@ public final class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
-        final InstanceIdentifierContext<?> mountPointIdentifier =
-                controllerContext.toMountPointIdentifier(identifier);
+        final InstanceIdentifierContext mountPointIdentifier = controllerContext.toMountPointIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final var entry = OperationsResourceUtils.contextForModelContext(modelContext(mountPoint), mountPoint);
         return new NormalizedNodeContext(entry.getKey(), entry.getValue());
@@ -455,7 +454,7 @@ public final class RestconfImpl implements RestconfService {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         } else {
             return new NormalizedNodeContext(
-                    new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint, schemaContext),
+                    new InstanceIdentifierContext(null, resultNodeSchema, mountPoint, schemaContext),
                     resultData, QueryParametersParser.parseWriterParameters(uriInfo));
         }
     }
@@ -468,7 +467,7 @@ public final class RestconfImpl implements RestconfService {
         final EffectiveModelContext schemaContext;
         if (identifier.contains(ControllerContext.MOUNT)) {
             // mounted RPC call - look up mount instance.
-            final InstanceIdentifierContext<?> mountPointId = controllerContext.toMountPointIdentifier(identifier);
+            final InstanceIdentifierContext mountPointId = controllerContext.toMountPointIdentifier(identifier);
             mountPoint = mountPointId.getMountPoint();
             schemaContext = modelContext(mountPoint);
             final int startOfRemoteRpcName =
@@ -530,7 +529,7 @@ public final class RestconfImpl implements RestconfService {
         //
         //        This is legacy code, so if anybody cares to do that refactor, feel free to contribute, but I am not
         //        doing that work.
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpc, mountPoint, schemaContext), result,
+        return new NormalizedNodeContext(new InstanceIdentifierContext(null, rpc, mountPoint, schemaContext), result,
             QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -701,7 +700,7 @@ public final class RestconfImpl implements RestconfService {
             }
         }
 
-        final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext iiWithData = controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         NormalizedNode data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
@@ -718,7 +717,7 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext readOperationalData(final String identifier, final UriInfo uriInfo) {
-        final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext iiWithData = controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         NormalizedNode data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
@@ -781,7 +780,7 @@ public final class RestconfImpl implements RestconfService {
 
         requireNonNull(identifier);
 
-        final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
+        final InstanceIdentifierContext iiWithData = payload.getInstanceIdentifierContext();
 
         validateInput(iiWithData.getSchemaNode(), payload);
         validateTopLevelNodeName(payload, iiWithData.getInstanceIdentifier());
@@ -877,7 +876,7 @@ public final class RestconfImpl implements RestconfService {
      */
     private static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodeContext payload) {
         checkArgument(payload != null);
-        final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
+        final InstanceIdentifierContext iiWithData = payload.getInstanceIdentifierContext();
         final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
         final SchemaNode schemaNode = iiWithData.getSchemaNode();
         final NormalizedNode data = payload.getData();
@@ -924,7 +923,7 @@ public final class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
+        final InstanceIdentifierContext iiWithData = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
         boolean insertUsed = false;
@@ -1017,7 +1016,7 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public Response deleteConfigurationData(final String identifier) {
-        final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext iiWithData = controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
@@ -1132,7 +1131,7 @@ public final class RestconfImpl implements RestconfService {
 
         if (response != null) {
             // prepare node with value of location
-            final InstanceIdentifierContext<?> iid = prepareIIDSubsStreamOutput();
+            final InstanceIdentifierContext iid = prepareIIDSubsStreamOutput();
             final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
                     ImmutableLeafNodeBuilder.create().withValue(response.toString());
             builder.withNodeIdentifier(
@@ -1165,7 +1164,7 @@ public final class RestconfImpl implements RestconfService {
      * @return {@link InstanceIdentifierContext} of location leaf for
      *         notification
      */
-    private InstanceIdentifierContext<?> prepareIIDSubsStreamOutput() {
+    private InstanceIdentifierContext prepareIIDSubsStreamOutput() {
         final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
         final EffectiveModelContext schemaCtx = controllerContext.getGlobalSchema();
         final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx
@@ -1175,8 +1174,7 @@ public final class RestconfImpl implements RestconfService {
         path.add(NodeIdentifier.create(qnameBase));
         path.add(NodeIdentifier.create(QName.create(qnameBase, "location")));
 
-        return new InstanceIdentifierContext<SchemaNode>(YangInstanceIdentifier.create(path), location, null,
-                schemaCtx);
+        return new InstanceIdentifierContext(YangInstanceIdentifier.create(path), location, null, schemaCtx);
     }
 
     /**

@@ -85,7 +85,7 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
     }
 
     private SchemaContext getMountSchemaContext(final String identifier) {
-        final InstanceIdentifierContext<?> mountContext = salContext.toMountPointIdentifier(identifier);
+        final InstanceIdentifierContext mountContext = salContext.toMountPointIdentifier(identifier);
         return mountContext.getSchemaContext();
     }
 }

@@ -63,9 +63,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
             return;
         }
 
-        @SuppressWarnings("unchecked")
-        final InstanceIdentifierContext<SchemaNode> identifierCtx =
-                (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
+        final InstanceIdentifierContext identifierCtx = context.getInstanceIdentifierContext();
         final SchemaPath path = identifierCtx.getSchemaNode().getPath();
         final var pretty = context.getWriterParameters().prettyPrint();
 
@@ -85,7 +83,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
     }
 
     private static void writeNormalizedNode(final JsonWriter jsonWriter,
-            final SchemaPath path, final InstanceIdentifierContext<SchemaNode> context, final NormalizedNode data,
+            final SchemaPath path, final InstanceIdentifierContext context, final NormalizedNode data,
             final DepthParam depth, final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
 
@@ -148,7 +146,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
-            final InstanceIdentifierContext<SchemaNode> context, final SchemaPath path, final JsonWriter jsonWriter,
+            final InstanceIdentifierContext context, final SchemaPath path, final JsonWriter jsonWriter,
             final DepthParam depth, final List<Set<QName>> fields) {
 
         final SchemaNode schema = context.getSchemaNode();
@@ -176,7 +174,7 @@ public class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrit
         return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
     }
 
-    private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
+    private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext context) {
         // TODO: Performance: Cache JSON Codec factory and schema context
         return JSONCodecFactorySupplier.RFC7951.getShared(context.getSchemaContext());
     }

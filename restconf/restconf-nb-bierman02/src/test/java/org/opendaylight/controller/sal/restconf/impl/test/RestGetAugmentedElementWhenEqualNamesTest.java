@@ -35,7 +35,7 @@ public class RestGetAugmentedElementWhenEqualNamesTest {
 
     @Test
     public void augmentedNodesInUri() {
-        InstanceIdentifierContext<?> iiWithData =
+        InstanceIdentifierContext iiWithData =
                 controllerContext.toInstanceIdentifier("main:cont/augment-main-a:cont1");
         assertEquals(XMLNamespace.of("ns:augment:main:a"), iiWithData.getSchemaNode().getQName().getNamespace());
         iiWithData = controllerContext.toInstanceIdentifier("main:cont/augment-main-b:cont1");

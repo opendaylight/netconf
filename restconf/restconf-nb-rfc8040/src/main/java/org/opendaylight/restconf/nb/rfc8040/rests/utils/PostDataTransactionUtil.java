@@ -148,7 +148,7 @@ public final class PostDataTransactionUtil {
                                             final RestconfTransaction transaction) {
         final YangInstanceIdentifier parent = path.getParent().getParent();
         transaction.remove(parent);
-        final InstanceIdentifierContext<?> instanceIdentifier =
+        final InstanceIdentifierContext instanceIdentifier =
             // FIXME: Point should be able to give us this method
             ParserIdentifier.toInstanceIdentifier(point.value(), schemaContext, Optional.empty());
         int lastItemPosition = 0;

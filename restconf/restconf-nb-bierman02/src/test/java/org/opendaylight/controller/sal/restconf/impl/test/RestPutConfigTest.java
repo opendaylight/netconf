@@ -52,14 +52,14 @@ public class RestPutConfigTest {
 
     @Before
     public void init() {
-        this.controllerCx = TestRestconfUtils.newControllerContext(schemaContext);
-        this.restconfService = RestconfImpl.newInstance(brokerFacade, controllerCx);
+        controllerCx = TestRestconfUtils.newControllerContext(schemaContext);
+        restconfService = RestconfImpl.newInstance(brokerFacade, controllerCx);
     }
 
     @Test
     public void testPutConfigData() {
         final String identifier = "test-interface:interfaces/interface/key";
-        final InstanceIdentifierContext<?> iiCx = this.controllerCx.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext iiCx = controllerCx.toInstanceIdentifier(identifier);
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "interface");
         final QName qNameKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "name");
@@ -74,13 +74,13 @@ public class RestPutConfigTest {
         final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
         Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
         Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
+        restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
     @Test
     public void testPutConfigDataCheckOnlyLastElement() {
         final String identifier = "test-interface:interfaces/interface/key/sub-interface/subkey";
-        final InstanceIdentifierContext<?> iiCx = this.controllerCx.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext iiCx = controllerCx.toInstanceIdentifier(identifier);
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "sub-interface");
         final QName qNameSubKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "sub-name");
@@ -95,19 +95,19 @@ public class RestPutConfigTest {
         final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
         Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
         Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
+        restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testPutConfigDataMissingUriKey() {
         final String identifier = "test-interface:interfaces/interface";
-        this.controllerCx.toInstanceIdentifier(identifier);
+        controllerCx.toInstanceIdentifier(identifier);
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testPutConfigDataDiferentKey() {
         final String identifier = "test-interface:interfaces/interface/key";
-        final InstanceIdentifierContext<?> iiCx = this.controllerCx.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext iiCx = controllerCx.toInstanceIdentifier(identifier);
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "interface");
         final QName qNameKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "name");
@@ -122,12 +122,12 @@ public class RestPutConfigTest {
         final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
         Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
         Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
+        restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
     private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode data) {
         final PutResult result = Mockito.mock(PutResult.class);
-        Mockito.when(this.brokerFacade.commitConfigurationDataPut(schemaContext, yii, data, null, null))
+        Mockito.when(brokerFacade.commitConfigurationDataPut(schemaContext, yii, data, null, null))
                 .thenReturn(result);
         Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         Mockito.when(result.getStatus()).thenReturn(Status.OK);

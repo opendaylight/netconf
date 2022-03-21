@@ -134,7 +134,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final ReadDataParams readParams = QueryParams.newReadDataParams(uriInfo);
 
         final EffectiveModelContext schemaContextRef = schemaContextHandler.get();
-        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
+        final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef, Optional.of(mountPointService));
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
 
@@ -220,7 +220,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
+        final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
 
         validInputData(iid.getSchemaNode(), payload);
         validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
@@ -254,7 +254,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response deleteData(final String identifier) {
-        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
+        final InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextHandler.get(), Optional.of(mountPointService));
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
@@ -280,7 +280,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response patchData(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iid = payload.getInstanceIdentifierContext();
+        final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
         validInputData(iid.getSchemaNode(), payload);
         validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
         validateListKeysEqualityInPayloadAndUri(payload);
@@ -317,7 +317,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @return {@link NormalizedNodePayload} wrapped in {@link Response}
      */
     public Response invokeAction(final NormalizedNodePayload payload) {
-        final InstanceIdentifierContext<?> context = payload.getInstanceIdentifierContext();
+        final InstanceIdentifierContext context = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier yangIIdContext = context.getInstanceIdentifier();
         final NormalizedNode data = payload.getData();
 
@@ -356,7 +356,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         return Response.status(Status.OK)
             .entity(NormalizedNodePayload.ofNullable(
-                new InstanceIdentifierContext<>(yangIIdContext, resultNodeSchema, mountPoint, schemaContextRef),
+                new InstanceIdentifierContext(yangIIdContext, resultNodeSchema, mountPoint, schemaContextRef),
                 resultData))
             .build();
     }
@@ -468,7 +468,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      */
     @VisibleForTesting
     public static void validateListKeysEqualityInPayloadAndUri(final NormalizedNodePayload payload) {
-        final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
+        final InstanceIdentifierContext iiWithData = payload.getInstanceIdentifierContext();
         final PathArgument lastPathArgument = iiWithData.getInstanceIdentifier().getLastPathArgument();
         final SchemaNode schemaNode = iiWithData.getSchemaNode();
         final NormalizedNode data = payload.getData();

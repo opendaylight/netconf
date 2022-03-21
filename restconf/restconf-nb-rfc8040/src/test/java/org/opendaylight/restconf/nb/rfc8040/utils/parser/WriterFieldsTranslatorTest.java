@@ -24,7 +24,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 @RunWith(MockitoJUnitRunner.class)
 public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set<QName>> {
     @Override
-    protected List<Set<QName>> translateFields(final InstanceIdentifierContext<?> context, final FieldsParam fields) {
+    protected List<Set<QName>> translateFields(final InstanceIdentifierContext context, final FieldsParam fields) {
         return WriterFieldsTranslator.translate(context, fields);
     }
 

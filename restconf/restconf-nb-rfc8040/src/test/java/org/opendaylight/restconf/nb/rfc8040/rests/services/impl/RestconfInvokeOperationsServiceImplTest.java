@@ -175,7 +175,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     private NormalizedNodePayload prepNNC(final NormalizedNode result) {
-        final InstanceIdentifierContext<?> context = mock(InstanceIdentifierContext.class);
+        final InstanceIdentifierContext context = mock(InstanceIdentifierContext.class);
         final RpcDefinition schemaNode = mock(RpcDefinition.class);
         final QName qname = QName.create("invoke:rpc:module", "2013-12-03", "rpcTest");
         doReturn(qname).when(schemaNode).getQName();

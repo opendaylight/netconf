@@ -40,7 +40,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -54,7 +53,7 @@ public class ReadDataTransactionUtilTest {
     @Mock
     private NetconfDataTreeService netconfService;
     @Mock
-    private InstanceIdentifierContext<ContainerSchemaNode> context;
+    private InstanceIdentifierContext context;
     @Mock
     private DOMDataTreeReadTransaction read;
     @Mock

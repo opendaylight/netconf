@@ -25,7 +25,7 @@ abstract class AbstractPatchBodyReader extends AbstractIdentifierAwareJaxRsProvi
     }
 
     @Override
-    protected final PatchContext emptyBody(final InstanceIdentifierContext<?> path) {
+    protected final PatchContext emptyBody(final InstanceIdentifierContext path) {
         return new PatchContext(path, null, null);
     }
 }

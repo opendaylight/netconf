@@ -54,7 +54,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
@@ -137,8 +136,8 @@ public class PostDataTransactionUtilTest {
 
     @Test
     public void testPostContainerData() {
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid2, null, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid2, null, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
@@ -165,8 +164,7 @@ public class PostDataTransactionUtilTest {
 
     @Test
     public void testPostListData() {
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iidList, null, null, schema);
+        final InstanceIdentifierContext iidContext = new InstanceIdentifierContext(iidList, null, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildList);
 
         final MapNode data = (MapNode) payload.getData();
@@ -201,8 +199,7 @@ public class PostDataTransactionUtilTest {
 
     @Test
     public void testPostDataFail() {
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid2, null, null, schema);
+        final InstanceIdentifierContext iidContext = new InstanceIdentifierContext(iid2, null, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,

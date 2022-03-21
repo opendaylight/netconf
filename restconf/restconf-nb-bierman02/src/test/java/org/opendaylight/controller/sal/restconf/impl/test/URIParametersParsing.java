@@ -62,10 +62,10 @@ public class URIParametersParsing {
 
     @Before
     public void init() throws FileNotFoundException, ReactorException {
-        this.mockedBrokerFacade = mock(BrokerFacade.class);
-        this.controllerContext = TestRestconfUtils.newControllerContext(
+        mockedBrokerFacade = mock(BrokerFacade.class);
+        controllerContext = TestRestconfUtils.newControllerContext(
                 TestUtils.loadSchemaContext("/datastore-and-scope-specification"));
-        this.restconf = RestconfImpl.newInstance(mockedBrokerFacade, controllerContext);
+        restconf = RestconfImpl.newInstance(mockedBrokerFacade, controllerContext);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class URIParametersParsing {
         final UriBuilder uriBuilder = UriBuilder.fromUri("www.whatever.com");
         when(mockedUriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
 
-        this.restconf.invokeRpc("sal-remote:create-data-change-event-subscription",
+        restconf.invokeRpc("sal-remote:create-data-change-event-subscription",
             prepareDomRpcNode(datastoreValue, scopeValue), mockedUriInfo);
 
         final ListenerAdapter listener =
@@ -110,7 +110,7 @@ public class URIParametersParsing {
     }
 
     private NormalizedNodeContext prepareDomRpcNode(final String datastore, final String scope) {
-        final EffectiveModelContext schema = this.controllerContext.getGlobalSchema();
+        final EffectiveModelContext schema = controllerContext.getGlobalSchema();
         final Module rpcSalRemoteModule = schema.findModule("sal-remote", Revision.of("2014-01-14")).get();
         final QName rpcQName =
                 QName.create(rpcSalRemoteModule.getQNameModule(), "create-data-change-event-subscription");
@@ -169,7 +169,7 @@ public class URIParametersParsing {
         when(rpcDef.getPath()).thenReturn(SchemaPath.create(true, rpcQName));
         when(rpcDef.getQName()).thenReturn(rpcQName);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcDef, null, schema),
+        return new NormalizedNodeContext(new InstanceIdentifierContext(null, rpcDef, null, schema),
                 container.build());
     }
 }

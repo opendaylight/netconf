@@ -61,7 +61,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -85,7 +84,7 @@ public class PatchDataTransactionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        this.refSchemaCtx = YangParserTestUtils.parseYangFiles(
+        refSchemaCtx = YangParserTestUtils.parseYangFiles(
             TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerPlayerQName = QName.create(baseQName, "player");
@@ -97,13 +96,13 @@ public class PatchDataTransactionUtilTest {
             "name of artist");
 
         /* instance identifier for accessing container node "player" */
-        this.instanceIdContainer = YangInstanceIdentifier.builder()
+        instanceIdContainer = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerPlayerQName)
                 .build();
 
         /* instance identifier for accessing leaf node "gap" */
-        this.instanceIdCreateAndDelete = instanceIdContainer.node(leafGapQName);
+        instanceIdCreateAndDelete = instanceIdContainer.node(leafGapQName);
 
         /* values that are used for creating leaf for testPatchDataCreateAndDelete test */
         final LeafNode<?> buildGapLeaf = Builders.leafBuilder()
@@ -116,18 +115,18 @@ public class PatchDataTransactionUtilTest {
                 .withChild(buildGapLeaf)
                 .build();
 
-        this.buildBaseContainerForTests = Builders.containerBuilder()
+        buildBaseContainerForTests = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(baseQName))
                 .withChild(buildPlayerContainer)
                 .build();
 
-        this.targetNodeForCreateAndDelete = YangInstanceIdentifier.builder(this.instanceIdCreateAndDelete)
+        targetNodeForCreateAndDelete = YangInstanceIdentifier.builder(instanceIdCreateAndDelete)
                 .node(containerPlayerQName)
                 .node(leafGapQName)
                 .build();
 
         /* instance identifier for accessing leaf node "name" in list "artist" */
-        this.instanceIdMerge = YangInstanceIdentifier.builder()
+        instanceIdMerge = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerLibraryQName)
                 .node(listArtistQName)
@@ -152,12 +151,12 @@ public class PatchDataTransactionUtilTest {
                 .withChild(contentDescription)
                 .build();
 
-        this.buildArtistList = Builders.mapBuilder()
+        buildArtistList = Builders.mapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listArtistQName))
                 .withChild(mapEntryNode)
                 .build();
 
-        this.targetNodeMerge = YangInstanceIdentifier.builder()
+        targetNodeMerge = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerLibraryQName)
                 .node(listArtistQName)
@@ -165,35 +164,35 @@ public class PatchDataTransactionUtilTest {
                 .build();
 
         /* Mocks */
-        doReturn(this.rwTransaction).when(this.mockDataBroker).newReadWriteTransaction();
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).merge(any(), any(),
+        doReturn(rwTransaction).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(rwTransaction).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).merge(any(), any(),
             any(), any());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).replace(any(), any(),
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).replace(any(), any(),
             any(), any());
     }
 
     @Test
     public void testPatchDataReplaceMergeAndRemove() {
         final PatchEntity entityReplace =
-                new PatchEntity("edit1", REPLACE, this.targetNodeMerge, this.buildArtistList);
-        final PatchEntity entityMerge = new PatchEntity("edit2", MERGE, this.targetNodeMerge, this.buildArtistList);
-        final PatchEntity entityRemove = new PatchEntity("edit3", REMOVE, this.targetNodeMerge);
+                new PatchEntity("edit1", REPLACE, targetNodeMerge, buildArtistList);
+        final PatchEntity entityMerge = new PatchEntity("edit2", MERGE, targetNodeMerge, buildArtistList);
+        final PatchEntity entityRemove = new PatchEntity("edit3", REMOVE, targetNodeMerge);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityReplace);
         entities.add(entityMerge);
         entities.add(entityRemove);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.instanceIdMerge, null, null, this.refSchemaCtx);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(instanceIdMerge, null, null, refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
 
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .remove(LogicalDatastoreType.CONFIGURATION, targetNodeMerge);
 
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), false);
@@ -202,27 +201,27 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void testPatchDataCreateAndDelete() {
-        doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
-            this.instanceIdContainer);
-        doReturn(immediateTrueFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
-            this.targetNodeForCreateAndDelete);
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .create(LogicalDatastoreType.CONFIGURATION, this.instanceIdContainer, this.buildBaseContainerForTests,
+        doReturn(immediateFalseFluentFuture()).when(rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
+            instanceIdContainer);
+        doReturn(immediateTrueFluentFuture()).when(rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
+            targetNodeForCreateAndDelete);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, instanceIdContainer, buildBaseContainerForTests,
                 Optional.empty());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, targetNodeForCreateAndDelete);
 
         final PatchEntity entityCreate =
-                new PatchEntity("edit1", CREATE, this.instanceIdContainer, this.buildBaseContainerForTests);
+                new PatchEntity("edit1", CREATE, instanceIdContainer, buildBaseContainerForTests);
         final PatchEntity entityDelete =
-                new PatchEntity("edit2", DELETE, this.targetNodeForCreateAndDelete);
+                new PatchEntity("edit2", DELETE, targetNodeForCreateAndDelete);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityCreate);
         entities.add(entityDelete);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(instanceIdCreateAndDelete, null, null, refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), true);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), true);
@@ -230,25 +229,25 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void deleteNonexistentDataTest() {
-        doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
-            this.targetNodeForCreateAndDelete);
+        doReturn(immediateFalseFluentFuture()).when(rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
+            targetNodeForCreateAndDelete);
         final NetconfDocumentedException exception = new NetconfDocumentedException("id",
             ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
         final SettableFuture<? extends DOMRpcResult> ret = SettableFuture.create();
         ret.setException(new TransactionCommitFailedException(
             String.format("Commit of transaction %s failed", this), exception));
 
-        doReturn(ret).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
-            .delete(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
+        doReturn(ret).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, targetNodeForCreateAndDelete);
 
-        final PatchEntity entityDelete = new PatchEntity("edit", DELETE, this.targetNodeForCreateAndDelete);
+        final PatchEntity entityDelete = new PatchEntity("edit", DELETE, targetNodeForCreateAndDelete);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityDelete);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(instanceIdCreateAndDelete, null, null, refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
         deleteMdsal(patchContext, new MdsalRestconfStrategy(mockDataBroker));
         deleteNetconf(patchContext, new NetconfRestconfStrategy(netconfService));
@@ -257,13 +256,13 @@ public class PatchDataTransactionUtilTest {
     @Test
     public void testPatchMergePutContainer() {
         final PatchEntity entityMerge =
-                new PatchEntity("edit1", MERGE, this.instanceIdContainer, this.buildBaseContainerForTests);
+                new PatchEntity("edit1", MERGE, instanceIdContainer, buildBaseContainerForTests);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityMerge);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(instanceIdCreateAndDelete, null, null, refSchemaCtx);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), false);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
@@ -272,7 +271,7 @@ public class PatchDataTransactionUtilTest {
     private void patch(final PatchContext patchContext, final RestconfStrategy strategy,
                        final boolean failed) {
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, refSchemaCtx);
         for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
@@ -285,7 +284,7 @@ public class PatchDataTransactionUtilTest {
 
     private void deleteMdsal(final PatchContext patchContext, final RestconfStrategy strategy) {
         final PatchStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, strategy, refSchemaCtx);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,
@@ -296,7 +295,7 @@ public class PatchDataTransactionUtilTest {
 
     private void deleteNetconf(final PatchContext patchContext, final RestconfStrategy strategy) {
         final PatchStatusContext patchStatusContext =
-            PatchDataTransactionUtil.patchData(patchContext, strategy, this.refSchemaCtx);
+            PatchDataTransactionUtil.patchData(patchContext, strategy, refSchemaCtx);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(ErrorType.PROTOCOL,

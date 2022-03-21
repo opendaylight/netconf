@@ -40,10 +40,10 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractFieldsTranslatorTest<T> {
     @Mock
-    private InstanceIdentifierContext<ContainerSchemaNode> identifierJukebox;
+    private InstanceIdentifierContext identifierJukebox;
 
     @Mock
-    private InstanceIdentifierContext<ContainerSchemaNode> identifierTestServices;
+    private InstanceIdentifierContext identifierTestServices;
 
     private static final QNameModule Q_NAME_MODULE_JUKEBOX = QNameModule.create(
         XMLNamespace.of("http://example.com/ns/example-jukebox"), Revision.of("2015-04-04"));
@@ -208,7 +208,7 @@ public abstract class AbstractFieldsTranslatorTest<T> {
         when(containerNextData.dataChildByName(NEXT_SERVICE_Q_NAME)).thenReturn(leafNextService);
     }
 
-    protected abstract List<T> translateFields(InstanceIdentifierContext<?> context, FieldsParam fields);
+    protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields);
 
     /**
      * Test parse fields parameter containing only one child selected.

@@ -30,7 +30,7 @@ abstract class AbstractNormalizedNodeBodyReader extends AbstractIdentifierAwareJ
     }
 
     @Override
-    protected final NormalizedNodePayload emptyBody(final InstanceIdentifierContext<?> path) {
+    protected final NormalizedNodePayload emptyBody(final InstanceIdentifierContext path) {
         return NormalizedNodePayload.empty(path);
     }
 }

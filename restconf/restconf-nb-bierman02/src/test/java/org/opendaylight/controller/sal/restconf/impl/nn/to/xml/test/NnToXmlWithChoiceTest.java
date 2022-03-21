@@ -96,8 +96,7 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
         dataContainerNodeAttrBuilder.withChild(dataChoice.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null,
-                        contSchemaNode, null, schemaContext),
+                new InstanceIdentifierContext(null, contSchemaNode, null, schemaContext),
                 dataContainerNodeAttrBuilder.build());
 
         return testNormalizedNodeContext;

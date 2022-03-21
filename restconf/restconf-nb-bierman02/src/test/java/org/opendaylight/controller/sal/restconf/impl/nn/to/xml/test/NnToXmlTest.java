@@ -305,7 +305,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue(object).build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+                new InstanceIdentifierContext(null, contSchema, null, schemaContext), contData.build());
 
         return testNormalizedNodeContext;
     }
@@ -343,7 +343,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue("true").build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+                new InstanceIdentifierContext(null, contSchema, null, schemaContext), contData.build());
 
         return testNormalizedNodeContext;
     }
@@ -363,7 +363,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(SchemaAwareBuilders.leafBuilder((LeafSchemaNode) schemaLf).withValue("value").build());
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+                new InstanceIdentifierContext(null, contSchema, null, schemaContext), contData.build());
     }
 
     private static NormalizedNodeContext prepareIdrefData(final String prefix, final boolean valueAsQName) {
@@ -397,7 +397,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         contData.withChild(cont1Data.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, contSchema, null, schemaContext), contData.build());
+                new InstanceIdentifierContext(null, contSchema, null, schemaContext), contData.build());
         return testNormalizedNodeContext;
     }
 

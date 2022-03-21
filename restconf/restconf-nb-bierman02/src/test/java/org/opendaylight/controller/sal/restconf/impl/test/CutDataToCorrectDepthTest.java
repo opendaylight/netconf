@@ -87,7 +87,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         public NormalizedNodeContext getData(@Encoded @PathParam("identifier") final String identifier,
                                              @Context final UriInfo uriInfo) {
 
-            final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
+            final InstanceIdentifierContext iiWithData = controllerContext.toInstanceIdentifier(identifier);
 
             NormalizedNode data = null;
             if (identifier.equals("nested-module:depth1-cont/depth2-cont1")) {
@@ -117,7 +117,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
             LOG.info("Instance identifier of payload: {}.",
                     payload.getInstanceIdentifierContext().getInstanceIdentifier());
             LOG.info("Data of payload: {}.", payload.getData());
-            CutDataToCorrectDepthTest.this.globalPayload = payload.getData();
+            globalPayload = payload.getData();
         }
 
         @PUT
@@ -218,9 +218,9 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     private void verifyResponse(final NormalizedNode nodeData) throws WebApplicationException, IOException {
-        assertNotNull(this.globalPayload);
-        assertEquals(this.globalPayload, nodeData);
-        this.globalPayload = null;
+        assertNotNull(globalPayload);
+        assertEquals(globalPayload, nodeData);
+        globalPayload = null;
     }
 
     @Override

@@ -68,7 +68,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected PatchContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+    protected PatchContext readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
             return readFrom(path, entityStream);
@@ -77,7 +77,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
         }
     }
 
-    private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+    private PatchContext readFrom(final InstanceIdentifierContext path, final InputStream entityStream)
             throws IOException {
         final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
         AtomicReference<String> patchId = new AtomicReference<>();
@@ -113,7 +113,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
             ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
-    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path,
+    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path,
             final AtomicReference<String> patchId) throws IOException {
         final DataSchemaContextTree schemaTree = DataSchemaContextTree.from(path.getSchemaContext());
         final List<PatchEntity> resultCollection = new ArrayList<>();
@@ -169,7 +169,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @throws IOException if operation fails
      */
     private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
-                             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext<?> path,
+                             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext path,
                              final @NonNull DataSchemaContextTree schemaTree,
                              final @NonNull List<PatchEntity> resultCollection,
                              final @NonNull AtomicReference<String> patchId) throws IOException {
@@ -210,7 +210,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @throws IOException if operation fails
      */
     private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
-                                    final @NonNull InstanceIdentifierContext<?> path,
+                                    final @NonNull InstanceIdentifierContext path,
                                     final @NonNull DataSchemaContextTree schemaTree) throws IOException {
         String deferredValue = null;
         in.beginObject();
@@ -369,7 +369,7 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      * @return NormalizedNode representing data
      */
     private static NormalizedNode readEditData(final @NonNull JsonReader in,
-             final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
+             final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),

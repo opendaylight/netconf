@@ -33,7 +33,7 @@ public final class OperationsResourceUtils {
         // Hidden on purpose
     }
 
-    public static @NonNull Entry<InstanceIdentifierContext<OperationsContainerSchemaNode>, ContainerNode>
+    public static @NonNull Entry<InstanceIdentifierContext, ContainerNode>
                 contextForModelContext(final @NonNull SchemaContext context, final @Nullable DOMMountPoint mountPoint) {
         // Determine which modules we need and construct leaf schemas to correspond to all RPC definitions
         final Collection<Module> modules = new ArrayList<>();
@@ -60,7 +60,7 @@ public final class OperationsResourceUtils {
             operationsBuilder.withChild(ImmutableNodes.leafNode(leaf.getQName(), Empty.value()));
         }
 
-        return Map.entry(new InstanceIdentifierContext<>(null, operatationsSchema, mountPoint,
+        return Map.entry(new InstanceIdentifierContext(null, operatationsSchema, mountPoint,
             new OperationsEffectiveModuleContext(ImmutableSet.copyOf(modules))), operationsBuilder.build());
     }
 }

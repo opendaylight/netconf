@@ -46,7 +46,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +114,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                 if (resultData == null || ((ContainerNode) resultData).isEmpty()) {
                     ar.resume(new WebApplicationException(Status.NO_CONTENT));
                 } else {
-                    ar.resume(NormalizedNodePayload.of(new InstanceIdentifierContext<>(null, (RpcDefinition) schema,
+                    ar.resume(NormalizedNodePayload.of(new InstanceIdentifierContext(null, schema,
                         mountPoint, schemaContextRef), resultData));
                 }
             }

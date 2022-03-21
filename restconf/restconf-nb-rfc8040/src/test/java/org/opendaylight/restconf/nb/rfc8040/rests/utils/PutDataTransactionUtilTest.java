@@ -171,21 +171,21 @@ public class PutDataTransactionUtilTest {
     @Test
     public void testValidInputData() {
         RestconfDataServiceImpl.validInputData(schemaNode, NormalizedNodePayload.of(
-            new InstanceIdentifierContext<>(iid, schemaNode, null, schema), buildLeaf));
+            new InstanceIdentifierContext(iid, schemaNode, null, schema), buildLeaf));
     }
 
     @Test
     public void testValidTopLevelNodeName() {
         RestconfDataServiceImpl.validTopLevelNodeName(iid, NormalizedNodePayload.of(
-            new InstanceIdentifierContext<>(iid, schemaNode, null, schema), buildLeaf));
+            new InstanceIdentifierContext(iid, schemaNode, null, schema), buildLeaf));
         RestconfDataServiceImpl.validTopLevelNodeName(iid2, NormalizedNodePayload.of(
-            new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema), buildBaseCont));
+            new InstanceIdentifierContext(iid2, schemaNode2, null, schema), buildBaseCont));
     }
 
     @Test
     public void testValidTopLevelNodeNamePathEmpty() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid, schemaNode, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
         // FIXME: more asserts
@@ -195,8 +195,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testValidTopLevelNodeNameWrongTopIdentifier() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid, schemaNode, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
         // FIXME: more asserts
@@ -206,16 +206,16 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testValidateListKeysEqualityInPayloadAndUri() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid3, schemaNode3, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid3, schemaNode3, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildListEntry);
         RestconfDataServiceImpl.validateListKeysEqualityInPayloadAndUri(payload);
     }
 
     @Test
     public void testPutContainerData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid2, schemaNode2, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -232,8 +232,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testPutCreateContainerData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid2, schemaNode2, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(iid2);
@@ -250,8 +250,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testPutReplaceContainerData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid2, schemaNode2, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService).getConfig(iid2);
@@ -267,8 +267,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testPutLeafData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid, schemaNode, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -285,8 +285,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testPutCreateLeafData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid, schemaNode, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(iid);
@@ -302,8 +302,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testPutReplaceLeafData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid, schemaNode, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid, schemaNode, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildLeaf);
 
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService).getConfig(iid);
@@ -319,8 +319,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testPutListData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid2, schemaNode2, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseContWithList);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -337,8 +337,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testPutCreateListData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid2, schemaNode2, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseContWithList);
 
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService)
@@ -356,8 +356,8 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testPutReplaceListData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iid2, schemaNode2, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iid2, schemaNode2, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseContWithList);
 
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)

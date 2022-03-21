@@ -60,7 +60,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
                         final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders,
                         final OutputStream entityStream) throws IOException, WebApplicationException {
-        final InstanceIdentifierContext<?> pathContext = context.getInstanceIdentifierContext();
+        final InstanceIdentifierContext pathContext = context.getInstanceIdentifierContext();
         if (context.getData() == null) {
             return;
         }
@@ -89,7 +89,7 @@ public class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWrite
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath path,
-            final InstanceIdentifierContext<?> pathContext, final NormalizedNode data, final DepthParam depth,
+            final InstanceIdentifierContext pathContext, final NormalizedNode data, final DepthParam depth,
             final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();

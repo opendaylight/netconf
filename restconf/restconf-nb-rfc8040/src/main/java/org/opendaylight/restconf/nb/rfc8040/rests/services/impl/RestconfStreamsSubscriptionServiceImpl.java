@@ -31,7 +31,6 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +94,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @param schemaHandler Schema context handler.
      * @return InstanceIdentifier of Location leaf.
      */
-    private static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
+    private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
         final Optional<Module> module = schemaHandler.get().findModule(NOTIFI_QNAME.getModule());
         checkState(module.isPresent());
         final DataSchemaNode notify = module.get().dataChildByName(NOTIFI_QNAME);
@@ -103,7 +102,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         final DataSchemaNode location = ((ContainerSchemaNode) notify).dataChildByName(LOCATION_QNAME);
         checkState(location != null, "Missing location");
 
-        return new InstanceIdentifierContext<SchemaNode>(LOCATION_PATH, location, null, schemaHandler.get());
+        return new InstanceIdentifierContext(LOCATION_PATH, location, null, schemaHandler.get());
     }
 
     /**

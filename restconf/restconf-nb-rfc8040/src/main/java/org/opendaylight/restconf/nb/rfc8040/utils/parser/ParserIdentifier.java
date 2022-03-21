@@ -84,7 +84,7 @@ public final class ParserIdentifier {
     //
     //        @NonNull InstanceIdentifierContext forUrl(identifier, schemaContexxt, mountPointService)
     //
-    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
+    public static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
             final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
         if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
             return createIIdContext(schemaContext, identifier, null);
@@ -115,11 +115,10 @@ public final class ParserIdentifier {
      * @return {@link InstanceIdentifierContext}
      * @throws RestconfDocumentedException if the path cannot be resolved
      */
-    private static InstanceIdentifierContext<?> createIIdContext(final EffectiveModelContext schemaContext,
+    private static InstanceIdentifierContext createIIdContext(final EffectiveModelContext schemaContext,
             final String url, final @Nullable DOMMountPoint mountPoint) {
         final YangInstanceIdentifier urlPath = IdentifierCodec.deserialize(url, schemaContext);
-        return new InstanceIdentifierContext<>(urlPath, getPathSchema(schemaContext, urlPath), mountPoint,
-                schemaContext);
+        return new InstanceIdentifierContext(urlPath, getPathSchema(schemaContext, urlPath), mountPoint, schemaContext);
     }
 
     private static SchemaNode getPathSchema(final EffectiveModelContext schemaContext,
@@ -253,7 +252,7 @@ public final class ParserIdentifier {
 
                 pathBuilder.append(current);
             }
-            final InstanceIdentifierContext<?> point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
+            final InstanceIdentifierContext point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
                 Optional.of(domMountPointService));
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
@@ -263,7 +262,7 @@ public final class ParserIdentifier {
         }
     }
 
-    public static YangInstanceIdentifier parserPatchTarget(final InstanceIdentifierContext<?> context,
+    public static YangInstanceIdentifier parserPatchTarget(final InstanceIdentifierContext context,
             final String target) {
         final var schemaContext = context.getSchemaContext();
         final var urlPath = context.getInstanceIdentifier();

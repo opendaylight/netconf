@@ -7,7 +7,10 @@
  */
 package org.opendaylight.controller.sal.rest.impl;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -26,27 +29,27 @@ public class InstanceIdentifierTypeLeafTest {
         final EffectiveModelContext schemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/instanceidentifier"));
         ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
-        final InstanceIdentifierContext<?> instanceIdentifier =
+        final InstanceIdentifierContext instanceIdentifier =
                 controllerContext.toInstanceIdentifier(
                         "/iid-value-module:cont-iid/iid-list/%2Fiid-value-module%3Acont-iid%2Fiid-value-module%3A"
                                 + "values-iid%5Biid-value-module:value-iid='value'%5D");
         final YangInstanceIdentifier yiD = instanceIdentifier.getInstanceIdentifier();
-        Assert.assertNotNull(yiD);
+        assertNotNull(yiD);
         final PathArgument lastPathArgument = yiD.getLastPathArgument();
-        Assert.assertTrue(lastPathArgument.getNodeType().getNamespace().toString().equals("iid:value:module"));
-        Assert.assertTrue(lastPathArgument.getNodeType().getLocalName().equals("iid-list"));
+        assertTrue(lastPathArgument.getNodeType().getNamespace().toString().equals("iid:value:module"));
+        assertTrue(lastPathArgument.getNodeType().getLocalName().equals("iid-list"));
 
         final NodeIdentifierWithPredicates list = (NodeIdentifierWithPredicates) lastPathArgument;
         final YangInstanceIdentifier value = (YangInstanceIdentifier) list.getValue(
             QName.create(lastPathArgument.getNodeType(), "iid-leaf"));
         final PathArgument lastPathArgumentOfValue = value.getLastPathArgument();
-        Assert.assertTrue(lastPathArgumentOfValue.getNodeType().getNamespace().toString().equals("iid:value:module"));
-        Assert.assertTrue(lastPathArgumentOfValue.getNodeType().getLocalName().equals("values-iid"));
+        assertTrue(lastPathArgumentOfValue.getNodeType().getNamespace().toString().equals("iid:value:module"));
+        assertTrue(lastPathArgumentOfValue.getNodeType().getLocalName().equals("values-iid"));
 
         final NodeIdentifierWithPredicates valueList = (NodeIdentifierWithPredicates) lastPathArgumentOfValue;
         final String valueIid = (String) valueList.getValue(
                 QName.create(lastPathArgumentOfValue.getNodeType(), "value-iid"));
-        Assert.assertEquals("value", valueIid);
+        assertEquals("value", valueIid);
     }
 
 }

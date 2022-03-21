@@ -36,7 +36,7 @@ public class XmlNormalizedNodeBodyWriterTest {
         doReturn(SchemaPath.ROOT).when(schemaNode).getPath();
 
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
-            new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
+            new InstanceIdentifierContext(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -56,7 +56,7 @@ public class XmlNormalizedNodeBodyWriterTest {
         doReturn(SchemaPath.ROOT).when(schemaNode).getPath();
 
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
-            new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
+            new InstanceIdentifierContext(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
             Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))
                 .withChild(Builders.containerBuilder()

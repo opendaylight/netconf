@@ -64,7 +64,7 @@ public final class NetconfFieldsTranslator extends AbstractFieldsTranslator<Netc
      *     of provided {@code identifier}
      */
     public static @NonNull List<YangInstanceIdentifier> translate(
-            final @NonNull InstanceIdentifierContext<?> identifier, final @NonNull FieldsParam input) {
+            final @NonNull InstanceIdentifierContext identifier, final @NonNull FieldsParam input) {
         final List<Set<LinkedPathElement>> levels = INSTANCE.parseFields(identifier, input);
         final List<Map<PathArgument, LinkedPathElement>> mappedLevels = mapLevelsContentByIdentifiers(levels);
         return buildPaths(mappedLevels);

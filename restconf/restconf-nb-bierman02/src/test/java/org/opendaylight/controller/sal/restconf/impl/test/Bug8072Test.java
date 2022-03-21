@@ -57,7 +57,7 @@ public class Bug8072Test {
 
     @Test
     public void testIdentityRefFromExternalModule() throws FileNotFoundException, ReactorException {
-        final InstanceIdentifierContext<?> ctx = controllerContext.toInstanceIdentifier(
+        final InstanceIdentifierContext ctx = controllerContext.toInstanceIdentifier(
                 "simple-nodes:users/yang-ext:mount/test-module:modules/module/test-module:module-type/name");
 
         final Map<QName, Object> keyValues = new HashMap<>();

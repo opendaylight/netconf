@@ -44,7 +44,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetExceptio
 import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -63,7 +62,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected NormalizedNodePayload readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+    protected NormalizedNodePayload readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
             return readFrom(path, entityStream, isPost());
@@ -74,7 +73,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
     }
 
     public static NormalizedNodePayload readFrom(
-            final InstanceIdentifierContext<?> path, final InputStream entityStream, final boolean isPost) {
+            final InstanceIdentifierContext path, final InputStream entityStream, final boolean isPost) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
@@ -98,7 +97,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
 
         NormalizedNode result = resultHolder.getResult();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
-        InstanceIdentifierContext<? extends SchemaNode> newIIContext;
+        InstanceIdentifierContext newIIContext;
 
         while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
             final Object childNode = ((DataContainerNode) result).body().iterator().next();
@@ -127,7 +126,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
                 path.getInstanceIdentifier().getPathArguments(), iiToDataList));
 
-        newIIContext = new InstanceIdentifierContext<>(fullIIToData, path.getSchemaNode(), path.getMountPoint(),
+        newIIContext = new InstanceIdentifierContext(fullIIToData, path.getSchemaNode(), path.getMountPoint(),
                 path.getSchemaContext());
 
         // FIXME: can result really be null?

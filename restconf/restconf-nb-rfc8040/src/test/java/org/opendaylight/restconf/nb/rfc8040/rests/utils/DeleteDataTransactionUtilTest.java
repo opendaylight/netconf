@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DeleteDataTransactionUtilTest {
     @Mock
-    private InstanceIdentifierContext<?> context;
+    private InstanceIdentifierContext context;
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -54,14 +54,14 @@ public class DeleteDataTransactionUtilTest {
 
     @Before
     public void init() {
-        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).commit();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).discardChanges();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).unlock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService).lock();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(this.netconfService)
+        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).discardChanges();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
-        doReturn(YangInstanceIdentifier.empty()).when(this.context).getInstanceIdentifier();
+        doReturn(YangInstanceIdentifier.empty()).when(context).getInstanceIdentifier();
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
     }
 
@@ -92,7 +92,7 @@ public class DeleteDataTransactionUtilTest {
         ret.setException(new TransactionCommitFailedException(
             String.format("Commit of transaction %s failed", this), exception));
 
-        doReturn(ret).when(this.netconfService).commit();
+        doReturn(ret).when(netconfService).commit();
 
         // test and assert error
         deleteFail(new MdsalRestconfStrategy(mockDataBroker));

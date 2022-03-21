@@ -71,7 +71,7 @@ public final class TestRestconfUtils {
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static NormalizedNodePayload loadNormalizedContextFromXmlFile(final String pathToInputFile,
             final String uri, final EffectiveModelContext schemaContext) {
-        final InstanceIdentifierContext<?> iiContext =
+        final InstanceIdentifierContext iiContext =
                 ParserIdentifier.toInstanceIdentifier(uri, schemaContext, Optional.empty());
         final InputStream inputStream = TestRestconfUtils.class.getResourceAsStream(pathToInputFile);
         try {
@@ -79,12 +79,12 @@ public final class TestRestconfUtils {
             final NormalizedNode nn = parse(iiContext, doc);
             return NormalizedNodePayload.of(iiContext, nn);
         } catch (final Exception e) {
-            LOG.error("Load xml file " + pathToInputFile + " fail.", e);
+            LOG.error("Load xml file {} fail.", pathToInputFile, e);
         }
         return null;
     }
 
-    private static NormalizedNode parse(final InstanceIdentifierContext<?> iiContext, final Document doc)
+    private static NormalizedNode parse(final InstanceIdentifierContext iiContext, final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = iiContext.getSchemaNode();
         DataSchemaNode schemaNode = null;

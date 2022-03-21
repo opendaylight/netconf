@@ -105,7 +105,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
 
     private NormalizedNodeContext readFrom(final InputStream entityStream) throws IOException, SAXException,
             XMLStreamException, ParserConfigurationException, URISyntaxException {
-        final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
+        final InstanceIdentifierContext path = getInstanceIdentifierContext();
         final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
         if (nonEmptyInputStreamOptional.isEmpty()) {
             // represent empty nopayload input
@@ -116,7 +116,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         return parse(path, doc);
     }
 
-    private NormalizedNodeContext parse(final InstanceIdentifierContext<?> pathContext,final Document doc)
+    private NormalizedNodeContext parse(final InstanceIdentifierContext pathContext,final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
@@ -192,7 +192,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
                 pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));
 
-        final InstanceIdentifierContext<? extends SchemaNode> outIIContext = new InstanceIdentifierContext<>(
+        final InstanceIdentifierContext outIIContext = new InstanceIdentifierContext(
                 fullIIToData, pathContext.getSchemaNode(), pathContext.getMountPoint(), pathContext.getSchemaContext());
 
         return new NormalizedNodeContext(outIIContext, parsed);

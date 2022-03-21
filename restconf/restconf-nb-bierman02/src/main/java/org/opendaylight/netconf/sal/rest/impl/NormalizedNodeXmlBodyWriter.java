@@ -88,7 +88,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         for (final Entry<String, Object> entry : context.getNewHeaders().entrySet()) {
             httpHeaders.add(entry.getKey(), entry.getValue());
         }
-        final InstanceIdentifierContext<?> pathContext = context.getInstanceIdentifierContext();
+        final InstanceIdentifierContext pathContext = context.getInstanceIdentifierContext();
         if (context.getData() == null) {
             return;
         }
@@ -109,7 +109,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
-            final InstanceIdentifierContext<?> pathContext, NormalizedNode data, final @Nullable Integer depth)
+            final InstanceIdentifierContext pathContext, NormalizedNode data, final @Nullable Integer depth)
             throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();

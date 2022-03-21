@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 @RunWith(MockitoJUnitRunner.class)
 public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
     @Override
-    protected List<YangInstanceIdentifier> translateFields(final InstanceIdentifierContext<?> context,
+    protected List<YangInstanceIdentifier> translateFields(final InstanceIdentifierContext context,
             final FieldsParam fields) {
         return NetconfFieldsTranslator.translate(context, fields);
     }

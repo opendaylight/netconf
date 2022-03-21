@@ -201,7 +201,7 @@ public class RestPutListDataTest {
             testNodeContainer.withChild(leafKey2.build());
         }
 
-        final NormalizedNodeContext testCompositeContext = new NormalizedNodeContext(new InstanceIdentifierContext<>(
+        final NormalizedNodeContext testCompositeContext = new NormalizedNodeContext(new InstanceIdentifierContext(
                 null, testNodeSchemaNode, null, schemaContextTestModule), testNodeContainer.build());
 
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);

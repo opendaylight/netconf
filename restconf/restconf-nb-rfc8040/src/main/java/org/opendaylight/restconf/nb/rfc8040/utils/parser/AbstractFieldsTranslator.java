@@ -42,7 +42,7 @@ public abstract class AbstractFieldsTranslator<T> {
      * @param input input value of fields parameter
      * @return {@link List} of levels; each level contains {@link Set} of identifiers of type {@link T}
      */
-    protected final @NonNull List<Set<T>> parseFields(final @NonNull InstanceIdentifierContext<?> identifier,
+    protected final @NonNull List<Set<T>> parseFields(final @NonNull InstanceIdentifierContext identifier,
                                                       final @NonNull FieldsParam input) {
         final DataSchemaContextNode<?> startNode = DataSchemaContextNode.fromDataSchemaNode(
                 (DataSchemaNode) identifier.getSchemaNode());

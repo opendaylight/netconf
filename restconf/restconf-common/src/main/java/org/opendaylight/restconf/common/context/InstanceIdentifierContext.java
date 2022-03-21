@@ -12,26 +12,26 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
-public class InstanceIdentifierContext<T extends SchemaNode> {
-
+// FIXME: non-final for Mocking, which we should not tolerate
+public class InstanceIdentifierContext {
     private final YangInstanceIdentifier instanceIdentifier;
-    private final T schemaNode;
+    private final SchemaNode schemaNode;
     private final DOMMountPoint mountPoint;
     private final EffectiveModelContext schemaContext;
 
-    public InstanceIdentifierContext(final YangInstanceIdentifier instanceIdentifier, final T schemaNode,
+    public InstanceIdentifierContext(final YangInstanceIdentifier instanceIdentifier, final SchemaNode schemaNode,
             final DOMMountPoint mountPoint, final EffectiveModelContext context) {
         this.instanceIdentifier = instanceIdentifier;
         this.schemaNode = schemaNode;
         this.mountPoint = mountPoint;
-        this.schemaContext = context;
+        schemaContext = context;
     }
 
     public YangInstanceIdentifier getInstanceIdentifier() {
         return instanceIdentifier;
     }
 
-    public T getSchemaNode() {
+    public SchemaNode getSchemaNode() {
         return schemaNode;
     }
 

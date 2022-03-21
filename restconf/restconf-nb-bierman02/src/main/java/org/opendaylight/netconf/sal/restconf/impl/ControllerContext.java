@@ -149,7 +149,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         onModelContextUpdated(schemas);
     }
 
-    public InstanceIdentifierContext<?> toInstanceIdentifier(final String restconfInstance) {
+    public InstanceIdentifierContext toInstanceIdentifier(final String restconfInstance) {
         return toIdentifier(restconfInstance, false);
     }
 
@@ -157,17 +157,16 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         return globalSchema;
     }
 
-    public InstanceIdentifierContext<?> toMountPointIdentifier(final String restconfInstance) {
+    public InstanceIdentifierContext toMountPointIdentifier(final String restconfInstance) {
         return toIdentifier(restconfInstance, true);
     }
 
-    private InstanceIdentifierContext<?> toIdentifier(final String restconfInstance,
-                                                      final boolean toMountPointIdentifier) {
+    private InstanceIdentifierContext toIdentifier(final String restconfInstance,
+                                                   final boolean toMountPointIdentifier) {
         checkPreconditions();
 
         if (restconfInstance == null) {
-            return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), globalSchema, null,
-                    globalSchema);
+            return new InstanceIdentifierContext(YangInstanceIdentifier.empty(), globalSchema, null, globalSchema);
         }
 
         final List<String> pathArgs = urlPathArgsDecode(SLASH_SPLITTER.split(restconfInstance));
@@ -191,7 +190,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        final InstanceIdentifierContext<?> iiWithSchemaNode =
+        final InstanceIdentifierContext iiWithSchemaNode =
                 collectPathArguments(builder, pathArgs, latestModule.iterator().next(), null, toMountPointIdentifier);
 
         if (iiWithSchemaNode == null) {
@@ -524,7 +523,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     }
 
     @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification = "Unrecognised NullableDecl")
-    private InstanceIdentifierContext<?> collectPathArguments(final InstanceIdentifierBuilder builder,
+    private InstanceIdentifierContext collectPathArguments(final InstanceIdentifierBuilder builder,
             final List<String> strings, final DataNodeContainer parentNode, final DOMMountPoint mountPoint,
             final boolean returnJustMountPoint) {
         requireNonNull(strings);
@@ -578,7 +577,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
 
                 if (returnJustMountPoint || strings.size() == 1) {
-                    return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), mountPointSchema, mount,
+                    return new InstanceIdentifierContext(YangInstanceIdentifier.empty(), mountPointSchema, mount,
                         mountPointSchema);
                 }
 
@@ -633,7 +632,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     rpc = getRpcDefinition(module, rpcName);
                 }
                 if (rpc != null) {
-                    return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint,
+                    return new InstanceIdentifierContext(builder.build(), rpc, mountPoint,
                             mountPoint != null ? getModelContext(mountPoint) : globalSchema);
                 }
             }
@@ -716,11 +715,11 @@ public final class ControllerContext implements EffectiveModelContextListener, C
             mountPoint != null ? getModelContext(mountPoint) : globalSchema);
     }
 
-    private static InstanceIdentifierContext<?> createContext(final YangInstanceIdentifier instance,
+    private static InstanceIdentifierContext createContext(final YangInstanceIdentifier instance,
             final DataSchemaNode dataSchemaNode, final DOMMountPoint mountPoint,
             final EffectiveModelContext schemaContext) {
         final YangInstanceIdentifier instanceIdentifier = new DataNormalizer(schemaContext).toNormalized(instance);
-        return new InstanceIdentifierContext<>(instanceIdentifier, dataSchemaNode, mountPoint, schemaContext);
+        return new InstanceIdentifierContext(instanceIdentifier, dataSchemaNode, mountPoint, schemaContext);
     }
 
     public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,

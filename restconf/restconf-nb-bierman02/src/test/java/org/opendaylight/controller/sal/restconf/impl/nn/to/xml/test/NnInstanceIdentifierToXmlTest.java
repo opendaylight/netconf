@@ -138,7 +138,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         dataCont.withChild(dataCont1.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, schemaCont,
+                new InstanceIdentifierContext(null, schemaCont,
                         null, schemaContext), dataCont.build());
 
         return testNormalizedNodeContext;
@@ -236,7 +236,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         dataCont1.withChild(dataLst11.build());
         dataCont.withChild(dataCont1.build());
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, schemaCont, null, schemaContext),
+        return new NormalizedNodeContext(new InstanceIdentifierContext(null, schemaCont, null, schemaContext),
             dataCont.build());
     }
 

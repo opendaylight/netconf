@@ -144,7 +144,7 @@ public final class PutDataTransactionUtil {
                                            final EffectiveModelContext schemaContext, final PointParam point,
                                            final NormalizedNodeContainer<?> readList, final boolean before) {
         transaction.remove(path.getParent());
-        final InstanceIdentifierContext<?> instanceIdentifier =
+        final InstanceIdentifierContext instanceIdentifier =
             // FIXME: Point should be able to give us this method
             ParserIdentifier.toInstanceIdentifier(point.value(), schemaContext, Optional.empty());
         int lastItemPosition = 0;

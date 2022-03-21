@@ -11,21 +11,19 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.List;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public class PatchContext {
-    private final InstanceIdentifierContext<? extends SchemaNode> context;
+    private final InstanceIdentifierContext context;
     private final List<PatchEntity> data;
     private final String patchId;
 
-    public PatchContext(final InstanceIdentifierContext<? extends SchemaNode> context,
-                        final List<PatchEntity> data, final String patchId) {
+    public PatchContext(final InstanceIdentifierContext context, final List<PatchEntity> data, final String patchId) {
         this.context = requireNonNull(context);
         this.data = requireNonNull(data);
         this.patchId = requireNonNull(patchId);
     }
 
-    public InstanceIdentifierContext<? extends SchemaNode> getInstanceIdentifierContext() {
+    public InstanceIdentifierContext getInstanceIdentifierContext() {
         return context;
     }
 

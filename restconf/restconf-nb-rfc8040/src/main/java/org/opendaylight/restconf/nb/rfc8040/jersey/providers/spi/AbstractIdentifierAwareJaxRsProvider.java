@@ -55,7 +55,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
             WebApplicationException {
-        final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
+        final InstanceIdentifierContext path = getInstanceIdentifierContext();
 
         final PushbackInputStream pushbackInputStream = new PushbackInputStream(entityStream);
 
@@ -75,17 +75,16 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
      * @param path Request path
      * @return empty body type
      */
-    protected abstract T emptyBody(InstanceIdentifierContext<?> path);
+    protected abstract T emptyBody(InstanceIdentifierContext path);
 
-    protected abstract T readBody(InstanceIdentifierContext<?> path, InputStream entityStream)
+    protected abstract T readBody(InstanceIdentifierContext path, InputStream entityStream)
             throws WebApplicationException;
-
 
     private String getIdentifier() {
         return this.uriInfo.getPathParameters(false).getFirst("identifier");
     }
 
-    private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
+    private InstanceIdentifierContext getInstanceIdentifierContext() {
         return ParserIdentifier.toInstanceIdentifier(getIdentifier(), getSchemaContext(),
                 Optional.ofNullable(getMountPointService()));
     }

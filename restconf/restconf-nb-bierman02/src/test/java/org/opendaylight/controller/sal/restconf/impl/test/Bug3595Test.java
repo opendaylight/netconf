@@ -45,7 +45,7 @@ public class Bug3595Test {
         final YangInstanceIdentifier node1IIexpected = YangInstanceIdentifier.of(CONT_QNAME)
                 .node(LST_WITH_LFREF_KEY_QNAME).node(NodeIdentifierWithPredicates.of(
                         LST_WITH_LFREF_KEY_QNAME, LFREF_KEY_QNAME, "node1"));
-        final InstanceIdentifierContext<?> iiContext =
+        final InstanceIdentifierContext iiContext =
                 controllerContext.toInstanceIdentifier("leafref-module:cont/lst-with-lfref-key/node1");
         iiContext.getInstanceIdentifier();
         assertEquals(node1IIexpected, iiContext.getInstanceIdentifier());

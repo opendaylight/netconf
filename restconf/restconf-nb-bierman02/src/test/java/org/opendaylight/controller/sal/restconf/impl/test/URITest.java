@@ -47,7 +47,7 @@ public class URITest {
 
     @Test
     public void testToInstanceIdentifierList() {
-        InstanceIdentifierContext<?> instanceIdentifier = controllerContext
+        InstanceIdentifierContext instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:userWithoutClass/foo");
         assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "userWithoutClass");
 
@@ -64,7 +64,7 @@ public class URITest {
 
     @Test
     public void testToInstanceIdentifierWithDoubleSlash() {
-        InstanceIdentifierContext<?> instanceIdentifier = controllerContext
+        InstanceIdentifierContext instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:food//nonalcoholic");
         assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "nonalcoholic");
 
@@ -91,7 +91,7 @@ public class URITest {
 
     @Test
     public void testToInstanceIdentifierContainer() {
-        final InstanceIdentifierContext<?> instanceIdentifier =
+        final InstanceIdentifierContext instanceIdentifier =
                 controllerContext.toInstanceIdentifier("simple-nodes:users");
         assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "users");
         assertTrue(instanceIdentifier.getSchemaNode() instanceof ContainerSchemaNode);
@@ -100,7 +100,7 @@ public class URITest {
 
     @Test
     public void testToInstanceIdentifierChoice() {
-        final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
+        final InstanceIdentifierContext instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:food/nonalcoholic");
         assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "nonalcoholic");
     }
@@ -132,7 +132,7 @@ public class URITest {
     @Test
     public void testMountPointWithExternModul() {
         initSchemaService();
-        final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
+        final InstanceIdentifierContext instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class/student/name");
         assertEquals(
                 "[(urn:ietf:params:xml:ns:yang:test-interface2?revision=2014-08-01)class, "
@@ -145,7 +145,7 @@ public class URITest {
     @Test
     public void testMountPointWithoutExternModul() {
         initSchemaService();
-        final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
+        final InstanceIdentifierContext instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/");
         assertTrue(Iterables.isEmpty(instanceIdentifier.getInstanceIdentifier().getPathArguments()));
     }

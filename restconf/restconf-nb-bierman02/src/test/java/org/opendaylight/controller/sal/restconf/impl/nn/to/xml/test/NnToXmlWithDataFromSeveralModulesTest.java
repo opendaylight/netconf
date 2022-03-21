@@ -108,7 +108,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
         dataContSchemaContNode.withChild(modul2.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, schemaContext, null, schemaContext),
+                new InstanceIdentifierContext(null, schemaContext, null, schemaContext),
                 dataContSchemaContNode.build());
 
         return testNormalizedNodeContext;

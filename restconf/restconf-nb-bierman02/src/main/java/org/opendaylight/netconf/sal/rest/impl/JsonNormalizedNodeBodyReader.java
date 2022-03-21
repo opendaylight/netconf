@@ -47,7 +47,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
@@ -100,7 +99,7 @@ public class JsonNormalizedNodeBodyReader
         }
     }
 
-    private static NormalizedNodeContext readFrom(final InstanceIdentifierContext<?> path,
+    private static NormalizedNodeContext readFrom(final InstanceIdentifierContext path,
                                                   final InputStream entityStream, final boolean isPost)
             throws IOException {
         final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
@@ -131,7 +130,7 @@ public class JsonNormalizedNodeBodyReader
 
         NormalizedNode result = resultHolder.getResult();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
-        InstanceIdentifierContext<? extends SchemaNode> newIIContext;
+        InstanceIdentifierContext newIIContext;
 
         while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
             final Object childNode = ((DataContainerNode) result).body().iterator().next();
@@ -157,7 +156,7 @@ public class JsonNormalizedNodeBodyReader
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
                 path.getInstanceIdentifier().getPathArguments(), iiToDataList));
 
-        newIIContext = new InstanceIdentifierContext<>(fullIIToData, path.getSchemaNode(), path.getMountPoint(),
+        newIIContext = new InstanceIdentifierContext(fullIIToData, path.getSchemaNode(), path.getMountPoint(),
                 path.getSchemaContext());
 
         return new NormalizedNodeContext(newIIContext, result);

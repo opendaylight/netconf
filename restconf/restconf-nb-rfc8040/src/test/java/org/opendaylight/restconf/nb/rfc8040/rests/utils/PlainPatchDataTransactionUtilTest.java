@@ -157,8 +157,8 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Test
     public void testPatchContainerData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iidJukebox, schemaNodeForJukebox, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iidJukebox, schemaNodeForJukebox, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlayer);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -179,8 +179,8 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Test
     public void testPatchLeafData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iidGap, schemaNodeForGap, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iidGap, schemaNodeForGap, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, leafGap);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -202,8 +202,8 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Test
     public void testPatchListData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iidJukebox, schemaNodeForJukebox, null, schema);
+        final InstanceIdentifierContext iidContext =
+                new InstanceIdentifierContext(iidJukebox, schemaNodeForJukebox, null, schema);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlaylist);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();

@@ -91,9 +91,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             return;
         }
 
-        @SuppressWarnings("unchecked")
-        final InstanceIdentifierContext<SchemaNode> identifierCtx =
-                (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
+        final InstanceIdentifierContext identifierCtx = context.getInstanceIdentifierContext();
 
         try (JsonWriter jsonWriter = createJsonWriter(entityStream, context.getWriterParameters().isPrettyPrint())) {
             jsonWriter.beginObject();
@@ -103,9 +101,9 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         }
     }
 
-    private static void writeNormalizedNode(final JsonWriter jsonWriter,
-            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode data,
-            final @Nullable Integer depth) throws IOException {
+    private static void writeNormalizedNode(final JsonWriter jsonWriter, final InstanceIdentifierContext context,
+            // Note: mutable argument
+            NormalizedNode data, final @Nullable Integer depth) throws IOException {
         SchemaPath path = context.getSchemaNode().getPath();
         final RestconfNormalizedNodeWriter nnWriter;
         if (SchemaPath.ROOT.equals(path)) {
@@ -158,7 +156,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
-            final InstanceIdentifierContext<SchemaNode> context, final SchemaPath path, final JsonWriter jsonWriter,
+            final InstanceIdentifierContext context, final SchemaPath path, final JsonWriter jsonWriter,
             final @Nullable Integer depth) {
 
         final SchemaNode schema = context.getSchemaNode();
@@ -189,7 +187,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
     }
 
-    private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
+    private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext context) {
         // TODO: Performance: Cache JSON Codec factory and schema context
         return JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(context.getSchemaContext());
     }

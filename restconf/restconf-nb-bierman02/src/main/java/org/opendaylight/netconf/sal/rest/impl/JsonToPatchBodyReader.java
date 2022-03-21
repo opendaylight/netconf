@@ -106,7 +106,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
     }
 
-    private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+    private PatchContext readFrom(final InstanceIdentifierContext path, final InputStream entityStream)
             throws IOException {
         final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
         if (nonEmptyInputStreamOptional.isEmpty()) {
@@ -135,7 +135,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                 ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
-    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path,
+    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path,
             final AtomicReference<String> patchId) throws IOException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
@@ -192,7 +192,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @throws IOException if operation fails
      */
     private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
-                             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext<?> path,
+                             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext path,
                              final @NonNull StringModuleInstanceIdentifierCodec codec,
                              final @NonNull List<PatchEntity> resultCollection,
                              final @NonNull AtomicReference<String> patchId) throws IOException {
@@ -232,7 +232,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @throws IOException if operation fails
      */
     private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
-                                    final @NonNull InstanceIdentifierContext<?> path,
+                                    final @NonNull InstanceIdentifierContext path,
                                     final @NonNull StringModuleInstanceIdentifierCodec codec) throws IOException {
         final StringBuilder value = new StringBuilder();
         in.beginObject();
@@ -378,7 +378,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @return NormalizedNode representing data
      */
     private static NormalizedNode readEditData(final @NonNull JsonReader in,
-            final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
+            final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final EffectiveModelContext context = path.getSchemaContext();
@@ -437,7 +437,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         private NormalizedNode data;
 
         public String getId() {
-            return this.id;
+            return id;
         }
 
         public void setId(final String id) {
@@ -445,7 +445,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public PatchEditOperation getOperation() {
-            return this.operation;
+            return operation;
         }
 
         public void setOperation(final PatchEditOperation operation) {
@@ -453,7 +453,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public YangInstanceIdentifier getTarget() {
-            return this.target;
+            return target;
         }
 
         public void setTarget(final YangInstanceIdentifier target) {
@@ -461,7 +461,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public SchemaNode getTargetSchemaNode() {
-            return this.targetSchemaNode;
+            return targetSchemaNode;
         }
 
         public void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
@@ -469,7 +469,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public NormalizedNode getData() {
-            return this.data;
+            return data;
         }
 
         public void setData(final NormalizedNode data) {
@@ -477,11 +477,11 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public void clear() {
-            this.id = null;
-            this.operation = null;
-            this.target = null;
-            this.targetSchemaNode = null;
-            this.data = null;
+            id = null;
+            operation = null;
+            target = null;
+            targetSchemaNode = null;
+            data = null;
         }
     }
 }

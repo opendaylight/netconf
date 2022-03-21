@@ -70,7 +70,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected PatchContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+    protected PatchContext readBody(final InstanceIdentifierContext path, final InputStream entityStream)
             throws WebApplicationException {
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
@@ -85,7 +85,7 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
         }
     }
 
-    private static PatchContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc)
+    private static PatchContext parse(final InstanceIdentifierContext pathContext, final Document doc)
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final String patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
