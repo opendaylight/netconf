@@ -36,6 +36,7 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -104,12 +105,12 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     @Override
     public String getStreamName() {
-        return this.streamName;
+        return streamName;
     }
 
     @Override
     public String getOutputType() {
-        return this.outputType.getName();
+        return outputType.getName();
     }
 
     /**
@@ -118,7 +119,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @return Path pointed to data in data store.
      */
     public YangInstanceIdentifier getPath() {
-        return this.path;
+        return path;
     }
 
     /**
@@ -128,7 +129,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
-        if (this.outputType.equals(NotificationOutputType.JSON)) {
+        if (outputType.equals(NotificationOutputType.JSON)) {
             event.setData(XML.toJSONObject(xml).toString());
         } else {
             event.setData(xml);
@@ -323,15 +324,18 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         operationElement.setTextContent(operation.value);
         dataChangeEventElement.appendChild(operationElement);
 
+        final SchemaPath nodePath;
+        if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
+            nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath();
+        } else {
+            nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath()
+                .getParent();
+        }
+
+        final var inference = SchemaInferenceStack.ofInstantiatedPath(schemaContext, nodePath).toInference();
+
         try {
-            SchemaPath nodePath;
-            if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
-                nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath();
-            } else {
-                nodePath = dataSchemaContextTree.findChild(eventPath).orElseThrow().getDataSchemaNode().getPath()
-                    .getParent();
-            }
-            final DOMResult domResult = writeNormalizedNode(normalized, schemaContext, nodePath);
+            final DOMResult domResult = writeNormalizedNode(normalized, inference);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("data");
             dataElement.appendChild(result);

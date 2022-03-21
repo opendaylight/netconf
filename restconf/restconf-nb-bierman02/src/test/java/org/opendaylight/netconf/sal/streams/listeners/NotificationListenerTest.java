@@ -42,7 +42,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -199,8 +198,8 @@ public class NotificationListenerTest {
     }
 
     private String prepareJson(final DOMNotification notificationData, final Absolute schemaPathNotifi) {
-        final List<SchemaPath> paths = new ArrayList<>();
-        paths.add(schemaPathNotifi.asSchemaPath());
+        final List<Absolute> paths = new ArrayList<>();
+        paths.add(schemaPathNotifi);
         final List<NotificationListenerAdapter> listNotifi =
                 Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString(),
                         controllerContext);

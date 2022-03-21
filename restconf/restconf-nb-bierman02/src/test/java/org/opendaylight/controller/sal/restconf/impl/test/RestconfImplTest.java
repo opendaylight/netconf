@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.io.FileNotFoundException;
 import java.net.URI;
@@ -76,6 +75,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
@@ -258,9 +258,9 @@ public class RestconfImplTest {
         final String identifier = "create-notification-stream/toaster:toastDone";
 
         // register test notification stream
-        final SchemaPath path = SchemaPath.create(
-                true, QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML", controllerContext);
+        final Absolute path = Absolute.of(
+                QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
+        Notificator.createNotificationListener(List.of(path), identifier, "XML", controllerContext);
 
         final UriInfo uriInfo = mock(UriInfo.class);
         final UriBuilder uriBuilder = mock(UriBuilder.class);

@@ -92,8 +92,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1219,9 +1217,8 @@ public class BrokerFacade implements Closeable {
             return;
         }
 
-        final SchemaPath path = listener.getSchemaPath();
         final ListenerRegistration<DOMNotificationListener> registration = domNotification
-                .registerNotificationListener(listener, Absolute.of(ImmutableList.copyOf(path.getPathFromRoot())));
+                .registerNotificationListener(listener, listener.getSchemaPath());
 
         listener.setRegistration(registration);
     }

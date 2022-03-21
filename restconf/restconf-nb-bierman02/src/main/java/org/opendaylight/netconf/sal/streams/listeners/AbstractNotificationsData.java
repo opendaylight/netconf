@@ -29,8 +29,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -69,14 +68,12 @@ abstract class AbstractNotificationsData {
      *
      * @param normalized
      *            data
-     * @param context
-     *            actual schema context
-     * @param schemaPath
-     *            schema path of data
+     * @param inference
+     *            SchemaInferenceStack state for the data
      * @return {@link DOMResult}
      */
-    protected DOMResult writeNormalizedNode(final NormalizedNode normalized, final EffectiveModelContext context,
-            final SchemaPath schemaPath) throws IOException, XMLStreamException {
+    protected DOMResult writeNormalizedNode(final NormalizedNode normalized, final Inference inference)
+            throws IOException, XMLStreamException {
         final Document doc = UntrustedXML.newDocumentBuilder().newDocument();
         final DOMResult result = new DOMResult(doc);
         NormalizedNodeWriter normalizedNodeWriter = null;
@@ -85,7 +82,7 @@ abstract class AbstractNotificationsData {
 
         try {
             writer = OF.createXMLStreamWriter(result);
-            normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
+            normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, inference);
             normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter);
 
             normalizedNodeWriter.write(normalized);

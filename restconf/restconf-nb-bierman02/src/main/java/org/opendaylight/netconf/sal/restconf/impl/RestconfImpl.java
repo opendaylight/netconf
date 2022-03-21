@@ -127,7 +127,6 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1511,7 +1510,7 @@ public final class RestconfImpl implements RestconfService {
         }
 
         final Collection<LeafSetEntryNode<?>> entryNodes = leafSet.body();
-        final List<SchemaPath> paths = new ArrayList<>();
+        final List<Absolute> paths = new ArrayList<>();
         String streamName = CREATE_NOTIFICATION_STREAM + "/";
 
         StringBuilder streamNameBuilder = new StringBuilder(streamName);
@@ -1530,7 +1529,7 @@ public final class RestconfImpl implements RestconfService {
             }
             final String moduleName = module.getName();
             checkNotNull(notifiDef, "Notification %s does not exist in module %s", valueQName, moduleName);
-            paths.add(SchemaPath.of(Absolute.of(notifiDef.getQName())));
+            paths.add(Absolute.of(notifiDef.getQName()));
             streamNameBuilder.append(moduleName).append(':').append(valueQName.getLocalName());
             if (iterator.hasNext()) {
                 streamNameBuilder.append(',');

@@ -29,7 +29,8 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -47,7 +48,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
 
     private final ControllerContext controllerContext;
     private final String streamName;
-    private final SchemaPath path;
+    private final Absolute path;
     private final String outputType;
 
     /**
@@ -60,7 +61,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      * @param outputType
      *             type of output on notification (JSON, XML)
      */
-    NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType,
+    NotificationListenerAdapter(final Absolute path, final String streamName, final String outputType,
             final ControllerContext controllerContext) {
         register(this);
         this.outputType = requireNonNull(outputType);
@@ -77,7 +78,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     @Override
     public String getOutputType() {
-        return this.outputType;
+        return outputType;
     }
 
     @Override
@@ -101,16 +102,16 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     @Override
     public String getStreamName() {
-        return this.streamName;
+        return streamName;
     }
 
     /**
      * Get schema path of notification.
      *
-     * @return {@link SchemaPath}
+     * @return {@link Absolute} SchemaNodeIdentifier
      */
-    public SchemaPath getSchemaPath() {
-        return this.path;
+    public Absolute getSchemaPath() {
+        return path;
     }
 
     /**
@@ -142,7 +143,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         final Writer writer = new StringWriter();
         final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
             JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(schemaContext),
-            notification.getType().asSchemaPath(), null, JsonWriterFactory.createJsonWriter(writer));
+            notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
         final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
         try {
             nodeWriter.write(notification.getBody());
@@ -169,7 +170,8 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
             final EffectiveModelContext schemaContext, final DOMNotification notification) {
         try {
 
-            final DOMResult domResult = writeNormalizedNode(notification.getBody(), schemaContext, this.path);
+            final DOMResult domResult = writeNormalizedNode(notification.getBody(),
+                SchemaInferenceStack.of(schemaContext, path).toInference());
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("notification");
             dataElement.appendChild(result);

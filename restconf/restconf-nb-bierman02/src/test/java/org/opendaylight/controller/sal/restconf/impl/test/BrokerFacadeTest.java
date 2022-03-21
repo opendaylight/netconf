@@ -28,8 +28,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
@@ -83,7 +81,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
@@ -330,15 +327,14 @@ public class BrokerFacadeTest {
     public void testRegisterToListenNotificationChanges() throws Exception {
         // create test notification listener
         final String identifier = "create-notification-stream/toaster:toastDone";
-        final SchemaPath path = SchemaPath.create(true,
+        final Absolute path = Absolute.of(
                 QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML", controllerContext);
+        Notificator.createNotificationListener(List.of(path), identifier, "XML", controllerContext);
         final NotificationListenerAdapter listener = Notificator.getNotificationListenerFor(identifier).get(0);
 
         // mock registration
         final ListenerRegistration<NotificationListenerAdapter> registration = mock(ListenerRegistration.class);
-        when(domNotification.registerNotificationListener(listener,
-            Absolute.of(ImmutableList.copyOf(listener.getSchemaPath().getPathFromRoot()))))
+        when(domNotification.registerNotificationListener(listener, listener.getSchemaPath()))
                 .thenReturn(registration);
 
         // test to register listener for the first time
@@ -350,8 +346,7 @@ public class BrokerFacadeTest {
         assertEquals("Registration was not successful", true, listener.isListening());
 
         // registrations should be invoked only once
-        verify(domNotification, times(1)).registerNotificationListener(listener,
-            Absolute.of(ImmutableList.copyOf(listener.getSchemaPath().getPathFromRoot())));
+        verify(domNotification, times(1)).registerNotificationListener(listener, listener.getSchemaPath());
 
         final DOMTransactionChain transactionChain = mock(DOMTransactionChain.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
