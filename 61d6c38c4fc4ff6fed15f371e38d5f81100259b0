@@ -46,6 +46,30 @@
       },
       "revId": "61d6c38c4fc4ff6fed15f371e38d5f81100259b0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d370fda9_1129b25b",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-03-21T06:18:44Z",
+      "side": 1,
+      "message": "Well that is because the Deque is in YangInstanceIdentifier format and you want to interpret it as SchemaNodeIdentifier.\nThere is *just* *no* *way* you can do that correctly without examining the underlying schema at each step.",
+      "parentUuid": "f801c23e_6edbc0c5",
+      "range": {
+        "startLine": 252,
+        "startChar": 20,
+        "endLine": 252,
+        "endChar": 47
+      },
+      "revId": "61d6c38c4fc4ff6fed15f371e38d5f81100259b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
