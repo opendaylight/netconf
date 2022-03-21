@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
@@ -14,7 +16,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -32,6 +34,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -181,11 +184,11 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             Optional<NestedNotificationInfo> nestedNotificationOptional = findNestedNotification(message, element);
             if (nestedNotificationOptional.isPresent()) {
                 nestedNotificationInfo = nestedNotificationOptional.get();
-                notificationDefinitions = Collections.singletonList(nestedNotificationInfo.notificationDefinition);
+                notificationDefinitions = List.of(nestedNotificationInfo.notificationDefinition);
                 element = (Element) nestedNotificationInfo.notificationNode;
             }
         }
-        Preconditions.checkArgument(notificationDefinitions.size() > 0,
+        checkArgument(!notificationDefinitions.isEmpty(),
                 "Unable to parse notification %s, unknown notification. Available notifications: %s",
                 notificationDefinitions, mappedNotifications.keySet());
 
@@ -341,16 +344,16 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             currentMappedRpcs = mappedRpcs;
         }
 
-        final RpcDefinition mappedRpc = Preconditions.checkNotNull(currentMappedRpcs.get(rpc),
+        final RpcDefinition mappedRpc = checkNotNull(currentMappedRpcs.get(rpc),
                 "Unknown rpc %s, available rpcs: %s", rpc, currentMappedRpcs.keySet());
         if (mappedRpc.getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter)
                 .getNode().getOwnerDocument());
         }
 
-        Preconditions.checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
+        checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpc);
 
-        Preconditions.checkArgument(payload instanceof ContainerNode,
+        checkArgument(payload instanceof ContainerNode,
                 "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpc, payload);
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter);
         try {
@@ -374,7 +377,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     public NetconfMessage toActionRequest(final Absolute action, final DOMDataTreeIdentifier domDataTreeIdentifier,
             final NormalizedNode payload) {
         final ActionDefinition actionDef = actions.get(action);
-        Preconditions.checkArgument(actionDef != null, "Action does not exist: %s", action);
+        checkArgument(actionDef != null, "Action does not exist: %s", action);
 
         final InputSchemaNode inputDef = actionDef.getInput();
         if (inputDef.getChildNodes().isEmpty()) {
@@ -382,8 +385,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 domDataTreeIdentifier, counter, actionDef.getQName()).getNode().getOwnerDocument());
         }
 
-        Preconditions.checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null", action);
-        Preconditions.checkArgument(payload instanceof ContainerNode,
+        checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null", action);
+        checkArgument(payload instanceof ContainerNode,
                 "Transforming an action with input: %s, payload has to be a container, but was: %s", action, payload);
 
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
@@ -425,11 +428,10 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             }
 
             final RpcDefinition rpcDefinition = currentMappedRpcs.get(rpc);
-            Preconditions.checkArgument(rpcDefinition != null,
-                    "Unable to parse response of %s, the rpc is unknown", rpc);
+            checkArgument(rpcDefinition != null, "Unable to parse response of %s, the rpc is unknown", rpc);
 
             // In case no input for rpc is defined, we can simply construct the payload here
-            normalizedNode = parseResult(message, rpcDefinition);
+            normalizedNode = parseResult(message, Absolute.of(rpc), rpcDefinition);
         }
         return new DefaultDOMRpcResult(normalizedNode);
     }
@@ -437,43 +439,51 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     @Override
     public DOMActionResult toActionResult(final Absolute action, final NetconfMessage message) {
         final ActionDefinition actionDefinition = actions.get(action);
-        Preconditions.checkArgument(actionDefinition != null, "Action does not exist: %s", action);
-        final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
+        checkArgument(actionDefinition != null, "Action does not exist: %s", action);
+        final ContainerNode normalizedNode = (ContainerNode) parseResult(message, action, actionDefinition);
 
         if (normalizedNode == null) {
-            return new SimpleDOMActionResult(Collections.emptyList());
+            return new SimpleDOMActionResult(List.of());
         } else {
-            return new SimpleDOMActionResult(normalizedNode, Collections.emptyList());
+            return new SimpleDOMActionResult(normalizedNode, List.of());
         }
     }
 
-    private NormalizedNode parseResult(final NetconfMessage message, final OperationDefinition operationDefinition) {
+    private NormalizedNode parseResult(final NetconfMessage message, final Absolute operationPath,
+            final OperationDefinition operationDef) {
         final Optional<XmlElement> okResponseElement = XmlElement.fromDomDocument(message.getDocument())
                 .getOnlyChildElementWithSameNamespaceOptionally("ok");
-        if (operationDefinition.getOutput().getChildNodes().isEmpty()) {
-            Preconditions.checkArgument(okResponseElement.isPresent(),
-                "Unexpected content in response of rpc: %s, %s", operationDefinition.getQName(), message);
+        final var operOutput = operationDef.getOutput();
+        if (operOutput.getChildNodes().isEmpty()) {
+            checkArgument(okResponseElement.isPresent(), "Unexpected content in response of operation: %s, %s",
+                operationDef.getQName(), message);
             return null;
-        } else {
-            if (okResponseElement.isPresent()) {
-                LOG.debug("Received response <ok/> for RPC with defined Output");
-                return null;
-            }
-
-            Element element = message.getDocument().getDocumentElement();
-            try {
-                final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-                final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                        // FIXME: we should have a cached inference here
-                        SchemaInferenceStack.ofInstantiatedPath(mountContext.getEffectiveModelContext(),
-                            operationDefinition.getOutput().getPath()).toInference(), strictParsing);
-                xmlParser.traverse(new DOMSource(element));
-                return resultHolder.getResult();
-            } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
-                throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
-            }
         }
+        if (okResponseElement.isPresent()) {
+            // FIXME: could be an action as well
+            LOG.debug("Received response <ok/> for RPC with defined Output");
+            return null;
+        }
+
+        final var operSteps = operationPath.getNodeIdentifiers();
+        final var outputPath = Absolute.of(ImmutableList.<QName>builderWithExpectedSize(operSteps.size() + 1)
+            .addAll(operSteps)
+            .add(operOutput.getQName())
+            .build());
+        // FIXME: we should have a cached inference here, or XMLParserStream should accept Absolute instead
+        final var inference = SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), outputPath)
+            .toInference();
+
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final Element element = message.getDocument().getDocumentElement();
+        try {
+            final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext, inference, strictParsing);
+            xmlParser.traverse(new DOMSource(element));
+        } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
+            throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
+        }
+        return resultHolder.getResult();
     }
 
     @Beta
