@@ -36,8 +36,6 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -50,7 +48,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
@@ -130,7 +127,6 @@ public final class TestRestconfUtils {
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = iiContext.getSchemaNode();
         DataSchemaNode schemaNode = null;
-        final SchemaInferenceStack stack;
         if (schemaNodeContext instanceof RpcDefinition) {
             if ("input".equalsIgnoreCase(doc.getDocumentElement().getLocalName())) {
                 schemaNode = ((RpcDefinition) schemaNodeContext).getInput();
@@ -139,15 +135,9 @@ public final class TestRestconfUtils {
             } else {
                 throw new IllegalStateException("Unknown Rpc input node");
             }
-            stack = SchemaInferenceStack.of(iiContext.getSchemaContext(),
-                    Absolute.of(schemaNodeContext.getQName(), schemaNode.getQName()));
+
         } else if (schemaNodeContext instanceof DataSchemaNode) {
             schemaNode = (DataSchemaNode) schemaNodeContext;
-            stack = SchemaInferenceStack.of(iiContext.getSchemaContext());
-            iiContext.getInstanceIdentifier().getPathArguments().stream()
-                    .filter(p -> !(p instanceof NodeIdentifierWithPredicates))
-                    .filter(p -> !(p instanceof AugmentationIdentifier))
-                    .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
         } else {
             throw new IllegalStateException("Unknow SchemaNode");
         }
@@ -166,7 +156,8 @@ public final class TestRestconfUtils {
 
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlParserStream xmlParser = XmlParserStream.create(writer, stack.toInference());
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, SchemaInferenceStack.ofInstantiatedPath(
+            iiContext.getSchemaContext(), schemaNode.getPath()).toInference());
 
         if (schemaNode instanceof ContainerLike || schemaNode instanceof ListSchemaNode) {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
