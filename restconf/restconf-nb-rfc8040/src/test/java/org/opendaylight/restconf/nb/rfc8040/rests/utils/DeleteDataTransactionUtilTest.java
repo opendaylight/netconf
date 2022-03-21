@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -43,8 +42,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DeleteDataTransactionUtilTest {
-    @Mock
-    private InstanceIdentifierContext context;
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
@@ -61,7 +58,6 @@ public class DeleteDataTransactionUtilTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty());
-        doReturn(YangInstanceIdentifier.empty()).when(context).getInstanceIdentifier();
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
     }
 
@@ -99,19 +95,19 @@ public class DeleteDataTransactionUtilTest {
         deleteFail(new NetconfRestconfStrategy(netconfService));
     }
 
-    private void delete(final RestconfStrategy strategy) {
-        final Response response = DeleteDataTransactionUtil.deleteData(strategy, context.getInstanceIdentifier());
+    private static void delete(final RestconfStrategy strategy) {
+        final Response response = DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.empty());
         // assert success
         assertEquals("Not expected response received", Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
-    private void deleteFail(final RestconfStrategy strategy) {
-        try {
-            DeleteDataTransactionUtil.deleteData(strategy, context.getInstanceIdentifier());
-            fail("Delete operation should fail due to missing data");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals(ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-        }
+    private static void deleteFail(final RestconfStrategy strategy) {
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> DeleteDataTransactionUtil.deleteData(strategy, YangInstanceIdentifier.empty()));
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
     }
 }

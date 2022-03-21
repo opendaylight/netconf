@@ -39,18 +39,15 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractFieldsTranslatorTest<T> {
-    @Mock
-    private InstanceIdentifierContext identifierJukebox;
-
-    @Mock
-    private InstanceIdentifierContext identifierTestServices;
-
     private static final QNameModule Q_NAME_MODULE_JUKEBOX = QNameModule.create(
         XMLNamespace.of("http://example.com/ns/example-jukebox"), Revision.of("2015-04-04"));
     private static final QNameModule Q_NAME_MODULE_TEST_SERVICES = QNameModule.create(
         XMLNamespace.of("tests:test-services"), Revision.of("2019-03-25"));
     private static final QNameModule Q_NAME_MODULE_AUGMENTED_JUKEBOX = QNameModule.create(
         XMLNamespace.of("http://example.com/ns/augmented-jukebox"), Revision.of("2016-05-05"));
+
+    private InstanceIdentifierContext identifierJukebox;
+    private InstanceIdentifierContext identifierTestServices;
 
     // container jukebox
     @Mock
@@ -149,9 +146,8 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     }
 
     private void initJukeboxSchemaNodes(final EffectiveModelContext schemaContext) {
-        when(identifierJukebox.getSchemaContext()).thenReturn(schemaContext);
+        identifierJukebox = new InstanceIdentifierContext(null, containerJukebox, null, schemaContext);
         when(containerJukebox.getQName()).thenReturn(JUKEBOX_Q_NAME);
-        when(identifierJukebox.getSchemaNode()).thenReturn(containerJukebox);
 
         when(containerLibrary.getQName()).thenReturn(LIBRARY_Q_NAME);
         when(containerJukebox.dataChildByName(LIBRARY_Q_NAME)).thenReturn(containerLibrary);
@@ -179,9 +175,8 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     }
 
     private void initTestServicesSchemaNodes(final EffectiveModelContext schemaContext) {
-        when(identifierTestServices.getSchemaContext()).thenReturn(schemaContext);
+        identifierTestServices = new InstanceIdentifierContext(null, containerTestData, null, schemaContext);
         when(containerTestData.getQName()).thenReturn(TEST_DATA_Q_NAME);
-        when(identifierTestServices.getSchemaNode()).thenReturn(containerTestData);
 
         when(listServices.getQName()).thenReturn(SERVICES_Q_NAME);
         when(containerTestData.dataChildByName(SERVICES_Q_NAME)).thenReturn(listServices);

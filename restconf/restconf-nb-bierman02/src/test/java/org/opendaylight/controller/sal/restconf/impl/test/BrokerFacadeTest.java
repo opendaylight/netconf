@@ -30,7 +30,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -361,13 +360,11 @@ public class BrokerFacadeTest {
     @Test
     public void testPatchConfigurationDataWithinTransactionServer() throws Exception {
         final PatchContext patchContext = mock(PatchContext.class);
-        final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
 
-        when(patchContext.getData()).thenReturn(new ArrayList<>());
-        doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
-
+        when(patchContext.getData()).thenReturn(List.of());
         // no mount point
-        when(identifierContext.getMountPoint()).thenReturn(null);
+        doReturn(new InstanceIdentifierContext(null, null, null, null)).when(patchContext)
+            .getInstanceIdentifierContext();
 
         doReturn(CommitInfo.emptyFluentFuture()).when(rwTransaction).commit();
 
@@ -383,16 +380,15 @@ public class BrokerFacadeTest {
     @Test
     public void testPatchConfigurationDataWithinTransactionMount() throws Exception {
         final PatchContext patchContext = mock(PatchContext.class);
-        final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeReadWriteTransaction transaction = mock(DOMDataTreeReadWriteTransaction.class);
 
-        when(patchContext.getData()).thenReturn(new ArrayList<>());
-        doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
-
+        when(patchContext.getData()).thenReturn(List.of());
         // return mount point with broker
-        when(identifierContext.getMountPoint()).thenReturn(mountPoint);
+        doReturn(new InstanceIdentifierContext(null, null, mountPoint, null)).when(patchContext)
+            .getInstanceIdentifierContext();
+
         when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.of(mountDataBroker));
         when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.empty());
         when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
@@ -411,18 +407,14 @@ public class BrokerFacadeTest {
     @Test
     public void testPatchConfigurationDataWithinTransactionMountFail() throws Exception {
         final PatchContext patchContext = mock(PatchContext.class);
-        final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-        final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
-        final DOMDataTreeReadWriteTransaction transaction = mock(DOMDataTreeReadWriteTransaction.class);
 
-        doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
-        when(identifierContext.getMountPoint()).thenReturn(mountPoint);
+        doReturn(new InstanceIdentifierContext(null, null, mountPoint, null)).when(patchContext)
+            .getInstanceIdentifierContext();
 
         // missing broker on mounted device
         when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.empty());
         when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.empty());
-
 
         final PatchStatusContext status = brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 

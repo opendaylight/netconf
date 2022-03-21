@@ -12,8 +12,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
-// FIXME: non-final for Mocking, which we should not tolerate
-public class InstanceIdentifierContext {
+public final class InstanceIdentifierContext {
     private final YangInstanceIdentifier instanceIdentifier;
     private final SchemaNode schemaNode;
     private final DOMMountPoint mountPoint;

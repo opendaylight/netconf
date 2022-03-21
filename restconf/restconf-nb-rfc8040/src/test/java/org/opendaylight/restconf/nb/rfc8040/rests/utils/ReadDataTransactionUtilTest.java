@@ -25,7 +25,6 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.ContentParam;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
@@ -52,8 +51,6 @@ public class ReadDataTransactionUtilTest {
     private RestconfStrategy netconfStrategy;
     @Mock
     private NetconfDataTreeService netconfService;
-    @Mock
-    private InstanceIdentifierContext context;
     @Mock
     private DOMDataTreeReadTransaction read;
     @Mock

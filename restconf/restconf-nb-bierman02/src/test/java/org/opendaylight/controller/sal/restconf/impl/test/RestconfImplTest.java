@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.Iterables;
@@ -39,7 +40,6 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -151,15 +151,13 @@ public class RestconfImplTest {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters(anyBoolean());
 
         final NormalizedNodeContext ctx = mock(NormalizedNodeContext.class);
-        final InstanceIdentifierContext iiCtx = mock(InstanceIdentifierContext.class);
-        doReturn(iiCtx).when(ctx).getInstanceIdentifierContext();
         final SchemaNode schemaNode = mock(SchemaNode.class);
-        doReturn(schemaNode).when(iiCtx).getSchemaNode();
         doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();
         doReturn(QName.create("namespace", "2010-10-10", "localname")).when(schemaNode).getQName();
 
         final DOMMountPoint mount = mock(DOMMountPoint.class);
-        doReturn(mount).when(iiCtx).getMountPoint();
+        doReturn(new InstanceIdentifierContext(null, schemaNode, mount, null)).when(ctx).getInstanceIdentifierContext();
+
         final DOMRpcService rpcService = mock(DOMRpcService.class);
         doReturn(Optional.of(rpcService)).when(mount).getService(DOMRpcService.class);
         doReturn(immediateFluentFuture(mock(DOMRpcResult.class))).when(rpcService)
@@ -175,21 +173,19 @@ public class RestconfImplTest {
     @Test
     public void createNotificationStreamTest() {
         final NormalizedNodeContext payload = mock(NormalizedNodeContext.class);
-        final InstanceIdentifierContext iiCtx = mock(InstanceIdentifierContext.class);
-        doReturn(iiCtx).when(payload).getInstanceIdentifierContext();
 
         final SchemaNode schemaNode = mock(SchemaNode.class,
-                Mockito.withSettings().extraInterfaces(RpcDefinition.class));
-        doReturn(schemaNode).when(iiCtx).getSchemaNode();
+                withSettings().extraInterfaces(RpcDefinition.class));
         doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();
+        doReturn(new InstanceIdentifierContext(null, schemaNode, null, null)).when(payload)
+                .getInstanceIdentifierContext();
 
         doReturn(QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",
                 "2014-01-14", "create-notification-stream")).when(schemaNode).getQName();
-        doReturn(null).when(iiCtx).getMountPoint();
 
         final Set<DataContainerChild> children = new HashSet<>();
         final DataContainerChild child = mock(DataContainerChild.class,
-                Mockito.withSettings().extraInterfaces(LeafSetNode.class));
+                withSettings().extraInterfaces(LeafSetNode.class));
 
         final LeafSetEntryNode entryNode = mock(LeafSetEntryNode.class);
         when(entryNode.body()).thenReturn("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)toastDone");
@@ -197,7 +193,7 @@ public class RestconfImplTest {
         children.add(child);
 
         final NormalizedNode normalizedNode = mock(NormalizedNode.class,
-                Mockito.withSettings().extraInterfaces(ContainerNode.class));
+                withSettings().extraInterfaces(ContainerNode.class));
         doReturn(normalizedNode).when(payload).getData();
         doReturn(children).when(normalizedNode).body();
 

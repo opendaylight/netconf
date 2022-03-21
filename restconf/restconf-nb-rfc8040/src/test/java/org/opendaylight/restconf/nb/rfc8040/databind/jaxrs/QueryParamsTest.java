@@ -167,12 +167,10 @@ public class QueryParamsTest {
         final var containerChildSchema = mock(LeafSchemaNode.class);
         doReturn(containerChild).when(containerChildSchema).getQName();
         doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
-        final var context = mock(InstanceIdentifierContext.class);
-        final var modelContext = mock(EffectiveModelContext.class);
-        doReturn(modelContext).when(context).getSchemaContext();
-        doReturn(containerSchema).when(context).getSchemaNode();
 
-        final QueryParameters queryParameters = QueryParams.newQueryParameters(params, context);
+        final QueryParameters queryParameters = QueryParams.newQueryParameters(params,
+
+            new InstanceIdentifierContext(null, containerSchema, null, mock(EffectiveModelContext.class)));
         final List<Set<QName>> fields = queryParameters.fields();
         assertNotNull(fields);
         assertEquals(1, fields.size());
