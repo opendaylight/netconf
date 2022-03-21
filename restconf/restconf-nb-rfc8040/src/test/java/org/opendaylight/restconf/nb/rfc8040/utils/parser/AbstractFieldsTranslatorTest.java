@@ -49,6 +49,8 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     private InstanceIdentifierContext identifierJukebox;
     private InstanceIdentifierContext identifierTestServices;
 
+    // FIXME: remove all this mocking -- just parse the underlying model and be done with it
+
     // container jukebox
     @Mock
     private ContainerSchemaNode containerJukebox;

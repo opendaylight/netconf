@@ -118,16 +118,17 @@ public final class ParserIdentifier {
     private static InstanceIdentifierContext createIIdContext(final EffectiveModelContext schemaContext,
             final String url, final @Nullable DOMMountPoint mountPoint) {
         final YangInstanceIdentifier urlPath = IdentifierCodec.deserialize(url, schemaContext);
+        // First things first: an empty path means data invocation on SchemaContext
+        if (urlPath.isEmpty()) {
+            return mountPoint != null ? InstanceIdentifierContext.ofMountPointRoot(mountPoint, schemaContext)
+                : InstanceIdentifierContext.ofLocalRoot(schemaContext);
+        }
+
         return new InstanceIdentifierContext(urlPath, getPathSchema(schemaContext, urlPath), mountPoint, schemaContext);
     }
 
     private static SchemaNode getPathSchema(final EffectiveModelContext schemaContext,
             final YangInstanceIdentifier urlPath) {
-        // First things first: an empty path means data invocation on SchemaContext
-        if (urlPath.isEmpty()) {
-            return schemaContext;
-        }
-
         // Peel the last component and locate the parent data node, empty path resolves to SchemaContext
         final DataSchemaContextNode<?> parent = DataSchemaContextTree.from(schemaContext)
                 .findChild(verifyNotNull(urlPath.getParent()))

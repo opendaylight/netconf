@@ -166,7 +166,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         checkPreconditions();
 
         if (restconfInstance == null) {
-            return new InstanceIdentifierContext(YangInstanceIdentifier.empty(), globalSchema, null, globalSchema);
+            return InstanceIdentifierContext.ofLocalRoot(globalSchema);
         }
 
         final List<String> pathArgs = urlPathArgsDecode(SLASH_SPLITTER.split(restconfInstance));
@@ -577,8 +577,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                 }
 
                 if (returnJustMountPoint || strings.size() == 1) {
-                    return new InstanceIdentifierContext(YangInstanceIdentifier.empty(), mountPointSchema, mount,
-                        mountPointSchema);
+                    return InstanceIdentifierContext.ofMountPointRoot(mount, mountPointSchema);
                 }
 
                 final String moduleNameBehindMountPoint = toModuleName(strings.get(1));

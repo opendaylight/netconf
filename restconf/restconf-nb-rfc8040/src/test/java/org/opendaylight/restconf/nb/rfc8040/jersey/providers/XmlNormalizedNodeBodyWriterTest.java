@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayOutputStream;
@@ -19,24 +18,18 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class XmlNormalizedNodeBodyWriterTest {
     @Test
     public void testWriteEmptyRootContainer() throws Exception {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
-        final SchemaNode schemaNode = mock(SchemaNode.class);
-        doReturn(SchemaPath.ROOT).when(schemaNode).getPath();
-
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
-            new InstanceIdentifierContext(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
+            InstanceIdentifierContext.ofLocalRoot(schemaContext),
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -52,11 +45,8 @@ public class XmlNormalizedNodeBodyWriterTest {
         final EffectiveModelContext schemaContext =
                 TestRestconfUtils.loadSchemaContext("/instanceidentifier/yang", null);
 
-        final SchemaNode schemaNode = mock(SchemaNode.class);
-        doReturn(SchemaPath.ROOT).when(schemaNode).getPath();
-
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
-            new InstanceIdentifierContext(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
+            InstanceIdentifierContext.ofLocalRoot(schemaContext),
             Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))
                 .withChild(Builders.containerBuilder()
