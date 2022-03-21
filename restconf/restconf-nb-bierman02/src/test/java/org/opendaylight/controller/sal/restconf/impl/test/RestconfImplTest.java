@@ -137,10 +137,8 @@ public class RestconfImplTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testExample() throws FileNotFoundException, ParseException {
-        @SuppressWarnings("rawtypes")
         final NormalizedNode normalizedNodeData = TestUtils.prepareNormalizedNodeWithIetfInterfacesInterfacesData();
         when(brokerFacade.readOperationalData(isNull())).thenReturn(normalizedNodeData);
         assertEquals(normalizedNodeData,
