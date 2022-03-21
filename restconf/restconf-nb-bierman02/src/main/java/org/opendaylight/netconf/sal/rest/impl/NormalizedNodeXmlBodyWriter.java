@@ -13,9 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -35,8 +33,6 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -46,9 +42,7 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStr
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.xml.sax.SAXException;
 
 /**
@@ -109,17 +103,18 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             throw new IllegalStateException(e);
         }
         final NormalizedNode data = context.getData();
+        final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
-        writeNormalizedNode(xmlWriter, pathContext, data, context.getWriterParameters().getDepth());
+        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().getDepth());
     }
 
-    private static void writeNormalizedNode(final XMLStreamWriter xmlWriter,
+    private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
             final InstanceIdentifierContext<?> pathContext, NormalizedNode data, final @Nullable Integer depth)
             throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();
-        if (pathContext.getSchemaNode() instanceof SchemaContext) {
-            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, SchemaPath.ROOT, depth);
+        if (SchemaPath.ROOT.equals(schemaPath)) {
+            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath, depth);
             if (data instanceof DOMSourceAnyxmlNode) {
                 try {
                     writeElements(xmlWriter, nnWriter,
@@ -132,18 +127,11 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
                 writeElements(xmlWriter, nnWriter, (ContainerNode) data);
             }
         }  else if (pathContext.getSchemaNode() instanceof RpcDefinition) {
-            final RpcDefinition rpc = (RpcDefinition) pathContext.getSchemaNode();
-            final SchemaPath path = SchemaPath.of(Absolute.of(rpc.getQName(), rpc.getOutput().getQName()));
-            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path, depth);
+            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx,
+                    ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
-            final List<QName> qNames = pathContext.getInstanceIdentifier().getPathArguments().stream()
-                .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
-                .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
-                .map(PathArgument::getNodeType)
-                .collect(Collectors.toList());
-            final SchemaPath path = SchemaPath.of(Absolute.of(qNames)).getParent();
-            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path, depth);
+            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath.getParent(), depth);
             if (data instanceof MapEntryNode) {
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
