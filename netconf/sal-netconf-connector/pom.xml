@@ -15,7 +15,6 @@
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <groupId>org.opendaylight.netconf</groupId>
   <artifactId>sal-netconf-connector</artifactId>
   <packaging>bundle</packaging>
 
