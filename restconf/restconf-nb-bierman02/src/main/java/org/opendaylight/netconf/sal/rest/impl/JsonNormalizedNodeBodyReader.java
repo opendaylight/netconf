@@ -46,9 +46,9 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,24 +110,21 @@ public class JsonNormalizedNodeBodyReader
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final SchemaInferenceStack stack;
-        if (path.getSchemaNode() instanceof RpcEffectiveStatement) {
-            stack = SchemaInferenceStack.of(path.getSchemaContext(), Absolute.of(path.getSchemaNode().getQName()));
+        final SchemaInferenceStack parentSchema;
+        if (isPost) {
+            // FIXME: We need dispatch for RPC.
+            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(), path.getSchemaNode().getPath());
+        } else if (path.getSchemaNode() instanceof SchemaContext
+                || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
+            parentSchema = SchemaInferenceStack.of(path.getSchemaContext());
         } else {
-            stack = SchemaInferenceStack.of(path.getSchemaContext());
-            path.getInstanceIdentifier().getPathArguments().stream()
-                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
-                    .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
-                    .forEach(p -> stack.enterSchemaTree(p.getNodeType()));
-        }
-
-        if (!isPost) {
-            stack.exit();
+            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
+                path.getSchemaNode().getPath().getParent());
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
             JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(path.getSchemaContext()),
-            stack.toInference());
+            parentSchema.toInference());
         final JsonReader reader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get(),
                 StandardCharsets.UTF_8));
         jsonParser.parse(reader);
