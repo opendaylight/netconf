@@ -8,35 +8,34 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNormalizedNodeBodyWriterTest {
     @Test
-    public void testWriteEmptyRootContainer() throws Exception {
+    public void testWriteEmptyRootContainer() throws IOException {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
-
-        final SchemaNode schemaNode = mock(SchemaNode.class);
-        doReturn(SchemaPath.ROOT).when(schemaNode).getPath();
+        doCallRealMethod().when(schemaContext).getPath();
 
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
-            new InstanceIdentifierContext(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
+            InstanceIdentifierContext.ofLocalRoot(schemaContext),
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -48,15 +47,12 @@ public class XmlNormalizedNodeBodyWriterTest {
     }
 
     @Test
-    public void testRootContainerWrite() throws Exception {
+    public void testRootContainerWrite() throws IOException {
         final EffectiveModelContext schemaContext =
                 TestRestconfUtils.loadSchemaContext("/instanceidentifier/yang", null);
 
-        final SchemaNode schemaNode = mock(SchemaNode.class);
-        doReturn(SchemaPath.ROOT).when(schemaNode).getPath();
-
         final NormalizedNodePayload nodePayload = NormalizedNodePayload.of(
-            new InstanceIdentifierContext(YangInstanceIdentifier.empty(), schemaNode, null, schemaContext),
+            InstanceIdentifierContext.ofLocalRoot(schemaContext),
             Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))
                 .withChild(Builders.containerBuilder()

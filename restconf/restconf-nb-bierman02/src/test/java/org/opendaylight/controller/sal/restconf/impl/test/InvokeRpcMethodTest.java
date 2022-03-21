@@ -261,23 +261,18 @@ public class InvokeRpcMethodTest {
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "make-toast");
 
         RpcDefinition rpcDef = null;
-        ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcInputSchemaNode = rpc.getInput();
                 rpcDef = rpc;
                 break;
             }
         }
 
         assertNotNull(rpcDef);
-        assertNotNull(rpcInputSchemaNode);
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
-                SchemaAwareBuilders.containerBuilder(rpcInputSchemaNode);
 
-        final NormalizedNodeContext payload =
-                new NormalizedNodeContext(new InstanceIdentifierContext(null, rpcInputSchemaNode,
-                null, schemaContext), containerBuilder.build());
+        final NormalizedNodeContext payload = new NormalizedNodeContext(
+                InstanceIdentifierContext.ofLocalRpcInput(schemaContext, rpcDef),
+                SchemaAwareBuilders.containerBuilder(rpcDef.getInput()).build());
 
         doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), any(NormalizedNode.class));
 

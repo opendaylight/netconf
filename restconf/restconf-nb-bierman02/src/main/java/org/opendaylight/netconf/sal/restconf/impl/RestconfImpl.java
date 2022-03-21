@@ -451,11 +451,11 @@ public final class RestconfImpl implements RestconfService {
 
         if (resultData != null && ((ContainerNode) resultData).isEmpty()) {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
-        } else {
-            return new NormalizedNodeContext(
-                    new InstanceIdentifierContext(null, resultNodeSchema, mountPoint, schemaContext),
-                    resultData, QueryParametersParser.parseWriterParameters(uriInfo));
         }
+
+        return new NormalizedNodeContext(
+            new InstanceIdentifierContext(null, resultNodeSchema, mountPoint, schemaContext),
+            resultData, QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     @SuppressFBWarnings(value = "NP_LOAD_OF_KNOWN_NULL_VALUE",
@@ -528,8 +528,9 @@ public final class RestconfImpl implements RestconfService {
         //
         //        This is legacy code, so if anybody cares to do that refactor, feel free to contribute, but I am not
         //        doing that work.
-        return new NormalizedNodeContext(new InstanceIdentifierContext(null, rpc, mountPoint, schemaContext), result,
-            QueryParametersParser.parseWriterParameters(uriInfo));
+        final var iic = mountPoint == null ? InstanceIdentifierContext.ofLocalRpcOutput(schemaContext, rpc)
+            : InstanceIdentifierContext.ofMountPointRpcOutput(mountPoint, schemaContext, rpc);
+        return new NormalizedNodeContext(iic, result, QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     private static @NonNull NormalizedNode nonnullInput(final SchemaNode rpc, final NormalizedNode input) {
