@@ -128,7 +128,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  RpcDefinition is not supported as initial codec in JSONStreamWriter,
              *  so we need to emit initial output declaratation..
              */
-            path = ((RpcDefinition) context.getSchemaNode()).getOutput().getPath();
+            final var rpc = (RpcDefinition) context.getSchemaNode();
+            path = SchemaPath.create(true, rpc.getQName(), rpc.getOutput().getQName());
             nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth);
             jsonWriter.name("output");
             jsonWriter.beginObject();

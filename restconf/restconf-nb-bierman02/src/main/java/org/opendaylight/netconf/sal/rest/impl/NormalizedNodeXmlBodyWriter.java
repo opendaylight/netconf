@@ -127,8 +127,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
                 writeElements(xmlWriter, nnWriter, (ContainerNode) data);
             }
         }  else if (pathContext.getSchemaNode() instanceof RpcDefinition) {
+            final var rpc = (RpcDefinition) pathContext.getSchemaNode();
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx,
-                    ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth);
+                    SchemaPath.create(true, rpc.getQName(), rpc.getOutput().getQName()), depth);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath.getParent(), depth);
