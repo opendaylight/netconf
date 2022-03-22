@@ -16,6 +16,24 @@
       "message": "1. We do not except that chars like \u0027@\u0027 are sometimes escaped and sometimes not. That kind of functionality is IMHO difficult to implement.\n\n2. I am afraid that we need to find also other chars which underlying library consider as special characters (and we do not).\n\nFor example you can use those in:\n1. https://github.com/mifmif/Generex/issues/22\n2. https://github.com/mifmif/Generex/pull/48",
       "revId": "0482486c7d687061e06ad28a6071527367922018",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa216ef9_647aabdd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2022-03-22T07:57:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d3a47d0_682eb400",
+      "revId": "0482486c7d687061e06ad28a6071527367922018",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
