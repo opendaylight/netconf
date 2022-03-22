@@ -103,14 +103,14 @@ public class InMemoryMdsalModule extends AbstractModule {
     }
 
     @Provides
-    @Singleton DOMRpcService getDOMRpcService(DOMSchemaService schemaService) {
-        return DOMRpcRouter.newInstance(schemaService).getRpcService();
+    @Singleton DOMRpcService getDOMRpcService(final DOMSchemaService schemaService) {
+        return new DOMRpcRouter(schemaService).getRpcService();
     }
 
     @Provides
     @Singleton
-    DOMActionService getDOMActionService(DOMSchemaService schemaService) {
-        return DOMRpcRouter.newInstance(schemaService).getActionService();
+    DOMActionService getDOMActionService(final DOMSchemaService schemaService) {
+        return new DOMRpcRouter(schemaService).getActionService();
     }
 
     @PreDestroy
