@@ -9,9 +9,12 @@ package org.opendaylight.restconf.common.context;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.Iterables;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -79,6 +82,16 @@ public final class InstanceIdentifierContext {
     public static @NonNull InstanceIdentifierContext ofMountPointRpcOutput(final DOMMountPoint mountPoint,
             final EffectiveModelContext mountContext, final RpcDefinition rpc) {
         return new InstanceIdentifierContext(mountContext, rpc, requireNonNull(mountPoint));
+    }
+
+    // FIXME: what the heck are the callers of this doing?!
+    public @NonNull InstanceIdentifierContext withConcatenatedArgs(final List<PathArgument> concatArgs) {
+        if (concatArgs.isEmpty()) {
+            return this;
+        }
+        final var newInstanceIdentifier = YangInstanceIdentifier.create(
+            Iterables.concat(instanceIdentifier.getPathArguments(), concatArgs));
+        return new InstanceIdentifierContext(newInstanceIdentifier, schemaNode, mountPoint, schemaContext);
     }
 
     public YangInstanceIdentifier getInstanceIdentifier() {

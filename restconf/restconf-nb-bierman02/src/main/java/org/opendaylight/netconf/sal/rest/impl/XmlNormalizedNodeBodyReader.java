@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -189,13 +188,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             parsed = null;
         }
 
-        final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
-                pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));
-
-        final InstanceIdentifierContext outIIContext = new InstanceIdentifierContext(
-                fullIIToData, pathContext.getSchemaNode(), pathContext.getMountPoint(), pathContext.getSchemaContext());
-
-        return new NormalizedNodeContext(outIIContext, parsed);
+        return new NormalizedNodeContext(pathContext.withConcatenatedArgs(iiToDataList), parsed);
     }
 
     private static Deque<Object> findPathToSchemaNodeByName(final DataSchemaNode schemaNode, final String elementName,

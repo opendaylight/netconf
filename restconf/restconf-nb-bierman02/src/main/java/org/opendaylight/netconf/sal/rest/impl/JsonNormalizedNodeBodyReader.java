@@ -153,13 +153,7 @@ public class JsonNormalizedNodeBodyReader
             }
         }
 
-        final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
-                path.getInstanceIdentifier().getPathArguments(), iiToDataList));
-
-        newIIContext = new InstanceIdentifierContext(fullIIToData, path.getSchemaNode(), path.getMountPoint(),
-                path.getSchemaContext());
-
-        return new NormalizedNodeContext(newIIContext, result);
+        return new NormalizedNodeContext(path.withConcatenatedArgs(iiToDataList), result);
     }
 
     private static void propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {

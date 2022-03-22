@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -158,14 +157,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             parsed = null;
         }
 
-        final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
-                pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));
-
-        final InstanceIdentifierContext outIIContext = new InstanceIdentifierContext(
-                fullIIToData, pathContext.getSchemaNode(), pathContext.getMountPoint(), pathContext.getSchemaContext());
-
         // FIXME: can result really be null?
-        return NormalizedNodePayload.ofNullable(outIIContext, parsed);
+        return NormalizedNodePayload.ofNullable(pathContext.withConcatenatedArgs(iiToDataList), parsed);
     }
 
     private static Deque<Object> findPathToSchemaNodeByName(final DataSchemaNode schemaNode, final String elementName,
