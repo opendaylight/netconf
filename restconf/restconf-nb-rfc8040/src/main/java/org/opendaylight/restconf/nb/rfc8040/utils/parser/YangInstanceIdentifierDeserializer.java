@@ -15,13 +15,11 @@ import com.google.common.collect.ImmutableMap;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath.Step;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -32,19 +30,17 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -84,31 +80,84 @@ public final class YangInstanceIdentifierDeserializer {
         return new YangInstanceIdentifierDeserializer(schemaContext, path).parse();
     }
 
+    // FIXME: NETCONF-818: this method really needs to report an Inference and optionally a YangInstanceIdentifier
+    // - we need the inference for discerning the correct context
+    // - RPCs do not have a YangInstanceIdentifier
+    // - Actions always have a YangInstanceIdentifier, but it points to their parent
+    // - we need to discern the cases RPC invocation, Action invocation and data tree access quickly
+    //
+    // All of this really is an utter mess because we end up calling into this code from various places which,
+    // for example, should not allow RPCs to be valid targets
     private ImmutableList<PathArgument> parse() {
-        final var steps = apiPath.steps();
-        if (steps.isEmpty()) {
+        final var it = apiPath.steps().iterator();
+        if (!it.hasNext()) {
             return ImmutableList.of();
         }
 
-        final List<PathArgument> path = new ArrayList<>();
-        DataSchemaContextNode<?> parentNode = DataSchemaContextTree.from(schemaContext).getRoot();
-        QNameModule parentNs = null;
-        for (Step step : steps) {
-            final var module = step.module();
-            final QNameModule ns;
-            if (module == null) {
-                if (parentNs == null) {
-                    throw new RestconfDocumentedException(
-                        "First member must use namespace-qualified form, '" + step.identifier() + "' does not",
-                        ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-                }
-                ns = parentNs;
-            } else {
-                ns = resolveNamespace(module);
+        // First step is somewhat special:
+        // - it has to contain a module qualifier
+        // - it has to consider RPCs, for which we need SchemaContext
+        //
+        // We therefore peel that first iteration here and not worry about those details in further iterations
+        var step = it.next();
+        final var firstModule = RestconfDocumentedException.throwIfNull(step.module(),
+            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+            "First member must use namespace-qualified form, '%s' does not", step.identifier());
+        var namespace = resolveNamespace(firstModule);
+        var qname = step.identifier().bindTo(namespace);
+
+        // We go through more modern APIs here to get this special out of the way quickly
+        final var optRpc = schemaContext.findModuleStatement(namespace).orElseThrow()
+            .findSchemaTreeNode(RpcEffectiveStatement.class, qname);
+        if (optRpc.isPresent()) {
+            // We have found an RPC match,
+            if (it.hasNext()) {
+                throw new RestconfDocumentedException("First step in the path resolves to RPC '" + qname + "' and "
+                    + "therefore it must be the only step present", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            }
+            if (step instanceof ListInstance) {
+                throw new RestconfDocumentedException("First step in the path resolves to RPC '" + qname + "' and "
+                    + "therefore it must not contain key values", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
 
-            final QName qname = step.identifier().bindTo(ns);
-            final DataSchemaContextNode<?> childNode = nextContextNode(parentNode, qname, path);
+            // Legacy behavior: RPCs do not really have a YangInstanceIdentifier, but the rest of the code expects it
+            return ImmutableList.of(new NodeIdentifier(qname));
+        }
+
+        final var path = new ArrayList<PathArgument>();
+        var parentNode = DataSchemaContextTree.from(schemaContext).getRoot();
+        while (true) {
+            final var parentSchema = parentNode.getDataSchemaNode();
+            if (parentSchema instanceof ActionNodeContainer) {
+                if (((ActionNodeContainer) parentSchema).findAction(qname).isPresent()) {
+                    if (it.hasNext()) {
+                        throw new RestconfDocumentedException("Request path resolves to action '" + qname + "' and "
+                            + "therefore it must not continue past it", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                    }
+                    if (step instanceof ListInstance) {
+                        throw new RestconfDocumentedException("Request path resolves to action '" + qname + "' and "
+                            + "therefore it must not contain key values",
+                            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                    }
+
+                    // Legacy behavior: Action's path should not include its path, but the rest of the code expects it
+                    path.add(new NodeIdentifier(qname));
+                    break;
+                }
+            }
+
+            // Resolve the child step with respect to data schema tree
+            final var found = RestconfDocumentedException.throwIfNull(parentNode.getChild(qname),
+                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Schema for '%s' not found", qname);
+
+            // Now add all mixins encountered to the path
+            var childNode = found;
+            while (childNode.isMixin()) {
+                path.add(childNode.getIdentifier());
+                childNode = verifyNotNull(childNode.getChild(qname),
+                    "Mixin %s is missing child for %s while resolving %s", childNode, qname, found);
+            }
+
             final PathArgument pathArg;
             if (step instanceof ListInstance) {
                 final var values = ((ListInstance) step).keyValues();
@@ -116,19 +165,27 @@ public final class YangInstanceIdentifierDeserializer {
                 pathArg = schema instanceof ListSchemaNode
                     ? prepareNodeWithPredicates(qname, (ListSchemaNode) schema, values)
                         : prepareNodeWithValue(qname, schema, values);
-            } else if (childNode != null) {
+            } else {
                 RestconfDocumentedException.throwIf(childNode.isKeyedEntry(),
                     ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
                     "Entry '%s' requires key or value predicate to be present.", qname);
                 pathArg = childNode.getIdentifier();
-            } else {
-                // FIXME: this should be a hard error here, as we cannot resolve the node correctly!
-                pathArg = NodeIdentifier.create(qname);
             }
 
             path.add(pathArg);
+
+            if (!it.hasNext()) {
+                break;
+            }
+
             parentNode = childNode;
-            parentNs = ns;
+            step = it.next();
+            final var module = step.module();
+            if (module != null) {
+                namespace = resolveNamespace(module);
+            }
+
+            qname = step.identifier().bindTo(namespace);
         }
 
         return ImmutableList.copyOf(path);
@@ -185,48 +242,6 @@ public final class YangInstanceIdentifierDeserializer {
         return new NodeWithValue<>(qname, prepareValueByType(schema,
             // FIXME: ahem: we probably want to do something differently here
             keyValues.get(0)));
-    }
-
-    private DataSchemaContextNode<?> nextContextNode(final DataSchemaContextNode<?> parent, final QName qname,
-            final List<PathArgument> path) {
-        final var found = parent.getChild(qname);
-        if (found == null) {
-            // FIXME: why are we making this special case here, especially with ...
-            final var module = schemaContext.findModule(qname.getModule());
-            if (module.isPresent()) {
-                for (final RpcDefinition rpcDefinition : module.get().getRpcs()) {
-                    // ... this comparison?
-                    if (rpcDefinition.getQName().getLocalName().equals(qname.getLocalName())) {
-                        return null;
-                    }
-                }
-            }
-            if (findActionDefinition(parent.getDataSchemaNode(), qname.getLocalName()).isPresent()) {
-                return null;
-            }
-
-            throw new RestconfDocumentedException("Schema for '" + qname + "' not found",
-                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
-        }
-
-        var result = found;
-        while (result.isMixin()) {
-            path.add(result.getIdentifier());
-            result = verifyNotNull(result.getChild(qname), "Mixin %s is missing child for %s while resolving %s",
-                result, qname, found);
-        }
-        return result;
-    }
-
-    private static Optional<? extends ActionDefinition> findActionDefinition(final DataSchemaNode dataSchemaNode,
-            // FIXME: this should be using a namespace
-            final String nodeName) {
-        if (dataSchemaNode instanceof ActionNodeContainer) {
-            return ((ActionNodeContainer) dataSchemaNode).getActions().stream()
-                    .filter(actionDef -> actionDef.getQName().getLocalName().equals(nodeName))
-                    .findFirst();
-        }
-        return Optional.empty();
     }
 
     private QName toIdentityrefQName(final String value, final DataSchemaNode schemaNode) {
