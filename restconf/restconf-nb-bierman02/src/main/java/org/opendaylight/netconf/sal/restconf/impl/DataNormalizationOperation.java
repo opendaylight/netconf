@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -61,7 +60,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
     }
 
     Set<QName> getQNameIdentifiers() {
-        return Collections.singleton(identifier.getNodeType());
+        return ImmutableSet.of(identifier.getNodeType());
     }
 
     abstract DataNormalizationOperation<?> getChild(PathArgument child) throws DataNormalizationException;
@@ -100,14 +99,12 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
     private abstract static class DataContainerNormalizationOperation<T extends PathArgument>
             extends DataNormalizationOperation<T> {
         private final DataNodeContainer schema;
-        private final Map<QName, DataNormalizationOperation<?>> byQName;
-        private final Map<PathArgument, DataNormalizationOperation<?>> byArg;
+        private final Map<QName, DataNormalizationOperation<?>> byQName = new ConcurrentHashMap<>();
+        private final Map<PathArgument, DataNormalizationOperation<?>> byArg = new ConcurrentHashMap<>();
 
         DataContainerNormalizationOperation(final T identifier, final DataNodeContainer schema) {
             super(identifier);
             this.schema = schema;
-            this.byArg = new ConcurrentHashMap<>();
-            this.byQName = new ConcurrentHashMap<>();
         }
 
         @Override
@@ -282,8 +279,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
 
         MapMixinNormalization(final ListSchemaNode list) {
             super(new NodeIdentifier(list.getQName()));
-            this.innerNode = new ListItemNormalization(NodeIdentifierWithPredicates.of(list.getQName(),
-                    Collections.<QName, Object>emptyMap()), list);
+            innerNode = new ListItemNormalization(NodeIdentifierWithPredicates.of(list.getQName()), list);
         }
 
         @Override
@@ -308,7 +304,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
 
         UnkeyedListMixinNormalization(final ListSchemaNode list) {
             super(new NodeIdentifier(list.getQName()));
-            this.innerNode = new UnkeyedListItemNormalization(list);
+            innerNode = new UnkeyedListItemNormalization(list);
         }
 
         @Override
@@ -359,6 +355,11 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         @Override
         DataNormalizationOperation<?> getChild(final QName child) {
             return byQName.get(child);
+        }
+
+        @Override
+        Set<QName> getQNameIdentifiers() {
+            return byQName.keySet();
         }
     }
 
