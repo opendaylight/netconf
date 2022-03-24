@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import static com.google.common.base.Verify.verifyNotNull;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -15,6 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.Identifiable;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -38,6 +42,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.util.EffectiveAugmentationSchema;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 abstract class DataNormalizationOperation<T extends PathArgument> implements Identifiable<T> {
     private final T identifier;
@@ -67,6 +72,27 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
 
     abstract DataNormalizationOperation<?> getChild(QName child) throws DataNormalizationException;
 
+    final @Nullable DataNormalizationOperation<?> enterChild(final SchemaInferenceStack stack, final QName child)
+            throws DataNormalizationException {
+        return enterChild(requireNonNull(child), requireNonNull(stack)) ;
+    }
+
+    abstract @Nullable DataNormalizationOperation<?> enterChild(@NonNull QName child,
+        @NonNull SchemaInferenceStack stack) throws DataNormalizationException;
+
+    final @Nullable DataNormalizationOperation<?> enterChild(final SchemaInferenceStack stack,
+            final PathArgument child) throws DataNormalizationException {
+        return enterChild(requireNonNull(child), requireNonNull(stack));
+    }
+
+    abstract @Nullable DataNormalizationOperation<?> enterChild(@NonNull PathArgument child,
+        @NonNull SchemaInferenceStack stack) throws DataNormalizationException;
+
+    void pushToStack(final @NonNull SchemaInferenceStack stack) {
+        // Accurate for most subclasses
+        stack.enterSchemaTree(getIdentifier().getNodeType());
+    }
+
     private abstract static class SimpleTypeNormalization<T extends PathArgument>
             extends DataNormalizationOperation<T> {
         SimpleTypeNormalization(final T identifier) {
@@ -82,6 +108,16 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         final DataNormalizationOperation<?> getChild(final QName child) {
             return null;
         }
+
+        @Override
+        final DataNormalizationOperation<?> enterChild(final QName child, final SchemaInferenceStack stack) {
+            return null;
+        }
+
+        @Override
+        final DataNormalizationOperation<?> enterChild(final PathArgument child, final SchemaInferenceStack stack) {
+            return null;
+        }
     }
 
     private static final class LeafNormalization extends SimpleTypeNormalization<NodeIdentifier> {
@@ -93,6 +129,11 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
     private static final class LeafListEntryNormalization extends SimpleTypeNormalization<NodeWithValue> {
         LeafListEntryNormalization(final LeafListSchemaNode potential) {
             super(new NodeWithValue<>(potential.getQName(), Empty.value()));
+        }
+
+        @Override
+        protected void pushToStack(final SchemaInferenceStack stack) {
+            // No-op
         }
     }
 
@@ -125,6 +166,26 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             }
             potential = fromLocalSchemaAndQName(schema, child);
             return register(potential);
+        }
+
+        @Override
+        final DataNormalizationOperation<?> enterChild(final QName child, final SchemaInferenceStack stack)
+                throws DataNormalizationException {
+            return pushToStack(getChild(child), stack);
+        }
+
+        @Override
+        final DataNormalizationOperation<?> enterChild(final PathArgument child, final SchemaInferenceStack stack)
+                throws DataNormalizationException {
+            return pushToStack(getChild(child), stack);
+        }
+
+        private static @Nullable DataNormalizationOperation<?> pushToStack(
+                final @Nullable DataNormalizationOperation<?> child, final @NonNull SchemaInferenceStack stack) {
+            if (child != null) {
+                child.pushToStack(stack);
+            }
+            return child;
         }
 
         private DataNormalizationOperation<?> fromLocalSchema(final PathArgument child)
@@ -174,12 +235,22 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         ListItemNormalization(final NodeIdentifierWithPredicates identifier, final ListSchemaNode schema) {
             super(identifier, schema);
         }
+
+        @Override
+        protected void pushToStack(final SchemaInferenceStack stack) {
+            // No-op
+        }
     }
 
     private static final class UnkeyedListItemNormalization
             extends DataContainerNormalizationOperation<NodeIdentifier> {
         UnkeyedListItemNormalization(final ListSchemaNode schema) {
             super(new NodeIdentifier(schema.getQName()), schema);
+        }
+
+        @Override
+        protected void pushToStack(final SchemaInferenceStack stack) {
+            // No-op
         }
     }
 
@@ -200,7 +271,26 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
     }
 
-    private static final class LeafListMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
+    private abstract static class ListLikeNormalizationOp<T extends PathArgument> extends MixinNormalizationOp<T> {
+        ListLikeNormalizationOp(final T identifier) {
+            super(identifier);
+        }
+
+        @Override
+        protected final DataNormalizationOperation<?> enterChild(final QName child, final SchemaInferenceStack stack)
+                throws DataNormalizationException {
+            // Stack is already pointing to the corresponding statement, now we are just working with the child
+            return getChild(child);
+        }
+
+        @Override
+        protected final DataNormalizationOperation<?> enterChild(final PathArgument child,
+                final SchemaInferenceStack stack) throws DataNormalizationException {
+            return getChild(child);
+        }
+    }
+
+    private static final class LeafListMixinNormalization extends ListLikeNormalizationOp<NodeIdentifier> {
         private final DataNormalizationOperation<?> innerOp;
 
         LeafListMixinNormalization(final LeafListSchemaNode potential) {
@@ -265,6 +355,11 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             return getIdentifier().getPossibleChildNames();
         }
 
+        @Override
+        void pushToStack(final SchemaInferenceStack stack) {
+            // No-op
+        }
+
         private static AugmentationIdentifier augmentationIdentifierFrom(final AugmentationSchemaNode augmentation) {
             final ImmutableSet.Builder<QName> potentialChildren = ImmutableSet.builder();
             for (final DataSchemaNode child : augmentation.getChildNodes()) {
@@ -274,7 +369,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
     }
 
-    private static final class MapMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
+    private static final class MapMixinNormalization extends ListLikeNormalizationOp<NodeIdentifier> {
         private final ListItemNormalization innerNode;
 
         MapMixinNormalization(final ListSchemaNode list) {
@@ -299,7 +394,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
     }
 
-    private static final class UnkeyedListMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
+    private static final class UnkeyedListMixinNormalization extends ListLikeNormalizationOp<NodeIdentifier> {
         private final UnkeyedListItemNormalization innerNode;
 
         UnkeyedListMixinNormalization(final ListSchemaNode list) {
@@ -327,9 +422,11 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
     private static final class ChoiceNodeNormalization extends MixinNormalizationOp<NodeIdentifier> {
         private final ImmutableMap<QName, DataNormalizationOperation<?>> byQName;
         private final ImmutableMap<PathArgument, DataNormalizationOperation<?>> byArg;
+        private final ImmutableMap<DataNormalizationOperation<?>, QName> childToCase;
 
         ChoiceNodeNormalization(final ChoiceSchemaNode schema) {
             super(new NodeIdentifier(schema.getQName()));
+            ImmutableMap.Builder<DataNormalizationOperation<?>, QName> childToCaseBuilder = ImmutableMap.builder();
             final ImmutableMap.Builder<QName, DataNormalizationOperation<?>> byQNameBuilder = ImmutableMap.builder();
             final ImmutableMap.Builder<PathArgument, DataNormalizationOperation<?>> byArgBuilder =
                     ImmutableMap.builder();
@@ -338,11 +435,13 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
                 for (final DataSchemaNode cazeChild : caze.getChildNodes()) {
                     final DataNormalizationOperation<?> childOp = fromDataSchemaNode(cazeChild);
                     byArgBuilder.put(childOp.getIdentifier(), childOp);
+                    childToCaseBuilder.put(childOp, caze.getQName());
                     for (final QName qname : childOp.getQNameIdentifiers()) {
                         byQNameBuilder.put(qname, childOp);
                     }
                 }
             }
+            childToCase = childToCaseBuilder.build();
             byQName = byQNameBuilder.build();
             byArg = byArgBuilder.build();
         }
@@ -360,6 +459,32 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         @Override
         Set<QName> getQNameIdentifiers() {
             return byQName.keySet();
+        }
+
+        @Override
+        DataNormalizationOperation<?> enterChild(final QName child, final SchemaInferenceStack stack) {
+            return pushToStack(getChild(child), stack);
+        }
+
+        @Override
+        DataNormalizationOperation<?> enterChild(final PathArgument child, final SchemaInferenceStack stack) {
+            return pushToStack(getChild(child), stack);
+        }
+
+        @Override
+        void pushToStack(final @NonNull SchemaInferenceStack stack) {
+            stack.enterChoice(getIdentifier().getNodeType());
+        }
+
+        private @Nullable DataNormalizationOperation<?> pushToStack(final @Nullable DataNormalizationOperation<?> child,
+                final @NonNull SchemaInferenceStack stack) {
+            if (child != null) {
+                final var caseName = verifyNotNull(childToCase.get(child), "No case statement for %s in %s", child,
+                    this);
+                stack.enterSchemaTree(caseName);
+                child.pushToStack(stack);
+            }
+            return child;
         }
     }
 
