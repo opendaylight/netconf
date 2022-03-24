@@ -41,14 +41,13 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     public final void serialize(final DataTreeCandidate candidate, final boolean leafNodesOnly, final boolean skipData)
             throws T {
-        final Deque<PathArgument> path = new ArrayDeque<>();
-        path.addAll(candidate.getRootPath().getPathArguments());
         if (leafNodesOnly) {
+            final Deque<PathArgument> path = new ArrayDeque<>();
+            path.addAll(candidate.getRootPath().getPathArguments());
             serializeLeafNodesOnly(path, candidate.getRootNode(), skipData);
-            return;
+        } else {
+            serializeData(candidate.getRootPath().getPathArguments(), candidate.getRootNode(), skipData);
         }
-
-        serializeData(path, candidate.getRootNode(), skipData);
     }
 
     void serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
