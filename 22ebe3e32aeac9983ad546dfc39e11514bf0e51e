@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63d0b575_ee54571f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-03-24T14:25:08Z",
+      "side": 1,
+      "message": "Looks good to me",
+      "revId": "22ebe3e32aeac9983ad546dfc39e11514bf0e51e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa8d3cd6_70c40352",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/serializer/AbstractWebsocketSerializer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-03-24T14:25:08Z",
+      "side": 1,
+      "message": "In the past we used to have QName module name, but that was removed. \nI noticed the path now looks like this: /urn-TBD-params-xml-ns-yang-network-topology:network-topology/urn-TBD-params-xml-ns-yang-network-topology:topology/urn-TBD-params-xml-ns-yang-network-topology:topology[urn-TBD-params-xml-ns-yang-network-topology:topology-id\u003d\u0027topology-netconf\u0027]/urn-TBD-params-xml-ns-yang-network-topology:node/urn-TBD-params-xml-ns-yang-network-topology:node[urn-TBD-params-xml-ns-yang-network-topology:node-id\u003d\u0027testtool\u0027]/urn-opendaylight-netconf-node-topology:port\nI suspect this is not RFC7950 compliant. Correct me if I am wrong.",
+      "revId": "22ebe3e32aeac9983ad546dfc39e11514bf0e51e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
