@@ -38,6 +38,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "99766364_fbb69108",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-24T14:00:06Z",
+      "side": 1,
+      "message": "`private final Map\u003cString, Boolean\u003e existingSessions \u003d new ConcurrentHashMap\u003c\u003e()`\n\nshould be enough.\n\nEven do we need a map? What about just set?",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f91e166a_effe7e16",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 4

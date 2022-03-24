@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4390985c_dd9816b7",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-24T14:00:06Z",
+      "side": 1,
+      "message": "IMO: The sessionId equality is already verified by `putIfAbsent` method.\n\n```\n            final var session \u003d new CallHomeSessionContext(sshSession, authorization, remoteAddress, this);\n            final var preexisting \u003d sessions.putIfAbsent(session.getSessionId(), session);\n            existingSessions.put(session.getSessionId(), preexisting !\u003d null);\n            return preexisting \u003d\u003d null ? session : null;\n```",
+      "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1365e485_896b7d99",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-24T14:00:06Z",
+      "side": 1,
+      "message": "```\n        Map\u003cString, Boolean\u003e getExistingSessions() {\n            return ImmutableMap.copyOf(existingSessions);\n        }\n```\n\nThis way we can defend our internal logic.",
+      "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ed9009a_d0b3e9f7",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-24T14:00:06Z",
+      "side": 1,
+      "message": "Lets leave this as it was..",
+      "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "927f249a_2bfba67e",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-24T14:00:06Z",
+      "side": 1,
+      "message": "`Map\u003cString, Boolean\u003e existingSessions \u003d new ConcurrentHashMap\u003c\u003e()`\nis enough.",
+      "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
