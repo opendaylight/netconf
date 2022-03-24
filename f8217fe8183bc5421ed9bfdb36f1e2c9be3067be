@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdf4c5f9_3d0dd20b",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 857,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-03-24T14:10:18Z",
+      "side": 1,
+      "message": "Maybe we can better reuse compiled pattern when it will be a class constant.\nJust name it AUTOMATON_SPECIAL_CHARACTERS and comment its usage directly on the regex. This method can be then deleted.",
+      "revId": "f8217fe8183bc5421ed9bfdb36f1e2c9be3067be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
