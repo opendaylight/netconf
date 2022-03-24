@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0307d665_3d17f3c7",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/JSONDataTreeCandidateFormatter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-03-24T16:35:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b14d233_157063cb",
+      "range": {
+        "startLine": 87,
+        "startChar": 9,
+        "endLine": 87,
+        "endChar": 62
+      },
+      "revId": "cebb8f3aed2afcc431f28c422260f43ec692a792",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8cd78a6e_ff55cf31",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aebb30f_3a6f27a6",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/XMLDataTreeCandidateFormatter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-03-24T16:35:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8cd78a6e_ff55cf31",
+      "range": {
+        "startLine": 89,
+        "startChar": 8,
+        "endLine": 89,
+        "endChar": 55
+      },
+      "revId": "cebb8f3aed2afcc431f28c422260f43ec692a792",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6e04b23_5acac739",
@@ -60,6 +108,30 @@
       "writtenOn": "2022-03-24T12:01:55Z",
       "side": 1,
       "message": "combine the check. also this is a terrible idea to do in SUBTREE_MODIFIED case",
+      "range": {
+        "startLine": 56,
+        "startChar": 20,
+        "endLine": 56,
+        "endChar": 74
+      },
+      "revId": "cebb8f3aed2afcc431f28c422260f43ec692a792",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1af6f8d_689214be",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/serializer/AbstractWebsocketSerializer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-03-24T16:35:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6e04b23_5acac739",
       "range": {
         "startLine": 56,
         "startChar": 20,
