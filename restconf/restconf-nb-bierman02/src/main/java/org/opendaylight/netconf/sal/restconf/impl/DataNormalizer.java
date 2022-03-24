@@ -10,7 +10,9 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -23,7 +25,7 @@ class DataNormalizer {
     }
 
     YangInstanceIdentifier toNormalized(final YangInstanceIdentifier legacy) {
-        ImmutableList.Builder<PathArgument> normalizedArgs = ImmutableList.builder();
+        List<PathArgument> normalizedArgs = new ArrayList<>();
 
         DataNormalizationOperation<?> currentOp = operation;
         Iterator<PathArgument> arguments = legacy.getPathArguments().iterator();
@@ -34,7 +36,7 @@ class DataNormalizer {
                 currentOp = currentOp.getChild(legacyArg);
                 checkArgument(currentOp != null,
                         "Legacy Instance Identifier %s is not correct. Normalized Instance Identifier so far %s",
-                        legacy, normalizedArgs.build());
+                        legacy, normalizedArgs);
                 while (currentOp.isMixin()) {
                     normalizedArgs.add(currentOp.getIdentifier());
                     currentOp = currentOp.getChild(legacyArg.getNodeType());
@@ -42,10 +44,10 @@ class DataNormalizer {
                 normalizedArgs.add(legacyArg);
             }
         } catch (DataNormalizationException e) {
-            throw new IllegalArgumentException(String.format("Failed to normalize path %s", legacy), e);
+            throw new IllegalArgumentException("Failed to normalize path " + legacy, e);
         }
 
-        return YangInstanceIdentifier.create(normalizedArgs.build());
+        return YangInstanceIdentifier.create(normalizedArgs);
     }
 
     DataNormalizationOperation<?> getOperation(final YangInstanceIdentifier legacy)
