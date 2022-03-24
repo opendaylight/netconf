@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b14d233_157063cb",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/JSONDataTreeCandidateFormatter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-03-24T12:01:55Z",
+      "side": 1,
+      "message": "this is a useless local\nanyway, we end up doing toString() twice -- and since we should know when we emitted no events -- for example by serializer.serialize() indicating what it has done",
+      "range": {
+        "startLine": 87,
+        "startChar": 9,
+        "endLine": 87,
+        "endChar": 62
+      },
+      "revId": "cebb8f3aed2afcc431f28c422260f43ec692a792",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cd78a6e_ff55cf31",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/formatters/XMLDataTreeCandidateFormatter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-03-24T12:01:55Z",
+      "side": 1,
+      "message": "same as JSON",
+      "range": {
+        "startLine": 89,
+        "startChar": 8,
+        "endLine": 89,
+        "endChar": 55
+      },
+      "revId": "cebb8f3aed2afcc431f28c422260f43ec692a792",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6e04b23_5acac739",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/serializer/AbstractWebsocketSerializer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-03-24T12:01:55Z",
+      "side": 1,
+      "message": "combine the check. also this is a terrible idea to do in SUBTREE_MODIFIED case",
+      "range": {
+        "startLine": 56,
+        "startChar": 20,
+        "endLine": 56,
+        "endChar": 74
+      },
+      "revId": "cebb8f3aed2afcc431f28c422260f43ec692a792",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
