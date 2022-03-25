@@ -62,6 +62,13 @@ public final class InstanceIdentifierContext {
         return new InstanceIdentifierContext(context, null);
     }
 
+    // Legacy bierman02 invokeRpc()
+    public static @NonNull InstanceIdentifierContext ofLocalRpc(final EffectiveModelContext context,
+        // FIXME: this this method really needed?
+            final RpcDefinition rpc) {
+        return new InstanceIdentifierContext(context, rpc, null);
+    }
+
     public static @NonNull InstanceIdentifierContext ofLocalRpcInput(final EffectiveModelContext context,
             // FIXME: this this method really needed?
             final RpcDefinition rpc) {

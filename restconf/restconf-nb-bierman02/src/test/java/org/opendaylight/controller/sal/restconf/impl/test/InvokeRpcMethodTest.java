@@ -64,6 +64,7 @@ import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -104,7 +105,6 @@ public class InvokeRpcMethodTest {
      * string - first argument).
      */
     @Test
-    @Ignore
     public void invokeRpcMethodTest() {
         controllerContext.findModuleNameByNamespace(XMLNamespace.of("invoke:rpc:module"));
 
@@ -122,15 +122,15 @@ public class InvokeRpcMethodTest {
         final Module rpcModule = schema.findModules("invoke-rpc-module").iterator().next();
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "rpc-test");
-        ContainerLike rpcInputSchemaNode = null;
+        RpcDefinition rpcSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcInputSchemaNode = rpc.getInput();
+                rpcSchemaNode = rpc;
                 break;
             }
         }
-        assertNotNull(rpcInputSchemaNode);
-
+        assertNotNull(rpcSchemaNode);
+        final InputSchemaNode rpcInputSchemaNode = rpcSchemaNode.getInput();
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> container =
                 SchemaAwareBuilders.containerBuilder(rpcInputSchemaNode);
 
@@ -148,8 +148,8 @@ public class InvokeRpcMethodTest {
         contNode.withChild(lfNode);
         container.withChild(contNode.build());
 
-        return new NormalizedNodeContext(
-                new InstanceIdentifierContext(null, rpcInputSchemaNode, null, schema), container.build());
+        return new NormalizedNodeContext(InstanceIdentifierContext.ofLocalRpc(schema, rpcSchemaNode),
+            container.build());
     }
 
     @Test

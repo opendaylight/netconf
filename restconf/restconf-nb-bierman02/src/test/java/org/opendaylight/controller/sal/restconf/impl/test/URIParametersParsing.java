@@ -169,7 +169,6 @@ public class URIParametersParsing {
         when(rpcDef.getPath()).thenReturn(SchemaPath.create(true, rpcQName));
         when(rpcDef.getQName()).thenReturn(rpcQName);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext(null, rpcDef, null, schema),
-                container.build());
+        return new NormalizedNodeContext(InstanceIdentifierContext.ofLocalRpc(schema, rpcDef), container.build());
     }
 }

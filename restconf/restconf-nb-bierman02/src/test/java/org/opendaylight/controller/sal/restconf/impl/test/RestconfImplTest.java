@@ -174,7 +174,7 @@ public class RestconfImplTest {
 
         final RpcDefinition schemaNode = mock(RpcDefinition.class);
         doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();
-        doReturn(new InstanceIdentifierContext(null, schemaNode, null, null)).when(payload)
+        doReturn(InstanceIdentifierContext.ofLocalRpc(schemaContext, schemaNode)).when(payload)
                 .getInstanceIdentifierContext();
 
         doReturn(QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",
