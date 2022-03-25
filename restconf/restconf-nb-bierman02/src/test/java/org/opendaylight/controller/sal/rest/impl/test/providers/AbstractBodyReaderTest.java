@@ -8,12 +8,13 @@
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -49,7 +50,7 @@ public abstract class AbstractBodyReaderTest {
     protected final MediaType mediaType;
 
     protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext, final DOMMountPoint mountInstance) {
-        this.mediaType = getMediaType();
+        mediaType = getMediaType();
 
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
     }
@@ -67,7 +68,7 @@ public abstract class AbstractBodyReaderTest {
         final MultivaluedMap<String, String> pathParm = new MultivaluedHashMap<>(1);
 
         if (!identifier.isEmpty()) {
-            pathParm.put(RestconfConstants.IDENTIFIER, Collections.singletonList(identifier));
+            pathParm.put(RestconfConstants.IDENTIFIER, List.of(identifier));
         }
 
         when(uriInfoMock.getPathParameters()).thenReturn(pathParm);
@@ -86,16 +87,21 @@ public abstract class AbstractBodyReaderTest {
         requestField.set(normalizedNodeProvider, request);
     }
 
-    protected static void checkMountPointNormalizedNodeContext(
-            final NormalizedNodeContext nnContext) {
+    protected static void checkMountPointNormalizedNodeContext(final NormalizedNodeContext nnContext) {
         checkNormalizedNodeContext(nnContext);
         assertNotNull(nnContext.getInstanceIdentifierContext().getMountPoint());
     }
 
-    protected static void checkNormalizedNodeContext(
-            final NormalizedNodeContext nnContext) {
+    protected static void checkNormalizedNodeContext(final NormalizedNodeContext nnContext) {
         assertNotNull(nnContext.getData());
         assertNotNull(nnContext.getInstanceIdentifierContext().getInstanceIdentifier());
+        assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaContext());
+        assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaNode());
+    }
+
+    protected static void checkNormalizedNodeContextRpc(final NormalizedNodeContext nnContext) {
+        assertNotNull(nnContext.getData());
+        assertNull(nnContext.getInstanceIdentifierContext().getInstanceIdentifier());
         assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaContext());
         assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaNode());
     }

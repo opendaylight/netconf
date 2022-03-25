@@ -45,7 +45,7 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
 
     public TestJsonBodyReaderMountPoint() throws NoSuchFieldException, SecurityException {
         super(schemaContext, mock(DOMMountPoint.class));
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(controllerContext);
+        jsonBodyReader = new JsonNormalizedNodeBodyReader(controllerContext);
     }
 
     @Override
@@ -65,11 +65,11 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
         final DataSchemaNode dataSchemaNode = schemaContext
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont";
-        mockBodyReader(uri, this.jsonBodyReader, false);
+        mockBodyReader(uri, jsonBodyReader, false);
         final InputStream inputStream = TestJsonBodyReaderMountPoint.class
                 .getResourceAsStream("/instanceidentifier/json/jsondata.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
+        final NormalizedNodeContext returnValue = jsonBodyReader.readFrom(null,
+                null, null, mediaType, null, inputStream);
         checkMountPointNormalizedNodeContext(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue);
     }
@@ -79,11 +79,11 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
         final DataSchemaNode dataSchemaNode = schemaContext
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont/cont1";
-        mockBodyReader(uri, this.jsonBodyReader, false);
+        mockBodyReader(uri, jsonBodyReader, false);
         final InputStream inputStream = TestJsonBodyReaderMountPoint.class
                 .getResourceAsStream("/instanceidentifier/json/json_sub_container.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
+        final NormalizedNodeContext returnValue = jsonBodyReader.readFrom(null,
+                null, null, mediaType, null, inputStream);
         checkMountPointNormalizedNodeContext(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue,
                 QName.create(dataSchemaNode.getQName(), "cont1"));
@@ -94,11 +94,11 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
         final DataSchemaNode dataSchemaNode = schemaContext
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont";
-        mockBodyReader(uri, this.jsonBodyReader, true);
+        mockBodyReader(uri, jsonBodyReader, true);
         final InputStream inputStream = TestJsonBodyReaderMountPoint.class
                 .getResourceAsStream("/instanceidentifier/json/json_sub_container.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
+        final NormalizedNodeContext returnValue = jsonBodyReader.readFrom(null,
+                null, null, mediaType, null, inputStream);
         checkMountPointNormalizedNodeContext(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue);
     }
@@ -106,12 +106,12 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
     @Test
     public void rpcModuleInputTest() throws Exception {
         final String uri = "instance-identifier-module:cont/yang-ext:mount/invoke-rpc-module:rpc-test";
-        mockBodyReader(uri, this.jsonBodyReader, true);
-        final InputStream inputStream = TestJsonBodyReaderMountPoint.class
-                .getResourceAsStream("/invoke-rpc/json/rpc-input.json");
-        final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
-        checkNormalizedNodeContext(returnValue);
+        mockBodyReader(uri, jsonBodyReader, true);
+        final InputStream inputStream = TestJsonBodyReaderMountPoint.class.getResourceAsStream(
+            "/invoke-rpc/json/rpc-input.json");
+        final NormalizedNodeContext returnValue = jsonBodyReader.readFrom(null, null, null, mediaType, null,
+            inputStream);
+        checkNormalizedNodeContextRpc(returnValue);
         final ContainerNode inputNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(
                 QName.create(inputNode.getIdentifier().getNodeType(), "cont"));

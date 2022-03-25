@@ -100,6 +100,11 @@ public final class InstanceIdentifierContext {
         return new InstanceIdentifierContext(mountContext, requireNonNull(mountPoint));
     }
 
+    public static @NonNull InstanceIdentifierContext ofMountPointRpc(final DOMMountPoint mountPoint,
+            final EffectiveModelContext mountContext, final RpcDefinition rpc) {
+        return new InstanceIdentifierContext(mountContext, rpc, requireNonNull(mountPoint));
+    }
+
     public static @NonNull InstanceIdentifierContext ofMountPointRpcOutput(final DOMMountPoint mountPoint,
             final EffectiveModelContext mountContext, final RpcDefinition rpc) {
         return new InstanceIdentifierContext(mountContext, rpc, requireNonNull(mountPoint));
@@ -107,7 +112,7 @@ public final class InstanceIdentifierContext {
 
     // FIXME: what the heck are the callers of this doing?!
     public @NonNull InstanceIdentifierContext withConcatenatedArgs(final List<PathArgument> concatArgs) {
-        if (concatArgs.isEmpty()) {
+        if (instanceIdentifier == null || concatArgs.isEmpty()) {
             return this;
         }
         final var newInstanceIdentifier = YangInstanceIdentifier.create(
