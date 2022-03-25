@@ -46,9 +46,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,21 +107,24 @@ public class JsonNormalizedNodeBodyReader
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final SchemaInferenceStack parentSchema;
+        final Inference parentInference;
         if (isPost) {
             // FIXME: We need dispatch for RPC.
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(), path.getSchemaNode().getPath());
-        } else if (path.getSchemaNode() instanceof SchemaContext
-                || SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
-            parentSchema = SchemaInferenceStack.of(path.getSchemaContext());
+            parentInference = path.inference();
         } else {
-            parentSchema = SchemaInferenceStack.ofSchemaPath(path.getSchemaContext(),
-                path.getSchemaNode().getPath().getParent());
+            final var inference = path.inference();
+            if (!inference.statementPath().isEmpty()) {
+                final var stack = inference.toSchemaInferenceStack();
+                stack.exit();
+                parentInference = stack.toInference();
+            } else {
+                parentInference = inference;
+            }
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
             JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(path.getSchemaContext()),
-            parentSchema.toInference());
+            parentInference);
         final JsonReader reader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get(),
                 StandardCharsets.UTF_8));
         jsonParser.parse(reader);
