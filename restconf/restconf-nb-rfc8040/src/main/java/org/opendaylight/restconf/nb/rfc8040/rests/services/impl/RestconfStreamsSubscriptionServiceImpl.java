@@ -25,7 +25,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -44,8 +43,6 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         QName.create("subscribe:to:notification", "2016-10-28", "location").intern();
     private static final NodeIdentifier LOCATION_NODEID = NodeIdentifier.create(LOCATION_QNAME);
     private static final QName NOTIFI_QNAME = QName.create(LOCATION_QNAME, "notifi").intern();
-    private static final YangInstanceIdentifier LOCATION_PATH =
-        YangInstanceIdentifier.create(NodeIdentifier.create(NOTIFI_QNAME), LOCATION_NODEID);
 
     private final SubscribeToStreamUtil streamUtils;
     private final HandlersHolder handlersHolder;
@@ -95,14 +92,14 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @return InstanceIdentifier of Location leaf.
      */
     private static InstanceIdentifierContext prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
-        final Optional<Module> module = schemaHandler.get().findModule(NOTIFI_QNAME.getModule());
+        final var context = schemaHandler.get();
+        final Optional<Module> module = context.findModule(NOTIFI_QNAME.getModule());
         checkState(module.isPresent());
         final DataSchemaNode notify = module.get().dataChildByName(NOTIFI_QNAME);
         checkState(notify instanceof ContainerSchemaNode, "Unexpected non-container %s", notify);
-        final DataSchemaNode location = ((ContainerSchemaNode) notify).dataChildByName(LOCATION_QNAME);
-        checkState(location != null, "Missing location");
+        final DataSchemaNode location = ((ContainerSchemaNode) notify).getDataChildByName(LOCATION_QNAME);
 
-        return new InstanceIdentifierContext(LOCATION_PATH, location, null, schemaHandler.get());
+        return InstanceIdentifierContext.ofDataSchemaNode(context, location);
     }
 
     /**

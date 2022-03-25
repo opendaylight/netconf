@@ -17,7 +17,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -51,8 +50,7 @@ public class RestconfImpl implements RestconfService {
             (LeafSchemaNode) ((ContainerSchemaNode) grouping.getDataChildByName(Restconf.QNAME))
             .getDataChildByName(YANG_LIBRARY_VERSION);
 
-        return NormalizedNodePayload.of(new InstanceIdentifierContext(
-            YangInstanceIdentifier.of(YANG_LIBRARY_VERSION), schemaNode, null, context),
+        return NormalizedNodePayload.of(InstanceIdentifierContext.ofDataSchemaNode(context, schemaNode),
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, IetfYangLibrary.REVISION.toString()));
     }
 }
