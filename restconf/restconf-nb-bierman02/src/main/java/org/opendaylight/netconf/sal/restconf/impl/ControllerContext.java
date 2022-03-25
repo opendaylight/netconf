@@ -631,8 +631,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     rpc = getRpcDefinition(module, rpcName);
                 }
                 if (rpc != null) {
-                    return new InstanceIdentifierContext(builder.build(), rpc, mountPoint,
-                            mountPoint != null ? getModelContext(mountPoint) : globalSchema);
+                    return mountPoint == null ? InstanceIdentifierContext.ofLocalRpc(globalSchema, rpc)
+                        : InstanceIdentifierContext.ofMountPointRpc(mountPoint, getModelContext(mountPoint), rpc);
                 }
             }
 

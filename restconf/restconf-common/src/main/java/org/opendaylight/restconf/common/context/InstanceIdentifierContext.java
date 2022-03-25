@@ -100,6 +100,11 @@ public final class InstanceIdentifierContext {
         return new InstanceIdentifierContext(mountContext, requireNonNull(mountPoint));
     }
 
+    public static @NonNull InstanceIdentifierContext ofMountPointRpc(final DOMMountPoint mountPoint,
+            final EffectiveModelContext mountContext, final RpcDefinition rpc) {
+        return new InstanceIdentifierContext(mountContext, rpc, requireNonNull(mountPoint));
+    }
+
     public static @NonNull InstanceIdentifierContext ofMountPointRpcOutput(final DOMMountPoint mountPoint,
             final EffectiveModelContext mountContext, final RpcDefinition rpc) {
         return new InstanceIdentifierContext(mountContext, rpc, requireNonNull(mountPoint));
