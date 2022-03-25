@@ -69,7 +69,8 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA");
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA")
+            .path.getPathArguments();
         assertEquals(1, result.size());
         assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
     }
@@ -80,7 +81,8 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithLeafTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/leaf-A");
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/leaf-A")
+            .path.getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
         assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "leaf-A")), result.get(1));
@@ -93,7 +95,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeContainerWithListWithLeafListTest() {
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:contA/list-A=100/leaf-list-AA=instance");
+            "deserializer-test:contA/list-A=100/leaf-list-AA=instance").path.getPathArguments();
         assertEquals(5, result.size());
 
         // container
@@ -116,7 +118,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeContainerWithListWithActionTest() {
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "example-actions:interfaces/interface=eth0/reset");
+            "example-actions:interfaces/interface=eth0/reset").path.getPathArguments();
         assertEquals(4, result.size());
         // container
         assertEquals(NodeIdentifier.create(ACTIONS_INTERFACES), result.get(0));
@@ -135,7 +137,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeContainerWithChoiceSchemaNodeWithActionTest() {
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "example-actions:interfaces/typeA-gigabyte/interface=eth0/reboot");
+            "example-actions:interfaces/typeA-gigabyte/interface=eth0/reboot").path.getPathArguments();
         assertEquals(6, result.size());
 
         // container
@@ -161,7 +163,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeContainerWithChoiceCaseSchemaNodeWithActionTest() {
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "example-actions:interfaces/udp/reboot");
+            "example-actions:interfaces/udp/reboot").path.getPathArguments();
         assertEquals(4, result.size());
         // container
         assertEquals(NodeIdentifier.create(ACTIONS_INTERFACES), result.get(0));
@@ -179,7 +181,8 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeListWithNoKeysTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-no-key");
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-no-key")
+            .path.getPathArguments();
         assertEquals(2, result.size());
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-no-key");
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -193,7 +196,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeListWithOneKeyTest() {
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:list-one-key=value");
+            "deserializer-test:list-one-key=value").path.getPathArguments();
         assertEquals(2, result.size());
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-one-key");
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -213,7 +216,7 @@ public class YangInstanceIdentifierDeserializerTest {
             QName.create(list, "enabled"), false);
 
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:list-multiple-keys=value,100,false");
+            "deserializer-test:list-multiple-keys=value,100,false").path.getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(list), result.get(0));
         assertEquals(NodeIdentifierWithPredicates.of(list, values), result.get(1));
@@ -226,7 +229,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeLeafListTest() {
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:leaf-list-0=true");
+            "deserializer-test:leaf-list-0=true").path.getPathArguments();
         assertEquals(2, result.size());
 
         final QName leafList = QName.create("deserializer:test", "2016-06-06", "leaf-list-0");
@@ -239,7 +242,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeEmptyDataTest() {
-        assertEquals(List.of(), YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, ""));
+        assertEquals(List.of(), YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "").path.getPathArguments());
     }
 
     /**
@@ -249,7 +252,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeMultipleSlashesTest() throws ParseException {
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            ApiPath.parseUrl("deserializer-test:contA////list-A=40//list-key"));
+            ApiPath.parseUrl("deserializer-test:contA////list-A=40//list-key")).path.getPathArguments();
         assertEquals(4, result.size());
 
         // container
@@ -561,7 +564,7 @@ public class YangInstanceIdentifierDeserializerTest {
             QName.create(list, "enabled"), false);
 
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:list-multiple-keys=%3Afoo,1,false/string-value");
+            "deserializer-test:list-multiple-keys=%3Afoo,1,false/string-value").path.getPathArguments();
         assertEquals(3, result.size());
         // list
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -592,8 +595,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void percentEncodedKeyEndsWithNoPercentEncodedChars() {
         final String URI = "deserializer-test:list-multiple-keys=%3Afoo,1,true";
-        final YangInstanceIdentifier result = YangInstanceIdentifier.create(
-                YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, URI));
+        final YangInstanceIdentifier result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, URI).path;
 
         final Iterator<Entry<QName, Object>> resultListKeys =
                 ((NodeIdentifierWithPredicates)result.getLastPathArgument()).entrySet().iterator();
@@ -615,7 +617,7 @@ public class YangInstanceIdentifierDeserializerTest {
             QName.create(list, "enabled"), true);
 
         final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test:list-multiple-keys=,0,true");
+            "deserializer-test:list-multiple-keys=,0,true").path.getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(list), result.get(0));
         assertEquals(NodeIdentifierWithPredicates.of(list, values), result.get(1));
@@ -640,7 +642,8 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializePartInOtherModuleTest() {
         final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test-included:augmented-list=100/deserializer-test:augmented-leaf");
+            "deserializer-test-included:augmented-list=100/deserializer-test:augmented-leaf")
+            .path.getPathArguments();
         assertEquals(4, result.size());
 
         // list
@@ -659,7 +662,8 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeListInOtherModuleTest() {
         final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            "deserializer-test-included:augmented-list=100/deserializer-test:augmenting-list=0");
+            "deserializer-test-included:augmented-list=100/deserializer-test:augmenting-list=0")
+            .path.getPathArguments();
         assertEquals(5, result.size());
 
         // list
@@ -695,7 +699,7 @@ public class YangInstanceIdentifierDeserializerTest {
     }
 
     private static void assertIdentityrefKeyValue(final String path) {
-        final var pathArgs = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, path);
+        final var pathArgs = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, path).path.getPathArguments();
         assertEquals(4, pathArgs.size());
 
         assertEquals("refs", pathArgs.get(0).getNodeType().getLocalName());

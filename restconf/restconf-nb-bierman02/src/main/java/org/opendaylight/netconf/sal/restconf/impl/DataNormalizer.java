@@ -8,38 +8,45 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 class DataNormalizer {
     private final DataNormalizationOperation<?> operation;
+    private final EffectiveModelContext context;
 
     DataNormalizer(final EffectiveModelContext ctx) {
+        context = requireNonNull(ctx);
         operation = DataNormalizationOperation.from(ctx);
     }
 
-    YangInstanceIdentifier toNormalized(final YangInstanceIdentifier legacy) {
+    Entry<YangInstanceIdentifier, SchemaInferenceStack> toNormalized(final YangInstanceIdentifier legacy) {
         List<PathArgument> normalizedArgs = new ArrayList<>();
 
         DataNormalizationOperation<?> currentOp = operation;
         Iterator<PathArgument> arguments = legacy.getPathArguments().iterator();
+        SchemaInferenceStack stack = SchemaInferenceStack.of(context);
 
         try {
             while (arguments.hasNext()) {
                 PathArgument legacyArg = arguments.next();
-                currentOp = currentOp.getChild(legacyArg);
+                currentOp = currentOp.enterChild(legacyArg, stack);
                 checkArgument(currentOp != null,
                         "Legacy Instance Identifier %s is not correct. Normalized Instance Identifier so far %s",
                         legacy, normalizedArgs);
                 while (currentOp.isMixin()) {
                     normalizedArgs.add(currentOp.getIdentifier());
-                    currentOp = currentOp.getChild(legacyArg.getNodeType());
+                    currentOp = currentOp.enterChild(legacyArg.getNodeType(), stack);
                 }
                 normalizedArgs.add(legacyArg);
             }
@@ -47,7 +54,7 @@ class DataNormalizer {
             throw new IllegalArgumentException("Failed to normalize path " + legacy, e);
         }
 
-        return YangInstanceIdentifier.create(normalizedArgs);
+        return Map.entry(YangInstanceIdentifier.create(normalizedArgs), stack);
     }
 
     DataNormalizationOperation<?> getOperation(final YangInstanceIdentifier legacy)

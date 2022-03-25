@@ -50,7 +50,7 @@ public class RestconfImpl implements RestconfService {
             (LeafSchemaNode) ((ContainerSchemaNode) grouping.getDataChildByName(Restconf.QNAME))
             .getDataChildByName(YANG_LIBRARY_VERSION);
 
-        return NormalizedNodePayload.of(InstanceIdentifierContext.ofDataSchemaNode(context, schemaNode),
+        return NormalizedNodePayload.of(InstanceIdentifierContext.ofDataSchemaNode(context, schemaNode, null),
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, IetfYangLibrary.REVISION.toString()));
     }
 }

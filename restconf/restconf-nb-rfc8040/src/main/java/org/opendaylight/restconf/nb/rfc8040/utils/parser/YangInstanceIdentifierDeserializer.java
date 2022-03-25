@@ -7,10 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -37,7 +37,9 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
@@ -49,6 +51,34 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
  * Deserializer for {@link String} to {@link YangInstanceIdentifier} for restconf.
  */
 public final class YangInstanceIdentifierDeserializer {
+    public static final class Result {
+        public final @NonNull YangInstanceIdentifier path;
+        public final @NonNull SchemaInferenceStack stack;
+        public final @NonNull SchemaNode node;
+
+        Result(final EffectiveModelContext context) {
+            path = YangInstanceIdentifier.empty();
+            node = requireNonNull(context);
+            stack = SchemaInferenceStack.of(context);
+        }
+
+        Result(final EffectiveModelContext context, final QName qname) {
+            // Legacy behavior: RPCs do not really have a YangInstanceIdentifier, but the rest of the code expects it
+            path = YangInstanceIdentifier.of(qname);
+            stack = SchemaInferenceStack.of(context);
+
+            final var stmt = stack.enterSchemaTree(qname);
+            verify(stmt instanceof RpcDefinition, "Unexpected statement %s", stmt);
+            node = (RpcDefinition) stmt;
+        }
+
+        Result(final List<PathArgument> steps, final SchemaInferenceStack stack, final SchemaNode node) {
+            path = YangInstanceIdentifier.create(steps);
+            this.stack = requireNonNull(stack);
+            this.node = requireNonNull(node);
+        }
+    }
+
     private final @NonNull EffectiveModelContext schemaContext;
     private final @NonNull ApiPath apiPath;
 
@@ -65,7 +95,7 @@ public final class YangInstanceIdentifierDeserializer {
      * @return {@link Iterable} of {@link PathArgument}
      * @throws RestconfDocumentedException the path is not valid
      */
-    public static List<PathArgument> create(final EffectiveModelContext schemaContext, final String data) {
+    public static Result create(final EffectiveModelContext schemaContext, final String data) {
         final ApiPath path;
         try {
             path = ApiPath.parse(requireNonNull(data));
@@ -76,7 +106,7 @@ public final class YangInstanceIdentifierDeserializer {
         return create(schemaContext, path);
     }
 
-    public static List<PathArgument> create(final EffectiveModelContext schemaContext, final ApiPath path) {
+    public static Result create(final EffectiveModelContext schemaContext, final ApiPath path) {
         return new YangInstanceIdentifierDeserializer(schemaContext, path).parse();
     }
 
@@ -88,10 +118,10 @@ public final class YangInstanceIdentifierDeserializer {
     //
     // All of this really is an utter mess because we end up calling into this code from various places which,
     // for example, should not allow RPCs to be valid targets
-    private ImmutableList<PathArgument> parse() {
+    private Result parse() {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
-            return ImmutableList.of();
+            return new Result(schemaContext);
         }
 
         // First step is somewhat special:
@@ -120,16 +150,19 @@ public final class YangInstanceIdentifierDeserializer {
                     + "therefore it must not contain key values", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
 
-            // Legacy behavior: RPCs do not really have a YangInstanceIdentifier, but the rest of the code expects it
-            return ImmutableList.of(new NodeIdentifier(qname));
+            return new Result(schemaContext, optRpc.orElseThrow().argument());
         }
 
+        final var stack = SchemaInferenceStack.of(schemaContext);
         final var path = new ArrayList<PathArgument>();
+        final SchemaNode node;
+
         var parentNode = DataSchemaContextTree.from(schemaContext).getRoot();
         while (true) {
             final var parentSchema = parentNode.getDataSchemaNode();
             if (parentSchema instanceof ActionNodeContainer) {
-                if (((ActionNodeContainer) parentSchema).findAction(qname).isPresent()) {
+                final var optAction = ((ActionNodeContainer) parentSchema).findAction(qname);
+                if (optAction.isPresent()) {
                     if (it.hasNext()) {
                         throw new RestconfDocumentedException("Request path resolves to action '" + qname + "' and "
                             + "therefore it must not continue past it", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
@@ -142,19 +175,21 @@ public final class YangInstanceIdentifierDeserializer {
 
                     // Legacy behavior: Action's path should not include its path, but the rest of the code expects it
                     path.add(new NodeIdentifier(qname));
+                    stack.enterSchemaTree(qname);
+                    node = optAction.orElseThrow();
                     break;
                 }
             }
 
             // Resolve the child step with respect to data schema tree
-            final var found = RestconfDocumentedException.throwIfNull(parentNode.getChild(qname),
+            final var found = RestconfDocumentedException.throwIfNull(parentNode.enterChild(stack, qname),
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Schema for '%s' not found", qname);
 
             // Now add all mixins encountered to the path
             var childNode = found;
             while (childNode.isMixin()) {
                 path.add(childNode.getIdentifier());
-                childNode = verifyNotNull(childNode.getChild(qname),
+                childNode = verifyNotNull(childNode.enterChild(stack, qname),
                     "Mixin %s is missing child for %s while resolving %s", childNode, qname, found);
             }
 
@@ -175,6 +210,7 @@ public final class YangInstanceIdentifierDeserializer {
             path.add(pathArg);
 
             if (!it.hasNext()) {
+                node = childNode.getDataSchemaNode();
                 break;
             }
 
@@ -188,7 +224,7 @@ public final class YangInstanceIdentifierDeserializer {
             qname = step.identifier().bindTo(namespace);
         }
 
-        return ImmutableList.copyOf(path);
+        return new Result(path, stack, node);
     }
 
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final QName qname,

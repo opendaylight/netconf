@@ -187,6 +187,6 @@ public class RestconfInvokeOperationsServiceImplTest {
         doReturn(immediateFluentFuture(domRpcResult)).when(rpcService).invokeRpc(qname, data);
         doReturn(result).when(domRpcResult).getResult();
         return NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalRpc(CONTEXT, schemaNode), data);
+            InstanceIdentifierContext.ofRpcInput(CONTEXT, schemaNode, null), data);
     }
 }

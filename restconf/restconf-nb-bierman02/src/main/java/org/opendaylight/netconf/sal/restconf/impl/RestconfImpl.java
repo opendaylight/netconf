@@ -219,8 +219,9 @@ public final class RestconfImpl implements RestconfService {
                 SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
         moduleContainerBuilder.withChild(allModuleMap);
 
-        return new NormalizedNodeContext(InstanceIdentifierContext.ofDataSchemaNode(schemaContext, modulesSchemaNode),
-                moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
+        return new NormalizedNodeContext(
+            InstanceIdentifierContext.ofDataSchemaNode(schemaContext, modulesSchemaNode, null),
+            moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     /**
@@ -251,8 +252,8 @@ public final class RestconfImpl implements RestconfService {
         moduleContainerBuilder.withChild(mountPointModulesMap);
 
         return new NormalizedNodeContext(
-                InstanceIdentifierContext.ofDataSchemaNode(controllerContext.getGlobalSchema(), modulesSchemaNode),
-                moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
+            InstanceIdentifierContext.ofDataSchemaNode(controllerContext.getGlobalSchema(), modulesSchemaNode, null),
+            moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     @Override
@@ -448,10 +449,9 @@ public final class RestconfImpl implements RestconfService {
         }
 
         final var resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
-        final var info = mountPoint == null ? InstanceIdentifierContext.ofLocalRpc(schemaContext, resultNodeSchema)
-            : InstanceIdentifierContext.ofMountPointRpcOutput(mountPoint, schemaContext, resultNodeSchema);
-
-        return new NormalizedNodeContext(info, resultData, QueryParametersParser.parseWriterParameters(uriInfo));
+        return new NormalizedNodeContext(
+            InstanceIdentifierContext.ofRpcOutput(schemaContext, resultNodeSchema, mountPoint), resultData,
+            QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     @SuppressFBWarnings(value = "NP_LOAD_OF_KNOWN_NULL_VALUE",

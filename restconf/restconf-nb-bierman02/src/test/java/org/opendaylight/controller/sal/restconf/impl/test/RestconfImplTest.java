@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.Iterables;
@@ -58,6 +59,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -69,11 +71,17 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNode
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.InputEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.OutputEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
@@ -146,18 +154,39 @@ public class RestconfImplTest {
 
     @Test
     public void testRpcForMountpoint() throws Exception {
+        final QName qname = QName.create("namespace", "2010-10-10", "localname");
         final UriInfo uriInfo = mock(UriInfo.class);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters(anyBoolean());
 
         final NormalizedNodeContext ctx = mock(NormalizedNodeContext.class);
-        final RpcDefinition schemaNode = mock(RpcDefinition.class);
-        doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();
-        doReturn(QName.create("namespace", "2010-10-10", "localname")).when(schemaNode).getQName();
+        final RpcDefinition rpc = mock(RpcDefinition.class,
+            withSettings().extraInterfaces(RpcEffectiveStatement.class));
+        doReturn(mock(SchemaPath.class)).when(rpc).getPath();
+        doReturn(qname).when(rpc).getQName();
+
+        final InputSchemaNode input = mock(InputSchemaNode.class,
+            withSettings().extraInterfaces(InputEffectiveStatement.class));
+        final QName inputQName = YangConstants.operationInputQName(qname.getModule());
+        doReturn(input).when(rpc).getInput();
+        doReturn(inputQName).when(input).getQName();
+        doReturn(Optional.of(input)).when((RpcEffectiveStatement) rpc).findSchemaTreeNode(inputQName);
+
+        final OutputSchemaNode output = mock(OutputSchemaNode.class,
+            withSettings().extraInterfaces(OutputEffectiveStatement.class));
+        final QName outputQName = YangConstants.operationInputQName(qname.getModule());
+        doReturn(output).when(rpc).getOutput();
+        doReturn(outputQName).when(output).getQName();
+        doReturn(Optional.of(output)).when((RpcEffectiveStatement) rpc).findSchemaTreeNode(outputQName);
+
+        final EffectiveModelContext mountContext = mock(EffectiveModelContext.class);
+        final ModuleEffectiveStatement mountModule = mock(ModuleEffectiveStatement.class);
+        doReturn(Map.of(qname.getModule(), mountModule)).when(mountContext).getModuleStatements();
+        doReturn(Optional.of(rpc)).when(mountModule).findSchemaTreeNode(qname);
 
         final DOMMountPoint mount = mock(DOMMountPoint.class);
-        doReturn(Optional.of(FixedDOMSchemaService.of(schemaContext))).when(mount).getService(DOMSchemaService.class);
+        doReturn(Optional.of(FixedDOMSchemaService.of(mountContext))).when(mount).getService(DOMSchemaService.class);
 
-        doReturn(InstanceIdentifierContext.ofMountPointRpc(mount, schemaContext, schemaNode))
+        doReturn(InstanceIdentifierContext.ofRpcInput(mountContext, rpc, mount))
             .when(ctx).getInstanceIdentifierContext();
 
         final DOMRpcService rpcService = mock(DOMRpcService.class);
@@ -174,15 +203,17 @@ public class RestconfImplTest {
      */
     @Test
     public void createNotificationStreamTest() {
+        final QName rpcQName = QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",
+            "2014-01-14", "create-notification-stream");
+
+        final RpcDefinition schemaNode = schemaContext.getOperations().stream()
+            .filter(rpc -> rpc.getQName().equals(rpcQName))
+            .findFirst()
+            .orElseThrow();
+
         final NormalizedNodeContext payload = mock(NormalizedNodeContext.class);
-
-        final RpcDefinition schemaNode = mock(RpcDefinition.class);
-        doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();
-        doReturn(InstanceIdentifierContext.ofLocalRpc(schemaContext, schemaNode)).when(payload)
+        doReturn(InstanceIdentifierContext.ofRpcInput(schemaContext, schemaNode, null)).when(payload)
                 .getInstanceIdentifierContext();
-
-        doReturn(QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",
-                "2014-01-14", "create-notification-stream")).when(schemaNode).getQName();
 
         final Set<DataContainerChild> children = new HashSet<>();
         final LeafSetNode child = mock(LeafSetNode.class);

@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,7 +18,6 @@ import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
-import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -37,9 +38,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -75,9 +74,15 @@ public class Netconf799Test {
             mock(DOMMountPointService.class), mock(RestconfStreamsSubscriptionService.class),
             actionService, mock(Configuration.class));
 
-        final var schemaNode = loadAction(contextRef, RESET_QNAME, ACTION_YII).orElseThrow();
+        final var nodeAndStack = DataSchemaContextTree.from(contextRef).enterPath(ACTION_YII).orElseThrow();
+        final var node = nodeAndStack.node();
+        assertThat(node, instanceOf(ActionNodeContainer.class));
+        final var actionNode = ((ActionNodeContainer) node).findAction(RESET_QNAME).orElseThrow();
+        final var stack = nodeAndStack.stack();
+        stack.enterSchemaTree(RESET_QNAME);
+
         final var response = dataService.invokeAction(NormalizedNodePayload.of(
-            new InstanceIdentifierContext(ACTION_YII, schemaNode, null, contextRef),
+            InstanceIdentifierContext.ofAction(stack, actionNode, ACTION_YII, null),
             Builders.containerBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(INPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(DELAY_QNAME, Uint32.TEN))
@@ -85,14 +90,5 @@ public class Netconf799Test {
 
         assertEquals(204, response.getStatus());
         assertNull(response.getEntity());
-    }
-
-    private static Optional<ActionDefinition> loadAction(final EffectiveModelContext modelContext,
-            final QName actionQName, final YangInstanceIdentifier actionYII) {
-        return DataSchemaContextTree.from(modelContext)
-            .findChild(actionYII)
-            .map(DataSchemaContextNode::getDataSchemaNode)
-            .flatMap(node -> node instanceof ActionNodeContainer ? ((ActionNodeContainer) node).findAction(actionQName)
-                : Optional.empty());
     }
 }

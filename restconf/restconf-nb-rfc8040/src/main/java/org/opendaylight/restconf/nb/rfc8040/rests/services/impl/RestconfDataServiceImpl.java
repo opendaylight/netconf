@@ -340,14 +340,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
         final DOMActionResult result = checkActionResponse(response);
 
-        ActionDefinition resultNodeSchema = null;
         ContainerNode resultData = null;
         if (result != null) {
-            final Optional<ContainerNode> optOutput = result.getOutput();
-            if (optOutput.isPresent()) {
-                resultData = optOutput.get();
-                resultNodeSchema = (ActionDefinition) context.getSchemaNode();
-            }
+            resultData = result.getOutput().orElse(null);
         }
 
         if (resultData != null && resultData.isEmpty()) {
@@ -355,9 +350,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         return Response.status(Status.OK)
-            .entity(NormalizedNodePayload.ofNullable(
-                new InstanceIdentifierContext(yangIIdContext, resultNodeSchema, mountPoint, schemaContextRef),
-                resultData))
+            .entity(NormalizedNodePayload.ofNullable(context, resultData))
             .build();
     }
 
