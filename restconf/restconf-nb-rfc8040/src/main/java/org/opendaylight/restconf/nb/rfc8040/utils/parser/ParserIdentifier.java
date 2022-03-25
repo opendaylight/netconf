@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Verify.verifyNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
@@ -37,16 +36,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,55 +109,14 @@ public final class ParserIdentifier {
      */
     private static InstanceIdentifierContext createIIdContext(final EffectiveModelContext schemaContext,
             final String url, final @Nullable DOMMountPoint mountPoint) {
-        final YangInstanceIdentifier urlPath = IdentifierCodec.deserialize(url, schemaContext);
         // First things first: an empty path means data invocation on SchemaContext
-        if (urlPath.isEmpty()) {
+        if (url == null) {
             return mountPoint != null ? InstanceIdentifierContext.ofMountPointRoot(mountPoint, schemaContext)
                 : InstanceIdentifierContext.ofLocalRoot(schemaContext);
         }
 
-        return new InstanceIdentifierContext(urlPath, getPathSchema(schemaContext, urlPath), mountPoint, schemaContext);
-    }
-
-    private static SchemaNode getPathSchema(final EffectiveModelContext schemaContext,
-            final YangInstanceIdentifier urlPath) {
-        // Peel the last component and locate the parent data node, empty path resolves to SchemaContext
-        final DataSchemaContextNode<?> parent = DataSchemaContextTree.from(schemaContext)
-                .findChild(verifyNotNull(urlPath.getParent()))
-                .orElseThrow(
-                    // Parent data node is not present, this is not a valid location.
-                    () -> new RestconfDocumentedException("Parent of " + urlPath + " not found",
-                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
-
-        // Now try to resolve the last component as a data item...
-        final DataSchemaContextNode<?> data = parent.getChild(urlPath.getLastPathArgument());
-        if (data != null) {
-            return data.getDataSchemaNode();
-        }
-
-        // ... otherwise this has to be an operation invocation. RPCs cannot be defined anywhere but schema root,
-        // actions can reside everywhere else (and SchemaContext reports them empty)
-        final QName qname = urlPath.getLastPathArgument().getNodeType();
-        final DataSchemaNode parentSchema = parent.getDataSchemaNode();
-        if (parentSchema instanceof SchemaContext) {
-            for (final RpcDefinition rpc : ((SchemaContext) parentSchema).getOperations()) {
-                if (qname.equals(rpc.getQName())) {
-                    return rpc;
-                }
-            }
-        }
-        if (parentSchema instanceof ActionNodeContainer) {
-            for (final ActionDefinition action : ((ActionNodeContainer) parentSchema).getActions()) {
-                if (qname.equals(action.getQName())) {
-                    return action;
-                }
-            }
-        }
-
-        // No luck: even if we found the parent, we did not locate a data, nor RPC, nor action node, hence the URL
-        //          is deemed invalid
-        throw new RestconfDocumentedException("Context for " + urlPath + " not found", ErrorType.PROTOCOL,
-            ErrorTag.INVALID_VALUE);
+        final var result = YangInstanceIdentifierDeserializer.create(schemaContext, url);
+        return InstanceIdentifierContext.ofPath(result.stack, result.node, result.path, mountPoint);
     }
 
     /**

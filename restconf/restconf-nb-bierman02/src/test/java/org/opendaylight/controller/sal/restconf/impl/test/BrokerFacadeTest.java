@@ -82,6 +82,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 /**
  * Unit tests for BrokerFacade.
@@ -364,8 +365,8 @@ public class BrokerFacadeTest {
 
         when(patchContext.getData()).thenReturn(List.of());
         // no mount point
-        doReturn(InstanceIdentifierContext.ofDataSchemaNode(
-            mock(EffectiveModelContext.class), mock(DataSchemaNode.class)))
+        doReturn(InstanceIdentifierContext.ofPath(SchemaInferenceStack.of(mock(EffectiveModelContext.class)),
+            mock(DataSchemaNode.class), YangInstanceIdentifier.empty(), null))
                 .when(patchContext).getInstanceIdentifierContext();
 
         doReturn(CommitInfo.emptyFluentFuture()).when(rwTransaction).commit();
@@ -388,8 +389,8 @@ public class BrokerFacadeTest {
 
         when(patchContext.getData()).thenReturn(List.of());
         // return mount point with broker
-        doReturn(InstanceIdentifierContext.ofDataSchemaNode(
-            mock(EffectiveModelContext.class), mock(DataSchemaNode.class), mountPoint))
+        doReturn(InstanceIdentifierContext.ofPath(SchemaInferenceStack.of(mock(EffectiveModelContext.class)),
+            mock(DataSchemaNode.class), YangInstanceIdentifier.empty(), mountPoint))
                 .when(patchContext).getInstanceIdentifierContext();
 
         when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.of(mountDataBroker));
@@ -412,8 +413,8 @@ public class BrokerFacadeTest {
         final PatchContext patchContext = mock(PatchContext.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
 
-        doReturn(InstanceIdentifierContext.ofDataSchemaNode(
-            mock(EffectiveModelContext.class), mock(DataSchemaNode.class), mountPoint))
+        doReturn(InstanceIdentifierContext.ofPath(SchemaInferenceStack.of(mock(EffectiveModelContext.class)),
+            mock(DataSchemaNode.class), YangInstanceIdentifier.empty(), mountPoint))
                 .when(patchContext).getInstanceIdentifierContext();
 
         // missing broker on mounted device

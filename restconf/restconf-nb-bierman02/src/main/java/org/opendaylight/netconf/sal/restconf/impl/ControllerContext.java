@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Splitter;
@@ -561,7 +562,7 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                             ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
 
-                final YangInstanceIdentifier partialPath = dataNormalizer.toNormalized(builder.build());
+                final YangInstanceIdentifier partialPath = dataNormalizer.toNormalized(builder.build()).getKey();
                 final Optional<DOMMountPoint> mountOpt = mountService.getMountPoint(partialPath);
                 if (mountOpt.isEmpty()) {
                     LOG.debug("Instance identifier to missing mount point: {}", partialPath);
@@ -631,8 +632,8 @@ public final class ControllerContext implements EffectiveModelContextListener, C
                     rpc = getRpcDefinition(module, rpcName);
                 }
                 if (rpc != null) {
-                    return mountPoint == null ? InstanceIdentifierContext.ofLocalRpc(globalSchema, rpc)
-                        : InstanceIdentifierContext.ofMountPointRpc(mountPoint, getModelContext(mountPoint), rpc);
+                    final var ctx = mountPoint == null ? globalSchema : getModelContext(mountPoint);
+                    return InstanceIdentifierContext.ofRpcInput(ctx, rpc, mountPoint);
                 }
             }
 
@@ -717,8 +718,19 @@ public final class ControllerContext implements EffectiveModelContextListener, C
     private static InstanceIdentifierContext createContext(final YangInstanceIdentifier instance,
             final DataSchemaNode dataSchemaNode, final DOMMountPoint mountPoint,
             final EffectiveModelContext schemaContext) {
-        final YangInstanceIdentifier instanceIdentifier = new DataNormalizer(schemaContext).toNormalized(instance);
-        return new InstanceIdentifierContext(instanceIdentifier, dataSchemaNode, mountPoint, schemaContext);
+        final var normalized = new DataNormalizer(schemaContext).toNormalized(instance);
+
+        // FIXME: Verification before we trust this
+        final var stack = normalized.getValue();
+        if (!stack.isEmpty()) {
+            final var stackPath = stack.toSchemaPath();
+            final var nodePath = dataSchemaNode.getPath();
+            verify(stackPath.equals(nodePath), "Mismatched path: expected %s got %s", nodePath, stackPath);
+        } else {
+            verify(dataSchemaNode.equals(schemaContext), "Unexpected node %s", dataSchemaNode);
+        }
+
+        return InstanceIdentifierContext.ofPath(normalized.getValue(), dataSchemaNode, normalized.getKey(), mountPoint);
     }
 
     public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
@@ -951,14 +963,6 @@ public final class ControllerContext implements EffectiveModelContextListener, C
         }
 
         return builder.toString();
-    }
-
-    public YangInstanceIdentifier toNormalized(final YangInstanceIdentifier legacy) {
-        try {
-            return dataNormalizer.toNormalized(legacy);
-        } catch (final NullPointerException e) {
-            throw new RestconfDocumentedException("Data normalizer isn't set. Normalization isn't possible", e);
-        }
     }
 
     public YangInstanceIdentifier toXpathRepresentation(final YangInstanceIdentifier instanceIdentifier) {

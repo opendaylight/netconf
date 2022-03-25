@@ -330,24 +330,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final Absolute schemaPath = Absolute.of(ImmutableList.copyOf(context.getSchemaNode().getPath()
             .getPathFromRoot()));
         final DOMActionResult response;
-        final EffectiveModelContext schemaContextRef;
         if (mountPoint != null) {
             response = invokeAction((ContainerNode) data, schemaPath, yangIIdContext, mountPoint);
-            schemaContextRef = modelContext(mountPoint);
         } else {
             response = invokeAction((ContainerNode) data, schemaPath, yangIIdContext, actionService);
-            schemaContextRef = schemaContextHandler.get();
         }
         final DOMActionResult result = checkActionResponse(response);
 
-        ActionDefinition resultNodeSchema = null;
         ContainerNode resultData = null;
         if (result != null) {
-            final Optional<ContainerNode> optOutput = result.getOutput();
-            if (optOutput.isPresent()) {
-                resultData = optOutput.get();
-                resultNodeSchema = (ActionDefinition) context.getSchemaNode();
-            }
+            resultData = result.getOutput().orElse(null);
         }
 
         if (resultData != null && resultData.isEmpty()) {
@@ -355,9 +347,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         return Response.status(Status.OK)
-            .entity(NormalizedNodePayload.ofNullable(
-                new InstanceIdentifierContext(yangIIdContext, resultNodeSchema, mountPoint, schemaContextRef),
-                resultData))
+            .entity(NormalizedNodePayload.ofNullable(context, resultData))
             .build();
     }
 
