@@ -98,7 +98,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -109,12 +108,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -1130,14 +1127,19 @@ public final class RestconfImpl implements RestconfService {
 
         if (response != null) {
             // prepare node with value of location
-            final InstanceIdentifierContext iid = prepareIIDSubsStreamOutput();
-            final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
-                    ImmutableLeafNodeBuilder.create().withValue(response.toString());
-            builder.withNodeIdentifier(
-                    NodeIdentifier.create(QName.create("subscribe:to:notification", "2016-10-28", "location")));
+
+            final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
+            final QName locationQName = QName.create(qnameBase, "location");
+
+            final EffectiveModelContext schemaCtx = controllerContext.getGlobalSchema();
+            final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx.findModule(qnameBase.getModule())
+                .orElseThrow()
+                .getDataChildByName(qnameBase))
+                .getDataChildByName(locationQName);
 
             // prepare new header with location
-            return new NormalizedNodeContext(iid, builder.build(), ImmutableMap.of("Location", response));
+            return new NormalizedNodeContext(InstanceIdentifierContext.ofDataSchemaNode(schemaCtx, location),
+                ImmutableNodes.leafNode(locationQName, response.toString()), ImmutableMap.of("Location", response));
         }
 
         final String msg = "Bad type of notification of sal-remote";
@@ -1155,25 +1157,6 @@ public final class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
         }
         return Instant.from(p);
-    }
-
-    /**
-     * Prepare instance identifier.
-     *
-     * @return {@link InstanceIdentifierContext} of location leaf for
-     *         notification
-     */
-    private InstanceIdentifierContext prepareIIDSubsStreamOutput() {
-        final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
-        final EffectiveModelContext schemaCtx = controllerContext.getGlobalSchema();
-        final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx
-                .findModule(qnameBase.getModule()).orElse(null)
-                .getDataChildByName(qnameBase)).getDataChildByName(QName.create(qnameBase, "location"));
-        final List<PathArgument> path = new ArrayList<>();
-        path.add(NodeIdentifier.create(qnameBase));
-        path.add(NodeIdentifier.create(QName.create(qnameBase, "location")));
-
-        return new InstanceIdentifierContext(YangInstanceIdentifier.create(path), location, null, schemaCtx);
     }
 
     /**
