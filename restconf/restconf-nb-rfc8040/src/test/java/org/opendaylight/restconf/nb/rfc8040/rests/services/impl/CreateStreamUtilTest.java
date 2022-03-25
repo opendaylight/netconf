@@ -11,10 +11,11 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -23,6 +24,8 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -40,22 +43,19 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CreateStreamUtilTest {
-    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/streams";
+    private static EffectiveModelContext SCHEMA_CTX;
 
-    private NormalizedNodePayload payload;
-    private EffectiveModelContext refSchemaCtx;
-
-    @Before
-    public void setUp() throws Exception {
-        refSchemaCtx = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+    @BeforeClass
+    public static void setUp() throws Exception {
+        SCHEMA_CTX = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/streams"));
     }
 
     @Test
     public void createStreamTest() {
-        payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster",
-            "path");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx);
-        assertEquals(result.getErrors(), Collections.emptyList());
+        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(
+            prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
+            SCHEMA_CTX);
+        assertEquals(List.of(), result.getErrors());
         final NormalizedNode testedNn = result.getResult();
         assertNotNull(testedNn);
         final NormalizedNodePayload contextRef = prepareDomPayload("create-data-change-event-subscription",
@@ -64,27 +64,36 @@ public class CreateStreamUtilTest {
         assertEquals(contextRef.getData(), testedNn);
     }
 
-    @Test(expected = RestconfDocumentedException.class)
+    @Test
     public void createStreamWrongValueTest() {
-        payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput,
+        final var payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput,
             "String value", "path");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx);
-        assertEquals(result.getErrors(), Collections.emptyList());
+        final var errors = assertThrows(RestconfDocumentedException.class,
+            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX)).getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
+        assertEquals("Instance identifier was not normalized correctly", error.getErrorMessage());
     }
 
-    @Test(expected = RestconfDocumentedException.class)
+    @Test
     public void createStreamWrongInputRpcTest() {
-        payload = prepareDomPayload("create-data-change-event-subscription2", RpcDefinition::getInput, "toaster",
-            "path2");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx);
-        assertEquals(result.getErrors(), Collections.emptyList());
+        final var payload = prepareDomPayload("create-data-change-event-subscription2", RpcDefinition::getInput,
+            "toaster", "path2");
+        final var errors = assertThrows(RestconfDocumentedException.class,
+            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX)).getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
+        assertEquals("Instance identifier was not normalized correctly", error.getErrorMessage());
     }
 
-    private NormalizedNodePayload prepareDomPayload(final String rpcName,
+    private static NormalizedNodePayload prepareDomPayload(final String rpcName,
             final Function<RpcDefinition, ContainerLike> rpcToContainer, final String toasterValue,
             final String inputOutputName) {
-        final EffectiveModelContext schema = refSchemaCtx;
-        final Module rpcModule = schema.findModules("sal-remote").iterator().next();
+        final Module rpcModule = SCHEMA_CTX.findModules("sal-remote").iterator().next();
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), rpcName);
         ContainerLike rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
@@ -114,7 +123,7 @@ public class CreateStreamUtilTest {
                 .withValue(o).build();
         container.withChild(lfNode);
 
-        return NormalizedNodePayload.of(new InstanceIdentifierContext(null, rpcInputSchemaNode, null, schema),
+        return NormalizedNodePayload.of(new InstanceIdentifierContext(null, rpcInputSchemaNode, null, SCHEMA_CTX),
                 container.build());
     }
 }
