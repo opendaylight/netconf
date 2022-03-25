@@ -17,11 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.text.ParseException;
@@ -174,8 +172,7 @@ public class RestconfImplTest {
     public void createNotificationStreamTest() {
         final NormalizedNodeContext payload = mock(NormalizedNodeContext.class);
 
-        final SchemaNode schemaNode = mock(SchemaNode.class,
-                withSettings().extraInterfaces(RpcDefinition.class));
+        final RpcDefinition schemaNode = mock(RpcDefinition.class);
         doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();
         doReturn(new InstanceIdentifierContext(null, schemaNode, null, null)).when(payload)
                 .getInstanceIdentifierContext();
@@ -184,16 +181,14 @@ public class RestconfImplTest {
                 "2014-01-14", "create-notification-stream")).when(schemaNode).getQName();
 
         final Set<DataContainerChild> children = new HashSet<>();
-        final DataContainerChild child = mock(DataContainerChild.class,
-                withSettings().extraInterfaces(LeafSetNode.class));
+        final LeafSetNode child = mock(LeafSetNode.class);
 
         final LeafSetEntryNode entryNode = mock(LeafSetEntryNode.class);
         when(entryNode.body()).thenReturn("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)toastDone");
-        when(((LeafSetNode) child).body()).thenReturn(Sets.newHashSet(entryNode));
+        when(child.body()).thenReturn(Set.of(entryNode));
         children.add(child);
 
-        final NormalizedNode normalizedNode = mock(NormalizedNode.class,
-                withSettings().extraInterfaces(ContainerNode.class));
+        final ContainerNode normalizedNode = mock(ContainerNode.class);
         doReturn(normalizedNode).when(payload).getData();
         doReturn(children).when(normalizedNode).body();
 
