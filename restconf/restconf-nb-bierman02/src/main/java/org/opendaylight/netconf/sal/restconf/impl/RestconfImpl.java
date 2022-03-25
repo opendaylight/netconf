@@ -254,8 +254,7 @@ public final class RestconfImpl implements RestconfService {
         moduleContainerBuilder.withChild(mountPointModulesMap);
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext(null, modulesSchemaNode, mountPoint,
-                        controllerContext.getGlobalSchema()),
+                InstanceIdentifierContext.ofDataSchemaNode(controllerContext.getGlobalSchema(), modulesSchemaNode),
                 moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
