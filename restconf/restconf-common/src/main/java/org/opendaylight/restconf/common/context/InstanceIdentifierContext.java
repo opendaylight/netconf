@@ -12,10 +12,12 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.Iterables;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -67,6 +69,18 @@ public final class InstanceIdentifierContext {
         // FIXME: this this method really needed?
             final RpcDefinition rpc) {
         return new InstanceIdentifierContext(context, rpc, null);
+    }
+
+    // Invocations of various identifier-less details
+    public static @NonNull InstanceIdentifierContext ofDataSchemaNode(final EffectiveModelContext context,
+            final DataSchemaNode schemaNode) {
+        return new InstanceIdentifierContext(null, requireNonNull(schemaNode), null, requireNonNull(context));
+    }
+
+    // Invocations of various identifier-less details, potentially having a mount point
+    public static @NonNull InstanceIdentifierContext ofDataSchemaNode(final EffectiveModelContext context,
+            final DataSchemaNode schemaNode, final @Nullable DOMMountPoint mountPoint) {
+        return new InstanceIdentifierContext(null, requireNonNull(schemaNode), mountPoint, requireNonNull(context));
     }
 
     public static @NonNull InstanceIdentifierContext ofLocalRpcInput(final EffectiveModelContext context,
