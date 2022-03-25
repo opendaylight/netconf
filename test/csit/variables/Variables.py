@@ -189,7 +189,7 @@ USER = (  # TODO: who is using this?  Can we make it more specific? (e.g.  RESTC
 )
 PWD = "admin"
 PASSWORD = "EMPTY"
-AUTH = [u"admin", u"admin"]
+AUTH = ["admin", "admin"]
 SCOPE = "sdn"
 HEADERS = {"Content-Type": "application/json"}
 # FIXME: keep it as 'application/json' to make it work for both Bierman02
