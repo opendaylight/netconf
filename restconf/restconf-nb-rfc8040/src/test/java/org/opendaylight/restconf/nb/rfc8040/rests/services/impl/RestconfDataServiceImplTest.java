@@ -81,8 +81,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -97,7 +95,6 @@ public class RestconfDataServiceImplTest {
     private ContainerNode buildBaseContOperational;
     private EffectiveModelContext contextRef;
     private YangInstanceIdentifier iidBase;
-    private DataSchemaNode schemaNode;
     private RestconfDataServiceImpl dataService;
     private QName baseQName;
     private QName containerPlayerQname;
@@ -188,8 +185,6 @@ public class RestconfDataServiceImplTest {
 
         contextRef =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
-        schemaNode = DataSchemaContextTree.from(contextRef).findChild(iidBase).orElseThrow(
-            ).getDataSchemaNode();
 
         doReturn(CommitInfo.emptyFluentFuture()).when(write).commit();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
@@ -359,8 +354,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPutData() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, schemaNode, null, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateTrueFluentFuture()).when(read)
@@ -374,7 +368,7 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testPutDataWithMountPoint() {
         final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, schemaNode, mountPoint, contextRef);
+            InstanceIdentifierContext.ofMountPointPath(mountPoint, contextRef, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateTrueFluentFuture()).when(read)
@@ -393,8 +387,7 @@ public class RestconfDataServiceImplTest {
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band");
 
         doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, null, null, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(listQname))
             .withChild(Builders.mapEntryBuilder()
@@ -443,8 +436,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchData() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, schemaNode, null, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
@@ -468,8 +460,8 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchDataMountPoint() throws Exception {
-        final InstanceIdentifierContext iidContext = new InstanceIdentifierContext(
-                iidBase, schemaNode, mountPoint, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofMountPointPath(mountPoint, contextRef,
+                iidBase);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
@@ -493,8 +485,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchDataDeleteNotExist() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, schemaNode, null, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)

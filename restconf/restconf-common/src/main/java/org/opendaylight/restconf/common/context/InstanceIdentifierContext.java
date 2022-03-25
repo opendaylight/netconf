@@ -9,6 +9,7 @@ package org.opendaylight.restconf.common.context;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
@@ -16,6 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -64,6 +66,14 @@ public final class InstanceIdentifierContext {
         return new InstanceIdentifierContext(context, null);
     }
 
+    @VisibleForTesting
+    public static @NonNull InstanceIdentifierContext ofLocalPath(final EffectiveModelContext context,
+            final YangInstanceIdentifier path) {
+        return new InstanceIdentifierContext(requireNonNull(path),
+            DataSchemaContextTree.from(context).findChild(path).orElseThrow().getDataSchemaNode(), null,
+            requireNonNull(context));
+    }
+
     // Legacy bierman02 invokeRpc()
     public static @NonNull InstanceIdentifierContext ofLocalRpc(final EffectiveModelContext context,
         // FIXME: this this method really needed?
@@ -98,6 +108,14 @@ public final class InstanceIdentifierContext {
     public static @NonNull InstanceIdentifierContext ofMountPointRoot(final DOMMountPoint mountPoint,
             final EffectiveModelContext mountContext) {
         return new InstanceIdentifierContext(mountContext, requireNonNull(mountPoint));
+    }
+
+    @VisibleForTesting
+    public static @NonNull InstanceIdentifierContext ofMountPointPath(final DOMMountPoint mountPoint,
+            final EffectiveModelContext context, final YangInstanceIdentifier path) {
+        return new InstanceIdentifierContext(requireNonNull(path),
+            DataSchemaContextTree.from(context).findChild(path).orElseThrow().getDataSchemaNode(),
+            requireNonNull(mountPoint), requireNonNull(context));
     }
 
     public static @NonNull InstanceIdentifierContext ofMountPointRpc(final DOMMountPoint mountPoint,

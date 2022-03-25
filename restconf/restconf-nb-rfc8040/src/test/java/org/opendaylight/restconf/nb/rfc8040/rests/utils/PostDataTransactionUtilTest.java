@@ -136,8 +136,7 @@ public class PostDataTransactionUtilTest {
 
     @Test
     public void testPostContainerData() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iid2, null, null, schema);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid2);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
@@ -164,7 +163,7 @@ public class PostDataTransactionUtilTest {
 
     @Test
     public void testPostListData() {
-        final InstanceIdentifierContext iidContext = new InstanceIdentifierContext(iidList, null, null, schema);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iidList);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildList);
 
         final MapNode data = (MapNode) payload.getData();
@@ -199,7 +198,7 @@ public class PostDataTransactionUtilTest {
 
     @Test
     public void testPostDataFail() {
-        final InstanceIdentifierContext iidContext = new InstanceIdentifierContext(iid2, null, null, schema);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid2);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,

@@ -41,8 +41,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -64,9 +62,7 @@ public class PlainPatchDataTransactionUtilTest {
     private ContainerNode jukeboxContainerWithPlayer;
     private ContainerNode jukeboxContainerWithPlaylist;
     private EffectiveModelContext schema;
-    private DataSchemaNode schemaNodeForGap;
     private YangInstanceIdentifier iidGap;
-    private DataSchemaNode schemaNodeForJukebox;
     private YangInstanceIdentifier iidJukebox;
 
     @Before
@@ -89,14 +85,10 @@ public class PlainPatchDataTransactionUtilTest {
                 .node(qnPlayer)
                 .node(qnGap)
                 .build();
-        schemaNodeForGap = DataSchemaContextTree.from(schema).findChild(iidGap).orElseThrow()
-                .getDataSchemaNode();
 
         iidJukebox = YangInstanceIdentifier.builder()
                 .node(qnJukebox)
                 .build();
-        schemaNodeForJukebox = DataSchemaContextTree.from(schema)
-                .findChild(iidJukebox).orElseThrow().getDataSchemaNode();
 
         leafGap = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(qnGap))
@@ -158,7 +150,7 @@ public class PlainPatchDataTransactionUtilTest {
     @Test
     public void testPatchContainerData() {
         final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidJukebox, schemaNodeForJukebox, null, schema);
+                InstanceIdentifierContext.ofLocalPath(schema, iidJukebox);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlayer);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -179,8 +171,7 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Test
     public void testPatchLeafData() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidGap, schemaNodeForGap, null, schema);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iidGap);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, leafGap);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
@@ -202,8 +193,7 @@ public class PlainPatchDataTransactionUtilTest {
 
     @Test
     public void testPatchListData() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidJukebox, schemaNodeForJukebox, null, schema);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iidJukebox);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, jukeboxContainerWithPlaylist);
 
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();

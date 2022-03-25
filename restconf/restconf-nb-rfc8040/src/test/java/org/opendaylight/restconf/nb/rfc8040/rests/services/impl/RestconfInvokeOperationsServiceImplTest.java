@@ -182,6 +182,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);
         doReturn(immediateFluentFuture(domRpcResult)).when(rpcService).invokeRpc(qname, data);
         doReturn(result).when(domRpcResult).getResult();
-        return NormalizedNodePayload.of(new InstanceIdentifierContext(null, schemaNode, null, null), data);
+        return NormalizedNodePayload.of(
+            InstanceIdentifierContext.ofLocalRpc(mock(EffectiveModelContext.class), schemaNode), data);
     }
 }

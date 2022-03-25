@@ -189,7 +189,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityRemove);
 
         final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(instanceIdMerge, null, null, refSchemaCtx);
+            InstanceIdentifierContext.ofLocalPath(refSchemaCtx, instanceIdMerge);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -221,7 +221,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityDelete);
 
         final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(instanceIdCreateAndDelete, null, null, refSchemaCtx);
+            InstanceIdentifierContext.ofLocalPath(refSchemaCtx, instanceIdCreateAndDelete);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), true);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), true);
@@ -246,9 +246,8 @@ public class PatchDataTransactionUtilTest {
 
         entities.add(entityDelete);
 
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(instanceIdCreateAndDelete, null, null, refSchemaCtx);
-        final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
+        final PatchContext patchContext = new PatchContext(
+            InstanceIdentifierContext.ofLocalPath(refSchemaCtx, instanceIdCreateAndDelete), entities, "patchD");
         deleteMdsal(patchContext, new MdsalRestconfStrategy(mockDataBroker));
         deleteNetconf(patchContext, new NetconfRestconfStrategy(netconfService));
     }
@@ -262,7 +261,7 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityMerge);
 
         final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(instanceIdCreateAndDelete, null, null, refSchemaCtx);
+            InstanceIdentifierContext.ofLocalPath(refSchemaCtx, instanceIdCreateAndDelete);
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
         patch(patchContext, new MdsalRestconfStrategy(mockDataBroker), false);
         patch(patchContext, new NetconfRestconfStrategy(netconfService), false);
