@@ -1169,11 +1169,10 @@ public final class RestconfImpl implements RestconfService {
         final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx
                 .findModule(qnameBase.getModule()).orElse(null)
                 .getDataChildByName(qnameBase)).getDataChildByName(QName.create(qnameBase, "location"));
-        final List<PathArgument> path = new ArrayList<>();
-        path.add(NodeIdentifier.create(qnameBase));
-        path.add(NodeIdentifier.create(QName.create(qnameBase, "location")));
 
-        return new InstanceIdentifierContext(YangInstanceIdentifier.create(path), location, null, schemaCtx);
+        return new InstanceIdentifierContext(YangInstanceIdentifier.create(
+            NodeIdentifier.create(qnameBase), NodeIdentifier.create(QName.create(qnameBase, "location"))),
+            location, null, schemaCtx);
     }
 
     /**
