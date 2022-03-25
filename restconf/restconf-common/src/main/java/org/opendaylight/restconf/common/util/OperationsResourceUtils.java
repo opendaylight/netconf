@@ -60,7 +60,8 @@ public final class OperationsResourceUtils {
             operationsBuilder.withChild(ImmutableNodes.leafNode(leaf.getQName(), Empty.value()));
         }
 
-        return Map.entry(new InstanceIdentifierContext(null, operatationsSchema, mountPoint,
-            new OperationsEffectiveModuleContext(ImmutableSet.copyOf(modules))), operationsBuilder.build());
+        return Map.entry(InstanceIdentifierContext.ofDataSchemaNode(
+            new OperationsEffectiveModuleContext(ImmutableSet.copyOf(modules)), operatationsSchema, mountPoint),
+            operationsBuilder.build());
     }
 }

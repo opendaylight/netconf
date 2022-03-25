@@ -21,6 +21,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 
 /**
  * Unit test for {@link NetconfFieldsTranslator}.
@@ -61,10 +62,11 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
     protected void assertChildrenPath(final List<YangInstanceIdentifier> result) {
         assertEquals(1, result.size());
         final var pathArguments = result.get(0).getPathArguments();
-        assertEquals(3, pathArguments.size());
+        assertEquals(4, pathArguments.size());
         assertEquals(LIBRARY_Q_NAME, pathArguments.get(0).getNodeType());
-        assertEquals(ALBUM_Q_NAME, pathArguments.get(1).getNodeType());
-        assertEquals(NAME_Q_NAME, pathArguments.get(2).getNodeType());
+        assertEquals(ARTIST_Q_NAME, pathArguments.get(1).getNodeType());
+        assertEquals(ALBUM_Q_NAME, pathArguments.get(2).getNodeType());
+        assertEquals(NAME_Q_NAME, pathArguments.get(3).getNodeType());
     }
 
     @Override
@@ -110,7 +112,10 @@ public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Ya
     @Override
     protected void assertListFieldUnderList(final List<YangInstanceIdentifier> result) {
         assertEquals(1, result.size());
-        assertEquals(List.of(new NodeIdentifier(SERVICES_Q_NAME), new NodeIdentifier(INSTANCE_Q_NAME)),
+        assertEquals(List.of(
+            // FIXME: this does not look right: where are the corresponding NodeIdentifiers?
+            NodeIdentifierWithPredicates.of(SERVICES_Q_NAME),
+            NodeIdentifierWithPredicates.of(INSTANCE_Q_NAME)),
             result.get(0).getPathArguments());
     }
 

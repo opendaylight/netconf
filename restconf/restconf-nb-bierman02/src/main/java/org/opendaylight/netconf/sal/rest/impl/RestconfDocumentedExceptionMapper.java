@@ -144,7 +144,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         errContBuild.withChild(listErorsBuilder.build());
 
         final NormalizedNodeContext errContext = new NormalizedNodeContext(InstanceIdentifierContext.ofDataSchemaNode(
-            controllerContext.getGlobalSchema(), (DataSchemaNode) errorsSchemaNode), errContBuild.build());
+            controllerContext.getGlobalSchema(), (DataSchemaNode) errorsSchemaNode, null), errContBuild.build());
 
         Object responseBody;
         if (mediaType.getSubtype().endsWith("json")) {

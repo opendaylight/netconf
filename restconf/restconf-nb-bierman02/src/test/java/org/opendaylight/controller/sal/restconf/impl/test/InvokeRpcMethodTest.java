@@ -148,7 +148,7 @@ public class InvokeRpcMethodTest {
         contNode.withChild(lfNode);
         container.withChild(contNode.build());
 
-        return new NormalizedNodeContext(InstanceIdentifierContext.ofLocalRpc(schema, rpcSchemaNode),
+        return new NormalizedNodeContext(InstanceIdentifierContext.ofRpcInput(schema, rpcSchemaNode, null),
             container.build());
     }
 

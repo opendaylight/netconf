@@ -10,16 +10,12 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.FieldsParam;
@@ -30,12 +26,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractFieldsTranslatorTest<T> {
@@ -52,157 +43,68 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     // FIXME: remove all this mocking -- just parse the underlying model and be done with it
 
     // container jukebox
-    @Mock
-    private ContainerSchemaNode containerJukebox;
     private static final QName JUKEBOX_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "jukebox");
 
     // container player
-    @Mock
-    private ContainerSchemaNode containerPlayer;
     protected static final QName PLAYER_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "player");
 
     // container library
-    @Mock
-    private ContainerSchemaNode containerLibrary;
     protected static final QName LIBRARY_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "library");
 
+    // list artist
+    protected static final QName ARTIST_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "artist");
+
     // container augmented library
-    @Mock
-    private ContainerSchemaNode augmentedContainerLibrary;
     protected static final QName AUGMENTED_LIBRARY_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX,
             "augmented-library");
 
-    // augmentation that contains speed leaf
-    @Mock
-    private AugmentationSchemaNode speedAugmentation;
-
     // leaf speed
-    @Mock
-    private LeafSchemaNode leafSpeed;
     protected static final QName SPEED_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX, "speed");
 
     // list album
-    @Mock
-    private ListSchemaNode listAlbum;
     public static final QName ALBUM_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "album");
 
     // leaf name
-    @Mock
-    private LeafSchemaNode leafName;
     protected static final QName NAME_Q_NAME = QName.create(Q_NAME_MODULE_JUKEBOX, "name");
 
     // container test data
-    @Mock
-    private ContainerSchemaNode containerTestData;
     private static final QName TEST_DATA_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "test-data");
 
     // list services
-    @Mock
-    private ListSchemaNode listServices;
     protected static final QName SERVICES_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "services");
 
     // leaf type-of-service
-    @Mock
-    private LeafSchemaNode leafTypeOfService;
     protected static final QName TYPE_OF_SERVICE_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "type-of-service");
 
     // list instance
-    @Mock
-    private ListSchemaNode listInstance;
     protected static final QName INSTANCE_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "instance");
 
     // leaf instance-name
-    @Mock
-    private LeafSchemaNode leafInstanceName;
     protected static final QName INSTANCE_NAME_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "instance-name");
 
     // leaf provider
-    @Mock
-    private LeafSchemaNode leafProvider;
     protected static final QName PROVIDER_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "provider");
 
     // container next-data
-    @Mock
-    private ContainerSchemaNode containerNextData;
     protected static final QName NEXT_DATA_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "next-data");
 
     // leaf next-service
-    @Mock
-    private LeafSchemaNode leafNextService;
     protected static final QName NEXT_SERVICE_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "next-service");
 
     // leaf-list protocols
-    @Mock
-    private LeafListSchemaNode leafListProtocols;
     protected static final QName PROTOCOLS_Q_NAME = QName.create(Q_NAME_MODULE_TEST_SERVICES, "protocols");
 
     @Before
     public void setUp() throws Exception {
         final EffectiveModelContext schemaContextJukebox =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
-        initJukeboxSchemaNodes(schemaContextJukebox);
+        identifierJukebox = InstanceIdentifierContext.ofDataSchemaNode(schemaContextJukebox,
+            schemaContextJukebox.getDataChildByName(JUKEBOX_Q_NAME));
 
         final EffectiveModelContext schemaContextTestServices =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/test-services"));
-        initTestServicesSchemaNodes(schemaContextTestServices);
-    }
-
-    private void initJukeboxSchemaNodes(final EffectiveModelContext schemaContext) {
-        identifierJukebox = InstanceIdentifierContext.ofDataSchemaNode(schemaContext, containerJukebox);
-        when(containerJukebox.getQName()).thenReturn(JUKEBOX_Q_NAME);
-
-        when(containerLibrary.getQName()).thenReturn(LIBRARY_Q_NAME);
-        when(containerJukebox.dataChildByName(LIBRARY_Q_NAME)).thenReturn(containerLibrary);
-
-        when(augmentedContainerLibrary.getQName()).thenReturn(AUGMENTED_LIBRARY_Q_NAME);
-        when(containerJukebox.dataChildByName(AUGMENTED_LIBRARY_Q_NAME))
-                .thenReturn(augmentedContainerLibrary);
-
-        when(containerPlayer.getQName()).thenReturn(PLAYER_Q_NAME);
-        when(containerJukebox.dataChildByName(PLAYER_Q_NAME)).thenReturn(containerPlayer);
-
-        when(listAlbum.getQName()).thenReturn(ALBUM_Q_NAME);
-        when(containerLibrary.dataChildByName(ALBUM_Q_NAME)).thenReturn(listAlbum);
-
-        when(leafName.getQName()).thenReturn(NAME_Q_NAME);
-        when(listAlbum.dataChildByName(NAME_Q_NAME)).thenReturn(leafName);
-
-        when(leafSpeed.getQName()).thenReturn(SPEED_Q_NAME);
-        when(leafSpeed.isAugmenting()).thenReturn(true);
-        when(containerPlayer.dataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
-        when(containerPlayer.getDataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
-        doReturn(List.of(leafSpeed)).when(speedAugmentation).getChildNodes();
-        doReturn(List.of(speedAugmentation)).when(containerPlayer).getAvailableAugmentations();
-        when(speedAugmentation.findDataChildByName(SPEED_Q_NAME)).thenReturn(Optional.of(leafSpeed));
-    }
-
-    private void initTestServicesSchemaNodes(final EffectiveModelContext schemaContext) {
-        identifierTestServices = InstanceIdentifierContext.ofDataSchemaNode(schemaContext, containerTestData);
-        when(containerTestData.getQName()).thenReturn(TEST_DATA_Q_NAME);
-
-        when(listServices.getQName()).thenReturn(SERVICES_Q_NAME);
-        when(containerTestData.dataChildByName(SERVICES_Q_NAME)).thenReturn(listServices);
-
-        when(leafListProtocols.getQName()).thenReturn(PROTOCOLS_Q_NAME);
-        when(containerTestData.dataChildByName(PROTOCOLS_Q_NAME)).thenReturn(leafListProtocols);
-
-        when(leafTypeOfService.getQName()).thenReturn(TYPE_OF_SERVICE_Q_NAME);
-        when(listServices.dataChildByName(TYPE_OF_SERVICE_Q_NAME)).thenReturn(leafTypeOfService);
-
-        when(listInstance.getQName()).thenReturn(INSTANCE_Q_NAME);
-        when(listServices.dataChildByName(INSTANCE_Q_NAME)).thenReturn(listInstance);
-
-        when(leafInstanceName.getQName()).thenReturn(INSTANCE_NAME_Q_NAME);
-        when(listInstance.dataChildByName(INSTANCE_NAME_Q_NAME)).thenReturn(leafInstanceName);
-
-        when(leafProvider.getQName()).thenReturn(PROVIDER_Q_NAME);
-        when(listInstance.dataChildByName(PROVIDER_Q_NAME)).thenReturn(leafProvider);
-
-        when(containerNextData.getQName()).thenReturn(NEXT_DATA_Q_NAME);
-        when(listServices.dataChildByName(NEXT_DATA_Q_NAME)).thenReturn(containerNextData);
-
-        when(leafNextService.getQName()).thenReturn(NEXT_SERVICE_Q_NAME);
-        when(containerNextData.dataChildByName(NEXT_SERVICE_Q_NAME)).thenReturn(leafNextService);
+        identifierTestServices = InstanceIdentifierContext.ofDataSchemaNode(schemaContextTestServices,
+            schemaContextTestServices.getDataChildByName(TEST_DATA_Q_NAME));
     }
 
     protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields);
@@ -236,7 +138,7 @@ public abstract class AbstractFieldsTranslatorTest<T> {
      */
     @Test
     public void testSubPath() {
-        final var result = translateFields(identifierJukebox, assertFields("library/album/name"));
+        final var result = translateFields(identifierJukebox, assertFields("library/artist/album/name"));
         assertNotNull(result);
         assertSubPath(result);
     }
@@ -248,7 +150,7 @@ public abstract class AbstractFieldsTranslatorTest<T> {
      */
     @Test
     public void testChildrenPath() {
-        final var result = translateFields(identifierJukebox, assertFields("library(album(name))"));
+        final var result = translateFields(identifierJukebox, assertFields("library(artist(album(name)))"));
         assertNotNull(result);
         assertChildrenPath(result);
     }

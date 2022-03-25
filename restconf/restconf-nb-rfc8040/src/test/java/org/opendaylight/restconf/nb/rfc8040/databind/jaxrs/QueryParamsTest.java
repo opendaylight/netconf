@@ -15,8 +15,11 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -40,6 +43,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class QueryParamsTest {
@@ -162,14 +168,22 @@ public class QueryParamsTest {
         assertNotNull(params.fields());
 
         // fields for write filtering
-        final var containerSchema = mock(ContainerSchemaNode.class);
-        doReturn(QName.create(containerChild, "container")).when(containerSchema).getQName();
+        final var containerSchema = mock(ContainerSchemaNode.class,
+            withSettings().extraInterfaces(ContainerEffectiveStatement.class));
+        final var containerQName = QName.create(containerChild, "container");
+        doReturn(containerQName).when(containerSchema).getQName();
+        doReturn(SchemaPath.create(true, containerQName)).when(containerSchema).getPath();
         final var containerChildSchema = mock(LeafSchemaNode.class);
         doReturn(containerChild).when(containerChildSchema).getQName();
         doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
 
+        final var module = mock(ModuleEffectiveStatement.class);
+        doReturn(Optional.of(containerSchema)).when(module).findSchemaTreeNode(containerQName);
+        final var context = mock(EffectiveModelContext.class);
+        doReturn(Map.of(containerQName.getModule(), module)).when(context).getModuleStatements();
+
         final QueryParameters queryParameters = QueryParams.newQueryParameters(params,
-            InstanceIdentifierContext.ofDataSchemaNode(mock(EffectiveModelContext.class), containerSchema));
+            InstanceIdentifierContext.ofDataSchemaNode(context, containerSchema));
         final List<Set<QName>> fields = queryParameters.fields();
         assertNotNull(fields);
         assertEquals(1, fields.size());

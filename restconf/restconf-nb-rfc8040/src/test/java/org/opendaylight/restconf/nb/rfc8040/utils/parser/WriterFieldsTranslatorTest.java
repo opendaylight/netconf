@@ -42,18 +42,20 @@ public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set
 
     @Override
     protected void assertSubPath(final List<Set<QName>> result) {
-        assertEquals(3, result.size());
+        assertEquals(4, result.size());
         assertEquals(Set.of(LIBRARY_Q_NAME), result.get(0));
-        assertEquals(Set.of(ALBUM_Q_NAME), result.get(1));
-        assertEquals(Set.of(NAME_Q_NAME), result.get(2));
+        assertEquals(Set.of(ARTIST_Q_NAME), result.get(1));
+        assertEquals(Set.of(ALBUM_Q_NAME), result.get(2));
+        assertEquals(Set.of(NAME_Q_NAME), result.get(3));
     }
 
     @Override
     protected void assertChildrenPath(final List<Set<QName>> result) {
-        assertEquals(3, result.size());
+        assertEquals(4, result.size());
         assertEquals(Set.of(LIBRARY_Q_NAME), result.get(0));
-        assertEquals(Set.of(ALBUM_Q_NAME), result.get(1));
-        assertEquals(Set.of(NAME_Q_NAME), result.get(2));
+        assertEquals(Set.of(ARTIST_Q_NAME), result.get(1));
+        assertEquals(Set.of(ALBUM_Q_NAME), result.get(2));
+        assertEquals(Set.of(NAME_Q_NAME), result.get(3));
     }
 
     @Override
