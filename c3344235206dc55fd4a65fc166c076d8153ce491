@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9c21e4d2_4080c556",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-03-25T12:57:41Z",
+      "side": 1,
+      "message": "I tested this scenario and it does not work. \nBecause key re-exchange is the third option when incoming sessionId is the same, it is needed to return session object, then verifyServerKey() is evaluated as true. Otherwise, it returns null and leads to SshExepction (Server key did not validate).",
+      "parentUuid": "4390985c_dd9816b7",
+      "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1365e485_896b7d99",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 10
@@ -31,6 +49,24 @@
       "writtenOn": "2022-03-24T14:00:06Z",
       "side": 1,
       "message": "```\n        Map\u003cString, Boolean\u003e getExistingSessions() {\n            return ImmutableMap.copyOf(existingSessions);\n        }\n```\n\nThis way we can defend our internal logic.",
+      "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8827070_55eb97f8",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-03-25T12:57:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1365e485_896b7d99",
       "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "959b5559_94f1cfcf",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-03-25T12:57:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ed9009a_d0b3e9f7",
+      "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "927f249a_2bfba67e",
@@ -65,6 +119,24 @@
       "writtenOn": "2022-03-24T14:00:06Z",
       "side": 1,
       "message": "`Map\u003cString, Boolean\u003e existingSessions \u003d new ConcurrentHashMap\u003c\u003e()`\nis enough.",
+      "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c77cf76f_c6154797",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-03-25T12:57:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "927f249a_2bfba67e",
       "revId": "c3344235206dc55fd4a65fc166c076d8153ce491",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

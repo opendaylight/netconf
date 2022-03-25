@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1e920b62_a0a51a59",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-03-25T12:57:41Z",
+      "side": 1,
+      "message": "In my opinion, using of Map is more accurate in this case. \nWhen a device was not connected before, a map looks as follows {sessionId\u003dfalse}, doAuth() is executed. \nWhen key re-exchange happens, based on the key (sessionId), his value is set to true {sessionId\u003dtrue}, doAuth() does not need to happen again.\nAs there is a second manipulation with the same key, value can be found easily and cannot be repeated in the map as well.",
+      "parentUuid": "99766364_fbb69108",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f91e166a_effe7e16",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 4
