@@ -264,13 +264,13 @@ def isolate_controller(controllers, username, password, isolated):
     iso_result = "pass"
     for controller in controllers:
         controller_regex_string = (
-            "[\s\S]*" + isolated_controller + " *" + controller + "[\s\S]*"
+            r"[\s\S]*" + isolated_controller + " *" + controller + r"[\s\S]*"
         )
         controller_regex = re.compile(controller_regex_string)
         if not controller_regex.match(ip_tables):
             iso_result = ip_tables
         controller_regex_string = (
-            "[\s\S]*" + controller + " *" + isolated_controller + "[\s\S]*"
+            r"[\s\S]*" + controller + " *" + isolated_controller + r"[\s\S]*"
         )
         controller_regex = re.compile(controller_regex_string)
         if not controller_regex.match(ip_tables):
@@ -314,13 +314,13 @@ def rejoin_controller(controllers, username, password, isolated):
     iso_result = "pass"
     for controller in controllers:
         controller_regex_string = (
-            "[\s\S]*" + isolated_controller + " *" + controller + "[\s\S]*"
+            r"[\s\S]*" + isolated_controller + " *" + controller + r"[\s\S]*"
         )
         controller_regex = re.compile(controller_regex_string)
         if controller_regex.match(ip_tables):
             iso_result = ip_tables
         controller_regex_string = (
-            "[\s\S]*" + controller + " *" + isolated_controller + "[\s\S]*"
+            r"[\s\S]*" + controller + " *" + isolated_controller + r"[\s\S]*"
         )
         controller_regex = re.compile(controller_regex_string)
         if controller_regex.match(ip_tables):
