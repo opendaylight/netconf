@@ -222,7 +222,7 @@ public final class RestconfImpl implements RestconfService {
                 SchemaAwareBuilders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
         moduleContainerBuilder.withChild(allModuleMap);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext(null, modulesSchemaNode, null, schemaContext),
+        return new NormalizedNodeContext(InstanceIdentifierContext.ofDataSchemaNode(schemaContext, modulesSchemaNode),
                 moduleContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -293,7 +293,7 @@ public final class RestconfImpl implements RestconfService {
         checkState(moduleSchemaNode instanceof ListSchemaNode);
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext(null, moduleSchemaNode, mountPoint, schemaContext), moduleMap,
+                InstanceIdentifierContext.ofDataSchemaNode(schemaContext, moduleSchemaNode, mountPoint), moduleMap,
                 QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -323,7 +323,7 @@ public final class RestconfImpl implements RestconfService {
         streamsContainerBuilder.withChild(listStreamsBuilder.build());
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext(null, streamsContainerSchemaNode, null, schemaContext),
+                InstanceIdentifierContext.ofDataSchemaNode(schemaContext, streamsContainerSchemaNode),
                 streamsContainerBuilder.build(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
