@@ -148,7 +148,7 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     }
 
     private void initJukeboxSchemaNodes(final EffectiveModelContext schemaContext) {
-        identifierJukebox = new InstanceIdentifierContext(null, containerJukebox, null, schemaContext);
+        identifierJukebox = InstanceIdentifierContext.ofDataSchemaNode(schemaContext, containerJukebox);
         when(containerJukebox.getQName()).thenReturn(JUKEBOX_Q_NAME);
 
         when(containerLibrary.getQName()).thenReturn(LIBRARY_Q_NAME);
@@ -177,7 +177,7 @@ public abstract class AbstractFieldsTranslatorTest<T> {
     }
 
     private void initTestServicesSchemaNodes(final EffectiveModelContext schemaContext) {
-        identifierTestServices = new InstanceIdentifierContext(null, containerTestData, null, schemaContext);
+        identifierTestServices = InstanceIdentifierContext.ofDataSchemaNode(schemaContext, containerTestData);
         when(containerTestData.getQName()).thenReturn(TEST_DATA_Q_NAME);
 
         when(listServices.getQName()).thenReturn(SERVICES_Q_NAME);
