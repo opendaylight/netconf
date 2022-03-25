@@ -452,9 +452,10 @@ public final class RestconfImpl implements RestconfService {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
 
-        return new NormalizedNodeContext(
-            new InstanceIdentifierContext(null, resultNodeSchema, mountPoint, schemaContext),
-            resultData, QueryParametersParser.parseWriterParameters(uriInfo));
+        final var info = mountPoint == null ? InstanceIdentifierContext.ofLocalRpc(schemaContext, resultNodeSchema)
+            : InstanceIdentifierContext.ofMountPointRpcOutput(mountPoint, schemaContext, resultNodeSchema);
+
+        return new NormalizedNodeContext(info, resultData, QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     @SuppressFBWarnings(value = "NP_LOAD_OF_KNOWN_NULL_VALUE",
