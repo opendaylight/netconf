@@ -29,6 +29,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -42,8 +43,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -62,8 +63,6 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfInvokeOperationsServiceImplTest {
-    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/invoke-rpc";
-
     private static final QName RPC = QName.create("ns", "2015-02-28", "test-rpc");
     private static final ContainerNode INPUT = Builders.containerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create(RPC, "input")))
@@ -74,23 +73,28 @@ public class RestconfInvokeOperationsServiceImplTest {
         .withChild(ImmutableNodes.leafNode(QName.create(RPC, "content"), "operation result"))
         .build();
 
+    private static EffectiveModelContext CONTEXT;
+
     @Mock
     private DOMRpcService rpcService;
     @Mock
     private DOMMountPoint mountPoint;
     private RestconfInvokeOperationsServiceImpl invokeOperationsService;
 
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        CONTEXT = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/invoke-rpc"));
+    }
+
     @Before
-    public void setup() throws Exception {
-        final EffectiveModelContext contextRef =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
+    public void setup() {
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
         doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(dataBroker,
-            mock(DOMSchemaService.class));
-        schemaContextHandler.onModelContextUpdated(contextRef);
+            FixedDOMSchemaService.of(CONTEXT));
+        schemaContextHandler.init();
         invokeOperationsService =
                 new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler);
     }
@@ -183,6 +187,6 @@ public class RestconfInvokeOperationsServiceImplTest {
         doReturn(immediateFluentFuture(domRpcResult)).when(rpcService).invokeRpc(qname, data);
         doReturn(result).when(domRpcResult).getResult();
         return NormalizedNodePayload.of(
-            InstanceIdentifierContext.ofLocalRpc(mock(EffectiveModelContext.class), schemaNode), data);
+            InstanceIdentifierContext.ofLocalRpc(CONTEXT, schemaNode), data);
     }
 }
