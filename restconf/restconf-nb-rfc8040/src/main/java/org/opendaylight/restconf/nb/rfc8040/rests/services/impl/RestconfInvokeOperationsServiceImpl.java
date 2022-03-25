@@ -74,20 +74,19 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     @Override
     public void invokeRpc(final String identifier, final NormalizedNodePayload payload, final UriInfo uriInfo,
             final AsyncResponse ar) {
-        final SchemaNode schema = payload.getInstanceIdentifierContext().getSchemaNode();
+        final InstanceIdentifierContext context = payload.getInstanceIdentifierContext();
+        final EffectiveModelContext schemaContext = context.getSchemaContext();
+        final DOMMountPoint mountPoint = context.getMountPoint();
+        final SchemaNode schema = context.getSchemaNode();
         final QName rpcName = schema.getQName();
-        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
 
         final ListenableFuture<? extends DOMRpcResult> future;
-        final EffectiveModelContext schemaContextRef;
         if (mountPoint == null) {
-            schemaContextRef = schemaContextHandler.get();
-
             // FIXME: this really should be a normal RPC invocation service which has its own interface with JAX-RS
             if (SAL_REMOTE_NAMESPACE.equals(rpcName.getNamespace())) {
                 if (identifier.contains("create-data-change-event-subscription")) {
                     future = Futures.immediateFuture(
-                        CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContextRef));
+                        CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext));
                 } else {
                     future = Futures.immediateFailedFuture(new RestconfDocumentedException("Unsupported operation",
                         ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED));
@@ -96,7 +95,6 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                 future = invokeRpc(payload.getData(), rpcName, rpcService);
             }
         } else {
-            schemaContextRef = modelContext(mountPoint);
             future = invokeRpc(payload.getData(), rpcName, mountPoint);
         }
 
@@ -114,8 +112,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                 if (resultData == null || ((ContainerNode) resultData).isEmpty()) {
                     ar.resume(new WebApplicationException(Status.NO_CONTENT));
                 } else {
-                    ar.resume(NormalizedNodePayload.of(new InstanceIdentifierContext(null, schema,
-                        mountPoint, schemaContextRef), resultData));
+                    ar.resume(NormalizedNodePayload.of(context, resultData));
                 }
             }
 
