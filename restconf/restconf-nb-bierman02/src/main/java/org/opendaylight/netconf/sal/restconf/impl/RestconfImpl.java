@@ -109,9 +109,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBui
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -167,11 +167,11 @@ public final class RestconfImpl implements RestconfService {
                 QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
                 QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
 
-    public static final CharSequence DATA_SUBSCR = "data-change-event-subscription";
-    private static final CharSequence CREATE_DATA_SUBSCR = "create-" + DATA_SUBSCR;
+    public static final String DATA_SUBSCR = "data-change-event-subscription";
+    private static final String CREATE_DATA_SUBSCR = "create-" + DATA_SUBSCR;
 
-    public static final CharSequence NOTIFICATION_STREAM = "notification-stream";
-    private static final CharSequence CREATE_NOTIFICATION_STREAM = "create-" + NOTIFICATION_STREAM;
+    public static final String NOTIFICATION_STREAM = "notification-stream";
+    private static final String CREATE_NOTIFICATION_STREAM = "create-" + NOTIFICATION_STREAM;
 
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
@@ -603,7 +603,7 @@ public final class RestconfImpl implements RestconfService {
         }
 
         final YangInstanceIdentifier pathIdentifier = (YangInstanceIdentifier) pathValue;
-        String streamName = (String) CREATE_DATA_SUBSCR;
+        final String streamName;
         NotificationOutputType outputType = null;
         if (!pathIdentifier.isEmpty()) {
             final String fullRestconfIdentifier =
@@ -621,6 +621,8 @@ public final class RestconfImpl implements RestconfService {
 
             streamName = Notificator
                     .createStreamNameFromUri(fullRestconfIdentifier + "/datastore=" + datastore + "/scope=" + scope);
+        } else {
+            streamName = CREATE_DATA_SUBSCR;
         }
 
         if (Strings.isNullOrEmpty(streamName)) {
@@ -630,18 +632,14 @@ public final class RestconfImpl implements RestconfService {
                     + "built-in type.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
-        final QName outputQname = QName.create(rpcQName, "output");
-        final QName streamNameQname = QName.create(rpcQName, "stream-name");
-
-        final ContainerNode output =
-                ImmutableContainerNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(outputQname))
-                        .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
-
         if (!Notificator.existListenerFor(streamName)) {
             Notificator.createListener(pathIdentifier, streamName, outputType, controllerContext);
         }
 
-        return Futures.immediateFuture(new DefaultDOMRpcResult(output));
+        return Futures.immediateFuture(new DefaultDOMRpcResult(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQName, "output")))
+            .withChild(ImmutableNodes.leafNode(QName.create(rpcQName, "stream-name"), streamName))
+            .build()));
     }
 
     private static RpcDefinition findRpc(final SchemaContext schemaContext, final String identifierDecoded) {
@@ -1494,9 +1492,8 @@ public final class RestconfImpl implements RestconfService {
 
         final Collection<LeafSetEntryNode<?>> entryNodes = leafSet.body();
         final List<Absolute> paths = new ArrayList<>();
-        String streamName = CREATE_NOTIFICATION_STREAM + "/";
 
-        StringBuilder streamNameBuilder = new StringBuilder(streamName);
+        StringBuilder streamNameBuilder = new StringBuilder(CREATE_NOTIFICATION_STREAM).append('/');
         final Iterator<LeafSetEntryNode<?>> iterator = entryNodes.iterator();
         while (iterator.hasNext()) {
             final QName valueQName = QName.create((String) iterator.next().body());
@@ -1519,21 +1516,17 @@ public final class RestconfImpl implements RestconfService {
             }
         }
 
-        streamName = streamNameBuilder.toString();
-
+        final String streamName = streamNameBuilder.toString();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final QName outputQname = QName.create(rpcQName, "output");
-        final QName streamNameQname = QName.create(rpcQName, "notification-stream-identifier");
-
-        final ContainerNode output =
-                ImmutableContainerNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(outputQname))
-                        .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
 
         if (!Notificator.existNotificationListenerFor(streamName)) {
             Notificator.createNotificationListener(paths, streamName, outputType, controllerContext);
         }
 
-        return Futures.immediateFuture(new DefaultDOMRpcResult(output));
+        return Futures.immediateFuture(new DefaultDOMRpcResult(Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQName, "output")))
+            .withChild(ImmutableNodes.leafNode(QName.create(rpcQName, "notification-stream-identifier"), streamName))
+            .build()));
     }
 
     private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
