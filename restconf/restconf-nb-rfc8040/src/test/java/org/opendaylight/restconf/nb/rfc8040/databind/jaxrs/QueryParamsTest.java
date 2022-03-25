@@ -169,8 +169,7 @@ public class QueryParamsTest {
         doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
 
         final QueryParameters queryParameters = QueryParams.newQueryParameters(params,
-
-            new InstanceIdentifierContext(null, containerSchema, null, mock(EffectiveModelContext.class)));
+            InstanceIdentifierContext.ofDataSchemaNode(mock(EffectiveModelContext.class), containerSchema));
         final List<Set<QName>> fields = queryParameters.fields();
         assertNotNull(fields);
         assertEquals(1, fields.size());

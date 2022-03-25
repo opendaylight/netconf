@@ -359,8 +359,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPutData() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, schemaNode, null, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
 
         doReturn(immediateTrueFluentFuture()).when(read)
@@ -393,8 +392,7 @@ public class RestconfDataServiceImplTest {
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band");
 
         doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, null, null, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(listQname))
             .withChild(Builders.mapEntryBuilder()
@@ -443,8 +441,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchData() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, schemaNode, null, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)
@@ -493,8 +490,7 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchDataDeleteNotExist() {
-        final InstanceIdentifierContext iidContext =
-                new InstanceIdentifierContext(iidBase, schemaNode, null, contextRef);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final List<PatchEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
                 .node(containerPlayerQname)

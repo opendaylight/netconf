@@ -222,7 +222,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
 
-        validInputData(iid.getSchemaNode(), payload);
+        validInputData(iid.getSchemaNode() != null, payload);
         validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
@@ -281,7 +281,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         requireNonNull(payload);
 
         final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
-        validInputData(iid.getSchemaNode(), payload);
+        validInputData(iid.getSchemaNode() != null, payload);
         validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
@@ -426,10 +426,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param payload    input data
      */
     @VisibleForTesting
-    public static void validInputData(final SchemaNode schemaNode, final NormalizedNodePayload payload) {
-        if (schemaNode != null && payload.getData() == null) {
-            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-        } else if (schemaNode == null && payload.getData() != null) {
+    public static void validInputData(final boolean haveSchemaNode, final NormalizedNodePayload payload) {
+        final boolean haveData = payload.getData() != null;
+        if (haveSchemaNode) {
+            if (!haveData) {
+                throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            }
+        } else if (haveData) {
             throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
     }
