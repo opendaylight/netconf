@@ -74,8 +74,14 @@
     </dependency>
 
     <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-data-api</artifactId>
+      <groupid>org.opendaylight.yangtools</groupid>
+      <artifactid>yang-data-api</artifactid>
+    </dependency>
+    <dependency>
+      <groupid>org.opendaylight.yangtools</groupid>
+      <artifactid>yang-data-util</artifactid>
+      <!-- FIXME: remove this override -->
+      <version>7.0.15</version>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
