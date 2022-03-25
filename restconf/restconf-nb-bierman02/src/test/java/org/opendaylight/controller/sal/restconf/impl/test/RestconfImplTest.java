@@ -71,7 +71,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
@@ -149,12 +148,13 @@ public class RestconfImplTest {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters(anyBoolean());
 
         final NormalizedNodeContext ctx = mock(NormalizedNodeContext.class);
-        final SchemaNode schemaNode = mock(SchemaNode.class);
+        final RpcDefinition schemaNode = mock(RpcDefinition.class);
         doReturn(mock(SchemaPath.class)).when(schemaNode).getPath();
         doReturn(QName.create("namespace", "2010-10-10", "localname")).when(schemaNode).getQName();
 
         final DOMMountPoint mount = mock(DOMMountPoint.class);
-        doReturn(new InstanceIdentifierContext(null, schemaNode, mount, null)).when(ctx).getInstanceIdentifierContext();
+        doReturn(InstanceIdentifierContext.ofMountPointRpc(mount, schemaContext, schemaNode))
+            .when(ctx).getInstanceIdentifierContext();
 
         final DOMRpcService rpcService = mock(DOMRpcService.class);
         doReturn(Optional.of(rpcService)).when(mount).getService(DOMRpcService.class);
