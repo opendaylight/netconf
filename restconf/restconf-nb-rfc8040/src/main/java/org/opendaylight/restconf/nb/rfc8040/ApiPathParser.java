@@ -70,8 +70,7 @@ class ApiPathParser {
     static {
         // Select the correct parser implementation where consecutive slashes are concerned. We default to lenient
         // interpretation and treat them as a single slash, but allow this to be overridden through a system property.
-        // FIXME: 3.0.0: make "reject" the default
-        final String prop = System.getProperty("org.opendaylight.restconf.url.consecutive-slashes", "allow");
+        final String prop = System.getProperty("org.opendaylight.restconf.url.consecutive-slashes", "reject");
         final String treatment;
         switch (prop) {
             case "allow":
