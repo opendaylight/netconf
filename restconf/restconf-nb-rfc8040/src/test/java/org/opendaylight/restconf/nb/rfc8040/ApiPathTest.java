@@ -34,22 +34,16 @@ public class ApiPathTest {
 
     @Test
     public void testSingleSlash() throws ParseException {
-        final var ex = assertThrows(ParseException.class, () -> ApiPath.parse("/"));
+        final var ex = assertThrows(ParseException.class, () -> ApiPath.parseUrl("/"));
         assertEquals("Identifier may not be empty", ex.getMessage());
         assertEquals(0, ex.getErrorOffset());
-
-        assertEquals(ApiPath.empty(), ApiPath.parseUrl("/"));
     }
 
     @Test
     public void testTrailingSlash() throws ParseException {
-        final var ex = assertThrows(ParseException.class, () -> ApiPath.parse("foo/"));
+        final var ex = assertThrows(ParseException.class, () -> ApiPath.parseUrl("foo/"));
         assertEquals("Identifier may not be empty", ex.getMessage());
         assertEquals(4, ex.getErrorOffset());
-
-        final var path = ApiPath.parseUrl("foo/").steps();
-        assertEquals(1, path.size());
-        assertApiIdentifier(path.get(0), null, "foo");
     }
 
     @Test

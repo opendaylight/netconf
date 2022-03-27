@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.FileNotFoundException;
-import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -243,27 +241,6 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeEmptyDataTest() {
         assertEquals(List.of(), YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "").path.getPathArguments());
-    }
-
-    /**
-     * Test of deserialization <code>String</code> URI with identifiers separated by multiple slashes to
-     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
-     */
-    @Test
-    public void deserializeMultipleSlashesTest() throws ParseException {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
-            ApiPath.parseUrl("deserializer-test:contA////list-A=40//list-key")).path.getPathArguments();
-        assertEquals(4, result.size());
-
-        // container
-        assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
-        // list
-        final QName list = QName.create("deserializer:test", "2016-06-06", "list-A");
-        assertEquals(NodeIdentifier.create(list), result.get(1));
-        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), Uint8.valueOf(40)),
-            result.get(2));
-        // leaf
-        assertEquals(new NodeIdentifier(QName.create("deserializer:test", "2016-06-06", "list-key")), result.get(3));
     }
 
     /**
