@@ -23,6 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
@@ -172,8 +173,16 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
                     writer.scalarValue(anyxmlNode.body());
                 }
                 writer.endNode();
+                return true;
             }
-            return true;
+        } else if (node instanceof AnydataNode) {
+            final AnydataNode<?> anydataNode = (AnydataNode<?>)node;
+            final Class<?> objectModel = anydataNode.bodyObjectModel();
+            if (writer.startAnydataNode(anydataNode.getIdentifier(), objectModel)) {
+                writer.scalarValue(anydataNode.body());
+                writer.endNode();
+                return true;
+            }
         }
 
         return false;
