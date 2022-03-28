@@ -173,16 +173,16 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
                     writer.scalarValue(anyxmlNode.body());
                 }
                 writer.endNode();
-                return true;
             }
+            return true;
         } else if (node instanceof AnydataNode) {
             final AnydataNode<?> anydataNode = (AnydataNode<?>)node;
             final Class<?> objectModel = anydataNode.bodyObjectModel();
             if (writer.startAnydataNode(anydataNode.getIdentifier(), objectModel)) {
                 writer.scalarValue(anydataNode.body());
                 writer.endNode();
-                return true;
             }
+            return true;
         }
 
         return false;
