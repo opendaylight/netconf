@@ -507,6 +507,7 @@ public class NetconfDevice
             if (!requiredSources.isEmpty()) {
                 // Initiate async resolution, drive it back based on the result
                 LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
+                // FIXME: Here we should pass supportedFeatures into context
                 Futures.addCallback(schemaContextFactory.createEffectiveModelContext(requiredSources), this,
                     MoreExecutors.directExecutor());
             } else {

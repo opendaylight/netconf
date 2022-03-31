@@ -77,6 +77,7 @@ final class DeviceSourcesResolver implements Callable<DeviceSources> {
         }
 
         final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
+        // Here features can be extract and put into DeviceSources and used later in context
         if (availableSchemas instanceof LibraryModulesSchemas) {
             sourceProvider = new YangLibrarySchemaYangSourceProvider(id,
                     ((LibraryModulesSchemas) availableSchemas).getAvailableModels());

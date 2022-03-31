@@ -26,14 +26,17 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
     private static final QName RFC7895_YANG_LIBRARY_CAPABILITY = RFC8525_YANG_LIBRARY_CAPABILITY
         .bindTo(QNameModule.create(RFC8525_YANG_LIBRARY_CAPABILITY.getNamespace(), Revision.of("2016-06-21"))).intern();
 
+    // This method is used to extract data from devices
     @Override
     public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc,
             final NetconfSessionPreferences remoteSessionCapabilities,
             final RemoteDeviceId id, final EffectiveModelContext schemaContext) {
         // FIXME: I think we should prefer YANG library here
+        // FIXME: This is ietf-netconf-monitoring case - features here can be parsed out of capabilities
         if (remoteSessionCapabilities.isMonitoringSupported()) {
             return NetconfStateSchemas.create(deviceRpc, remoteSessionCapabilities, id, schemaContext);
         }
+        // FIXME: This is ietf-yang-library case - here we need to extract features from the device with explicit request
         if (remoteSessionCapabilities.containsModuleCapability(RFC8525_YANG_LIBRARY_CAPABILITY)
                 || remoteSessionCapabilities.containsModuleCapability(RFC7895_YANG_LIBRARY_CAPABILITY)) {
             return LibraryModulesSchemas.create(deviceRpc, id);
