@@ -166,6 +166,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         try {
             moduleListNodeResult =
                     deviceRpc.invokeRpc(NETCONF_GET_QNAME, GET_MODULES_STATE_MODULE_LIST_RPC).get();
+            // FIXME: Here should be explicit request for features. But I saw only two requests in this list of rpcs that return data - get and one thea return config
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException(deviceId + ": Interrupted while waiting for response to "
