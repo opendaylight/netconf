@@ -45,6 +45,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.ListEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +116,12 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                     current = next;
                 } while (current.isMixin());
 
+                // We need to unwind the last identifier if it a NodeIdentifierWithPredicates, as it does not have
+                // any predicates at all. The real identifier is then added below
+                if (stack.currentStatement() instanceof ListEffectiveStatement) {
+                    iiToDataList.remove(iiToDataList.size() - 1);
+                }
+
                 inference = stack.toInference();
             } else {
                 // PUT
@@ -148,7 +155,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                 parsed = mapNode.body().iterator().next();
             }
 
-            if (schemaNode instanceof  ListSchemaNode && isPost()) {
+            if (schemaNode instanceof ListSchemaNode && isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
         } else {

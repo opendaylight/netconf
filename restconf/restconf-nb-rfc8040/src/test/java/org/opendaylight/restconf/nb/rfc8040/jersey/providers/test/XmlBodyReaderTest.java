@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -38,6 +39,8 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
@@ -51,6 +54,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class XmlBodyReaderTest extends AbstractBodyReaderTest {
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
+    private static final QName TOP_LEVEL_LIST = QName.create("foo", "2017-08-09", "top-level-list");
 
     private static EffectiveModelContext schemaContext;
 
@@ -89,6 +93,12 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final NormalizedNodePayload payload = xmlBodyReader.readFrom(null, null, null, mediaType, null,
             XmlBodyReaderTest.class.getResourceAsStream("/foo-xml-test/foo.xml"));
         assertNotNull(payload);
+
+        final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
+        assertEquals(YangInstanceIdentifier.create(
+            new NodeIdentifier(TOP_LEVEL_LIST),
+            NodeIdentifierWithPredicates.of(TOP_LEVEL_LIST, QName.create(TOP_LEVEL_LIST, "key-leaf"), "key-value")),
+            iid.getInstanceIdentifier());
 
         assertThat(payload.getData(), instanceOf(MapEntryNode.class));
         final MapEntryNode data = (MapEntryNode) payload.getData();
