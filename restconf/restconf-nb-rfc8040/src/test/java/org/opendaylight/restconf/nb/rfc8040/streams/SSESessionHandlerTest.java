@@ -13,7 +13,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -48,8 +47,8 @@ public class SSESessionHandlerTest {
     private Sse sse;
 
     private SSESessionHandler setup(final int maxFragmentSize, final int heartbeatInterval) {
-        doCallRealMethod().when(sse).newEvent(any());
-        doAnswer(inv -> new OutboundEvent.Builder()).when(sse).newEventBuilder();
+        doAnswer(inv -> new OutboundEvent.Builder().data(String.class, inv.getArgument(0, String.class)).build())
+            .when(sse).newEvent(any());
 
         final SSESessionHandler sseSessionHandler = new SSESessionHandler(executorService, eventSink, sse, listener,
             maxFragmentSize, heartbeatInterval);
