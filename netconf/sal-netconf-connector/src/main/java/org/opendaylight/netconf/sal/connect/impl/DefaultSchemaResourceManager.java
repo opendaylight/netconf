@@ -25,7 +25,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
-import org.opendaylight.yangtools.yang.model.repo.spi.GuavaSchemaSourceCache;
+import org.opendaylight.yangtools.yang.model.repo.spi.SoftSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.ir.IRSchemaSource;
@@ -67,7 +67,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         this.parserFactory = requireNonNull(parserFactory);
         this.rootDirectory = requireNonNull(rootDirectory);
         this.defaultSubdirectory = requireNonNull(defaultSubdirectory);
-        this.defaultResources = createResources(defaultSubdirectory);
+        defaultResources = createResources(defaultSubdirectory);
         LOG.info("Schema Resource Manager instantiated on {}/{}", rootDirectory, defaultSubdirectory);
     }
 
@@ -115,8 +115,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         // for a consistent set of modules, as it skips the need to re-parse the text sources multiple times. It also
         // helps establishing different sets of contexts, as they can share this pre-made cache.
         repository.registerSchemaSourceListener(
-            // FIXME: add knobs to control cache lifetime explicitly
-            GuavaSchemaSourceCache.createSoftCache(repository, IRSchemaSource.class));
+            new SoftSchemaSourceCache<>(repository, IRSchemaSource.class));
 
         // Attach the filesystem cache, providing persistence capability, so that restarts do not require us to
         // re-populate the cache. This also acts as a side-load capability, as anything pre-populated into that
