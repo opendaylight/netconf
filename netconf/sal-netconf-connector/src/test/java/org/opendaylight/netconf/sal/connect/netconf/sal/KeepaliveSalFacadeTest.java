@@ -20,13 +20,11 @@ import static org.mockito.Mockito.verify;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -61,9 +59,6 @@ public class KeepaliveSalFacadeTest {
 
     private DOMRpcService proxyRpc;
 
-    @Mock
-    private ScheduledFuture<?> currentKeepalive;
-
     private KeepaliveSalFacade keepaliveSalFacade;
 
     @Before
@@ -72,14 +67,6 @@ public class KeepaliveSalFacadeTest {
 
         doNothing().when(listener).disconnect();
         doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
-
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-        executorServiceSpy = Mockito.spy(executorService);
-
-        doAnswer(invocationOnMock -> {
-            invocationOnMock.callRealMethod();
-            return currentKeepalive;
-        }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), any());
 
         keepaliveSalFacade =
                 new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 1L, 1L);
