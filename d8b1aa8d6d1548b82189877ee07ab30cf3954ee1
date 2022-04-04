@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "12689565_fe0c7276",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/DeviceSourcesResolver.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2022-04-04T11:35:11Z",
+      "side": 1,
+      "message": "No, I meant that they can be extract here if I have them. This will be last step when I add them to sources. But I still need to extract them before in NetconfStateSchemasResolver.",
+      "parentUuid": "44ad0ac3_a8daff2e",
+      "revId": "d8b1aa8d6d1548b82189877ee07ab30cf3954ee1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "752f5590_8a7abcb7",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemas.java",
         "patchSetId": 1
