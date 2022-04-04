@@ -12,8 +12,8 @@ import static com.google.common.base.Preconditions.checkState;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -45,6 +45,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.ListEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
-        final List<PathArgument> iiToDataList = new ArrayList<>();
+        final Deque<PathArgument> iiToDataList = new ArrayDeque<>();
         Inference inference;
         if (schemaNodeContext instanceof OperationDefinition) {
             schemaNode = ((OperationDefinition) schemaNodeContext).getInput();
@@ -114,6 +115,12 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                     schemaNode = next.getDataSchemaNode();
                     current = next;
                 } while (current.isMixin());
+
+                // We need to unwind the last identifier if it a NodeIdentifierWithPredicates, as it does not have
+                // any predicates at all. The real identifier is then added below
+                if (stack.currentStatement() instanceof ListEffectiveStatement) {
+                    iiToDataList.removeLast();
+                }
 
                 inference = stack.toInference();
             } else {
@@ -148,7 +155,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                 parsed = mapNode.body().iterator().next();
             }
 
-            if (schemaNode instanceof  ListSchemaNode && isPost()) {
+            if (schemaNode instanceof ListSchemaNode && isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
         } else {
