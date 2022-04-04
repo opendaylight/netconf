@@ -127,7 +127,7 @@ CONTROLLER_CONFIG_MOUNT = (
 )
 CONFIG_API = "/restconf/config"
 OPERATIONAL_API = "/restconf/operational"
-MODULES_API = "/restconf/modules"
+MODULES_API = "/rests/data/ietf-yang-library:modules-state"
 VTN_INVENTORY_NODE_API = "/restconf/operational/vtn-inventory:vtn-nodes"
 
 # NEMO Variables
