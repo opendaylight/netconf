@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
+import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
@@ -870,7 +871,7 @@ public class DefinitionGenerator {
 
     private static String processNumberType(final RangeRestrictedTypeDefinition<?, ?> leafTypeDef,
             final ObjectNode property) {
-        final Optional<Number> maybeLower = ((RangeRestrictedTypeDefinition<?, ?>) leafTypeDef).getRangeConstraint()
+        final Optional<Number> maybeLower = leafTypeDef.getRangeConstraint()
                 .map(RangeConstraint::getAllowedRanges).map(RangeSet::span).map(Range::lowerEndpoint);
 
         if (isHexadecimalOrOctal(leafTypeDef)) {
@@ -878,7 +879,7 @@ public class DefinitionGenerator {
         }
 
         if (leafTypeDef instanceof DecimalTypeDefinition) {
-            maybeLower.ifPresent(number -> setDefaultValue(property, (BigDecimal) number));
+            maybeLower.ifPresent(number -> setDefaultValue(property, ((Decimal64) number).decimalValue()));
             return NUMBER_TYPE;
         }
         if (leafTypeDef instanceof Uint8TypeDefinition
