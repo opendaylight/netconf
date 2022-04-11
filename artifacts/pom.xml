@@ -481,11 +481,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>restconf-nb-bierman02</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-nb-rfc8040</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -561,13 +556,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-restconf-common</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>odl-restconf-nb-bierman02</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>

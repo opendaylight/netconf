@@ -54,12 +54,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>odl-restconf-nb-bierman02</artifactId>
-      <type>xml</type>
-      <classifier>features</classifier>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>odl-restconf-nb-rfc8040</artifactId>
       <type>xml</type>
       <classifier>features</classifier>
