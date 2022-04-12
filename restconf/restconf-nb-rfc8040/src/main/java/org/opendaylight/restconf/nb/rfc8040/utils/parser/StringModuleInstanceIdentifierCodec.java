@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.codecs;
+package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,7 +17,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
-    private final EffectiveModelContext context;
+    private final @NonNull EffectiveModelContext context;
 
     private volatile DataSchemaContextTree dataContextTree;
 

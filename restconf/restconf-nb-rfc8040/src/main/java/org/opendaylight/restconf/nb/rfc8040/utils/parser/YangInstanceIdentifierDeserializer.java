@@ -44,6 +44,7 @@ import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
@@ -268,7 +269,12 @@ public final class YangInstanceIdentifierDeserializer {
         if (typedef instanceof IdentityrefTypeDefinition) {
             return toIdentityrefQName(value, schemaNode);
         }
+
         try {
+            if (typedef instanceof InstanceIdentifierTypeDefinition) {
+                return new StringModuleInstanceIdentifierCodec(schemaContext).deserialize(value);
+            }
+
             return RestCodec.deserialize(schemaContext, typedef, value);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),

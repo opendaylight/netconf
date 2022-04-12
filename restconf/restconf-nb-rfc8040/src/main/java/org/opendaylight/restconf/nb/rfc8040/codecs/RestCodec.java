@@ -11,7 +11,6 @@ import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,19 +27,14 @@ public final class RestCodec {
         final TypeDefinition<?> type = RestUtil.resolveBaseTypeFrom(typeDefinition);
 
         try {
-            if (type instanceof InstanceIdentifierTypeDefinition) {
-                // FIXME: what is it that we are trying to decode here and why?
-                return new StringModuleInstanceIdentifierCodec(schemaContext).deserialize(input);
+            final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
+                TypeDefinitionAwareCodec.from(type);
+            if (typeAwarecodec != null) {
+                return typeAwarecodec.deserialize(String.valueOf(input));
             } else {
-                final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
-                        TypeDefinitionAwareCodec.from(type);
-                if (typeAwarecodec != null) {
-                    return typeAwarecodec.deserialize(String.valueOf(input));
-                } else {
-                    // FIXME: this should be a hard error
-                    LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
-                    return null;
-                }
+                // FIXME: this should be a hard error
+                LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
+                return null;
             }
         } catch (final ClassCastException e) {
             // FIXME: remove this catch when everyone use codecs
