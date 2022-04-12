@@ -24,8 +24,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.Predicate;
-import org.opendaylight.restconf.common.util.RestUtil;
-import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -36,7 +34,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.codec.IdentityrefCodec;
 import org.opendaylight.yangtools.yang.data.api.codec.InstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.api.codec.LeafrefCodec;
-import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
@@ -49,10 +46,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,124 +57,11 @@ public final class RestCodec {
         // Hidden on purpose
     }
 
-    // FIXME: IllegalArgumentCodec is not quite accurate
-    public static IllegalArgumentCodec<Object, Object> from(final TypeDefinition<?> typeDefinition,
-            final DOMMountPoint mountPoint, final EffectiveModelContext schemaContext) {
-        return new ObjectCodec(typeDefinition, mountPoint, schemaContext);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static final class ObjectCodec implements IllegalArgumentCodec<Object, Object> {
-
-        private static final Logger LOG = LoggerFactory.getLogger(ObjectCodec.class);
-
-        public static final IllegalArgumentCodec LEAFREF_DEFAULT_CODEC = new LeafrefCodecImpl();
-        private final IllegalArgumentCodec instanceIdentifier;
-        private final IllegalArgumentCodec identityrefCodec;
-
-        private final TypeDefinition<?> type;
-
-        private final EffectiveModelContext schemaContext;
-
-        private ObjectCodec(final TypeDefinition<?> typeDefinition, final DOMMountPoint mountPoint,
-                final EffectiveModelContext schemaContext) {
-            this.schemaContext = schemaContext;
-            type = RestUtil.resolveBaseTypeFrom(typeDefinition);
-            if (type instanceof IdentityrefTypeDefinition) {
-                identityrefCodec = new IdentityrefCodecImpl(mountPoint, schemaContext);
-            } else {
-                identityrefCodec = null;
-            }
-            if (type instanceof InstanceIdentifierTypeDefinition) {
-                instanceIdentifier = new InstanceIdentifierCodecImpl(mountPoint, schemaContext);
-            } else {
-                instanceIdentifier = null;
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        @SuppressFBWarnings(value = "NP_NONNULL_RETURN_VIOLATION", justification = "Legacy returns")
-        public Object deserialize(final Object input) {
-            try {
-                if (type instanceof IdentityrefTypeDefinition) {
-                    if (input instanceof IdentityValuesDTO) {
-                        return identityrefCodec.deserialize(input);
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(
-                            "Value is not instance of IdentityrefTypeDefinition but is {}. "
-                                    + "Therefore NULL is used as translation of - {}",
-                            input == null ? "null" : input.getClass(), String.valueOf(input));
-                    }
-                    // FIXME: this should be a hard error
-                    return null;
-                } else if (type instanceof InstanceIdentifierTypeDefinition) {
-                    return input instanceof IdentityValuesDTO ? instanceIdentifier.deserialize(input)
-                        // FIXME: what is it that we are trying to decode here and why?
-                        : new StringModuleInstanceIdentifierCodec(schemaContext).deserialize((String) input);
-                } else {
-                    final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
-                            TypeDefinitionAwareCodec.from(type);
-                    if (typeAwarecodec != null) {
-                        if (input instanceof IdentityValuesDTO) {
-                            return typeAwarecodec.deserialize(((IdentityValuesDTO) input).getOriginValue());
-                        }
-                        return typeAwarecodec.deserialize(String.valueOf(input));
-                    } else {
-                        // FIXME: this should be a hard error
-                        LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
-                        return null;
-                    }
-                }
-            } catch (final ClassCastException e) {
-                // FIXME: remove this catch when everyone use codecs
-                // FIXME: this should be a hard error
-                LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
-                return null;
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        @SuppressFBWarnings(value = "NP_NONNULL_RETURN_VIOLATION", justification = "Legacy returns")
-        public Object serialize(final Object input) {
-            try {
-                if (type instanceof IdentityrefTypeDefinition) {
-                    return identityrefCodec.serialize(input);
-                } else if (type instanceof LeafrefTypeDefinition) {
-                    return LEAFREF_DEFAULT_CODEC.serialize(input);
-                } else if (type instanceof InstanceIdentifierTypeDefinition) {
-                    return instanceIdentifier.serialize(input);
-                } else {
-                    final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
-                            TypeDefinitionAwareCodec.from(type);
-                    if (typeAwarecodec != null) {
-                        return typeAwarecodec.serialize(input);
-                    } else {
-                        // FIXME: this needs to be a hard error
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
-                        }
-                        return null;
-                    }
-                }
-            } catch (final ClassCastException e) {
-                // FIXME: remove this catch when everyone use codecs
-                // FIXME: this needs to be a hard error
-                LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
-                return input;
-            }
-        }
-    }
-
     public static class IdentityrefCodecImpl implements IdentityrefCodec<IdentityValuesDTO> {
-
         private static final Logger LOG = LoggerFactory.getLogger(IdentityrefCodecImpl.class);
 
-        private final DOMMountPoint mountPoint;
-
         private final SchemaContext schemaContext;
+        private final DOMMountPoint mountPoint;
 
         public IdentityrefCodecImpl(final DOMMountPoint mountPoint, final SchemaContext schemaContext) {
             this.mountPoint = mountPoint;
@@ -292,35 +172,33 @@ public final class RestCodec {
                 PathArgument pathArgument = null;
                 if (identityValue.getPredicates().isEmpty()) {
                     pathArgument = new NodeIdentifier(qName);
-                } else {
-                    if (node instanceof LeafListSchemaNode) { // predicate is value of leaf-list entry
-                        final Predicate leafListPredicate = identityValue.getPredicates().get(0);
-                        // FIXME: this needs to be a hard error
-                        if (!leafListPredicate.isLeafList()) {
-                            LOG.info("Predicate's data is not type of leaf-list. It should be in format \".='value'\"");
-                            LOG.info("Instance-identifier will be translated as NULL for data - {}",
-                                    String.valueOf(identityValue.getValue()));
-                            return null;
-                        }
-                        pathArgument = new NodeWithValue<>(qName, leafListPredicate.getValue());
-                    } else if (node instanceof ListSchemaNode) { // predicates are keys of list
-                        final DataNodeContainer listNode = (DataNodeContainer) node;
-                        final Map<QName, Object> predicatesMap = new HashMap<>();
-                        for (final Predicate predicate : identityValue.getPredicates()) {
-                            validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), mountPoint,
-                                    schemaContext);
-                            final DataSchemaNode listKey = findInstanceDataChildByNameAndNamespace(listNode,
-                                    predicate.getName().getValue(), validNamespace);
-                            predicatesMap.put(listKey.getQName(), predicate.getValue());
-                        }
-                        pathArgument = NodeIdentifierWithPredicates.of(qName, predicatesMap);
-                    } else {
-                        // FIXME: this needs to be a hard error
-                        LOG.info("Node {} is not List or Leaf-list.", node);
+                } else if (node instanceof LeafListSchemaNode) { // predicate is value of leaf-list entry
+                    final Predicate leafListPredicate = identityValue.getPredicates().get(0);
+                    // FIXME: this needs to be a hard error
+                    if (!leafListPredicate.isLeafList()) {
+                        LOG.info("Predicate's data is not type of leaf-list. It should be in format \".='value'\"");
                         LOG.info("Instance-identifier will be translated as NULL for data - {}",
                                 String.valueOf(identityValue.getValue()));
                         return null;
                     }
+                    pathArgument = new NodeWithValue<>(qName, leafListPredicate.getValue());
+                } else if (node instanceof ListSchemaNode) { // predicates are keys of list
+                    final DataNodeContainer listNode = (DataNodeContainer) node;
+                    final Map<QName, Object> predicatesMap = new HashMap<>();
+                    for (final Predicate predicate : identityValue.getPredicates()) {
+                        validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), mountPoint,
+                                schemaContext);
+                        final DataSchemaNode listKey = findInstanceDataChildByNameAndNamespace(listNode,
+                                predicate.getName().getValue(), validNamespace);
+                        predicatesMap.put(listKey.getQName(), predicate.getValue());
+                    }
+                    pathArgument = NodeIdentifierWithPredicates.of(qName, predicatesMap);
+                } else {
+                    // FIXME: this needs to be a hard error
+                    LOG.info("Node {} is not List or Leaf-list.", node);
+                    LOG.info("Instance-identifier will be translated as NULL for data - {}",
+                            String.valueOf(identityValue.getValue()));
+                    return null;
                 }
                 result.add(pathArgument);
                 if (i < identities.size() - 1) { // last element in instance-identifier can be other than
