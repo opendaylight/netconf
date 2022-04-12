@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.util;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.net.URI;
 import java.util.List;
@@ -20,17 +20,12 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Thomas Pantelis
  */
-public class SimpleUriInfo implements UriInfo {
+final class LocalUriInfo implements UriInfo {
+    private final MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
     private final String path;
-    private final MultivaluedMap<String, String> queryParams;
 
-    public SimpleUriInfo(String path) {
-        this(path, new MultivaluedHashMap<>());
-    }
-
-    public SimpleUriInfo(String path, MultivaluedMap<String, String> queryParams) {
-        this.path = path;
-        this.queryParams = queryParams;
+    LocalUriInfo() {
+        path = "/";
     }
 
     @Override
@@ -39,7 +34,7 @@ public class SimpleUriInfo implements UriInfo {
     }
 
     @Override
-    public String getPath(boolean decode) {
+    public String getPath(final boolean decode) {
         return path;
     }
 
@@ -49,7 +44,7 @@ public class SimpleUriInfo implements UriInfo {
     }
 
     @Override
-    public List<PathSegment> getPathSegments(boolean decode) {
+    public List<PathSegment> getPathSegments(final boolean decode) {
         throw new UnsupportedOperationException();
     }
 
@@ -75,7 +70,7 @@ public class SimpleUriInfo implements UriInfo {
 
     @Override
     public URI getBaseUri() {
-        return URI.create("");
+        return UriBuilder.fromUri("http://localhost:8181").build();
     }
 
     @Override
@@ -89,7 +84,7 @@ public class SimpleUriInfo implements UriInfo {
     }
 
     @Override
-    public MultivaluedMap<String, String> getPathParameters(boolean decode) {
+    public MultivaluedMap<String, String> getPathParameters(final boolean decode) {
         return getPathParameters();
     }
 
@@ -99,7 +94,7 @@ public class SimpleUriInfo implements UriInfo {
     }
 
     @Override
-    public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
+    public MultivaluedMap<String, String> getQueryParameters(final boolean decode) {
         return getQueryParameters();
     }
 
@@ -109,7 +104,7 @@ public class SimpleUriInfo implements UriInfo {
     }
 
     @Override
-    public List<String> getMatchedURIs(boolean decode) {
+    public List<String> getMatchedURIs(final boolean decode) {
         return getMatchedURIs();
     }
 
@@ -119,12 +114,12 @@ public class SimpleUriInfo implements UriInfo {
     }
 
     @Override
-    public URI resolve(URI uri) {
+    public URI resolve(final URI uri) {
         return uri;
     }
 
     @Override
-    public URI relativize(URI uri) {
+    public URI relativize(final URI uri) {
         return uri;
     }
 }
