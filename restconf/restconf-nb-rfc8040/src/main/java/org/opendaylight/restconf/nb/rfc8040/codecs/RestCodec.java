@@ -11,7 +11,6 @@ import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +28,7 @@ public final class RestCodec {
         final TypeDefinition<?> type = RestUtil.resolveBaseTypeFrom(typeDefinition);
 
         try {
-            if (type instanceof IdentityrefTypeDefinition) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "Value is not instance of IdentityrefTypeDefinition but is {}. "
-                                + "Therefore NULL is used as translation of - {}",
-                        input == null ? "null" : input.getClass(), String.valueOf(input));
-                }
-                // FIXME: this should be a hard error
-                return null;
-            } else if (type instanceof InstanceIdentifierTypeDefinition) {
+            if (type instanceof InstanceIdentifierTypeDefinition) {
                 // FIXME: what is it that we are trying to decode here and why?
                 return new StringModuleInstanceIdentifierCodec(schemaContext).deserialize(input);
             } else {
