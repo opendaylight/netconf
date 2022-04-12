@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.formatters;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -19,7 +19,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWrit
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-public class XMLNotificationFormatter extends NotificationFormatter {
+final class XMLNotificationFormatter extends NotificationFormatter {
     private static final XMLNotificationFormatter INSTANCE = new XMLNotificationFormatter();
 
     static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:xml:ns:netconf:notification:1.0";
@@ -28,9 +28,9 @@ public class XMLNotificationFormatter extends NotificationFormatter {
     static final String DATA_CHANGED_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
     static final String DATA_CHANGED_NOTIFICATION_ELEMENT = "data-changed-notification";
 
-    public static final String DATA_CHANGE_EVENT_ELEMENT = "data-change-event";
+    static final String DATA_CHANGE_EVENT_ELEMENT = "data-change-event";
 
-    public static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory() {
+    static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory() {
         @Override
         public XMLNotificationFormatter getFormatter(final String xpathFilter) throws XPathExpressionException {
             return new XMLNotificationFormatter(xpathFilter);
@@ -42,16 +42,17 @@ public class XMLNotificationFormatter extends NotificationFormatter {
         }
     };
 
-    public XMLNotificationFormatter() {
+    XMLNotificationFormatter() {
+
     }
 
-    public XMLNotificationFormatter(String xpathFilter) throws XPathExpressionException {
+    XMLNotificationFormatter(final String xpathFilter) throws XPathExpressionException {
         super(xpathFilter);
     }
 
     @Override
-    String createText(EffectiveModelContext schemaContext, DOMNotification input, Instant now,
-                      boolean leafNodesOnly, boolean skipData)
+    String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
+                      final boolean leafNodesOnly, final boolean skipData)
             throws IOException {
         final StringWriter writer = new StringWriter();
         try {

@@ -12,9 +12,6 @@ import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.restconf.common.formatters.JSONNotificationFormatter;
-import org.opendaylight.restconf.common.formatters.NotificationFormatterFactory;
-import org.opendaylight.restconf.common.formatters.XMLNotificationFormatter;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -24,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link NotificationListenerAdapter} is responsible to track events on notifications.
  */
-public class NotificationListenerAdapter extends AbstractCommonSubscriber<Absolute, DOMNotification>
+public final class NotificationListenerAdapter extends AbstractCommonSubscriber<Absolute, DOMNotification>
         implements DOMNotificationListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationListenerAdapter.class);
@@ -83,7 +80,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber<Absolu
         return path();
     }
 
-    public final synchronized void listen(final DOMNotificationService notificationService) {
+    public synchronized void listen(final DOMNotificationService notificationService) {
         if (!isListening()) {
             setRegistration(notificationService.registerNotificationListener(this, getSchemaPath()));
         }

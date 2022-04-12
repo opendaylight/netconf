@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.serializer;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
 
@@ -22,11 +22,11 @@ import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
-public class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<IOException> {
+final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<IOException> {
     private final JSONCodecFactorySupplier codecSupplier;
     private final JsonWriter jsonWriter;
 
-    public JsonDataTreeCandidateSerializer(final EffectiveModelContext context,
+    JsonDataTreeCandidateSerializer(final EffectiveModelContext context,
             final JSONCodecFactorySupplier codecSupplier, final JsonWriter jsonWriter) {
         super(context);
         this.codecSupplier = requireNonNull(codecSupplier);

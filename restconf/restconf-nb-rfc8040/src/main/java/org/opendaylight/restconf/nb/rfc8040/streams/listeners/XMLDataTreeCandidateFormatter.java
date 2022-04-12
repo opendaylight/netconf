@@ -5,13 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.formatters;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import static org.opendaylight.restconf.common.formatters.NotificationFormatter.XML_OUTPUT_FACTORY;
-import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGED_NAMESPACE;
-import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
-import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.NOTIFICATION_ELEMENT;
-import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.NOTIFICATION_NAMESPACE;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.XML_OUTPUT_FACTORY;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.DATA_CHANGED_NAMESPACE;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.NOTIFICATION_ELEMENT;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.NOTIFICATION_NAMESPACE;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -20,14 +20,13 @@ import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.xpath.XPathExpressionException;
-import org.opendaylight.restconf.common.serializer.XmlDataTreeCandidateSerializer;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
     private static final XMLDataTreeCandidateFormatter INSTANCE = new XMLDataTreeCandidateFormatter();
 
-    public static final DataTreeCandidateFormatterFactory FACTORY =
+    static final DataTreeCandidateFormatterFactory FACTORY =
         new DataTreeCandidateFormatterFactory() {
             @Override
             public XMLDataTreeCandidateFormatter getFormatter(final String xpathFilter)
@@ -42,6 +41,7 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
         };
 
     private XMLDataTreeCandidateFormatter() {
+
     }
 
     private XMLDataTreeCandidateFormatter(final String xpathFilter) throws XPathExpressionException {

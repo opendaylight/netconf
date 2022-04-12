@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.formatters;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 
-public abstract class EventFormatter<T> implements Immutable {
+abstract class EventFormatter<T> implements Immutable {
     private static final XPathFactory XPF = XPathFactory.newInstance();
 
     // FIXME: NETCONF-369: XPath operates without namespace context, therefore we need an namespace-unaware builder.
@@ -67,8 +67,8 @@ public abstract class EventFormatter<T> implements Immutable {
         filter = xpath.compile(xpathFilter);
     }
 
-    public final Optional<String> eventData(final EffectiveModelContext schemaContext, final T input, final Instant now,
-                                            boolean leafNodesOnly, boolean skipData)
+    final Optional<String> eventData(final EffectiveModelContext schemaContext, final T input, final Instant now,
+                                     final boolean leafNodesOnly, final boolean skipData)
             throws Exception {
         if (!filterMatches(schemaContext, input, now)) {
             return Optional.empty();
@@ -121,7 +121,7 @@ public abstract class EventFormatter<T> implements Immutable {
             throw new IllegalStateException("Failed to evaluate expression " + filter, e);
         }
 
-        return eval.booleanValue();
+        return eval;
     }
 
     /**
