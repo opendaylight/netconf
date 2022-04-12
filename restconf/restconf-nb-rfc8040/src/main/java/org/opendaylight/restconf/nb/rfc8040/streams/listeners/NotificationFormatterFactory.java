@@ -5,12 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.formatters;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 
-public interface NotificationFormatterFactory extends EventFormatterFactory<DOMNotification> {
+interface NotificationFormatterFactory extends EventFormatterFactory<DOMNotification> {
     @Override
     NotificationFormatter getFormatter();
 

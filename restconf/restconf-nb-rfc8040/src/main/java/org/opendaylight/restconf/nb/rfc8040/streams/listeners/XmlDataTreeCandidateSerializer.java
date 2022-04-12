@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.serializer;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
 
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
@@ -21,10 +21,10 @@ import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
-public class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<Exception> {
+final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<Exception> {
     private final XMLStreamWriter xmlWriter;
 
-    public XmlDataTreeCandidateSerializer(final EffectiveModelContext context, final XMLStreamWriter xmlWriter) {
+    XmlDataTreeCandidateSerializer(final EffectiveModelContext context, final XMLStreamWriter xmlWriter) {
         super(context);
         this.xmlWriter = requireNonNull(xmlWriter);
     }

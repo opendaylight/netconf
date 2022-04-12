@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.formatters;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import static org.opendaylight.restconf.common.formatters.NotificationFormatter.XML_OUTPUT_FACTORY;
-import static org.opendaylight.restconf.common.formatters.XMLNotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.XML_OUTPUT_FACTORY;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.XMLNotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
 
-import com.google.common.annotations.Beta;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
@@ -32,12 +31,12 @@ import org.w3c.dom.Element;
 /**
  * Base formatter for DataTreeCandidates which only handles exporting to a document for filter checking purpose.
  */
-@Beta
-public abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<DataTreeCandidate>> {
-    protected DataTreeCandidateFormatter() {
+abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<DataTreeCandidate>> {
+    DataTreeCandidateFormatter() {
+
     }
 
-    public DataTreeCandidateFormatter(final String xpathFilter) throws XPathExpressionException {
+    DataTreeCandidateFormatter(final String xpathFilter) throws XPathExpressionException {
         super(xpathFilter);
     }
 

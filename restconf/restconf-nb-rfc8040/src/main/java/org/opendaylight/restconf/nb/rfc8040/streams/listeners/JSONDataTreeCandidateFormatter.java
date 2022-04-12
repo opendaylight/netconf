@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.formatters;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,7 +16,6 @@ import java.io.Writer;
 import java.time.Instant;
 import java.util.Collection;
 import javax.xml.xpath.XPathExpressionException;
-import org.opendaylight.restconf.common.serializer.JsonDataTreeCandidateSerializer;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;

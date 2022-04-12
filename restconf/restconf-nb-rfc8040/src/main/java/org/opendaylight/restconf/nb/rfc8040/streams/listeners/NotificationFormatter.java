@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.formatters;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -24,8 +24,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
-    protected static final XMLOutputFactory XML_OUTPUT_FACTORY;
+abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
+    static final XMLOutputFactory XML_OUTPUT_FACTORY;
 
     static {
         XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
@@ -36,12 +36,13 @@ public abstract class NotificationFormatter extends EventFormatter<DOMNotificati
 
     }
 
-    public NotificationFormatter(final String xpathFilter) throws XPathExpressionException {
+    NotificationFormatter(final String xpathFilter) throws XPathExpressionException {
         super(xpathFilter);
     }
 
     @Override
-    void fillDocument(Document doc, EffectiveModelContext schemaContext, DOMNotification input) throws IOException {
+    final void fillDocument(final Document doc, final EffectiveModelContext schemaContext, final DOMNotification input)
+            throws IOException {
         final Element notificationElement = doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
                 "notification");
         final Element eventTimeElement = doc.createElement("eventTime");

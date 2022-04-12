@@ -27,8 +27,6 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.formatters.EventFormatter;
-import org.opendaylight.restconf.common.formatters.EventFormatterFactory;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
