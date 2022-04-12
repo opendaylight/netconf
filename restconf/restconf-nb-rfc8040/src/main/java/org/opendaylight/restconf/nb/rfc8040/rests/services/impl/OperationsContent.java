@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
@@ -28,8 +28,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
  * RESTCONF {@code /operations} content for a {@code GET} operation as per
  * <a href="https://datatracker.ietf.org/doc/html/rfc8040#section-3.3.2">RFC8040</a>.
  */
-// FIXME: when bierman02 is gone, this should be folded to nb-rfc8040, as it is a server-side thing.
-public enum OperationsContent {
+enum OperationsContent {
     JSON("{ \"ietf-restconf:operations\" : { } }") {
         @Override
         String createBody(final List<Entry<String, List<String>>> rpcsByPrefix) {
