@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.formatters;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,7 +20,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-public final class JSONNotificationFormatter extends NotificationFormatter {
+final class JSONNotificationFormatter extends NotificationFormatter {
     private final JSONCodecFactorySupplier codecSupplier;
 
     private JSONNotificationFormatter(final JSONCodecFactorySupplier codecSupplier) {
@@ -33,7 +33,7 @@ public final class JSONNotificationFormatter extends NotificationFormatter {
         this.codecSupplier = requireNonNull(codecSupplier);
     }
 
-    public static NotificationFormatterFactory createFactory(final JSONCodecFactorySupplier codecSupplier) {
+    static NotificationFormatterFactory createFactory(final JSONCodecFactorySupplier codecSupplier) {
         requireNonNull(codecSupplier);
         return new NotificationFormatterFactory() {
             @Override
@@ -51,7 +51,7 @@ public final class JSONNotificationFormatter extends NotificationFormatter {
 
     @Override
     String createText(final EffectiveModelContext schemaContext, final DOMNotification input, final Instant now,
-                      boolean leafNodesOnly, boolean skipData)
+                      final boolean leafNodesOnly, final boolean skipData)
             throws IOException {
         final Writer writer = new StringWriter();
         final JsonWriter jsonWriter = new JsonWriter(writer).beginObject();

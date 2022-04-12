@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.serializer;
+package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
@@ -31,12 +31,12 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractWebsocketSerializer<T extends Exception> {
+abstract class AbstractWebsocketSerializer<T extends Exception> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
 
     private final EffectiveModelContext context;
 
-    protected AbstractWebsocketSerializer(final EffectiveModelContext context) {
+    AbstractWebsocketSerializer(final EffectiveModelContext context) {
         this.context = requireNonNull(context);
     }
 
@@ -51,7 +51,7 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
         }
     }
 
-    void serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
+    final void serializeLeafNodesOnly(final Deque<PathArgument> path, final DataTreeCandidateNode candidate,
             final boolean skipData) throws T {
         NormalizedNode node = null;
         switch (candidate.getModificationType()) {
@@ -114,16 +114,16 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     abstract void serializeOperation(DataTreeCandidateNode candidate) throws T;
 
-    String convertPath(final Collection<PathArgument> path) {
+    static final String convertPath(final Collection<PathArgument> path) {
         final StringBuilder pathBuilder = new StringBuilder();
 
         for (PathArgument pathArgument : path) {
             if (pathArgument instanceof YangInstanceIdentifier.AugmentationIdentifier) {
                 continue;
             }
-            pathBuilder.append("/");
+            pathBuilder.append('/');
             pathBuilder.append(pathArgument.getNodeType().getNamespace().toString().replace(':', '-'));
-            pathBuilder.append(":");
+            pathBuilder.append(':');
             pathBuilder.append(pathArgument.getNodeType().getLocalName());
 
             if (pathArgument instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
@@ -132,20 +132,21 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
                         ((YangInstanceIdentifier.NodeIdentifierWithPredicates) pathArgument).entrySet();
                 for (Map.Entry<QName, Object> key : keys) {
                     pathBuilder.append(key.getKey().getNamespace().toString().replace(':', '-'));
-                    pathBuilder.append(":");
+                    pathBuilder.append(':');
                     pathBuilder.append(key.getKey().getLocalName());
                     pathBuilder.append("='");
                     pathBuilder.append(key.getValue().toString());
-                    pathBuilder.append("'");
+                    pathBuilder.append('\'');
                 }
-                pathBuilder.append("]");
+                pathBuilder.append(']');
             }
         }
 
         return pathBuilder.toString();
     }
 
-    String modificationTypeToOperation(final DataTreeCandidateNode candidate, final ModificationType modificationType) {
+    static final String modificationTypeToOperation(final DataTreeCandidateNode candidate,
+            final ModificationType modificationType) {
         switch (modificationType) {
             case UNMODIFIED:
                 // shouldn't ever happen since the root of a modification is only triggered by some event
@@ -163,8 +164,7 @@ public abstract class AbstractWebsocketSerializer<T extends Exception> {
             case DISAPPEARED:
                 return "deleted";
             default:
-                LOG.error("DataTreeCandidate modification has unknown type: {}",
-                        candidate.getModificationType());
+                LOG.error("DataTreeCandidate modification has unknown type: {}", candidate.getModificationType());
                 throw new IllegalStateException("Unknown modification type");
         }
     }
