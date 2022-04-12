@@ -13,7 +13,6 @@ import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.codec.IdentityrefCodec;
-import org.opendaylight.yangtools.yang.data.api.codec.LeafrefCodec;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
@@ -54,20 +53,6 @@ public final class RestCodec {
             }
 
             return QName.create(module.getNamespace(), module.getRevision(), valueWithNamespace.getValue());
-        }
-
-    }
-
-    public static class LeafrefCodecImpl implements LeafrefCodec<String> {
-
-        @Override
-        public String serialize(final Object data) {
-            return String.valueOf(data);
-        }
-
-        @Override
-        public Object deserialize(final String data) {
-            return data;
         }
 
     }
