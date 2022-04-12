@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,7 +34,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -87,23 +85,13 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 .when(dataBroker).getExtensions();
 
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
+        // FIXME: just mock UriInfo here
         doReturn(new LocalUriInfo().getBaseUriBuilder()).when(uriInfo).getBaseUriBuilder();
         doReturn(new URI("http://127.0.0.1/" + URI)).when(uriInfo).getAbsolutePath();
         schemaHandler.onModelContextUpdated(
             YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
         configurationWs = new Configuration(0, 100, 10, false);
         configurationSse = new Configuration(0, 100, 10, true);
-    }
-
-    private static class LocalUriInfo extends SimpleUriInfo {
-        LocalUriInfo() {
-            super("/");
-        }
-
-        @Override
-        public URI getBaseUri() {
-            return UriBuilder.fromUri("http://localhost:8181").build();
-        }
     }
 
     @BeforeClass
