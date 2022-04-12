@@ -20,7 +20,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
-import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -30,6 +29,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -275,7 +275,8 @@ public final class YangInstanceIdentifierDeserializer {
                 return new StringModuleInstanceIdentifierCodec(schemaContext).deserialize(value);
             }
 
-            return RestCodec.deserialize(schemaContext, typedef, value);
+            return verifyNotNull(TypeDefinitionAwareCodec.from(typedef),
+                "Unhandled type %s decoding %s", typedef, value).deserialize(value);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
