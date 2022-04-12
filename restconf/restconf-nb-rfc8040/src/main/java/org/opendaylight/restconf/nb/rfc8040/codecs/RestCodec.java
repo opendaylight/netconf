@@ -7,14 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.codecs;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.opendaylight.restconf.common.util.IdentityValuesDTO;
-import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.data.api.codec.IdentityrefCodec;
-import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.restconf.common.util.RestUtil;
+import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,60 +24,39 @@ public final class RestCodec {
         // Hidden on purpose
     }
 
-    public static class IdentityrefCodecImpl implements IdentityrefCodec<IdentityValuesDTO> {
-        private static final Logger LOG = LoggerFactory.getLogger(IdentityrefCodecImpl.class);
+    public static Object deserialize(final EffectiveModelContext schemaContext, final TypeDefinition<?> typeDefinition,
+            final String input) {
+        final TypeDefinition<?> type = RestUtil.resolveBaseTypeFrom(typeDefinition);
 
-        private final SchemaContext schemaContext;
-
-        public IdentityrefCodecImpl(final SchemaContext schemaContext) {
-            this.schemaContext = schemaContext;
-        }
-
-        @Override
-        public IdentityValuesDTO serialize(final QName data) {
-            return new IdentityValuesDTO(data.getNamespace().toString(), data.getLocalName(), null, null);
-        }
-
-        @Override
-        @SuppressFBWarnings(value = "NP_NONNULL_RETURN_VIOLATION", justification = "Legacy return")
-        public QName deserialize(final IdentityValuesDTO data) {
-            final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
-            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), schemaContext);
-            // FIXME: this needs to be a hard error
-            if (module == null) {
-                LOG.info("Module was not found for namespace {}", valueWithNamespace.getNamespace());
-                LOG.info("Idenetityref will be translated as NULL for data - {}", String.valueOf(valueWithNamespace));
+        try {
+            if (type instanceof IdentityrefTypeDefinition) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
+                        "Value is not instance of IdentityrefTypeDefinition but is {}. "
+                                + "Therefore NULL is used as translation of - {}",
+                        input == null ? "null" : input.getClass(), String.valueOf(input));
+                }
+                // FIXME: this should be a hard error
                 return null;
+            } else if (type instanceof InstanceIdentifierTypeDefinition) {
+                // FIXME: what is it that we are trying to decode here and why?
+                return new StringModuleInstanceIdentifierCodec(schemaContext).deserialize(input);
+            } else {
+                final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
+                        TypeDefinitionAwareCodec.from(type);
+                if (typeAwarecodec != null) {
+                    return typeAwarecodec.deserialize(String.valueOf(input));
+                } else {
+                    // FIXME: this should be a hard error
+                    LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
+                    return null;
+                }
             }
-
-            return QName.create(module.getNamespace(), module.getRevision(), valueWithNamespace.getValue());
-        }
-
-    }
-
-    private static Module getModuleByNamespace(final String namespace, final SchemaContext schemaContext) {
-        final var validNamespace = resolveValidNamespace(namespace, schemaContext);
-        final var it = schemaContext.findModules(validNamespace).iterator();
-        if (!it.hasNext()) {
-            LOG.info("Module for namespace {} was not found.", validNamespace);
+        } catch (final ClassCastException e) {
+            // FIXME: remove this catch when everyone use codecs
+            // FIXME: this should be a hard error
+            LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
             return null;
         }
-        return it.next();
-    }
-
-    private static XMLNamespace resolveValidNamespace(final String namespace, final SchemaContext schemaContext) {
-        XMLNamespace validNamespace = findFirstModuleByName(schemaContext, namespace);
-        return validNamespace != null ? validNamespace
-            // FIXME: what the heck?!
-            : XMLNamespace.of(namespace);
-    }
-
-    private static XMLNamespace findFirstModuleByName(final SchemaContext schemaContext, final String name) {
-        for (final Module module : schemaContext.getModules()) {
-            if (module.getName().equals(name)) {
-                return module.getNamespace();
-            }
-        }
-        return null;
     }
 }

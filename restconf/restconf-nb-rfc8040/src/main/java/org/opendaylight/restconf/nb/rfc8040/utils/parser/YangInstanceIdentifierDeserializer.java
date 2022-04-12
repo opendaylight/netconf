@@ -20,7 +20,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
-import org.opendaylight.restconf.nb.rfc8040.codecs.ObjectCodec;
+import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -269,7 +269,7 @@ public final class YangInstanceIdentifierDeserializer {
             return toIdentityrefQName(value, schemaNode);
         }
         try {
-            return ObjectCodec.of(schemaContext, typedef).deserialize(value);
+            return RestCodec.deserialize(schemaContext, typedef, value);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
