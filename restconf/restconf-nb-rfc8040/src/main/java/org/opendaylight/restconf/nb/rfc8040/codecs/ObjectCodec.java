@@ -7,8 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.codecs;
 
+import static java.util.Objects.requireNonNull;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec.IdentityrefCodecImpl;
@@ -35,25 +36,23 @@ public final class ObjectCodec implements IllegalArgumentCodec<Object, Object> {
     private final EffectiveModelContext schemaContext;
     private final TypeDefinition<?> type;
 
-    private ObjectCodec(final TypeDefinition<?> typeDefinition, final DOMMountPoint mountPoint,
-            final EffectiveModelContext schemaContext) {
-        this.schemaContext = schemaContext;
+    private ObjectCodec(final EffectiveModelContext schemaContext, final TypeDefinition<?> typeDefinition) {
+        this.schemaContext = requireNonNull(schemaContext);
         type = RestUtil.resolveBaseTypeFrom(typeDefinition);
         if (type instanceof IdentityrefTypeDefinition) {
-            identityrefCodec = new IdentityrefCodecImpl(mountPoint, schemaContext);
+            identityrefCodec = new IdentityrefCodecImpl(schemaContext);
         } else {
             identityrefCodec = null;
         }
         if (type instanceof InstanceIdentifierTypeDefinition) {
-            instanceIdentifier = new InstanceIdentifierCodecImpl(mountPoint, schemaContext);
+            instanceIdentifier = new InstanceIdentifierCodecImpl(schemaContext);
         } else {
             instanceIdentifier = null;
         }
     }
 
-    public static ObjectCodec of(final TypeDefinition<?> typeDefinition, final DOMMountPoint mountPoint,
-            final EffectiveModelContext schemaContext) {
-        return new ObjectCodec(typeDefinition, mountPoint, schemaContext);
+    public static ObjectCodec of(final EffectiveModelContext schemaContext, final TypeDefinition<?> typeDefinition) {
+        return new ObjectCodec(schemaContext, typeDefinition);
     }
 
     @SuppressWarnings("unchecked")
