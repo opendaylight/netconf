@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.ApiPath.ListInstance;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -261,9 +260,8 @@ public final class YangInstanceIdentifierDeserializer {
         } else {
             typedef = ((LeafSchemaNode) schemaNode).getType();
         }
-        final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
-        if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = stack.resolveLeafref((LeafrefTypeDefinition) baseType);
+        if (typedef instanceof LeafrefTypeDefinition) {
+            typedef = stack.resolveLeafref((LeafrefTypeDefinition) typedef);
         }
 
         if (typedef instanceof IdentityrefTypeDefinition) {
