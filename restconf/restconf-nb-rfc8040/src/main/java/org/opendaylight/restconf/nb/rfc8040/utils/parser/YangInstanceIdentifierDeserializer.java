@@ -269,7 +269,7 @@ public final class YangInstanceIdentifierDeserializer {
             return toIdentityrefQName(value, schemaNode);
         }
         try {
-            return ObjectCodec.of(typedef, null, schemaContext).deserialize(value);
+            return ObjectCodec.of(schemaContext, typedef).deserialize(value);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);

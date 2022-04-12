@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.Predicate;
@@ -40,7 +37,6 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -61,10 +57,8 @@ public final class RestCodec {
         private static final Logger LOG = LoggerFactory.getLogger(IdentityrefCodecImpl.class);
 
         private final SchemaContext schemaContext;
-        private final DOMMountPoint mountPoint;
 
-        public IdentityrefCodecImpl(final DOMMountPoint mountPoint, final SchemaContext schemaContext) {
-            this.mountPoint = mountPoint;
+        public IdentityrefCodecImpl(final SchemaContext schemaContext) {
             this.schemaContext = schemaContext;
         }
 
@@ -77,7 +71,7 @@ public final class RestCodec {
         @SuppressFBWarnings(value = "NP_NONNULL_RETURN_VIOLATION", justification = "Legacy return")
         public QName deserialize(final IdentityValuesDTO data) {
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
-            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint, schemaContext);
+            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), schemaContext);
             // FIXME: this needs to be a hard error
             if (module == null) {
                 LOG.info("Module was not found for namespace {}", valueWithNamespace.getNamespace());
@@ -106,11 +100,10 @@ public final class RestCodec {
 
     public static class InstanceIdentifierCodecImpl implements InstanceIdentifierCodec<IdentityValuesDTO> {
         private static final Logger LOG = LoggerFactory.getLogger(InstanceIdentifierCodecImpl.class);
-        private final DOMMountPoint mountPoint;
+
         private final SchemaContext schemaContext;
 
-        public InstanceIdentifierCodecImpl(final DOMMountPoint mountPoint, final SchemaContext schemaContext) {
-            this.mountPoint = mountPoint;
+        public InstanceIdentifierCodecImpl(final SchemaContext schemaContext) {
             this.schemaContext = schemaContext;
         }
 
@@ -143,7 +136,7 @@ public final class RestCodec {
         public YangInstanceIdentifier deserialize(final IdentityValuesDTO data) {
             final List<PathArgument> result = new ArrayList<>();
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
-            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint, schemaContext);
+            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), schemaContext);
             // FIXME: this needs to be a hard error
             if (module == null) {
                 LOG.info("Module by namespace '{}' of first node in instance-identifier was not found.",
@@ -157,8 +150,7 @@ public final class RestCodec {
             final List<IdentityValue> identities = data.getValuesWithNamespaces();
             for (int i = 0; i < identities.size(); i++) {
                 final IdentityValue identityValue = identities.get(i);
-                XMLNamespace validNamespace =
-                        resolveValidNamespace(identityValue.getNamespace(), mountPoint, schemaContext);
+                XMLNamespace validNamespace = resolveValidNamespace(identityValue.getNamespace(), schemaContext);
                 final DataSchemaNode node = findInstanceDataChildByNameAndNamespace(
                         parentContainer, identityValue.getValue(), validNamespace);
                 // FIXME: this needs to be a hard error
@@ -186,8 +178,7 @@ public final class RestCodec {
                     final DataNodeContainer listNode = (DataNodeContainer) node;
                     final Map<QName, Object> predicatesMap = new HashMap<>();
                     for (final Predicate predicate : identityValue.getPredicates()) {
-                        validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), mountPoint,
-                                schemaContext);
+                        validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), schemaContext);
                         final DataSchemaNode listKey = findInstanceDataChildByNameAndNamespace(listNode,
                                 predicate.getName().getValue(), validNamespace);
                         predicatesMap.put(listKey.getQName(), predicate.getValue());
@@ -236,35 +227,21 @@ public final class RestCodec {
         }
     }
 
-    private static Module getModuleByNamespace(final String namespace, final DOMMountPoint mountPoint,
-            final SchemaContext schemaContext) {
-        final XMLNamespace validNamespace = resolveValidNamespace(namespace, mountPoint, schemaContext);
-        Module module = null;
-        if (mountPoint != null) {
-            module = modelContext(mountPoint).findModules(validNamespace).iterator().next();
-        } else {
-            module = schemaContext.findModules(validNamespace).iterator().next();
-        }
-        if (module == null) {
+    private static Module getModuleByNamespace(final String namespace, final SchemaContext schemaContext) {
+        final var validNamespace = resolveValidNamespace(namespace, schemaContext);
+        final var it = schemaContext.findModules(validNamespace).iterator();
+        if (!it.hasNext()) {
             LOG.info("Module for namespace {} was not found.", validNamespace);
             return null;
         }
-        return module;
+        return it.next();
     }
 
-    private static XMLNamespace resolveValidNamespace(final String namespace, final DOMMountPoint mountPoint,
-            final SchemaContext schemaContext) {
-        XMLNamespace validNamespace;
-        if (mountPoint != null) {
-            validNamespace = findFirstModuleByName(modelContext(mountPoint), namespace);
-        } else {
-            validNamespace = findFirstModuleByName(schemaContext, namespace);
-        }
-        if (validNamespace == null) {
-            validNamespace = XMLNamespace.of(namespace);
-        }
-
-        return validNamespace;
+    private static XMLNamespace resolveValidNamespace(final String namespace, final SchemaContext schemaContext) {
+        XMLNamespace validNamespace = findFirstModuleByName(schemaContext, namespace);
+        return validNamespace != null ? validNamespace
+            // FIXME: what the heck?!
+            : XMLNamespace.of(namespace);
     }
 
     private static XMLNamespace findFirstModuleByName(final SchemaContext schemaContext, final String name) {
@@ -320,11 +297,5 @@ public final class RestCodec {
         return node instanceof LeafSchemaNode || node instanceof LeafListSchemaNode
                 || node instanceof ContainerSchemaNode || node instanceof ListSchemaNode
                 || node instanceof AnyxmlSchemaNode;
-    }
-
-    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
-        return mountPoint.getService(DOMSchemaService.class)
-            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
-            .orElse(null);
     }
 }
