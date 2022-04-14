@@ -13,12 +13,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.yang.gen.v1.http.cisco.com.ns.yang.cisco.ios.xr.ip._static.cfg.rev130722.VRFPREFIXTABLE;
-import org.opendaylight.yangtools.yang.binding.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,16 +43,16 @@ public class NotificationsCounter implements DOMNotificationListener {
         Preconditions.checkArgument(matcher.matches());
         expectedNotificationCount = Long.parseLong(matcher.group(1));
         Preconditions.checkArgument(expectedNotificationCount > 0);
-        this.notifCounter = new AtomicLong(this.expectedNotificationCount);
+        notifCounter = new AtomicLong(expectedNotificationCount);
     }
 
 
     @Override
-    public void onNotification(@NonNull DOMNotification domNotification) {
+    public void onNotification(final DOMNotification domNotification) {
         final long andDecrement = notifCounter.getAndDecrement();
 
         if (andDecrement == expectedNotificationCount) {
-            this.stopWatch = Stopwatch.createStarted();
+            stopWatch = Stopwatch.createStarted();
             LOG.info("First notification received at {}", stopWatch);
         }
 
@@ -63,21 +61,21 @@ public class NotificationsCounter implements DOMNotificationListener {
             LOG.trace("Notification received: {}", domNotification);
         }
 
-        final Notification notification = serializer.fromNormalizedNodeNotification(domNotification.getType(),
+        final var notification = serializer.fromNormalizedNodeNotification(domNotification.getType(),
             domNotification.getBody());
         if (notification instanceof VRFPREFIXTABLE) {
             totalPrefixesReceived += ((VRFPREFIXTABLE)notification).getVrfPrefixes().getVrfPrefix().size();
         }
 
         if (andDecrement == 1) {
-            this.stopWatch.stop();
+            stopWatch.stop();
             LOG.info("Last notification received at {}", stopWatch);
             LOG.info("Elapsed ms for {} notifications: {}", expectedNotificationCount,
                 stopWatch.elapsed(TimeUnit.MILLISECONDS));
             LOG.info("Performance (notifications/second): {}",
-                (expectedNotificationCount * 1.0 / stopWatch.elapsed(TimeUnit.MILLISECONDS)) * 1000);
+                expectedNotificationCount * 1.0 / stopWatch.elapsed(TimeUnit.MILLISECONDS) * 1000);
             LOG.info("Performance (prefixes/second): {}",
-                (totalPrefixesReceived * 1.0 / stopWatch.elapsed(TimeUnit.MILLISECONDS)) * 1000);
+                totalPrefixesReceived * 1.0 / stopWatch.elapsed(TimeUnit.MILLISECONDS) * 1000);
         }
     }
 
