@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bcef6c5_10ccf7c7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-04-14T19:39:46Z",
+      "side": 1,
+      "message": "Right, this should go through JAX-RS security context and if we need some binding from aaa side, it should be exposed in a Shiro-agnostic way",
+      "range": {
+        "startLine": 150,
+        "startChar": 33,
+        "endLine": 150,
+        "endChar": 46
+      },
+      "revId": "fac13f6d4ad895c12a7a069b551594615a7b2869",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
