@@ -41,6 +41,16 @@ public final class SwaggerObjectTest {
     }
 
     @Test
+    public void testActionTypes() throws Exception {
+        final Optional<? extends Module> module = context.findModule("action-types");
+        assertTrue("Desired module not found", module.isPresent());
+        final DefinitionGenerator generator = new DefinitionGenerator();
+        final ObjectNode jsonObject = generator.convertToJsonSchema(module.get(), context,
+                new DefinitionNames(), ApiDocServiceImpl.OAversion.V2_0, true);
+        Assert.assertNotNull(jsonObject);
+    }
+
+    @Test
     public void testStringTypes() throws Exception {
         final Optional<? extends Module> module = context.findModule("string-types");
         assertTrue("Desired module not found", module.isPresent());
