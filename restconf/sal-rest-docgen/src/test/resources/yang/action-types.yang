@@ -1,0 +1,50 @@
+module action-types {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:test:action:types";
+  prefix "act-tp";
+
+  list list {
+    key name;
+    leaf name {
+      type string;
+    }
+    action list-action {
+      input {
+        leaf la-input {
+          type string;
+          mandatory true;
+        }
+      }
+      output {
+        leaf la-output {
+          type string;
+          mandatory true;
+        }
+      }
+    }
+  }
+
+  container container {
+    action container-action {
+      input {
+        leaf ca-input {
+          type string;
+          mandatory true;
+        }
+      }
+      output {
+        leaf ca-output {
+          type string;
+          mandatory true;
+        }
+      }
+    }
+  }
+
+  container multi-container {
+    container inner-container {
+      action action {
+      }
+    }
+  }
+}
