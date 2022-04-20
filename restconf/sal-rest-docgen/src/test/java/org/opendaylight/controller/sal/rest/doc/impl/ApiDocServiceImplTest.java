@@ -7,13 +7,13 @@
  */
 package org.opendaylight.controller.sal.rest.doc.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import javax.ws.rs.core.UriInfo;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -28,10 +28,8 @@ import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraf
 import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorRFC8040;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public final class ApiDocServiceImplTest {
+public final class ApiDocServiceImplTest extends AbstractApiDocTest {
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
@@ -41,21 +39,18 @@ public final class ApiDocServiceImplTest {
     private ApiDocService apiDocService;
 
     @Before
-    public void setUp() {
-        final EffectiveModelContext context = YangParserTestUtils.parseYangResourceDirectory("/yang");
-        final DOMSchemaService schemaService = DocGenTestHelper.createMockSchemaService(context);
-
+    public void before() {
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(SCHEMA_SERVICE));
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
         final MountPointSwaggerGeneratorDraft02 mountPointDraft02 =
-                new MountPointSwaggerGeneratorDraft02(schemaService, service);
+                new MountPointSwaggerGeneratorDraft02(SCHEMA_SERVICE, service);
         final MountPointSwaggerGeneratorRFC8040 mountPointRFC8040 =
-                new MountPointSwaggerGeneratorRFC8040(schemaService, service);
-        final ApiDocGeneratorDraftO2 apiDocGeneratorDraftO2 = new ApiDocGeneratorDraftO2(schemaService);
-        final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(schemaService);
+                new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service);
+        final ApiDocGeneratorDraftO2 apiDocGeneratorDraftO2 = new ApiDocGeneratorDraftO2(SCHEMA_SERVICE);
+        final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
         mountPointDraft02.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
         final AllModulesDocGenerator allModulesDocGenerator = new AllModulesDocGenerator(apiDocGeneratorDraftO2,
                 apiDocGeneratorRFC8040);
@@ -69,6 +64,6 @@ public final class ApiDocServiceImplTest {
         // simulate the behavior of JacksonJaxbJsonProvider
         final ObjectMapper mapper = new ObjectMapper();
         final String result = mapper.writer().writeValueAsString(apiDocService.getListOfMounts(mockInfo).getEntity());
-        Assert.assertEquals("[{\"instance\":\"/nodes/node/123/\",\"id\":1}]", result);
+        assertEquals("[{\"instance\":\"/nodes/node/123/\",\"id\":1}]", result);
     }
 }

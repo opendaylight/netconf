@@ -14,8 +14,8 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -33,10 +33,8 @@ import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public final class MountPointSwaggerTest {
+public final class MountPointSwaggerTest extends AbstractApiDocTest {
     private static final String HTTP_URL = "http://localhost/path";
     private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("", "nodes"))
@@ -47,23 +45,17 @@ public final class MountPointSwaggerTest {
     private MountPointSwagger swagger;
 
     @Before
-    public void setUp() {
+    public void before() {
         // We are sharing the global schema service and the mount schema service
         // in our test.
         // OK for testing - real thing would have separate instances.
-        final EffectiveModelContext context = YangParserTestUtils.parseYangResourceDirectory("/yang");
-        final DOMSchemaService schemaService = DocGenTestHelper.createMockSchemaService(context);
-
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
+        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(SCHEMA_SERVICE));
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        final MountPointSwaggerGeneratorDraft02 generator =
-                new MountPointSwaggerGeneratorDraft02(schemaService, service);
-
-        swagger = generator.getMountPointSwagger();
+        swagger = new MountPointSwaggerGeneratorDraft02(SCHEMA_SERVICE, service).getMountPointSwagger();
     }
 
     @Test()
@@ -110,7 +102,7 @@ public final class MountPointSwaggerTest {
             assertNotNull("expected non-null desc on " + path, getOperation.get("description"));
         }
 
-        final Set<String> expectedUrls = new TreeSet<>(Arrays.asList(
+        final Set<String> expectedUrls = new TreeSet<>(List.of(
                 "/restconf/config" + INSTANCE_URL + "yang-ext:mount",
                 "/restconf/operational" + INSTANCE_URL + "yang-ext:mount",
                 "/restconf/operations" + INSTANCE_URL + "yang-ext:mount"));

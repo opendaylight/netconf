@@ -18,19 +18,11 @@ import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class DocGenTestHelper {
 
     private DocGenTestHelper() {
         // hidden on purpose
-    }
-
-    static DOMSchemaService createMockSchemaService(final EffectiveModelContext mockContext) {
-        final DOMSchemaService mockSchemaService = mock(DOMSchemaService.class);
-        when(mockSchemaService.getGlobalContext()).thenReturn(mockContext);
-        return mockSchemaService;
     }
 
     static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {

@@ -14,70 +14,53 @@ import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
-import java.util.Optional;
-import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorDraftO2;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public final class ApiDocGeneratorDraftO2Test {
+public final class ApiDocGeneratorDraftO2Test extends AbstractApiDocTest {
     private static final String NAME = "toaster2";
     private static final String REVISION_DATE = "2009-11-20";
     private static final String NAME_2 = "toaster";
     private static final String REVISION_DATE_2 = "2009-11-20";
 
-    private EffectiveModelContext context;
-    private ApiDocGeneratorDraftO2 generator;
-
-    @Before
-    public void setUp() {
-        context = YangParserTestUtils.parseYangResourceDirectory("/yang");
-        generator = new ApiDocGeneratorDraftO2(DocGenTestHelper.createMockSchemaService(context));
-    }
+    private final ApiDocGeneratorDraftO2 generator = new ApiDocGeneratorDraftO2(SCHEMA_SERVICE);
 
     /**
      * Test that paths are generated according to the model.
      */
     @Test
     public void testPaths() {
-        final List<String> expectedPaths = Arrays.asList("/restconf/config",
-                "/restconf/config/toaster2:toaster",
-                "/restconf/config/toaster2:toaster/toasterSlot/{slotId}",
-                "/restconf/config/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo",
-                "/restconf/operational/toaster2:toaster",
-                "/restconf/operational/toaster2:toaster/toasterSlot/{slotId}",
-                "/restconf/operational/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo",
-                "/restconf/config/toaster2:lst",
-                "/restconf/config/toaster2:lst/cont1",
-                "/restconf/config/toaster2:lst/cont1/cont11",
-                "/restconf/config/toaster2:lst/cont1/lst11",
-                "/restconf/config/toaster2:lst/lst1/{key1}/{key2}",
-                "/restconf/operational/toaster2:lst",
-                "/restconf/operational/toaster2:lst/cont1",
-                "/restconf/operational/toaster2:lst/cont1/cont11",
-                "/restconf/operational/toaster2:lst/cont1/lst11",
-                "/restconf/operational/toaster2:lst/lst1/{key1}/{key2}",
-                "/restconf/operations/toaster2:make-toast",
-                "/restconf/operations/toaster2:cancel-toast",
-                "/restconf/operations/toaster2:restock-toaster");
+        final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final var doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT, URIType.DRAFT02,
+            ApiDocServiceImpl.OAversion.V2_0);
 
-        final Optional<? extends Module> module = context.findModule(NAME, Revision.of(REVISION_DATE));
-        assertTrue("Desired module not found", module.isPresent());
-        final SwaggerObject doc = generator.getSwaggerDocSpec(module.get(), "http","localhost:8181",
-                "/", "", context, URIType.DRAFT02, ApiDocServiceImpl.OAversion.V2_0);
-        final List<String> actualPaths = new ArrayList<>();
-        doc.getPaths().fieldNames().forEachRemaining(actualPaths::add);
-
-        assertEquals(expectedPaths, actualPaths);
+        assertEquals(List.of("/restconf/config",
+            "/restconf/config/toaster2:toaster",
+            "/restconf/config/toaster2:toaster/toasterSlot/{slotId}",
+            "/restconf/config/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo",
+            "/restconf/operational/toaster2:toaster",
+            "/restconf/operational/toaster2:toaster/toasterSlot/{slotId}",
+            "/restconf/operational/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo",
+            "/restconf/config/toaster2:lst",
+            "/restconf/config/toaster2:lst/cont1",
+            "/restconf/config/toaster2:lst/cont1/cont11",
+            "/restconf/config/toaster2:lst/cont1/lst11",
+            "/restconf/config/toaster2:lst/lst1/{key1}/{key2}",
+            "/restconf/operational/toaster2:lst",
+            "/restconf/operational/toaster2:lst/cont1",
+            "/restconf/operational/toaster2:lst/cont1/cont11",
+            "/restconf/operational/toaster2:lst/cont1/lst11",
+            "/restconf/operational/toaster2:lst/lst1/{key1}/{key2}",
+            "/restconf/operations/toaster2:make-toast",
+            "/restconf/operations/toaster2:cancel-toast",
+            "/restconf/operations/toaster2:restock-toaster"),
+            ImmutableList.copyOf(doc.getPaths().fieldNames()));
     }
 
     /**
@@ -85,16 +68,15 @@ public final class ApiDocGeneratorDraftO2Test {
      */
     @Test
     public void testConfigPaths() {
-        final List<String> configPaths = Arrays.asList("/restconf/config/toaster2:lst",
-                "/restconf/config/toaster2:lst/cont1",
-                "/restconf/config/toaster2:lst/cont1/cont11",
-                "/restconf/config/toaster2:lst/cont1/lst11",
-                "/restconf/config/toaster2:lst/lst1/{key1}/{key2}");
+        final List<String> configPaths = List.of("/restconf/config/toaster2:lst",
+            "/restconf/config/toaster2:lst/cont1",
+            "/restconf/config/toaster2:lst/cont1/cont11",
+            "/restconf/config/toaster2:lst/cont1/lst11",
+            "/restconf/config/toaster2:lst/lst1/{key1}/{key2}");
 
-        final Optional<? extends Module> module = context.findModule(NAME, Revision.of(REVISION_DATE));
-        assertTrue("Desired module not found", module.isPresent());
-        final SwaggerObject doc = generator.getSwaggerDocSpec(module.get(), "http","localhost:8181",
-                "/", "", context, URIType.DRAFT02, ApiDocServiceImpl.OAversion.V2_0);
+        final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+            URIType.DRAFT02, ApiDocServiceImpl.OAversion.V2_0);
 
         for (final String path : configPaths) {
             final JsonNode node = doc.getPaths().get(path);
@@ -110,59 +92,49 @@ public final class ApiDocGeneratorDraftO2Test {
      */
     @Test
     public void testDefinitions() {
-        final Optional<? extends Module> module = context.findModule(NAME, Revision.of(REVISION_DATE));
-        assertTrue("Desired module not found", module.isPresent());
-        final SwaggerObject doc = generator.getSwaggerDocSpec(module.get(), "http","localhost:8181",
-                "/", "", context, URIType.DRAFT02, ApiDocServiceImpl.OAversion.V2_0);
+        final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
+        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+            URIType.DRAFT02, ApiDocServiceImpl.OAversion.V2_0);
 
         final ObjectNode definitions = doc.getDefinitions();
         assertNotNull(definitions);
 
         final JsonNode configLstTop = definitions.get("toaster2_config_lst_TOP");
         assertNotNull(configLstTop);
-        DocGenTestHelper.containsReferences(configLstTop,
-                "lst", "#/definitions/toaster2_config_lst");
+        DocGenTestHelper.containsReferences(configLstTop, "lst", "#/definitions/toaster2_config_lst");
 
         final JsonNode configLst = definitions.get("toaster2_config_lst");
         assertNotNull(configLst);
-        DocGenTestHelper.containsReferences(configLst,
-                "lst1", "#/definitions/toaster2_lst_config_lst1");
-        DocGenTestHelper.containsReferences(configLst,
-                "cont1", "#/definitions/toaster2_lst_config_cont1");
+        DocGenTestHelper.containsReferences(configLst, "lst1", "#/definitions/toaster2_lst_config_lst1");
+        DocGenTestHelper.containsReferences(configLst, "cont1", "#/definitions/toaster2_lst_config_cont1");
 
         final JsonNode configLst1Top = definitions.get("toaster2_lst_config_lst1_TOP");
         assertNotNull(configLst1Top);
-        DocGenTestHelper.containsReferences(configLst1Top,
-                "lst1", "#/definitions/toaster2_lst_config_lst1");
+        DocGenTestHelper.containsReferences(configLst1Top, "lst1", "#/definitions/toaster2_lst_config_lst1");
 
         final JsonNode configLst1 = definitions.get("toaster2_lst_config_lst1");
         assertNotNull(configLst1);
 
         final JsonNode configCont1Top = definitions.get("toaster2_lst_config_cont1_TOP");
         assertNotNull(configCont1Top);
-        DocGenTestHelper.containsReferences(configCont1Top,
-                "cont1", "#/definitions/toaster2_lst_config_cont1");
+        DocGenTestHelper.containsReferences(configCont1Top, "cont1", "#/definitions/toaster2_lst_config_cont1");
 
         final JsonNode configCont1 = definitions.get("toaster2_lst_config_cont1");
         assertNotNull(configCont1);
-        DocGenTestHelper.containsReferences(configCont1,
-                "cont11", "#/definitions/toaster2_lst_cont1_config_cont11");
-        DocGenTestHelper.containsReferences(configCont1,
-
-                "lst11", "#/definitions/toaster2_lst_cont1_config_lst11");
+        DocGenTestHelper.containsReferences(configCont1, "cont11", "#/definitions/toaster2_lst_cont1_config_cont11");
+        DocGenTestHelper.containsReferences(configCont1, "lst11", "#/definitions/toaster2_lst_cont1_config_lst11");
 
         final JsonNode configCont11Top = definitions.get("toaster2_lst_cont1_config_cont11_TOP");
         assertNotNull(configCont11Top);
         DocGenTestHelper.containsReferences(configCont11Top,
-                "cont11", "#/definitions/toaster2_lst_cont1_config_cont11");
+            "cont11", "#/definitions/toaster2_lst_cont1_config_cont11");
 
         final JsonNode configCont11 = definitions.get("toaster2_lst_cont1_config_cont11");
         assertNotNull(configCont11);
 
         final JsonNode configLst11Top = definitions.get("toaster2_lst_cont1_config_lst11_TOP");
         assertNotNull(configLst11Top);
-        DocGenTestHelper.containsReferences(configLst11Top,
-                "lst11", "#/definitions/toaster2_lst_cont1_config_lst11");
+        DocGenTestHelper.containsReferences(configLst11Top, "lst11", "#/definitions/toaster2_lst_cont1_config_lst11");
 
         final JsonNode configLst11 = definitions.get("toaster2_lst_cont1_config_lst11");
         assertNotNull(configLst11);
@@ -173,10 +145,9 @@ public final class ApiDocGeneratorDraftO2Test {
      */
     @Test
     public void testRPC() {
-        final Optional<? extends Module> module = context.findModule(NAME_2, Revision.of(REVISION_DATE_2));
-        assertTrue("Desired module not found", module.isPresent());
-        final SwaggerObject doc = generator.getSwaggerDocSpec(module.get(), "http","localhost:8181",
-                "/", "", context, URIType.DRAFT02, ApiDocServiceImpl.OAversion.V2_0);
+        final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
+        final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
+            URIType.DRAFT02, ApiDocServiceImpl.OAversion.V2_0);
         assertNotNull(doc);
 
         final ObjectNode definitions = doc.getDefinitions();
