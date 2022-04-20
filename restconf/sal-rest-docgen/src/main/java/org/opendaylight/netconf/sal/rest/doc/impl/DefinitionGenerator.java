@@ -257,7 +257,9 @@ public class DefinitionGenerator {
                                             final SchemaInferenceStack stack, final OAversion oaversion)
             throws IOException {
         for (final ActionDefinition actionDef : ((ActionNodeContainer) childNode).getActions()) {
+            stack.enterSchemaTree(actionDef.getQName());
             processOperations(actionDef, moduleName, definitions, definitionNames, stack, oaversion);
+            stack.exit();
         }
     }
 
