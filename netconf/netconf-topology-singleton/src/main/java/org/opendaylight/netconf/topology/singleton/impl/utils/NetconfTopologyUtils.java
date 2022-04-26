@@ -44,18 +44,25 @@ public final class NetconfTopologyUtils {
 
     public static RemoteDeviceId createRemoteDeviceId(final NodeId nodeId, final NetconfNode node) {
         final IpAddress ipAddress = node.getHost().getIpAddress();
-        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
-                ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
-                node.getPort().getValue().toJava());
-        return new RemoteDeviceId(nodeId.getValue(), address);
+        if (ipAddress != null) {
+            final InetSocketAddress address = new InetSocketAddress(
+                    ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address().getValue()
+                            : ipAddress.getIpv6Address().getValue(),
+                    node.getPort().getValue().toJava());
+            return new RemoteDeviceId(nodeId.getValue(), address);
+        } else {
+            final InetSocketAddress domainAddress = new InetSocketAddress(node.getHost().getDomainName().getValue(),
+                    node.getPort().getValue().toJava());
+            return new RemoteDeviceId(nodeId.getValue(), domainAddress);
+        }
     }
 
     public static String createActorPath(final String masterMember, final String name) {
-        return  masterMember + "/user/" + name;
+        return masterMember + "/user/" + name;
     }
 
     public static String createMasterActorName(final String name, final String masterAddress) {
-        return masterAddress.replace("//", "") + "_" + name;
+        return masterAddress.replaceAll("//", "") + "_" + name;
     }
 
     public static NodeId getNodeId(final InstanceIdentifier.PathArgument pathArgument) {
@@ -75,8 +82,8 @@ public final class NetconfTopologyUtils {
 
     public static KeyedInstanceIdentifier<Node, NodeKey> createTopologyNodeListPath(final NodeKey key,
             final String topologyId) {
-        return createTopologyListPath(topologyId)
-                .child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
+        return createTopologyListPath(topologyId).child(Node.class,
+                new NodeKey(new NodeId(key.getNodeId().getValue())));
     }
 
     public static InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {
@@ -84,7 +91,7 @@ public final class NetconfTopologyUtils {
     }
 
     public static DocumentedException createMasterIsDownException(final RemoteDeviceId id, final Exception cause) {
-        return new DocumentedException(id + ":Master is down. Please try again.", cause,
-                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.WARNING);
+        return new DocumentedException(id + ":Master is down. Please try again.", cause, ErrorType.APPLICATION,
+                ErrorTag.OPERATION_FAILED, ErrorSeverity.WARNING);
     }
 }

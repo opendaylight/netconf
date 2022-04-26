@@ -13,12 +13,17 @@ import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -30,6 +35,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -63,6 +69,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,8 +81,8 @@ public class NetconfTopologyManager
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyManager.class);
 
     private final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts = new ConcurrentHashMap<>();
-    private final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>
-            clusterRegistrations = new ConcurrentHashMap<>();
+    private final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration> clusterRegistrations =
+            new ConcurrentHashMap<>();
 
     private final BaseNetconfSchemas baseSchemas;
     private final DataBroker dataBroker;
@@ -101,18 +108,14 @@ public class NetconfTopologyManager
     private String privateKeyPassphrase;
 
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
-                                  final DOMRpcProviderService rpcProviderRegistry,
-                                  final DOMActionProviderService actionProviderService,
-                                  final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
-                                  final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                                  final ActorSystemProvider actorSystemProvider,
-                                  final EventExecutor eventExecutor, final NetconfClientDispatcher clientDispatcher,
-                                  final String topologyId, final Config config,
-                                  final DOMMountPointService mountPointService,
-                                  final AAAEncryptionService encryptionService,
-                                  final RpcProviderService rpcProviderService,
-                                  final DeviceActionFactory deviceActionFactory,
-                                  final SchemaResourceManager resourceManager) {
+            final DOMRpcProviderService rpcProviderRegistry, final DOMActionProviderService actionProviderService,
+            final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
+            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+            final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
+            final NetconfClientDispatcher clientDispatcher, final String topologyId, final Config config,
+            final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
+            final RpcProviderService rpcProviderService, final DeviceActionFactory deviceActionFactory,
+            final SchemaResourceManager resourceManager) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
@@ -136,7 +139,40 @@ public class NetconfTopologyManager
     public void init() {
         dataChangeListenerRegistration = registerDataTreeChangeListener();
         rpcReg = rpcProviderService.registerRpcImplementation(NetconfNodeTopologyService.class,
-            new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId));
+                new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId));
+    }
+
+    /**
+     * Blocking read transaction.
+     *
+     * @param store :DatastoreType
+     * @param path  :InstanceIdentifier
+     * @param db    :An instance of the {@link DataBroker}
+     * @return :data read from path
+     */
+    public static <D extends DataObject> D read(final LogicalDatastoreType store, final InstanceIdentifier<D> path,
+            final DataBroker db) {
+        final ListenableFuture<Optional<D>> future;
+        try (ReadTransaction transaction = db.newReadOnlyTransaction()) {
+            future = transaction.read(store, path);
+        }
+
+        final Optional<D> optionalData;
+        try {
+            optionalData = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.warn("Failed to read {} ", path, e);
+            return null;
+        }
+
+        if (optionalData.isPresent()) {
+            return optionalData.get();
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("{}: Failed to read {}", Thread.currentThread().getStackTrace()[1], path);
+        }
+        return null;
     }
 
     @Override
@@ -156,7 +192,11 @@ public class NetconfTopologyManager
                         refreshNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
                     } else {
                         LOG.debug("Config for node {} created", nodeId);
-                        startNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
+                        try {
+                            startNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
+                        } catch (UnknownHostException e) {
+                            LOG.error("Unable to connect to device {} ,invalid payload", nodeId, e);
+                        }
                     }
                     break;
                 case DELETE:
@@ -174,42 +214,48 @@ public class NetconfTopologyManager
         context.refresh(createSetup(instanceIdentifier, node));
     }
 
-    // ClusterSingletonServiceRegistration registerClusterSingletonService method throws a Runtime exception if there
-    // are problems with registration and client has to deal with it. Only thing we can do if this error occurs is to
+    // ClusterSingletonServiceRegistration registerClusterSingletonService method
+    // throws a Runtime exception if there
+    // are problems with registration and client has to deal with it. Only thing we
+    // can do if this error occurs is to
     // retry registration several times and log the error.
-    // TODO change to a specific documented Exception when changed in ClusterSingletonServiceProvider
+    // TODO change to a specific documented Exception when changed in
+    // ClusterSingletonServiceProvider
     @SuppressWarnings("checkstyle:IllegalCatch")
-    private void startNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
+    private void startNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node)
+            throws UnknownHostException {
         final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
         requireNonNull(netconfNode);
         requireNonNull(netconfNode.getHost());
-        requireNonNull(netconfNode.getHost().getIpAddress());
+        if (netconfNode.getHost().getIpAddress() != null
+                || InetAddress.getByName(netconfNode.getHost().getDomainName().getValue()).getHostAddress() != null) {
+            final Timeout actorResponseWaitTime = new Timeout(
+                    Duration.create(netconfNode.getActorResponseWaitTime().toJava(), "seconds"));
 
-        final Timeout actorResponseWaitTime = new Timeout(
-                Duration.create(netconfNode.getActorResponseWaitTime().toJava(), "seconds"));
+            final ServiceGroupIdentifier serviceGroupIdent = ServiceGroupIdentifier
+                    .create(instanceIdentifier.toString());
 
-        final ServiceGroupIdentifier serviceGroupIdent =
-                ServiceGroupIdentifier.create(instanceIdentifier.toString());
+            final NetconfTopologyContext newNetconfTopologyContext = newNetconfTopologyContext(
+                    createSetup(instanceIdentifier, node), serviceGroupIdent, actorResponseWaitTime,
+                    deviceActionFactory);
 
-        final NetconfTopologyContext newNetconfTopologyContext = newNetconfTopologyContext(
-            createSetup(instanceIdentifier, node), serviceGroupIdent, actorResponseWaitTime, deviceActionFactory);
-
-        int tries = 3;
-        while (true) {
-            try {
-                final ClusterSingletonServiceRegistration clusterSingletonServiceRegistration =
-                        clusterSingletonServiceProvider.registerClusterSingletonService(newNetconfTopologyContext);
-                clusterRegistrations.put(instanceIdentifier, clusterSingletonServiceRegistration);
-                contexts.put(instanceIdentifier, newNetconfTopologyContext);
-                break;
-            } catch (final RuntimeException e) {
-                LOG.warn("Unable to register cluster singleton service {}, trying again", newNetconfTopologyContext, e);
-
-                if (--tries <= 0) {
-                    LOG.error("Unable to register cluster singleton service {} - done trying, closing topology context",
-                            newNetconfTopologyContext, e);
-                    close(newNetconfTopologyContext);
+            int tries = 3;
+            while (true) {
+                try {
+                    final ClusterSingletonServiceRegistration clusterSingletonServiceRegistration =
+                            clusterSingletonServiceProvider.registerClusterSingletonService(newNetconfTopologyContext);
+                    clusterRegistrations.put(instanceIdentifier, clusterSingletonServiceRegistration);
+                    contexts.put(instanceIdentifier, newNetconfTopologyContext);
                     break;
+                } catch (final RuntimeException e) {
+                    LOG.warn("Unable to register cluster singleton service {}, trying again", newNetconfTopologyContext,
+                            e);
+                    if (--tries <= 0) {
+                        LOG.error("Unable to register cluster singleton service {} - done trying, closing topology"
+                                + "context", newNetconfTopologyContext, e);
+                        close(newNetconfTopologyContext);
+                        break;
+                    }
                 }
             }
         }
@@ -228,7 +274,7 @@ public class NetconfTopologyManager
             final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
             final DeviceActionFactory deviceActionFact) {
         return new NetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, mountPointService,
-            deviceActionFact);
+                deviceActionFact);
     }
 
     @Override
@@ -259,14 +305,16 @@ public class NetconfTopologyManager
     }
 
     /**
-     * Sets the private key path from location specified in configuration file using blueprint.
+     * Sets the private key path from location specified in configuration file using
+     * blueprint.
      */
     public void setPrivateKeyPath(final String privateKeyPath) {
         this.privateKeyPath = privateKeyPath;
     }
 
     /**
-     * Sets the private key passphrase from location specified in configuration file using blueprint.
+     * Sets the private key passphrase from location specified in configuration file
+     * using blueprint.
      */
     public void setPrivateKeyPassphrase(final String privateKeyPassphrase) {
         this.privateKeyPassphrase = privateKeyPassphrase;
@@ -290,17 +338,17 @@ public class NetconfTopologyManager
 
         LOG.debug("Registering datastore listener");
         return dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
-            NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
+                NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
     }
 
     private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
+        final InstanceIdentifier<NetworkTopology> networkTopologyId = InstanceIdentifier.builder(NetworkTopology.class)
+                .build();
         wtx.merge(datastoreType, networkTopologyId, networkTopology);
         final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build();
-        wtx.merge(datastoreType, networkTopologyId.child(Topology.class,
-                new TopologyKey(new TopologyId(topologyId))), topology);
+        wtx.merge(datastoreType, networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(topologyId))),
+                topology);
     }
 
     private NetconfTopologySetup createSetup(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
@@ -308,24 +356,15 @@ public class NetconfTopologyManager
         final RemoteDeviceId deviceId = NetconfTopologyUtils.createRemoteDeviceId(node.getNodeId(), netconfNode);
 
         final NetconfTopologySetupBuilder builder = NetconfTopologySetupBuilder.create()
-                .setClusterSingletonServiceProvider(clusterSingletonServiceProvider)
-                .setBaseSchemas(baseSchemas)
-                .setDataBroker(dataBroker)
-                .setInstanceIdentifier(instanceIdentifier)
-                .setRpcProviderRegistry(rpcProviderRegistry)
-                .setActionProviderRegistry(actionProviderRegistry)
-                .setNode(node)
-                .setActorSystem(actorSystem)
-                .setEventExecutor(eventExecutor)
-                .setKeepaliveExecutor(keepaliveExecutor)
-                .setProcessingExecutor(processingExecutor)
-                .setTopologyId(topologyId)
-                .setNetconfClientDispatcher(clientDispatcher)
+                .setClusterSingletonServiceProvider(clusterSingletonServiceProvider).setBaseSchemas(baseSchemas)
+                .setDataBroker(dataBroker).setInstanceIdentifier(instanceIdentifier)
+                .setRpcProviderRegistry(rpcProviderRegistry).setActionProviderRegistry(actionProviderRegistry)
+                .setNode(node).setActorSystem(actorSystem).setEventExecutor(eventExecutor)
+                .setKeepaliveExecutor(keepaliveExecutor).setProcessingExecutor(processingExecutor)
+                .setTopologyId(topologyId).setNetconfClientDispatcher(clientDispatcher)
                 .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode, deviceId))
-                .setIdleTimeout(writeTxIdleTimeout)
-                .setPrivateKeyPath(privateKeyPath)
-                .setPrivateKeyPassphrase(privateKeyPassphrase)
-                .setEncryptionService(encryptionService);
+                .setIdleTimeout(writeTxIdleTimeout).setPrivateKeyPath(privateKeyPath)
+                .setPrivateKeyPassphrase(privateKeyPassphrase).setEncryptionService(encryptionService);
 
         return builder.build();
     }
