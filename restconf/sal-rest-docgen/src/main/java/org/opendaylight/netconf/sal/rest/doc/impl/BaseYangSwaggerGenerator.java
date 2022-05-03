@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
-import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.CONFIG;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TOP;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildDelete;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildGet;
@@ -47,7 +46,6 @@ import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Components;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Info;
@@ -92,7 +90,7 @@ public abstract class BaseYangSwaggerGenerator {
 
     protected BaseYangSwaggerGenerator(final Optional<DOMSchemaService> schemaService) {
         this.schemaService = schemaService.orElse(null);
-        this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
     public DOMSchemaService getSchemaService() {
@@ -100,8 +98,8 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     public ResourceList getResourceListing(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
-                                           final String context, final URIType uriType, final OAversion oaversion) {
-        return getResourceListing(uriInfo, schemaContext, context, 0, true, uriType, oaversion);
+                                           final String context, final OAversion oaversion) {
+        return getResourceListing(uriInfo, schemaContext, context, 0, true, oaversion);
     }
 
     /**
@@ -109,7 +107,7 @@ public abstract class BaseYangSwaggerGenerator {
      */
     public ResourceList getResourceListing(final UriInfo uriInfo, final EffectiveModelContext schemaContext,
                                            final String context, final int pageNum, final boolean all,
-                                           final URIType uriType, final OAversion oaversion) {
+                                           final OAversion oaversion) {
         final ResourceList resourceList = createResourceList();
 
         final Set<Module> modules = getSortedModules(schemaContext);
@@ -125,7 +123,7 @@ public abstract class BaseYangSwaggerGenerator {
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
             final SwaggerObject doc = getApiDeclaration(module.getName(), revisionString, uriInfo, schemaContext,
-                    context, uriType, oaversion);
+                    context, oaversion);
             if (doc != null) {
                 count++;
                 if (count >= start && count < end || all) {
@@ -148,17 +146,17 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames,
-                                          final URIType uriType, final OAversion oaversion) {
+                                          final OAversion oaversion) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
         return getAllModulesDoc(uriInfo, Optional.empty(), schemaContext, Optional.empty(), "", definitionNames,
-                uriType, oaversion);
+                oaversion);
     }
 
     public SwaggerObject getAllModulesDoc(final UriInfo uriInfo, final Optional<Range<Integer>> range,
                                           final EffectiveModelContext schemaContext, final Optional<String> deviceName,
                                           final String context, final DefinitionNames definitionNames,
-                                          final URIType uriType, final OAversion oaversion) {
+                                          final OAversion oaversion) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
         String name = "Controller";
@@ -166,19 +164,19 @@ public abstract class BaseYangSwaggerGenerator {
             name = deviceName.get();
         }
 
-        final String title = String.format("%s modules of RestConf version %s", name, uriType.name());
+        final String title = name + " modules of RESTCONF";
         final SwaggerObject doc = createSwaggerObject(schema, host, BASE_PATH, title);
         doc.setDefinitions(JsonNodeFactory.instance.objectNode());
         doc.setPaths(JsonNodeFactory.instance.objectNode());
 
-        fillDoc(doc, range, schemaContext, context, deviceName, uriType, oaversion, definitionNames);
+        fillDoc(doc, range, schemaContext, context, deviceName, oaversion, definitionNames);
 
         return doc;
     }
 
     public void fillDoc(final SwaggerObject doc, final Optional<Range<Integer>> range,
                         final EffectiveModelContext schemaContext, final String context,
-                        final Optional<String> deviceName, final URIType uriType, final OAversion oaversion,
+                        final Optional<String> deviceName, final OAversion oaversion,
                         final DefinitionNames definitionNames) {
         final SortedSet<Module> modules = getSortedModules(schemaContext);
         final Set<Module> filteredModules;
@@ -193,8 +191,7 @@ public abstract class BaseYangSwaggerGenerator {
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
 
-            getSwaggerDocSpec(module, context, deviceName, schemaContext, uriType, oaversion, definitionNames, doc,
-                    false);
+            getSwaggerDocSpec(module, context, deviceName, schemaContext, oaversion, definitionNames, doc, false);
         }
     }
 
@@ -236,17 +233,16 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     public CommonApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
-                                             final URIType uriType, final OAversion oaversion) {
+                                             final OAversion oaversion) {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "", uriType,
-                oaversion);
+        final SwaggerObject doc = getApiDeclaration(module, revision, uriInfo, schemaContext, "", oaversion);
         return getAppropriateDoc(doc, oaversion);
     }
 
     public SwaggerObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
                                            final EffectiveModelContext schemaContext, final String context,
-                                           final URIType uriType, final OAversion oaversion) {
+                                           final OAversion oaversion) {
         final Optional<Revision> rev;
 
         try {
@@ -259,16 +255,15 @@ public abstract class BaseYangSwaggerGenerator {
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        return getApiDeclaration(module, uriInfo, context, schemaContext, uriType, oaversion);
+        return getApiDeclaration(module, uriInfo, context, schemaContext, oaversion);
     }
 
-    public SwaggerObject getApiDeclaration(final Module module, final UriInfo uriInfo,
-                                           final String context, final EffectiveModelContext schemaContext,
-                                           final URIType uriType, final OAversion oaversion) {
+    public SwaggerObject getApiDeclaration(final Module module, final UriInfo uriInfo, final String context,
+                                           final EffectiveModelContext schemaContext, final OAversion oaversion) {
         final String schema = createSchemaFromUriInfo(uriInfo);
         final String host = createHostFromUriInfo(uriInfo);
 
-        return getSwaggerDocSpec(module, schema, host, BASE_PATH, context, schemaContext, uriType, oaversion);
+        return getSwaggerDocSpec(module, schema, host, BASE_PATH, context, schemaContext, oaversion);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -286,33 +281,32 @@ public abstract class BaseYangSwaggerGenerator {
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String schema, final String host,
                                            final String basePath, final String context,
-                                           final EffectiveModelContext schemaContext, final URIType uriType,
-                                           final OAversion oaversion) {
+                                           final EffectiveModelContext schemaContext, final OAversion oaversion) {
         final SwaggerObject doc = createSwaggerObject(schema, host, basePath, module.getName());
         final DefinitionNames definitionNames = new DefinitionNames();
-        return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, uriType, oaversion,
-                definitionNames, doc, true);
+        return getSwaggerDocSpec(module, context, Optional.empty(), schemaContext, oaversion, definitionNames, doc,
+            true);
     }
 
 
     public SwaggerObject getSwaggerDocSpec(final Module module, final String context, final Optional<String> deviceName,
-                                           final EffectiveModelContext schemaContext, final URIType uriType,
-                                           final OAversion oaversion, final DefinitionNames definitionNames,
-                                           final SwaggerObject doc, final boolean isForSingleModule) {
+                                           final EffectiveModelContext schemaContext, final OAversion oaversion,
+                                           final DefinitionNames definitionNames, final SwaggerObject doc,
+                                           final boolean isForSingleModule) {
         final ObjectNode definitions;
 
         try {
             if (isForSingleModule) {
-                definitions = this.jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
+                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
                         true);
                 doc.setDefinitions(definitions);
             } else {
-                definitions = this.jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
+                definitions = jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames, oaversion,
                         false);
                 addFields(doc.getDefinitions(), definitions.fields());
             }
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Document: {}", this.mapper.writeValueAsString(doc));
+                LOG.debug("Document: {}", mapper.writeValueAsString(doc));
             }
         } catch (final IOException e) {
             LOG.error("Exception occured in DefinitionGenerator", e);
@@ -350,17 +344,16 @@ public abstract class BaseYangSwaggerGenerator {
                     }
 
                     final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
-                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true,
-                            module.getName(), definitionNames, uriType, oaversion, resolvedPath);
+                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, true, module.getName(),
+                        definitionNames, oaversion, resolvedPath);
                 }
                 pathParams = JsonNodeFactory.instance.arrayNode();
                 resourcePath = getResourcePath("operational", context);
 
-                if (uriType.equals(URIType.DRAFT02)
-                        || uriType.equals(URIType.RFC8040) && !node.isConfiguration()) {
+                if (!node.isConfiguration()) {
                     final String resolvedPath = resourcePath + "/" + createPath(node, pathParams, oaversion, localName);
-                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false,
-                            moduleName, definitionNames, uriType, oaversion, resolvedPath);
+                    addPaths(node, deviceName, moduleName, paths, pathParams, schemaContext, false, moduleName,
+                        definitionNames, oaversion, resolvedPath);
                 }
             }
         }
@@ -446,8 +439,7 @@ public abstract class BaseYangSwaggerGenerator {
     private void addPaths(final DataSchemaNode node, final Optional<String> deviceName, final String moduleName,
                           final ObjectNode paths, final ArrayNode parentPathParams,
                           final EffectiveModelContext schemaContext, final boolean isConfig, final String parentName,
-                          final DefinitionNames definitionNames, final URIType uriType, final OAversion oaversion,
-                          final String resourcePath) {
+                          final DefinitionNames definitionNames, final OAversion oaversion, final String resourcePath) {
         LOG.debug("Adding path: [{}]", resourcePath);
 
         final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
@@ -459,10 +451,10 @@ public abstract class BaseYangSwaggerGenerator {
 
         final ObjectNode path = JsonNodeFactory.instance.objectNode();
         path.setAll(operations(node, moduleName, deviceName, pathParams, isConfig, parentName, definitionNames,
-                uriType, oaversion));
+                oaversion));
         paths.set(resourcePath, path);
 
-        if (uriType.equals(URIType.RFC8040)) {
+        if (node instanceof ActionNodeContainer) {
             ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
                 final String resolvedPath = "rests/operations" + resourcePath.substring(11)
                         + "/" + resolvePathArgumentsName(actionDef.getQName(), node.getQName(), schemaContext);
@@ -477,16 +469,9 @@ public abstract class BaseYangSwaggerGenerator {
                 final String localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
                 final String newResourcePath = resourcePath + "/" + createPath(childNode, pathParams, oaversion,
                         localName);
-                if (uriType.equals(URIType.RFC8040)) {
-                    final boolean newIsConfig = isConfig && childNode.isConfiguration();
-                    addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
-                            newIsConfig, newParent, definitionNames, uriType, oaversion, newResourcePath);
-                } else {
-                    if (!isConfig || childNode.isConfiguration()) {
-                        addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
-                                isConfig, newParent, definitionNames, uriType, oaversion, newResourcePath);
-                    }
-                }
+                final boolean newIsConfig = isConfig && childNode.isConfiguration();
+                addPaths(childNode, deviceName, moduleName, paths, pathParams, schemaContext,
+                    newIsConfig, newParent, definitionNames, oaversion, newResourcePath);
             }
         }
     }
@@ -503,21 +488,15 @@ public abstract class BaseYangSwaggerGenerator {
     private static Map<String, ObjectNode> operations(final DataSchemaNode node, final String moduleName,
                                                       final Optional<String> deviceName, final ArrayNode pathParams,
                                                       final boolean isConfig, final String parentName,
-                                                      final DefinitionNames definitionNames, final URIType uriType,
+                                                      final DefinitionNames definitionNames,
                                                       final OAversion oaversion) {
         final Map<String, ObjectNode> operations = new HashMap<>();
         final String discriminator = definitionNames.getDiscriminator(node);
 
         final String nodeName = node.getQName().getLocalName();
 
-        String prefix = "_";
-        if (isConfig && uriType.equals(URIType.DRAFT02)) {
-            prefix = CONFIG + "_";
-        }
-
-        final String defName = parentName + prefix + nodeName + TOP + discriminator;
-        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig, uriType,
-                oaversion);
+        final String defName = parentName + "_" + nodeName + TOP + discriminator;
+        final ObjectNode get = buildGet(node, moduleName, deviceName, pathParams, defName, isConfig, oaversion);
         operations.put("get", get);
 
 

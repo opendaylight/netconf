@@ -21,10 +21,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.impl.AllModulesDocGenerator;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorDraftO2;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorRFC8040;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
-import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraft02;
 import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorRFC8040;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -45,17 +43,12 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
-        final MountPointSwaggerGeneratorDraft02 mountPointDraft02 =
-                new MountPointSwaggerGeneratorDraft02(SCHEMA_SERVICE, service);
         final MountPointSwaggerGeneratorRFC8040 mountPointRFC8040 =
                 new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service);
-        final ApiDocGeneratorDraftO2 apiDocGeneratorDraftO2 = new ApiDocGeneratorDraftO2(SCHEMA_SERVICE);
         final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
-        mountPointDraft02.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
-        final AllModulesDocGenerator allModulesDocGenerator = new AllModulesDocGenerator(apiDocGeneratorDraftO2,
-                apiDocGeneratorRFC8040);
-        apiDocService = new ApiDocServiceImpl(mountPointDraft02, mountPointRFC8040, apiDocGeneratorDraftO2,
-                apiDocGeneratorRFC8040, allModulesDocGenerator);
+        mountPointRFC8040.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
+        final AllModulesDocGenerator allModulesDocGenerator = new AllModulesDocGenerator(apiDocGeneratorRFC8040);
+        apiDocService = new ApiDocServiceImpl(mountPointRFC8040, apiDocGeneratorRFC8040, allModulesDocGenerator);
     }
 
     @Test

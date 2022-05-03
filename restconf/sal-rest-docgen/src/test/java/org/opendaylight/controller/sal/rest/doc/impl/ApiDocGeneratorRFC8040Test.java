@@ -19,7 +19,6 @@ import java.util.List;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorRFC8040;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.Revision;
 
@@ -38,7 +37,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testPaths() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
+            ApiDocServiceImpl.OAversion.V2_0);
 
         assertEquals(List.of("/rests/data",
             "/rests/data/toaster2:toaster",
@@ -68,7 +67,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
+            ApiDocServiceImpl.OAversion.V2_0);
 
         for (final String path : configPaths) {
             final JsonNode node = doc.getPaths().get(path);
@@ -86,7 +85,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testDefinitions() {
         final var module = CONTEXT.findModule(NAME, Revision.of(REVISION_DATE)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
+            ApiDocServiceImpl.OAversion.V2_0);
 
         final ObjectNode definitions = doc.getDefinitions();
         assertNotNull(definitions);
@@ -139,7 +138,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testRPC() {
         final var module = CONTEXT.findModule(NAME_2, Revision.of(REVISION_DATE_2)).orElseThrow();
         final SwaggerObject doc = generator.getSwaggerDocSpec(module, "http", "localhost:8181", "/", "", CONTEXT,
-            URIType.RFC8040, ApiDocServiceImpl.OAversion.V2_0);
+            ApiDocServiceImpl.OAversion.V2_0);
         assertNotNull(doc);
 
         final ObjectNode definitions = doc.getDefinitions();

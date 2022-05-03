@@ -27,8 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
-import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraft02;
+import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorRFC8040;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -55,7 +54,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        swagger = new MountPointSwaggerGeneratorDraft02(SCHEMA_SERVICE, service).getMountPointSwagger();
+        swagger = new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service).getMountPointSwagger();
     }
 
     @Test()
@@ -76,8 +75,8 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
-        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores",
-                "-", URIType.DRAFT02, OAversion.V2_0);
+        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-",
+            OAversion.V2_0);
         assertNotNull("failed to find Datastore API", mountPointApi);
 
         final ObjectNode pathsObject = mountPointApi.getPaths();

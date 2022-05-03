@@ -7,32 +7,23 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
+import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 
 public class AllModulesDocGenerator {
-    private final ApiDocGeneratorDraftO2 apiDocGeneratorDraft02;
     private final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040;
 
-    public AllModulesDocGenerator(final ApiDocGeneratorDraftO2 apiDocGeneratorDraft02,
-                                  final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
-        this.apiDocGeneratorDraft02 = Objects.requireNonNull(apiDocGeneratorDraft02);
-        this.apiDocGeneratorRFC8040 = Objects.requireNonNull(apiDocGeneratorRFC8040);
+    public AllModulesDocGenerator(final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
+        this.apiDocGeneratorRFC8040 = requireNonNull(apiDocGeneratorRFC8040);
     }
 
-    public CommonApiObject getAllModulesDoc(final UriInfo uriInfo, final URIType uriType, final OAversion oaversion) {
+    public CommonApiObject getAllModulesDoc(final UriInfo uriInfo, final OAversion oaversion) {
         final DefinitionNames definitionNames = new DefinitionNames();
-        final SwaggerObject doc;
-        if (uriType.equals(URIType.DRAFT02)) {
-            doc = apiDocGeneratorDraft02.getAllModulesDoc(uriInfo, definitionNames, uriType, oaversion);
-        } else {
-            doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames, uriType, oaversion);
-        }
+        final SwaggerObject doc = apiDocGeneratorRFC8040.getAllModulesDoc(uriInfo, definitionNames, oaversion);
 
         return BaseYangSwaggerGenerator.getAppropriateDoc(doc, oaversion);
     }
