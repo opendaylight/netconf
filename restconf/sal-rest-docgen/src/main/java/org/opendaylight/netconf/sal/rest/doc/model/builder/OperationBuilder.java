@@ -21,9 +21,7 @@ import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -107,8 +105,7 @@ public final class OperationBuilder {
 
     public static ObjectNode buildGet(final DataSchemaNode node, final String moduleName,
                                       final Optional<String> deviceName, final ArrayNode pathParams,
-                                      final String defName, final boolean isConfig,
-                                      final URIType uriType, final OAversion oaversion) {
+                                      final String defName, final boolean isConfig, final OAversion oaversion) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
@@ -116,7 +113,7 @@ public final class OperationBuilder {
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
 
-        addQueryParameters(parameters, isConfig, uriType, oaversion);
+        addQueryParameters(parameters, isConfig, oaversion);
 
         value.set(PARAMETERS_KEY, parameters);
 
@@ -131,25 +128,23 @@ public final class OperationBuilder {
     }
 
     private static void addQueryParameters(final ArrayNode parameters, final boolean isConfig,
-                                           final ApiDocServiceImpl.URIType uriType, final OAversion oaversion) {
-        if (uriType.equals(ApiDocServiceImpl.URIType.RFC8040)) {
-            final ObjectNode contentParam = JsonNodeFactory.instance.objectNode();
-            final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
-            cases.add(NONCONFIG_QUERY_PARAM);
-            if (isConfig) {
-                cases.add(CONFIG_QUERY_PARAM);
-            } else {
-                contentParam.put(REQUIRED_KEY, true);
-            }
-            contentParam.put(IN_KEY, QUERY);
-            contentParam.put(NAME_KEY, CONTENT);
-
-            final ObjectNode typeParent = getTypeParentNode(contentParam, oaversion);
-            typeParent.put(TYPE_KEY, STRING);
-            typeParent.set(ENUM_KEY, cases);
-
-            parameters.add(contentParam);
+                                           final OAversion oaversion) {
+        final ObjectNode contentParam = JsonNodeFactory.instance.objectNode();
+        final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
+        cases.add(NONCONFIG_QUERY_PARAM);
+        if (isConfig) {
+            cases.add(CONFIG_QUERY_PARAM);
+        } else {
+            contentParam.put(REQUIRED_KEY, true);
         }
+        contentParam.put(IN_KEY, QUERY);
+        contentParam.put(NAME_KEY, CONTENT);
+
+        final ObjectNode typeParent = getTypeParentNode(contentParam, oaversion);
+        typeParent.put(TYPE_KEY, STRING);
+        typeParent.set(ENUM_KEY, cases);
+
+        parameters.add(contentParam);
     }
 
     public static ObjectNode buildPut(final String parentName, final String nodeName, final String discriminator,

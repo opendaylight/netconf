@@ -15,7 +15,6 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -27,8 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
-import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraft02;
+import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorRFC8040;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -40,7 +38,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
-    private static final String INSTANCE_URL = "/nodes/node/123/";
+    private static final String INSTANCE_URL = "/nodes/node=123/";
 
     private MountPointSwagger swagger;
 
@@ -55,7 +53,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        swagger = new MountPointSwaggerGeneratorDraft02(SCHEMA_SERVICE, service).getMountPointSwagger();
+        swagger = new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service).getMountPointSwagger();
     }
 
     @Test()
@@ -76,14 +74,14 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
         swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of mount points
 
-        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores",
-                "-", URIType.DRAFT02, OAversion.V2_0);
+        final SwaggerObject mountPointApi = (SwaggerObject) swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-",
+            OAversion.V2_0);
         assertNotNull("failed to find Datastore API", mountPointApi);
 
         final ObjectNode pathsObject = mountPointApi.getPaths();
         assertNotNull(pathsObject);
 
-        assertEquals("Unexpected api list size", 3, pathsObject.size());
+        assertEquals("Unexpected api list size", 2, pathsObject.size());
 
         final Set<String> actualUrls = new TreeSet<>();
 
@@ -102,10 +100,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
             assertNotNull("expected non-null desc on " + path, getOperation.get("description"));
         }
 
-        final Set<String> expectedUrls = new TreeSet<>(List.of(
-                "/restconf/config" + INSTANCE_URL + "yang-ext:mount",
-                "/restconf/operational" + INSTANCE_URL + "yang-ext:mount",
-                "/restconf/operations" + INSTANCE_URL + "yang-ext:mount"));
-        assertEquals(expectedUrls, actualUrls);
+        assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
+            "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
     }
 }

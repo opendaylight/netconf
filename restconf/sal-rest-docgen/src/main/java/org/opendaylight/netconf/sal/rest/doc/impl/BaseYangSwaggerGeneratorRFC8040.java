@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
@@ -16,24 +18,20 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  * @author Thomas Pantelis
  */
 public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGenerator {
-
-    private static final String DEFAULT_BASE_PATH = "rests";
-    private static final String PATH_VERSION = "rfc8040";
     private final String basePath;
 
     protected BaseYangSwaggerGeneratorRFC8040(final Optional<DOMSchemaService> schemaService) {
-        super(schemaService);
-        this.basePath = DEFAULT_BASE_PATH;
+        this(schemaService, "rests");
     }
 
     protected BaseYangSwaggerGeneratorRFC8040(final Optional<DOMSchemaService> schemaService, final String basePath) {
         super(schemaService);
-        this.basePath = basePath;
+        this.basePath = requireNonNull(basePath);
     }
 
     @Override
     protected String getPathVersion() {
-        return PATH_VERSION;
+        return "rfc8040";
     }
 
     @Override

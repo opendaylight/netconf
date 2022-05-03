@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import java.util.Objects;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
@@ -18,12 +17,11 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  * @author Thomas Pantelis
  */
 public class ApiDocGeneratorRFC8040 extends BaseYangSwaggerGeneratorRFC8040 {
-
     public ApiDocGeneratorRFC8040(final DOMSchemaService schemaService) {
-        super(Optional.of(Objects.requireNonNull(schemaService)));
+        super(Optional.of(schemaService));
     }
 
     public ApiDocGeneratorRFC8040(final DOMSchemaService schemaService, final String basePath) {
-        super(Optional.of(Objects.requireNonNull(schemaService)), basePath);
+        super(Optional.of(schemaService), basePath);
     }
 }
