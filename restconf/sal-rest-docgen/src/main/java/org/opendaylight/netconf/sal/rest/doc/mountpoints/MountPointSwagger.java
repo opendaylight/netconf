@@ -35,7 +35,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
@@ -89,9 +88,9 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
 
     public Map<String, Long> getInstanceIdentifiers() {
         final Map<String, Long> urlToId = new HashMap<>();
-        synchronized (this.lock) {
-            final SchemaContext context = this.globalSchema.getGlobalContext();
-            for (final Entry<YangInstanceIdentifier, Long> entry : this.instanceIdToLongId.entrySet()) {
+        synchronized (lock) {
+            final SchemaContext context = globalSchema.getGlobalContext();
+            for (final Entry<YangInstanceIdentifier, Long> entry : instanceIdToLongId.entrySet()) {
                 final String modName = findModuleName(entry.getKey(), context);
                 urlToId.put(swaggerGenerator.generateUrlPrefixFromInstanceID(entry.getKey(), modName),
                         entry.getValue());
@@ -111,14 +110,14 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     private String getYangMountUrl(final YangInstanceIdentifier key) {
-        final String modName = findModuleName(key, this.globalSchema.getGlobalContext());
+        final String modName = findModuleName(key, globalSchema.getGlobalContext());
         return swaggerGenerator.generateUrlPrefixFromInstanceID(key, modName) + "yang-ext:mount";
     }
 
     private YangInstanceIdentifier getInstanceId(final Long id) {
         final YangInstanceIdentifier instanceId;
-        synchronized (this.lock) {
-            instanceId = this.longIdToInstanceId.get(id);
+        synchronized (lock) {
+            instanceId = longIdToInstanceId.get(id);
         }
         return instanceId;
     }
@@ -129,14 +128,14 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         }
 
         checkState(mountService != null);
-        return this.mountService.getMountPoint(id)
+        return mountService.getMountPoint(id)
             .flatMap(mountPoint -> mountPoint.getService(DOMSchemaService.class))
             .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
             .orElse(null);
     }
 
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-                                            final String revision, final URIType uriType, final OAversion oaversion) {
+                                            final String revision, final OAversion oaversion) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -150,12 +149,12 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
             return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
         }
         final SwaggerObject swaggerObject = swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context,
-                urlPrefix, uriType, oaversion);
+                urlPrefix, oaversion);
         return BaseYangSwaggerGenerator.getAppropriateDoc(swaggerObject, oaversion);
     }
 
     public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final Optional<Integer> pageNum,
-                                            final URIType uriType, final OAversion oaversion) {
+                                            final OAversion oaversion) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -184,7 +183,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         final SwaggerObject doc;
 
         final SwaggerObject swaggerObject = swaggerGenerator.getAllModulesDoc(uriInfo, range, context,
-                Optional.of(deviceName), urlPrefix, definitionNames, uriType, oaversion);
+                Optional.of(deviceName), urlPrefix, definitionNames, oaversion);
 
         if (includeDataStore) {
             doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
@@ -244,20 +243,20 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
 
     @Override
     public void onMountPointCreated(final YangInstanceIdentifier path) {
-        synchronized (this.lock) {
+        synchronized (lock) {
             LOG.debug("Mount point {} created", path);
-            final Long idLong = this.idKey.incrementAndGet();
-            this.instanceIdToLongId.put(path, idLong);
-            this.longIdToInstanceId.put(idLong, path);
+            final Long idLong = idKey.incrementAndGet();
+            instanceIdToLongId.put(path, idLong);
+            longIdToInstanceId.put(idLong, path);
         }
     }
 
     @Override
     public void onMountPointRemoved(final YangInstanceIdentifier path) {
-        synchronized (this.lock) {
+        synchronized (lock) {
             LOG.debug("Mount point {} removed", path);
-            final Long id = this.instanceIdToLongId.remove(path);
-            this.longIdToInstanceId.remove(id);
+            final Long id = instanceIdToLongId.remove(path);
+            longIdToInstanceId.remove(id);
         }
     }
 }
