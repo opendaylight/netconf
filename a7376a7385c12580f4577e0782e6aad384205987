@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab86305b_98406e7d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-05-05T07:29:52Z",
+      "side": 1,
+      "message": "IMO: There is also alternative solution - the method\n\n```\n    /**\n     * Verify that the server key provided is really the one of the host.\n     *\n     * @param  clientSession the current {@link ClientSession}\n     * @param  remoteAddress the host\u0027s {@link SocketAddress}\n     * @param  serverKey     the presented server {@link PublicKey}\n     * @return               \u003ccode\u003etrue\u003c/code\u003e if the key is accepted for the host\n     */\n    boolean verifyServerKey(ClientSession clientSession, SocketAddress remoteAddress, PublicKey serverKey);\n```\n\nshould just verify the keys - but now it creates the session (if it does not exits) and return false if yes - maybe that is the root problem..\n\nWhat is your opinion?",
+      "revId": "a7376a7385c12580f4577e0782e6aad384205987",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
