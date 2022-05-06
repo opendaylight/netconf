@@ -124,9 +124,13 @@ public class XmlPatchBodyReader extends AbstractPatchBodyReader {
                     stack.exit();
                 }
 
-                final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
-                verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
-                targetNode = (SchemaNode) parentStmt;
+                if (stack.isEmpty()) {
+                    targetNode = pathContext.getSchemaContext();
+                } else {
+                    final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
+                    verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
+                    targetNode = (SchemaNode) parentStmt;
+                }
             }
 
             if (targetNode == null) {
