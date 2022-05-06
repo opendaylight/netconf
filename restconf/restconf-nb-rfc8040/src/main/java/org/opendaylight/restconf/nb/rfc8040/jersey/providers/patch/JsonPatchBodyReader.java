@@ -239,8 +239,10 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                             stack.exit();
                         }
 
-                        final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
-                        verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
+                        if (!stack.isEmpty()) {
+                            final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
+                            verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
+                        }
                         edit.setTargetSchemaNode(stack.toInference());
                     }
 
