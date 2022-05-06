@@ -1,0 +1,16 @@
+<yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+    <patch-id>test-patch</patch-id>
+    <comment>Test patch applied to the top-level container with empty URI</comment>
+    <edit>
+        <edit-id>edit1</edit-id>
+        <operation>replace</operation>
+        <target>/instance-identifier-patch-module:patch-cont</target>
+        <value>
+            <patch-cont xmlns="instance:identifier:patch:module">
+                <my-list1>
+                    <name>my-leaf10</name>
+                </my-list1>
+            </patch-cont>
+        </value>
+    </edit>
+</yang-patch>
