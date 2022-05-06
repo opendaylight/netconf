@@ -116,4 +116,15 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml");
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
     }
+
+    /**
+     * Test of Yang Patch on the top-level container with empty URI for data root.
+     */
+    @Test
+    public void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
+        mockBodyReader("", xmlToPatchBodyReader, false);
+        final InputStream inputStream = XmlBodyReaderTest.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHTargetTopLevelContainerWithEmptyURI.xml");
+        checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+    }
 }
