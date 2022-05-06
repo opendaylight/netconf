@@ -162,4 +162,19 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
         final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
     }
+
+    /**
+     * Test of Yang Patch on the top-level container with empty URI for data root.
+     */
+    @Test
+    public void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
+        final String uri = "";
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
+
+        final InputStream inputStream = JsonBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHTargetTopLevelContainerWithEmptyURI.json");
+
+        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+    }
 }
