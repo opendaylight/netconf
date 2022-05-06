@@ -1,0 +1,22 @@
+{
+  "ietf-yang-patch:yang-patch" : {
+    "patch-id" : "test-patch",
+    "comment" : "Test patch applied to the top-level container with empty URI",
+    "edit" : [
+      {
+        "edit-id": "edit1",
+        "operation": "replace",
+        "target": "/instance-identifier-patch-module:patch-cont",
+        "value": {
+          "patch-cont": {
+            "my-list1": [
+              {
+                "name": "my-leaf10"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
