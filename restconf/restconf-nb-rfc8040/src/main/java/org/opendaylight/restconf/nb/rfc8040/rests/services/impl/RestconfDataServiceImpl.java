@@ -42,7 +42,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -224,12 +223,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
-        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final EffectiveModelContext ref = mountPoint == null
-                ? schemaContextHandler.get() : modelContext(mountPoint);
-
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        return PutDataTransactionUtil.putData(payload, ref, strategy, params);
+        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
+        return PutDataTransactionUtil.putData(payload, iid.getSchemaContext(), strategy, params);
     }
 
     @Override
@@ -240,14 +235,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response postData(final NormalizedNodePayload payload, final UriInfo uriInfo) {
         requireNonNull(payload);
-        if (payload.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition) {
+        final InstanceIdentifierContext iid = payload.getInstanceIdentifierContext();
+        if (iid.getSchemaNode() instanceof ActionDefinition) {
             return invokeAction(payload);
         }
 
         final WriteDataParams params = QueryParams.newWriteDataParams(uriInfo);
-        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        return PostDataTransactionUtil.postData(uriInfo, payload, strategy, getSchemaContext(mountPoint), params);
+        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
+        return PostDataTransactionUtil.postData(uriInfo, payload, strategy, iid.getSchemaContext(), params);
     }
 
     @Override
@@ -267,11 +262,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
-        final DOMMountPoint mountPoint = RestconfDocumentedException.throwIfNull(context,
+        final InstanceIdentifierContext iid = RestconfDocumentedException.throwIfNull(context,
             ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "No patch documented provided")
-            .getInstanceIdentifierContext().getMountPoint();
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        return PatchDataTransactionUtil.patchData(context, strategy, getSchemaContext(mountPoint));
+            .getInstanceIdentifierContext();
+        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
+        return PatchDataTransactionUtil.patchData(context, strategy, iid.getSchemaContext());
     }
 
     @Override
@@ -283,16 +278,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
-        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final EffectiveModelContext ref = mountPoint == null
-                ? schemaContextHandler.get() : modelContext(mountPoint);
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-
-        return PlainPatchDataTransactionUtil.patchData(payload, strategy, ref);
-    }
-
-    private EffectiveModelContext getSchemaContext(final DOMMountPoint mountPoint) {
-        return mountPoint == null ? schemaContextHandler.get() : modelContext(mountPoint);
+        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
+        return PlainPatchDataTransactionUtil.patchData(payload, strategy, iid.getSchemaContext());
     }
 
     // FIXME: why is this synchronized?
@@ -489,11 +476,5 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
             }
         }
-    }
-
-    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
-        return mountPoint.getService(DOMSchemaService.class)
-            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
-            .orElse(null);
     }
 }
