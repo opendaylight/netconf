@@ -224,12 +224,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
-        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final EffectiveModelContext ref = mountPoint == null
-                ? schemaContextHandler.get() : modelContext(mountPoint);
-
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-        return PutDataTransactionUtil.putData(payload, ref, strategy, params);
+        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
+        return PutDataTransactionUtil.putData(payload, iid.getSchemaContext(), strategy, params);
     }
 
     @Override
@@ -283,16 +279,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
         validateListKeysEqualityInPayloadAndUri(payload);
 
-        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final EffectiveModelContext ref = mountPoint == null
-                ? schemaContextHandler.get() : modelContext(mountPoint);
-        final RestconfStrategy strategy = getRestconfStrategy(mountPoint);
-
-        return PlainPatchDataTransactionUtil.patchData(payload, strategy, ref);
+        final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
+        return PlainPatchDataTransactionUtil.patchData(payload, strategy, iid.getSchemaContext());
     }
 
     private EffectiveModelContext getSchemaContext(final DOMMountPoint mountPoint) {
-        return mountPoint == null ? schemaContextHandler.get() : modelContext(mountPoint);
+        return mountPoint == null ? schemaContextHandler.get() : mountPoint.getService(DOMSchemaService.class)
+            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .orElse(null);
     }
 
     // FIXME: why is this synchronized?
@@ -489,11 +483,5 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
             }
         }
-    }
-
-    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
-        return mountPoint.getService(DOMSchemaService.class)
-            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
-            .orElse(null);
     }
 }
