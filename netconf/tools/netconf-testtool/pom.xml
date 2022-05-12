@@ -157,17 +157,17 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.bouncycastle</groupId>
-                                    <artifactId>bcpkix-jdk15on</artifactId>
+                                    <artifactId>bcpkix-jdk18on</artifactId>
                                     <outputDirectory>${project.build.directory}/lib</outputDirectory>
                                     <overWrite>true</overWrite>
-                                    <destFileName>bcpkix-jdk15on.jar</destFileName>
+                                    <destFileName>bcpkix-jdk18on.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.bouncycastle</groupId>
-                                    <artifactId>bcprov-jdk15on</artifactId>
+                                    <artifactId>bcprov-jdk18on</artifactId>
                                     <outputDirectory>${project.build.directory}/lib</outputDirectory>
                                     <overWrite>true</overWrite>
-                                    <destFileName>bcprov-jdk15on.jar</destFileName>
+                                    <destFileName>bcprov-jdk18on.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -243,7 +243,7 @@
                                           implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                       <manifestEntries>
                                           <Main-Class>org.opendaylight.netconf.test.tool.client.stress.StressClient</Main-Class>
-                                          <Class-Path>. lib lib/bcprov-jdk15on.jar lib/bcpkix-jdk15on.jar</Class-Path>
+                                          <Class-Path>. lib lib/bcprov-jdk18on.jar lib/bcpkix-jdk18on.jar</Class-Path>
                                       </manifestEntries>
                                   </transformer>
                               </transformers>
@@ -318,7 +318,7 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Main-Class>org.opendaylight.netconf.test.tool.ScaleUtil</Main-Class>
-                                        <Class-Path>. lib lib/bcprov-jdk15on.jar lib/bcpkix-jdk15on.jar</Class-Path>
+                                        <Class-Path>. lib lib/bcprov-jdk18on.jar lib/bcpkix-jdk18on.jar</Class-Path>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
