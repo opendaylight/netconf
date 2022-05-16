@@ -15,7 +15,6 @@ import static org.mockito.Mockito.when;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -157,8 +156,7 @@ public abstract class AbstractFieldsTranslatorTest<T> {
         when(containerJukebox.dataChildByName(LIBRARY_Q_NAME)).thenReturn(containerLibrary);
 
         when(augmentedContainerLibrary.getQName()).thenReturn(AUGMENTED_LIBRARY_Q_NAME);
-        when(containerJukebox.dataChildByName(AUGMENTED_LIBRARY_Q_NAME))
-                .thenReturn(augmentedContainerLibrary);
+        when(containerJukebox.dataChildByName(AUGMENTED_LIBRARY_Q_NAME)).thenReturn(augmentedContainerLibrary);
 
         when(containerPlayer.getQName()).thenReturn(PLAYER_Q_NAME);
         when(containerJukebox.dataChildByName(PLAYER_Q_NAME)).thenReturn(containerPlayer);
@@ -172,10 +170,9 @@ public abstract class AbstractFieldsTranslatorTest<T> {
         when(leafSpeed.getQName()).thenReturn(SPEED_Q_NAME);
         when(leafSpeed.isAugmenting()).thenReturn(true);
         when(containerPlayer.dataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
-        when(containerPlayer.getDataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
         doReturn(List.of(leafSpeed)).when(speedAugmentation).getChildNodes();
         doReturn(List.of(speedAugmentation)).when(containerPlayer).getAvailableAugmentations();
-        when(speedAugmentation.findDataChildByName(SPEED_Q_NAME)).thenReturn(Optional.of(leafSpeed));
+        when(speedAugmentation.dataChildByName(SPEED_Q_NAME)).thenReturn(leafSpeed);
     }
 
     private void initTestServicesSchemaNodes(final EffectiveModelContext schemaContext) {
