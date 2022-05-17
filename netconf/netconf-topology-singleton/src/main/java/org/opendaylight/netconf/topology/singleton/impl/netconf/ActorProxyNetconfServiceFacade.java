@@ -15,6 +15,7 @@ import akka.dispatch.OnComplete;
 import akka.pattern.AskTimeoutException;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -244,7 +244,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     }
 
     @Override
-    public @NonNull Object getDeviceId() {
+    public Object getDeviceId() {
         return id;
     }
 
@@ -291,10 +291,9 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
             ? NetconfTopologyUtils.createMasterIsDownException(id, (Exception) failure) : failure;
     }
 
-    private ListenableFuture<? extends DOMRpcResult> createResult() {
-        final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
-        settableFuture.set(new DefaultDOMRpcResult());
-        return settableFuture;
+    // FIXME: this is being used in contexts where we should be waiting for a reply
+    private static ListenableFuture<? extends DOMRpcResult> createResult() {
+        return Futures.immediateFuture(new DefaultDOMRpcResult());
     }
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
