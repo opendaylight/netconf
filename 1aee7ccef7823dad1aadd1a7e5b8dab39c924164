@@ -20,6 +20,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1a816ee4_c40f85ea",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/AbstractRestconfApplication.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:19:54Z",
+      "side": 1,
+      "message": "all of this is RESTCONF, just lose the prefix",
+      "range": {
+        "startLine": 42,
+        "startChar": 47,
+        "endLine": 42,
+        "endChar": 55
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34baa59a_c7132348",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/AbstractRestconfApplication.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:19:54Z",
+      "side": 1,
+      "message": "please keep this an ImmutableSet",
+      "range": {
+        "startLine": 63,
+        "startChar": 39,
+        "endLine": 63,
+        "endChar": 63
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "22639b1b_f09e9f9a",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/DataStreamApplication.java",
         "patchSetId": 2
@@ -59,6 +105,29 @@
         "startChar": 3,
         "endLine": 26,
         "endChar": 9
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be7c7594_2a321268",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:19:54Z",
+      "side": 1,
+      "message": "non-null, I presume?",
+      "range": {
+        "startLine": 46,
+        "startChar": 36,
+        "endLine": 46,
+        "endChar": 56
       },
       "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
@@ -135,6 +204,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d5601b46_9bbaae59",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:19:54Z",
+      "side": 1,
+      "message": "this should get interpreted at instantiation time and we should have a filter at hand.",
+      "range": {
+        "startLine": 167,
+        "startChar": 38,
+        "endLine": 167,
+        "endChar": 81
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ddb2e033_cc958b82",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
         "patchSetId": 2
@@ -174,6 +266,75 @@
         "startChar": 24,
         "endLine": 217,
         "endChar": 71
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd7e2729_3720034c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:19:54Z",
+      "side": 1,
+      "message": "StringBuilders are ordinarily called \u0027sb\u0027",
+      "range": {
+        "startLine": 220,
+        "startChar": 82,
+        "endLine": 220,
+        "endChar": 92
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bef6cfc4_b2bce46c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:19:54Z",
+      "side": 1,
+      "message": "so we end up with an empty field?\nalso Object is rather ugly and callers each look it up: just pass the context down, do the lookup here and perform an instanceof check to remove the unchecked cast below",
+      "range": {
+        "startLine": 227,
+        "startChar": 12,
+        "endLine": 227,
+        "endChar": 36
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be42c13f_ea415840",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/resources/restconf8040.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:19:54Z",
+      "side": 1,
+      "message": "please document these parameters -- their effects are far from obvious",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 36
       },
       "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
