@@ -18,7 +18,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
-import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,9 +59,6 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSc
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -203,17 +199,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
-        final Host host = node.getHost();
-        final IpAddress ipAddress = host.getIpAddress();
-        final InetSocketAddress address;
-        if (ipAddress != null) {
-            address = new InetSocketAddress(IetfInetUtil.INSTANCE.inetAddressFor(ipAddress),
-                    node.getPort().getValue().toJava());
-        } else {
-            address = new InetSocketAddress(host.getDomainName().getValue(),
-                    node.getPort().getValue().toJava());
-        }
-        final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
+        final RemoteDeviceId remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, node);
 
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = createSalFacade(remoteDeviceId);
@@ -264,7 +250,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return new NetconfConnectorDTO(netconfDeviceCommunicator, salFacade, yanglibRegistrations);
     }
 
-    private List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
+    private static List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
             final NetconfNode node, final SchemaResourcesDTO resources) {
         final YangLibrary yangLibrary = node.getYangLibrary();
         if (yangLibrary != null) {
@@ -340,7 +326,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         return reconnectingClientConfigurationBuilder
-                .withAddress(getSocketAddress(node.getHost(), node.getPort().getValue().toJava()))
+                .withAddress(NetconfNodeUtils.toInetSocketAddress(node))
                 .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava())
                 .withReconnectStrategy(sf.createReconnectStrategy())
                 .withConnectStrategyFactory(sf)
@@ -376,17 +362,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id);
-
-    private static InetSocketAddress getSocketAddress(final Host host, final int port) {
-        if (host.getDomainName() != null) {
-            return new InetSocketAddress(host.getDomainName().getValue(), port);
-        }
-
-        final IpAddress ipAddress = host.getIpAddress();
-        final String ip = ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address().getValue()
-                : ipAddress.getIpv6Address().getValue();
-        return new InetSocketAddress(ip, port);
-    }
 
     private static Optional<UserPreferences> getUserCapabilities(final NetconfNode node) {
         // if none of yang-module-capabilities or non-module-capabilities is specified
