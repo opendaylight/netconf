@@ -7,11 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
-import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -39,15 +36,7 @@ public final class NetconfTopologyUtils {
     public static final Decimal64 DEFAULT_SLEEP_FACTOR = Decimal64.valueOf("1.5");
 
     private NetconfTopologyUtils() {
-
-    }
-
-    public static RemoteDeviceId createRemoteDeviceId(final NodeId nodeId, final NetconfNode node) {
-        final IpAddress ipAddress = node.getHost().getIpAddress();
-        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
-                ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
-                node.getPort().getValue().toJava());
-        return new RemoteDeviceId(nodeId.getValue(), address);
+        // Hidden on purpose
     }
 
     public static String createActorPath(final String masterMember, final String name) {

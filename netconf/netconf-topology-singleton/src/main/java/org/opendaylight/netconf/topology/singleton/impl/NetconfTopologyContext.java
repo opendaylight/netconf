@@ -27,6 +27,7 @@ import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
+import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.slf4j.Logger;
@@ -60,8 +61,8 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         this.mountService = mountService;
         this.deviceActionFactory = deviceActionFactory;
 
-        remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
-            netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
+        final var node = netconfTopologyDeviceSetup.getNode();
+        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
         remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
             deviceActionFactory);
         netconfNodeManager = createNodeDeviceManager();
@@ -137,8 +138,8 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
      */
     void refresh(final @NonNull NetconfTopologySetup setup) {
         netconfTopologyDeviceSetup = requireNonNull(setup);
-        remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
-                netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
+        final var node = netconfTopologyDeviceSetup.getNode();
+        remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), node.augmentation(NetconfNode.class));
 
         if (isMaster) {
             remoteDeviceConnector.stopRemoteDeviceConnection();

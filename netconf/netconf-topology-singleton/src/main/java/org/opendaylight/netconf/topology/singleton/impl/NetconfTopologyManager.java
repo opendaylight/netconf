@@ -50,6 +50,7 @@ import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonS
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
@@ -182,7 +183,6 @@ public class NetconfTopologyManager
         final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
         requireNonNull(netconfNode);
         requireNonNull(netconfNode.getHost());
-        requireNonNull(netconfNode.getHost().getIpAddress());
 
         final Timeout actorResponseWaitTime = Timeout.create(
                 Duration.ofSeconds(netconfNode.getActorResponseWaitTime().toJava()));
@@ -304,9 +304,9 @@ public class NetconfTopologyManager
 
     private NetconfTopologySetup createSetup(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
         final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
-        final RemoteDeviceId deviceId = NetconfTopologyUtils.createRemoteDeviceId(node.getNodeId(), netconfNode);
+        final RemoteDeviceId deviceId = NetconfNodeUtils.toRemoteDeviceId(node.getNodeId(), netconfNode);
 
-        final NetconfTopologySetupBuilder builder = NetconfTopologySetupBuilder.create()
+        return NetconfTopologySetupBuilder.create()
                 .setClusterSingletonServiceProvider(clusterSingletonServiceProvider)
                 .setBaseSchemas(baseSchemas)
                 .setDataBroker(dataBroker)
@@ -324,8 +324,7 @@ public class NetconfTopologyManager
                 .setIdleTimeout(writeTxIdleTimeout)
                 .setPrivateKeyPath(privateKeyPath)
                 .setPrivateKeyPassphrase(privateKeyPassphrase)
-                .setEncryptionService(encryptionService);
-
-        return builder.build();
+                .setEncryptionService(encryptionService)
+                .build();
     }
 }

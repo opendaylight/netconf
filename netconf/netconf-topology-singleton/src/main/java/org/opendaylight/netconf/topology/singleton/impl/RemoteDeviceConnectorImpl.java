@@ -53,8 +53,7 @@ import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.OdlHelloMessageCapabilities;
@@ -257,18 +256,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         return Optional.of(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined));
     }
 
-    //TODO: duplicate code
-    private static InetSocketAddress getSocketAddress(final Host host, final int port) {
-        if (host.getDomainName() != null) {
-            return new InetSocketAddress(host.getDomainName().getValue(), port);
-        } else {
-            final IpAddress ipAddress = host.getIpAddress();
-            final String ip = ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address().getValue() :
-                    ipAddress.getIpv6Address().getValue();
-            return new InetSocketAddress(ip, port);
-        }
-    }
-
     @VisibleForTesting
     NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
                                                            final NetconfNode node) {
@@ -286,7 +273,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final Decimal64 sleepFactor = node.getSleepFactor() == null
                 ? NetconfTopologyUtils.DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 
-        final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue().toJava());
+        final InetSocketAddress socketAddress = NetconfNodeUtils.toInetSocketAddress(node);
 
         final ReconnectStrategyFactory sf =
             new TimedReconnectStrategyFactory(netconfTopologyDeviceSetup.getEventExecutor(), maxConnectionAttempts,
