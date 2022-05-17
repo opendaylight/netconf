@@ -16,6 +16,121 @@
       "message": "Should be now in Shiro agnostic way.",
       "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3971356b_b3c8a59b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:00:56Z",
+      "side": 1,
+      "message": "this is not monotonic: use a started Stopwatch instead",
+      "range": {
+        "startLine": 60,
+        "startChar": 54,
+        "endLine": 60,
+        "endChar": 80
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b9e7c8a_23497a32",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:00:56Z",
+      "side": 1,
+      "message": "all of this is just busy work if !LOG.isTraceEnabled()",
+      "range": {
+        "startLine": 62,
+        "startChar": 18,
+        "endLine": 62,
+        "endChar": 51
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e84455f5_73383e0d",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:00:56Z",
+      "side": 1,
+      "message": "this is too opaque and contains sensitive data: add proper leading message and add a the proper logging marker",
+      "range": {
+        "startLine": 71,
+        "startChar": 19,
+        "endLine": 71,
+        "endChar": 24
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddb2e033_cc958b82",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:00:56Z",
+      "side": 1,
+      "message": "so if this is not enabled, we just buffered the entire thing for nothing?\nthe boolean is an invariant, hence we should do better",
+      "range": {
+        "startLine": 210,
+        "startChar": 13,
+        "endLine": 210,
+        "endChar": 56
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70fbcf51_5262cb7a",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/logging/RestconfLoggingBroker.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-05-17T22:00:56Z",
+      "side": 1,
+      "message": "can we not instantiate an intermediate string here?",
+      "range": {
+        "startLine": 217,
+        "startChar": 24,
+        "endLine": 217,
+        "endChar": 71
+      },
+      "revId": "1aee7ccef7823dad1aadd1a7e5b8dab39c924164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
