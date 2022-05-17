@@ -10,14 +10,13 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 import akka.actor.ActorSystem;
 import akka.testkit.TestActorRef;
 import akka.testkit.javadsl.TestKit;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import scala.concurrent.duration.Duration;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class WriteTransactionActorTest extends WriteTransactionActorTestAdapter {
@@ -29,7 +28,7 @@ public class WriteTransactionActorTest extends WriteTransactionActorTestAdapter 
     @Before
     public void setUp() {
         init(mockWriteTx, system, TestActorRef.create(system,
-                WriteTransactionActor.props(mockWriteTx, Duration.apply(2, TimeUnit.SECONDS))));
+                WriteTransactionActor.props(mockWriteTx, Duration.ofSeconds(2))));
     }
 
     @AfterClass

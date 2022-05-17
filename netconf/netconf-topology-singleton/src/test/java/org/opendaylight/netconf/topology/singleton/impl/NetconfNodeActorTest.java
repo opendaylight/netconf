@@ -53,8 +53,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -129,12 +129,11 @@ import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
-import scala.concurrent.duration.Duration;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
-    private static final Timeout TIMEOUT = new Timeout(Duration.create(5, "seconds"));
+    private static final Timeout TIMEOUT = Timeout.create(Duration.ofSeconds(5));
     private static final RevisionSourceIdentifier SOURCE_IDENTIFIER1 = RevisionSourceIdentifier.create("yang1");
     private static final RevisionSourceIdentifier SOURCE_IDENTIFIER2 = RevisionSourceIdentifier.create("yang2");
 
@@ -198,7 +197,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
         doReturn(mockRegistry).when(schemaResourceDTO).getSchemaRegistry();
         final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
-                .setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS)).setSchemaResourceDTO(schemaResourceDTO)
+                .setIdleTimeout(Duration.ofSeconds(1)).setSchemaResourceDTO(schemaResourceDTO)
                 .setBaseSchemas(BASE_SCHEMAS).build();
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
@@ -425,7 +424,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         doReturn(repository).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(repository).when(schemaResourceDTO2).getSchemaRepository();
         final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
-                .setSchemaResourceDTO(schemaResourceDTO2).setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS))
+                .setSchemaResourceDTO(schemaResourceDTO2).setIdleTimeout(Duration.ofSeconds(1))
                 .setBaseSchemas(BASE_SCHEMAS).build();
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
         ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
@@ -609,7 +608,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         doReturn(mock(DOMDataTreeReadWriteTransaction.class)).when(mockDOMDataBroker).newReadWriteTransaction();
         doReturn(mock(DOMDataTreeWriteTransaction.class)).when(mockDOMDataBroker).newWriteOnlyTransaction();
 
-        initializeMaster(Collections.emptyList());
+        initializeMaster(List.of());
         registerSlaveMountPoint();
 
         ArgumentCaptor<DOMDataBroker> domDataBrokerCaptor = ArgumentCaptor.forClass(DOMDataBroker.class);
@@ -630,7 +629,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testSlaveNewNetconfDataTreeServiceRequest() {
-        initializeMaster(Collections.emptyList());
+        initializeMaster(List.of());
         registerSlaveMountPoint();
 
         ArgumentCaptor<NetconfDataTreeService> netconfCaptor = ArgumentCaptor.forClass(NetconfDataTreeService.class);

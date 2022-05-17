@@ -24,6 +24,7 @@ import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
@@ -59,7 +60,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import scala.concurrent.duration.Duration;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDataTreeServiceActorTest {
@@ -81,7 +81,7 @@ public class NetconfDataTreeServiceActorTest {
     @Before
     public void setUp() {
         this.actorRef = TestActorRef.create(system,
-            NetconfDataTreeServiceActor.props(netconfService, Duration.apply(2, TimeUnit.SECONDS)));
+            NetconfDataTreeServiceActor.props(netconfService, Duration.ofSeconds(2)));
         this.probe = TestProbe.apply(system);
     }
 

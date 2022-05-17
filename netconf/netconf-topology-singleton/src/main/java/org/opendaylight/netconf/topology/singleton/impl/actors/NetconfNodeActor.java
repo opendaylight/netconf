@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
@@ -74,7 +75,6 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import scala.concurrent.duration.Duration;
 
 public class NetconfNodeActor extends AbstractUntypedActor {
     private final Duration writeTxIdleTimeout;

@@ -12,10 +12,12 @@ import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.Status;
 import akka.actor.UntypedAbstractActor;
+import akka.util.JavaDurationConverters;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -41,7 +43,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.Duration;
 
 public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDataTreeServiceActor.class);
@@ -53,7 +54,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
         this.netconfService = netconfService;
         this.idleTimeout = idleTimeout.toSeconds();
         if (this.idleTimeout > 0) {
-            context().setReceiveTimeout(idleTimeout);
+            context().setReceiveTimeout(JavaDurationConverters.asFiniteDuration(idleTimeout));
         }
     }
 
