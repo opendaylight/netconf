@@ -16,6 +16,24 @@
       "message": "Is this path RFC-7950 compliant? I do not feel like it is, ie\n/urn-TBD-params-xml-ns-yang-network-topology:network-topology/urn-TBD-params-xml-ns-yang-network-topology:topology/urn-TBD-params-xml-ns-yang-network-topology:topology[urn-TBD-params-xml-ns-yang-network-topology:topology-id\u003d\u0027topology-netconf\u0027]/urn-TBD-params-xml-ns-yang-network-topology:node/urn-TBD-params-xml-ns-yang-network-topology:node[urn-TBD-params-xml-ns-yang-network-topology:node-id\u003d\u0027testtool\u0027]/urn-opendaylight-netconf-node-topology:port\n\nshould be \n/network-topology:network-topology/network-topology:topology/network-topology:topology[network-topology:topology-id\u003d\u0027topology-netconf\u0027]/network-topology:node/network-topology:node[network-topology:node-id\u003d\u0027testtool\u0027]/netconf-node-topology:port, no? \n\nCorrect me if I am wrong...\nBecause I know in the past notifications used to have QNameModule name instead of this but that attribute was removed.",
       "revId": "0ba244e559103d0743e6db8943927f3d73adb320",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "677b4704_6ed25915",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/serializer/AbstractWebsocketSerializer.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-05-17T12:36:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e91d470f_4ba71547",
+      "revId": "0ba244e559103d0743e6db8943927f3d73adb320",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
