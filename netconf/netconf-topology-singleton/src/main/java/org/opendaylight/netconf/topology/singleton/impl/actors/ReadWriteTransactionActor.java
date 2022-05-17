@@ -10,12 +10,13 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.UntypedAbstractActor;
+import akka.util.JavaDurationConverters;
+import java.time.Duration;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.WriteActorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.Duration;
 
 public final class ReadWriteTransactionActor extends UntypedAbstractActor {
 
@@ -30,7 +31,7 @@ public final class ReadWriteTransactionActor extends UntypedAbstractActor {
         this.tx = tx;
         this.idleTimeout = idleTimeout.toSeconds();
         if (this.idleTimeout > 0) {
-            context().setReceiveTimeout(idleTimeout);
+            context().setReceiveTimeout(JavaDurationConverters.asFiniteDuration(idleTimeout));
         }
         readAdapter = new ReadAdapter(tx);
         writeAdapter = new WriteAdapter(tx);

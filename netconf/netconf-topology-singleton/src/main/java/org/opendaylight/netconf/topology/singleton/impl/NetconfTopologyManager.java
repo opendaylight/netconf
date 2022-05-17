@@ -16,11 +16,11 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -66,7 +66,6 @@ import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.Duration;
 
 public class NetconfTopologyManager
         implements ClusteredDataTreeChangeListener<Node>, NetconfTopologySingletonService, AutoCloseable {
@@ -124,7 +123,7 @@ public class NetconfTopologyManager
         this.eventExecutor = requireNonNull(eventExecutor);
         this.clientDispatcher = requireNonNull(clientDispatcher);
         this.topologyId = requireNonNull(topologyId);
-        this.writeTxIdleTimeout = Duration.apply(config.getWriteTransactionIdleTimeout().toJava(), TimeUnit.SECONDS);
+        this.writeTxIdleTimeout = Duration.ofSeconds(config.getWriteTransactionIdleTimeout().toJava());
         this.mountPointService = mountPointService;
         this.encryptionService = requireNonNull(encryptionService);
         this.rpcProviderService = requireNonNull(rpcProviderService);
@@ -185,8 +184,8 @@ public class NetconfTopologyManager
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getHost().getIpAddress());
 
-        final Timeout actorResponseWaitTime = new Timeout(
-                Duration.create(netconfNode.getActorResponseWaitTime().toJava(), "seconds"));
+        final Timeout actorResponseWaitTime = Timeout.create(
+                Duration.ofSeconds(netconfNode.getActorResponseWaitTime().toJava()));
 
         final ServiceGroupIdentifier serviceGroupIdent =
                 ServiceGroupIdentifier.create(instanceIdentifier.toString());

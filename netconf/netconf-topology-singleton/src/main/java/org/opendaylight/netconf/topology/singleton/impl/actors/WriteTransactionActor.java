@@ -10,11 +10,12 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.UntypedAbstractActor;
+import akka.util.JavaDurationConverters;
+import java.time.Duration;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.WriteActorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.Duration;
 
 /**
  * WriteTransactionActor is an interface to device's {@link DOMDataTreeWriteTransaction} for cluster nodes.
@@ -31,7 +32,7 @@ public final class WriteTransactionActor extends UntypedAbstractActor {
         this.tx = tx;
         this.idleTimeout = idleTimeout.toSeconds();
         if (this.idleTimeout > 0) {
-            context().setReceiveTimeout(idleTimeout);
+            context().setReceiveTimeout(JavaDurationConverters.asFiniteDuration(idleTimeout));
         }
         writeAdapter = new WriteAdapter(tx);
     }
