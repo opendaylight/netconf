@@ -5,14 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -66,7 +64,6 @@ public class NetconfClientSessionNegotiator extends
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     protected void handleMessage(final NetconfHelloMessage netconfMessage) throws NetconfDocumentedException {
         if (!ifNegotiatedAlready()) {
             LOG.debug("Server hello message received, starting negotiation on channel {}", channel);
@@ -118,7 +115,6 @@ public class NetconfClientSessionNegotiator extends
         });
     }
 
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     private boolean shouldUseExi(final NetconfHelloMessage helloMsg) {
         return containsExi10Capability(helloMsg.getDocument())
                 && containsExi10Capability(sessionPreferences.getHelloMessage().getDocument());
