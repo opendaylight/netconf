@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.nettyutil;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.bootstrap.Bootstrap;
@@ -108,14 +109,14 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
         LOG.debug("Attempt to connect to {} failed", address, cf.cause());
 
         final Future<Void> rf = strategy.scheduleReconnect(cf.cause());
-        rf.addListener(this::reconnectFutureComplete);
         pending = rf;
+        rf.addListener(this::reconnectFutureComplete);
     }
 
     // Triggered when a connection attempt is to be made.
     private synchronized void reconnectFutureComplete(final Future<?> sf) {
         LOG.debug("Promise {} strategy triggered reconnect", this);
-        checkState(pending.equals(sf));
+        verify(pending == sf, "Completed strategy future %s while pending %s", sf, pending);
 
         /*
          * The promise we gave out could have been cancelled,
