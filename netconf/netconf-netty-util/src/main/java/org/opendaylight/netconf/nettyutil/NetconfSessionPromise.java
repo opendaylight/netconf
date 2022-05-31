@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
@@ -53,9 +52,9 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
                 address = new InetSocketAddress(address.getHostName(), address.getPort());
             }
             final ChannelFuture connectFuture = bootstrap.connect(address);
+            pending = connectFuture;
             // Add listener that attempts reconnect by invoking this method again.
             connectFuture.addListener((ChannelFutureListener) this::channelConnectComplete);
-            pending = connectFuture;
         } catch (final Exception e) {
             LOG.info("Failed to connect to {}", address, e);
             setFailure(e);
@@ -82,7 +81,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
     // Triggered when a connection attempt is resolved.
     private synchronized void channelConnectComplete(final ChannelFuture cf) {
         LOG.debug("Promise {} connection resolved", this);
-        checkState(pending.equals(cf));
+        verify(pending == cf, "Completed channel future %s while pending %s", cf, pending);
 
         /*
          * The promise we gave out could have been cancelled,
