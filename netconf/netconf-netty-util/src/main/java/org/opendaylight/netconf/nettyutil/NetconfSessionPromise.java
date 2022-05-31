@@ -45,17 +45,17 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
     @SuppressWarnings("checkstyle:illegalCatch")
     synchronized void connect() {
         try {
-            final int timeout = this.strategy.getConnectTimeout();
+            final int timeout = strategy.getConnectTimeout();
 
             LOG.debug("Promise {} attempting connect for {}ms", this, timeout);
 
-            if (this.address.isUnresolved()) {
-                this.address = new InetSocketAddress(this.address.getHostName(), this.address.getPort());
+            if (address.isUnresolved()) {
+                address = new InetSocketAddress(address.getHostName(), address.getPort());
             }
-            final ChannelFuture connectFuture = this.bootstrap.connect(this.address);
+            final ChannelFuture connectFuture = bootstrap.connect(address);
             // Add listener that attempts reconnect by invoking this method again.
             connectFuture.addListener(new BootstrapConnectListener());
-            this.pending = connectFuture;
+            pending = connectFuture;
         } catch (final Exception e) {
             LOG.info("Failed to connect to {}", address, e);
             setFailure(e);
@@ -65,7 +65,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
     @Override
     public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
         if (super.cancel(mayInterruptIfRunning)) {
-            this.pending.cancel(mayInterruptIfRunning);
+            pending.cancel(mayInterruptIfRunning);
             return true;
         }
 
@@ -75,7 +75,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
     @Override
     public synchronized Promise<S> setSuccess(final S result) {
         LOG.debug("Promise {} completed", this);
-        this.strategy.reconnectSuccessful();
+        strategy.reconnectSuccessful();
         return super.setSuccess(result);
     }
 
@@ -87,7 +87,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
                 LOG.debug("Promise {} connection resolved", NetconfSessionPromise.this);
 
                 // Triggered when a connection attempt is resolved.
-                checkState(NetconfSessionPromise.this.pending.equals(cf));
+                checkState(pending.equals(cf));
 
                 /*
                  * The promise we gave out could have been cancelled,
@@ -111,11 +111,11 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
                     return;
                 }
 
-                LOG.debug("Attempt to connect to {} failed", NetconfSessionPromise.this.address, cf.cause());
+                LOG.debug("Attempt to connect to {} failed", address, cf.cause());
 
-                final Future<Void> rf = NetconfSessionPromise.this.strategy.scheduleReconnect(cf.cause());
+                final Future<Void> rf = strategy.scheduleReconnect(cf.cause());
                 rf.addListener(new ReconnectingStrategyListener());
-                NetconfSessionPromise.this.pending = rf;
+                pending = rf;
             }
         }
 
@@ -124,7 +124,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
             public void operationComplete(final Future<Void> sf) {
                 synchronized (NetconfSessionPromise.this) {
                     // Triggered when a connection attempt is to be made.
-                    checkState(NetconfSessionPromise.this.pending.equals(sf));
+                    checkState(pending.equals(sf));
 
                     /*
                      * The promise we gave out could have been cancelled,
