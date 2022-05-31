@@ -83,7 +83,6 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
         @Override
         public void operationComplete(final ChannelFuture cf) {
             synchronized (NetconfSessionPromise.this) {
-
                 LOG.debug("Promise {} connection resolved", NetconfSessionPromise.this);
 
                 // Triggered when a connection attempt is resolved.
@@ -118,28 +117,28 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
                 pending = rf;
             }
         }
+    }
 
-        private class ReconnectingStrategyListener implements FutureListener<Void> {
-            @Override
-            public void operationComplete(final Future<Void> sf) {
-                synchronized (NetconfSessionPromise.this) {
-                    // Triggered when a connection attempt is to be made.
-                    checkState(pending.equals(sf));
+    private class ReconnectingStrategyListener implements FutureListener<Void> {
+        @Override
+        public void operationComplete(final Future<Void> sf) {
+            synchronized (NetconfSessionPromise.this) {
+                // Triggered when a connection attempt is to be made.
+                checkState(pending.equals(sf));
 
-                    /*
-                     * The promise we gave out could have been cancelled,
-                     * which cascades to the reconnect attempt getting
-                     * cancelled, but there is a slight race window, where
-                     * the reconnect attempt is already enqueued, but the
-                     * listener has not yet been notified -- if cancellation
-                     * happens at that point, we need to catch it here.
-                     */
-                    if (!isCancelled()) {
-                        if (sf.isSuccess()) {
-                            connect();
-                        } else {
-                            setFailure(sf.cause());
-                        }
+                /*
+                 * The promise we gave out could have been cancelled,
+                 * which cascades to the reconnect attempt getting
+                 * cancelled, but there is a slight race window, where
+                 * the reconnect attempt is already enqueued, but the
+                 * listener has not yet been notified -- if cancellation
+                 * happens at that point, we need to catch it here.
+                 */
+                if (!isCancelled()) {
+                    if (sf.isSuccess()) {
+                        connect();
+                    } else {
+                        setFailure(sf.cause());
                     }
                 }
             }
