@@ -54,18 +54,21 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
 
         LOG.debug("Promise {} attempting connect for {}ms", this, timeout);
 
+        final ChannelFuture connectFuture;
         try {
             if (address.isUnresolved()) {
                 address = new InetSocketAddress(address.getHostName(), address.getPort());
             }
-            final ChannelFuture connectFuture = bootstrap.connect(address);
-            pending = connectFuture;
-            // Add listener that attempts reconnect by invoking this method again.
-            connectFuture.addListener((ChannelFutureListener) this::channelConnectComplete);
+            connectFuture = bootstrap.connect(address);
         } catch (final Exception e) {
             LOG.info("Failed to connect to {}", address, e);
             setFailure(e);
+            return;
         }
+
+        pending = connectFuture;
+        // Add listener that attempts reconnect by invoking this method again.
+        connectFuture.addListener((ChannelFutureListener) this::channelConnectComplete);
     }
 
     @Override
