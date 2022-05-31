@@ -54,7 +54,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
             }
             final ChannelFuture connectFuture = bootstrap.connect(address);
             // Add listener that attempts reconnect by invoking this method again.
-            connectFuture.addListener(new BootstrapConnectListener());
+            connectFuture.addListener((ChannelFutureListener) this::channelConnectComplete);
             pending = connectFuture;
         } catch (final Exception e) {
             LOG.info("Failed to connect to {}", address, e);
@@ -79,44 +79,38 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
         return super.setSuccess(result);
     }
 
-    private class BootstrapConnectListener implements ChannelFutureListener {
-        @Override
-        public void operationComplete(final ChannelFuture cf) {
-            synchronized (NetconfSessionPromise.this) {
-                LOG.debug("Promise {} connection resolved", NetconfSessionPromise.this);
+    // Triggered when a connection attempt is resolved.
+    private synchronized void channelConnectComplete(final ChannelFuture cf) {
+        LOG.debug("Promise {} connection resolved", this);
+        checkState(pending.equals(cf));
 
-                // Triggered when a connection attempt is resolved.
-                checkState(pending.equals(cf));
-
-                /*
-                 * The promise we gave out could have been cancelled,
-                 * which cascades to the connect getting cancelled,
-                 * but there is a slight race window, where the connect
-                 * is already resolved, but the listener has not yet
-                 * been notified -- cancellation at that point won't
-                 * stop the notification arriving, so we have to close
-                 * the race here.
-                 */
-                if (isCancelled()) {
-                    if (cf.isSuccess()) {
-                        LOG.debug("Closing channel for cancelled promise {}", NetconfSessionPromise.this);
-                        cf.channel().close();
-                    }
-                    return;
-                }
-
-                if (cf.isSuccess()) {
-                    LOG.debug("Promise {} connection successful", NetconfSessionPromise.this);
-                    return;
-                }
-
-                LOG.debug("Attempt to connect to {} failed", address, cf.cause());
-
-                final Future<Void> rf = strategy.scheduleReconnect(cf.cause());
-                rf.addListener(new ReconnectingStrategyListener());
-                pending = rf;
+        /*
+         * The promise we gave out could have been cancelled,
+         * which cascades to the connect getting cancelled,
+         * but there is a slight race window, where the connect
+         * is already resolved, but the listener has not yet
+         * been notified -- cancellation at that point won't
+         * stop the notification arriving, so we have to close
+         * the race here.
+         */
+        if (isCancelled()) {
+            if (cf.isSuccess()) {
+                LOG.debug("Closing channel for cancelled promise {}", this);
+                cf.channel().close();
             }
+            return;
         }
+
+        if (cf.isSuccess()) {
+            LOG.debug("Promise {} connection successful", this);
+            return;
+        }
+
+        LOG.debug("Attempt to connect to {} failed", address, cf.cause());
+
+        final Future<Void> rf = strategy.scheduleReconnect(cf.cause());
+        rf.addListener(new ReconnectingStrategyListener());
+        pending = rf;
     }
 
     private class ReconnectingStrategyListener implements FutureListener<Void> {
