@@ -14,8 +14,6 @@ import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.Timer;
@@ -104,16 +102,13 @@ public class NetconfClientSessionNegotiator extends
                 ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER,
                 new ExiConfirmationInboundHandler(session, startExiMessage));
 
-        session.sendMessage(startExiMessage).addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(final ChannelFuture channelFuture) {
-                if (!channelFuture.isSuccess()) {
-                    LOG.warn("Failed to send start-exi message {} on session {}", startExiMessage, this,
-                            channelFuture.cause());
-                    channel.pipeline().remove(ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER);
-                } else {
-                    LOG.trace("Start-exi message {} sent to socket on session {}", startExiMessage, this);
-                }
+        session.sendMessage(startExiMessage).addListener(channelFuture -> {
+            if (!channelFuture.isSuccess()) {
+                LOG.warn("Failed to send start-exi message {} on session {}", startExiMessage, session,
+                        channelFuture.cause());
+                channel.pipeline().remove(ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER);
+            } else {
+                LOG.trace("Start-exi message {} sent to socket on session {}", startExiMessage, session);
             }
         });
     }
