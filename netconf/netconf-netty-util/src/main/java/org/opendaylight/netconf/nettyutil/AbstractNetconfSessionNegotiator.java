@@ -13,14 +13,12 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
 import io.netty.util.Timer;
-import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.index.qual.NonNegative;
@@ -181,11 +179,11 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
                     connectionTimeoutMillis);
                 changeState(State.FAILED);
 
-                channel.close().addListener((GenericFutureListener<ChannelFuture>) future -> {
+                channel.close().addListener(future -> {
                     if (future.isSuccess()) {
-                        LOG.debug("Channel {} closed: success", future.channel());
+                        LOG.debug("Channel {} closed: success", channel);
                     } else {
-                        LOG.warn("Channel {} closed: fail", future.channel());
+                        LOG.warn("Channel {} closed: fail", channel);
                     }
                 });
             }
