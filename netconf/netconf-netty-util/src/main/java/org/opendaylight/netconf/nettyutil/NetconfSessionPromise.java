@@ -43,11 +43,18 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
 
     @SuppressWarnings("checkstyle:illegalCatch")
     synchronized void connect() {
+        final int timeout;
         try {
-            final int timeout = strategy.getConnectTimeout();
+            timeout = strategy.getConnectTimeout();
+        } catch (Exception e) {
+            LOG.info("Connection to {} aborted due to strategy decision", address, e);
+            setFailure(e);
+            return;
+        }
 
-            LOG.debug("Promise {} attempting connect for {}ms", this, timeout);
+        LOG.debug("Promise {} attempting connect for {}ms", this, timeout);
 
+        try {
             if (address.isUnresolved()) {
                 address = new InetSocketAddress(address.getHostName(), address.getPort());
             }
