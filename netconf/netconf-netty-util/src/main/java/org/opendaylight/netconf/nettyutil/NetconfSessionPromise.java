@@ -81,7 +81,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
     // Triggered when a connection attempt is resolved.
     private synchronized void channelConnectComplete(final ChannelFuture cf) {
         LOG.debug("Promise {} connection resolved", this);
-        checkState(pending.equals(cf));
+        checkState(pending.equals(cf), "Completed strategy future %s while pending %s", sf, pending);
 
         /*
          * The promise we gave out could have been cancelled,
@@ -108,14 +108,14 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
         LOG.debug("Attempt to connect to {} failed", address, cf.cause());
 
         final Future<Void> rf = strategy.scheduleReconnect(cf.cause());
-        rf.addListener(this::reconnectFutureComplete);
         pending = rf;
+        rf.addListener(this::reconnectFutureComplete);
     }
 
     // Triggered when a connection attempt is to be made.
     private synchronized void reconnectFutureComplete(final Future<?> sf) {
         LOG.debug("Promise {} strategy triggered reconnect", this);
-        checkState(pending.equals(sf));
+        checkState(pending == sf, "Completed strategy future %s while pending %s", sf, pending);
 
         /*
          * The promise we gave out could have been cancelled,
