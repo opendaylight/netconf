@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -171,12 +170,18 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     }
 
     private void queueRequest(final ChannelHandlerContext ctx, final ByteBuf msg, final ChannelPromise promise) {
-//        try {
         LOG.debug("Write pending on channel: {}, queueing, current queue size: {}", ctx.channel(), pending.size());
         if (LOG.isTraceEnabled()) {
             LOG.trace("Queueing request due to pending: {}", byteBufToString(msg));
         }
-        new PendingWriteRequest(ctx, msg, promise).pend(pending);
+
+//      try {
+        final var req = new PendingWriteRequest(ctx, msg, promise);
+        // Preconditions.checkState(pending.size() < MAX_PENDING_WRITES,
+        // "Too much pending writes(%s) on channel: %s, remote window is not getting read or is too small",
+        // pending.size(), ctx.channel());
+        checkState(pending.offer(req), "Cannot pend another request write (pending count: %s) on channel: %s",
+                pending.size(), ctx.channel());
 //        } catch (final Exception ex) {
 //            LOG.warn("Unable to queue write request on channel: {}. Setting fail for the request: {}",
 //                    ctx.channel(), ex, byteBufToString(msg));
@@ -209,14 +214,6 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
             msg.resetReaderIndex();
             this.msg = msg;
             this.promise = promise;
-        }
-
-        void pend(final Queue<PendingWriteRequest> pending) {
-            // Preconditions.checkState(pending.size() < MAX_PENDING_WRITES,
-            // "Too much pending writes(%s) on channel: %s, remote window is not getting read or is too small",
-            // pending.size(), ctx.channel());
-            checkState(pending.offer(this), "Cannot pend another request write (pending count: %s) on channel: %s",
-                pending.size(), ctx.channel());
         }
     }
 }
