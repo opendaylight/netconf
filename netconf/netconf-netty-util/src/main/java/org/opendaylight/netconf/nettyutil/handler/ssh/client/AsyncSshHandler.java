@@ -140,10 +140,10 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     private synchronized void handleSshAuthenticated(final NettyAwareClientSession newSession,
             final ChannelHandlerContext ctx) {
-        try {
-            LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
-                    newSession.getServerVersion());
+        LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
+            newSession.getServerVersion());
 
+        try {
             channel = newSession.createSubsystemChannel(SUBSYSTEM, ctx);
             channel.setStreaming(ClientChannel.Streaming.Async);
             channel.open().addListener(future -> {
@@ -153,8 +153,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
                     handleSshSetupFailure(ctx, future.getException());
                 }
             });
-
-
         } catch (final IOException e) {
             handleSshSetupFailure(ctx, e);
         }
