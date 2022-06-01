@@ -191,8 +191,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     @Override
     public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
                                      final SocketAddress localAddress, final ChannelPromise promise) throws Exception {
-        LOG.debug("SSH session connecting on channel {}. promise: {}", ctx.channel(), connectPromise);
-        connectPromise = promise;
+        LOG.debug("SSH session connecting on channel {}. promise: {}", ctx.channel(), promise);
+        connectPromise = requireNonNull(promise);
 
         if (negotiationFuture != null) {
             negotiationFutureListener = future -> {
