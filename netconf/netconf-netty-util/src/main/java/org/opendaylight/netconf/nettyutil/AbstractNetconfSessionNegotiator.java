@@ -102,7 +102,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         return Optional.ofNullable(channel.pipeline().get(SslHandler.class));
     }
 
-    public P getSessionPreferences() {
+    public final P getSessionPreferences() {
         return sessionPreferences;
     }
 
