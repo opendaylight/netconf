@@ -163,6 +163,9 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         return getSession(sessionListener, channel, netconfMessage);
     }
 
+    protected abstract S getSession(L sessionListener, Channel channel, NetconfHelloMessage message)
+        throws NetconfDocumentedException;
+
     /**
      * Insert chunk framing handlers into the pipeline.
      */
@@ -215,10 +218,6 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
                                                         final ChannelHandler decoder) {
         return channel.pipeline().replace(handlerKey, handlerKey, decoder);
     }
-
-    @SuppressWarnings("checkstyle:hiddenField")
-    protected abstract S getSession(L sessionListener, Channel channel, NetconfHelloMessage message)
-            throws NetconfDocumentedException;
 
     private synchronized void changeState(final State newState) {
         LOG.debug("Changing state from : {} to : {} for channel: {}", state, newState, channel);
