@@ -14,9 +14,8 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
-import java.util.Optional;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -25,26 +24,20 @@ import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfServerSessionNegotiator
+public final class NetconfServerSessionNegotiator
         extends AbstractNetconfSessionNegotiator<NetconfServerSessionPreferences, NetconfServerSession,
                 NetconfServerSessionListener> {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiator.class);
-
     private static final String UNKNOWN = "unknown";
 
-    protected NetconfServerSessionNegotiator(
-            NetconfServerSessionPreferences sessionPreferences,
-            Promise<NetconfServerSession> promise, Channel channel,
-            Timer timer, NetconfServerSessionListener sessionListener,
-            long connectionTimeoutMillis) {
-        super(sessionPreferences, promise, channel, timer, sessionListener,
-                connectionTimeoutMillis);
+    protected NetconfServerSessionNegotiator(final NetconfServerSessionPreferences sessionPreferences,
+            final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
+            final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis) {
+        super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
     }
 
     @Override
-    protected void handleMessage(NetconfHelloMessage netconfMessage)
-            throws NetconfDocumentedException {
+    protected void handleMessage(final NetconfHelloMessage netconfMessage) throws NetconfDocumentedException {
         NetconfServerSession session = getSessionForHelloMessage(netconfMessage);
         replaceHelloMessageInboundHandler(session);
         // Negotiation successful after all non hello messages were processed
@@ -52,30 +45,19 @@ public class NetconfServerSessionNegotiator
     }
 
     @Override
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
-    protected NetconfServerSession getSession(
-            NetconfServerSessionListener sessionListener, Channel channel,
-            NetconfHelloMessage message) {
-        Optional<NetconfHelloMessageAdditionalHeader> additionalHeader = message
-                .getAdditionalHeader();
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+        justification = "SpotBugs does not grok generic return of getSessionPreferences()")
+    protected NetconfServerSession getSession(final NetconfServerSessionListener sessionListener, final Channel channel,
+            final NetconfHelloMessage message) {
+        final var additionalHeader = message.getAdditionalHeader();
+        final var parsedHeader = additionalHeader.orElseGet(() -> {
+            final var hostName = getHostName(channel.localAddress());
+            return new NetconfHelloMessageAdditionalHeader(UNKNOWN, hostName.getValue(), hostName.getKey(), "tcp",
+                "client");
+        });
 
-        NetconfHelloMessageAdditionalHeader parsedHeader;
-        if (additionalHeader.isPresent()) {
-            parsedHeader = additionalHeader.get();
-        } else {
-
-            parsedHeader = new NetconfHelloMessageAdditionalHeader(UNKNOWN,
-                    getHostName(channel.localAddress()).getValue(),
-                    getHostName(channel.localAddress()).getKey(), "tcp",
-                    "client");
-
-        }
-
-        LOG.debug("Additional header from hello parsed as {} from {}",
-                parsedHeader, additionalHeader);
-
-        return new NetconfServerSession(sessionListener, channel,
-                getSessionPreferences().getSessionId(), parsedHeader);
+        LOG.debug("Additional header from hello parsed as {} from {}", parsedHeader, additionalHeader);
+        return new NetconfServerSession(sessionListener, channel, getSessionPreferences().getSessionId(), parsedHeader);
     }
 
     /**
@@ -85,25 +67,15 @@ public class NetconfServerSessionNegotiator
      *                      InetSocketAddress, for others returns unknown
      * @return Two values - port and host of socket address
      */
-    protected static Map.Entry<String, String> getHostName(
-            SocketAddress socketAddress) {
-
+    protected static Map.Entry<String, String> getHostName(final SocketAddress socketAddress) {
         if (socketAddress instanceof InetSocketAddress) {
-
-            InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
-
-            return new AbstractMap.SimpleImmutableEntry<>(
-                    Integer.toString(inetSocketAddress.getPort()),
+            final var inetSocketAddress = (InetSocketAddress) socketAddress;
+            return new SimpleImmutableEntry<>(Integer.toString(inetSocketAddress.getPort()),
                     inetSocketAddress.getHostString());
-
         } else if (socketAddress instanceof LocalAddress) {
-
-            return new AbstractMap.SimpleImmutableEntry<>(UNKNOWN,
-                    ((LocalAddress) socketAddress).id());
-
+            return new SimpleImmutableEntry<>(UNKNOWN, ((LocalAddress) socketAddress).id());
+        } else {
+            return new SimpleImmutableEntry<>(UNKNOWN, UNKNOWN);
         }
-        return new AbstractMap.SimpleImmutableEntry<>(UNKNOWN, UNKNOWN);
-
     }
-
 }
