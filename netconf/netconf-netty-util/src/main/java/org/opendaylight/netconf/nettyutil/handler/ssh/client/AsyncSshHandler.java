@@ -14,7 +14,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +65,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private NettyAwareChannelSubsystem channel;
     private ClientSession session;
     private ChannelPromise connectPromise;
-    private GenericFutureListener negotiationFutureListener;
+    private FutureListener<Object> negotiationFutureListener;
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
             final Future<?> negotiationFuture) {
@@ -192,7 +192,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
                                      final SocketAddress localAddress, final ChannelPromise promise) throws Exception {
         LOG.debug("SSH session connecting on channel {}. promise: {} ", ctx.channel(), connectPromise);
-        this.connectPromise = promise;
+        connectPromise = promise;
 
         if (negotiationFuture != null) {
             negotiationFutureListener = future -> {
