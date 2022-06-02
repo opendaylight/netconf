@@ -7,32 +7,31 @@
  */
 package org.opendaylight.netconf.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.impl.util.DeserializerExceptionHandler;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
-public class ServerChannelInitializer extends AbstractChannelInitializer<NetconfServerSession> {
-
-    public static final String DESERIALIZER_EX_HANDLER_KEY = "deserializerExHandler";
+public final class ServerChannelInitializer extends AbstractChannelInitializer<NetconfServerSession> {
+    private static final String DESERIALIZER_EX_HANDLER_KEY = "deserializerExHandler";
 
     private final NetconfServerSessionNegotiatorFactory negotiatorFactory;
 
-
-    public ServerChannelInitializer(NetconfServerSessionNegotiatorFactory negotiatorFactory) {
-        this.negotiatorFactory = negotiatorFactory;
-
+    public ServerChannelInitializer(final NetconfServerSessionNegotiatorFactory negotiatorFactory) {
+        this.negotiatorFactory = requireNonNull(negotiatorFactory);
     }
 
     @Override
-    protected void initializeMessageDecoder(Channel ch) {
+    protected void initializeMessageDecoder(final Channel ch) {
         super.initializeMessageDecoder(ch);
         ch.pipeline().addLast(DESERIALIZER_EX_HANDLER_KEY, new DeserializerExceptionHandler());
     }
 
     @Override
-    protected void initializeSessionNegotiator(Channel ch, Promise<NetconfServerSession> promise) {
-        ch.pipeline().addAfter(DESERIALIZER_EX_HANDLER_KEY, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
-                negotiatorFactory.getSessionNegotiator(null, ch, promise));
+    protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfServerSession> promise) {
+        ch.pipeline().addAfter(DESERIALIZER_EX_HANDLER_KEY, NETCONF_SESSION_NEGOTIATOR,
+            negotiatorFactory.getSessionNegotiator(null, ch, promise));
     }
 }
