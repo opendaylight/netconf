@@ -16,7 +16,6 @@ import java.net.SocketAddress;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
-import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
@@ -30,11 +29,11 @@ public final class NetconfServerSessionNegotiator
 
     private final long sessionId;
 
-    protected NetconfServerSessionNegotiator(final NetconfServerSessionPreferences sessionPreferences,
+    protected NetconfServerSessionNegotiator(final NetconfHelloMessage hello, final long sessionId,
             final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
             final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis) {
-        super(sessionPreferences.getHelloMessage(), promise, channel, timer, sessionListener, connectionTimeoutMillis);
-        sessionId = sessionPreferences.getSessionId();
+        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        this.sessionId = sessionId;
     }
 
     @Override
