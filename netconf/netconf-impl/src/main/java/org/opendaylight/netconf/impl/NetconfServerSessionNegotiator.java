@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.impl;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.local.LocalAddress;
 import io.netty.util.Timer;
@@ -25,15 +24,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class NetconfServerSessionNegotiator
-        extends AbstractNetconfSessionNegotiator<NetconfServerSessionPreferences, NetconfServerSession,
-                NetconfServerSessionListener> {
+        extends AbstractNetconfSessionNegotiator<NetconfServerSession, NetconfServerSessionListener> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiator.class);
     private static final String UNKNOWN = "unknown";
+
+    private final long sessionId;
 
     protected NetconfServerSessionNegotiator(final NetconfServerSessionPreferences sessionPreferences,
             final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
             final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis) {
-        super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        super(sessionPreferences.getHelloMessage(), promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        sessionId = sessionPreferences.getSessionId();
     }
 
     @Override
@@ -45,8 +46,6 @@ public final class NetconfServerSessionNegotiator
     }
 
     @Override
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
-        justification = "SpotBugs does not grok generic return of getSessionPreferences()")
     protected NetconfServerSession getSession(final NetconfServerSessionListener sessionListener, final Channel channel,
             final NetconfHelloMessage message) {
         final var additionalHeader = message.getAdditionalHeader();
@@ -57,7 +56,7 @@ public final class NetconfServerSessionNegotiator
         });
 
         LOG.debug("Additional header from hello parsed as {} from {}", parsedHeader, additionalHeader);
-        return new NetconfServerSession(sessionListener, channel, getSessionPreferences().getSessionId(), parsedHeader);
+        return new NetconfServerSession(sessionListener, channel, sessionId, parsedHeader);
     }
 
     /**
