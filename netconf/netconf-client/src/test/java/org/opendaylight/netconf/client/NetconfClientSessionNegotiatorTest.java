@@ -39,7 +39,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -129,15 +128,15 @@ public class NetconfClientSessionNegotiatorTest {
 
     private NetconfClientSessionNegotiator createNetconfClientSessionNegotiator(
             final Promise<NetconfClientSession> promise,
-            final NetconfMessage startExi) {
+            final NetconfStartExiMessage startExi) {
         ChannelProgressivePromise progressivePromise = mock(ChannelProgressivePromise.class);
-        NetconfClientSessionPreferences preferences = new NetconfClientSessionPreferences(helloMessage, startExi);
         doReturn(progressivePromise).when(promise).setFailure(any(Throwable.class));
 
         long timeout = 10L;
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         Timer timer = new HashedWheelTimer();
-        return new NetconfClientSessionNegotiator(preferences, promise, channel, timer, sessionListener, timeout);
+        return new NetconfClientSessionNegotiator(helloMessage, startExi, promise, channel, timer, sessionListener,
+            timeout);
     }
 
     private static NetconfHelloMessage createHelloMsg(final String name) throws Exception {

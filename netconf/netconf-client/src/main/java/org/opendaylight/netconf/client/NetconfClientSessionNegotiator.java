@@ -19,7 +19,6 @@ import io.netty.util.concurrent.Promise;
 import java.util.Set;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
-import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -51,13 +50,13 @@ class NetconfClientSessionNegotiator
 
     private static final Interner<Set<String>> INTERNER = Interners.newWeakInterner();
 
-    private final NetconfMessage startExi;
+    private final NetconfStartExiMessage startExi;
 
-    NetconfClientSessionNegotiator(final NetconfClientSessionPreferences sessionPreferences,
+    NetconfClientSessionNegotiator(final NetconfHelloMessage hello, final NetconfStartExiMessage startExi,
             final Promise<NetconfClientSession> promise, final Channel channel, final Timer timer,
             final NetconfClientSessionListener sessionListener, final long connectionTimeoutMillis) {
-        super(sessionPreferences.getHelloMessage(), promise, channel, timer, sessionListener, connectionTimeoutMillis);
-        startExi = sessionPreferences.getStartExiMessage();
+        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        this.startExi = startExi;
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -78,9 +77,9 @@ class NetconfClientSessionNegotiator
 
         // If exi should be used, try to initiate exi communication
         // Call negotiationSuccessFul after exi negotiation is finished successfully or not
-        if (startExi instanceof NetconfStartExiMessage && shouldUseExi(netconfMessage)) {
+        if (startExi != null && shouldUseExi(netconfMessage)) {
             LOG.debug("Netconf session {} should use exi.", session);
-            tryToInitiateExi(session, (NetconfStartExiMessage) startExi);
+            tryToInitiateExi(session, startExi);
         } else {
             // Exi is not supported, release session immediately
             LOG.debug("Netconf session {} isn't capable of using exi.", session);
