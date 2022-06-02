@@ -16,7 +16,6 @@ import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -30,7 +29,7 @@ import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOpt
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfClientSessionNegotiatorFactory
+public final class NetconfClientSessionNegotiatorFactory
         implements NetconfSessionNegotiatorFactory<NetconfClientSession, NetconfClientSessionListener> {
 
     public static final Set<String> EXI_CLIENT_CAPABILITIES = ImmutableSet.of(
@@ -98,8 +97,8 @@ public class NetconfClientSessionNegotiatorFactory
         this.timer = requireNonNull(timer);
         this.additionalHeader = additionalHeader;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
-        this.options = exiOptions;
-        this.clientCapabilities = capabilities;
+        options = exiOptions;
+        clientCapabilities = capabilities;
     }
 
     public long getConnectionTimeoutMillis() {
@@ -110,12 +109,9 @@ public class NetconfClientSessionNegotiatorFactory
     public NetconfClientSessionNegotiator getSessionNegotiator(
             final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
             final Channel channel, final Promise<NetconfClientSession> promise) {
-
-        NetconfMessage startExiMessage = NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID);
-        NetconfHelloMessage helloMessage = NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader);
-
-        NetconfClientSessionPreferences proposal = new NetconfClientSessionPreferences(helloMessage, startExiMessage);
-        return new NetconfClientSessionNegotiator(proposal, promise, channel, timer,
+        return new NetconfClientSessionNegotiator(new NetconfClientSessionPreferences(
+            NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader),
+            NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID)), promise, channel, timer,
                 sessionListenerFactory.getSessionListener(), connectionTimeoutMillis);
     }
 }
