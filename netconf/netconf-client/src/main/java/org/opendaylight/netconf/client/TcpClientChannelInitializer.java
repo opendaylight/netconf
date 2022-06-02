@@ -16,17 +16,11 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
-class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
-
-    private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
-    private final NetconfClientSessionListener sessionListener;
-
+final class TcpClientChannelInitializer extends AbstractClientChannelInitializer {
     TcpClientChannelInitializer(final NetconfClientSessionNegotiatorFactory negotiatorFactory,
-                                final NetconfClientSessionListener sessionListener) {
-        this.negotiatorFactory = negotiatorFactory;
-        this.sessionListener = sessionListener;
+            final NetconfClientSessionListener sessionListener) {
+        super(negotiatorFactory, sessionListener);
     }
 
     @Override
@@ -92,11 +86,5 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
         });
 
         super.initialize(ch, promise);
-    }
-
-    @Override
-    protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfClientSession> promise) {
-        ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
-                negotiatorFactory.getSessionNegotiator(() -> sessionListener, ch, promise));
     }
 }
