@@ -1,5 +1,5 @@
-<nodes xmlns="urn:opendaylight:inventory">
-  <node>
-    <id>agent-007</id>
-  </node>
-</nodes>
+<network-topology xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+  <topology>
+    <topology-id>netconf-notif</topology-id>
+  </topology>
+</network-topology>
