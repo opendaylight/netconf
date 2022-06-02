@@ -11,37 +11,27 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Promise;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
-public final class TlsClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
+public final class TlsClientChannelInitializer extends AbstractClientChannelInitializer {
     public static final String CHANNEL_ACTIVE_SENTRY = "channelActiveSentry";
 
     private final SslHandlerFactory sslHandlerFactory;
-    private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
-    private final NetconfClientSessionListener sessionListener;
 
     public TlsClientChannelInitializer(final SslHandlerFactory sslHandlerFactory,
                                        final NetconfClientSessionNegotiatorFactory negotiatorFactory,
                                        final NetconfClientSessionListener sessionListener) {
+        super(negotiatorFactory, sessionListener);
         this.sslHandlerFactory = sslHandlerFactory;
-        this.negotiatorFactory = negotiatorFactory;
-        this.sessionListener = sessionListener;
     }
 
     @Override
-    public void initialize(Channel ch, Promise<NetconfClientSession> promise) {
+    public void initialize(final Channel ch, final Promise<NetconfClientSession> promise) {
         // When ssl handshake fails due to the certificate mismatch, the connection will try again,
         // then we have a chance to create a new SslHandler using the latest certificates with the
         // help of the sentry. We will replace the sentry with the new SslHandler once the channel
         // is active.
         ch.pipeline().addFirst(CHANNEL_ACTIVE_SENTRY, new ChannelActiveSentry(sslHandlerFactory));
         super.initialize(ch, promise);
-    }
-
-    @Override
-    protected void initializeSessionNegotiator(Channel ch, Promise<NetconfClientSession> promise) {
-        ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
-                negotiatorFactory.getSessionNegotiator(() -> sessionListener, ch, promise));
     }
 
     private static final class ChannelActiveSentry extends ChannelInboundHandlerAdapter {
@@ -52,9 +42,9 @@ public final class TlsClientChannelInitializer extends AbstractChannelInitialize
         }
 
         @Override
-        public void channelActive(ChannelHandlerContext ctx) {
-            ctx.pipeline().replace(this, "sslHandler", sslHandlerFactory.createSslHandler())
-                          .fireChannelActive();
+        public void channelActive(final ChannelHandlerContext ctx) {
+            final var sslHandler = sslHandlerFactory.createSslHandler();
+            ctx.pipeline().replace(this, "sslHandler", sslHandler).fireChannelActive();
         }
     }
 }
