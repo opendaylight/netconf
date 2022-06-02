@@ -16,14 +16,13 @@ import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.api.messages.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
 import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOption;
@@ -98,8 +97,8 @@ public class NetconfClientSessionNegotiatorFactory
         this.timer = requireNonNull(timer);
         this.additionalHeader = additionalHeader;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
-        this.options = exiOptions;
-        this.clientCapabilities = capabilities;
+        options = exiOptions;
+        clientCapabilities = capabilities;
     }
 
     public long getConnectionTimeoutMillis() {
@@ -111,7 +110,7 @@ public class NetconfClientSessionNegotiatorFactory
             final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
             final Channel channel, final Promise<NetconfClientSession> promise) {
 
-        NetconfMessage startExiMessage = NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID);
+        NetconfStartExiMessage startExiMessage = options.toStartExiMessage(START_EXI_MESSAGE_ID);
         NetconfHelloMessage helloMessage = NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader);
 
         NetconfClientSessionPreferences proposal = new NetconfClientSessionPreferences(helloMessage, startExiMessage);

@@ -23,11 +23,11 @@ import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.xml.XMLNetconfUtil;
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ class NetconfClientSessionNegotiator
 
     private static final Interner<Set<String>> INTERNER = Interners.newWeakInterner();
 
-    private final NetconfMessage startExi;
+    private final NetconfStartExiMessage startExi;
 
     NetconfClientSessionNegotiator(final NetconfClientSessionPreferences sessionPreferences,
             final Promise<NetconfClientSession> promise, final Channel channel, final Timer timer,
@@ -78,9 +78,9 @@ class NetconfClientSessionNegotiator
 
         // If exi should be used, try to initiate exi communication
         // Call negotiationSuccessFul after exi negotiation is finished successfully or not
-        if (startExi instanceof NetconfStartExiMessage && shouldUseExi(netconfMessage)) {
+        if (startExi != null && shouldUseExi(netconfMessage)) {
             LOG.debug("Netconf session {} should use exi.", session);
-            tryToInitiateExi(session, (NetconfStartExiMessage) startExi);
+            tryToInitiateExi(session, startExi);
         } else {
             // Exi is not supported, release session immediately
             LOG.debug("Netconf session {} isn't capable of using exi.", session);

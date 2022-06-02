@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.api;
 
+import org.opendaylight.netconf.api.messages.NetconfStartExiMessage;
+
 /**
  * Session capable of exi communication according to http://tools.ietf.org/html/draft-varga-netconf-exi-capability-02.
  */
@@ -17,7 +19,7 @@ public interface NetconfExiSession {
      *
      * @param startExiMessage start exi message
      */
-    void startExiCommunication(NetconfMessage startExiMessage);
+    void startExiCommunication(NetconfStartExiMessage startExiMessage);
 
     /**
      * Stop exi communication, initiated by stop-exi message.

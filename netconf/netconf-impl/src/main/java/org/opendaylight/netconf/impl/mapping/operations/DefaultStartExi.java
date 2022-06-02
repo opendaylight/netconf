@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.impl.mapping.operations;
 
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -41,7 +41,7 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
         }
 
         try {
-            netconfSession.startExiCommunication(new NetconfMessage(message));
+            netconfSession.startExiCommunication(new NetconfStartExiMessage(message));
         } catch (final IllegalArgumentException e) {
             throw new DocumentedException("Failed to parse EXI parameters", e, ErrorType.PROTOCOL,
                     ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);

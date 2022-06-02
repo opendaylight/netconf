@@ -21,6 +21,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
+import org.opendaylight.netconf.api.messages.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
@@ -127,7 +128,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     }
 
     @Override
-    public final void startExiCommunication(final NetconfMessage startExiMessage) {
+    public final void startExiCommunication(final NetconfStartExiMessage startExiMessage) {
         final EXIParameters exiParams;
         try {
             exiParams = EXIParameters.fromXmlElement(XmlElement.fromDomDocument(startExiMessage.getDocument()));

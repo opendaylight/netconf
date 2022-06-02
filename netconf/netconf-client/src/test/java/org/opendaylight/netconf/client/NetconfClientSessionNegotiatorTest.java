@@ -43,13 +43,13 @@ import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;
@@ -128,8 +128,7 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     private NetconfClientSessionNegotiator createNetconfClientSessionNegotiator(
-            final Promise<NetconfClientSession> promise,
-            final NetconfMessage startExi) {
+            final Promise<NetconfClientSession> promise, final NetconfStartExiMessage startExi) {
         ChannelProgressivePromise progressivePromise = mock(ChannelProgressivePromise.class);
         NetconfClientSessionPreferences preferences = new NetconfClientSessionPreferences(helloMessage, startExi);
         doReturn(progressivePromise).when(promise).setFailure(any(Throwable.class));
@@ -185,7 +184,7 @@ public class NetconfClientSessionNegotiatorTest {
     @Test
     public void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
         Promise<NetconfClientSession> promise = mock(Promise.class);
-        NetconfStartExiMessage exiMessage = NetconfStartExiMessage.create(EXIParameters.empty(), "msg-id");
+        NetconfStartExiMessage exiMessage = EXIParameters.empty().toStartExiMessage("msg-id");
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
 

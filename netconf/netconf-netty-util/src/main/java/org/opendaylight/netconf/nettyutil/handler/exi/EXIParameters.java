@@ -11,8 +11,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.api.messages.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
 import org.opendaylight.netconf.shaded.exificient.core.EXIFactory;
 import org.opendaylight.netconf.shaded.exificient.core.EncodingOptions;
@@ -23,6 +29,7 @@ import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOpt
 import org.opendaylight.netconf.shaded.exificient.core.helpers.DefaultEXIFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -187,7 +194,37 @@ public final class EXIParameters {
                 && fidelityOptions.equals(other.fidelityOptions);
     }
 
-    String getAlignment() {
+    public @NonNull NetconfStartExiMessage toStartExiMessage(final String messageId) {
+        final Document doc = XmlUtil.newDocument();
+        final Element rpcElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
+                XmlNetconfConstants.RPC_KEY);
+        rpcElement.setAttributeNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
+                XmlNetconfConstants.MESSAGE_ID, messageId);
+
+        // TODO draft http://tools.ietf.org/html/draft-varga-netconf-exi-capability-02#section-3.5.1 has no namespace
+        // for start-exi element in xml
+        final Element startExiElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0,
+            NetconfStartExiMessage.START_EXI);
+
+        addAlignment(doc, startExiElement);
+        addFidelity(doc, startExiElement);
+        addSchema(doc, startExiElement);
+
+        rpcElement.appendChild(startExiElement);
+
+        doc.appendChild(rpcElement);
+        return new NetconfStartExiMessage(doc);
+    }
+
+    private void addAlignment(final Document doc, final Element startExiElement) {
+        final Element alignmentElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0,
+            EXIParameters.EXI_PARAMETER_ALIGNMENT);
+
+        alignmentElement.setTextContent(getAlignment());
+        startExiElement.appendChild(alignmentElement);
+    }
+
+    private String getAlignment() {
         switch (codingMode) {
             case BIT_PACKED:
                 return EXI_PARAMETER_BIT_PACKED;
@@ -202,31 +239,43 @@ public final class EXIParameters {
         }
     }
 
+    private void addFidelity(final Document doc, final Element startExiElement) {
+        final List<Element> fidelityElements = new ArrayList<>(5);
+        createFidelityElement(doc, fidelityElements,
+            fidelityString(FidelityOptions.FEATURE_COMMENT, EXI_FIDELITY_COMMENTS));
+        createFidelityElement(doc, fidelityElements, fidelityString(FidelityOptions.FEATURE_DTD, EXI_FIDELITY_DTD));
+        createFidelityElement(doc, fidelityElements,
+            fidelityString(FidelityOptions.FEATURE_LEXICAL_VALUE, EXI_FIDELITY_LEXICAL_VALUES));
+        createFidelityElement(doc, fidelityElements, fidelityString(FidelityOptions.FEATURE_PI, EXI_FIDELITY_PIS));
+        createFidelityElement(doc, fidelityElements,
+            fidelityString(FidelityOptions.FEATURE_PREFIX, EXI_FIDELITY_PREFIXES));
+
+        if (!fidelityElements.isEmpty()) {
+            final Element fidelityElement = doc.createElementNS(
+                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0, EXIParameters.EXI_PARAMETER_FIDELITY);
+            for (final Element element : fidelityElements) {
+                fidelityElement.appendChild(element);
+            }
+            startExiElement.appendChild(fidelityElement);
+        }
+    }
+
     private String fidelityString(final String feature, final String string) {
         return fidelityOptions.isFidelityEnabled(feature) ? string : null;
     }
 
-    String getPreserveComments() {
-        return fidelityString(FidelityOptions.FEATURE_COMMENT, EXI_FIDELITY_COMMENTS);
+    private void addSchema(final Document doc, final Element startExiElement) {
+        if (schema != null) {
+            final Element child = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0,
+                EXIParameters.EXI_PARAMETER_SCHEMAS);
+            child.setTextContent(schema.name());
+            startExiElement.appendChild(child);
+        }
     }
 
-    String getPreserveDTD() {
-        return fidelityString(FidelityOptions.FEATURE_DTD, EXI_FIDELITY_DTD);
-    }
-
-    String getPreserveLexicalValues() {
-        return fidelityString(FidelityOptions.FEATURE_LEXICAL_VALUE, EXI_FIDELITY_LEXICAL_VALUES);
-    }
-
-    String getPreservePIs() {
-        return fidelityString(FidelityOptions.FEATURE_PI, EXI_FIDELITY_PIS);
-    }
-
-    String getPreservePrefixes() {
-        return fidelityString(FidelityOptions.FEATURE_PREFIX, EXI_FIDELITY_PREFIXES);
-    }
-
-    String getSchema() {
-        return schema == EXISchema.NONE ? null : schema.name();
+    private static void createFidelityElement(final Document doc, final List<Element> elements, final String fidelity) {
+        if (fidelity != null) {
+            elements.add(doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0, fidelity));
+        }
     }
 }
