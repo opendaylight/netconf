@@ -16,7 +16,6 @@ import java.net.SocketAddress;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
-import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
