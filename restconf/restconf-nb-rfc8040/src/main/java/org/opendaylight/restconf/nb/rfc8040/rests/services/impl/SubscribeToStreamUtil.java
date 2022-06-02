@@ -50,9 +50,9 @@ abstract class SubscribeToStreamUtil {
         static final ServerSentEvents INSTANCE = new ServerSentEvents();
 
         @Override
-        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName, String locationPathPrefix) {
             final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-            return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/'
+            return uriBuilder.replacePath(locationPathPrefix + '/'
                     + RestconfConstants.NOTIF + '/' + streamName).build();
         }
     }
@@ -64,7 +64,7 @@ abstract class SubscribeToStreamUtil {
         static final WebSockets INSTANCE = new WebSockets();
 
         @Override
-        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName, String locationPathPrefix) {
             final String scheme = uriInfo.getAbsolutePath().getScheme();
             final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
             switch (scheme) {
@@ -103,7 +103,7 @@ abstract class SubscribeToStreamUtil {
      * @param streamName name of stream for create
      * @return final URL
      */
-    abstract @NonNull URI prepareUriByStreamName(UriInfo uriInfo, String streamName);
+    abstract @NonNull URI prepareUriByStreamName(UriInfo uriInfo, String streamName, String locationPathPrefix);
 
     /**
      * Register listener by streamName in identifier to listen to yang notifications, and put or delete information
@@ -116,7 +116,9 @@ abstract class SubscribeToStreamUtil {
      * @return Stream location for listening.
      */
     final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+                                             final NotificationQueryParams notificationQueryParams,
+                                             final HandlersHolder handlersHolder,
+                                             String locationPathPrefix) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -129,7 +131,7 @@ abstract class SubscribeToStreamUtil {
                 ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT));
 
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(uriInfo, streamName, locationPathPrefix);
         notificationListenerAdapter.setQueryParams(notificationQueryParams);
         notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
@@ -157,7 +159,9 @@ abstract class SubscribeToStreamUtil {
      * @return Location for listening.
      */
     final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+                                    final NotificationQueryParams notificationQueryParams,
+                                    final HandlersHolder handlersHolder,
+                                    String locationPathPrefix) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
 
         final String datastoreParam = mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME);
@@ -185,7 +189,7 @@ abstract class SubscribeToStreamUtil {
         listener.setCloseVars(dataBroker, schemaHandler);
         listener.listen(dataBroker, LogicalDatastoreType.valueOf(datastoreParam));
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(uriInfo, streamName, locationPathPrefix);
         final EffectiveModelContext schemaContext = schemaHandler.get();
         final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 

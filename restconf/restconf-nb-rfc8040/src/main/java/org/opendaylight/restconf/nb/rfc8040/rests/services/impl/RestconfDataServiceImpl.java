@@ -95,6 +95,8 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public class RestconfDataServiceImpl implements RestconfDataService {
+    private final String locationPathPrefix;
+
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
     private static final QName NETCONF_BASE_QNAME = SchemaContext.NAME;
@@ -119,6 +121,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         this.actionService = requireNonNull(actionService);
         streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
+        locationPathPrefix = configuration.getLocationPathPrefix();
     }
 
     @Override
@@ -202,7 +205,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
             final UriInfo uriInfo, final DOMDataTreeWriteOperations tx, final NotificationListenerAdapter listener) {
-        final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
+        final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName(), locationPathPrefix);
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri);

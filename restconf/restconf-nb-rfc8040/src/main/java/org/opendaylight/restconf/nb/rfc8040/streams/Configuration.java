@@ -22,6 +22,7 @@ public class Configuration {
     private final int idleTimeout;
     private final int heartbeatInterval;
     private final boolean useSSE;
+    private final String locationPathPrefix;
 
     /**
      * Creation of the restconf configuration holder with verification of input parameters.
@@ -33,7 +34,7 @@ public class Configuration {
      * @param useSSE                when is true use SSE else use WS
      */
     public Configuration(final int maximumFragmentLength, final int idleTimeout, final int heartbeatInterval,
-            final boolean useSSE) {
+                         final boolean useSSE, String locationPathPrefix) {
         checkArgument(idleTimeout > 0, "Idle timeout must be specified by positive value.");
         checkArgument(maximumFragmentLength >= 0 && maximumFragmentLength < MAX_FRAGMENT_LENGTH,
                 "Maximum fragment length must be disabled (0) or specified by positive value less than 64 KB.");
@@ -44,6 +45,7 @@ public class Configuration {
         this.idleTimeout = idleTimeout;
         this.heartbeatInterval = heartbeatInterval;
         this.useSSE = useSSE;
+        this.locationPathPrefix = locationPathPrefix;
     }
 
     public int getMaximumFragmentLength() {
@@ -67,6 +69,10 @@ public class Configuration {
         return useSSE;
     }
 
+    public String getLocationPathPrefix() {
+        return locationPathPrefix;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -74,6 +80,7 @@ public class Configuration {
                 .add("idleTimeout", idleTimeout)
                 .add("heartbeatInterval", heartbeatInterval)
                 .add("useSSE", useSSE)
+                .add("locationPathPrefix", locationPathPrefix)
                 .toString();
     }
 }

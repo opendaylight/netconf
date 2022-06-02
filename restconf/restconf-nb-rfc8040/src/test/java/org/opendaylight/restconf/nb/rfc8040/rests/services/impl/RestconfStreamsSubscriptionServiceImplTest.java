@@ -90,8 +90,10 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(new URI("http://127.0.0.1/" + URI)).when(uriInfo).getAbsolutePath();
         schemaHandler.onModelContextUpdated(
             YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
-        configurationWs = new Configuration(0, 100, 10, false);
-        configurationSse = new Configuration(0, 100, 10, true);
+        configurationWs = new Configuration(0, 100, 10, false,
+                RestconfConstants.BASE_URI_PATTERN);
+        configurationSse = new Configuration(0, 100, 10, true,
+                RestconfConstants.BASE_URI_PATTERN);
     }
 
     @BeforeClass

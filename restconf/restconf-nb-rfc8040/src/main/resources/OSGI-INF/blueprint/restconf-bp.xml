@@ -7,6 +7,7 @@
  and is available at http://www.eclipse.org/legal/epl-v10.html
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.4.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
   <!-- Restconf providers -->
   <cm:property-placeholder persistent-id="org.opendaylight.restconf.nb.rfc8040">
@@ -17,6 +18,7 @@
       <cm:property name="ping-executor-name-prefix" value="ping-executor"/>
       <cm:property name="max-thread-count" value="1"/>
       <cm:property name="use-sse" value="true"/>
+      <cm:property name="location-path-prefix" value="rests"/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -37,6 +39,7 @@
     <argument value="${idle-timeout}"/>
     <argument value="${heartbeat-interval}"/>
     <argument value="${use-sse}" />
+    <argument value="${locationPathPrefix}" />
   </bean>
 
   <bean id="dataStreamApplication" class="org.opendaylight.restconf.nb.rfc8040.DataStreamApplication">
