@@ -37,8 +37,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class NetconfClientSessionNegotiator extends
-        AbstractNetconfSessionNegotiator<NetconfClientSessionPreferences, NetconfClientSession,
+final class NetconfClientSessionNegotiator
+        extends AbstractNetconfSessionNegotiator<NetconfClientSessionPreferences, NetconfClientSession,
                 NetconfClientSessionListener> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientSessionNegotiator.class);
 
@@ -52,12 +52,9 @@ public class NetconfClientSessionNegotiator extends
 
     private static final Interner<Set<String>> INTERNER = Interners.newWeakInterner();
 
-    protected NetconfClientSessionNegotiator(final NetconfClientSessionPreferences sessionPreferences,
-                                             final Promise<NetconfClientSession> promise,
-                                             final Channel channel,
-                                             final Timer timer,
-                                             final NetconfClientSessionListener sessionListener,
-                                             final long connectionTimeoutMillis) {
+    NetconfClientSessionNegotiator(final NetconfClientSessionPreferences sessionPreferences,
+            final Promise<NetconfClientSession> promise, final Channel channel, final Timer timer,
+            final NetconfClientSessionListener sessionListener, final long connectionTimeoutMillis) {
         super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
     }
 
