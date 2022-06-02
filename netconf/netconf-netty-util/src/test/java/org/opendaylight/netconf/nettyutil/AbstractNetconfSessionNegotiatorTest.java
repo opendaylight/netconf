@@ -48,7 +48,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfSessionListener;
-import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -77,7 +76,6 @@ public class AbstractNetconfSessionNegotiatorTest {
     private NetconfHelloMessage hello;
     private NetconfHelloMessage helloBase11;
     private NetconfXMLToHelloMessageDecoder xmlToHello;
-    private NetconfSessionPreferences prefs;
 
     @Before
     public void setUp() {
@@ -92,9 +90,8 @@ public class AbstractNetconfSessionNegotiatorTest {
         hello = NetconfHelloMessage.createClientHello(Set.of(), Optional.empty());
         helloBase11 = NetconfHelloMessage.createClientHello(
             Set.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
-        prefs = new NetconfSessionPreferences(helloBase11);
         doReturn(promise).when(promise).setFailure(any());
-        negotiator = new TestSessionNegotiator(prefs, promise, channel, timer, listener, 100L);
+        negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
 
     @Test
@@ -132,11 +129,6 @@ public class AbstractNetconfSessionNegotiatorTest {
 
         captor.getValue().run(timeout);
         verify(closedDetector).close(any(), any());
-    }
-
-    @Test
-    public void testGetSessionPreferences() {
-        assertEquals(prefs, negotiator.getSessionPreferences());
     }
 
     @Test

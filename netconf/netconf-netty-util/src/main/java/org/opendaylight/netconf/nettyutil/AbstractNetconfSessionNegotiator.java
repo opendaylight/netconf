@@ -21,10 +21,10 @@ import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
-import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionPreferences,
-        S extends AbstractNetconfSession<S, L>, L extends NetconfSessionListener<S>>
+public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconfSession<S, L>,
+            L extends NetconfSessionListener<S>>
             extends ChannelInboundHandlerAdapter implements NetconfSessionNegotiator<S> {
     /**
      * Possible states for Finite State Machine.
@@ -51,7 +51,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSessionNegotiator.class);
     private static final String NAME_OF_EXCEPTION_HANDLER = "lastExceptionHandler";
 
-    protected final P sessionPreferences;
+    private final @NonNull NetconfHelloMessage localHello;
     protected final Channel channel;
 
     private final long connectionTimeoutMillis;
@@ -64,15 +64,19 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     @GuardedBy("this")
     private State state = State.IDLE;
 
-    protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise,
+    protected AbstractNetconfSessionNegotiator(final NetconfHelloMessage hello, final Promise<S> promise,
                                                final Channel channel, final Timer timer,
                                                final L sessionListener, final long connectionTimeoutMillis) {
-        this.channel = requireNonNull(channel);
+        this.localHello = requireNonNull(hello);
         this.promise = requireNonNull(promise);
-        this.sessionPreferences = sessionPreferences;
+        this.channel = requireNonNull(channel);
         this.timer = timer;
         this.sessionListener = sessionListener;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
+    }
+
+    protected final @NonNull NetconfHelloMessage localHello() {
+        return localHello;
     }
 
     protected final void startNegotiation() {
@@ -101,17 +105,12 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         return Optional.ofNullable(channel.pipeline().get(SslHandler.class));
     }
 
-    public final P getSessionPreferences() {
-        return sessionPreferences;
-    }
-
     private void start() {
-        final NetconfHelloMessage helloMessage = this.sessionPreferences.getHelloMessage();
-        LOG.debug("Session negotiation started with hello message {} on channel {}", helloMessage, channel);
+        LOG.debug("Session negotiation started with hello message {} on channel {}", localHello, channel);
 
         channel.pipeline().addLast(NAME_OF_EXCEPTION_HANDLER, new ExceptionHandlingInboundChannelHandler());
 
-        sendMessage(helloMessage);
+        sendMessage(localHello);
 
         replaceHelloMessageOutboundHandler();
         changeState(State.OPEN_WAIT);
@@ -176,8 +175,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     private boolean shouldUseChunkFraming(final Document doc) {
-        return containsBase11Capability(doc)
-                && containsBase11Capability(sessionPreferences.getHelloMessage().getDocument());
+        return containsBase11Capability(doc) && containsBase11Capability(localHello.getDocument());
     }
 
     /**

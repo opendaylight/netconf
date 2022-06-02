@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
@@ -14,16 +16,14 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.Promise;
-import java.util.Collections;
 import java.util.Optional;
-import org.junit.Assert;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfSessionListener;
-import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
@@ -43,7 +43,7 @@ public class Netconf539Test {
     private Promise<TestingNetconfSession> promise;
 
     private EmbeddedChannel channel;
-    private AbstractNetconfSessionNegotiator negotiator;
+    private TestSessionNegotiator negotiator;
 
     @Before
     public void setUp() throws Exception {
@@ -55,10 +55,9 @@ public class Netconf539Test {
         channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
             FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
-        final NetconfHelloMessage serverHello = NetconfHelloMessage.createClientHello(Collections
-            .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
-        negotiator = new TestSessionNegotiator(new NetconfSessionPreferences(serverHello), promise, channel,
-            new HashedWheelTimer(), listener, 100L);
+        final NetconfHelloMessage serverHello = NetconfHelloMessage.createClientHello(
+            Set.of(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
+        negotiator = new TestSessionNegotiator(serverHello, promise, channel, new HashedWheelTimer(), listener, 100L);
     }
 
     @Test
@@ -75,11 +74,11 @@ public class Netconf539Test {
         final Document helloDocument = XmlFileLoader.xmlFileToDocument(fileName);
         negotiator.startNegotiation();
         final NetconfHelloMessage helloMessage = new NetconfHelloMessage(helloDocument);
-        final AbstractNetconfSession session = negotiator.getSessionForHelloMessage(helloMessage);
-        Assert.assertNotNull(session);
-        Assert.assertTrue("NetconfChunkAggregator was not installed in the Netconf pipeline",
+        final TestingNetconfSession session = negotiator.getSessionForHelloMessage(helloMessage);
+        assertNotNull(session);
+        assertTrue("NetconfChunkAggregator was not installed in the Netconf pipeline",
             channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR) instanceof NetconfChunkAggregator);
-        Assert.assertTrue("ChunkedFramingMechanismEncoder was not installed in the Netconf pipeline",
+        assertTrue("ChunkedFramingMechanismEncoder was not installed in the Netconf pipeline",
             channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER) instanceof ChunkedFramingMechanismEncoder);
     }
 }
