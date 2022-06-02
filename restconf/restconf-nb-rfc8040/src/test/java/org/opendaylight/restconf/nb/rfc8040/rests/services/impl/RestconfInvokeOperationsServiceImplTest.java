@@ -39,6 +39,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -50,6 +51,8 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationMountPointListener;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -81,6 +84,10 @@ public class RestconfInvokeOperationsServiceImplTest {
     private DOMRpcService rpcService;
     @Mock
     private DOMMountPoint mountPoint;
+    @Mock
+    private DOMMountPointService mountPointService;
+    @Mock
+    private DeviceNotificationMountPointListener deviceNotificationMountPointListener;
     private RestconfInvokeOperationsServiceImpl invokeOperationsService;
 
     @BeforeClass
@@ -98,7 +105,8 @@ public class RestconfInvokeOperationsServiceImplTest {
             FixedDOMSchemaService.of(CONTEXT));
         schemaContextHandler.init();
         invokeOperationsService =
-                new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler);
+                new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler, mountPointService,
+                        mock(Configuration.class));
     }
 
     @Test

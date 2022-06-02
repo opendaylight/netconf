@@ -10,17 +10,29 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationListenerAdaptor;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationMountPointListener;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -126,6 +138,71 @@ final class CreateStreamUtil {
     }
 
     /**
+     * Create device notification stream.
+     *
+     * @param uriInfo URI information
+     * @param payload data
+     * @param refSchemaCtx Reference to {@link EffectiveModelContext}.
+     * @param streamUtil stream utility
+     * @param mountPointService dom mount point service
+     * @return {@link DOMRpcResult} - Output of RPC - example in JSON
+     */
+    static DOMRpcResult createDeviceNotificationListener(final UriInfo uriInfo,
+                                                         final NormalizedNodePayload payload,
+                                                         final EffectiveModelContext refSchemaCtx,
+                                                         final SubscribeToStreamUtil streamUtil,
+                                                         final DOMMountPointService mountPointService) {
+        // parsing out of container with settings and path
+        final ContainerNode data = (ContainerNode)requireNonNull(payload).getData();
+        final QName qname = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
+        final Object value = data.findChildByArg(new NodeIdentifier(QName.create(qname, "path")))
+                .map(DataContainerChild::body)
+                .orElse(null);
+        if (value == null || value.equals("")) {
+            LOG.debug("Instance identifier {} has no value", qname);
+            throw new RestconfDocumentedException("Instance identifier has no value",ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED);
+        }
+        String pathValue = String.valueOf(value);
+        InstanceIdentifierContext instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
+                pathValue, refSchemaCtx, Optional.of(mountPointService));
+        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
+
+        if (mountPoint != null) {
+            List<Absolute> absolutes = new ArrayList<Absolute>();
+            Collection<? extends NotificationDefinition> notificationDefinitions =
+                    instanceIdentifier.getSchemaContext().getNotifications();
+            if (notificationDefinitions == null || notificationDefinitions.isEmpty()) {
+                throw new RestconfDocumentedException("Device does not support notification",ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED);
+            }
+            notificationDefinitions.forEach(notificationDefinition -> {
+                absolutes.add(Absolute.of(notificationDefinition.getQName()));
+            });
+            final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
+                    .registerDeviceNotificationListener(pathValue, NotificationOutputType.XML, refSchemaCtx);
+            notificationListenerAdapter.listen(mountPoint.getService(DOMNotificationService.class).get(),
+                    absolutes.toArray(Absolute[]::new));
+            DeviceNotificationMountPointListener.addDeviceNotificationListener(mountPoint.getIdentifier(),
+                    notificationListenerAdapter, mountPointService);
+
+
+            URI uri = streamUtil.prepareUriByStreamName(uriInfo, notificationListenerAdapter.getStreamName());
+            // building of output
+            final QName outputQname = QName.create(qname, "output");
+            final QName streamNameQname = QName.create(qname, "stream-path");
+
+            final ContainerNode output = ImmutableContainerNodeBuilder.create()
+                    .withNodeIdentifier(new NodeIdentifier(outputQname))
+                    .withChild(ImmutableNodes.leafNode(streamNameQname, uri.toString())).build();
+            return new DefaultDOMRpcResult(output);
+        } else {
+            return new DefaultDOMRpcResult(ImmutableContainerNodeBuilder.create().build());
+        }
+
+    }
+
+    /**
      * Prepare {@link NotificationOutputType}.
      *
      * @param data Container with stream settings (RPC create-stream).
@@ -211,7 +288,7 @@ final class CreateStreamUtil {
         final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
                 .getNotificationListenerFor(streamName);
         return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
-                Absolute.of(notificationDefinition.getQName()), streamName, outputType));
+                Absolute.of(notificationDefinition.getQName()), streamName, outputType, refSchemaCtx));
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,
