@@ -49,8 +49,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSessionNegotiator.class);
-
-    public static final String NAME_OF_EXCEPTION_HANDLER = "lastExceptionHandler";
+    private static final String NAME_OF_EXCEPTION_HANDLER = "lastExceptionHandler";
 
     protected final P sessionPreferences;
     protected final Channel channel;
