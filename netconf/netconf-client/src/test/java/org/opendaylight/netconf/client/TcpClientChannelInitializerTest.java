@@ -15,6 +15,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Promise;
@@ -36,6 +37,11 @@ public class TcpClientChannelInitializerTest {
         Channel channel = mock(Channel.class);
         doReturn(pipeline).when(channel).pipeline();
         doReturn("").when(channel).toString();
+
+        ChannelConfig channelConfig = mock(ChannelConfig.class);
+        doReturn(channelConfig).when(channel).config();
+        doReturn(1L).when(factory).getConnectionTimeoutMillis();
+        doReturn(channelConfig).when(channelConfig).setConnectTimeoutMillis(1);
 
         Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn("").when(promise).toString();
