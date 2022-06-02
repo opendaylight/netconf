@@ -16,7 +16,6 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.Set;
-import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
@@ -60,7 +59,7 @@ public class NetconfServerSessionNegotiatorFactory
                                                  final NetconfMonitoringService monitoringService,
                                                  final Set<String> baseCapabilities) {
         this.timer = timer;
-        this.aggregatedOpService = netconfOperationProvider;
+        aggregatedOpService = netconfOperationProvider;
         this.idProvider = idProvider;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.monitoringService = monitoringService;
@@ -99,11 +98,9 @@ public class NetconfServerSessionNegotiatorFactory
             final Channel channel, final Promise<NetconfServerSession> promise) {
         final long sessionId = idProvider.getNextSessionId();
 
-        NetconfServerSessionPreferences proposal =
-            new NetconfServerSessionPreferences(createHelloMessage(sessionId, monitoringService), sessionId);
-
-        return new NetconfServerSessionNegotiator(proposal, promise, channel, timer,
-                getListener(Long.toString(sessionId), channel.parent().localAddress()), connectionTimeoutMillis);
+        return new NetconfServerSessionNegotiator(createHelloMessage(sessionId, monitoringService), sessionId, promise,
+            channel, timer, getListener(Long.toString(sessionId), channel.parent().localAddress()),
+            connectionTimeoutMillis);
     }
 
     private NetconfServerSessionListener getListener(final String netconfSessionIdForReporting,
@@ -117,7 +114,7 @@ public class NetconfServerSessionNegotiatorFactory
 
     protected NetconfOperationService getOperationServiceForAddress(final String netconfSessionIdForReporting,
                                                                     final SocketAddress socketAddress) {
-        return this.aggregatedOpService.createService(netconfSessionIdForReporting);
+        return aggregatedOpService.createService(netconfSessionIdForReporting);
     }
 
     protected final NetconfOperationServiceFactory getOperationServiceFactory() {
