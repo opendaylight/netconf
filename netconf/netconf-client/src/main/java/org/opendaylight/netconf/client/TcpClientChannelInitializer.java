@@ -13,7 +13,7 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelPromise;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 
@@ -25,34 +25,30 @@ final class TcpClientChannelInitializer extends AbstractClientChannelInitializer
 
     @Override
     public void initialize(final Channel ch, final Promise<NetconfClientSession> promise) {
-        final Future<NetconfClientSession> negotiationFuture = promise;
-
-        //We have to add this channel outbound handler to channel pipeline, in order
-        //to get notifications from netconf negotiatior. Set connection promise to
-        //success only after successful negotiation.
+        // We have to add this channel outbound handler to channel pipeline, in order to get notifications from netconf
+        // negotiatior. Set connection promise to success only after successful negotiation.
         ch.pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
-            ChannelPromise connectPromise;
-            GenericFutureListener<Future<NetconfClientSession>> negotiationFutureListener;
+            private final Future<NetconfClientSession> negotiationFuture = promise;
+
+            private FutureListener<NetconfClientSession> negotiationFutureListener;
+            private ChannelPromise connectPromise;
 
             @Override
             public void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
-                                final SocketAddress localAddress,
-                                final ChannelPromise channelPromise) {
+                    final SocketAddress localAddress, final ChannelPromise channelPromise) {
                 connectPromise = channelPromise;
-                ChannelPromise tcpConnectFuture = new DefaultChannelPromise(ch);
-
                 negotiationFutureListener = future -> {
                     if (future.isSuccess()) {
-                        channelPromise.setSuccess();
+                        connectPromise.setSuccess();
                     }
                 };
 
-                tcpConnectFuture.addListener(future -> {
+                ChannelPromise tcpConnectFuture = new DefaultChannelPromise(ch).addListener(future -> {
                     if (future.isSuccess()) {
                         //complete connection promise with netconf negotiation future
                         negotiationFuture.addListener(negotiationFutureListener);
                     } else {
-                        channelPromise.setFailure(future.cause());
+                        connectPromise.setFailure(future.cause());
                     }
                 });
                 ctx.connect(remoteAddress, localAddress, tcpConnectFuture);
