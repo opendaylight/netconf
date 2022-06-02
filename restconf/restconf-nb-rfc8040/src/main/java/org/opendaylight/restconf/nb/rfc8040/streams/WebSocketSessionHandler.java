@@ -9,22 +9,20 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import com.google.common.base.Strings;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.eclipse.jetty.websocket.api.RemoteEndpoint;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import javax.websocket.CloseReason;
+import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfig;
+import javax.websocket.OnError;
+import javax.websocket.RemoteEndpoint.Basic;
+import javax.websocket.Session;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +31,7 @@ import org.slf4j.LoggerFactory;
  * Web-socket session handler that is responsible for controlling of session, managing subscription
  * to data-change-event or notification listener, and sending of data over established web-socket session.
  */
-@WebSocket
-public final class WebSocketSessionHandler implements StreamSessionHandler {
+public final class WebSocketSessionHandler extends Endpoint implements StreamSessionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketSessionHandler.class);
     private static final byte[] PING_PAYLOAD = "ping".getBytes(Charset.defaultCharset());
 
@@ -76,10 +73,9 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      * the heartbeat ping process is started if it is enabled.
      *
      * @param webSocketSession Created web-socket session.
-     * @see OnWebSocketConnect More information about invocation of this method and parameters.
      */
-    @OnWebSocketConnect
-    public synchronized void onWebSocketConnected(final Session webSocketSession) {
+    @Override
+    public synchronized void onOpen(final Session webSocketSession, final EndpointConfig config) {
         if (session == null || !session.isOpen()) {
             session = webSocketSession;
             listener.addSubscriber(this);
@@ -101,13 +97,12 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      * @param reason     Reason, why the web-socket is closed (for example, reached timeout).
      * @see OnWebSocketClose More information about invocation of this method and parameters.
      */
-    @OnWebSocketClose
-    public synchronized void onWebSocketClosed(final int statusCode, final String reason) {
+    @Override
+    public synchronized void onClose(final Session webSocketSession, final CloseReason closeReason) {
         // note: there is not guarantee that Session.isOpen() returns true - it is better to not check it here
         // using 'session != null && session.isOpen()'
         if (session != null) {
-            LOG.debug("Web-socket session has been closed with status code {} and reason message: {}.",
-                    statusCode, reason);
+            LOG.debug("Web-socket session has been closed with status code {} and reason message: {}.", closeReason);
             listener.removeSubscriber(this);
             stopPingProcess();
         }
@@ -120,15 +115,13 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      * @param error Error details.
      * @see OnWebSocketError More information about invocation of this method and parameters.
      */
-    @OnWebSocketError
-    public synchronized void onWebSocketError(final Throwable error) {
-        LOG.warn("An error occurred on web-socket: ", error);
+    @Override
+    @OnError
+    public synchronized void onError(final Session webSocketSession, final Throwable thr) {
+        LOG.warn("An error occurred on web-socket: ", thr);
         if (session != null) {
             LOG.warn("Trying to close web-socket session {} gracefully after error.", session);
             listener.removeSubscriber(this);
-            if (session.isOpen()) {
-                session.close();
-            }
             stopPingProcess();
         }
     }
@@ -154,7 +147,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
         }
 
         if (session != null && session.isOpen()) {
-            final RemoteEndpoint remoteEndpoint = session.getRemote();
+            final Basic remoteEndpoint = session.getBasicRemote();
             if (maximumFragmentLength == 0 || message.length() <= maximumFragmentLength) {
                 sendDataMessage(message, remoteEndpoint);
             } else {
@@ -165,9 +158,9 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
         }
     }
 
-    private void sendDataMessage(final String message, final RemoteEndpoint remoteEndpoint) {
+    private void sendDataMessage(final String message, final Basic remoteEndpoint) {
         try {
-            remoteEndpoint.sendString(message);
+            remoteEndpoint.sendText(message);
             LOG.trace("Message with body '{}' has been successfully sent to remote endpoint {}.", message,
                 remoteEndpoint);
         } catch (IOException e) {
@@ -175,13 +168,13 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
         }
     }
 
-    private void sendFragmentedMessage(final List<String> orderedFragments, final RemoteEndpoint remoteEndpoint) {
+    private void sendFragmentedMessage(final List<String> orderedFragments, final Basic remoteEndpoint) {
         for (int i = 0; i < orderedFragments.size(); i++) {
             final String fragment = orderedFragments.get(i);
             final boolean last = i == orderedFragments.size() - 1;
 
             try {
-                remoteEndpoint.sendPartialString(fragment, last);
+                remoteEndpoint.sendText(fragment, last);
             } catch (IOException e) {
                 LOG.warn("Cannot send message fragment number {} over web-socket session {}. All other fragments of "
                     + " the message are dropped too.", i, session, e);
@@ -194,7 +187,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
 
     private synchronized void sendPingMessage() {
         try {
-            Objects.requireNonNull(session).getRemote().sendPing(ByteBuffer.wrap(PING_PAYLOAD));
+            Objects.requireNonNull(session).getBasicRemote().sendPing(ByteBuffer.wrap(PING_PAYLOAD));
         } catch (IOException e) {
             LOG.warn("Cannot send ping message over web-socket session {}.", session, e);
         }
@@ -207,21 +200,6 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
             parts.add(inputMessage.substring(i, Math.min(length, i + maximumFragmentLength)));
         }
         return parts;
-    }
-
-    /**
-     * Get remote endpoint address of the current web-socket session.
-     *
-     * @return If the session exists and is open the {@link InetSocketAddress} wrapped in {@link Optional} is returned.
-     *     Otherwise, {@link Optional#empty()} is returned.
-     */
-    // FIXME: remove this method?
-    public synchronized Optional<InetSocketAddress> getRemoteEndpointAddress() {
-        if (session != null && session.isOpen()) {
-            return Optional.of(session.getRemote().getInetSocketAddress());
-        } else {
-            return Optional.empty();
-        }
     }
 
     @Override
