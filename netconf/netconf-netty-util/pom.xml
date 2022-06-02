@@ -23,22 +23,54 @@
   <dependencies>
     <!-- compile dependencies -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-util</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.checkerframework</groupId>
+      <artifactId>checker-qual</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-buffer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-common</artifactId>
     </dependency>
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-handler</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-encrypt-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-util</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>shaded-exificient</artifactId>
@@ -48,10 +80,7 @@
       <artifactId>shaded-sshd</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
+    <!-- test dependencies -->
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-legacy</artifactId>
@@ -61,17 +90,10 @@
       <artifactId>mockito-configuration</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>aaa-encrypt-service</artifactId>
-    </dependency>
-
-    <!-- test dependencies -->
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-util</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 </project>
