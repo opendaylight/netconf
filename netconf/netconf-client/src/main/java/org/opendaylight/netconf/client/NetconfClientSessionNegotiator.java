@@ -11,7 +11,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -39,8 +38,7 @@ import org.w3c.dom.NodeList;
 
 // Non-final for mocking
 class NetconfClientSessionNegotiator
-        extends AbstractNetconfSessionNegotiator<NetconfClientSessionPreferences, NetconfClientSession,
-                NetconfClientSessionListener> {
+        extends AbstractNetconfSessionNegotiator<NetconfClientSession, NetconfClientSessionListener> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientSessionNegotiator.class);
 
     private static final XPathExpression SESSION_ID_X_PATH = XMLNetconfUtil
@@ -53,15 +51,16 @@ class NetconfClientSessionNegotiator
 
     private static final Interner<Set<String>> INTERNER = Interners.newWeakInterner();
 
+    private final NetconfMessage startExi;
+
     NetconfClientSessionNegotiator(final NetconfClientSessionPreferences sessionPreferences,
             final Promise<NetconfClientSession> promise, final Channel channel, final Timer timer,
             final NetconfClientSessionListener sessionListener, final long connectionTimeoutMillis) {
-        super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        super(sessionPreferences.getHelloMessage(), promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        startExi = sessionPreferences.getStartExiMessage();
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-        justification = "SpotBugs does not understand generic cast of sessionPreferences")
     @Override
     protected void handleMessage(final NetconfHelloMessage netconfMessage) throws NetconfDocumentedException {
         if (!ifNegotiatedAlready()) {
@@ -79,10 +78,9 @@ class NetconfClientSessionNegotiator
 
         // If exi should be used, try to initiate exi communication
         // Call negotiationSuccessFul after exi negotiation is finished successfully or not
-        final NetconfMessage startExiMessage = sessionPreferences.getStartExiMessage();
-        if (shouldUseExi(netconfMessage) && startExiMessage instanceof NetconfStartExiMessage) {
+        if (startExi instanceof NetconfStartExiMessage && shouldUseExi(netconfMessage)) {
             LOG.debug("Netconf session {} should use exi.", session);
-            tryToInitiateExi(session, (NetconfStartExiMessage) startExiMessage);
+            tryToInitiateExi(session, (NetconfStartExiMessage) startExi);
         } else {
             // Exi is not supported, release session immediately
             LOG.debug("Netconf session {} isn't capable of using exi.", session);
@@ -111,11 +109,8 @@ class NetconfClientSessionNegotiator
         });
     }
 
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-        justification = "SpotBugs does not understand generic cast of sessionPreferences")
     private boolean shouldUseExi(final NetconfHelloMessage helloMsg) {
-        return containsExi10Capability(helloMsg.getDocument())
-                && containsExi10Capability(sessionPreferences.getHelloMessage().getDocument());
+        return containsExi10Capability(helloMsg.getDocument()) && containsExi10Capability(localHello().getDocument());
     }
 
     private static boolean containsExi10Capability(final Document doc) {
