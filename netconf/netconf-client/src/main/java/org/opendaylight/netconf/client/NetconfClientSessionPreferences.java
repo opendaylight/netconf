@@ -5,20 +5,21 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+package org.opendaylight.netconf.client;
 
-package org.opendaylight.netconf.api;
-
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 
 /**
  * The only input for the start of a NETCONF session is hello-message.
  */
 public final class NetconfClientSessionPreferences extends NetconfSessionPreferences {
-
-    private final NetconfMessage startExiMessage;
+    private final @Nullable NetconfStartExiMessage startExiMessage;
 
     public NetconfClientSessionPreferences(final NetconfHelloMessage helloMessage,
-                                           final NetconfMessage startExiMessage) {
+            final NetconfStartExiMessage startExiMessage) {
         super(helloMessage);
         this.startExiMessage = startExiMessage;
     }
@@ -28,7 +29,7 @@ public final class NetconfClientSessionPreferences extends NetconfSessionPrefere
      *
      * @return the startExiMessage
      */
-    public NetconfMessage getStartExiMessage() {
+    public @Nullable NetconfStartExiMessage getStartExiMessage() {
         return startExiMessage;
     }
 }
