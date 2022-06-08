@@ -7,10 +7,11 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -18,17 +19,18 @@ import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 public class Netconf538Test {
-
     private static final String SESSION_ID_FOR_REPORTING = "netconf-test-session1";
     private static final QName BASE = QName.create("urn:dummy:list", "2019-08-21", "user");
     private static final QName NAME_QNAME = QName.create(BASE, "name");
@@ -50,29 +52,23 @@ public class Netconf538Test {
         final Document document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class
                 .getResourceAsStream("/filter/netconf538.xml"));
 
-        LeafNode<String> leafNode = Builders.<String>leafBuilder()
-                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(NAME_QNAME))
-                .withValue(LEAF_VALUE).build();
+        LeafNode<String> leafNode = ImmutableNodes.leafNode(NAME_QNAME, LEAF_VALUE);
 
-        MapEntryNode mapEntryNode = Builders.mapEntryBuilder()
-                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates
-                        .of(BASE, NAME_QNAME,LEAF_VALUE))
-                .withChild(leafNode).build();
+        MapNode data = Builders.mapBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(BASE))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(BASE, NAME_QNAME,LEAF_VALUE))
+                .withChild(leafNode)
+                .build())
+            .build();
 
-        MapNode data = Builders.mapBuilder().withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(BASE))
-                .withChild(mapEntryNode).build();
+        final Node node = getConfig.transformNormalizedNode(document, data, YangInstanceIdentifier.empty());
 
-
-        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().build();
-
-        final Node node = getConfig.transformNormalizedNode(document, data, path);
-
-        Assert.assertNotNull(node);
+        assertNotNull(node);
         Node nodeUser = node.getFirstChild();
-        Assert.assertEquals(data.getIdentifier().getNodeType().getLocalName(), nodeUser.getLocalName());
+        assertEquals(data.getIdentifier().getNodeType().getLocalName(), nodeUser.getLocalName());
         Node nodeName = nodeUser.getFirstChild();
-        Assert.assertEquals(leafNode.getIdentifier().getNodeType().getLocalName(), nodeName.getLocalName());
-        Assert.assertEquals(leafNode.body(), nodeName.getFirstChild().getNodeValue());
+        assertEquals(leafNode.getIdentifier().getNodeType().getLocalName(), nodeName.getLocalName());
+        assertEquals(leafNode.body(), nodeName.getFirstChild().getNodeValue());
     }
-
 }
