@@ -9,7 +9,6 @@ package org.opendaylight.netconf.test.tool;
 
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,9 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class MdsalOperationProvider implements NetconfOperationServiceFactory {
-
-    private static final Logger LOG = LoggerFactory
-            .getLogger(MdsalOperationProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MdsalOperationProvider.class);
 
     private final Set<Capability> caps;
     private final EffectiveModelContext schemaContext;
@@ -88,17 +85,16 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(
-            final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(caps, Collections.emptySet());
+    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+        listener.onCapabilitiesChanged(caps, Set.of());
         return () -> {
         };
     }
 
     @Override
     public NetconfOperationService createService(final String netconfSessionIdForReporting) {
-        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext,
-            caps, sourceProvider);
+        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext, caps,
+            sourceProvider);
     }
 
     static class MdsalOperationService implements NetconfOperationService {
@@ -117,9 +113,9 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             this.schemaContext = schemaContext;
             this.caps = caps;
             this.sourceProvider = sourceProvider;
-            this.schemaService = createSchemaService();
+            schemaService = createSchemaService();
 
-            this.dataBroker = createDataStore(schemaService, currentSessionId);
+            dataBroker = createDataStore(schemaService, currentSessionId);
 
         }
 
