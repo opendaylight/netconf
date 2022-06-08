@@ -33,6 +33,40 @@
       "message": "Please review it",
       "revId": "41a5508f52475b69481bfc28abfe6c008399a763",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60ca35d1_d4bbc869",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 7779
+      },
+      "writtenOn": "2022-06-08T09:28:20Z",
+      "side": 1,
+      "message": "2022",
+      "revId": "41a5508f52475b69481bfc28abfe6c008399a763",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1df8d2f8_6938b3a9",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 7779
+      },
+      "writtenOn": "2022-06-08T09:28:20Z",
+      "side": 1,
+      "message": "2022",
+      "revId": "41a5508f52475b69481bfc28abfe6c008399a763",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
