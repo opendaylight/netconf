@@ -199,18 +199,14 @@ public final class ReadDataTransactionUtil {
                 if (keys.contains(child.getIdentifier().getNodeType())) {
                     leafBuilder.withValue(((LeafNode<?>) child).body());
                     builder.withChild(leafBuilder.build());
-                } else {
-                    if (trim) {
-                        if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(((LeafNode<?>) child).body());
-                            builder.withChild(leafBuilder.build());
-                        }
-                    } else {
-                        if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(((LeafNode<?>) child).body());
-                            builder.withChild(leafBuilder.build());
-                        }
+                } else if (trim) {
+                    if (defaultVal == null || !defaultVal.equals(nodeVal)) {
+                        leafBuilder.withValue(((LeafNode<?>) child).body());
+                        builder.withChild(leafBuilder.build());
                     }
+                } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
+                    leafBuilder.withValue(((LeafNode<?>) child).body());
+                    builder.withChild(leafBuilder.build());
                 }
             }
         }
@@ -257,11 +253,9 @@ public final class ReadDataTransactionUtil {
                         leafBuilder.withValue(((LeafNode<?>) child).body());
                         builder.withChild(leafBuilder.build());
                     }
-                } else {
-                    if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(((LeafNode<?>) child).body());
-                        builder.withChild(leafBuilder.build());
-                    }
+                } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
+                    leafBuilder.withValue(((LeafNode<?>) child).body());
+                    builder.withChild(leafBuilder.build());
                 }
             }
         }
