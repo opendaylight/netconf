@@ -51,7 +51,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.ListNodeBuilder;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -194,19 +193,14 @@ public final class ReadDataTransactionUtil {
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
                 final Object nodeVal = child.body();
-                final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
-                    SchemaAwareBuilders.leafBuilder((LeafSchemaNode) childSchema);
                 if (keys.contains(child.getIdentifier().getNodeType())) {
-                    leafBuilder.withValue(((LeafNode<?>) child).body());
-                    builder.withChild(leafBuilder.build());
+                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
                 } else if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(((LeafNode<?>) child).body());
-                        builder.withChild(leafBuilder.build());
+                        builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
                     }
                 } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                    leafBuilder.withValue(((LeafNode<?>) child).body());
-                    builder.withChild(leafBuilder.build());
+                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
                 }
             }
         }
@@ -246,16 +240,12 @@ public final class ReadDataTransactionUtil {
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
                 final Object nodeVal = child.body();
-                final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
-                    SchemaAwareBuilders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(((LeafNode<?>) child).body());
-                        builder.withChild(leafBuilder.build());
+                        builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
                     }
                 } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                    leafBuilder.withValue(((LeafNode<?>) child).body());
-                    builder.withChild(leafBuilder.build());
+                    builder.withChild(ImmutableNodes.leafNode(childSchema.getQName(), child.body()));
                 }
             }
         }
