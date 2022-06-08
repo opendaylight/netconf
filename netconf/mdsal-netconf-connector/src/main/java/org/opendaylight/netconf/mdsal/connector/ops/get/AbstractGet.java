@@ -10,7 +10,6 @@ package org.opendaylight.netconf.mdsal.connector.ops.get;
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -25,9 +24,6 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -37,17 +33,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.YangInstanceIdentifierWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
-    private static final YangInstanceIdentifier ROOT = YangInstanceIdentifier.empty();
     private static final String FILTER = "filter";
 
     static {
@@ -61,32 +54,19 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     public AbstractGet(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
         super(netconfSessionIdForReporting);
         this.schemaContext = schemaContext;
-        this.validator = new FilterContentValidator(schemaContext);
+        validator = new FilterContentValidator(schemaContext);
     }
 
     protected Node transformNormalizedNode(final Document document, final NormalizedNode data,
                                            final YangInstanceIdentifier dataRoot) {
-
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
-
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
+        final EffectiveModelContext currentContext = schemaContext.getCurrentContext();
 
-        final SchemaPath schemaPath = getSchemaPath(dataRoot);
         final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-                schemaContext.getCurrentContext(), schemaPath);
+            currentContext);
 
-        final DataSchemaNode dataSchemaNode;
-        if (dataRoot.isEmpty()) {
-            dataSchemaNode = schemaContext.getCurrentContext();
-        } else {
-            final Optional<DataSchemaNode> dataTreeChild =
-                    schemaContext.getCurrentContext().findDataTreeChild(schemaPath.getPathFromRoot());
-            dataSchemaNode = dataTreeChild.orElseThrow(
-                    () -> new IllegalArgumentException("Unable to find schema node for " + dataRoot));
-        }
-
-        try (var yiidWriter = YangInstanceIdentifierWriter.open(nnStreamWriter,
-                (DataNodeContainer) dataSchemaNode, dataRoot)) {
+        try (var yiidWriter = YangInstanceIdentifierWriter.open(nnStreamWriter, currentContext, dataRoot)) {
             try (var nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true)) {
                 if (data instanceof ContainerNode) {
                     writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
@@ -109,15 +89,6 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         } catch (final XMLStreamException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static SchemaPath getSchemaPath(final YangInstanceIdentifier dataRoot) {
-
-        return SchemaPath.create(dataRoot.getPathArguments().stream()
-                .filter(p -> !(p instanceof NodeIdentifierWithPredicates))
-                .filter(p -> !(p instanceof AugmentationIdentifier))
-                .map(PathArgument::getNodeType)
-                .collect(Collectors.toList()), true);
     }
 
     private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
@@ -144,10 +115,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
     protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot,
                                                        final NormalizedNode node) {
-        if (!dataRoot.equals(ROOT)) {
-            return (Element) transformNormalizedNode(document, node, dataRoot);
-        }
-        return (Element) transformNormalizedNode(document, node, ROOT);
+        return (Element) transformNormalizedNode(document, node, dataRoot);
     }
 
     /**
@@ -169,7 +137,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
             return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
         }
 
-        return Optional.of(ROOT);
+        return Optional.of(YangInstanceIdentifier.empty());
     }
 
     @VisibleForTesting
