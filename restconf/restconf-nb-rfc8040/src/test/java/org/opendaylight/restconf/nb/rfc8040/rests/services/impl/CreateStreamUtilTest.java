@@ -28,11 +28,10 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaAwareBuilders;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -97,36 +96,33 @@ public class CreateStreamUtilTest {
             final String inputOutputName) {
         final Module rpcModule = SCHEMA_CTX.findModules("sal-remote").iterator().next();
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), rpcName);
-        ContainerLike rpcInputSchemaNode = null;
+
+        ContainerLike containerSchemaNode = null;
         for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
-                rpcInputSchemaNode = rpcToContainer.apply(rpc);
+                containerSchemaNode = rpcToContainer.apply(rpc);
                 break;
             }
         }
-        assertNotNull(rpcInputSchemaNode);
-
-        final DataContainerNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> container =
-            SchemaAwareBuilders.containerBuilder(rpcInputSchemaNode);
+        assertNotNull(containerSchemaNode);
 
         final QName lfQName = QName.create(rpcModule.getQNameModule(), inputOutputName);
-        final DataSchemaNode lfSchemaNode = rpcInputSchemaNode.findDataChildByName(lfQName).orElseThrow();
-
+        final DataSchemaNode lfSchemaNode = containerSchemaNode.getDataChildByName(lfQName);
         assertThat(lfSchemaNode, instanceOf(LeafSchemaNode.class));
 
         final Object o;
         if ("toaster".equals(toasterValue)) {
             final QName rpcQname = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", toasterValue);
-            o = YangInstanceIdentifier.builder().node(rpcQname).build();
+            o = YangInstanceIdentifier.of(rpcQname);
         } else {
             o = toasterValue;
         }
-        final LeafNode<Object> lfNode = SchemaAwareBuilders.leafBuilder((LeafSchemaNode) lfSchemaNode)
-                .withValue(o).build();
-        container.withChild(lfNode);
 
         return NormalizedNodePayload.of(InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.of(SCHEMA_CTX, Absolute.of(rpcQName, rpcInputSchemaNode.getQName()))),
-            container.build());
+            SchemaInferenceStack.of(SCHEMA_CTX, Absolute.of(rpcQName, containerSchemaNode.getQName()))),
+            Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(containerSchemaNode.getQName()))
+                .withChild(ImmutableNodes.leafNode(lfQName, o))
+                .build());
     }
 }
