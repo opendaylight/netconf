@@ -9,7 +9,6 @@ package org.opendaylight.netconf.test.tool;
 
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,12 +50,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -65,9 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class MdsalOperationProvider implements NetconfOperationServiceFactory {
-
-    private static final Logger LOG = LoggerFactory
-            .getLogger(MdsalOperationProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MdsalOperationProvider.class);
 
     private final Set<Capability> caps;
     private final EffectiveModelContext schemaContext;
@@ -88,54 +85,45 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     }
 
     @Override
-    public AutoCloseable registerCapabilityListener(
-            final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(caps, Collections.emptySet());
+    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+        listener.onCapabilitiesChanged(caps, Set.of());
         return () -> {
         };
     }
 
     @Override
     public NetconfOperationService createService(final String netconfSessionIdForReporting) {
-        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext,
-            caps, sourceProvider);
+        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext, caps,
+            sourceProvider);
     }
 
     static class MdsalOperationService implements NetconfOperationService {
-        private final long currentSessionId;
+        private final String currentSessionId;
         private final EffectiveModelContext schemaContext;
         private final Set<Capability> caps;
         private final DOMSchemaService schemaService;
         private final DOMDataBroker dataBroker;
         private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
-        MdsalOperationService(final long currentSessionId,
-                              final EffectiveModelContext schemaContext,
+        MdsalOperationService(final long currentSessionId, final EffectiveModelContext schemaContext,
                               final Set<Capability> caps,
                               final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
-            this.currentSessionId = currentSessionId;
+            this.currentSessionId = String.valueOf(currentSessionId);
             this.schemaContext = schemaContext;
             this.caps = caps;
             this.sourceProvider = sourceProvider;
-            this.schemaService = createSchemaService();
+            schemaService = createSchemaService();
 
-            this.dataBroker = createDataStore(schemaService, currentSessionId);
+            dataBroker = createDataStore(schemaService, currentSessionId);
 
         }
 
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
-            TransactionProvider transactionProvider = new TransactionProvider(
-                dataBroker, String.valueOf(currentSessionId));
-            CurrentSchemaContext currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
-
             ContainerNode netconf = createNetconfState();
 
-            YangInstanceIdentifier yangInstanceIdentifier = YangInstanceIdentifier.builder().node(NetconfState.QNAME)
-                    .build();
-
             final DOMDataTreeWriteTransaction tx = dataBroker.newWriteOnlyTransaction();
-            tx.put(LogicalDatastoreType.OPERATIONAL, yangInstanceIdentifier, netconf);
+            tx.put(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(NetconfState.QNAME), netconf);
 
             try {
                 tx.commit().get();
@@ -144,19 +132,18 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                 LOG.warn("Unable to update netconf state", e);
             }
 
-            final Get get = new Get(String.valueOf(currentSessionId), currentSchemaContext, transactionProvider);
-            final EditConfig editConfig = new EditConfig(String.valueOf(currentSessionId), currentSchemaContext,
-                    transactionProvider);
-            final GetConfig getConfig = new GetConfig(String.valueOf(currentSessionId), currentSchemaContext,
-                    transactionProvider);
-            final Commit commit = new Commit(String.valueOf(currentSessionId), transactionProvider);
-            final Lock lock = new Lock(String.valueOf(currentSessionId));
-            final Unlock unLock = new Unlock(String.valueOf(currentSessionId));
-            final DiscardChanges discardChanges = new DiscardChanges(
-                String.valueOf(currentSessionId), transactionProvider);
+            TransactionProvider transactionProvider = new TransactionProvider(dataBroker, currentSessionId);
+            CurrentSchemaContext currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);
 
-            return Sets.newHashSet(get, getConfig,
-                    editConfig, commit, lock, unLock, discardChanges);
+            final Get get = new Get(currentSessionId, currentSchemaContext, transactionProvider);
+            final EditConfig editConfig = new EditConfig(currentSessionId, currentSchemaContext, transactionProvider);
+            final GetConfig getConfig = new GetConfig(currentSessionId, currentSchemaContext, transactionProvider);
+            final Commit commit = new Commit(currentSessionId, transactionProvider);
+            final Lock lock = new Lock(currentSessionId);
+            final Unlock unLock = new Unlock(currentSessionId);
+            final DiscardChanges discardChanges = new DiscardChanges(currentSessionId, transactionProvider);
+
+            return Sets.newHashSet(get, getConfig, editConfig, commit, lock, unLock, discardChanges);
         }
 
         @Override
@@ -164,9 +151,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         }
 
         private ContainerNode createNetconfState() {
-            DummyMonitoringService monitor = new DummyMonitoringService(
-                    caps);
-
+            final DummyMonitoringService monitor = new DummyMonitoringService(caps);
             final QName identifier = QName.create(Schema.QNAME, "identifier");
             final QName version = QName.create(Schema.QNAME, "version");
             final QName format = QName.create(Schema.QNAME, "format");
@@ -175,8 +160,13 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
             CollectionNodeBuilder<MapEntryNode, SystemMapNode> schemaMapEntryNodeMapNodeCollectionNodeBuilder =
                 Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(Schema.QNAME));
-            LeafSetEntryNode locationLeafSetEntryNode = Builders.leafSetEntryBuilder().withNodeIdentifier(
-                            new NodeWithValue<>(location, "NETCONF")).withValue("NETCONF").build();
+            LeafSetNode<String> locationLeafSet = Builders.<String>leafSetBuilder()
+                .withNodeIdentifier(new NodeIdentifier(location))
+                .withChild(Builders.<String>leafSetEntryBuilder()
+                    .withNodeIdentifier(new NodeWithValue<>(location, "NETCONF"))
+                    .withValue("NETCONF")
+                    .build())
+                .build();
 
             Map<QName, Object> keyValues = new HashMap<>();
             for (final Schema schema : monitor.getSchemas().nonnullSchema().values()) {
@@ -184,30 +174,23 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                 keyValues.put(version, schema.getVersion());
                 keyValues.put(format, Yang.QNAME);
 
-                MapEntryNode schemaMapEntryNode = Builders.mapEntryBuilder()
-                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keyValues))
-                        .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(identifier))
-                            .withValue(schema.getIdentifier()).build())
-                        .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(version))
-                            .withValue(schema.getVersion()).build())
-                        .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(format))
-                            .withValue(Yang.QNAME).build())
-                        .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(namespace))
-                            .withValue(schema.getNamespace().getValue()).build())
-                        .withChild((DataContainerChild) Builders.leafSetBuilder().withNodeIdentifier(
-                                        new NodeIdentifier(location))
-                                .withChild(locationLeafSetEntryNode).build())
-                        .build();
-
-                schemaMapEntryNodeMapNodeCollectionNodeBuilder.withChild(schemaMapEntryNode);
+                schemaMapEntryNodeMapNodeCollectionNodeBuilder.withChild(Builders.mapEntryBuilder()
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keyValues))
+                    .withChild(ImmutableNodes.leafNode(identifier, schema.getIdentifier()))
+                    .withChild(ImmutableNodes.leafNode(version, schema.getVersion()))
+                    .withChild(ImmutableNodes.leafNode(format, Yang.QNAME))
+                    .withChild(ImmutableNodes.leafNode(namespace, schema.getNamespace().getValue()))
+                    .withChild(locationLeafSet)
+                    .build());
             }
 
-            DataContainerChild schemaList = schemaMapEntryNodeMapNodeCollectionNodeBuilder.build();
-
-            ContainerNode schemasContainer = Builders.containerBuilder().withNodeIdentifier(
-                    new NodeIdentifier(Schemas.QNAME)).withChild(schemaList).build();
-            return Builders.containerBuilder().withNodeIdentifier(
-                    new NodeIdentifier(NetconfState.QNAME)).withChild(schemasContainer).build();
+            return Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(NetconfState.QNAME))
+                .withChild(Builders.containerBuilder()
+                    .withNodeIdentifier(new NodeIdentifier(Schemas.QNAME))
+                    .withChild(schemaMapEntryNodeMapNodeCollectionNodeBuilder.build())
+                    .build())
+                .build();
         }
 
         private static DOMDataBroker createDataStore(final DOMSchemaService schemaService, final long sessionId) {
@@ -215,8 +198,8 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
             final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
-            ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
-                    16, 16, "CommitFutures", MdsalOperationProvider.class);
+            ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(16, 16,
+                "CommitFutures", MdsalOperationProvider.class);
 
             final EnumMap<LogicalDatastoreType, DOMStore> datastores = new EnumMap<>(LogicalDatastoreType.class);
             datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
@@ -246,5 +229,4 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             };
         }
     }
-
 }
