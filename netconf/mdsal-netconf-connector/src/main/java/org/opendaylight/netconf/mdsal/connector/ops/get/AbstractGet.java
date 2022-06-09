@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 // FIXME: seal when we have JDK17+
-public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
+abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
     private static final String FILTER = "filter";
 
@@ -47,21 +47,18 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
     }
 
-    // FIXME: hide this field
-    protected final CurrentSchemaContext schemaContext;
+    private final CurrentSchemaContext schemaContext;
     private final FilterContentValidator validator;
 
-    // FIXME: package-private
-    protected AbstractGet(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
+    AbstractGet(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
         super(netconfSessionIdForReporting);
         this.schemaContext = schemaContext;
         validator = new FilterContentValidator(schemaContext);
     }
 
-    // FIXME: hide this method
     // FIXME: throw a DocumentedException
-    protected Node transformNormalizedNode(final Document document, final NormalizedNode data,
-                                           final YangInstanceIdentifier dataRoot) {
+    private Node transformNormalizedNode(final Document document, final NormalizedNode data,
+                                         final YangInstanceIdentifier dataRoot) {
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
         final EffectiveModelContext currentContext = schemaContext.getCurrentContext();
@@ -111,8 +108,8 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
-    protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot,
-                                                       final NormalizedNode node) {
+    final Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot,
+                                                   final NormalizedNode node) {
         return (Element) transformNormalizedNode(document, node, dataRoot);
     }
 
@@ -125,7 +122,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
      *      container in the response. If filter is not present we want to read the entire datastore - return ROOT.
      * @throws DocumentedException if not possible to get identifier from filter
      */
-    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement)
+    final Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement)
             throws DocumentedException {
         final Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
         if (filterElement.isPresent()) {
@@ -139,7 +136,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     }
 
     @VisibleForTesting
-    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(final XmlElement filterElement)
+    protected final YangInstanceIdentifier getInstanceIdentifierFromFilter(final XmlElement filterElement)
             throws DocumentedException {
 
         if (filterElement.getChildElements().size() != 1) {

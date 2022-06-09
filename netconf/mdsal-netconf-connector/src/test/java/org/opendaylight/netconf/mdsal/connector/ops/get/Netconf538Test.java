@@ -25,7 +25,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -40,10 +39,8 @@ public class Netconf538Test {
     private TransactionProvider transactionProvider;
 
     @Test
-    public void transformNormalizedNodeTest_mapNodeTest() throws Exception {
-
-        final SchemaContext context = YangParserTestUtils.parseYangResources(Netconf538Test.class,
-                "/yang/simple-list.yang");
+    public void testRootMap() throws Exception {
+        final var context = YangParserTestUtils.parseYangResources(Netconf538Test.class, "/yang/simple-list.yang");
         final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
 
@@ -62,7 +59,7 @@ public class Netconf538Test {
                 .build())
             .build();
 
-        final Node node = getConfig.transformNormalizedNode(document, data, YangInstanceIdentifier.of(BASE));
+        final Node node = getConfig.serializeNodeWithParentStructure(document, YangInstanceIdentifier.of(BASE), data);
 
         assertNotNull(node);
         Node nodeUser = node.getFirstChild();
