@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.util.Optional;
@@ -25,20 +27,17 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.YangInstanceIdentifierWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+// FIXME: seal when we have JDK17+
 public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
     private static final String FILTER = "filter";
@@ -48,15 +47,19 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
     }
 
+    // FIXME: hide this field
     protected final CurrentSchemaContext schemaContext;
     private final FilterContentValidator validator;
 
-    public AbstractGet(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
+    // FIXME: package-private
+    protected AbstractGet(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
         super(netconfSessionIdForReporting);
         this.schemaContext = schemaContext;
         validator = new FilterContentValidator(schemaContext);
     }
 
+    // FIXME: hide this method
+    // FIXME: throw a DocumentedException
     protected Node transformNormalizedNode(final Document document, final NormalizedNode data,
                                            final YangInstanceIdentifier dataRoot) {
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
@@ -66,21 +69,38 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
             currentContext);
 
-        try (var yiidWriter = YangInstanceIdentifierWriter.open(nnStreamWriter, currentContext, dataRoot)) {
-            try (var nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true)) {
-                if (data instanceof ContainerNode) {
-                    writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
-                } else if (data instanceof MapNode) {
-                    writeRootElement(xmlWriter, nnWriter, (MapNode) data);
-                } else {
-                    throw new IllegalArgumentException("Unable to transform node of type: "
-                            + data.getClass().toString() + " offending node: " + data);
-                }
+        try {
+            if (dataRoot.isEmpty()) {
+                writeRoot(nnStreamWriter, data);
+            } else {
+                write(nnStreamWriter, currentContext, dataRoot.coerceParent(), data);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         return result.getNode();
+    }
+
+    private static void write(final NormalizedNodeStreamWriter nnStreamWriter,
+            final EffectiveModelContext currentContext, final YangInstanceIdentifier parent, final NormalizedNode data)
+                throws IOException {
+        try (var yiidWriter = YangInstanceIdentifierWriter.open(nnStreamWriter, currentContext, parent)) {
+            try (var nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true)) {
+                nnWriter.write(data);
+            }
+        }
+    }
+
+    private static void writeRoot(final NormalizedNodeStreamWriter nnStreamWriter, final NormalizedNode data)
+            throws IOException {
+        checkArgument(data instanceof ContainerNode, "Unexpected root data %s", data);
+
+        try (var nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true)) {
+            for (var child : ((ContainerNode) data).body()) {
+                nnWriter.write(child);
+            }
+        }
     }
 
     private static XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
@@ -88,28 +108,6 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
         } catch (final XMLStreamException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
-                                         final ContainerNode data) throws IOException {
-        if (data.getIdentifier().getNodeType().equals(SchemaContext.NAME)) {
-            for (final DataContainerChild child : data.body()) {
-                nnWriter.write(child);
-            }
-        } else {
-            nnWriter.write(data);
-        }
-    }
-
-    private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
-                                         final MapNode data) throws IOException {
-        if (data.getIdentifier().getNodeType().equals(SchemaContext.NAME)) {
-            for (final MapEntryNode child : data.body()) {
-                nnWriter.write(child);
-            }
-        } else {
-            nnWriter.write(data);
         }
     }
 
