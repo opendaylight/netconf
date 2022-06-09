@@ -62,7 +62,7 @@ public class Netconf538Test {
                 .build())
             .build();
 
-        final Node node = getConfig.transformNormalizedNode(document, data, YangInstanceIdentifier.empty());
+        final Node node = getConfig.transformNormalizedNode(document, data, YangInstanceIdentifier.of(BASE));
 
         assertNotNull(node);
         Node nodeUser = node.getFirstChild();
