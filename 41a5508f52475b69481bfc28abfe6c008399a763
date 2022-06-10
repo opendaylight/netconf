@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9dc15e3_dc46ab98",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-06-10T15:19:28Z",
+      "side": 1,
+      "message": "Resolved",
+      "parentUuid": "b3d1d0dc_7fa68833",
+      "revId": "41a5508f52475b69481bfc28abfe6c008399a763",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "46bb30e4_33225c80",
@@ -71,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5a1c5edc_cb91f05b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationListenerAdaptor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-06-10T15:19:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "60ca35d1_d4bbc869",
+      "revId": "41a5508f52475b69481bfc28abfe6c008399a763",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1df8d2f8_6938b3a9",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
         "patchSetId": 7
@@ -82,6 +118,24 @@
       "writtenOn": "2022-06-08T09:28:20Z",
       "side": 1,
       "message": "2022",
+      "revId": "41a5508f52475b69481bfc28abfe6c008399a763",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4c83197_67577633",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/DeviceNotificationMountPointListener.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-06-10T15:19:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1df8d2f8_6938b3a9",
       "revId": "41a5508f52475b69481bfc28abfe6c008399a763",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
