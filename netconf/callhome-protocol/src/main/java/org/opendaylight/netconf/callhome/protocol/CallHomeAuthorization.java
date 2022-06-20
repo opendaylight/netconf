@@ -14,6 +14,7 @@ import java.security.KeyPair;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 
 /**
@@ -93,11 +94,9 @@ public abstract class CallHomeAuthorization {
      * Builder for CallHomeAuthorization which accepts incoming connection.
      *
      * <p>
-     * Use {@link CallHomeAuthorization#serverAccepted(String, String)} to instantiate
-     * builder.
+     * Use {@link CallHomeAuthorization#serverAccepted(String, String)} to instantiate builder.
      */
-    public static class Builder implements org.opendaylight.yangtools.concepts.Builder<CallHomeAuthorization> {
-
+    public static class Builder {
         private final String nodeId;
         private final String username;
         private final Set<String> passwords = new HashSet<>();
@@ -115,7 +114,7 @@ public abstract class CallHomeAuthorization {
          * @return this builder.
          */
         public Builder addPassword(final String password) {
-            this.passwords.add(password);
+            passwords.add(password);
             return this;
         }
 
@@ -126,19 +125,16 @@ public abstract class CallHomeAuthorization {
          * @return this builder.
          */
         public Builder addClientKeys(final KeyPair clientKey) {
-            this.clientKeys.add(clientKey);
+            clientKeys.add(clientKey);
             return this;
         }
 
-        @Override
-        public CallHomeAuthorization build() {
+        public @NonNull CallHomeAuthorization build() {
             return new ServerAllowed(nodeId, username, passwords, clientKeys);
         }
-
     }
 
-    private static class ServerAllowed extends CallHomeAuthorization {
-
+    private static final class ServerAllowed extends CallHomeAuthorization {
         private final String nodeId;
         private final String username;
         private final Set<String> passwords;
@@ -148,7 +144,7 @@ public abstract class CallHomeAuthorization {
                       final Collection<KeyPair> clientKeyPairs) {
             this.username = requireNonNull(username);
             this.passwords = ImmutableSet.copyOf(passwords);
-            this.clientKeyPair = ImmutableSet.copyOf(clientKeyPairs);
+            clientKeyPair = ImmutableSet.copyOf(clientKeyPairs);
             this.nodeId = requireNonNull(nodeId);
         }
 
