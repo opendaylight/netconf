@@ -64,7 +64,7 @@ public enum ContentParam implements RestconfQueryParam<ContentParam> {
                 return NONCONFIG;
             default:
                 throw new IllegalArgumentException(
-                    "Value can be 'all', 'config' or 'non-config', not '" + uriValue + "'");
+                    "Value can be 'all', 'config' or 'nonconfig', not '" + uriValue + "'");
         }
     }
 }
