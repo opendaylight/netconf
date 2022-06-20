@@ -52,8 +52,9 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     protected CallHomeTopology topology;
 
     private final CloseCallback onCloseHandler = deviceContext -> {
-        LOG.info("Removing {} from Netconf Topology.", deviceContext.getId());
-        topology.disconnectNode(deviceContext.getId());
+        final var nodeId = deviceContext.getId();
+        LOG.info("Removing {} from Netconf Topology.", nodeId);
+        topology.disconnectNode(nodeId);
     };
 
     private final DeviceActionFactory deviceActionFactory;
