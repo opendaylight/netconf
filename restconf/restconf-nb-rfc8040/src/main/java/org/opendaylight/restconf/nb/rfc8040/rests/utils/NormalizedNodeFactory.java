@@ -8,12 +8,11 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import java.util.Optional;
-import org.opendaylight.yangtools.concepts.Builder;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-class NormalizedNodeFactory extends FutureDataFactory<Optional<NormalizedNode>> implements Builder<NormalizedNode> {
-    @Override
-    public NormalizedNode build() {
+final class NormalizedNodeFactory extends FutureDataFactory<Optional<NormalizedNode>> {
+    @Nullable NormalizedNode build() {
         return result.orElse(null);
     }
 }

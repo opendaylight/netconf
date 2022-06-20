@@ -11,18 +11,17 @@ import java.net.URI;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.yangtools.concepts.Builder;
 
-final class ResponseFactory extends FutureDataFactory<CommitInfo> implements Builder<Response> {
-
+final class ResponseFactory extends FutureDataFactory<CommitInfo> {
     private ResponseBuilder responseBuilder;
 
     ResponseFactory() {
     }
 
     ResponseFactory(final Status status) {
-        this.responseBuilder = Response.status(status);
+        responseBuilder = Response.status(status);
     }
 
     ResponseFactory status(final Status status) {
@@ -35,11 +34,10 @@ final class ResponseFactory extends FutureDataFactory<CommitInfo> implements Bui
         return this;
     }
 
-    @Override
-    public Response build() {
+    public @NonNull Response build() {
         if (getFailureStatus()) {
             responseBuilder = responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        return this.responseBuilder.build();
+        return responseBuilder.build();
     }
 }

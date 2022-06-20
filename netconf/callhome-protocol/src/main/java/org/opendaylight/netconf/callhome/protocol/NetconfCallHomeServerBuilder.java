@@ -13,13 +13,11 @@ import io.netty.util.HashedWheelTimer;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.Factory;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
-import org.opendaylight.yangtools.concepts.Builder;
 
-public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServer> {
-
+public class NetconfCallHomeServerBuilder {
     private static final long DEFAULT_SESSION_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(5);
     private static final int DEFAULT_CALL_HOME_PORT = 4334;
 
@@ -39,11 +37,10 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
         this.recorder = recorder;
     }
 
-    @Override
-    public NetconfCallHomeServer build() {
-        Factory factory =
-                new CallHomeSessionContext.Factory(nettyGroup(), negotiatorFactory(), subsystemListener());
-        return new NetconfCallHomeServer(sshClient(), authProvider(), factory, bindAddress(), this.recorder);
+    public @NonNull NetconfCallHomeServer build() {
+        return new NetconfCallHomeServer(sshClient(), authProvider(),
+            new CallHomeSessionContext.Factory(nettyGroup(), negotiatorFactory(), subsystemListener()),
+            bindAddress(), recorder);
     }
 
     public SshClient getSshClient() {
