@@ -54,7 +54,7 @@ public class NetconfClientBuilder extends ClientBuilder {
     @Override
     protected ClientBuilder fillWithDefaultValues() {
         if (factory == null) {
-            factory = NetconfSshClient.DEFAULT_NETCONF_SSH_CLIENT_FACTORY;
+            factory = NetconfSshClient::new;
         }
         if (signatureFactories == null) {
             signatureFactories = FULL_SIGNATURE_PREFERENCE;

@@ -9,7 +9,6 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import com.google.common.annotations.Beta;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
-import org.opendaylight.netconf.shaded.sshd.common.Factory;
 
 /**
  * An extension to {@link SshClient} which uses {@link NetconfSessionFactory} to create sessions (leading towards
@@ -17,8 +16,6 @@ import org.opendaylight.netconf.shaded.sshd.common.Factory;
  */
 @Beta
 public class NetconfSshClient extends SshClient {
-    public static final Factory<SshClient> DEFAULT_NETCONF_SSH_CLIENT_FACTORY = NetconfSshClient::new;
-
     @Override
     protected NetconfSessionFactory createSessionFactory() {
         return new NetconfSessionFactory(this);
