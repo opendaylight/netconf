@@ -11,9 +11,7 @@ import com.google.common.annotations.Beta;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
-import org.opendaylight.netconf.shaded.sshd.common.Factory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.ConnectionService;
 
@@ -23,8 +21,6 @@ import org.opendaylight.netconf.shaded.sshd.common.session.ConnectionService;
  */
 @Beta
 public class NetconfClientSessionImpl extends ClientSessionImpl implements NettyAwareClientSession {
-    public static final Factory<SshClient> DEFAULT_NETCONF_SSH_CLIENT_FACTORY = SshClient::new;
-
     public NetconfClientSessionImpl(final ClientFactoryManager client, final IoSession ioSession) throws Exception {
         super(client, ioSession);
     }
