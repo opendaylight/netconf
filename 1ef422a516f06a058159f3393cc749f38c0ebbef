@@ -49,6 +49,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba0c2a4d_59f68f1d",
+        "filename": "restconf/restconf-common-models/src/main/yang/device-notification.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-06-22T03:55:31Z",
+      "side": 1,
+      "message": "There is no relationship between them.\ndescription is type, will change it.\n\nCan I add this RPC (specific to Device notification) in existing Sal-remote yang ?",
+      "parentUuid": "125d4c13_a634aed4",
+      "range": {
+        "startLine": 22,
+        "startChar": 21,
+        "endLine": 22,
+        "endChar": 28
+      },
+      "revId": "1ef422a516f06a058159f3393cc749f38c0ebbef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32f5eae0_7204013b",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
         "patchSetId": 9
