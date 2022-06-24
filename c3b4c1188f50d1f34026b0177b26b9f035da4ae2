@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d50f29c_26e2be0b",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 9048
+      },
+      "writtenOn": "2022-06-24T11:27:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53e7b025_49676767",
+      "revId": "c3b4c1188f50d1f34026b0177b26b9f035da4ae2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2ae6942_579f4033",
