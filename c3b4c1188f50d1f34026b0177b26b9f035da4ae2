@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53e7b025_49676767",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-06-24T10:49:48Z",
+      "side": 1,
+      "message": "Revert this back.",
+      "revId": "c3b4c1188f50d1f34026b0177b26b9f035da4ae2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2ae6942_579f4033",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerTest.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-06-24T10:49:48Z",
+      "side": 1,
+      "message": "Do we need this line?",
+      "revId": "c3b4c1188f50d1f34026b0177b26b9f035da4ae2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

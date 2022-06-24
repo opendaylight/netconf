@@ -71,6 +71,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbf7a342_b081a773",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-06-24T10:49:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ea11692_ca558143",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "574dc2b1_8a2d42f9",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-06-24T10:49:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e920b62_a0a51a59",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f91e166a_effe7e16",
@@ -102,6 +138,24 @@
       "side": 1,
       "message": "No, it does not need to be. If you mean there should be a DEFAULT access modifier, \nas it is in the case of other methods in Factory.java, I will make a change.",
       "parentUuid": "f91e166a_effe7e16",
+      "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5137fef_47575bc9",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-06-24T10:49:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2999779_35a7b914",
       "revId": "4efe1e54ebe5bb6942aad9d056bff3d62f0abf73",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
