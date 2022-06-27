@@ -85,7 +85,7 @@ public final class Main {
             try {
                 netconfDeviceSimulator.wait();
             } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Interrupted while waiting", e);
             }
         }
     }

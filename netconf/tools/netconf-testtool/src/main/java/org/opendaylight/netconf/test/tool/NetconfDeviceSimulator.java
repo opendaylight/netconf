@@ -60,7 +60,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.Submodule;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -95,8 +94,7 @@ public class NetconfDeviceSimulator implements Closeable {
         hashedWheelTimer = new HashedWheelTimer();
         minaTimerExecutor = Executors.newScheduledThreadPool(configuration.getThreadPoolSize(),
                 new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build());
-        nioExecutor = ThreadUtils
-                .newFixedThreadPool("netconf-ssh-server-nio-group", configuration.getThreadPoolSize());
+        nioExecutor = ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", configuration.getThreadPoolSize());
     }
 
     private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities,
@@ -232,7 +230,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 try {
                     server.get();
                 } catch (final InterruptedException e) {
-                    throw new RuntimeException(e);
+                    throw new IllegalStateException("Interrupted while waiting for server", e);
                 } catch (final ExecutionException e) {
                     LOG.warn("Cannot start ssh simulated device on {}, skipping", address, e);
                     continue;
@@ -247,7 +245,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 try {
                     server.get();
                 } catch (final InterruptedException e) {
-                    throw new RuntimeException(e);
+                    throw new IllegalStateException("Interrupted while waiting for server", e);
                 } catch (final ExecutionException e) {
                     LOG.warn("Cannot start tcp simulated device on {}, skipping", address, e);
                     continue;
@@ -321,8 +319,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }
 
         configuration.getDefaultYangResources().forEach(r -> {
-            final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create(r.getModuleName(),
-                Revision.ofNullable(r.getRevision()));
+            final SourceIdentifier sourceIdentifier = new SourceIdentifier(r.getModuleName(), r.getRevision());
             registerSource(consumer, r.getResourcePath(), sourceIdentifier);
         });
 
@@ -331,8 +328,8 @@ public class NetconfDeviceSimulator implements Closeable {
             schemaContext = consumer.createEffectiveModelContextFactory()
                     .createEffectiveModelContext(loadedSources).get();
         } catch (final InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Cannot parse schema context. "
-                    + "Please read stack trace and check YANG files in schema directory.", e);
+            throw new IllegalStateException(
+                "Cannot parse schema context. Please read stack trace and check YANG files in schema directory.", e);
         }
 
         final Set<Capability> capabilities = new HashSet<>();
@@ -348,16 +345,16 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private static void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
                                             final ModuleLike module) {
-        final SourceIdentifier moduleSourceIdentifier = RevisionSourceIdentifier.create(module.getName(),
-            module.getRevision());
+        final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
+            module.getRevision().map(Revision::toString).orElse(null));
         try {
             final String moduleContent = new String(
                 consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class).get().read());
             capabilities.add(new YangModuleCapability(module, moduleContent));
             //IOException would be thrown in creating SchemaContext already
         } catch (final ExecutionException | InterruptedException | IOException e) {
-            throw new RuntimeException("Cannot retrieve schema source for module "
-                + moduleSourceIdentifier.toString() + " from schema repository", e);
+            throw new IllegalStateException(
+                "Cannot retrieve schema source for module " + moduleSourceIdentifier + " from schema repository", e);
         }
     }
 
@@ -373,7 +370,7 @@ public class NetconfDeviceSimulator implements Closeable {
         try {
             return new InetSocketAddress(Inet4Address.getByName(ip), port);
         } catch (final UnknownHostException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Cannot resolve address " + ip, e);
         }
     }
 

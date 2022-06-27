@@ -98,9 +98,9 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
 
     @Override
     public ListenableFuture<YangTextSchemaSource> getSource(final SourceIdentifier sourceIdentifier) {
-        final String moduleName = sourceIdentifier.getName();
+        final String moduleName = sourceIdentifier.name().getLocalName();
 
-        final Optional<String> revision = sourceIdentifier.getRevision().map(Revision::toString);
+        final Optional<String> revision = Optional.ofNullable(sourceIdentifier.revision()).map(Revision::toString);
         final ContainerNode getSchemaRequest = createGetSchemaRequest(moduleName, revision);
         LOG.trace("{}: Loading YANG schema source for {}:{}", id, moduleName, revision);
         return Futures.transform(

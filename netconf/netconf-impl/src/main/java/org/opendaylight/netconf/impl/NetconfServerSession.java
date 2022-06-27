@@ -82,7 +82,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     @Override
     protected void sessionUp() {
         checkState(loginTime == null, "Session is already up");
-        this.loginTime = Instant.now().atZone(ZoneId.systemDefault());
+        loginTime = Instant.now().atZone(ZoneId.systemDefault());
         super.sessionUp();
     }
 
@@ -91,7 +91,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
      * Suitable for close rpc that needs to send ok response before the session is closed.
      */
     public void delayedClose() {
-        this.delayedClose = true;
+        delayedClose = true;
     }
 
     @Override
@@ -149,15 +149,12 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
                 .build();
     }
 
-    private static Class<? extends Transport> getTransportForString(final String transport) {
-        switch (transport) {
-            case "ssh":
-                return NetconfSsh.class;
-            case "tcp":
-                return NetconfTcp.class;
-            default:
-                throw new IllegalArgumentException("Unknown transport type " + transport);
-        }
+    private static Transport getTransportForString(final String transport) {
+        return switch (transport) {
+            case "ssh" -> NetconfSsh.VALUE;
+            case "tcp" -> NetconfTcp.VALUE;
+            default -> throw new IllegalArgumentException("Unknown transport type " + transport);
+        };
     }
 
     @Override

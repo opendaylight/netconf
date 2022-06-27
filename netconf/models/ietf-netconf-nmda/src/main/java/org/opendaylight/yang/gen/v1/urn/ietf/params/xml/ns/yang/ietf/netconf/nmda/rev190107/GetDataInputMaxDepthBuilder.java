@@ -7,7 +7,6 @@
  */
 package org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.nmda.rev190107;
 
-import java.util.Optional;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.nmda.rev190107.GetDataInput.MaxDepth;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.nmda.rev190107.GetDataInput.MaxDepth.Enumeration;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -21,9 +20,9 @@ public final class GetDataInputMaxDepthBuilder {
     }
 
     public static MaxDepth getDefaultInstance(final String defaultValue) {
-        final Optional<Enumeration> optEnum = Enumeration.forName(defaultValue);
-        if (optEnum.isPresent()) {
-            return new MaxDepth(optEnum.get());
+        final var optEnum = Enumeration.forName(defaultValue);
+        if (optEnum != null) {
+            return new MaxDepth(optEnum);
         }
         // FIXME: consider being stricter about number formats here
         return new MaxDepth(Uint16.valueOf(defaultValue));

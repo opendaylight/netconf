@@ -13,7 +13,6 @@ import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddressBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
  * Create an MD-SAL NETCONF server using TCP.
  */
 public class NetconfNorthboundTcpServer implements AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundTcpServer.class);
 
     private final ChannelFuture tcpServer;
@@ -35,13 +33,13 @@ public class NetconfNorthboundTcpServer implements AutoCloseable {
                 LOG.info("Netconf TCP endpoint started successfully at {}", inetAddress);
             } else {
                 LOG.warn("Unable to start TCP netconf server at {}", inetAddress, future.cause());
-                throw new RuntimeException("Unable to start TCP netconf server", future.cause());
+                throw new IllegalStateException("Unable to start TCP netconf server", future.cause());
             }
         });
     }
 
     private static InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
-        final IpAddress ipAddress = IpAddressBuilder.getDefaultInstance(bindingAddress);
+        final IpAddress ipAddress = IetfInetUtil.ipAddressFor(bindingAddress);
         final InetAddress inetAd = IetfInetUtil.INSTANCE.inetAddressFor(ipAddress);
         return new InetSocketAddress(inetAd, Integer.parseInt(portNumber));
     }

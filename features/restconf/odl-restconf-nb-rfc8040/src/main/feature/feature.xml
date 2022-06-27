@@ -8,8 +8,8 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-restconf-nb-rfc8040-${project.version}">
     <feature name="odl-restconf-nb-rfc8040" version="${project.version}">
-        <feature version="[9,10)">odl-mdsal-model-rfc8072</feature>
-        <feature version="[5,6)">odl-controller-exp-netty-config</feature>
+        <feature version="[10,11)">odl-mdsal-model-rfc8072</feature>
+        <feature version="[6,7)">odl-controller-exp-netty-config</feature>
         <configfile finalname="etc/org.opendaylight.restconf.nb.rfc8040.cfg">
             mvn:org.opendaylight.netconf/restconf-nb-rfc8040/${project.version}/cfg/config
         </configfile>

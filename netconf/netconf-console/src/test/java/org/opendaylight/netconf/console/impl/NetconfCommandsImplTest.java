@@ -37,7 +37,8 @@ import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 import org.opendaylight.netconf.console.utils.NetconfConsoleUtils;
 import org.opendaylight.netconf.console.utils.NetconfIidFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
@@ -126,7 +127,8 @@ public class NetconfCommandsImplTest {
     @Test
     public void testConnectDisconnectDevice() throws InterruptedException, TimeoutException, ExecutionException {
         final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setPort(new PortNumber(Uint16.valueOf(7777))).setHost(HostBuilder.getDefaultInstance("10.10.1.1"))
+                .setPort(new PortNumber(Uint16.valueOf(7777)))
+                .setHost(new Host(new IpAddress(new Ipv4Address("10.10.1.1"))))
                 .build();
 
         createTopology(LogicalDatastoreType.CONFIGURATION);
@@ -217,7 +219,7 @@ public class NetconfCommandsImplTest {
     private static Node getNetconfNode(final String nodeIdent, final String ip, final int portNumber,
             final NetconfNodeConnectionStatus.ConnectionStatus cs, final String notificationCapabilityPrefix) {
 
-        final Host host = HostBuilder.getDefaultInstance(ip);
+        final Host host = new Host(new IpAddress(new Ipv4Address(ip)));
         final PortNumber port = new PortNumber(Uint16.valueOf(portNumber));
 
         final List<AvailableCapability> avCapList = new ArrayList<>();

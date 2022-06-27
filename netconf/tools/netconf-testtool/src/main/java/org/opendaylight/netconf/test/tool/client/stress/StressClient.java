@@ -174,12 +174,12 @@ public final class StressClient {
                 try {
                     future.get(4L, TimeUnit.MINUTES);
                 } catch (ExecutionException | TimeoutException e) {
-                    throw new RuntimeException(e);
+                    throw new IllegalStateException(e);
                 }
             }
             executorService.shutdownNow();
         } catch (final InterruptedException e) {
-            throw new RuntimeException("Unable to execute requests", e);
+            throw new IllegalStateException("Unable to execute requests", e);
         }
         started.stop();
 
@@ -238,12 +238,10 @@ public final class StressClient {
             } else {
                 netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer);
             }
+        } else if (params.legacyFraming) {
+            netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer);
         } else {
-            if (params.legacyFraming) {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer);
-            } else {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
-            }
+            netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
         }
         return netconfClientDispatcher;
     }

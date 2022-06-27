@@ -9,6 +9,7 @@ package org.opendaylight.netconf.test.tool;
 
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
@@ -125,7 +126,7 @@ public final class ScaleUtil {
                 SEMAPHORE.acquire();
                 root.warn("semaphore released");
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Interrupted while waiting for semaphore", e);
             }
 
             timeoutGuardFuture.cancel(false);
@@ -176,10 +177,8 @@ public final class ScaleUtil {
             for (File f : files) {
                 if (f.isDirectory()) {
                     deleteFolder(f);
-                } else {
-                    if (!f.delete()) {
-                        root.warn("Failed to delete {}", f);
-                    }
+                } else if (!f.delete()) {
+                    root.warn("Failed to delete {}", f);
                 }
             }
         }
@@ -191,7 +190,7 @@ public final class ScaleUtil {
     private static void waitNetconfTopologyReady(final TesttoolParameters params) {
         root.info("Wait for Netconf topology to be accessible via Restconf");
         HttpResponse<String> response = requestNetconfTopology(params);
-        while (response == null || (response.statusCode() != 200 && response.statusCode() != 204)) {
+        while (response == null || response.statusCode() != 200 && response.statusCode() != 204) {
             if (response == null) {
                 root.warn("Failed to get response from controller, going to sleep...");
             } else {
@@ -199,10 +198,10 @@ public final class ScaleUtil {
             }
             try {
                 Thread.sleep(1000L);
-                response = requestNetconfTopology(params);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Sleep interrupted", e);
             }
+            response = requestNetconfTopology(params);
         }
         root.info("Returned status code {}, Netconf topology is accessible", response.statusCode());
     }
@@ -230,7 +229,7 @@ public final class ScaleUtil {
             root.warn(e.getMessage());
             return null;
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Interrupted while waiting for response", e);
         }
     }
 
@@ -305,7 +304,6 @@ public final class ScaleUtil {
         }
     }
 
-    @SuppressWarnings("checkstyle:illegalCatch")
     public static class LoggingWrapperExecutor extends ScheduledThreadPoolExecutor {
         public LoggingWrapperExecutor(final int corePoolSize) {
             super(corePoolSize);
@@ -324,15 +322,16 @@ public final class ScaleUtil {
             }
 
             @Override
+            @SuppressWarnings("checkstyle:illegalCatch")
             public T call() {
                 try {
                     return theCallable.call();
                 } catch (Exception e) {
                     // log
                     root.warn("error in executing: " + theCallable + ". It will no longer be run!", e);
-
+                    Throwables.throwIfUnchecked(e);
                     // rethrow so that the executor can do it's thing
-                    throw new RuntimeException(e);
+                    throw new IllegalStateException(e);
                 }
             }
         }

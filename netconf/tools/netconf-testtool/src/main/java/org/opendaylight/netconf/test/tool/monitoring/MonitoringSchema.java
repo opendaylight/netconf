@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.monitoring;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.Collections2;
 import java.util.Collection;
 import javax.xml.bind.annotation.XmlElement;
@@ -45,8 +45,8 @@ final class MonitoringSchema {
 
     @XmlElement(name = "format")
     public String getFormat() {
-        Preconditions.checkState(schema.getFormat() == Yang.class, "Only yang format permitted, but was %s",
-                schema.getFormat());
+        final var format = schema.getFormat();
+        checkState(Yang.VALUE.equals(format), "Only yang format permitted, but was %s", format);
         return "yang";
     }
 }

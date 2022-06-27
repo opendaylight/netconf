@@ -12,6 +12,7 @@ import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARA
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import com.google.common.base.Function;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -67,9 +68,8 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
     synchronized Schemas getSchemas() {
         try {
             return transformSchemas(netconfOperationProvider.getCapabilities());
-        } catch (final RuntimeException e) {
-            throw e;
         } catch (final Exception e) {
+            Throwables.throwIfUnchecked(e);
             throw new IllegalStateException("Exception while closing", e);
         }
     }
@@ -142,11 +142,11 @@ final class NetconfCapabilityMonitoringService implements CapabilityListener, Au
         final Map<SchemaKey, Schema> schemas = Maps.newHashMapWithExpectedSize(caps.size());
         for (final Capability cap : caps) {
             if (isValidModuleCapability(cap)) {
-                final SchemaKey key = new SchemaKey(Yang.class, cap.getModuleName().get(),
+                final SchemaKey key = new SchemaKey(Yang.VALUE, cap.getModuleName().orElseThrow(),
                     cap.getRevision().orElse(""));
                 schemas.put(key, new SchemaBuilder()
                     .withKey(key)
-                    .setNamespace(new Uri(cap.getModuleNamespace().get()))
+                    .setNamespace(new Uri(cap.getModuleNamespace().orElseThrow()))
                     .setLocation(transformLocations(cap.getLocation()))
                     .build());
             }

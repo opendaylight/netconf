@@ -44,7 +44,6 @@ import akka.testkit.TestActorRef;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.io.ByteSource;
 import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.FluentFuture;
@@ -118,7 +117,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -135,8 +133,8 @@ import scala.concurrent.Future;
 public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private static final Timeout TIMEOUT = Timeout.create(Duration.ofSeconds(5));
-    private static final RevisionSourceIdentifier SOURCE_IDENTIFIER1 = RevisionSourceIdentifier.create("yang1");
-    private static final RevisionSourceIdentifier SOURCE_IDENTIFIER2 = RevisionSourceIdentifier.create("yang2");
+    private static final SourceIdentifier SOURCE_IDENTIFIER1 = new SourceIdentifier("yang1");
+    private static final SourceIdentifier SOURCE_IDENTIFIER2 = new SourceIdentifier("yang2");
 
     private ActorSystem system = ActorSystem.create();
     private final TestKit testKit = new TestKit(system);
@@ -256,7 +254,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         // Now initialize - master should send the RegisterMountPoint message.
 
-        List<SourceIdentifier> sourceIdentifiers = Lists.newArrayList(RevisionSourceIdentifier.create("testID"));
+        List<SourceIdentifier> sourceIdentifiers = List.of(new SourceIdentifier("testID"));
         initializeMaster(sourceIdentifiers);
 
         masterRef.tell(new AskForMasterMountPoint(kit.getRef()), kit.getRef());
@@ -430,7 +428,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
         ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
 
-        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID");
+        final SourceIdentifier sourceIdentifier = new SourceIdentifier("testID");
 
         final ProxyYangTextSourceProvider proxyYangProvider =
                 new ProxyYangTextSourceProvider(actor, system.dispatcher(), TIMEOUT);
@@ -442,7 +440,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testYangTextSchemaSourceRequest() throws Exception {
-        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID");
+        final SourceIdentifier sourceIdentifier = new SourceIdentifier("testID");
 
         final ProxyYangTextSourceProvider proxyYangProvider =
                 new ProxyYangTextSourceProvider(masterRef, system.dispatcher(), TIMEOUT);
@@ -481,10 +479,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     @Test
     public void testSlaveInvokeRpc() throws Exception {
 
-        final List<SourceIdentifier> sourceIdentifiers =
-                Lists.newArrayList(RevisionSourceIdentifier.create("testID"));
-
-        initializeMaster(sourceIdentifiers);
+        initializeMaster(List.of(new SourceIdentifier("testID")));
         registerSlaveMountPoint();
 
         ArgumentCaptor<DOMRpcService> domRPCServiceCaptor = ArgumentCaptor.forClass(DOMRpcService.class);
@@ -551,9 +546,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testSlaveInvokeAction() throws Exception {
-        final List<SourceIdentifier> sourceIdentifiers = Lists
-            .newArrayList(RevisionSourceIdentifier.create("testActionID"));
-        initializeMaster(sourceIdentifiers);
+        initializeMaster(List.of(new SourceIdentifier("testActionID")));
         registerSlaveMountPoint();
 
         ArgumentCaptor<DOMActionService> domActionServiceCaptor = ArgumentCaptor.forClass(DOMActionService.class);
