@@ -104,9 +104,9 @@ public class NetconfServerSessionTest {
     @Test
     public void testOnIncommingRpcSuccess() throws Exception {
         session.sessionUp();
-        final Session managementSession = this.session.toManagementSession();
-        this.session.onIncommingRpcSuccess();
-        final Session afterRpcSuccess = this.session.toManagementSession();
+        final Session managementSession = session.toManagementSession();
+        session.onIncommingRpcSuccess();
+        final Session afterRpcSuccess = session.toManagementSession();
         assertEquals(managementSession.getInRpcs().getValue().toJava() + 1,
                 afterRpcSuccess.getInRpcs().getValue().longValue());
     }
@@ -114,9 +114,9 @@ public class NetconfServerSessionTest {
     @Test
     public void testOnIncommingRpcFail() throws Exception {
         session.sessionUp();
-        final Session managementSession = this.session.toManagementSession();
-        this.session.onIncommingRpcFail();
-        final Session afterRpcSuccess = this.session.toManagementSession();
+        final Session managementSession = session.toManagementSession();
+        session.onIncommingRpcFail();
+        final Session afterRpcSuccess = session.toManagementSession();
         assertEquals(managementSession.getInBadRpcs().getValue().toJava() + 1,
                 afterRpcSuccess.getInBadRpcs().getValue().longValue());
     }
@@ -124,9 +124,9 @@ public class NetconfServerSessionTest {
     @Test
     public void testOnOutgoingRpcError() throws Exception {
         session.sessionUp();
-        final Session managementSession = this.session.toManagementSession();
-        this.session.onOutgoingRpcError();
-        final Session afterRpcSuccess = this.session.toManagementSession();
+        final Session managementSession = session.toManagementSession();
+        session.onOutgoingRpcError();
+        final Session afterRpcSuccess = session.toManagementSession();
         assertEquals(managementSession.getOutRpcErrors().getValue().toJava() + 1,
                 afterRpcSuccess.getOutRpcErrors().getValue().longValue());
     }
@@ -140,9 +140,9 @@ public class NetconfServerSessionTest {
         tcpSession.sessionUp();
         final Session managementSession = tcpSession.toManagementSession();
         assertEquals(HOST, managementSession.getSourceHost().getIpAddress().getIpv4Address().getValue());
-        assertEquals(managementSession.getUsername(), USER);
-        assertEquals(managementSession.getSessionId().toString(), SESSION_ID);
-        assertEquals(managementSession.getTransport(), NetconfTcp.class);
+        assertEquals(USER, managementSession.getUsername());
+        assertEquals(SESSION_ID, managementSession.getSessionId().toString());
+        assertEquals(NetconfTcp.VALUE, managementSession.getTransport());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -165,9 +165,9 @@ public class NetconfServerSessionTest {
         tcpSession.sessionUp();
         final Session managementSession = tcpSession.toManagementSession();
         assertEquals("::1", managementSession.getSourceHost().getIpAddress().getIpv6Address().getValue());
-        assertEquals(managementSession.getUsername(), USER);
-        assertEquals(managementSession.getSessionId().toString(), SESSION_ID);
-        assertEquals(managementSession.getTransport(), NetconfSsh.class);
+        assertEquals(USER, managementSession.getUsername());
+        assertEquals(SESSION_ID, managementSession.getSessionId().toString());
+        assertEquals(NetconfSsh.VALUE, managementSession.getTransport());
     }
 
     @Test

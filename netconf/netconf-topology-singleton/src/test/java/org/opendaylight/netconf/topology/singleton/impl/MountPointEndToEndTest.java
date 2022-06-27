@@ -142,6 +142,7 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -156,7 +157,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
@@ -286,8 +287,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         resources.getSchemaRegistry().registerSchemaSource(
             id -> Futures.immediateFuture(YangTextSchemaSource.delegateForByteSource(id,
                     topModuleInfo.getYangTextByteSource())),
-            PotentialSchemaSource.create(RevisionSourceIdentifier.create(TOP_MODULE_NAME,
-                    topModuleInfo.getName().getRevision()), YangTextSchemaSource.class, 1));
+            PotentialSchemaSource.create(new SourceIdentifier(TOP_MODULE_NAME,
+                    topModuleInfo.getName().getRevision().map(Revision::toString).orElse(null)),
+                YangTextSchemaSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
                 mockRpcProviderRegistry, mockActionProviderRegistry, masterClusterSingletonServiceProvider,
@@ -737,7 +739,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         }
 
         void init(final FluentFuture<DOMRpcResult> retFuture) {
-            this.returnFuture = retFuture;
+            returnFuture = retFuture;
             rpcInvokedFuture = SettableFuture.create();
         }
 

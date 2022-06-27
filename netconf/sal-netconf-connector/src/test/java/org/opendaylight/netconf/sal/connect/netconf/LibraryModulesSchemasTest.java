@@ -17,8 +17,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import org.junit.Test;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
 public class LibraryModulesSchemasTest {
@@ -42,22 +40,17 @@ public class LibraryModulesSchemasTest {
         final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
         assertThat(resolvedModulesSchema.size(), is(3));
 
-        assertTrue(resolvedModulesSchema.containsKey(RevisionSourceIdentifier.create("module-with-revision",
-                Revision.of("2014-04-08"))));
-        assertThat(resolvedModulesSchema.get(
-                RevisionSourceIdentifier.create("module-with-revision", Revision.of("2014-04-08"))),
+        assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("module-with-revision", "2014-04-08")));
+        assertThat(resolvedModulesSchema.get(new SourceIdentifier("module-with-revision", "2014-04-08")),
                 is(new URL("http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08")));
 
         assertTrue(resolvedModulesSchema.containsKey(
-                RevisionSourceIdentifier.create("another-module-with-revision", Revision.of("2013-10-21"))));
-        assertThat(resolvedModulesSchema.get(
-                RevisionSourceIdentifier.create("another-module-with-revision", Revision.of("2013-10-21"))),
+                new SourceIdentifier("another-module-with-revision", "2013-10-21")));
+        assertThat(resolvedModulesSchema.get(new SourceIdentifier("another-module-with-revision", "2013-10-21")),
                 is(new URL("http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21")));
 
-        assertTrue(resolvedModulesSchema.containsKey(
-                RevisionSourceIdentifier.create("module-without-revision")));
-        assertThat(resolvedModulesSchema.get(
-                RevisionSourceIdentifier.create("module-without-revision")),
+        assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("module-without-revision")));
+        assertThat(resolvedModulesSchema.get(new SourceIdentifier("module-without-revision")),
                 is(new URL("http://localhost:8181/yanglib/schemas/module-without-revision/")));
     }
 
@@ -69,11 +62,11 @@ public class LibraryModulesSchemasTest {
         final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
         assertThat(resolvedModulesSchema.size(), is(1));
 
-        assertFalse(resolvedModulesSchema.containsKey(RevisionSourceIdentifier.create("module-with-bad-url")));
+        assertFalse(resolvedModulesSchema.containsKey(new SourceIdentifier("module-with-bad-url")));
         //See BUG 8071 https://bugs.opendaylight.org/show_bug.cgi?id=8071
         //assertFalse(resolvedModulesSchema.containsKey(
         //        RevisionSourceIdentifier.create("module-with-bad-revision", "bad-revision")));
-        assertTrue(resolvedModulesSchema.containsKey(RevisionSourceIdentifier.create("good-ol-module")));
+        assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("good-ol-module")));
     }
 
     @Test

@@ -36,7 +36,9 @@ import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -46,12 +48,12 @@ public class NetconfSessionMonitoringServiceTest {
 
     private static final Session SESSION_1 = new SessionBuilder()
             .setSessionId(Uint32.valueOf(1))
-            .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
+            .setSourceHost(new Host(new IpAddress(new Ipv4Address("0.0.0.0"))))
             .setUsername("admin")
             .build();
     private static final Session SESSION_2 = new SessionBuilder()
             .setSessionId(Uint32.valueOf(2))
-            .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
+            .setSourceHost(new Host(new IpAddress(new Ipv4Address("0.0.0.0"))))
             .setUsername("admin")
             .build();
 

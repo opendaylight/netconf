@@ -72,7 +72,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
@@ -127,8 +126,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     public Map<SourceIdentifier, URL> getAvailableModels() {
         final Map<SourceIdentifier, URL> result = new HashMap<>();
         for (final Entry<QName, URL> entry : availableModels.entrySet()) {
-            final SourceIdentifier sId = RevisionSourceIdentifier.create(entry.getKey().getLocalName(),
-                entry.getKey().getRevision());
+            final SourceIdentifier sId = new SourceIdentifier(entry.getKey().getLocalName(),
+                entry.getKey().getRevision().map(Revision::toString).orElse(null));
             result.put(sId, entry.getValue());
         }
 
@@ -169,7 +168,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                     deviceRpc.invokeRpc(NETCONF_GET_QNAME, GET_MODULES_STATE_MODULE_LIST_RPC).get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(deviceId + ": Interrupted while waiting for response to "
+            throw new IllegalStateException(deviceId + ": Interrupted while waiting for response to "
                     + MODULES_STATE_MODULE_LIST, e);
         } catch (final ExecutionException e) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed", deviceId,

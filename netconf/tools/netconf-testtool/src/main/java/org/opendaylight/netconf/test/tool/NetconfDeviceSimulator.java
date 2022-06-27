@@ -60,7 +60,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.Submodule;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -321,8 +320,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }
 
         configuration.getDefaultYangResources().forEach(r -> {
-            final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create(r.getModuleName(),
-                Revision.ofNullable(r.getRevision()));
+            final SourceIdentifier sourceIdentifier = new SourceIdentifier(r.getModuleName(), r.getRevision());
             registerSource(consumer, r.getResourcePath(), sourceIdentifier);
         });
 
@@ -348,8 +346,8 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private static void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
                                             final ModuleLike module) {
-        final SourceIdentifier moduleSourceIdentifier = RevisionSourceIdentifier.create(module.getName(),
-            module.getRevision());
+        final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
+            module.getRevision().map(Revision::toString).orElse(null));
         try {
             final String moduleContent = new String(
                 consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class).get().read());

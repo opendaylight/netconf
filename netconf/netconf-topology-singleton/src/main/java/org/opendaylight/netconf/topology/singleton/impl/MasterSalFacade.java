@@ -16,7 +16,6 @@ import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -34,7 +33,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
@@ -65,7 +63,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
                     final DOMMountPointService mountService,
                     final DataBroker dataBroker) {
         this.id = id;
-        this.salProvider = new NetconfDeviceSalProvider(id, mountService, dataBroker);
+        salProvider = new NetconfDeviceSalProvider(id, mountService, dataBroker);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         this.actorResponseWaitTime = actorResponseWaitTime;
@@ -75,7 +73,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     public void onDeviceConnected(final MountPointContext mountContext,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService, final DOMActionService domActionService) {
-        this.deviceAction = domActionService;
+        deviceAction = domActionService;
         LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
             + "DOMActionService exposed for the device", id);
         onDeviceConnected(mountContext, sessionPreferences, domRpcService);
@@ -85,9 +83,9 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     public void onDeviceConnected(final MountPointContext mountContext,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService) {
-        this.currentMountContext = mountContext;
-        this.netconfSessionPreferences = sessionPreferences;
-        this.deviceRpc = domRpcService;
+        currentMountContext = mountContext;
+        netconfSessionPreferences = sessionPreferences;
+        deviceRpc = domRpcService;
 
         LOG.info("Device {} connected - registering master mount point", id);
 
@@ -159,10 +157,8 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     }
 
     private Future<Object> sendInitialDataToActor() {
-        final List<SourceIdentifier> sourceIdentifiers = SchemaContextUtil.getConstituentModuleIdentifiers(
-            currentMountContext.getEffectiveModelContext()).stream()
-                .map(mi -> RevisionSourceIdentifier.create(mi.getName(), mi.getRevision()))
-                .collect(Collectors.toList());
+        final List<SourceIdentifier> sourceIdentifiers = List.copyOf(SchemaContextUtil.getConstituentModuleIdentifiers(
+            currentMountContext.getEffectiveModelContext()));
 
         LOG.debug("{}: Sending CreateInitialMasterActorData with sourceIdentifiers {} to {}", id, sourceIdentifiers,
             masterActorRef);

@@ -18,8 +18,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangConstants;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 
 @Provider
@@ -29,8 +31,9 @@ public class YangSchemaExportBodyWriter extends AbstractSchemaExportBodyWriter {
     public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException {
-        final RevisionSourceIdentifier sourceId = RevisionSourceIdentifier.create(context.getModule().getName(),
-                context.getModule().getQNameModule().getRevision());
+        final Module module = context.getModule();
+        final SourceIdentifier sourceId = new SourceIdentifier(module.getName(),
+                module.getQNameModule().getRevision().map(Revision::toString).orElse(null));
         final YangTextSchemaSource yangTextSchemaSource;
         try {
             yangTextSchemaSource = context.getSourceProvider().getSource(sourceId).get();
