@@ -15,8 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -59,9 +60,9 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation> exten
         // creation of source identifiers for all yang module info
         cachedSchemas = allModulesInfo.stream()
                 .map(yangModuleInfo -> {
-                    final RevisionSourceIdentifier revisionSourceIdentifier = RevisionSourceIdentifier.create(
-                            yangModuleInfo.getName().getLocalName(),
-                            yangModuleInfo.getName().getRevision());
+                    final QName name = yangModuleInfo.getName();
+                    final SourceIdentifier revisionSourceIdentifier = new SourceIdentifier(
+                            name.getLocalName(), name.getRevision().map(Revision::toString).orElse(null));
                     return new AbstractMap.SimpleEntry<>(revisionSourceIdentifier, yangModuleInfo);
                 })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));

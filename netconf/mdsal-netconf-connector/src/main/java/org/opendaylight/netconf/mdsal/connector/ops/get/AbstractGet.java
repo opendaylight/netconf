@@ -73,7 +73,8 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
                 write(nnStreamWriter, currentContext, dataRoot.coerceParent(), data);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            // FIXME: throw DocumentedException
+            throw new IllegalStateException(e);
         }
 
         return result.getNode();
@@ -104,7 +105,8 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         try {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
         } catch (final XMLStreamException e) {
-            throw new RuntimeException(e);
+            // FIXME: throw DocumentedException
+            throw new IllegalStateException(e);
         }
     }
 

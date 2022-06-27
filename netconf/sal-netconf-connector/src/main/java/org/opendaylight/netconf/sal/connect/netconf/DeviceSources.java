@@ -13,7 +13,7 @@ import com.google.common.collect.Collections2;
 import java.util.Collection;
 import java.util.Set;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
@@ -54,6 +54,6 @@ final class DeviceSources {
     }
 
     private static SourceIdentifier toSourceId(final QName input) {
-        return RevisionSourceIdentifier.create(input.getLocalName(), input.getRevision());
+        return new SourceIdentifier(input.getLocalName(), input.getRevision().map(Revision::toString).orElse(null));
     }
 }

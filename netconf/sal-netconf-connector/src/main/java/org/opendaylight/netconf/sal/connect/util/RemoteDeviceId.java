@@ -11,8 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.InetSocketAddress;
 import java.util.Objects;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -48,20 +49,21 @@ public final class RemoteDeviceId {
 
     private RemoteDeviceId(final String name) {
         this.name = requireNonNull(name);
-        this.topologyPath = DEFAULT_TOPOLOGY_NODE
-                .node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, name));
-        this.key = new NodeKey(new NodeId(name));
-        this.topologyBindingPath = DEFAULT_TOPOLOGY_IID.child(Node.class, key);
+        topologyPath = DEFAULT_TOPOLOGY_NODE.node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, name));
+        key = new NodeKey(new NodeId(name));
+        topologyBindingPath = DEFAULT_TOPOLOGY_IID.child(Node.class, key);
     }
 
     public RemoteDeviceId(final String name, final InetSocketAddress address) {
         this(name);
         this.address = address;
-        this.host = buildHost();
+        host = buildHost();
     }
 
     private Host buildHost() {
-        return HostBuilder.getDefaultInstance(address.getHostString());
+        final var addr = address.getAddress();
+        return addr != null ? new Host(IetfInetUtil.INSTANCE.ipAddressFor(addr))
+            : new Host(new DomainName(address.getHostString()));
     }
 
     public String getName() {
@@ -95,14 +97,8 @@ public final class RemoteDeviceId {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof RemoteDeviceId)) {
-            return false;
-        }
-        final RemoteDeviceId that = (RemoteDeviceId) obj;
-        return name.equals(that.name) && topologyBindingPath.equals(that.topologyBindingPath);
+        return this == obj || obj instanceof RemoteDeviceId other
+            && name.equals(other.name) && topologyBindingPath.equals(other.topologyBindingPath);
     }
 
     @Override

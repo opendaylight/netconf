@@ -30,11 +30,11 @@ import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.Submodule;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
@@ -63,9 +63,9 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
         this.dataBroker = dataBroker;
         this.rpcService = rpcService;
 
-        this.rootSchemaSourceProviderDependency = schemaService.getExtensions()
+        rootSchemaSourceProviderDependency = schemaService.getExtensions()
                 .getInstance(DOMYangTextSourceProvider.class);
-        this.currentSchemaContext = CurrentSchemaContext.create(requireNonNull(schemaService),
+        currentSchemaContext = CurrentSchemaContext.create(requireNonNull(schemaService),
                 rootSchemaSourceProviderDependency);
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
     }
@@ -135,8 +135,8 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
 
     private static Optional<YangModuleCapability> moduleToCapability(final ModuleLike module,
             final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
-        final SourceIdentifier moduleSourceIdentifier = RevisionSourceIdentifier.create(module.getName(),
-                module.getRevision());
+        final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
+                module.getRevision().map(Revision::toString).orElse(null));
 
         InputStream sourceStream = null;
         String source;

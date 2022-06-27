@@ -19,12 +19,10 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -36,7 +34,7 @@ public class YangLibrarySchemaYangSourceProviderTest {
     @Before
     public void setUp() throws Exception {
         final URL url = getClass().getResource("/schemas/config-test-rpc.yang");
-        workingSid = RevisionSourceIdentifier.create("abc", Optional.empty());
+        workingSid = new SourceIdentifier("abc");
         final Map<SourceIdentifier, URL> sourceIdentifierURLMap = Collections.singletonMap(workingSid, url);
         final RemoteDeviceId id = new RemoteDeviceId("id", new InetSocketAddress("localhost", 22));
         yangLibrarySchemaYangSourceProvider = new YangLibrarySchemaYangSourceProvider(id, sourceIdentifierURLMap);
@@ -65,8 +63,8 @@ public class YangLibrarySchemaYangSourceProviderTest {
     }
 
     @Test
-    public void testGetSourceNotAvailable() throws Exception {
+    public void testGetSourceNotAvailable() {
         assertThrows(IllegalArgumentException.class,
-            () -> yangLibrarySchemaYangSourceProvider.getSource(RevisionSourceIdentifier.create("aaaaa")));
+            () -> yangLibrarySchemaYangSourceProvider.getSource(new SourceIdentifier("aaaaa")));
     }
 }
