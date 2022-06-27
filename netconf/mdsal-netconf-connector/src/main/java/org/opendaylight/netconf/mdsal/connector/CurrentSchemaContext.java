@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -27,9 +27,10 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 @SuppressWarnings("checkstyle:FinalClass")
 public class CurrentSchemaContext implements EffectiveModelContextListener, AutoCloseable {
     private final AtomicReference<EffectiveModelContext> currentContext = new AtomicReference<>();
-    private ListenerRegistration<?> schemaContextListenerListenerRegistration;
     private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(new HashSet<>());
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
+
+    private Registration schemaContextListenerListenerRegistration;
 
     private CurrentSchemaContext(final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
         this.rootSchemaSourceProvider = rootSchemaSourceProvider;
@@ -39,13 +40,12 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
     public static CurrentSchemaContext create(final DOMSchemaService schemaService,
                          final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
         var context = new CurrentSchemaContext(rootSchemaSourceProvider);
-        final ListenerRegistration<EffectiveModelContextListener> registration =
-                schemaService.registerSchemaContextListener(context);
+        final Registration registration = schemaService.registerSchemaContextListener(context);
         context.setRegistration(registration);
         return context;
     }
 
-    private void setRegistration(ListenerRegistration<EffectiveModelContextListener> registration) {
+    private void setRegistration(final Registration registration) {
         schemaContextListenerListenerRegistration = registration;
     }
 

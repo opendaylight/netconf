@@ -68,9 +68,9 @@ class AsyncExecutionStrategy extends AbstractExecutionStrategy {
                     LOG.warn("Request failed {}", netconfMessageRpcResult);
                 }
             } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             } catch (final ExecutionException | TimeoutException e) {
-                throw new RuntimeException("Request not finished", e);
+                throw new IllegalStateException("Request not finished", e);
             }
         }
 

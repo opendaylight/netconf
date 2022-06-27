@@ -18,7 +18,6 @@ import org.opendaylight.aaa.web.FilterDetails;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextBuilder;
-import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
@@ -28,6 +27,7 @@ import org.opendaylight.restconf.nb.rfc8040.RootFoundApplication;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.yangtools.concepts.Registration;
 
 /**
  * Initializes the rfc8040 web app endpoint.
@@ -36,7 +36,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
  */
 @Singleton
 public class WebInitializer {
-    private final WebContextRegistration registration;
+    private final Registration registration;
 
     @Inject
     public WebInitializer(final WebServer webServer, final WebContextSecurer webContextSecurer,

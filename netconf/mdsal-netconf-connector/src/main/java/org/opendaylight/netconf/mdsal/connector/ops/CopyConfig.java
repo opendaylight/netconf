@@ -202,7 +202,8 @@ public final class CopyConfig extends AbstractEdit {
             nnWriter.flush();
             xmlWriter.flush();
         } catch (XMLStreamException | IOException e) {
-            throw new RuntimeException(e);
+            // FIXME: throw DocumentedException
+            throw new IllegalStateException(e);
         }
         return result.getNode();
     }

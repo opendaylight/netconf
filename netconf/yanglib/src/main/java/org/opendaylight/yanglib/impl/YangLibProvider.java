@@ -22,15 +22,16 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.LegacyRevisionUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesStateBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.CommonLeafsRevisionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleKey;
@@ -38,8 +39,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yanglib.api.YangLibService;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -112,12 +111,13 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
         final Map<ModuleKey, Module> newModules = new HashMap<>();
 
         for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
-            final YangIdentifier moduleName = new YangIdentifier(potentialYangSource.getSourceIdentifier().getName());
+            final YangIdentifier moduleName =
+                new YangIdentifier(potentialYangSource.getSourceIdentifier().name().getLocalName());
 
             final Module newModule = new ModuleBuilder()
                     .setName(moduleName)
-                    .setRevision(CommonLeafsRevisionBuilder.fromYangCommon(
-                        potentialYangSource.getSourceIdentifier().getRevision()))
+                    .setRevision(LegacyRevisionUtils.fromYangCommon(
+                        Optional.ofNullable(potentialYangSource.getSourceIdentifier().revision())))
                     .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
                     .build();
 
@@ -156,8 +156,8 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
         WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(ModulesState.class)
-            .child(Module.class, new ModuleKey(new YangIdentifier(source.getSourceIdentifier().getName()),
-                CommonLeafsRevisionBuilder.fromYangCommon(source.getSourceIdentifier().getRevision()))));
+            .child(Module.class, new ModuleKey(new YangIdentifier(source.getSourceIdentifier().name().getLocalName()),
+                LegacyRevisionUtils.fromYangCommon(Optional.ofNullable(source.getSourceIdentifier().revision())))));
 
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
@@ -175,8 +175,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
     @Override
     public String getSchema(final String name, final String revision) {
         LOG.debug("Attempting load for schema source {}:{}", name, revision);
-        final SourceIdentifier sourceId = RevisionSourceIdentifier.create(name,
-            revision.isEmpty() ? null : Revision.of(revision));
+        final SourceIdentifier sourceId = new SourceIdentifier(name, revision.isEmpty() ? null : revision);
 
         final ListenableFuture<YangTextSchemaSource> sourceFuture = schemaRepository.getSchemaSource(sourceId,
             YangTextSchemaSource.class);
@@ -191,10 +190,11 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener, Yan
 
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
         return new Uri("http://" + yanglibConfig.getBindingAddr() + ':' + yanglibConfig.getBindingPort()
-                + "/yanglib/schemas/" + sourceIdentifier.getName() + '/' + revString(sourceIdentifier));
+                + "/yanglib/schemas/" + sourceIdentifier.name().getLocalName() + '/' + revString(sourceIdentifier));
     }
 
     private static String revString(final SourceIdentifier id) {
-        return id.getRevision().map(Revision::toString).orElse("");
+        final var rev = id.revision();
+        return rev != null ? rev.toString() : "";
     }
 }

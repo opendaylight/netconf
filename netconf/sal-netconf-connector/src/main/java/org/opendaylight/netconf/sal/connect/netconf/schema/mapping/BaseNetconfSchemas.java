@@ -9,11 +9,11 @@ package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.yangtools.concepts.Immutable;
 
 @Beta
 @NonNullByDefault
-public interface BaseNetconfSchemas extends Immutable {
+// FIXME: implements Immutable once we do not use Blueprint, or ARIES-2078 is fixed
+public interface BaseNetconfSchemas {
 
     BaseSchema getBaseSchema();
 

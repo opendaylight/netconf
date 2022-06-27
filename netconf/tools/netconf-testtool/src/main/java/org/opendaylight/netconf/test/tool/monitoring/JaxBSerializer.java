@@ -35,7 +35,7 @@ public class JaxBSerializer {
             res = new DOMResult();
             marshaller.marshal(monitoringModel, res);
         } catch (final JAXBException e) {
-            throw new RuntimeException("Unable to serialize netconf state " + monitoringModel, e);
+            throw new IllegalStateException("Unable to serialize netconf state " + monitoringModel, e);
         }
         return ((Document) res.getNode()).getDocumentElement();
     }

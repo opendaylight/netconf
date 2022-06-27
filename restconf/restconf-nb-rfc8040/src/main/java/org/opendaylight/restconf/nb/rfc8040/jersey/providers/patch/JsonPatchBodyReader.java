@@ -89,19 +89,19 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public PatchContext readFrom(final String uriPath, final InputStream entityStream) throws
-            RestconfDocumentedException {
+    public PatchContext readFrom(final String uriPath, final InputStream entityStream)
+            throws RestconfDocumentedException {
         try {
             return readFrom(
                     ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(),
                             Optional.ofNullable(getMountPointService())), entityStream);
         } catch (final Exception e) {
-            propagateExceptionAs(e);
-            return null; // no-op
+            throw propagateExceptionAs(e);
         }
     }
 
-    private static RuntimeException propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {
+    private static RestconfDocumentedException propagateExceptionAs(final Exception exception)
+            throws RestconfDocumentedException {
         Throwables.throwIfInstanceOf(exception, RestconfDocumentedException.class);
         LOG.debug("Error parsing json input", exception);
 

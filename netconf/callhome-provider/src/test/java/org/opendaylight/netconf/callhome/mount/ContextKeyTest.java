@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
 import static org.junit.Assert.assertFalse;
@@ -24,7 +23,7 @@ import org.junit.Test;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddressBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -46,8 +45,8 @@ public class ContextKeyTest {
 
     @Before
     public void setup() {
-        address1 = IpAddressBuilder.getDefaultInstance("1.2.3.4");
-        address2 = IpAddressBuilder.getDefaultInstance("5.6.7.8");
+        address1 = new IpAddress(new Ipv4Address("1.2.3.4"));
+        address2 = new IpAddress(new Ipv4Address("5.6.7.8"));
 
         port1 = new PortNumber(Uint16.valueOf(123));
         port2 = new PortNumber(Uint16.valueOf(456));

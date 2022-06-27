@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.concepts.SemVer;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
@@ -113,11 +112,6 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     @Override
     public final Collection<? extends NotificationDefinition> getNotifications() {
         return Collections.emptySet();
-    }
-
-    @Override
-    public final Optional<SemVer> getSemanticVersion() {
-        return Optional.empty();
     }
 
     @Override
