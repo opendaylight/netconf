@@ -176,7 +176,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
             // channel handler of reconnect promise
             super.channelInactive(ctx);
         } catch (final Exception e) {
-            throw new RuntimeException("Failed to delegate channel inactive event on channel " + ctx.channel(), e);
+            throw new IllegalStateException("Failed to delegate channel inactive event on channel " + ctx.channel(), e);
         }
     }
 

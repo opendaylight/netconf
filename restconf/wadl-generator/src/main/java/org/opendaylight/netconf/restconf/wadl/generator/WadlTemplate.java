@@ -172,7 +172,8 @@ final class WadlTemplate {
             builder.append("xmlns:");
             builder.append(imprt.getPrefix());
             builder.append("=\"");
-            builder.append(context.findModule(imprt.getModuleName(), imprt.getRevision()).get().getNamespace());
+            builder.append(context.findModule(imprt.getModuleName().getLocalName(),
+                imprt.getRevision()).get().getNamespace());
             builder.append("\"");
             builder.newLineIfNotEmpty();
         }
@@ -212,8 +213,7 @@ final class WadlTemplate {
     private String createPath(final DataSchemaNode schemaNode) {
         pathListParams = new ArrayList<>();
         StringBuilder path = new StringBuilder().append(schemaNode.getQName().getLocalName());
-        if (schemaNode instanceof ListSchemaNode) {
-            final var listNode = (ListSchemaNode) schemaNode;
+        if (schemaNode instanceof ListSchemaNode listNode) {
             for (final QName listKey : listNode.getKeyDefinition()) {
                 pathListParams.add((LeafSchemaNode) listNode.getDataChildByName(listKey));
                 path.append("'/{").append(listKey.getLocalName()).append('}');

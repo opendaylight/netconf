@@ -13,10 +13,10 @@ import org.opendaylight.aaa.web.ResourceDetails;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextBuilder;
-import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.yangtools.concepts.Registration;
 
 /**
  * Initializes the wep app.
@@ -24,7 +24,7 @@ import org.opendaylight.aaa.web.servlet.ServletSupport;
  * @author Thomas Pantelis
  */
 public class WebInitializer {
-    private final WebContextRegistration registration;
+    private final Registration registration;
 
     public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
             Application webApp) throws ServletException {

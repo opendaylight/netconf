@@ -216,6 +216,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             nnStreamWriter.close();
             xmlWriter.close();
         } catch (IOException | XMLStreamException e) {
+            // FIXME: throw DocumentedException
             LOG.warn("Error while closing streams", e);
         }
 
@@ -226,7 +227,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         try {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
         } catch (final XMLStreamException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -237,7 +238,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             nnWriter.flush();
             xmlWriter.flush();
         } catch (XMLStreamException | IOException e) {
-            throw new RuntimeException(e);
+            // FIXME: throw DocumentedException
+            throw new IllegalStateException(e);
         }
     }
 

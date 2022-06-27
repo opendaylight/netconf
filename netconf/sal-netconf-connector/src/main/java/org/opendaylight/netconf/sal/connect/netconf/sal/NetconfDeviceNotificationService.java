@@ -11,11 +11,13 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
+import java.util.Map;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,5 +63,12 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
     public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
             final T listener, final Absolute... types) {
         return registerNotificationListener(listener, Lists.newArrayList(types));
+    }
+
+    @Override
+    public synchronized Registration registerNotificationListeners(
+            final Map<Absolute, DOMNotificationListener> typeToListener) {
+        // FIXME: implement this
+        throw new UnsupportedOperationException();
     }
 }
