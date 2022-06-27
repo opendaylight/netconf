@@ -130,7 +130,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             schemasNodeResult = deviceRpc.invokeRpc(NETCONF_GET_QNAME, GET_SCHEMAS_RPC).get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(id
+            throw new IllegalStateException(id
                     + ": Interrupted while waiting for response to " + STATE_SCHEMAS_IDENTIFIER, e);
         } catch (final ExecutionException e) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed", id, STATE_SCHEMAS_IDENTIFIER, e);

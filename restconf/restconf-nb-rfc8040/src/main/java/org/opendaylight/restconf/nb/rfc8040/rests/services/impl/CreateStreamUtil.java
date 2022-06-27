@@ -152,7 +152,7 @@ final class CreateStreamUtil {
 
         final String scopeName = extractStringLeaf(data, SCOPE_NODEID);
         // FIXME: this is not really used
-        final Scope scope = scopeName != null ? Scope.forName(scopeName).orElseThrow() : Scope.BASE;
+        final Scope scope = scopeName != null ? Scope.ofName(scopeName) : Scope.BASE;
 
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
             + "/" + ListenersBroker.createStreamNameFromUri(IdentifierCodec.serialize(path, schemaContext)

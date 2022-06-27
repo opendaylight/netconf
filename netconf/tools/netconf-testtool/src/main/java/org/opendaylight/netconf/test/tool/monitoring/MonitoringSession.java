@@ -10,6 +10,7 @@ package org.opendaylight.netconf.test.tool.monitoring;
 import com.google.common.base.Joiner;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.opendaylight.mdsal.binding.spec.naming.BindingMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.Session1;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
@@ -74,7 +75,8 @@ final class MonitoringSession {
     @XmlElement(name = "transport")
     public String getTransport() {
         try {
-            final QName qualifiedName = (QName) managementSession.getTransport().getField("QNAME").get(null);
+            final QName qualifiedName = (QName) managementSession.getTransport().implementedInterface()
+                .getField(BindingMapping.QNAME_STATIC_FIELD_NAME).get(null);
             // Add extension prefix if transport type is from extension yang module
             if (qualifiedName.getNamespace().toString().equals(MonitoringConstants.EXTENSION_NAMESPACE)) {
                 return Joiner.on(':').join(MonitoringConstants.EXTENSION_NAMESPACE_PREFIX,

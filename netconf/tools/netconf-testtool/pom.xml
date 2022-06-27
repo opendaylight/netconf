@@ -35,7 +35,6 @@
         <dependency>
             <groupId>net.sourceforge.argparse4j</groupId>
             <artifactId>argparse4j</artifactId>
-            <version>0.9.0</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -130,7 +129,6 @@
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
-            <version>${karaf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.xmlunit</groupId>

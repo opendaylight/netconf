@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
@@ -30,12 +31,10 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableAnyXmlNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.w3c.dom.Document;
@@ -61,13 +60,11 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
 
     @Test
     public void testGetSource() throws Exception {
-        final SourceIdentifier identifier = RevisionSourceIdentifier.create("test", Revision.of("2016-02-08"));
+        final SourceIdentifier identifier = new SourceIdentifier("test", "2016-02-08");
         final YangTextSchemaSource source = provider.getSource(identifier).get();
         assertEquals(identifier, source.getIdentifier());
         verify(service).invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME,
-                NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest(identifier.getName(),
-                    identifier.getRevision().map(Revision::toString))
-        );
+                NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
     }
 
     private static ContainerNode getNode() throws ParserConfigurationException {

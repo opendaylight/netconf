@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -140,13 +141,13 @@ public class NetconfDevice
         this.node = node;
         this.eventExecutor = eventExecutor;
         this.nodeOptional = nodeOptional;
-        this.schemaRegistry = schemaResourcesDTO.getSchemaRegistry();
-        this.schemaRepository = schemaResourcesDTO.getSchemaRepository();
-        this.schemaContextFactory = schemaResourcesDTO.getSchemaContextFactory();
+        schemaRegistry = schemaResourcesDTO.getSchemaRegistry();
+        schemaRepository = schemaResourcesDTO.getSchemaRepository();
+        schemaContextFactory = schemaResourcesDTO.getSchemaContextFactory();
         this.salFacade = salFacade;
-        this.stateSchemasResolver = schemaResourcesDTO.getStateSchemasResolver();
-        this.processingExecutor = requireNonNull(globalProcessingExecutor);
-        this.notificationHandler = new NotificationHandler(salFacade, id);
+        stateSchemasResolver = schemaResourcesDTO.getStateSchemasResolver();
+        processingExecutor = requireNonNull(globalProcessingExecutor);
+        notificationHandler = new NotificationHandler(salFacade, id);
     }
 
     @Override
@@ -253,14 +254,14 @@ public class NetconfDevice
         //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         //since salFacade.onDeviceDisconnected was already called.
         if (connected) {
-            this.messageTransformer = new NetconfMessageTransformer(result, true,
+            messageTransformer = new NetconfMessageTransformer(result, true,
                 resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
 
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
-            this.salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
-                    this.deviceActionFactory == null ? null : this.deviceActionFactory.createDeviceAction(
-                            this.messageTransformer, listener, result.getEffectiveModelContext()));
-            this.notificationHandler.onRemoteSchemaUp(this.messageTransformer);
+            salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
+                    deviceActionFactory == null ? null : deviceActionFactory.createDeviceAction(
+                            messageTransformer, listener, result.getEffectiveModelContext()));
+            notificationHandler.onRemoteSchemaUp(messageTransformer);
 
             LOG.info("{}: Netconf connector initialized successfully", id);
         } else {
@@ -388,7 +389,7 @@ public class NetconfDevice
             this.schemaRegistry = requireNonNull(schemaRegistry);
             this.schemaRepository = requireNonNull(schemaRepository);
             this.schemaContextFactory = requireNonNull(schemaContextFactory);
-            this.stateSchemasResolver = requireNonNull(deviceSchemasResolver);
+            stateSchemasResolver = requireNonNull(deviceSchemasResolver);
         }
 
         public SchemaSourceRegistry getSchemaRegistry() {
@@ -436,7 +437,7 @@ public class NetconfDevice
         SchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities) {
             this.deviceSources = deviceSources;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
-            this.capabilities = remoteSessionCapabilities.getNetconfDeviceCapabilities();
+            capabilities = remoteSessionCapabilities.getNetconfDeviceCapabilities();
 
             // If device supports notifications and does not contain necessary modules, add them automatically
             if (remoteSessionCapabilities.containsNonModuleCapability(
@@ -591,11 +592,11 @@ public class NetconfDevice
         private QName getQNameFromSourceIdentifier(final SourceIdentifier identifier) {
             // Required sources are all required and provided merged in DeviceSourcesResolver
             for (final QName qname : deviceSources.getRequiredSourcesQName()) {
-                if (!qname.getLocalName().equals(identifier.getName())) {
+                if (!qname.getLocalName().equals(identifier.name().getLocalName())) {
                     continue;
                 }
 
-                if (identifier.getRevision().equals(qname.getRevision())) {
+                if (Objects.equals(identifier.revision(), qname.getRevision().orElse(null))) {
                     return qname;
                 }
             }
