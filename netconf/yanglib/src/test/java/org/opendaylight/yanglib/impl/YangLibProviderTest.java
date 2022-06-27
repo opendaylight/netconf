@@ -38,11 +38,11 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.LegacyRevisionUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesStateBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.RevisionIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.CommonLeafs.Revision;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.CommonLeafsRevisionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleKey;
@@ -51,7 +51,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controll
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -106,14 +106,11 @@ public class YangLibProviderTest {
 
         List<PotentialSchemaSource<?>> list = new ArrayList<>();
         list.add(
-                PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("no-revision"),
+                PotentialSchemaSource.create(new SourceIdentifier("no-revision"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         list.add(
-                PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("with-revision",
-                            org.opendaylight.yangtools.yang.common.Revision.of("2016-04-28")),
+                PotentialSchemaSource.create(new SourceIdentifier("with-revision", "2016-04-28"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
@@ -123,7 +120,7 @@ public class YangLibProviderTest {
 
         Module newModule = new ModuleBuilder()
                 .setName(new YangIdentifier("no-revision"))
-                .setRevision(CommonLeafsRevisionBuilder.emptyRevision())
+                .setRevision(LegacyRevisionUtils.emptyRevision())
                 .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/no-revision/"))
                 .build();
 
@@ -158,13 +155,11 @@ public class YangLibProviderTest {
         // expected behavior is to do nothing
         potentialSources = new ArrayList<>();
         potentialSources.add(
-                PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("yin-source-representation"),
+                PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
                         YinSchemaSourceRepresentation.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         potentialSources.add(
-                PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("asts-schema-source"),
+                PotentialSchemaSource.create(new SourceIdentifier("asts-schema-source"),
                         IRSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         yangLibProvider.schemaSourceRegistered(potentialSources);
@@ -172,8 +167,7 @@ public class YangLibProviderTest {
 
         // add yang schema source to list
         potentialSources.add(
-                PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("yang-schema-source"),
+                PotentialSchemaSource.create(new SourceIdentifier("yang-schema-source"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
@@ -193,8 +187,7 @@ public class YangLibProviderTest {
         yangLibProvider.init();
 
         final PotentialSchemaSource<YinSchemaSourceRepresentation> nonYangSource =
-                PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("yin-source-representation"),
+            PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
                 YinSchemaSourceRepresentation.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue());
 
         yangLibProvider.schemaSourceUnregistered(nonYangSource);
@@ -214,9 +207,8 @@ public class YangLibProviderTest {
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
 
         PotentialSchemaSource<YangTextSchemaSource> yangUnregistererSource =
-                PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("unregistered-yang-schema-without-revision"),
-                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
+            PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-schema-without-revision"),
+                YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
 
         yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);
 
@@ -225,14 +217,12 @@ public class YangLibProviderTest {
                 eq(InstanceIdentifier.create(ModulesState.class)
                         .child(Module.class,
                                 new ModuleKey(new YangIdentifier("unregistered-yang-schema-without-revision"),
-                                        CommonLeafsRevisionBuilder.emptyRevision()))));
+                                        LegacyRevisionUtils.emptyRevision()))));
 
         verify(writeTransaction).commit();
 
         yangUnregistererSource =
-                PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("unregistered-yang-with-revision",
-                            org.opendaylight.yangtools.yang.common.Revision.of("2016-04-28")),
+                PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-with-revision", "2016-04-28"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
 
         yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);

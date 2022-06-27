@@ -8,6 +8,6 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-impl-${project.version}">
     <feature name="odl-netconf-impl" version="${project.version}">
-        <feature version="[5,6)">odl-controller-exp-netty-config</feature>
+        <feature version="[6,7)">odl-controller-exp-netty-config</feature>
     </feature>
 </features>

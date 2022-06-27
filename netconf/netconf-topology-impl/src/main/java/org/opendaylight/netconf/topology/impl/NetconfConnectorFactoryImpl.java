@@ -14,7 +14,11 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.api.NetconfConnectorFactory;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.DomainName;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwBuilder;
@@ -36,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * Created by adetalhouet on 2016-11-03.
  */
 public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConnectorFactoryImpl.class);
 
     private static final InstanceIdentifier<Topology> TOPOLOGY_PATH = InstanceIdentifier.create(NetworkTopology.class)
@@ -56,7 +59,7 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
         final Node node =  new NodeBuilder()
                 .withKey(nodeKey)
                 .addAugmentation(new NetconfNodeBuilder()
-                    .setHost(HostBuilder.getDefaultInstance(address))
+                    .setHost(createHost(address))
                     .setPort(new PortNumber(Uint16.valueOf(port)))
                     .setCredentials(new LoginPwBuilder()
                         .setLoginPassword(new LoginPasswordBuilder()
@@ -84,5 +87,19 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
             }
         }, MoreExecutors.directExecutor());
         return node;
+    }
+
+    private static Host createHost(final String host) {
+        try {
+            return new Host(new IpAddress(new Ipv4Address(host)));
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Cannot interpret {} as an Ipv4Address", host, e);
+        }
+        try {
+            return new Host(new IpAddress(new Ipv6Address(host)));
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Cannot interpret {} as an Ipv6Address", host, e);
+        }
+        return new Host(new DomainName(host));
     }
 }

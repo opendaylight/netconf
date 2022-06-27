@@ -27,19 +27,19 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.datastores.rev180214.Operational;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.LegacyRevisionUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesStateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.RevisionUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.CommonLeafsRevisionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.set.parameters.ImportOnlyModuleRevisionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.set.parameters.module.SubmoduleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.yang.library.parameters.DatastoreBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.yang.library.parameters.ModuleSetBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.yang.library.parameters.SchemaBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -76,7 +76,7 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
     @GuardedBy("this")
     private long moduleSetId;
     @GuardedBy("this")
-    private ListenerRegistration<?> reg;
+    private Registration reg;
 
     @Inject
     @Activate
@@ -167,8 +167,8 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
                 final var submoduleMap = module.getSubmodules().stream()
                     .map(subModule -> new SubmoduleBuilder()
                         .setName(new YangIdentifier(subModule.getName()))
-                        .setRevision(ImportOnlyModuleRevisionBuilder.fromYangCommon(subModule.getQNameModule()
-                            .getRevision()).getRevisionIdentifier())
+                        .setRevision(RevisionUtils.fromYangCommon(subModule.getQNameModule().getRevision())
+                            .getRevisionIdentifier())
                         .build())
                     .collect(BindingMap.toMap());
 
@@ -177,7 +177,7 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
                     .setName(new YangIdentifier(module.getName() + "_"
                         // FIXME: 'orElse' seems to be wrong here
                         + module.getRevision().map(Revision::toString).orElse(null)))
-                    .setRevision(ImportOnlyModuleRevisionBuilder.fromYangCommon(module.getQNameModule().getRevision())
+                    .setRevision(RevisionUtils.fromYangCommon(module.getQNameModule().getRevision())
                         .getRevisionIdentifier())
                     .setNamespace(new Uri(module.getNamespace().toString()))
                     .setFeature(extractFeatures(module))
@@ -198,7 +198,7 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
                 .setModuleSet(Set.of(MODULE_SET_NAME))
                 .build()))
             .setDatastore(BindingMap.of(new DatastoreBuilder()
-                .setName(Operational.class)
+                .setName(Operational.VALUE)
                 .setSchema(SCHEMA_NAME)
                 .build()))
             .setContentId(String.valueOf(moduleSetId))
@@ -214,7 +214,7 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
                     .map(subModule -> new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
                         .rev190104.module.list.module.SubmoduleBuilder()
                         .setName(new YangIdentifier(subModule.getName()))
-                        .setRevision(CommonLeafsRevisionBuilder.fromYangCommon(subModule.getQNameModule()
+                        .setRevision(LegacyRevisionUtils.fromYangCommon(subModule.getQNameModule()
                             .getRevision()))
                         .build())
                     .collect(BindingMap.toMap());
@@ -222,7 +222,7 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
                 return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
                     .rev190104.module.list.ModuleBuilder()
                     .setName(new YangIdentifier(module.getName()))
-                    .setRevision(CommonLeafsRevisionBuilder.fromYangCommon(module.getQNameModule().getRevision()))
+                    .setRevision(LegacyRevisionUtils.fromYangCommon(module.getQNameModule().getRevision()))
                     .setNamespace(new Uri(module.getNamespace().toString()))
                     // FIXME: Conformance type is always set to Implement value, but it should it really be like this?
                     .setConformanceType(ConformanceType.Implement)

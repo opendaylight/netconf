@@ -15,9 +15,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.datastores.rev180214.Operational;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.RevisionIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.RevisionUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.set.parameters.ImportOnlyModuleRevisionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.set.parameters.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.set.parameters.ModuleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.set.parameters.module.Submodule;
@@ -42,7 +42,7 @@ public class YangLibraryTest extends AbstractYangLibraryWriterTest {
     private static YangLibrary createTestModuleSet() {
         Submodule sub = new SubmoduleBuilder()
                 .setName(new YangIdentifier("test-submodule"))
-                .setRevision(ImportOnlyModuleRevisionBuilder.emptyRevision().getRevisionIdentifier())
+                .setRevision(RevisionUtils.emptyRevision().getRevisionIdentifier())
                 .build();
 
         Module modules = new ModuleBuilder().setName(new YangIdentifier("test-module_2013-07-22"))
@@ -68,7 +68,7 @@ public class YangLibraryTest extends AbstractYangLibraryWriterTest {
                 .setModuleSet(Set.of(modulesSet.getName()))
                 .build();
 
-        Datastore datastore = new DatastoreBuilder().setName(Operational.class)
+        Datastore datastore = new DatastoreBuilder().setName(Operational.VALUE)
                 .setSchema(schema.getName())
                 .build();
 

@@ -46,10 +46,10 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     private static final Function<Capability, Schema> CAPABILITY_SCHEMA_FUNCTION = capability -> new SchemaBuilder()
             .setIdentifier(capability.getModuleName().get())
             .setNamespace(new Uri(capability.getModuleNamespace().get()))
-            .setFormat(Yang.class)
+            .setFormat(Yang.VALUE)
             .setVersion(capability.getRevision().orElse(""))
             .setLocation(Set.of(new Location(Enumeration.NETCONF)))
-            .withKey(new SchemaKey(Yang.class, capability.getModuleName().get(),
+            .withKey(new SchemaKey(Yang.VALUE, capability.getModuleName().get(),
                 capability.getRevision().orElse("")))
             .build();
 

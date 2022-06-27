@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import io.netty.util.concurrent.GlobalEventExecutor;
@@ -43,17 +42,17 @@ public class StressClientCallable implements Callable<Boolean> {
                                 final NetconfClientDispatcherImpl netconfClientDispatcher,
                                 final List<NetconfMessage> preparedMessages) {
         this.params = params;
-        this.sessionListener = getSessionListener(params.getInetAddress(), params.concurrentMessageLimit);
+        sessionListener = getSessionListener(params.getInetAddress(), params.concurrentMessageLimit);
         this.netconfClientDispatcher = netconfClientDispatcher;
-        cfg = getNetconfClientConfiguration(this.params, this.sessionListener);
+        cfg = getNetconfClientConfiguration(this.params, sessionListener);
 
         LOG.info("Connecting to netconf server {}:{}", params.ip, params.port);
         try {
             netconfClientSession = netconfClientDispatcher.createClient(cfg).get();
         } catch (final InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         } catch (final ExecutionException e) {
-            throw new RuntimeException("Unable to connect", e);
+            throw new IllegalStateException("Unable to connect", e);
         }
         executionStrategy = getExecutionStrategy(params, preparedMessages, sessionListener);
     }
@@ -89,7 +88,7 @@ public class StressClientCallable implements Callable<Boolean> {
         netconfClientConfigurationBuilder.withSessionListener(sessionListener);
         netconfClientConfigurationBuilder.withAddress(params.getInetAddress());
         if (params.tcpHeader != null) {
-            final String header = params.tcpHeader.replaceAll("\"", "").trim() + "\n";
+            final String header = params.tcpHeader.replace("\"", "").trim() + "\n";
             netconfClientConfigurationBuilder.withAdditionalHeader(
                 new NetconfHelloMessageAdditionalHeader(null, null, null, null, null) {
                     @Override

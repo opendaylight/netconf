@@ -68,9 +68,9 @@ final class Execution implements Callable<Void> {
     public Void call() {
         final List<HttpRequest> requests = prepareRequests();
         if (isAsync) {
-            this.sendAsync(requests);
+            sendAsync(requests);
         } else {
-            this.sendSync(requests);
+            sendSync(requests);
         }
         return null;
     }
@@ -101,7 +101,7 @@ final class Execution implements Callable<Void> {
         }
         LOG.info("Requests sent, waiting for responses");
         try {
-            semaphore.acquire(this.throttle);
+            semaphore.acquire(throttle);
         } catch (final InterruptedException e) {
             LOG.warn("Semaphore acquire interrupted");
         }
@@ -119,7 +119,7 @@ final class Execution implements Callable<Void> {
                 }
             } catch (final InterruptedException | IOException e) {
                 LOG.error("Failed to execute request: {}", request, e);
-                throw new RuntimeException("Failed to execute request", e);
+                throw new IllegalStateException("Failed to execute request", e);
             }
         }
         LOG.info("End sending sync requests");

@@ -74,7 +74,8 @@ public class FilterContentValidator {
         try {
             namespace = XMLNamespace.of(filterContent.getNamespace());
         } catch (final IllegalArgumentException e) {
-            throw new RuntimeException("Wrong namespace in element + " + filterContent.toString(), e);
+            // FIXME: throw DocumentedException
+            throw new IllegalArgumentException("Wrong namespace in element + " + filterContent.toString(), e);
         }
 
         try {
@@ -123,8 +124,7 @@ public class FilterContentValidator {
      */
     private FilterTree validateNode(final XmlElement element, final DataSchemaNode parentNodeSchema,
                                     final FilterTree tree) throws ValidationException {
-        final List<XmlElement> childElements = element.getChildElements();
-        for (final XmlElement childElement : childElements) {
+        for (final XmlElement childElement : element.getChildElements()) {
             try {
                 final Deque<DataSchemaNode> path = findSchemaNodeByNameAndNamespace(parentNodeSchema,
                         childElement.getName(), XMLNamespace.of(childElement.getNamespace()));
@@ -138,7 +138,7 @@ public class FilterContentValidator {
                 final DataSchemaNode childSchema = path.getLast();
                 validateNode(childElement, childSchema, subtree);
             } catch (IllegalArgumentException | MissingNameSpaceException e) {
-                throw new RuntimeException("Wrong namespace in element + " + childElement.toString(), e);
+                throw new IllegalArgumentException("Wrong namespace in element + " + childElement.toString(), e);
             }
         }
         return tree;

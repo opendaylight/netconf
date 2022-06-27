@@ -15,8 +15,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -74,8 +74,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             final CallHomeMountDispatcher mountDispacher) {
         this.dataBroker = dataBroker;
         this.mountDispacher = mountDispacher;
-        this.authProvider = new CallHomeAuthProviderImpl(dataBroker);
-        this.statusReporter = new CallhomeStatusReporter(dataBroker);
+        authProvider = new CallHomeAuthProviderImpl(dataBroker);
+        statusReporter = new CallhomeStatusReporter(dataBroker);
     }
 
     public void init() {
@@ -108,7 +108,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
 
     private void initializeServer() throws IOException {
         LOG.info("Initializing Call Home server instance");
-        CallHomeAuthorizationProvider provider = this.getCallHomeAuthorization();
+        CallHomeAuthorizationProvider provider = getCallHomeAuthorization();
         NetconfCallHomeServerBuilder builder = new NetconfCallHomeServerBuilder(provider, mountDispacher,
                                                                                 statusReporter);
         if (port > 0) {
@@ -124,8 +124,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     @VisibleForTesting
     void assertValid(final Object obj, final String description) {
         if (obj == null) {
-            throw new RuntimeException(
-                    String.format("Failed to find %s in IetfZeroTouchCallHomeProvider.initialize()", description));
+            throw new IllegalStateException(
+                "Failed to find " + description + " in IetfZeroTouchCallHomeProvider.initialize()");
         }
     }
 
@@ -135,7 +135,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         statusReporter.close();
 
         // FIXME unbind the server
-        if (this.listenerReg != null) {
+        if (listenerReg != null) {
             listenerReg.close();
         }
         if (server != null) {
@@ -208,7 +208,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
 
     private static Collection<Device> getReadDevices(final ListenableFuture<Optional<AllowedDevices>> devicesFuture)
             throws InterruptedException, ExecutionException {
-        return devicesFuture.get().map(AllowedDevices::nonnullDevice).orElse(Collections.emptyMap()).values();
+        return devicesFuture.get().map(AllowedDevices::nonnullDevice).orElse(Map.of()).values();
     }
 
     private void readAndUpdateStatus(final Device cfgDevice) throws InterruptedException, ExecutionException {
