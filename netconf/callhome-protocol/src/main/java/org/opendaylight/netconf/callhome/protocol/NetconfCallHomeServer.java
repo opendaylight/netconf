@@ -76,6 +76,7 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
                 LOG.debug("SSH session {} event {}", session, event);
                 switch (event) {
                     case KeyEstablished:
+                        createCallHomeSessionContext(clientSession);
                         doAuth(clientSession);
                         break;
                     case Authenticated:
@@ -100,10 +101,23 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
                 LOG.debug("SSH Session {} closed", session);
             }
 
+            /**
+             * Creates call-home authorization for incoming session, then creates call-home session context,
+             * if session with identical unique device ID did not exist in the session map before.
+             */
+            private void createCallHomeSessionContext(final ClientSession clientSession) {
+                final var authorization = authProvider.provideAuth(
+                        clientSession.getRemoteAddress(), clientSession.getServerKey());
+                sessionFactory.createIfNotExists(clientSession, authorization, clientSession.getRemoteAddress());
+            }
+
             private void doAuth(final ClientSession session) {
                 try {
-                    final AuthFuture authFuture = CallHomeSessionContext.getFrom(session).authorize();
-                    authFuture.addListener(newAuthSshFutureListener(session));
+                    // Case of key re-exchange - if session is once authenticated, it does not need to be made again
+                    if (!session.isAuthenticated()) {
+                        final AuthFuture authFuture = CallHomeSessionContext.getFrom(session).authorize();
+                        authFuture.addListener(newAuthSshFutureListener(session));
+                    }
                 } catch (IOException e) {
                     LOG.error("Failed to authorize session {}", session, e);
                 }
@@ -147,22 +161,14 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
     @Override
     public boolean verifyServerKey(final ClientSession sshClientSession, final SocketAddress remoteAddress,
             final PublicKey serverKey) {
-        final CallHomeAuthorization authorization = authProvider.provideAuth(remoteAddress, serverKey);
-        // server is not authorized
-        if (!authorization.isServerAllowed()) {
+        // Verify that the server is authorized
+        final boolean allowed = authProvider.provideAuth(remoteAddress, serverKey).isServerAllowed();
+        if (allowed) {
+            LOG.info("Incoming session {} was successfully verified.", sshClientSession);
+        } else {
             LOG.info("Incoming session {} was rejected by Authorization Provider.", sshClientSession);
-            return false;
         }
-        CallHomeSessionContext session = sessionFactory.createIfNotExists(
-            sshClientSession, authorization, remoteAddress);
-        // Session was created, session with same name does not exists
-        if (session != null) {
-            return true;
-        }
-        // Session was not created, session with same name exists
-        LOG.info("Incoming session {} was rejected. Session with same name {} is already active.",
-            sshClientSession, authorization.getSessionName());
-        return false;
+        return allowed;
     }
 
     public void bind() throws IOException {
