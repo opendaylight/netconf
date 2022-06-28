@@ -20,7 +20,6 @@ import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
@@ -177,14 +176,11 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
             return subsystemListener;
         }
 
-        @Nullable CallHomeSessionContext createIfNotExists(final ClientSession sshSession,
+        void createIfNotExists(final ClientSession sshSession,
                 final CallHomeAuthorization authorization, final SocketAddress remoteAddress) {
             CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
                     remoteAddress, this);
-            CallHomeSessionContext preexisting = sessions.putIfAbsent(session.getSessionId(), session);
-            // If preexisting is null - session does not exist, so we can safely create new one, otherwise we return
-            // null and incoming connection will be rejected.
-            return preexisting == null ? session : null;
+            sessions.putIfAbsent(session.getSessionId(), session);
         }
 
         EventLoopGroup getNettyGroup() {
