@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -98,12 +100,16 @@ public class CallHomeSessionContextTest {
 
     @Test
     public void theContextShouldBeSettableAndRetrievableAsASessionAttribute() {
-        // redo instance below because previous constructor happened too early to capture behavior
+        // when
         instance = realFactory.createIfNotExists(mockSession, mockAuth, address);
+        // then
+        assertNotNull(instance);
+        verify(mockSession, times(1)).setAttribute(CallHomeSessionContext.SESSION_KEY, instance);
+        verify(mockSession, times(0)).getAttribute(any());
+
         // when
         CallHomeSessionContext.getFrom(mockSession);
         // then
-        verify(mockSession, times(1)).setAttribute(CallHomeSessionContext.SESSION_KEY, instance);
         verify(mockSession, times(1)).getAttribute(CallHomeSessionContext.SESSION_KEY);
     }
 
@@ -185,10 +191,10 @@ public class CallHomeSessionContextTest {
 
     @Test
     @Ignore
+    // FIXME: enable this test
     public void failureToOpenTheChannelShouldCauseTheSessionToClose() {
         // given
         instance = realFactory.createIfNotExists(mockSession, mockAuth, address);
-
         OpenFuture mockFuture = mock(OpenFuture.class);
         Mockito.doReturn(false).when(mockFuture).isOpened();
         Mockito.doReturn(new RuntimeException("test")).when(mockFuture).getException();
@@ -201,5 +207,12 @@ public class CallHomeSessionContextTest {
         // then
         // You'll see an error message logged to the console - it is expected.
         verify(mockSession, times(1)).close(anyBoolean());
+    }
+
+    @Test
+    public void theContextConstructorShouldNotModifySession() {
+        instance = new CallHomeSessionContext(mockSession, mockAuth, address, realFactory);
+        verify(mockSession, times(0)).setAttribute(any(), any());
+        assertNull(CallHomeSessionContext.getFrom(mockSession));
     }
 }
