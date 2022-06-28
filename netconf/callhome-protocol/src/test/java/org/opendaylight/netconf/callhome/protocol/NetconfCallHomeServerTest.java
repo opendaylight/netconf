@@ -117,8 +117,9 @@ public class NetconfCallHomeServerTest {
             final PublicKey serverKey = mock(PublicKey.class);
             doReturn(serverKey).when(mockSession).getServerKey();
 
-            SessionListener listener = instance.createSessionListener();
+            final SessionListener listener = instance.createSessionListener();
             doReturn(mockAuthFuture).when(mockContext).authorize();
+            doReturn(false).when(mockSession).isAuthenticated();
             // when
             listener.sessionEvent(mockSession, evt[pass]);
             // then
@@ -130,7 +131,6 @@ public class NetconfCallHomeServerTest {
     @Test
     public void verificationOfTheServerKeyShouldBeSuccessfulForServerIsAllowed() {
         // given
-
         ClientSessionImpl mockClientSession = mock(ClientSessionImpl.class);
         Mockito.doReturn("test").when(mockClientSession).toString();
         SocketAddress mockSocketAddr = mock(SocketAddress.class);
@@ -138,13 +138,11 @@ public class NetconfCallHomeServerTest {
 
         Mockito.doReturn(true).when(mockAuth).isServerAllowed();
         Mockito.doReturn("some-session-name").when(mockAuth).getSessionName();
-
         Mockito.doReturn(mockAuth).when(mockCallHomeAuthProv).provideAuth(mockSocketAddr, mockPublicKey);
-
         Mockito.doReturn(null).when(mockFactory).createIfNotExists(mockClientSession, mockAuth, mockSocketAddr);
 
         // expect
-        instance.verifyServerKey(mockClientSession, mockSocketAddr, mockPublicKey);
+        assertFalse(instance.verifyServerKey(mockClientSession, mockSocketAddr, mockPublicKey));
     }
 
     @Test
