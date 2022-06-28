@@ -76,7 +76,10 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
                 LOG.debug("SSH session {} event {}", session, event);
                 switch (event) {
                     case KeyEstablished:
-                        doAuth(clientSession);
+                        // Case of key re-exchange - if session is once authenticated, it does not need to be made again
+                        if (!clientSession.isAuthenticated()) {
+                            doAuth(clientSession);
+                        }
                         break;
                     case Authenticated:
                         CallHomeSessionContext.getFrom(clientSession).openNetconfChannel();
@@ -148,21 +151,22 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
     public boolean verifyServerKey(final ClientSession sshClientSession, final SocketAddress remoteAddress,
             final PublicKey serverKey) {
         final CallHomeAuthorization authorization = authProvider.provideAuth(remoteAddress, serverKey);
-        // server is not authorized
         if (!authorization.isServerAllowed()) {
+            // server is not authorized
             LOG.info("Incoming session {} was rejected by Authorization Provider.", sshClientSession);
             return false;
         }
-        CallHomeSessionContext session = sessionFactory.createIfNotExists(
-            sshClientSession, authorization, remoteAddress);
-        // Session was created, session with same name does not exists
-        if (session != null) {
-            return true;
+
+        if (sessionFactory.createIfNotExists(sshClientSession, authorization, remoteAddress) == null) {
+            // Session was not created, session with same name exists
+            LOG.info("Incoming session {} was rejected. Session with same name {} is already active.", sshClientSession,
+                authorization.getSessionName());
+            return false;
         }
-        // Session was not created, session with same name exists
-        LOG.info("Incoming session {} was rejected. Session with same name {} is already active.",
-            sshClientSession, authorization.getSessionName());
-        return false;
+
+        // Session was created, session with same name does not exist
+        LOG.debug("Incoming session {} was successfully verified.", sshClientSession);
+        return true;
     }
 
     public void bind() throws IOException {
