@@ -76,7 +76,10 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
                 LOG.debug("SSH session {} event {}", session, event);
                 switch (event) {
                     case KeyEstablished:
-                        doAuth(clientSession);
+                        createCallHomeSessionContext(clientSession);
+                        if (!clientSession.isAuthenticated()) {
+                            doAuth(clientSession);
+                        }
                         break;
                     case Authenticated:
                         CallHomeSessionContext.getFrom(clientSession).openNetconfChannel();
@@ -98,6 +101,12 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
                     ctx.removeSelf();
                 }
                 LOG.debug("SSH Session {} closed", session);
+            }
+
+            private void createCallHomeSessionContext(final ClientSession clientSession) {
+                final CallHomeAuthorization authorization = authProvider.provideAuth(
+                        clientSession.getRemoteAddress(), clientSession.getServerKey());
+                sessionFactory.createIfNotExists(clientSession, authorization);
             }
 
             private void doAuth(final ClientSession session) {
@@ -153,16 +162,8 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
             LOG.info("Incoming session {} was rejected by Authorization Provider.", sshClientSession);
             return false;
         }
-        CallHomeSessionContext session = sessionFactory.createIfNotExists(
-            sshClientSession, authorization, remoteAddress);
-        // Session was created, session with same name does not exists
-        if (session != null) {
-            return true;
-        }
-        // Session was not created, session with same name exists
-        LOG.info("Incoming session {} was rejected. Session with same name {} is already active.",
-            sshClientSession, authorization.getSessionName());
-        return false;
+        LOG.info("Incoming session {} was successfully verified.", sshClientSession);
+        return true;
     }
 
     public void bind() throws IOException {
