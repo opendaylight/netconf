@@ -13,10 +13,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Sets;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,6 +36,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 
 /**
@@ -43,17 +45,16 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
  */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ParameterAwareNormalizedNodeWriterDepthTest {
-
     @Mock
     private NormalizedNodeStreamWriter writer;
     @Mock
     private ContainerNode containerNodeData;
     @Mock
-    private MapNode mapNodeData;
+    private SystemMapNode mapNodeData;
     @Mock
     private MapEntryNode mapEntryNodeData;
     @Mock
-    private LeafSetNode<String> leafSetNodeData;
+    private SystemLeafSetNode<String> leafSetNodeData;
     @Mock
     private LeafSetEntryNode<String> leafSetEntryNodeData;
     @Mock
@@ -115,16 +116,16 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
         // values
         when(leafSetEntryNodeData.body()).thenReturn(leafSetEntryNodeValue);
 
-        leafSetNodeValue = Collections.singletonList(leafSetEntryNodeData);
+        leafSetNodeValue = List.of(leafSetEntryNodeData);
         when(leafSetNodeData.body()).thenReturn(leafSetNodeValue);
 
-        containerNodeValue = Collections.singleton(leafSetNodeData);
+        containerNodeValue = Set.of(leafSetNodeData);
         when(containerNodeData.body()).thenReturn(containerNodeValue);
 
-        mapEntryNodeValue = Sets.newHashSet(keyLeafNodeData, anotherLeafNodeData);
+        mapEntryNodeValue = Set.of(keyLeafNodeData, anotherLeafNodeData);
         when(mapEntryNodeData.body()).thenReturn(mapEntryNodeValue);
 
-        mapNodeValue = Collections.singleton(mapEntryNodeData);
+        mapNodeValue = Set.of(mapEntryNodeData);
         when(mapNodeData.body()).thenReturn(mapNodeValue);
     }
 
