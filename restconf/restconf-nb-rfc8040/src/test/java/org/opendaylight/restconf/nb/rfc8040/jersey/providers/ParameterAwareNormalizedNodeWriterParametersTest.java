@@ -5,13 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
-import com.google.common.collect.Sets;
-import java.util.ArrayList;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.junit.Before;
@@ -19,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.nb.rfc8040.DepthParam;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -38,13 +38,12 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ParameterAwareNormalizedNodeWriterParametersTest {
-
     @Mock
     private NormalizedNodeStreamWriter writer;
     @Mock
     private ContainerNode containerNodeData;
     @Mock
-    private LeafSetNode<String> leafSetNodeData;
+    private SystemLeafSetNode<String> leafSetNodeData;
     @Mock
     private LeafSetEntryNode<String> leafSetEntryNodeData;
     @Mock
@@ -63,29 +62,29 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
     public void setUp() {
         // identifiers
         containerNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "container"));
-        Mockito.when(containerNodeData.getIdentifier()).thenReturn(containerNodeIdentifier);
+        when(containerNodeData.getIdentifier()).thenReturn(containerNodeIdentifier);
 
         final QName leafSetEntryNodeQName = QName.create("namespace", "leaf-set-entry");
         leafSetEntryNodeValue = "leaf-set-value";
         leafSetEntryNodeIdentifier = new NodeWithValue<>(leafSetEntryNodeQName, leafSetEntryNodeValue);
-        Mockito.when(leafSetEntryNodeData.getIdentifier()).thenReturn(leafSetEntryNodeIdentifier);
+        when(leafSetEntryNodeData.getIdentifier()).thenReturn(leafSetEntryNodeIdentifier);
 
         leafSetNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "leaf-set"));
-        Mockito.when(leafSetNodeData.getIdentifier()).thenReturn(leafSetNodeIdentifier);
+        when(leafSetNodeData.getIdentifier()).thenReturn(leafSetNodeIdentifier);
 
         // values
-        Mockito.when(leafSetEntryNodeData.body()).thenReturn(leafSetEntryNodeValue);
+        when(leafSetEntryNodeData.body()).thenReturn(leafSetEntryNodeValue);
 
-        leafSetNodeValue = Collections.singletonList(leafSetEntryNodeData);
-        Mockito.when(leafSetNodeData.body()).thenReturn(leafSetNodeValue);
+        leafSetNodeValue = List.of(leafSetEntryNodeData);
+        when(leafSetNodeData.body()).thenReturn(leafSetNodeValue);
 
-        containerNodeValue = Collections.singleton(leafSetNodeData);
-        Mockito.when(containerNodeData.body()).thenReturn(containerNodeValue);
+        containerNodeValue = Set.of(leafSetNodeData);
+        when(containerNodeData.body()).thenReturn(containerNodeValue);
 
-        rootDataContainerValue = Collections.singleton(leafSetNodeData);
-        Mockito.when(rootDataContainerData.getIdentifier()).thenReturn(NodeIdentifier.create(
+        rootDataContainerValue = Set.of(leafSetNodeData);
+        when(rootDataContainerData.getIdentifier()).thenReturn(NodeIdentifier.create(
             QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data")));
-        Mockito.when(rootDataContainerData.body()).thenReturn(rootDataContainerValue);
+        when(rootDataContainerData.body()).thenReturn(rootDataContainerValue);
     }
 
     /**
@@ -97,22 +96,22 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
      */
     @Test
     public void writeContainerParameterPrioritiesTest() throws Exception {
-        final List<Set<QName>> limitedFields = new ArrayList<>();
-        limitedFields.add(Sets.newHashSet(leafSetNodeIdentifier.getNodeType()));
-        limitedFields.add(Sets.newHashSet(leafSetEntryNodeIdentifier.getNodeType()));
+        final List<Set<QName>> limitedFields = List.of(
+            Set.of(leafSetNodeIdentifier.getNodeType()),
+            Set.of(leafSetEntryNodeIdentifier.getNodeType()));
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
                 writer, DepthParam.min(), limitedFields);
 
         parameterWriter.write(containerNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
-        inOrder.verify(writer, Mockito.times(1)).scalarValue(leafSetEntryNodeValue);
-        inOrder.verify(writer, Mockito.times(3)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(leafSetEntryNodeValue);
+        inOrder.verify(writer, times(3)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -126,12 +125,12 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
 
         parameterWriter.write(rootDataContainerData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
-        inOrder.verify(writer, Mockito.times(1)).scalarValue(leafSetEntryNodeValue);
-        inOrder.verify(writer, Mockito.times(2)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(leafSetEntryNodeValue);
+        inOrder.verify(writer, times(2)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     @Test
