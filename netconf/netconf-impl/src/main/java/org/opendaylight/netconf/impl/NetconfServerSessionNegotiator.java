@@ -66,12 +66,11 @@ public final class NetconfServerSessionNegotiator
      * @return Two values - port and host of socket address
      */
     protected static Map.Entry<String, String> getHostName(final SocketAddress socketAddress) {
-        if (socketAddress instanceof InetSocketAddress) {
-            final var inetSocketAddress = (InetSocketAddress) socketAddress;
+        if (socketAddress instanceof InetSocketAddress inetSocketAddress) {
             return new SimpleImmutableEntry<>(Integer.toString(inetSocketAddress.getPort()),
                     inetSocketAddress.getHostString());
-        } else if (socketAddress instanceof LocalAddress) {
-            return new SimpleImmutableEntry<>(UNKNOWN, ((LocalAddress) socketAddress).id());
+        } else if (socketAddress instanceof LocalAddress localAddress) {
+            return new SimpleImmutableEntry<>(UNKNOWN, localAddress.id());
         } else {
             return new SimpleImmutableEntry<>(UNKNOWN, UNKNOWN);
         }
