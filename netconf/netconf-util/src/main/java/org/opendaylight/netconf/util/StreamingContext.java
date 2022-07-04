@@ -72,19 +72,20 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
     }
 
     static StreamingContext<?> fromDataSchemaNode(final DataSchemaNode potential) {
-        if (potential instanceof ContainerSchemaNode) {
-            return new Container((ContainerSchemaNode) potential);
-        } else if (potential instanceof ListSchemaNode) {
-            return fromListSchemaNode((ListSchemaNode) potential);
-        } else if (potential instanceof LeafSchemaNode) {
-            return new Leaf((LeafSchemaNode) potential);
-        } else if (potential instanceof ChoiceSchemaNode) {
-            return new Choice((ChoiceSchemaNode) potential);
-        } else if (potential instanceof LeafListSchemaNode) {
-            return fromLeafListSchemaNode((LeafListSchemaNode) potential);
-        } else if (potential instanceof AnyxmlSchemaNode) {
-            return new AnyXml((AnyxmlSchemaNode) potential);
+        if (potential instanceof ContainerSchemaNode container) {
+            return new Container(container);
+        } else if (potential instanceof ListSchemaNode list) {
+            return fromListSchemaNode(list);
+        } else if (potential instanceof LeafSchemaNode leaf) {
+            return new Leaf(leaf);
+        } else if (potential instanceof ChoiceSchemaNode choice) {
+            return new Choice(choice);
+        } else if (potential instanceof LeafListSchemaNode leafList) {
+            return fromLeafListSchemaNode(leafList);
+        } else if (potential instanceof AnyxmlSchemaNode anyxml) {
+            return new AnyXml(anyxml);
         }
+        // FIXME: unhandled anydata!
         return null;
     }
 
@@ -235,9 +236,8 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         }
 
         private StreamingContext<?> fromLocalSchema(final PathArgument child) {
-            if (child instanceof AugmentationIdentifier) {
-                return fromSchemaAndQNameChecked(schema, ((AugmentationIdentifier) child).getPossibleChildNames()
-                        .iterator().next());
+            if (child instanceof AugmentationIdentifier aid) {
+                return fromSchemaAndQNameChecked(schema, aid.getPossibleChildNames().iterator().next());
             }
             return fromSchemaAndQNameChecked(schema, child.getNodeType());
         }
@@ -266,11 +266,10 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         @Override
         final void emitChildTreeNode(final NormalizedNodeStreamWriter writer, final PathNode node) throws IOException {
             final PathArgument element = node.element();
-            if (!(element instanceof NodeIdentifierWithPredicates)) {
+            if (!(element instanceof NodeIdentifierWithPredicates childPath)) {
                 throw new IOException("Child identifier " + element + " is invalid in parent " + getIdentifier());
             }
 
-            final NodeIdentifierWithPredicates childPath = (NodeIdentifierWithPredicates) element;
             final StreamingContext<?> childOp = getChildOperation(childPath);
             if (childPath.size() == 0 && node.isEmpty() || childPath.keySet().containsAll(keyLeaves)) {
                 // This is a query for the entire list, or the query specifies everything we need
