@@ -154,7 +154,7 @@ public final class XmlElement {
     }
 
     public void appendChild(final Element toAppend) {
-        this.element.appendChild(toAppend);
+        element.appendChild(toAppend);
     }
 
     public Element getDomElement() {
@@ -181,12 +181,8 @@ public final class XmlElement {
         NodeList childNodes = element.getChildNodes();
         final List<XmlElement> result = new ArrayList<>();
         for (int i = 0; i < childNodes.getLength(); i++) {
-            Node item = childNodes.item(i);
-            if (!(item instanceof Element)) {
-                continue;
-            }
-            if (strat.accept((Element) item)) {
-                result.add(new XmlElement((Element) item));
+            if (childNodes.item(i) instanceof Element elem && strat.accept(elem)) {
+                result.add(new XmlElement(elem));
             }
         }
 
@@ -321,10 +317,8 @@ public final class XmlElement {
             return DEFAULT_NAMESPACE_PREFIX;
         }
         for (int i = 0; i < childNodes.getLength(); i++) {
-            Node textChild = childNodes.item(i);
-            if (textChild instanceof Text) {
-                String content = textChild.getTextContent();
-                return content.trim();
+            if (childNodes.item(i) instanceof Text textChild) {
+                return textChild.getTextContent().trim();
             }
         }
         throw new DocumentedException(getName() + " should contain text.",
@@ -334,9 +328,8 @@ public final class XmlElement {
     public Optional<String> getOnlyTextContentOptionally() {
         // only return text content if this node has exactly one Text child node
         if (element.getChildNodes().getLength() == 1) {
-            Node item = element.getChildNodes().item(0);
-            if (item instanceof Text) {
-                return Optional.of(((Text) item).getWholeText());
+            if (element.getChildNodes().item(0) instanceof Text textChild) {
+                return Optional.of(textChild.getWholeText());
             }
         }
         return Optional.empty();
