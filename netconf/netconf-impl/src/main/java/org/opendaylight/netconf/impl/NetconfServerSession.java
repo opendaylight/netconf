@@ -97,9 +97,9 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     @Override
     public ChannelFuture sendMessage(final NetconfMessage netconfMessage) {
         final ChannelFuture channelFuture = super.sendMessage(netconfMessage);
-        if (netconfMessage instanceof NetconfNotification) {
+        if (netconfMessage instanceof NetconfNotification notification) {
             outNotification++;
-            sessionListener.onNotification(this, (NetconfNotification) netconfMessage);
+            sessionListener.onNotification(this, notification);
         }
         // delayed close was set, close after the message was sent
         if (delayedClose) {

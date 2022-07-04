@@ -150,11 +150,11 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
 
         for (final NetconfOperation netconfOperation : allNetconfOperations) {
             final HandlingPriority handlingPriority = netconfOperation.canHandle(message);
-            if (netconfOperation instanceof DefaultNetconfOperation) {
-                ((DefaultNetconfOperation) netconfOperation).setNetconfSession(session);
+            if (netconfOperation instanceof DefaultNetconfOperation defaultOperation) {
+                defaultOperation.setNetconfSession(session);
             }
-            if (netconfOperation instanceof SessionAwareNetconfOperation) {
-                ((SessionAwareNetconfOperation) netconfOperation).setSession(session);
+            if (netconfOperation instanceof SessionAwareNetconfOperation sessionAwareOperation) {
+                sessionAwareOperation.setSession(session);
             }
             if (!handlingPriority.equals(HandlingPriority.CANNOT_HANDLE)) {
 
