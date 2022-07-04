@@ -108,9 +108,9 @@ public class RemoteNetconfCommand implements AsyncCommand {
         final SocketAddress remoteAddress = session.getIoSession().getRemoteAddress();
         final String hostName;
         final String port;
-        if (remoteAddress instanceof InetSocketAddress) {
-            hostName = ((InetSocketAddress) remoteAddress).getAddress().getHostAddress();
-            port = Integer.toString(((InetSocketAddress) remoteAddress).getPort());
+        if (remoteAddress instanceof InetSocketAddress remoteInetAddress) {
+            hostName = remoteInetAddress.getAddress().getHostAddress();
+            port = Integer.toString(remoteInetAddress.getPort());
         } else {
             hostName = "";
             port = "";
