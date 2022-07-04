@@ -335,8 +335,8 @@ public final class NetconfUtil {
 
         final Element childElement = data.getOwnerDocument().createElementNS(elementNamespace, nodeType.getLocalName());
         data.appendChild(childElement);
-        if (pathArg instanceof NodeIdentifierWithPredicates) {
-            appendListKeyNodes(childElement, (NodeIdentifierWithPredicates) pathArg);
+        if (pathArg instanceof NodeIdentifierWithPredicates nip) {
+            appendListKeyNodes(childElement, nip);
         }
         for (final PathNode childrenNode : pathArgumentTree.children()) {
             pathArgumentTreeToXmlStructure(childrenNode, childElement);
