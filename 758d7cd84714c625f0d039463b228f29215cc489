@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "877368a1_cd5c5b5c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-07-06T21:55:54Z",
+      "side": 1,
+      "message": "Why is shaded-exificient/shaded-sshd also affected by this?",
+      "revId": "758d7cd84714c625f0d039463b228f29215cc489",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
