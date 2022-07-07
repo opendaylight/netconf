@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b9d73c4_26b6dff0",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-07-07T00:29:58Z",
+      "side": 0,
+      "message": "okay... so when negotiation fails we do not notify the promise. When can it fail then?\n\nIf we are ditching this then a corresponding documentation update needs to be made to the Promise being exposed to the outside world.\n\nWhat I mean to say is that the promise handled here is defined somewhere and that place needs to define the semantics.",
+      "range": {
+        "startLine": 276,
+        "startChar": 8,
+        "endLine": 276,
+        "endChar": 34
+      },
+      "revId": "e91aa63a54778bca132a22056bbc084bd7d9e1ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
