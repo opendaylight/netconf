@@ -123,7 +123,7 @@ public class NetconfCallHomeServerTest {
 
             final SessionListener listener = instance.createSessionListener();
             doReturn(mockAuthFuture).when(mockContext).authorize();
-            doNothing().when(mockFactory).createIfNotExists(mockSession, mockAuth, mockSocketAddr);
+            doNothing().when(mockFactory).createIfNotExists(mockSession, mockAuth);
             doReturn(false).when(mockSession).isAuthenticated();
             // when
             listener.sessionEvent(mockSession, evt[pass]);
