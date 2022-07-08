@@ -99,7 +99,7 @@ public class CallHomeSessionContextTest {
     @Test
     public void theContextShouldBeSettableAndRetrievableAsASessionAttribute() {
         // redo instance below because previous constructor happened too early to capture behavior
-        instance = new CallHomeSessionContext(mockSession, mockAuth, address, realFactory);
+        instance = new CallHomeSessionContext(mockSession, mockAuth, realFactory);
         // when
         CallHomeSessionContext.getFrom(mockSession);
         // then
@@ -109,7 +109,7 @@ public class CallHomeSessionContextTest {
 
     @Test
     public void anAuthorizeActionShouldApplyToTheBoundSession() throws IOException {
-        instance = new CallHomeSessionContext(mockSession, mockAuth, address, realFactory);
+        instance = new CallHomeSessionContext(mockSession, mockAuth, realFactory);
         // when
         Mockito.doReturn(null).when(mockSession).auth();
         instance.authorize();
@@ -127,7 +127,7 @@ public class CallHomeSessionContextTest {
 
         Mockito.doReturn(null).when(mockFuture).addListener(any(SshFutureListener.class));
         doNothing().when(mockChannelSubsystem).setStreaming(any(StreamingChannel.Streaming.class));
-        instance = new CallHomeSessionContext(mockSession, mockAuth, address, realFactory);
+        instance = new CallHomeSessionContext(mockSession, mockAuth, realFactory);
         // when
         instance.openNetconfChannel();
         // then
@@ -140,7 +140,7 @@ public class CallHomeSessionContextTest {
         TestableContext(final ClientSession sshSession, final CallHomeAuthorization authorization,
                         final InetSocketAddress address, final CallHomeSessionContext.Factory factory,
                         final MinaSshNettyChannel minaMock) {
-            super(sshSession, authorization, address, factory);
+            super(sshSession, authorization, factory);
             this.minaMock = minaMock;
         }
 
@@ -187,7 +187,7 @@ public class CallHomeSessionContextTest {
     @Ignore
     public void failureToOpenTheChannelShouldCauseTheSessionToClose() {
         // given
-        instance = new CallHomeSessionContext(mockSession, mockAuth, address, realFactory);
+        instance = new CallHomeSessionContext(mockSession, mockAuth, realFactory);
         OpenFuture mockFuture = mock(OpenFuture.class);
         Mockito.doReturn(false).when(mockFuture).isOpened();
         Mockito.doReturn(new RuntimeException("test")).when(mockFuture).getException();

@@ -100,6 +100,7 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
                 }
                 LOG.debug("SSH Session {} closed", session);
             }
+
             /**
              * Creates call-home authorization for incoming session, then creates call-home session context,
              * if session with identical unique device ID did not exist in the session map before.
@@ -107,7 +108,7 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
             private void createCallHomeSessionContext(final ClientSession clientSession) {
                 final var authorization = authProvider.provideAuth(
                         clientSession.getRemoteAddress(), clientSession.getServerKey());
-                sessionFactory.createIfNotExists(clientSession, authorization, clientSession.getRemoteAddress());
+                sessionFactory.createIfNotExists(clientSession, authorization);
             }
 
             private void doAuth(final ClientSession session) {
