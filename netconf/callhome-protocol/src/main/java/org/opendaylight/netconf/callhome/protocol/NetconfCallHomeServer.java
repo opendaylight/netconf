@@ -108,7 +108,7 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
             private void createCallHomeSessionContext(final ClientSession clientSession) {
                 final var authorization = authProvider.provideAuth(
                         clientSession.getRemoteAddress(), clientSession.getServerKey());
-                sessionFactory.createIfNotExists(clientSession, authorization, clientSession.getRemoteAddress());
+                sessionFactory.createIfNotExists(clientSession, authorization);
             }
 
             private void doAuth(final ClientSession session) {
