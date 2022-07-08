@@ -157,7 +157,7 @@ public final class NetconfCallHomeServer implements AutoCloseable, ServerKeyVeri
             return false;
         }
 
-        if (sessionFactory.createIfNotExists(sshClientSession, authorization, remoteAddress) == null) {
+        if (sessionFactory.createIfNotExists(sshClientSession, authorization) == null) {
             // Session was not created, session with same name exists
             LOG.info("Incoming session {} was rejected. Session with same name {} is already active.", sshClientSession,
                 authorization.getSessionName());
