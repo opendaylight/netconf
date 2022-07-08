@@ -16,7 +16,6 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -51,7 +50,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "Passing 'this' around")
     CallHomeSessionContext(final ClientSession sshSession, final CallHomeAuthorization authorization,
-                           final SocketAddress remoteAddress, final Factory factory) {
+                           final Factory factory) {
         this.authorization = requireNonNull(authorization, "authorization");
         checkArgument(this.authorization.isServerAllowed(), "Server was not allowed.");
         this.factory = requireNonNull(factory);
@@ -176,10 +175,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
             return subsystemListener;
         }
 
-        void createIfNotExists(final ClientSession sshSession,
-                final CallHomeAuthorization authorization, final SocketAddress remoteAddress) {
-            CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
-                    remoteAddress, this);
+        void createIfNotExists(final ClientSession sshSession, final CallHomeAuthorization authorization) {
+            CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization, this);
             sessions.putIfAbsent(session.getSessionId(), session);
         }
 
