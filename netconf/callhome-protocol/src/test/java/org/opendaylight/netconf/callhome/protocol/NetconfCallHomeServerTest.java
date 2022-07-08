@@ -139,7 +139,7 @@ public class NetconfCallHomeServerTest {
         Mockito.doReturn(true).when(mockAuth).isServerAllowed();
         Mockito.doReturn("some-session-name").when(mockAuth).getSessionName();
         Mockito.doReturn(mockAuth).when(mockCallHomeAuthProv).provideAuth(mockSocketAddr, mockPublicKey);
-        Mockito.doReturn(null).when(mockFactory).createIfNotExists(mockClientSession, mockAuth, mockSocketAddr);
+        Mockito.doReturn(null).when(mockFactory).createIfNotExists(mockClientSession, mockAuth);
 
         // expect
         assertFalse(instance.verifyServerKey(mockClientSession, mockSocketAddr, mockPublicKey));
