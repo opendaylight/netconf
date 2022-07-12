@@ -13,17 +13,19 @@
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-parent</artifactId>
         <version>4.0.0-SNAPSHOT</version>
-        <relativePath>../../../parent</relativePath>
+        <relativePath>../../parent</relativePath>
     </parent>
 
-    <artifactId>ietf-netconf-with-defaults</artifactId>
+    <groupId>org.opendaylight.netconf.model</groupId>
+    <artifactId>rfc6243</artifactId>
     <packaging>bundle</packaging>
     <name>${project.artifactId}</name>
+    <description>RFC6243 With-defaults Capability for NETCONF</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf</artifactId>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc6241</artifactId>
         </dependency>
     </dependencies>
 </project>

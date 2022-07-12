@@ -56,8 +56,8 @@
       <artifactId>mockito-configuration</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>ietf-netconf</artifactId>
+      <groupId>org.opendaylight.netconf.model</groupId>
+      <artifactId>rfc6241</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal</groupId>
