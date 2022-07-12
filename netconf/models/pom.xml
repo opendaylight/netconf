@@ -28,14 +28,7 @@
   </properties>
 
   <modules>
-    <module>ietf-netconf</module>
-    <module>ietf-netconf-acm</module>
-    <module>ietf-netconf-monitoring</module>
     <module>ietf-netconf-monitoring-extension</module>
-    <module>ietf-netconf-nmda</module>
     <module>ietf-netconf-notifications</module>
-    <module>ietf-netconf-with-defaults</module>
-
-    <module>netconf-test-models</module>
   </modules>
 </project>

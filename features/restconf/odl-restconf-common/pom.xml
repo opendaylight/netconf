@@ -59,8 +59,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-restconf-monitoring</artifactId>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
