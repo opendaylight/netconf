@@ -13,12 +13,14 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
     <version>4.0.0-SNAPSHOT</version>
-    <relativePath>../../../parent</relativePath>
+    <relativePath>../../parent</relativePath>
   </parent>
 
-  <artifactId>ietf-netconf-monitoring</artifactId>
+  <groupId>org.opendaylight.netconf.model</groupId>
+  <artifactId>rfc6022</artifactId>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
+  <description>RFC6020 YANG Module for NETCONF Monitoring</description>
 
   <dependencies>
     <dependency>
