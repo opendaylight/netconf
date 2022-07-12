@@ -13,12 +13,14 @@
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-parent</artifactId>
         <version>4.0.0-SNAPSHOT</version>
-        <relativePath>../../../parent</relativePath>
+        <relativePath>../../parent</relativePath>
     </parent>
 
-    <artifactId>ietf-netconf</artifactId>
+    <groupId>org.opendaylight.netconf</groupId>
+    <artifactId>rfc6241</artifactId>
     <packaging>bundle</packaging>
     <name>${project.artifactId}</name>
+    <description>RFC6241 Network Configuration Protocol (NETCONF)</description>
 
     <dependencies>
         <dependency>
