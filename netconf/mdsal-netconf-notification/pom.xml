@@ -37,8 +37,8 @@
             <artifactId>mdsal-binding-runtime-spi</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ietf-netconf-notifications</artifactId>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc5277</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
