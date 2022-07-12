@@ -20,7 +20,7 @@
   <artifactId>rfc6022</artifactId>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
-  <description>RFC6020 YANG Module for NETCONF Monitoring</description>
+  <description>RFC6022 YANG Module for NETCONF Monitoring</description>
 
   <dependencies>
     <dependency>
