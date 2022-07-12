@@ -60,6 +60,8 @@
     <module>callhome-protocol</module>
     <module>callhome-provider</module>
 
+    <module>netconf-test-models</module>
+
     <module>shaded-exificient-jar</module>
     <module>shaded-exificient</module>
     <module>shaded-sshd-jar</module>
