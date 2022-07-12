@@ -123,17 +123,34 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- YANG models -->
+            <!-- RFC6241 Network Configuration Protocol (NETCONF) -->
             <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>ietf-netconf</artifactId>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>rfc6241</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- RFC8040 RESTCONF Protocol
+                 Note that ietf-restconf is packaged in MD-SAL -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- RFC8341 Network Configuration Access Control Model -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>rfc8341</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- RFC8639 Subscription to YANG Notifications -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>rfc8639</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>ietf-netconf-acm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+            <!-- FIXME: clean up these models -->
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -464,16 +481,6 @@
             </dependency>
 
             <!-- RESTCONF -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>ietf-restconf-monitoring</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>ietf-subscribed-notifications</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-common-models</artifactId>

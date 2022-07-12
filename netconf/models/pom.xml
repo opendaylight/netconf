@@ -28,8 +28,6 @@
   </properties>
 
   <modules>
-    <module>ietf-netconf</module>
-    <module>ietf-netconf-acm</module>
     <module>ietf-netconf-monitoring</module>
     <module>ietf-netconf-monitoring-extension</module>
     <module>ietf-netconf-nmda</module>
