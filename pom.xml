@@ -34,6 +34,7 @@
         <module>features</module>
         <module>karaf</module>
         <module>karaf-static</module>
+        <module>model</module>
         <module>netconf</module>
         <module>restconf</module>
     </modules>
