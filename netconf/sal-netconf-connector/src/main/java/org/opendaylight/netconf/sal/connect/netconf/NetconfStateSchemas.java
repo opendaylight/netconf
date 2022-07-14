@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_MONITORING;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
@@ -38,6 +39,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfUtil;
+import org.opendaylight.netconf.util.xml.XMLNetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
@@ -71,6 +73,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemas.class);
     private static final YangInstanceIdentifier STATE_SCHEMAS_IDENTIFIER =
             YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).build();
+    private static final Set<String> MONITORING_NAMESPACES = Set.of(IETF_NETCONF_MONITORING.getNamespace().toString());
     private static final @NonNull ContainerNode GET_SCHEMAS_RPC;
 
     static {
@@ -196,7 +199,9 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         try {
             dataNode = NetconfUtil.transformDOMSourceToNormalizedNode(schemaContext,
-                    ((DOMSourceAnyxmlNode) rpcResult).body()).getResult();
+                    XMLNetconfUtil.filterDomNamespaces(((DOMSourceAnyxmlNode) rpcResult).body(),
+                            MONITORING_NAMESPACES))
+                    .getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Failed to transform {}", rpcResult, e);
             return Optional.empty();
