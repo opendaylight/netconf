@@ -7,12 +7,20 @@
  */
 package org.opendaylight.netconf.util.xml;
 
+import java.util.List;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.traversal.DocumentTraversal;
+import org.w3c.dom.traversal.NodeFilter;
+import org.w3c.dom.traversal.TreeWalker;
 
 public final class XMLNetconfUtil {
     private static final XPathFactory FACTORY = XPathFactory.newInstance();
@@ -33,4 +41,39 @@ public final class XMLNetconfUtil {
         }
     }
 
+    public static DOMSource filterDomNamespaces(final DOMSource domSource, final List<String> namespacesAllowed) {
+        final var sourceDoc = XmlUtil.newDocument();
+        sourceDoc.appendChild(sourceDoc.importNode(domSource.getNode(), true));
+
+        final var treeWalker = ((DocumentTraversal) sourceDoc).createTreeWalker(
+                sourceDoc.getDocumentElement(),
+                NodeFilter.SHOW_ALL,
+                n -> {
+                    if (n.getNamespaceURI() == null || namespacesAllowed.contains(n.getNamespaceURI())) {
+                        return NodeFilter.FILTER_ACCEPT;
+                    } else {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+                },
+                false);
+
+        final var filteredDoc = XmlUtil.newDocument();
+        filteredDoc.appendChild(filteredDoc.importNode(treeWalker.getRoot(), false));
+        filterChildren(treeWalker, filteredDoc, filteredDoc.getDocumentElement());
+
+        return new DOMSource(filteredDoc.getDocumentElement());
+    }
+
+    private static void filterChildren(final TreeWalker treeWalker,
+            final Document filteredDoc, final Node filteredNode) {
+        if (treeWalker.firstChild() == null) {
+            return;
+        }
+        for (Node node = treeWalker.getCurrentNode(); node != null; node = treeWalker.nextSibling()) {
+            final var newFilteredNode = filteredDoc.importNode(node, false);
+            filteredNode.appendChild(newFilteredNode);
+            filterChildren(treeWalker, filteredDoc, newFilteredNode);
+            treeWalker.setCurrentNode(node);
+        }
+    }
 }
