@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_MONITORING;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
@@ -60,6 +61,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.traversal.DocumentTraversal;
+import org.w3c.dom.traversal.NodeFilter;
+import org.w3c.dom.traversal.TreeWalker;
 import org.xml.sax.SAXException;
 
 /**
@@ -69,8 +74,9 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     public static final NetconfStateSchemas EMPTY = new NetconfStateSchemas(ImmutableSet.of());
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemas.class);
-    private static final YangInstanceIdentifier STATE_SCHEMAS_IDENTIFIER =
-            YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).build();
+    private static final YangInstanceIdentifier STATE_SCHEMAS_IDENTIFIER = YangInstanceIdentifier.builder()
+        .node(NetconfState.QNAME).node(Schemas.QNAME).build();
+    private static final String MONITORING_NAMESPACE = IETF_NETCONF_MONITORING.getNamespace().toString();
     private static final @NonNull ContainerNode GET_SCHEMAS_RPC;
 
     static {
@@ -185,30 +191,69 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         if (result == null) {
             return Optional.empty();
         }
-        final Optional<DataContainerChild> rpcResultOpt = ((ContainerNode)result).findChildByArg(NETCONF_DATA_NODEID);
+        // FIXME: unchecked cast
+        final var rpcResultOpt = ((ContainerNode) result).findChildByArg(NETCONF_DATA_NODEID);
         if (rpcResultOpt.isEmpty()) {
             return Optional.empty();
         }
 
-        final DataContainerChild rpcResult = rpcResultOpt.get();
+        final var rpcResult = rpcResultOpt.get();
         verify(rpcResult instanceof DOMSourceAnyxmlNode, "Unexpected result %s", rpcResult);
-        final NormalizedNode dataNode;
 
+        // Server may include additional data which we do not understand. Make sure we trim the input before we try
+        // to interpret it.
+        // FIXME: this is something NetconfUtil.transformDOMSourceToNormalizedNode(), and more generally, NormalizedNode
+        //        codecs should handle. We really want to a NormalizedNode tree which can be directly queried for known
+        //        things while completely ignoring XML content (and hence its semantics) of other elements.
+        final var filteredBody = ietfMonitoringCopy(((DOMSourceAnyxmlNode) rpcResult).body());
+
+        final NormalizedNode dataNode;
         try {
-            dataNode = NetconfUtil.transformDOMSourceToNormalizedNode(schemaContext,
-                    ((DOMSourceAnyxmlNode) rpcResult).body()).getResult();
+            dataNode = NetconfUtil.transformDOMSourceToNormalizedNode(schemaContext, filteredBody).getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Failed to transform {}", rpcResult, e);
             return Optional.empty();
         }
 
-        final Optional<DataContainerChild> nStateNode = ((DataContainerNode) dataNode).findChildByArg(
-            toId(NetconfState.QNAME));
+        // FIXME: unchecked cast
+        final var nStateNode = ((DataContainerNode) dataNode).findChildByArg(toId(NetconfState.QNAME));
         if (nStateNode.isEmpty()) {
             return Optional.empty();
         }
 
+        // FIXME: unchecked cast
         return ((DataContainerNode) nStateNode.get()).findChildByArg(toId(Schemas.QNAME));
+    }
+
+    @VisibleForTesting
+    static DOMSource ietfMonitoringCopy(final DOMSource domSource) {
+        final var sourceDoc = XmlUtil.newDocument();
+        sourceDoc.appendChild(sourceDoc.importNode(domSource.getNode(), true));
+
+        final var treeWalker = ((DocumentTraversal) sourceDoc).createTreeWalker(sourceDoc.getDocumentElement(),
+            NodeFilter.SHOW_ALL, node -> {
+                final var namespace = node.getNamespaceURI();
+                return namespace == null || MONITORING_NAMESPACE.equals(namespace)
+                    ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            }, false);
+
+        final var filteredDoc = XmlUtil.newDocument();
+        filteredDoc.appendChild(filteredDoc.importNode(treeWalker.getRoot(), false));
+        final var filteredElement = filteredDoc.getDocumentElement();
+        copyChildren(treeWalker, filteredDoc, filteredElement);
+
+        return new DOMSource(filteredElement);
+    }
+
+    private static void copyChildren(final TreeWalker walker, final Document targetDoc, final Node targetNode) {
+        if (walker.firstChild() != null) {
+            for (var node = walker.getCurrentNode(); node != null; node = walker.nextSibling()) {
+                final var importedNode = targetDoc.importNode(node, false);
+                targetNode.appendChild(importedNode);
+                copyChildren(walker, targetDoc, importedNode);
+                walker.setCurrentNode(node);
+            }
+        }
     }
 
     public static final class RemoteYangSchema {
