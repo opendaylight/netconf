@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+    <schemas>
+      <schema>
+        <namespace>urn:opendaylight:params:xml:ns:yang:controller:threadpool</namespace>
+        <location>NETCONF</location>
+        <identifier>threadpool</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2013-04-09</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:params:xml:ns:yang:controller:logback:config</namespace>
+        <location>NETCONF</location>
+        <identifier>config-logging</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2013-07-16</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:model:statistics:types</namespace>
+        <location>NETCONF</location>
+        <identifier>opendaylight-statistics-types</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2013-09-25</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:params:xml:ns:yang:controller:md:sal:core:spi:config-dom-store
+        </namespace>
+        <location>NETCONF</location>
+        <identifier>opendaylight-config-dom-datastore</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2014-06-17</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:flow:table:statistics</namespace>
+        <location>NETCONF</location>
+        <identifier>opendaylight-flow-table-statistics</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2013-12-15</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:meter:service</namespace>
+        <location>NETCONF</location>
+        <identifier>sal-meter</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2013-09-18</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:params:xml:ns:yang:controller:config:toaster-provider:impl
+        </namespace>
+        <location>NETCONF</location>
+        <identifier>toaster-provider-impl</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2014-01-31</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:table:types</namespace>
+        <location>NETCONF</location>
+        <identifier>opendaylight-table-types</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2013-10-26</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:table:service</namespace>
+        <location>NETCONF</location>
+        <identifier>sal-table</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2013-10-26</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+      <schema>
+        <namespace>urn:opendaylight:params:xml:ns:yang:controller:shutdown</namespace>
+        <location>NETCONF</location>
+        <identifier>shutdown</identifier>
+        <format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</format>
+        <version>2013-12-18</version>
+        <semver xmlns="urn:opendaylight:params:xml:ns:netconf">1.0.0</semver>
+      </schema>
+    </schemas>
+  </netconf-state>
+</data>
