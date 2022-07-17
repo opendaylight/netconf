@@ -39,8 +39,8 @@ public class Configuration {
     public static final Set<YangResource> DEFAULT_YANG_RESOURCES = ImmutableSet.of(
             new YangResource("ietf-netconf-monitoring", "2010-10-04",
                     "/META-INF/yang/ietf-netconf-monitoring@2010-10-04.yang"),
-            new YangResource("ietf-netconf-monitoring-extension", "2013-12-10",
-                    "/META-INF/yang/ietf-netconf-monitoring-extension@2013-12-10.yang"),
+            new YangResource("odl-netconf-monitoring", "2022-07-18",
+                    "/META-INF/yang/odl-netconf-monitoring@2022-07-18.yang"),
             new YangResource("ietf-yang-types", "2013-07-15",
                     "/META-INF/yang/ietf-yang-types@2013-07-15.yang"),
             new YangResource("ietf-inet-types", "2013-07-15",

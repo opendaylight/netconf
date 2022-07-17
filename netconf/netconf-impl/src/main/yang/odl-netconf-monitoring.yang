@@ -1,0 +1,23 @@
+module odl-netconf-monitoring {
+  namespace "urn:opendaylight:params:xml:ns:yang:netconf:monitoring";
+  prefix "odlncm";
+
+  import ietf-netconf-monitoring {
+    prefix ncm;
+  }
+
+  revision "2022-07-18" {
+    description "Initial revision.";
+  }
+
+  identity netconf-tcp {
+    base ncm:transport;
+    description "NETCONF over plain TCP/IP.";
+  }
+
+  augment "/ncm:netconf-state/ncm:sessions/ncm:session" {
+    leaf session-identifier {
+      type string;
+    }
+  }
+}

@@ -26,11 +26,11 @@ Set<String> models = ImmutableSet.of(
     "models/ietf-inet-types@2013-07-15.yang",
     "models/ietf-netconf@2011-06-01.yang",
     "models/ietf-netconf-monitoring@2010-10-04.yang",
-    "models/ietf-netconf-monitoring-extension@2013-12-10.yang",
     "models/ietf-yang-library@2016-06-21.yang",
     "models/ietf-yang-types@2013-07-15.yang",
     "models/nc-notifications@2008-07-14.yang",
     "models/notifications@2008-07-14.yang",
+    "models/odl-netconf-monitoring@2022-07-18.yang",
     ...
 );
 ----
