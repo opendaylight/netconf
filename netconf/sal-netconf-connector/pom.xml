@@ -33,10 +33,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ietf-netconf-monitoring-extension</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>netconf-client</artifactId>
     </dependency>
     <dependency>

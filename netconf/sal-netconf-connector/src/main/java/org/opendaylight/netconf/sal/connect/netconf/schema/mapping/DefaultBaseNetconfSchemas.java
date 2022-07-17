@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import com.google.common.annotations.Beta;
-import java.util.Arrays;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -41,18 +41,14 @@ public final class DefaultBaseNetconfSchemas implements BaseNetconfSchemas {
 
     private static EffectiveModelContext withoutNotifications(final YangParserFactory parserFactory)
             throws YangParserException {
-        return BindingRuntimeHelpers.createEffectiveModel(parserFactory, Arrays.asList(
+        return BindingRuntimeHelpers.createEffectiveModel(parserFactory, List.of(
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
-                .$YangModuleInfoImpl.getInstance(),
-            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210
                 .$YangModuleInfoImpl.getInstance()));
     }
 
     private static EffectiveModelContext withNotifications(final YangParserFactory parserFactory)
             throws YangParserException {
-        return BindingRuntimeHelpers.createEffectiveModel(parserFactory, Arrays.asList(
-            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210
-                .$YangModuleInfoImpl.getInstance(),
+        return BindingRuntimeHelpers.createEffectiveModel(parserFactory, List.of(
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
                 .$YangModuleInfoImpl.getInstance(),
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
