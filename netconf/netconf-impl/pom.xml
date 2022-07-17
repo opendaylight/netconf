@@ -25,10 +25,6 @@
       <groupId>org.opendaylight.netconf.model</groupId>
       <artifactId>rfc6022</artifactId>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ietf-netconf-monitoring-extension</artifactId>
-    </dependency>
     <!-- compile dependencies -->
     <dependency>
       <groupId>${project.groupId}</groupId>
