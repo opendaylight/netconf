@@ -33,11 +33,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ietf-netconf-monitoring-extension</artifactId>
+      <artifactId>netconf-client</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-client</artifactId>
+      <artifactId>netconf-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -116,11 +116,6 @@
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-legacy</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-impl</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
