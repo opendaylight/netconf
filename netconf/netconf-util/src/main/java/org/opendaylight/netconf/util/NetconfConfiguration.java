@@ -28,6 +28,26 @@ public interface NetconfConfiguration {
     long DEFAULT_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(30);
 
     /**
+     * Max chunk size property name.
+     */
+    String MAX_CHUNK_SIZE_PROP_NAME = "org.opendaylight.netconf.maximum.chunk.size";
+
+    /**
+     * Default size of chunk in bytes.
+     */
+    int DEFAULT_CHUNK_SIZE = 8192;
+
+    /**
+     * Minimum size of chunk in bytes.
+     */
+    int MIN_CHUNK_SIZE = 128;
+
+    /**
+     * Maximum size of chunk in bytes.
+     */
+    int MAX_CHUNK_SIZE = Integer.parseInt(System.getProperty(MAX_CHUNK_SIZE_PROP_NAME, "16")) * 1024 * 1024;
+
+    /**
      * NETCONF SSH server address.
      *
      * @return NETCONF SSH server address

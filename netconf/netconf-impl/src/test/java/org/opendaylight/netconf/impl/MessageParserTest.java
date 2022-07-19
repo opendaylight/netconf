@@ -25,12 +25,12 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
+import org.opendaylight.netconf.util.NetconfConfiguration;
 import org.opendaylight.netconf.util.messages.FramingMechanism;
 import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
@@ -62,17 +62,18 @@ public class MessageParserTest {
         enc.encode(null, msg, out);
         int msgLength = out.readableBytes();
 
-        int chunkCount = msgLength / ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE;
-        if (msgLength % ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE != 0) {
+        int defaultChunkSize = NetconfConfiguration.DEFAULT_CHUNK_SIZE;
+        int chunkCount = msgLength / defaultChunkSize;
+        if (msgLength % defaultChunkSize != 0) {
             chunkCount++;
         }
 
         byte[] endOfChunkBytes = NetconfMessageConstants.END_OF_CHUNK.getBytes(StandardCharsets.UTF_8);
         for (int i = 1; i <= chunkCount; i++) {
             ByteBuf recievedOutbound = (ByteBuf) messages.poll();
-            int exptHeaderLength = ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE;
+            int exptHeaderLength = defaultChunkSize;
             if (i == chunkCount) {
-                exptHeaderLength = msgLength - ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE * (i - 1);
+                exptHeaderLength = msgLength - defaultChunkSize * (i - 1);
                 byte[] eom = new byte[endOfChunkBytes.length];
                 recievedOutbound.getBytes(recievedOutbound.readableBytes() - endOfChunkBytes.length, eom);
                 assertArrayEquals(endOfChunkBytes, eom);

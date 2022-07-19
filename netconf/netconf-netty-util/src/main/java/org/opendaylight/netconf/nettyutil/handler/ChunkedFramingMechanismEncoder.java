@@ -13,21 +13,19 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.nio.charset.StandardCharsets;
+import org.opendaylight.netconf.util.NetconfConfiguration;
 
 public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf> {
-    public static final int DEFAULT_CHUNK_SIZE = 8192;
-    public static final int MIN_CHUNK_SIZE = 128;
-    public static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;
 
     private final int chunkSize;
 
     public ChunkedFramingMechanismEncoder() {
-        this(DEFAULT_CHUNK_SIZE);
+        this(NetconfConfiguration.DEFAULT_CHUNK_SIZE);
     }
 
     public ChunkedFramingMechanismEncoder(final int chunkSize) {
-        Preconditions.checkArgument(chunkSize >= MIN_CHUNK_SIZE && chunkSize <= MAX_CHUNK_SIZE,
-                "Unsupported chunk size %s", chunkSize);
+        Preconditions.checkArgument(chunkSize >= NetconfConfiguration.MIN_CHUNK_SIZE
+                && chunkSize <= NetconfConfiguration.MAX_CHUNK_SIZE, "Unsupported chunk size %s", chunkSize);
         this.chunkSize = chunkSize;
     }
 

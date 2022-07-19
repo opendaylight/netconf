@@ -14,6 +14,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
+import org.opendaylight.netconf.util.NetconfConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,6 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM = "Got byte {} while waiting for {}-{}";
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM =
         "Got byte {} while waiting for {}-{}-{}";
-    public static final int DEFAULT_MAXIMUM_CHUNK_SIZE = 16 * 1024 * 1024;
 
     private enum State {
         HEADER_ONE, // \n
@@ -37,7 +37,6 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
         FOOTER_FOUR, // \n
     }
 
-    private final int maxChunkSize = DEFAULT_MAXIMUM_CHUNK_SIZE;
     private State state = State.HEADER_ONE;
     private long chunkSize;
     private CompositeByteBuf chunk;
@@ -57,6 +56,8 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     }
 
     private void checkChunkSize() {
+        int maxChunkSize = NetconfConfiguration.MAX_CHUNK_SIZE;
+        LOG.debug("maximum allowed chunk size is {}", maxChunkSize);
         if (chunkSize > maxChunkSize) {
             LOG.debug("Parsed chunk size {}, maximum allowed is {}", chunkSize, maxChunkSize);
             throw new IllegalStateException("Maximum chunk size exceeded");
