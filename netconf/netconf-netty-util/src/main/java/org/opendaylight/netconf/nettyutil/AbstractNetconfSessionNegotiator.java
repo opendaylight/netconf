@@ -10,6 +10,7 @@ package org.opendaylight.netconf.nettyutil;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -22,6 +23,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -51,8 +53,28 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSessionNegotiator.class);
+    private static final String NAME_OF_EXCEPTION_HANDLER = "lastExceptionHandler";
+    private static final String DEFAULT_MAXIMUM_CHUNK_SIZE_PROP = "org.opendaylight.netconf.default.maximum.chunk.size";
+    private static final int DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT = 16 * 1024 * 1024;
 
-    public static final String NAME_OF_EXCEPTION_HANDLER = "lastExceptionHandler";
+    /**
+     * Default upper bound on the size of an individual chunk. This value can be controlled through
+     * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_PROP} system property and defaults to
+     * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT} bytes.
+     */
+    @Beta
+    public static final @NonNegative int DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
+
+    static {
+        final int propValue = Integer.getInteger(DEFAULT_MAXIMUM_CHUNK_SIZE_PROP, DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT);
+        if (propValue <= 0) {
+            LOG.warn("Ignoring invalid {} value {}", DEFAULT_MAXIMUM_CHUNK_SIZE_PROP, propValue);
+            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE = DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT;
+        } else {
+            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE = propValue;
+        }
+        LOG.debug("Default maximum incoming NETCONF chunk size is {} bytes", DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
+    }
 
     protected final P sessionPreferences;
     protected final Channel channel;
