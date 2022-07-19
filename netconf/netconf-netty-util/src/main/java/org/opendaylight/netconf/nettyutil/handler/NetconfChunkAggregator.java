@@ -5,8 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
@@ -14,6 +15,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
+import org.checkerframework.checker.index.qual.NonNegative;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +26,9 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM = "Got byte {} while waiting for {}-{}";
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM =
         "Got byte {} while waiting for {}-{}-{}";
-    public static final int DEFAULT_MAXIMUM_CHUNK_SIZE = 16 * 1024 * 1024;
+
+    public static final @NonNegative int DEFAULT_MAXIMUM_CHUNK_SIZE =
+        AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
 
     private enum State {
         HEADER_ONE, // \n
@@ -37,10 +42,28 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
         FOOTER_FOUR, // \n
     }
 
-    private final int maxChunkSize = DEFAULT_MAXIMUM_CHUNK_SIZE;
+    private final int maxChunkSize;
     private State state = State.HEADER_ONE;
     private long chunkSize;
     private CompositeByteBuf chunk;
+
+    /**
+     * Construct an instance with maximum chunk size set to {@link #DEFAULT_MAXIMUM_CHUNK_SIZE}.
+     */
+    public NetconfChunkAggregator() {
+        this(DEFAULT_MAXIMUM_CHUNK_SIZE);
+    }
+
+    /**
+     * Construct an instance with specified maximum chunk size.
+     *
+     * @param maxChunkSize maximum chunk size
+     * @throws IllegalArgumentException if {@code maxChunkSize} is negative
+     */
+    public NetconfChunkAggregator(final @NonNegative int maxChunkSize) {
+        this.maxChunkSize = maxChunkSize;
+        checkArgument(maxChunkSize > 0, "Negative maximum chunk size %s", maxChunkSize);
+    }
 
     private static void checkNewLine(final byte byteToCheck, final String errorMessage) {
         if (byteToCheck != '\n') {
@@ -59,7 +82,7 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     private void checkChunkSize() {
         if (chunkSize > maxChunkSize) {
             LOG.debug("Parsed chunk size {}, maximum allowed is {}", chunkSize, maxChunkSize);
-            throw new IllegalStateException("Maximum chunk size exceeded");
+            throw new IllegalStateException("Chunk size " + chunkSize + " exceeds maximum " + maxChunkSize);
         }
     }
 
