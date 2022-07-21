@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "bd17b928d5659b4e919beb53e853e82e38377b25",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc94b085_48f7e939",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContextTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2022-07-21T14:04:28Z",
+      "side": 1,
+      "message": "the static class is weirdly placed in the middle of the test class. Put it at the end.",
+      "revId": "bd17b928d5659b4e919beb53e853e82e38377b25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
