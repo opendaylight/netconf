@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3aa8ee2_60b4baf0",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/AbstractFieldsTranslator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-07-22T05:37:00Z",
+      "side": 1,
+      "message": "Fix your formatting.",
+      "revId": "93a3d837ab9e53eceed53375484faf9f1e06405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2215391d_509a85a6",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/AbstractFieldsTranslator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-07-22T05:37:00Z",
+      "side": 1,
+      "message": "final",
+      "revId": "93a3d837ab9e53eceed53375484faf9f1e06405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
