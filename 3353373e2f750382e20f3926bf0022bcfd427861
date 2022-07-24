@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c1d3b50_fcc4fca7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-07-24T19:46:58Z",
+      "side": 1,
+      "message": "This looks but I think it can be improved through use of ByteBuf.indexOf().\nI\u0027ll take a deeper look on Friday.",
+      "revId": "3353373e2f750382e20f3926bf0022bcfd427861",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
