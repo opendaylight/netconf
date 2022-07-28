@@ -5,25 +5,29 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.util.messages;
 
-public interface NetconfMessageConstants {
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
+@NonNullByDefault
+public final class NetconfMessageConstants {
     /**
-     * The NETCONF 1.0 old-style message separator. This is framing mechanism
-     * is used by default.
+     * The NETCONF 1.0 old-style message separator. This is framing mechanism is used by default.
      */
-    String END_OF_MESSAGE = "]]>]]>";
+    public static final String END_OF_MESSAGE = "]]>]]>";
 
     // bytes
-
-    int MIN_HEADER_LENGTH = 4;
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    public static final int MIN_HEADER_LENGTH = 4;
 
     // bytes
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    public static final int MAX_HEADER_LENGTH = 13;
 
-    int MAX_HEADER_LENGTH = 13;
+    public static final String START_OF_CHUNK = "\n#";
+    public static final String END_OF_CHUNK = "\n##\n";
 
-    String START_OF_CHUNK = "\n#";
-    String END_OF_CHUNK = "\n##\n";
+    private NetconfMessageConstants() {
+        // Hidden on purpose
+    }
 }
