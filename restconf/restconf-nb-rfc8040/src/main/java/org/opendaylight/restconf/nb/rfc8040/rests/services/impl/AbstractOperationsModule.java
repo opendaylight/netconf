@@ -5,12 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.util;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName;
@@ -36,6 +37,7 @@ import org.opendaylight.yangtools.yang.model.api.meta.StatementOrigin;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleStatement;
 
+@Deprecated(forRemoval = true, since = "4.0.0")
 abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatement {
     @Override
     public final ModuleStatement getDeclared() {
@@ -76,7 +78,7 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
     @Override
     public final Collection<? extends @NonNull ModuleImport> getImports() {
         // Yeah, not accurate, but this should not be needed
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
@@ -86,17 +88,17 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
 
     @Override
     public final Collection<? extends TypeDefinition<?>> getTypeDefinitions() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public final Collection<? extends GroupingDefinition> getGroupings() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public final Collection<? extends UsesNode> getUses() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
@@ -111,7 +113,7 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
 
     @Override
     public final Collection<? extends NotificationDefinition> getNotifications() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
@@ -126,37 +128,37 @@ abstract class AbstractOperationsModule implements Module, ModuleEffectiveStatem
 
     @Override
     public final Collection<? extends @NonNull Submodule> getSubmodules() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public final Collection<? extends @NonNull FeatureDefinition> getFeatures() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public final Collection<? extends @NonNull AugmentationSchemaNode> getAugmentations() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public final Collection<? extends @NonNull RpcDefinition> getRpcs() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public final Collection<? extends @NonNull Deviation> getDeviations() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public final Collection<? extends @NonNull IdentitySchemaNode> getIdentities() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public final Collection<? extends @NonNull ExtensionDefinition> getExtensionSchemaNodes() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

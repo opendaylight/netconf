@@ -5,58 +5,53 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.util;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.List;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 
-final class OperationsRestconfModule extends AbstractOperationsModule {
-    // There is no need to intern this nor add a revision, as we are providing the corresponding context anyway
-    static final @NonNull QNameModule NAMESPACE =
-            QNameModule.create(XMLNamespace.of("urn:ietf:params:xml:ns:yang:ietf-restconf"));
+@Deprecated(forRemoval = true, since = "4.0.0")
+final class OperationsImportedModule extends AbstractOperationsModule {
+    private final Module original;
 
-    private final OperationsContainerSchemaNode operations;
-
-    OperationsRestconfModule(final OperationsContainerSchemaNode operations) {
-        this.operations = requireNonNull(operations);
+    OperationsImportedModule(final Module original) {
+        this.original = requireNonNull(original);
     }
 
     @Override
     public String getName() {
-        return "ietf-restconf";
+        return original.getName();
     }
 
     @Override
     public QNameModule getQNameModule() {
-        return NAMESPACE;
+        return original.getQNameModule();
     }
 
     @Override
     public String getPrefix() {
-        return "rc";
+        return original.getPrefix();
     }
 
     @Override
     public Collection<DataSchemaNode> getChildNodes() {
-        return List.of(operations);
+        return List.of();
     }
 
     @Override
     public DataSchemaNode dataChildByName(final QName name) {
-        return operations.getQName().equals(requireNonNull(name)) ? operations : null;
+        return null;
     }
 
     @Override
     public List<EffectiveStatement<?, ?>> effectiveSubstatements() {
-        // This is not accurate, but works for now
         return List.of();
     }
 }

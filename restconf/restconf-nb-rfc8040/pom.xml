@@ -119,6 +119,14 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-model-ri</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-model-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-model-util</artifactId>
     </dependency>
     <dependency>
@@ -128,6 +136,10 @@
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-repo-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-xpath-api</artifactId>
     </dependency>
 
     <dependency>

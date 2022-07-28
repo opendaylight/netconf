@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.util;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Maps;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
@@ -27,6 +26,7 @@ import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
 
+@Deprecated(forRemoval = true, since = "4.0.0")
 final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNode implements ContainerSchemaNode {
     // There is no need to intern this nor add a revision, as we are providing the corresponding context anyway
     static final @NonNull QName QNAME = QName.create(OperationsRestconfModule.NAMESPACE, "operations");
@@ -55,37 +55,37 @@ final class OperationsContainerSchemaNode extends AbstractOperationDataSchemaNod
 
     @Override
     public Set<TypeDefinition<?>> getTypeDefinitions() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public Set<GroupingDefinition> getGroupings() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public Set<UsesNode> getUses() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public Set<AugmentationSchemaNode> getAvailableAugmentations() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public Set<NotificationDefinition> getNotifications() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public Set<ActionDefinition> getActions() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
     public Collection<@NonNull MustDefinition> getMustConstraints() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override

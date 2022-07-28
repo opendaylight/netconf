@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.util;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -18,6 +18,7 @@ import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.LeafEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.ri.type.BaseTypes;
 
+@Deprecated(forRemoval = true, since = "4.0.0")
 final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode implements LeafSchemaNode {
     private final QName qname;
 
@@ -43,7 +44,7 @@ final class OperationsLeafSchemaNode extends AbstractOperationDataSchemaNode imp
 
     @Override
     public Collection<@NonNull MustDefinition> getMustConstraints() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override
