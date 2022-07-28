@@ -51,6 +51,24 @@
       "message": "\u0027-1\u0027 should be removed.",
       "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92aa3562_6bf33466",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfEOMAggregator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-07-28T21:40:08Z",
+      "side": 1,
+      "message": "Hmm... this is me and my typical \u0027off-by-one\u0027 errors.\nIn this case, I think we need to re-check the EOM marker again, hence bodyLength should be pointing to the byte before.\nAm I mistaken here? Perhaps we need another test?",
+      "parentUuid": "74b6467b_dc3f8c21",
+      "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
