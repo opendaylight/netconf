@@ -105,6 +105,24 @@
       "parentUuid": "a79c2201_5b484e78",
       "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82afd7b7_97660e47",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfEOMAggregator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2022-07-28T23:59:15Z",
+      "side": 1,
+      "message": "The new test case fails because bodyLength becomes -1 after decode() is called:\n\n\u003e 16:41:40 [ERROR] org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregatorTest.testDecodeEmptyMessage  Time elapsed: 0.002 s  \u003c\u003c\u003c FAILURE!\n\u003e 16:41:40 java.lang.AssertionError: expected:\u003c0\u003e but was:\u003c-1\u003e\n\nNote that the test does not fail without the assertion for bodyLength - so the functionality was not affected by the negative value.",
+      "parentUuid": "13cda1f0_1ff6e9cf",
+      "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
