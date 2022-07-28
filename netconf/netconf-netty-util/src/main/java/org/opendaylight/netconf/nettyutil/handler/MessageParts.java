@@ -12,7 +12,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
+import org.opendaylight.netconf.util.messages.FramingMechanism;
 
 /**
  * netconf message part constants as bytes.
@@ -20,9 +20,9 @@ import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
  * @author Thomas Pantelis
  */
 final class MessageParts {
-    static final byte[] END_OF_MESSAGE = asciiBytes(NetconfMessageConstants.END_OF_MESSAGE);
-    static final byte[] START_OF_CHUNK = asciiBytes(NetconfMessageConstants.START_OF_CHUNK);
-    static final byte[] END_OF_CHUNK = asciiBytes(NetconfMessageConstants.END_OF_CHUNK);
+    static final byte[] END_OF_MESSAGE = asciiBytes(FramingMechanism.EOM_STR);
+    static final byte[] START_OF_CHUNK = asciiBytes(FramingMechanism.CHUNK_START_STR);
+    static final byte[] END_OF_CHUNK = asciiBytes(FramingMechanism.CHUNK_END_STR);
 
     private MessageParts() {
         // Hidden on purpose
