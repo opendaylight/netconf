@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "973d88e1_e2d9e8c2",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfEOMAggregator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2022-07-28T21:28:53Z",
+      "side": 1,
+      "message": "DELIMITER \u0026 DELIMITER_LENGTH should be removed.",
+      "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74b6467b_dc3f8c21",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfEOMAggregator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2022-07-28T21:28:53Z",
+      "side": 1,
+      "message": "\u0027-1\u0027 should be removed.",
+      "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
