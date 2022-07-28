@@ -49,7 +49,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-nb-rfc8040</artifactId>
+            <artifactId>odl-restconf-nb</artifactId>
             <classifier>features</classifier>
             <type>xml</type>
         </dependency>
@@ -66,7 +66,7 @@
                     </startupFeatures>
                     <bootFeatures combine.children="append">
                         <feature>odl-netconf-connector-all</feature>
-                        <feature>odl-restconf-nb-rfc8040</feature>
+                        <feature>odl-restconf-nb</feature>
                     </bootFeatures>
                 </configuration>
             </plugin>

@@ -493,12 +493,12 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>restconf-nb-rfc8040</artifactId>
+                <artifactId>restconf-nb</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>restconf-nb-rfc8040</artifactId>
+                <artifactId>restconf-nb</artifactId>
                 <type>cfg</type>
                 <classifier>config</classifier>
                 <version>${project.version}</version>
@@ -574,7 +574,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>odl-restconf-nb-rfc8040</artifactId>
+                <artifactId>odl-restconf-nb</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>

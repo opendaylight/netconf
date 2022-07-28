@@ -16,9 +16,9 @@
         <relativePath>../../parent</relativePath>
     </parent>
 
-    <artifactId>odl-restconf-nb-rfc8040</artifactId>
+    <artifactId>odl-restconf-nb</artifactId>
     <packaging>feature</packaging>
-    <name>OpenDaylight :: Restconf :: NB :: RFC8040</name>
+    <name>OpenDaylight :: RESTCONF :: Northbound</name>
 
     <dependencies>
         <dependency>
@@ -47,11 +47,11 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-nb-rfc8040</artifactId>
+            <artifactId>restconf-nb</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-nb-rfc8040</artifactId>
+            <artifactId>restconf-nb</artifactId>
             <type>cfg</type>
             <classifier>config</classifier>
         </dependency>

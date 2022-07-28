@@ -30,7 +30,7 @@
     <modules>
         <module>restconf-common-models</module>
         <module>restconf-common</module>
-        <module>restconf-nb-rfc8040</module>
+        <module>restconf-nb</module>
         <module>sal-rest-connector-config</module>
         <module>sal-rest-docgen</module>
         <module>wadl-generator</module>
