@@ -16,8 +16,12 @@ import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
  *
  * @author Thomas Pantelis
  */
-interface MessageParts {
-    byte[] END_OF_MESSAGE = NetconfMessageConstants.END_OF_MESSAGE.getBytes(UTF_8);
-    byte[] START_OF_CHUNK = NetconfMessageConstants.START_OF_CHUNK.getBytes(UTF_8);
-    byte[] END_OF_CHUNK = NetconfMessageConstants.END_OF_CHUNK.getBytes(UTF_8);
+final class MessageParts {
+    static final byte[] END_OF_MESSAGE = NetconfMessageConstants.END_OF_MESSAGE.getBytes(UTF_8);
+    static final byte[] START_OF_CHUNK = NetconfMessageConstants.START_OF_CHUNK.getBytes(UTF_8);
+    static final byte[] END_OF_CHUNK = NetconfMessageConstants.END_OF_CHUNK.getBytes(UTF_8);
+
+    private MessageParts() {
+        // Hidden on purpose
+    }
 }
