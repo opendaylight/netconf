@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f75dd19_55bcdc8c",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfEOMAggregator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-07-28T21:37:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "973d88e1_e2d9e8c2",
+      "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74b6467b_dc3f8c21",
