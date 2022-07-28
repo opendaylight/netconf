@@ -76,6 +76,10 @@ public final class NetconfEOMAggregator extends ByteToMessageDecoder {
         }
     }
 
+    // TODO: ByteBufUtil.indexOf() uses https://en.wikipedia.org/wiki/Two-way_string-matching_algorithm
+    //       We should be able to take advantage of this improvement, i.e. adjust bodyLength when a match turns out to
+    //       to be impossible. As our needle is only 6 bytes long, this may be a moot point. On the other hand, we might
+    //       get some improvement by making this search a getInt() + getShort() comparison.
     private static boolean isEom(final ByteBuf in, final int index) {
         for (int i = 1; i < EOM_LENGTH; ++i) {
             if (in.getByte(index + i) != EOM[i]) {
