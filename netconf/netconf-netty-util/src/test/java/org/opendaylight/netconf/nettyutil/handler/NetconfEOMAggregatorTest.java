@@ -18,125 +18,142 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class NetconfEOMAggregatorTest {
+    private static final String COMM_1 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="105"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <users>
+        <user><name>root</name><type>superuser</type></user>
+        <user><name>fred</name><type>admin</type></user>
+        <user><name>barney</name><type>admin</type></user>
+        </users>
+        </config>
+        </rpc-reply>
+        ]]>]]>\
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="106"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <users>
+        <user><name>root</name><type>superuser</type></user>
+        <user><name>fred</name><type>admin</type></user>
+        <user><name>barney</name><type>admin</type></user>
+        <user><name>joe</name><type>user</type></user>
+        </users>
+        </config>
+        </rpc-reply>
+        ]]>]]>
+        """;
 
-    private static final String COMM_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"105\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<users>\n"
-            + "<user><name>root</name><type>superuser</type></user>\n"
-            + "<user><name>fred</name><type>admin</type></user>\n"
-            + "<user><name>barney</name><type>admin</type></user>\n"
-            + "</users>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n"
-            + "]]>]]>"
-            + "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"106\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<users>\n"
-            + "<user><name>root</name><type>superuser</type></user>\n"
-            + "<user><name>fred</name><type>admin</type></user>\n"
-            + "<user><name>barney</name><type>admin</type></user>\n"
-            + "<user><name>joe</name><type>user</type></user>\n"
-            + "</users>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n"
-            + "]]>]]>";
+    private static final String COMM_1_M_1 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="105"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <users>
+        <user><name>root</name><type>superuser</type></user>
+        <user><name>fred</name><type>admin</type></user>
+        <user><name>barney</name><type>admin</type></user>
+        </users>
+        </config>
+        </rpc-reply>
+        """;
 
-    private static final String COMM_1_M_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"105\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<users>\n"
-            + "<user><name>root</name><type>superuser</type></user>\n"
-            + "<user><name>fred</name><type>admin</type></user>\n"
-            + "<user><name>barney</name><type>admin</type></user>\n"
-            + "</users>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n";
-    private static final String COMM_1_M_2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"106\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<users>\n"
-            + "<user><name>root</name><type>superuser</type></user>\n"
-            + "<user><name>fred</name><type>admin</type></user>\n"
-            + "<user><name>barney</name><type>admin</type></user>\n"
-            + "<user><name>joe</name><type>user</type></user>\n"
-            + "</users>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n";
+    private static final String COMM_1_M_2 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="106"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <users>
+        <user><name>root</name><type>superuser</type></user>
+        <user><name>fred</name><type>admin</type></user>
+        <user><name>barney</name><type>admin</type></user>
+        <user><name>joe</name><type>user</type></user>
+        </users>
+        </config>
+        </rpc-reply>
+        """;
 
-    private static final String COMM_2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"107\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<cars>\n"
-            + "<car><name>porsche</name></car>\n"
-            + "<car><name>ford</name></car>\n"
-            + "</cars>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n"
-            + "]]>]]>";
+    private static final String COMM_2 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="107"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <cars>
+        <car><name>porsche</name></car>
+        <car><name>ford</name></car>
+        </cars>
+        </config>
+        </rpc-reply>
+        ]]>]]>
+        """;
+    private static final String COMM_2_M_1 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="107"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <cars>
+        <car><name>porsche</name></car>
+        <car><name>ford</name></car>
+        </cars>
+        </config>
+        </rpc-reply>
+        """;
+    private static final String COMM_3_S_1 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="105"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <users>
+        <user><name>root</name><type>superuser</type></user>
+        <user><name>fred</name><type>admin</type></user>
+        <user><name>barney</name><type>admin</type></user>
+        </users>
+        </config>
+        </rpc-reply>
+        ]]>]]>""";
+    private static final String COMM_3_S_2 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="107"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <cars>
+        """;
+    private static final String COMM_3_S_3 = """
+        <car><name>porsche</name></car>
+        <car><name>ford</name></car>
+        </cars>
+        </config>
+        </rpc-reply>
+        ]]>]]>
+        """;
 
-    private static final String COMM_2_M_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"107\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<cars>\n"
-            + "<car><name>porsche</name></car>\n"
-            + "<car><name>ford</name></car>\n"
-            + "</cars>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n";
-
-    private static final String COMM_3_S_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"105\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<users>\n"
-            + "<user><name>root</name><type>superuser</type></user>\n"
-            + "<user><name>fred</name><type>admin</type></user>\n"
-            + "<user><name>barney</name><type>admin</type></user>\n"
-            + "</users>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n"
-            + "]]>]]>";
-    private static final String COMM_3_S_2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"107\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<cars>\n";
-    private static final String COMM_3_S_3 = "<car><name>porsche</name></car>\n"
-            + "<car><name>ford</name></car>\n"
-            + "</cars>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n"
-            + "]]>]]>";
-
-    private static final String COMM_3_M_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"105\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<users>\n"
-            + "<user><name>root</name><type>superuser</type></user>\n"
-            + "<user><name>fred</name><type>admin</type></user>\n"
-            + "<user><name>barney</name><type>admin</type></user>\n"
-            + "</users>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n";
-    private static final String COMM_3_M_2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<rpc-reply message-id=\"107\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<config xmlns=\"http://example.com/schema/1.2/config\">\n"
-            + "<cars>\n"
-            + "<car><name>porsche</name></car>\n"
-            + "<car><name>ford</name></car>\n"
-            + "</cars>\n"
-            + "</config>\n"
-            + "</rpc-reply>\n";
+    private static final String COMM_3_M_1 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="105"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <users>
+        <user><name>root</name><type>superuser</type></user>
+        <user><name>fred</name><type>admin</type></user>
+        <user><name>barney</name><type>admin</type></user>
+        </users>
+        </config>
+        </rpc-reply>
+        """;
+    private static final String COMM_3_M_2 = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rpc-reply message-id="107"
+        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <config xmlns="http://example.com/schema/1.2/config">
+        <cars>
+        <car><name>porsche</name></car>
+        <car><name>ford</name></car>
+        </cars>
+        </config>
+        </rpc-reply>
+        """;
 
     private static NetconfEOMAggregator aggregator;
 
