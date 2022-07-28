@@ -17,7 +17,7 @@
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <artifactId>restconf-nb-rfc8040</artifactId>
+  <artifactId>restconf-nb</artifactId>
   <packaging>bundle</packaging>
 
   <dependencies>
