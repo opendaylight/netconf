@@ -87,6 +87,24 @@
       "parentUuid": "92aa3562_6bf33466",
       "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13cda1f0_1ff6e9cf",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/NetconfEOMAggregator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-07-28T22:50:22Z",
+      "side": 1,
+      "message": "as far as I can tell, bodyLength can never get \u003c 0. There are 3 call sites:\n- first requires writerIndex \u003c readerIndex, how can that happen?\n- second reqires eomIndex \u003c readerIndex, for an empty message -- which gets caught by eomIndex \u003c 0 check -- or we enter this branch, where we really want to say \u0027recheck from eomIndex (inclusive) next time around\n- third is explicit 0 if we have found a frame\n\nCan you come up with a UT case which fails, please? It is ETOOLATE on my part as I am just not seeing how it can happen. But, yeah, we have an uncovered part in:\n\n            // No match: move one byte past eomIndex and repeat\n            searchIndex \u003d eomIndex + 1;\n            LOG.trace(\"Context {} buffer {} restart at {}\", ctx, in, searchIndex);\n\nThat certainly needs to be covered.",
+      "parentUuid": "a79c2201_5b484e78",
+      "revId": "109654ee0e1d92d5f0216d8bc098e16a367b3c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
