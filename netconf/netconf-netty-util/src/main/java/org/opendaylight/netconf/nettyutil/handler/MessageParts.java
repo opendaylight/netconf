@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import org.opendaylight.netconf.util.messages.FramingMechanism;
@@ -20,27 +20,32 @@ import org.opendaylight.netconf.util.messages.FramingMechanism;
  * @author Thomas Pantelis
  */
 final class MessageParts {
-    static final byte[] END_OF_MESSAGE = asciiBytes(FramingMechanism.EOM_STR);
-    static final byte[] START_OF_CHUNK = asciiBytes(FramingMechanism.CHUNK_START_STR);
-    static final byte[] END_OF_CHUNK = asciiBytes(FramingMechanism.CHUNK_END_STR);
+    static final byte[] END_OF_MESSAGE;
+    static final byte[] START_OF_CHUNK;
+    static final byte[] END_OF_CHUNK;
+
+    static {
+        final var encoder = StandardCharsets.US_ASCII.newEncoder()
+            .onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT);
+
+        try {
+            END_OF_MESSAGE = getBytes(encoder, FramingMechanism.EOM_STR);
+            START_OF_CHUNK = getBytes(encoder, FramingMechanism.CHUNK_START_STR);
+            END_OF_CHUNK = getBytes(encoder, FramingMechanism.CHUNK_END_STR);
+        } catch (CharacterCodingException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     private MessageParts() {
         // Hidden on purpose
     }
 
-    private static byte[] asciiBytes(final String str) {
-        final ByteBuffer buf;
-        try {
-            buf = StandardCharsets.US_ASCII.newEncoder()
-                .onMalformedInput(CodingErrorAction.REPORT)
-                .onUnmappableCharacter(CodingErrorAction.REPORT)
-                .encode(CharBuffer.wrap(str));
-        } catch (CharacterCodingException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-
-        final byte[] ret = new byte[buf.remaining()];
-        buf.get(ret);
-        return ret;
+    private static byte[] getBytes(final CharsetEncoder encoder, final String str) throws CharacterCodingException {
+        final var buf = encoder.encode(CharBuffer.wrap(str));
+        final var bytes = new byte[buf.remaining()];
+        buf.get(bytes);
+        return bytes;
     }
 }
