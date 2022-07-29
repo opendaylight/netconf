@@ -103,14 +103,6 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         checkArgument(maximumIncomingChunkSize > 0, "Invalid maximum incoming chunk size %s", maximumIncomingChunkSize);
     }
 
-    @Deprecated(since = "4.0.1", forRemoval = true)
-    protected AbstractNetconfSessionNegotiator(final NetconfHelloMessage hello, final Promise<S> promise,
-                                               final Channel channel, final Timer timer,
-                                               final L sessionListener, final long connectionTimeoutMillis) {
-        this(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
-            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
-    }
-
     protected final @NonNull NetconfHelloMessage localHello() {
         return localHello;
     }
