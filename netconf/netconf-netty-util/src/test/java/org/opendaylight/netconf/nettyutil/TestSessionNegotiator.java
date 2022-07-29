@@ -18,7 +18,7 @@ final class TestSessionNegotiator
     TestSessionNegotiator(final NetconfHelloMessage hello, final Promise<TestingNetconfSession> promise,
             final Channel channel, final Timer timer,
             final NetconfSessionListener<TestingNetconfSession> sessionListener, final long connectionTimeoutMillis) {
-        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis, 16384);
     }
 
     @Override
