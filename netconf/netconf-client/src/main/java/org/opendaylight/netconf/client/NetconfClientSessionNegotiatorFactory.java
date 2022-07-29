@@ -15,10 +15,12 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
@@ -65,6 +67,7 @@ public class NetconfClientSessionNegotiatorFactory
     }
 
     private final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader;
+    private final @NonNegative int maximumIncomingChunkSize;
     private final Set<String> clientCapabilities;
     private final long connectionTimeoutMillis;
     private final Timer timer;
@@ -74,6 +77,14 @@ public class NetconfClientSessionNegotiatorFactory
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis) {
         this(timer, additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS);
+    }
+
+    public NetconfClientSessionNegotiatorFactory(final Timer timer,
+                                                 final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
+                                                 final long connectionTimeoutMillis,
+                                                 final @NonNegative int maximumIncomingChunkSize) {
+        this(timer, additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS, EXI_CLIENT_CAPABILITIES,
+            maximumIncomingChunkSize);
     }
 
     public NetconfClientSessionNegotiatorFactory(final Timer timer,
@@ -93,11 +104,21 @@ public class NetconfClientSessionNegotiatorFactory
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions,
                                                  final Set<String> capabilities) {
+        this(timer, additionalHeader, connectionTimeoutMillis, exiOptions, capabilities,
+            AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
+    }
+
+    public NetconfClientSessionNegotiatorFactory(final Timer timer,
+                                                 final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
+                                                 final long connectionTimeoutMillis, final EXIParameters exiOptions,
+                                                 final Set<String> capabilities,
+                                                 final @NonNegative int maximumIncomingChunkSize) {
         this.timer = requireNonNull(timer);
         this.additionalHeader = additionalHeader;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         options = exiOptions;
         clientCapabilities = capabilities;
+        this.maximumIncomingChunkSize = maximumIncomingChunkSize;
     }
 
     public long getConnectionTimeoutMillis() {
@@ -111,6 +132,6 @@ public class NetconfClientSessionNegotiatorFactory
         return new NetconfClientSessionNegotiator(
             NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader),
             NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID), promise, channel, timer,
-                sessionListenerFactory.getSessionListener(), connectionTimeoutMillis);
+                sessionListenerFactory.getSessionListener(), connectionTimeoutMillis, maximumIncomingChunkSize);
     }
 }

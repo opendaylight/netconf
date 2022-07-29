@@ -138,7 +138,7 @@ public class NetconfClientDispatcherImpl
         final List<Uri> odlHelloCapabilities = cfg.getOdlHelloCapabilities();
         if (odlHelloCapabilities == null || odlHelloCapabilities.isEmpty()) {
             return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
-                    cfg.getConnectionTimeoutMillis());
+                    cfg.getConnectionTimeoutMillis(), cfg.getMaximumIncomingChunkSize());
         }
 
         // LinkedHashSet since perhaps the device cares about order of hello message capabilities.

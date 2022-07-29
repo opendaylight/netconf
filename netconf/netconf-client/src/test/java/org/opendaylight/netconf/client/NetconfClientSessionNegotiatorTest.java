@@ -54,7 +54,6 @@ import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;
 
 public class NetconfClientSessionNegotiatorTest {
-
     private NetconfHelloMessage helloMessage;
     private ChannelPipeline pipeline;
     private ChannelPromise future;
@@ -136,7 +135,7 @@ public class NetconfClientSessionNegotiatorTest {
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         Timer timer = new HashedWheelTimer();
         return new NetconfClientSessionNegotiator(helloMessage, startExi, promise, channel, timer, sessionListener,
-            timeout);
+            timeout, 16384);
     }
 
     private static NetconfHelloMessage createHelloMsg(final String name) throws Exception {
@@ -179,7 +178,6 @@ public class NetconfClientSessionNegotiatorTest {
 
         verify(promise).setSuccess(any());
     }
-
 
     @Test
     public void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
