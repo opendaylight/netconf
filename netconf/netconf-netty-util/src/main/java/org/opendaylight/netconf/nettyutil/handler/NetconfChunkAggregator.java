@@ -32,7 +32,10 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
      * Default upper bound on the size of an individual chunk. This value can be controlled through
      * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_PROP} system property and defaults to
      * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT} bytes.
+     *
+     * @deprecated This constant should not be used.
      */
+    @Deprecated(since = "4.0.1", forRemoval = true)
     public static final @NonNegative int DEFAULT_MAXIMUM_CHUNK_SIZE;
 
     static {
@@ -65,7 +68,10 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
 
     /**
      * Construct an instance with maximum chunk size set to {@link #DEFAULT_MAXIMUM_CHUNK_SIZE}.
+     *
+     * @deprecated Prefer {@link #NetconfChunkAggregator(int)} for fine-grained control.
      */
+    @Deprecated(since = "4.0.1", forRemoval = true)
     public NetconfChunkAggregator() {
         this(DEFAULT_MAXIMUM_CHUNK_SIZE);
     }
