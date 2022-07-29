@@ -13,12 +13,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class NetconfChunkAggregatorTest {
-
     private static final String CHUNKED_MESSAGE = "\n#4\n"
             + "<rpc"
             + "\n#18\n"
@@ -29,36 +26,31 @@ public class NetconfChunkAggregatorTest {
             + "</rpc>"
             + "\n##\n";
 
-    public static final String EXPECTED_MESSAGE = "<rpc message-id=\"102\"\n"
+    private static final String EXPECTED_MESSAGE = "<rpc message-id=\"102\"\n"
             + "     xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
             + "  <close-session/>\n"
             + "</rpc>";
 
     private static final String CHUNKED_MESSAGE_ONE = "\n#101\n" + EXPECTED_MESSAGE + "\n##\n";
 
-    private static NetconfChunkAggregator agr;
-
-    @BeforeClass
-    public static void setUp() throws Exception {
-        agr = new NetconfChunkAggregator();
-    }
+    private final NetconfChunkAggregator agr = new NetconfChunkAggregator(4096);
 
     @Test
     public void testMultipleChunks() throws Exception {
-        final List<Object> output = new ArrayList<>();
-        final ByteBuf input = Unpooled.copiedBuffer(CHUNKED_MESSAGE.getBytes(StandardCharsets.UTF_8));
+        final var output = new ArrayList<>();
+        final var input = Unpooled.copiedBuffer(CHUNKED_MESSAGE.getBytes(StandardCharsets.UTF_8));
         agr.decode(null, input, output);
 
         assertEquals(1, output.size());
-        final ByteBuf chunk = (ByteBuf) output.get(0);
+        final var chunk = (ByteBuf) output.get(0);
 
         assertEquals(EXPECTED_MESSAGE, chunk.toString(StandardCharsets.UTF_8));
     }
 
     @Test
     public void testOneChunks() throws Exception {
-        final List<Object> output = new ArrayList<>();
-        final ByteBuf input = Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8));
+        final var output = new ArrayList<>();
+        final var input = Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8));
         agr.decode(null, input, output);
 
         assertEquals(1, output.size());
