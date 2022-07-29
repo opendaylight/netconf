@@ -29,7 +29,7 @@ public final class NetconfServerSessionNegotiator
 
     private final long sessionId;
 
-    protected NetconfServerSessionNegotiator(final NetconfHelloMessage hello, final long sessionId,
+    NetconfServerSessionNegotiator(final NetconfHelloMessage hello, final long sessionId,
             final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
             final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis) {
         super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis);
