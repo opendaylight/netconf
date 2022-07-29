@@ -30,7 +30,7 @@ public class NetconfClientSessionImpl extends ClientSessionImpl implements Netty
             throws IOException {
         final NettyAwareChannelSubsystem channel = new NettyAwareChannelSubsystem(subsystem, ctx);
         final ConnectionService service = getConnectionService();
-        final int id = service.registerChannel(channel);
+        final long id = service.registerChannel(channel);
         if (log.isDebugEnabled()) {
             log.debug("createSubsystemChannel({})[{}] created id={}", this, channel.getSubsystem(), id);
         }
