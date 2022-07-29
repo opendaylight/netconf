@@ -7,11 +7,15 @@
  */
 package org.opendaylight.netconf.client.conf;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.net.InetSocketAddress;
 import java.util.List;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
@@ -33,7 +37,8 @@ public class NetconfClientConfigurationBuilder {
     private SslHandlerFactory sslHandlerFactory;
     private NetconfSshClient sshClient;
     private List<Uri> odlHelloCapabilities;
-
+    private @NonNegative int maximumIncomingChunkSize =
+        AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
 
     protected NetconfClientConfigurationBuilder() {
     }
@@ -104,6 +109,14 @@ public class NetconfClientConfigurationBuilder {
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withMaximumIncomingChunkSize(
+            final @NonNegative int maximumIncomingChunkSize) {
+        checkArgument(maximumIncomingChunkSize > 0);
+        this.maximumIncomingChunkSize  = maximumIncomingChunkSize;
+        return this;
+    }
+
     final InetSocketAddress getAddress() {
         return address;
     }
@@ -144,8 +157,13 @@ public class NetconfClientConfigurationBuilder {
         return odlHelloCapabilities;
     }
 
+    final @NonNegative int getMaximumIncomingChunkSize() {
+        return maximumIncomingChunkSize;
+    }
+
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities);
+                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities,
+                maximumIncomingChunkSize);
     }
 }

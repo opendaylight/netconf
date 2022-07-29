@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.net.InetSocketAddress;
 import java.util.List;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
@@ -34,9 +35,10 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
                                            final AuthenticationHandler authHandler,
                                            final SslHandlerFactory sslHandlerFactory,
                                            final NetconfSshClient sshClient,
-                                           final List<Uri> odlHelloCapabilities) {
+                                           final List<Uri> odlHelloCapabilities,
+                                           final @NonNegative int maximumIncomingChunkSize) {
         super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
-                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities);
+                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities, maximumIncomingChunkSize);
         this.connectStrategyFactory = connectStrategyFactory;
         validateReconnectConfiguration();
     }

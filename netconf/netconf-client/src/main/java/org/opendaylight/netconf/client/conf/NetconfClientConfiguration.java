@@ -14,6 +14,7 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
@@ -25,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfClientConfiguration {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientConfiguration.class);
 
     private final NetconfClientProtocol clientProtocol;
@@ -42,6 +42,7 @@ public class NetconfClientConfiguration {
     private final NetconfSshClient sshClient;
 
     private final List<Uri> odlHelloCapabilities;
+    private final @NonNegative int maximumIncomingChunkSize;
 
     NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
                                final Long connectionTimeoutMillis,
@@ -49,7 +50,7 @@ public class NetconfClientConfiguration {
                                final NetconfClientSessionListener sessionListener,
                                final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler,
                                final SslHandlerFactory sslHandlerFactory, final NetconfSshClient sshClient,
-                               final List<Uri> odlHelloCapabilities) {
+                               final List<Uri> odlHelloCapabilities, final @NonNegative int maximumIncomingChunkSize) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -60,6 +61,7 @@ public class NetconfClientConfiguration {
         this.sslHandlerFactory = sslHandlerFactory;
         this.sshClient = sshClient;
         this.odlHelloCapabilities = odlHelloCapabilities;
+        this.maximumIncomingChunkSize = maximumIncomingChunkSize;
         validateConfiguration();
     }
 
@@ -102,6 +104,10 @@ public class NetconfClientConfiguration {
 
     public List<Uri> getOdlHelloCapabilities() {
         return odlHelloCapabilities;
+    }
+
+    public @NonNegative int getMaximumIncomingChunkSize() {
+        return maximumIncomingChunkSize;
     }
 
     private void validateConfiguration() {
