@@ -5,15 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -36,7 +33,6 @@ import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 
 public class MessageParserTest {
-
     private NetconfMessage msg;
 
     @Before
@@ -49,13 +45,12 @@ public class MessageParserTest {
         EmbeddedChannel testChunkChannel = new EmbeddedChannel(
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.CHUNK),
                 new NetconfMessageToXMLEncoder(),
-
-                new NetconfChunkAggregator(),
+                new NetconfChunkAggregator(ChunkedFramingMechanismEncoder.MAX_CHUNK_SIZE),
                 new NetconfXMLToMessageDecoder());
 
         testChunkChannel.writeOutbound(this.msg);
         Queue<Object> messages = testChunkChannel.outboundMessages();
-        assertFalse(messages.isEmpty());
+        assertEquals(1, messages.size());
 
         final NetconfMessageToXMLEncoder enc = new NetconfMessageToXMLEncoder();
         final ByteBuf out = Unpooled.buffer();
@@ -85,7 +80,7 @@ public class MessageParserTest {
 
             testChunkChannel.writeInbound(recievedOutbound);
         }
-        assertTrue(messages.isEmpty());
+        assertEquals(0, messages.size());
 
         NetconfMessage receivedMessage = testChunkChannel.readInbound();
         assertNotNull(receivedMessage);

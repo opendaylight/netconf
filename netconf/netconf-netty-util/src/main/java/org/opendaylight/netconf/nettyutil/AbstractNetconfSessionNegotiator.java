@@ -194,7 +194,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER,
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.CHUNK));
         replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR,
-                new NetconfChunkAggregator());
+                new NetconfChunkAggregator(DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE));
     }
 
     private boolean shouldUseChunkFraming(final Document doc) {

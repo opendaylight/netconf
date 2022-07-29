@@ -27,6 +27,7 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM =
         "Got byte {} while waiting for {}-{}-{}";
 
+    @Deprecated(since = "4.0.1", forRemoval = true)
     public static final @NonNegative int DEFAULT_MAXIMUM_CHUNK_SIZE =
         AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
 
@@ -49,7 +50,10 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
 
     /**
      * Construct an instance with maximum chunk size set to {@link #DEFAULT_MAXIMUM_CHUNK_SIZE}.
+     *
+     * @deprecated Prefer {@link #NetconfChunkAggregator(int)} for fine-grained control.
      */
+    @Deprecated(since = "4.0.1", forRemoval = true)
     public NetconfChunkAggregator() {
         this(DEFAULT_MAXIMUM_CHUNK_SIZE);
     }
