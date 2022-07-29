@@ -40,7 +40,8 @@ public final class NetconfReconnectingClientConfigurationBuilder extends Netconf
     public NetconfReconnectingClientConfiguration build() {
         return new NetconfReconnectingClientConfiguration(getProtocol(), getAddress(), getConnectionTimeoutMillis(),
                 getAdditionalHeader(), getSessionListener(), getReconnectStrategy(), connectStrategyFactory,
-                getAuthHandler(), getSslHandlerFactory(), getSshClient(), getOdlHelloCapabilities());
+                getAuthHandler(), getSslHandlerFactory(), getSshClient(), getOdlHelloCapabilities(),
+                getMaximumIncomingChunkSize());
     }
 
     // Override setter methods to return subtype
@@ -82,7 +83,7 @@ public final class NetconfReconnectingClientConfigurationBuilder extends Netconf
 
     @Override
     public NetconfReconnectingClientConfigurationBuilder withProtocol(
-            NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
+            final NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
         return (NetconfReconnectingClientConfigurationBuilder) super.withProtocol(clientProtocol);
     }
 
@@ -99,7 +100,7 @@ public final class NetconfReconnectingClientConfigurationBuilder extends Netconf
     }
 
     @Override
-    public NetconfReconnectingClientConfigurationBuilder withOdlHelloCapabilities(List<Uri> odlHelloCapabilities) {
+    public NetconfReconnectingClientConfigurationBuilder withOdlHelloCapabilities(final List<Uri> odlHelloCapabilities) {
         return (NetconfReconnectingClientConfigurationBuilder) super.withOdlHelloCapabilities(odlHelloCapabilities);
     }
 }
