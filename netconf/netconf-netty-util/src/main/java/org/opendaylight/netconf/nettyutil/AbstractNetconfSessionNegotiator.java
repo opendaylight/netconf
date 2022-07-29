@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
@@ -20,6 +21,7 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -50,10 +52,13 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSessionNegotiator.class);
     private static final String NAME_OF_EXCEPTION_HANDLER = "lastExceptionHandler";
+    protected static final @NonNegative int DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE =
+        NetconfChunkAggregator.DEFAULT_MAXIMUM_CHUNK_SIZE;
 
     private final @NonNull NetconfHelloMessage localHello;
     protected final Channel channel;
 
+    private final @NonNegative int maximumIncomingChunkSize;
     private final long connectionTimeoutMillis;
     private final Promise<S> promise;
     private final L sessionListener;
@@ -65,14 +70,25 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     private State state = State.IDLE;
 
     protected AbstractNetconfSessionNegotiator(final NetconfHelloMessage hello, final Promise<S> promise,
-                                               final Channel channel, final Timer timer,
-                                               final L sessionListener, final long connectionTimeoutMillis) {
+                                               final Channel channel, final Timer timer, final L sessionListener,
+                                               final long connectionTimeoutMillis,
+                                               final @NonNegative int maximumIncomingChunkSize) {
         this.localHello = requireNonNull(hello);
         this.promise = requireNonNull(promise);
         this.channel = requireNonNull(channel);
         this.timer = timer;
         this.sessionListener = sessionListener;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
+        this.maximumIncomingChunkSize = maximumIncomingChunkSize;
+        checkArgument(maximumIncomingChunkSize > 0, "Invalid maximum incoming chunk size %s", maximumIncomingChunkSize);
+    }
+
+    @Deprecated(since = "4.0.1", forRemoval = true)
+    protected AbstractNetconfSessionNegotiator(final NetconfHelloMessage hello, final Promise<S> promise,
+                                               final Channel channel, final Timer timer,
+                                               final L sessionListener, final long connectionTimeoutMillis) {
+        this(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
+            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
     protected final @NonNull NetconfHelloMessage localHello() {
@@ -171,7 +187,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
         replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER,
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.CHUNK));
         replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR,
-                new NetconfChunkAggregator());
+                new NetconfChunkAggregator(maximumIncomingChunkSize));
     }
 
     private boolean shouldUseChunkFraming(final Document doc) {

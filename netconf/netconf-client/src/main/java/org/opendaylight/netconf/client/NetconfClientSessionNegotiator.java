@@ -55,7 +55,8 @@ class NetconfClientSessionNegotiator
     NetconfClientSessionNegotiator(final NetconfHelloMessage hello, final NetconfStartExiMessage startExi,
             final Promise<NetconfClientSession> promise, final Channel channel, final Timer timer,
             final NetconfClientSessionListener sessionListener, final long connectionTimeoutMillis) {
-        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
+            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
         this.startExi = startExi;
     }
 
