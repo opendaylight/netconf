@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
@@ -79,6 +80,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     protected final P sessionPreferences;
     protected final Channel channel;
 
+    private final @NonNegative int maximumIncomingChunkSize;
     private final long connectionTimeoutMillis;
     private final Promise<S> promise;
     private final L sessionListener;
@@ -91,13 +93,24 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
     protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise,
                                                final Channel channel, final Timer timer,
-                                               final L sessionListener, final long connectionTimeoutMillis) {
+                                               final L sessionListener, final long connectionTimeoutMillis,
+                                               final @NonNegative int maximumIncomingChunkSize) {
         this.channel = requireNonNull(channel);
         this.promise = requireNonNull(promise);
         this.sessionPreferences = sessionPreferences;
         this.timer = timer;
         this.sessionListener = sessionListener;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
+        this.maximumIncomingChunkSize = maximumIncomingChunkSize;
+        checkArgument(maximumIncomingChunkSize > 0, "Invalid maximum incoming chunk size %s", maximumIncomingChunkSize);
+    }
+
+    @Deprecated(since = "4.0.1", forRemoval = true)
+    protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise,
+                                               final Channel channel, final Timer timer,
+                                               final L sessionListener, final long connectionTimeoutMillis) {
+        this(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis,
+            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
     protected final void startNegotiation() {
@@ -194,7 +207,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER,
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.CHUNK));
         replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR,
-                new NetconfChunkAggregator(DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE));
+                new NetconfChunkAggregator(maximumIncomingChunkSize));
     }
 
     private boolean shouldUseChunkFraming(final Document doc) {

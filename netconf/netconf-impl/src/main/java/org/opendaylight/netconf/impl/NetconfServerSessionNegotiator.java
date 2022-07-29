@@ -34,16 +34,16 @@ public class NetconfServerSessionNegotiator
     private static final String UNKNOWN = "unknown";
 
     protected NetconfServerSessionNegotiator(
-            NetconfServerSessionPreferences sessionPreferences,
-            Promise<NetconfServerSession> promise, Channel channel,
-            Timer timer, NetconfServerSessionListener sessionListener,
-            long connectionTimeoutMillis) {
-        super(sessionPreferences, promise, channel, timer, sessionListener,
-                connectionTimeoutMillis);
+            final NetconfServerSessionPreferences sessionPreferences,
+            final Promise<NetconfServerSession> promise, final Channel channel,
+            final Timer timer, final NetconfServerSessionListener sessionListener,
+            final long connectionTimeoutMillis) {
+        super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis,
+            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
     @Override
-    protected void handleMessage(NetconfHelloMessage netconfMessage)
+    protected void handleMessage(final NetconfHelloMessage netconfMessage)
             throws NetconfDocumentedException {
         NetconfServerSession session = getSessionForHelloMessage(netconfMessage);
         replaceHelloMessageInboundHandler(session);
@@ -54,8 +54,8 @@ public class NetconfServerSessionNegotiator
     @Override
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
     protected NetconfServerSession getSession(
-            NetconfServerSessionListener sessionListener, Channel channel,
-            NetconfHelloMessage message) {
+            final NetconfServerSessionListener sessionListener, final Channel channel,
+            final NetconfHelloMessage message) {
         Optional<NetconfHelloMessageAdditionalHeader> additionalHeader = message
                 .getAdditionalHeader();
 
@@ -86,7 +86,7 @@ public class NetconfServerSessionNegotiator
      * @return Two values - port and host of socket address
      */
     protected static Map.Entry<String, String> getHostName(
-            SocketAddress socketAddress) {
+            final SocketAddress socketAddress) {
 
         if (socketAddress instanceof InetSocketAddress) {
 

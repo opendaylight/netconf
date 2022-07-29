@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import com.google.common.base.Strings;
@@ -59,7 +58,8 @@ public class NetconfClientSessionNegotiator extends
                                              final Timer timer,
                                              final NetconfClientSessionListener sessionListener,
                                              final long connectionTimeoutMillis) {
-        super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis,
+            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
