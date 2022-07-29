@@ -32,7 +32,8 @@ public final class NetconfServerSessionNegotiator
     NetconfServerSessionNegotiator(final NetconfHelloMessage hello, final long sessionId,
             final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
             final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis) {
-        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis);
+        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
+            DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
         this.sessionId = sessionId;
     }
 
