@@ -53,6 +53,26 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSessionNegotiator.class);
     private static final String NAME_OF_EXCEPTION_HANDLER = "lastExceptionHandler";
 
+    private static final String DEFAULT_MAXIMUM_CHUNK_SIZE_PROP = "org.opendaylight.netconf.default.maximum.chunk.size";
+    private static final int DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT = 16 * 1024 * 1024;
+    /**
+     * Default upper bound on the size of an individual chunk. This value can be controlled through
+     * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_PROP} system property and defaults to
+     * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT} bytes.
+     */
+    protected static final @NonNegative int DEFAULT_MAXIMUM_CHUNK_SIZE;
+
+    static {
+        final int propValue = Integer.getInteger(DEFAULT_MAXIMUM_CHUNK_SIZE_PROP, DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT);
+        if (propValue <= 0) {
+            LOG.warn("Ignoring invalid {} value {}", DEFAULT_MAXIMUM_CHUNK_SIZE_PROP, propValue);
+            DEFAULT_MAXIMUM_CHUNK_SIZE = DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT;
+        } else {
+            DEFAULT_MAXIMUM_CHUNK_SIZE = propValue;
+        }
+        LOG.debug("Default maximum incoming NETCONF chunk size is {} bytes", DEFAULT_MAXIMUM_CHUNK_SIZE);
+    }
+
     private final @NonNull NetconfHelloMessage localHello;
     protected final Channel channel;
 
@@ -84,8 +104,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     protected AbstractNetconfSessionNegotiator(final NetconfHelloMessage hello, final Promise<S> promise,
                                                final Channel channel, final Timer timer,
                                                final L sessionListener, final long connectionTimeoutMillis) {
-        this(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
-            NetconfChunkAggregator.DEFAULT_MAXIMUM_CHUNK_SIZE);
+        this(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis, DEFAULT_MAXIMUM_CHUNK_SIZE);
     }
 
     protected final @NonNull NetconfHelloMessage localHello() {

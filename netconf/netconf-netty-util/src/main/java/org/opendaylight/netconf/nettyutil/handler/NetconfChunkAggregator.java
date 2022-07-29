@@ -26,29 +26,6 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM =
         "Got byte {} while waiting for {}-{}-{}";
 
-    private static final String DEFAULT_MAXIMUM_CHUNK_SIZE_PROP = "org.opendaylight.netconf.default.maximum.chunk.size";
-    private static final int DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT = 16 * 1024 * 1024;
-    /**
-     * Default upper bound on the size of an individual chunk. This value can be controlled through
-     * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_PROP} system property and defaults to
-     * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT} bytes.
-     *
-     * @deprecated This constant should not be used.
-     */
-    @Deprecated(since = "4.0.1", forRemoval = true)
-    public static final @NonNegative int DEFAULT_MAXIMUM_CHUNK_SIZE;
-
-    static {
-        final int propValue = Integer.getInteger(DEFAULT_MAXIMUM_CHUNK_SIZE_PROP, DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT);
-        if (propValue <= 0) {
-            LOG.warn("Ignoring invalid {} value {}", DEFAULT_MAXIMUM_CHUNK_SIZE_PROP, propValue);
-            DEFAULT_MAXIMUM_CHUNK_SIZE = DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT;
-        } else {
-            DEFAULT_MAXIMUM_CHUNK_SIZE = propValue;
-        }
-        LOG.debug("Default maximum incoming NETCONF chunk size is {} bytes", DEFAULT_MAXIMUM_CHUNK_SIZE);
-    }
-
     private enum State {
         HEADER_ONE, // \n
         HEADER_TWO, // #
@@ -65,16 +42,6 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     private State state = State.HEADER_ONE;
     private long chunkSize;
     private CompositeByteBuf chunk;
-
-    /**
-     * Construct an instance with maximum chunk size set to {@link #DEFAULT_MAXIMUM_CHUNK_SIZE}.
-     *
-     * @deprecated Prefer {@link #NetconfChunkAggregator(int)} for fine-grained control.
-     */
-    @Deprecated(since = "4.0.1", forRemoval = true)
-    public NetconfChunkAggregator() {
-        this(DEFAULT_MAXIMUM_CHUNK_SIZE);
-    }
 
     /**
      * Construct an instance with specified maximum chunk size.
