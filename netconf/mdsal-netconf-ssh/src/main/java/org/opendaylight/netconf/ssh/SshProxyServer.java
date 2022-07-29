@@ -18,6 +18,7 @@ import java.nio.channels.AsynchronousChannelGroup;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
@@ -127,26 +128,32 @@ public class SshProxyServer implements AutoCloseable {
     private abstract static class AbstractNioServiceFactory extends AbstractCloseable implements IoServiceFactory {
         private final FactoryManager manager;
         private final AsynchronousChannelGroup group;
-
+        private final ExecutorService resumeTasks;
         private IoServiceEventListener eventListener;
 
-        AbstractNioServiceFactory(final FactoryManager manager, final AsynchronousChannelGroup group) {
+        AbstractNioServiceFactory(final FactoryManager manager, final AsynchronousChannelGroup group,
+                final ExecutorService resumeTasks) {
             this.manager = requireNonNull(manager);
             this.group = requireNonNull(group);
+            this.resumeTasks = requireNonNull(resumeTasks);
         }
 
         final AsynchronousChannelGroup group() {
             return group;
         }
 
+        final ExecutorService resumeTasks() {
+            return resumeTasks;
+        }
+
         @Override
         public final IoConnector createConnector(final IoHandler handler) {
-            return new Nio2Connector(manager, handler, group);
+            return new Nio2Connector(manager, handler, group, resumeTasks);
         }
 
         @Override
         public final IoAcceptor createAcceptor(final IoHandler handler) {
-            return new Nio2Acceptor(manager, handler, group);
+            return new Nio2Acceptor(manager, handler, group, resumeTasks);
         }
 
         @Override
@@ -164,13 +171,16 @@ public class SshProxyServer implements AutoCloseable {
      * Based on Nio2ServiceFactory with one addition: injectable executor.
      */
     private static final class NioServiceWithPoolFactory extends AbstractNioServiceFactory {
-        NioServiceWithPoolFactory(final FactoryManager manager, final AsynchronousChannelGroup group) {
-            super(manager, group);
+        NioServiceWithPoolFactory(final FactoryManager manager, final AsynchronousChannelGroup group,
+                final ExecutorService resumeTasks) {
+            super(manager, group, resumeTasks);
         }
 
         @Override
         protected void doCloseImmediately() {
             try {
+                resumeTasks().shutdownNow();
+                resumeTasks().awaitTermination(5, TimeUnit.SECONDS);
                 group().shutdownNow();
                 group().awaitTermination(5, TimeUnit.SECONDS);
             } catch (final IOException | InterruptedException e) {
@@ -191,7 +201,8 @@ public class SshProxyServer implements AutoCloseable {
         @Override
         public IoServiceFactory create(final FactoryManager manager) {
             try {
-                return new NioServiceWithPoolFactory(manager, AsynchronousChannelGroup.withThreadPool(nioExecutor));
+                return new NioServiceWithPoolFactory(manager, AsynchronousChannelGroup.withThreadPool(nioExecutor),
+                        Executors.newSingleThreadExecutor());
             } catch (final IOException e) {
                 throw new RuntimeSshException("Failed to create channel group", e);
             }
@@ -199,8 +210,9 @@ public class SshProxyServer implements AutoCloseable {
     }
 
     private static final class SharedNioServiceFactory extends AbstractNioServiceFactory {
-        SharedNioServiceFactory(final FactoryManager manager, final AsynchronousChannelGroup group) {
-            super(manager, group);
+        SharedNioServiceFactory(final FactoryManager manager, final AsynchronousChannelGroup group,
+                final ExecutorService resumeTasks) {
+            super(manager, group, resumeTasks);
         }
     }
 
@@ -213,7 +225,7 @@ public class SshProxyServer implements AutoCloseable {
 
         @Override
         public IoServiceFactory create(final FactoryManager manager) {
-            return new SharedNioServiceFactory(manager, group);
+            return new SharedNioServiceFactory(manager, group, Executors.newSingleThreadExecutor());
         }
     }
 }
