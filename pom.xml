@@ -35,6 +35,9 @@
         <module>karaf</module>
         <module>karaf-static</module>
         <module>model</module>
+        <module>transport</module>
+
+        <!-- Legacy layout -->
         <module>netconf</module>
         <module>restconf</module>
 
