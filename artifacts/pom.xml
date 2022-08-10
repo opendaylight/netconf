@@ -123,6 +123,18 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- NETCONF Transport API and implementations-->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-tcp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- YANG models -->
             <!-- RFC5277 NETCONF Event Notifications -->
             <dependency>
