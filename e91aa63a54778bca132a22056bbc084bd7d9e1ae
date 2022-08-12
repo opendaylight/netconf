@@ -22,6 +22,30 @@
       },
       "revId": "e91aa63a54778bca132a22056bbc084bd7d9e1ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e981c95_11fe9fe3",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 9055
+      },
+      "writtenOn": "2022-08-12T07:40:57Z",
+      "side": 0,
+      "message": "We are currently reusing the same NetconfSessionPromise for the whole negotiation process, that includes timeout and subsequent retries. \n\nThe problem is that negotiationFailed is not called only at the end after all attempts fail, but it will be called after first failed attempt. \nIf we fail/cancel the NetconfSessionPromise after 1st attempt, it marks it unusable for subsequent retries. \n\nNow the question is whether the initial intent was to use one Promise for the whole negotiation or new Promise for each attempt?",
+      "parentUuid": "9b9d73c4_26b6dff0",
+      "range": {
+        "startLine": 276,
+        "startChar": 8,
+        "endLine": 276,
+        "endChar": 34
+      },
+      "revId": "e91aa63a54778bca132a22056bbc084bd7d9e1ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
