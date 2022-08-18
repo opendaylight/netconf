@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>karaf4-parent</artifactId>
-    <version>11.0.0</version>
+    <version>11.0.1</version>
     <relativePath/>
   </parent>
   <groupId>org.opendaylight.netconf</groupId>
@@ -22,25 +22,23 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.opendaylight.controller</groupId>
-        <artifactId>controller-artifacts</artifactId>
-        <version>6.0.0</version>
+        <groupId>org.opendaylight.infrautils</groupId>
+        <artifactId>infrautils-artifacts</artifactId>
+        <version>4.0.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>controller-artifacts</artifactId>
+        <version>6.0.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-artifacts</artifactId>
         <version>4.0.1-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.opendaylight.infrautils</groupId>
-        <artifactId>infrautils-artifacts</artifactId>
-        <version>4.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
