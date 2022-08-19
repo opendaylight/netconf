@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8fe9d7f_38437b62",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2022-08-19T06:05:43Z",
+      "side": 1,
+      "message": "present tense imperative style is usually recommended for commit messages titles and the description of actions performed in it\n\nhttps://git.kernel.org/pub/scm/git/git.git/tree/Documentation/SubmittingPatches?h\u003dv2.36.1#n181",
+      "revId": "78f425014fa37556123170ddc138190ee0736fd3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
