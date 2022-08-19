@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44af0f27_c58e53c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2022-08-19T05:52:03Z",
+      "side": 1,
+      "message": "line length \u003e72 char are usually disadvised in commit messages\nGerrit interface wraps them also.\n\nidem for title \u003e 50 char but there are different opinions about this.",
+      "revId": "9041dfd358d106e1f0384bb47c1fd5613910531f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
