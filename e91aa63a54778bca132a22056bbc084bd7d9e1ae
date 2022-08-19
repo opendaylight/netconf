@@ -46,6 +46,30 @@
       },
       "revId": "e91aa63a54778bca132a22056bbc084bd7d9e1ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c179bd9b_234260ef",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-08-19T22:12:33Z",
+      "side": 0,
+      "message": "There are multiple Promises at play, see netconf-client.",
+      "parentUuid": "9e981c95_11fe9fe3",
+      "range": {
+        "startLine": 276,
+        "startChar": 8,
+        "endLine": 276,
+        "endChar": 34
+      },
+      "revId": "e91aa63a54778bca132a22056bbc084bd7d9e1ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
