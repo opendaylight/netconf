@@ -180,12 +180,43 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- draft-ietf-netconf-crypto-types -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>draft-ietf-netconf-crypto-types</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- FIXME: place these models with their users -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-test-models</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <!-- Keystore API and implementations. This is a manifestation of draft-ietf-netconf-keystore. -->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>keystore-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>keystore-none</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Truststore API and implementations. This is a manifestation of draft-ietf-netconf-truststore. -->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>truststore-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>truststore-none</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
