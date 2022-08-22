@@ -37,6 +37,9 @@
         <module>model</module>
         <module>netconf</module>
         <module>restconf</module>
+
+        <module>keystore</module>
+        <module>truststore</module>
     </modules>
 
     <profiles>
