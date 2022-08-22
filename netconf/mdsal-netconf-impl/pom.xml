@@ -36,7 +36,16 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Embed-Dependency>netconf-impl</Embed-Dependency>
+            <Import-Package>
+                io.netty.channel,
+                io.netty.util,
+                org.opendaylight.controller.config.threadpool,
+                org.opendaylight.netconf.api.monitoring,
+                org.opendaylight.netconf.impl,
+                org.opendaylight.netconf.impl.osgi,
+                org.opendaylight.netconf.mapping.api,
+                *
+            </Import-Package>
           </instructions>
         </configuration>
       </plugin>
