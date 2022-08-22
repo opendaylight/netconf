@@ -16,6 +16,24 @@
       "message": "it would make more sense to use  now a positive guard clause instead of a negative one IMO\n\nif (authorization.isServerAllowed()) {\n    LOG.info(\"Incoming session {} was successfully verified.\", sshClientSession);\n    return true;\n}\n\nLOG.info(\"Incoming session {} was rejected by Authorization Provider.\", sshClientSession);\nreturn false;",
       "revId": "8866cc0add821c3b67977589638b4d0c03a0abac",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8851d62_a0d4edcc",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2022-08-22T18:10:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23f2466b_fc1b7254",
+      "revId": "8866cc0add821c3b67977589638b4d0c03a0abac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
