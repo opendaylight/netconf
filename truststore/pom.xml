@@ -18,7 +18,7 @@
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
-    <artifactId>model-aggregator</artifactId>
+    <artifactId>truststore-aggregator</artifactId>
     <version>4.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -29,17 +29,7 @@
     </properties>
 
     <modules>
-        <module>rfc5277</module>
-        <module>rfc6022</module>
-        <module>rfc6241</module>
-        <module>rfc6243</module>
-        <module>rfc6470</module>
-        <module>rfc8040-ietf-restconf-monitoring</module>
-        <module>rfc8341</module>
-        <module>rfc8526</module>
-        <module>rfc8639</module>
-
-        <!-- draft-ietf-netconf-crypto-types-24 -->
-        <module>draft-ietf-netconf-crypto-types</module>
+        <module>truststore-api</module>
+        <module>truststore-none</module>
     </modules>
 </project>
