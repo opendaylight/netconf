@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18053439_30413172",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2022-08-23T06:49:18Z",
+      "side": 1,
+      "message": "LGTM apart a minor comment",
+      "revId": "695f86f20bf702570bdee0f3d6dac87c902910db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebc2ab87_b2af9cc1",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2022-08-23T06:49:18Z",
+      "side": 1,
+      "message": "I don\u0027t think we need the intermediate variable \"existing\" here.",
+      "revId": "695f86f20bf702570bdee0f3d6dac87c902910db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
