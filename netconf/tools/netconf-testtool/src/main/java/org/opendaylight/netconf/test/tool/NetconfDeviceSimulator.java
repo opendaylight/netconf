@@ -142,6 +142,11 @@ public class NetconfDeviceSimulator implements Closeable {
             operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
                     Optional.ofNullable(configuration.getNotificationFile()),
                     Optional.ofNullable(configuration.getInitialConfigXMLFile()));
+        } else if (configuration.isNotificationsSupported()) {
+            LOG.info("using SimulatedOperationProvider.");
+            operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
+                    Optional.ofNullable(configuration.getNotificationFile()),
+                    Optional.empty());
         } else {
             LOG.info("using OperationsProvider.");
             operationProvider = new OperationsProvider(idProvider, transformedCapabilities,

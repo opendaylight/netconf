@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -33,6 +34,9 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationMountPointListener;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -58,14 +62,23 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
 
     // FIXME: at some point we do not want to have this here, as this is only used for dispatch
     private static final QNameModule SAL_REMOTE_NAMESPACE = CreateDataChangeEventSubscriptionInput.QNAME.getModule();
+    private static final QNameModule DEVICE_NOTIFICATION_NAMESPACE = SubscribeDeviceNotificationInput.QNAME.getModule();
 
     private final DOMRpcService rpcService;
     private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointService mountPointService;
+    private final SubscribeToStreamUtil streamUtils;
+    private final DeviceNotificationMountPointListener deviceMountPointListener;
 
     public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
-            final SchemaContextHandler schemaContextHandler) {
+            final SchemaContextHandler schemaContextHandler,final DOMMountPointService mountPointService,
+            final Configuration configuration, final DeviceNotificationMountPointListener deviceMountPointListener) {
         this.rpcService = requireNonNull(rpcService);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.mountPointService = requireNonNull(mountPointService);
+        streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
+            : SubscribeToStreamUtil.webSockets();
+        this.deviceMountPointListener = deviceMountPointListener;
     }
 
     @Override
@@ -89,6 +102,12 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                     future = Futures.immediateFailedFuture(new RestconfDocumentedException("Unsupported operation",
                         ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED));
                 }
+            } else if (DEVICE_NOTIFICATION_NAMESPACE.equals(rpcName.getModule())) {
+                // FIXME: this should be a match on RPC QName
+                final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
+                future = Futures.immediateFuture(
+                    CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload, schemaContext, streamUtils,
+                        mountPointService, deviceMountPointListener));
             } else {
                 future = invokeRpc(payload.getData(), rpcName, rpcService);
             }
