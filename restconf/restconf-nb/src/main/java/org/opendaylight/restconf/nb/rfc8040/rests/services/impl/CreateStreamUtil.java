@@ -10,14 +10,25 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationListenerAdaptor;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationMountPointListener;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
@@ -32,6 +43,7 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -50,6 +62,10 @@ import org.slf4j.LoggerFactory;
  */
 final class CreateStreamUtil {
     private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
+    private static final QNameModule NETWORK_TOPOLOGY_MODULE =  QNameModule.create(
+        XMLNamespace.of("urn:TBD:params:xml:ns:yang:network-topology"),  Revision.of("2013-10-21"));
+    private static QName NODE_ID =
+        QName.create(NETWORK_TOPOLOGY_MODULE,  "node-id").intern();
     private static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(
         XMLNamespace.of("urn:sal:restconf:event:subscription"), Revision.of("2014-07-08"));
     private static final QName DATASTORE_QNAME =
@@ -123,6 +139,74 @@ final class CreateStreamUtil {
                 .withNodeIdentifier(new NodeIdentifier(outputQname))
                 .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
         return new DefaultDOMRpcResult(output);
+    }
+
+    /**
+     * Create device notification stream.
+     *
+     * @param baseUrl base Url
+     * @param payload data
+     * @param refSchemaCtx Reference to {@link EffectiveModelContext}.
+     * @param streamUtil stream utility
+     * @param mountPointService dom mount point service
+     * @return {@link DOMRpcResult} - Output of RPC - example in JSON
+     */
+    static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final NormalizedNodePayload payload,
+        final EffectiveModelContext refSchemaCtx,
+        final SubscribeToStreamUtil streamUtil,
+        final DOMMountPointService mountPointService) {
+        // parsing out of container with settings and path
+        final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
+        final QName qname = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
+        final YangInstanceIdentifier value = (YangInstanceIdentifier) data.findChildByArg(
+                new NodeIdentifier(QName.create(qname, "path")))
+            .map(DataContainerChild::body)
+            .orElse(null);
+        String nodeName = null;
+        if (value.getLastPathArgument() instanceof NodeIdentifierWithPredicates lastPathArgument) {
+            final Map<QName, Object> nameValues = lastPathArgument.asMap();
+            nodeName = String.valueOf(nameValues.get(NODE_ID)) + "/yang-ext:mount";
+        } else {
+            throw new RestconfDocumentedException(null,
+                new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Device name does not exist", value));
+        }
+        final NotificationOutputType outputType = prepareOutputType(data);
+        Optional<DOMMountPoint> mountPoint = mountPointService.getMountPoint((YangInstanceIdentifier) value);
+
+        if (mountPoint.isPresent()) {
+            EffectiveModelContext effectiveModelContext = mountPoint.get().getService(DOMSchemaService.class).get()
+                .getGlobalContext();
+            List<Absolute> absolutes = new ArrayList<Absolute>();
+            Collection<? extends NotificationDefinition> notificationDefinitions = mountPoint.get().getService(
+                    DOMSchemaService.class).get().getGlobalContext()
+                .getNotifications();
+            if (notificationDefinitions == null || notificationDefinitions.isEmpty()) {
+                throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED);
+            }
+            notificationDefinitions.forEach(notificationDefinition -> {
+                absolutes.add(Absolute.of(notificationDefinition.getQName()));
+            });
+            final DeviceNotificationListenerAdaptor notificationListenerAdapter = ListenersBroker.getInstance()
+                .registerDeviceNotificationListener(nodeName, outputType, effectiveModelContext);
+            notificationListenerAdapter.listen(mountPoint.get().getService(DOMNotificationService.class).get(),
+                absolutes.toArray(Absolute[]::new));
+            DeviceNotificationMountPointListener.addDeviceNotificationListener(mountPoint.get().getIdentifier(),
+                notificationListenerAdapter, mountPointService);
+
+            // building of output
+            final QName outputQname = QName.create(qname, "output");
+            final QName streamNameQname = QName.create(qname, "stream-path");
+
+            final ContainerNode output = ImmutableContainerNodeBuilder.create()
+                .withNodeIdentifier(new NodeIdentifier(outputQname))
+                .withChild(ImmutableNodes.leafNode(streamNameQname, baseUrl + nodeName)).build();
+            return new DefaultDOMRpcResult(output);
+        } else {
+            throw new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                ErrorTag.OPERATION_FAILED);
+        }
+
     }
 
     /**

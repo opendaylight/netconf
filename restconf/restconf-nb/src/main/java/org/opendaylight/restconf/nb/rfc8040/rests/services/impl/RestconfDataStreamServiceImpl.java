@@ -20,6 +20,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
@@ -48,14 +49,23 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
     @Override
     public void getSSE(final String identifier, final UriInfo uriInfo, final SseEventSink sink, final Sse sse) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final BaseListenerInterface listener = listenersBroker.getListenerFor(streamName)
-            .orElseThrow(() -> {
-                LOG.debug("Listener for stream with name {} was not found.", streamName);
-                throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-            });
+        final BaseListenerInterface listener;
+        if (streamName.contains(RestconfConstants.MOUNT)) {
+            listener = listenersBroker.getDeviceNotificationListenerFor(streamName)
+                .orElseThrow(() -> {
+                    LOG.debug("Listener for device path with name {} was not found.", streamName);
+                    throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION,
+                        ErrorTag.DATA_MISSING);
+                });
+        } else {
+            listener = listenersBroker.getListenerFor(streamName)
+                .orElseThrow(() -> {
+                    LOG.debug("Listener for stream with name {} was not found.", streamName);
+                    throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+                });
+        }
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
-
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
         //        handler.init()/handler.close()
         final SSESessionHandler handler = new SSESessionHandler(executorService, sink, sse, listener,
