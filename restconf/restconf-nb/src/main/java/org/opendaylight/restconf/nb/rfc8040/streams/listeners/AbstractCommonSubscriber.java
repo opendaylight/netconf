@@ -101,7 +101,7 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
     }
 
     @Override
-    public final synchronized void close() throws InterruptedException, ExecutionException {
+    public synchronized void close() throws InterruptedException, ExecutionException {
         if (registration != null) {
             registration.close();
             registration = null;

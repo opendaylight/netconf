@@ -28,7 +28,8 @@ public class Configuration {
     public static final Set<String> DEFAULT_BASE_CAPABILITIES_EXI = ImmutableSet.of(
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1,
-            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0,
+            XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0
     );
 
     public static final Set<String> DEFAULT_BASE_CAPABILITIES = ImmutableSet.of(
@@ -236,7 +237,12 @@ public class Configuration {
 
     @Deprecated
     public boolean isXmlConfigurationProvided() {
-        return initialConfigXMLFile != null && notificationFile != null;
+        return initialConfigXMLFile != null;
+    }
+
+    @Deprecated
+    public boolean isNotificationsSupported() {
+        return notificationFile != null;
     }
 
     @Deprecated
