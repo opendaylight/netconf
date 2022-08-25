@@ -54,7 +54,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfStreamsSubscriptionServiceImplTest {
 
-    private static final String URI = "/restconf/18/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
+    private static final String URI = "/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
             + "toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
 
     @Mock

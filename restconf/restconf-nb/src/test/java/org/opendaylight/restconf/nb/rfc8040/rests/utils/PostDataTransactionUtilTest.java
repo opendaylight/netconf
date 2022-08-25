@@ -127,7 +127,7 @@ public class PostDataTransactionUtilTest {
                 .withChild(mapEntryNode)
                 .build();
 
-        doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/16/")).when(uriInfo).getBaseUriBuilder();
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();

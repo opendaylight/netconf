@@ -404,7 +404,7 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
-        doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/15/")).when(uriInfo).getBaseUriBuilder();
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
         final Response response = dataService.postData(null, payload, uriInfo);
         assertEquals(201, response.getStatus());
