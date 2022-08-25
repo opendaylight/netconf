@@ -7,7 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -28,11 +31,13 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link ListenerAdapter} is responsible to track events, which occurred by changing data in data source.
  */
-public class ListenerAdapter extends AbstractCommonSubscriber<YangInstanceIdentifier, Collection<DataTreeCandidate>>
+public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTreeCandidate>>
         implements ClusteredDOMDataTreeChangeListener {
     private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapter.class);
     private static final DataTreeCandidateFormatterFactory JSON_FORMATTER_FACTORY =
             JSONDataTreeCandidateFormatter.createFactory(JSONCodecFactorySupplier.RFC7951);
+
+    private final YangInstanceIdentifier path;
 
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream name and register for subscribing.
@@ -44,7 +49,8 @@ public class ListenerAdapter extends AbstractCommonSubscriber<YangInstanceIdenti
     @VisibleForTesting
     public ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType) {
-        super(path.getLastPathArgument().getNodeType(), streamName, path, outputType, getFormatterFactory(outputType));
+        super(path.getLastPathArgument().getNodeType(), streamName, outputType, getFormatterFactory(outputType));
+        this.path = requireNonNull(path);
     }
 
     private static DataTreeCandidateFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {
@@ -88,7 +94,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber<YangInstanceIdenti
      * @return Path pointed to data in data store.
      */
     public YangInstanceIdentifier getPath() {
-        return path();
+        return path;
     }
 
     /**
@@ -108,5 +114,10 @@ public class ListenerAdapter extends AbstractCommonSubscriber<YangInstanceIdenti
             setRegistration(changeService.registerDataTreeChangeListener(
                 new DOMDataTreeIdentifier(datastore, getPath()), this));
         }
+    }
+
+    @Override
+    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return super.addToStringAttributes(helper.add("path", path));
     }
 }

@@ -36,6 +36,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -45,6 +46,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -75,6 +77,8 @@ public class RestconfInvokeOperationsServiceImplTest {
     private DOMRpcService rpcService;
     @Mock
     private DOMMountPoint mountPoint;
+    @Mock
+    private DOMMountPointService mountPointService;
     private RestconfInvokeOperationsServiceImpl invokeOperationsService;
 
     @BeforeClass
@@ -84,7 +88,8 @@ public class RestconfInvokeOperationsServiceImplTest {
 
     @Before
     public void setup() {
-        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(rpcService);
+        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(rpcService, mountPointService,
+            mock(Configuration.class));
     }
 
     @Test
