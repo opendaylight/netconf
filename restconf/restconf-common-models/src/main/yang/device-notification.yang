@@ -1,0 +1,34 @@
+module device-notification {
+
+    yang-version 1;
+    namespace "device:notification";
+    prefix "device-notifi";
+
+    contact "nikk.sonitech@gmail.com>";
+
+    description
+          "This module contains the definition of methods related to
+          device notification model";
+
+    revision "2022-06-01" {
+        description
+            "Initial revision";
+    }
+
+
+    rpc subscribe-device-notification {
+        input {
+            leaf path {
+              type instance-identifier;
+              description "Instance identifier";
+            }
+         }
+         output {
+            leaf stream-path {
+                type string;
+                description "Notification stream path.";
+            }
+         }
+    }
+
+}

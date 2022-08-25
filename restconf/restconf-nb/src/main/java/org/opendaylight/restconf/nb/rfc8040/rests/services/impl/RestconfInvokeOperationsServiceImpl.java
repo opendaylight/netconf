@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -33,6 +34,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -58,14 +60,22 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     // FIXME: at some point we do not want to have this here
     private static final XMLNamespace SAL_REMOTE_NAMESPACE =
         XMLNamespace.of("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote");
+    private static final XMLNamespace DEVICE_NOTIFICATION_NAMESPACE =
+            XMLNamespace.of("device:notification");
 
     private final DOMRpcService rpcService;
     private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointService mountPointService;
+    private final SubscribeToStreamUtil streamUtils;
 
     public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
-            final SchemaContextHandler schemaContextHandler) {
+        final SchemaContextHandler schemaContextHandler, final DOMMountPointService mountPointService,
+        final Configuration configuration) {
         this.rpcService = requireNonNull(rpcService);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
+        this.mountPointService = requireNonNull(mountPointService);
+        this.streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
+            : SubscribeToStreamUtil.webSockets();
     }
 
     @Override
@@ -76,6 +86,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final DOMMountPoint mountPoint = context.getMountPoint();
         final SchemaNode schema = context.getSchemaNode();
         final QName rpcName = schema.getQName();
+        boolean isDeviceNotification = DEVICE_NOTIFICATION_NAMESPACE.equals(rpcName.getNamespace());
 
         final ListenableFuture<? extends DOMRpcResult> future;
         if (mountPoint == null) {
@@ -88,6 +99,11 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                     future = Futures.immediateFailedFuture(new RestconfDocumentedException("Unsupported operation",
                         ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED));
                 }
+            } else if (isDeviceNotification) {
+                final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
+                future = Futures.immediateFuture(
+                    CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload, schemaContext, streamUtils,
+                        mountPointService));
             } else {
                 future = invokeRpc(payload.getData(), rpcName, rpcService);
             }
