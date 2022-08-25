@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7164f38_fe1134a6",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/NetconfDeviceSimulator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-08-25T12:05:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9199455a_b3216e56",
+      "range": {
+        "startLine": 153,
+        "startChar": 29,
+        "endLine": 153,
+        "endChar": 45
+      },
+      "revId": "1ef422a516f06a058159f3393cc749f38c0ebbef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "125d4c13_a634aed4",
@@ -108,6 +132,30 @@
       "writtenOn": "2022-06-14T09:01:26Z",
       "side": 1,
       "message": "this is wrong layering: this file should be completely independent of JAX-RS",
+      "range": {
+        "startLine": 150,
+        "startChar": 24,
+        "endLine": 150,
+        "endChar": 56
+      },
+      "revId": "1ef422a516f06a058159f3393cc749f38c0ebbef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "331ae3c7_651a24b7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/CreateStreamUtil.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-08-25T12:05:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32f5eae0_7204013b",
       "range": {
         "startLine": 150,
         "startChar": 24,

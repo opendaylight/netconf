@@ -16,6 +16,24 @@
       "message": "Please resolve all previous comments and reply to them. For example this line has been requested to change from Robert.",
       "revId": "5c86e04a73c5a7d496e73bdb3b42c46358d02b59",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d3bea52_40681c4b",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/NetconfDeviceSimulator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8761
+      },
+      "writtenOn": "2022-08-25T12:05:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "824969fc_25e8c1ef",
+      "revId": "5c86e04a73c5a7d496e73bdb3b42c46358d02b59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
