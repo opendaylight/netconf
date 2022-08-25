@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Features of subscribing part of both notifications.
  */
-abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData implements BaseListenerInterface {
+abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData implements BaseListenerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
         .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
@@ -54,7 +55,6 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
     private final EventFormatterFactory<T> formatterFactory;
     private final NotificationOutputType outputType;
     private final String streamName;
-    private final P path;
 
     @GuardedBy("this")
     private final Set<StreamSessionHandler> subscribers = new HashSet<>();
@@ -69,12 +69,11 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
     private boolean changedLeafNodesOnly = false;
     private EventFormatter<T> formatter;
 
-    AbstractCommonSubscriber(final QName lastQName, final String streamName, final P path,
-            final NotificationOutputType outputType, final EventFormatterFactory<T> formatterFactory) {
+    AbstractCommonSubscriber(final QName lastQName, final String streamName, final NotificationOutputType outputType,
+            final EventFormatterFactory<T> formatterFactory) {
         super(lastQName);
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
-        this.path = requireNonNull(path);
 
         this.outputType = requireNonNull(outputType);
         this.formatterFactory = requireNonNull(formatterFactory);
@@ -166,10 +165,6 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
         } else {
             formatter = formatterFactory.getFormatter();
         }
-    }
-
-    final P path() {
-        return path;
     }
 
     /**
@@ -271,11 +266,11 @@ abstract class AbstractCommonSubscriber<P, T> extends AbstractNotificationsData 
 
     @Override
     public final String toString() {
-        return MoreObjects.toStringHelper(this)
-            .add("path", path)
-            .add("stream-name", streamName)
-            .add("output-type", getOutputType())
-            .toString();
+        return addToStringAttributes(MoreObjects.toStringHelper(this)).toString();
+    }
+
+    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return helper.add("stream-name", streamName).add("output-type", getOutputType());
     }
 
     /**
