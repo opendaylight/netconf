@@ -26,6 +26,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperatio
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationMountPointListener;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {
@@ -33,12 +34,13 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final DOMMountPointService mountPointService, final RestconfStreamsSubscriptionService streamSubscription,
             final DOMDataBroker dataBroker, final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
-            final Configuration configuration) {
+            final DeviceNotificationMountPointListener deviceMountPointListener, final Configuration configuration) {
         super(schemaContextHandler, mountPointService, List.of(
             streamSubscription,
             new RestconfDataServiceImpl(schemaContextHandler, dataBroker, mountPointService, streamSubscription,
                 actionService, configuration),
-            new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler),
+            new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler, mountPointService, configuration,
+                deviceMountPointListener),
             new RestconfOperationsServiceImpl(schemaContextHandler, mountPointService),
             new RestconfSchemaServiceImpl(schemaContextHandler, mountPointService,
                 domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class)),
@@ -50,11 +52,11 @@ public class RestconfApplication extends AbstractRestconfApplication {
     public RestconfApplication(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
-            final DOMNotificationService notificationService,
-            final DOMSchemaService domSchemaService, final Configuration configuration) {
+            final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
+            final DeviceNotificationMountPointListener deviceMountPointListener, final Configuration configuration) {
         this(schemaContextHandler, mountPointService,
             new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, schemaContextHandler,
-                configuration),
-            dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration);
+                configuration), dataBroker, rpcService, actionService, notificationService, domSchemaService,
+            deviceMountPointListener, configuration);
     }
 }
