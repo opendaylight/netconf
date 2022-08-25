@@ -29,16 +29,17 @@ import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {
+
     private RestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService, final RestconfStreamsSubscriptionService streamSubscription,
-            final DOMDataBroker dataBroker, final DOMRpcService rpcService, final DOMActionService actionService,
-            final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
-            final Configuration configuration) {
+        final DOMMountPointService mountPointService, final RestconfStreamsSubscriptionService streamSubscription,
+        final DOMDataBroker dataBroker, final DOMRpcService rpcService, final DOMActionService actionService,
+        final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
+        final Configuration configuration) {
         super(schemaContextHandler, mountPointService, List.of(
             streamSubscription,
             new RestconfDataServiceImpl(schemaContextHandler, dataBroker, mountPointService, streamSubscription,
                 actionService, configuration),
-            new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler),
+            new RestconfInvokeOperationsServiceImpl(rpcService, schemaContextHandler, mountPointService, configuration),
             new RestconfOperationsServiceImpl(schemaContextHandler, mountPointService),
             new RestconfSchemaServiceImpl(schemaContextHandler, mountPointService,
                 domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class)),
@@ -48,13 +49,13 @@ public class RestconfApplication extends AbstractRestconfApplication {
 
     @Inject
     public RestconfApplication(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
-            final DOMRpcService rpcService, final DOMActionService actionService,
-            final DOMNotificationService notificationService,
-            final DOMSchemaService domSchemaService, final Configuration configuration) {
+        final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
+        final DOMRpcService rpcService, final DOMActionService actionService,
+        final DOMNotificationService notificationService, final DOMSchemaService domSchemaService,
+        final Configuration configuration) {
         this(schemaContextHandler, mountPointService,
             new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, schemaContextHandler,
-                configuration),
-            dataBroker, rpcService, actionService, notificationService, domSchemaService, configuration);
+                configuration), dataBroker, rpcService, actionService, notificationService, domSchemaService,
+            configuration);
     }
 }
