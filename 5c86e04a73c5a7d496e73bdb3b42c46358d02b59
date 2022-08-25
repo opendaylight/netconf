@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "824969fc_25e8c1ef",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/NetconfDeviceSimulator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2022-08-25T08:21:43Z",
+      "side": 1,
+      "message": "Please resolve all previous comments and reply to them. For example this line has been requested to change from Robert.",
+      "revId": "5c86e04a73c5a7d496e73bdb3b42c46358d02b59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
