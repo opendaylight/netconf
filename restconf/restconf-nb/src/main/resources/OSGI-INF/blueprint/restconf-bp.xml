@@ -53,7 +53,9 @@
     <argument ref="dOMNotificationService"/>
     <argument ref="dOMSchemaService"/>
     <argument ref="configuration"/>
+    <argument ref="deviceNotificationMountPointListener"/>
   </bean>
+  <bean id="deviceNotificationMountPointListener" class="org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationMountPointListener" destroy-method="close"/>
   <bean id="restconfDataStreamServiceImpl" class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl">
     <argument ref="scheduledThreadPool"/>
     <argument ref="configuration"/>
