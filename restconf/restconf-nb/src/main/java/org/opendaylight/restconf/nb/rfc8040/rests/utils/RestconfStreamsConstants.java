@@ -22,6 +22,8 @@ public final class RestconfStreamsConstants {
     public static final String STREAM_PATH = STREAMS_PATH + STREAM_PATH_PART;
     public static final String STREAM_ACCESS_PATH_PART = "/access=";
     public static final String STREAM_LOCATION_PATH_PART = "/location";
+    public static final String NOTIFICATION_TYPE = "notificationType";
+    public static final String DEVICE = "device";
 
     private RestconfStreamsConstants() {
         // Hidden on purpose
