@@ -50,6 +50,18 @@ public abstract class AbstractBodyReaderTest {
     protected final DatabindProvider databindProvider;
     protected final DOMMountPointService mountPointService;
 
+    public static final QName CONT_AUG_QNAME = QName.create("test-ns-aug", "container-aug").intern();
+    public static final QName LEAF_AUG_QNAME = QName.create("test-ns-aug", "leaf-aug").intern();
+    public static final QName MAP_CONT_QNAME = QName.create("map:ns", "my-map").intern();
+    public static final QName KEY_LEAF_QNAME = QName.create("map:ns", "key-leaf").intern();
+    public static final QName DATA_LEAF_QNAME = QName.create("map:ns", "data-leaf").intern();
+    public static final QName LEAF_SET_QNAME = QName.create("set:ns", "my-set").intern();
+    public static final QName LIST_QNAME = QName.create("list:ns", "unkeyed-list").intern();
+    public static final QName LIST_LEAF1_QNAME = QName.create("list:ns", "leaf1").intern();
+    public static final QName LIST_LEAF2_QNAME = QName.create("list:ns", "leaf2").intern();
+    public static final QName CHOICE_CONT_QNAME = QName.create("choice:ns", "case-cont1").intern();
+    public static final QName CASE_LEAF1_QNAME = QName.create("choice:ns", "case-leaf1").intern();
+
     protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) throws NoSuchFieldException,
             IllegalAccessException {
         mediaType = getMediaType();

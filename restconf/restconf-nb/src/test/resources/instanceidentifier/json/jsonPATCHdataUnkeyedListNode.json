@@ -1,0 +1,19 @@
+{
+  "ietf-yang-patch:yang-patch": {
+    "patch-id": "list-patch",
+    "comment": "comment",
+    "edit": [
+      {
+        "edit-id": "edit1",
+        "operation": "replace",
+        "target": "/list-model:cont-root/list-model:cont1/list-model:unkeyed-list",
+        "value": {
+          "unkeyed-list": {
+            "leaf1": "data1",
+            "leaf2": "data2"
+          }
+        }
+      }
+    ]
+  }
+}
