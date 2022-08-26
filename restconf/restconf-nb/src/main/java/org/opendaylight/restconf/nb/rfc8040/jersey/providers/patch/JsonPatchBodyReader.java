@@ -42,8 +42,10 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
@@ -374,12 +376,17 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
      */
     private static NormalizedNode readEditData(final @NonNull JsonReader in,
              final @NonNull Inference targetSchemaNode, final @NonNull InstanceIdentifierContext path) {
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final var resultHolder = new NormalizedNodeResult();
+        final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
             targetSchemaNode).parse(in);
 
-        return resultHolder.getResult();
+        // In case AugmentationNode or ChoiceNode additional step to get actual data node is required
+        var data = resultHolder.getResult();
+        while (data instanceof AugmentationNode || data instanceof ChoiceNode) {
+            data = ((DataContainerNode) data).body().iterator().next();
+        }
+        return data;
     }
 
     /**
