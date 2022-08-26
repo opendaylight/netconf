@@ -43,6 +43,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractBodyReaderTest {
+    protected static final QName CONT_AUG_QNAME = QName.create("test-ns-aug", "container-aug").intern();
+    protected static final QName LEAF_AUG_QNAME = QName.create("test-ns-aug", "leaf-aug").intern();
     protected static final QName MAP_CONT_QNAME = QName.create("map:ns", "my-map").intern();
     protected static final QName KEY_LEAF_QNAME = QName.create("map:ns", "key-leaf").intern();
     protected static final QName DATA_LEAF_QNAME = QName.create("map:ns", "data-leaf").intern();
