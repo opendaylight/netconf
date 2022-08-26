@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 
 import java.io.InputStream;
@@ -18,6 +19,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.data.api.schema.MixinNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
@@ -126,5 +128,19 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHTargetTopLevelContainerWithEmptyURI.xml");
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+    }
+
+    /**
+     * Test of Yang Patch on the top augmented element. Data returned by {@link XmlPatchBodyReader} should not be
+     * instanceof {@link MixinNode} or PATCH requests will fail after we fire them.
+     */
+    @Test
+    public void moduleTargetTopLevelAugmentedContainerTest() throws Exception {
+        mockBodyReader("", xmlToPatchBodyReader, false);
+        final var inputStream = XmlBodyReaderTest.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAugmentedElement.xml");
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        assertFalse(returnValue.getData().get(0).getNode() instanceof MixinNode);
     }
 }
