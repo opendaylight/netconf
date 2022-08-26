@@ -11,7 +11,9 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,12 +22,99 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
+    private static EffectiveModelContext schemaContext;
+    private static final String PATCH_MAP = """
+        {
+          "ietf-yang-patch:yang-patch": {
+            "patch-id": "map-patch",
+            "comment": "comment",
+            "edit": [
+              {
+                "edit-id": "edit1",
+                "operation": "replace",
+                "target": "/map-model:cont-root/map-model:cont1/map-model:my-map=key",
+                "value": {
+                  "my-map": {
+                    "key-leaf": "key",
+                    "data-leaf": "data"
+                  }
+                }
+              }
+            ]
+          }
+        }
+        """;
+    private static final String PATCH_LEAFSET = """
+        {
+          "ietf-yang-patch:yang-patch": {
+            "patch-id": "set-patch",
+            "comment": "comment",
+            "edit": [
+              {
+                "edit-id": "edit1",
+                "operation": "replace",
+                "target": "/set-model:cont-root/set-model:cont1/set-model:my-set=data1",
+                "value": {
+                  "my-set": [
+                    "data1"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+        """;
+    private static final String PATCH_LIST = """
+        {
+          "ietf-yang-patch:yang-patch": {
+            "patch-id": "list-patch",
+            "comment": "comment",
+            "edit": [
+              {
+                "edit-id": "edit1",
+                "operation": "replace",
+                "target": "/list-model:cont-root/list-model:cont1/list-model:unkeyed-list",
+                "value": {
+                  "unkeyed-list": {
+                    "leaf1": "data1",
+                    "leaf2": "data2"
+                  }
+                }
+              }
+            ]
+          }
+        }
+        """;
+    private static final String PATCH_CHOICE = """
+        {
+          "ietf-yang-patch:yang-patch": {
+            "patch-id": "choice-patch",
+            "comment": "comment",
+            "edit": [
+              {
+                "edit-id": "edit1",
+                "operation": "replace",
+                "target": "/choice-model:cont-root/choice-model:cont1/choice-model:case-cont1",
+                "value": {
+                  "case-cont1": {
+                    "case-leaf1": "data"
+                  }
+                }
+              }
+            ]
+          }
+        }
+        """;
 
     private final JsonPatchBodyReader jsonToPatchBodyReader;
-    private static EffectiveModelContext schemaContext;
 
     public JsonPatchBodyReaderTest() throws Exception {
         super(schemaContext);
@@ -176,5 +265,90 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
         final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
+    }
+
+    /**
+     * Test of Yang Patch on the system map node element.
+     */
+    @Test
+    public void modulePatchTargetMapNodeTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream(PATCH_MAP.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.mapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(MAP_CONT_QNAME))
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(MAP_CONT_QNAME, KEY_LEAF_QNAME, "key"))
+                        .withChild(ImmutableNodes.leafNode(KEY_LEAF_QNAME, "key"))
+                        .withChild(ImmutableNodes.leafNode(DATA_LEAF_QNAME, "data"))
+                        .build())
+                .build();
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(MAP_CONT_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the leaf set node element.
+     */
+    @Test
+    public void modulePatchTargetLeafSetNodeTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream(PATCH_LEAFSET.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.leafSetBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LEAF_SET_QNAME))
+                .withChild(Builders.leafSetEntryBuilder()
+                        .withNodeIdentifier(new NodeWithValue(LEAF_SET_QNAME, "data1"))
+                        .withValue("data1")
+                        .build())
+                .build();
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LEAF_SET_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the unkeyed list node element.
+     */
+    @Test
+    public void modulePatchTargetUnkeyedListNodeTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream(PATCH_LIST.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.unkeyedListBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+                .withChild(Builders.unkeyedListEntryBuilder()
+                        .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+                        .withChild(ImmutableNodes.leafNode(LIST_LEAF1_QNAME, "data1"))
+                        .withChild(ImmutableNodes.leafNode(LIST_LEAF2_QNAME, "data2"))
+                        .build())
+                .build();
+
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(LIST_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
+     * Test of Yang Patch on the choice node element.
+     */
+    @Test
+    public void modulePatchTargetChoiceNodeTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream(PATCH_CHOICE.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(CHOICE_CONT_QNAME))
+                .withChild(ImmutableNodes.leafNode(CASE_LEAF1_QNAME, "data"))
+                .build();
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(CHOICE_CONT_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
     }
 }

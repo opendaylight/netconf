@@ -1,0 +1,12 @@
+module set-model {
+  namespace "set:ns";
+  prefix set-model;
+
+  container cont-root {
+    container cont1 {
+      leaf-list my-set {
+        type string;
+      }
+    }
+  }
+}
