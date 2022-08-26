@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -42,6 +43,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.MixinNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
@@ -256,7 +258,13 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
                         deferredValue = readValueNode(in);
                     } else {
                         // We have a target schema node, reuse this reader without buffering the value.
-                        edit.setData(readEditData(in, edit.getTargetSchemaNode(), path));
+                        NormalizedNode data = readEditData(in, edit.getTargetSchemaNode(), path);
+                        while (data instanceof MixinNode) {
+                            Collection<NormalizedNode> children = (Collection<NormalizedNode>) data.body();
+                            data = (NormalizedNode) children.toArray()[0];
+                        }
+
+                        edit.setData(data);
                     }
                     break;
                 default:
