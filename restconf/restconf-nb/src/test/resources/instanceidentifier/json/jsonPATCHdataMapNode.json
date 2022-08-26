@@ -1,0 +1,19 @@
+{
+  "ietf-yang-patch:yang-patch": {
+    "patch-id": "map-patch",
+    "comment": "comment",
+    "edit": [
+      {
+        "edit-id": "edit1",
+        "operation": "replace",
+        "target": "/map-model:cont-root/map-model:cont1/map-model:my-map=key",
+        "value": {
+          "my-map": {
+            "key-leaf": "key",
+            "data-leaf": "data"
+          }
+        }
+      }
+    ]
+  }
+}
