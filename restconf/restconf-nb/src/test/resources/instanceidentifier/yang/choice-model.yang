@@ -1,0 +1,18 @@
+module choice-model {
+  namespace "choice :ns";
+  prefix choice-model;
+
+  container cont-root {
+    container cont1 {
+      choice choice1 {
+        case case 1 {
+          container case-cont1 {
+            leaf case-leaf 1 {
+              type string;
+            }
+          }
+        }
+      }
+    }
+  }
+}
