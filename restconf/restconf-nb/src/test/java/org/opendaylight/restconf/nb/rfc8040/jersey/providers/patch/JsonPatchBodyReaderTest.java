@@ -20,6 +20,9 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
@@ -176,5 +179,24 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
         final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
+    }
+
+    /**
+     * Test of Yang Patch on the top augmented element.
+     */
+    @Test
+    public void modulePatchTargetTopLevelAugmentedContainerTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = JsonBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHdataAugmentedElement.json");
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
+                .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
+                .build();
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(CONT_AUG_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
     }
 }
