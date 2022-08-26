@@ -1,0 +1,17 @@
+module list-model {
+    namespace "list:ns";
+    prefix list-model;
+
+    container cont-root {
+        container cont1 {
+            list unkeyed-list {
+                leaf leaf1 {
+                    type string;
+                }
+                leaf leaf2 {
+                    type string;
+                }
+            }
+        }
+    }
+}
