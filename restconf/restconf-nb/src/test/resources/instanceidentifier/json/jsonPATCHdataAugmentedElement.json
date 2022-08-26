@@ -1,0 +1,18 @@
+{
+  "ietf-yang-patch:yang-patch": {
+    "patch-id": "test-patch",
+    "comment": "comment",
+    "edit": [
+      {
+        "edit-id": "edit1",
+        "operation": "replace",
+        "target": "/test-model:container-root/test-model:container-lvl1/test-model-aug:container-aug",
+        "value": {
+          "container-aug": {
+            "leaf-aug": "data"
+          }
+        }
+      }
+    ]
+  }
+}
