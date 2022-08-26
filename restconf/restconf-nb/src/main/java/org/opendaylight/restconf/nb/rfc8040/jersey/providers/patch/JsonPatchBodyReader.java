@@ -42,6 +42,9 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
@@ -379,7 +382,13 @@ public class JsonPatchBodyReader extends AbstractPatchBodyReader {
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
             targetSchemaNode).parse(in);
 
-        return resultHolder.getResult();
+        // In case AugmentationNode or ChoiceNode additional step to get actual data node is required
+        NormalizedNode data = resultHolder.getResult();
+        while (data instanceof AugmentationNode || data instanceof ChoiceNode) {
+            final var childNode = ((DataContainerNode) data).body().iterator().next();
+            data = childNode;
+        }
+        return data;
     }
 
     /**
