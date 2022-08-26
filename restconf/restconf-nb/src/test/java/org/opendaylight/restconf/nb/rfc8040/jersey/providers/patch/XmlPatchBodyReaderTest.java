@@ -137,6 +137,39 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     }
 
     /**
+     * Test of Yang Patch on the top augmented element.
+     */
+    @Test
+    public void moduleTargetTopLevelAugmentedContainerTest() throws Exception {
+        mockBodyReader("", xmlToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream("""
+            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                <patch-id>test-patch</patch-id>
+                <comment>This test patch for augmented element</comment>
+                <edit>
+                    <edit-id>edit1</edit-id>
+                    <operation>replace</operation>
+                    <target>/test-m:container-root/test-m:container-lvl1/test-m-aug:container-aug</target>
+                    <value>
+                        <container-aug xmlns="test-ns-aug">
+                            <leaf-aug>data</leaf-aug>
+                        </container-aug>
+                    </value>
+                </edit>
+            </yang-patch>
+            """.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
+                .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
+                .build();
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(CONT_AUG_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
      * Test of Yang Patch on the top system map node element.
      */
     @Test

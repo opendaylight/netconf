@@ -186,6 +186,43 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
     }
 
     /**
+     * Test of Yang Patch on the top augmented element.
+     */
+    @Test
+    public void modulePatchTargetTopLevelAugmentedContainerTest() throws Exception {
+        mockBodyReader("", jsonToPatchBodyReader, false);
+        final var inputStream = new ByteArrayInputStream("""
+            {
+                "ietf-yang-patch:yang-patch": {
+                    "patch-id": "test-patch",
+                    "comment": "comment",
+                    "edit": [
+                        {
+                            "edit-id": "edit1",
+                            "operation": "replace",
+                            "target": "/test-m:container-root/test-m:container-lvl1/test-m-aug:container-aug",
+                            "value": {
+                                "container-aug": {
+                                    "leaf-aug": "data"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+            """.getBytes(StandardCharsets.UTF_8));
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
+                .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
+                .build();
+        final var returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(CONT_AUG_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
+    }
+
+    /**
      * Test of Yang Patch on the system map node element.
      */
     @Test
