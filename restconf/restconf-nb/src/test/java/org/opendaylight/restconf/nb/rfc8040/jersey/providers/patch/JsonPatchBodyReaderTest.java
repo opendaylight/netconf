@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThrows;
 
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
+import com.google.common.base.Preconditions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -20,6 +21,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.data.api.schema.MixinNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
@@ -176,5 +178,21 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
         final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         checkPatchContext(returnValue);
+    }
+
+    /**
+     * TODO
+     */
+    @Test
+    public void modulePatchTargetTopLevelAugmentedContainerTest() throws Exception {
+        final String uri = "";
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
+
+        final InputStream inputStream = JsonBodyReaderTest.class.getResourceAsStream(
+                "/instanceidentifier/json/jsonPATCHdataAugmentedElement.json");
+
+        final PatchContext returnValue = jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        Preconditions.checkArgument(!(returnValue.getData().get(0).getNode() instanceof MixinNode));
     }
 }
