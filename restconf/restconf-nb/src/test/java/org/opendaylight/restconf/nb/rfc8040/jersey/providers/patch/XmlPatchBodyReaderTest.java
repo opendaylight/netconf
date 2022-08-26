@@ -18,6 +18,9 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
@@ -126,5 +129,24 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHTargetTopLevelContainerWithEmptyURI.xml");
         checkPatchContext(xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream));
+    }
+
+    /**
+     * Test of Yang Patch on the top augmented element.
+     */
+    @Test
+    public void moduleTargetTopLevelAugmentedContainerTest() throws Exception {
+        mockBodyReader("", xmlToPatchBodyReader, false);
+        final var inputStream = XmlBodyReaderTest.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAugmentedElement.xml");
+        final var expectedData = Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(CONT_AUG_AUG_QNAME))
+                .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
+                .build();
+        final var returnValue = xmlToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        checkPatchContext(returnValue);
+        final var data = returnValue.getData().get(0).getNode();
+        assertEquals(CONT_AUG_QNAME, data.getIdentifier().getNodeType());
+        assertEquals(expectedData, data);
     }
 }
