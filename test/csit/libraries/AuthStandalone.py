@@ -87,7 +87,7 @@ class _BasicReusingSession(object):
 
     def __init__(self, ip, username="", password="", port="8181"):
         """Initialize session using hardcoded text data, remember credentials."""
-        self.rest_prefix = "http://" + ip + ":" + port + "/restconf/"
+        self.rest_prefix = "http://" + ip + ":" + port + "/rests/"
         self.session = requests.Session()
         if username:
             self.session.auth = (username, password)  # May work with non-string values
@@ -107,7 +107,7 @@ class _BasicClosingSession(object):
 
     def __init__(self, ip, username="", password="", port="8181"):
         """Prepare session initialization data using hardcoded text, remember credentials."""
-        self.rest_prefix = "http://" + ip + ":" + port + "/restconf/"
+        self.rest_prefix = "http://" + ip + ":" + port + "/rests/"
         if username:
             self.auth = (username, password)  # May work with non-string values
         else:
@@ -135,7 +135,7 @@ class _TokenReusingSession(object):
     def __init__(self, ip, username, password, scope, port="8181"):
         """Initialize session using hardcoded text data."""
         self.auth_url = "http://" + ip + ":" + port + "/oauth2/token"
-        self.rest_prefix = "http://" + ip + ":" + port + "/restconf/"
+        self.rest_prefix = "http://" + ip + ":" + port + "/rests/"
         self.auth_data = "grant_type=password&username=" + username
         self.auth_data += "&password=" + password + "&scope=" + scope
         self.auth_header = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -184,7 +184,7 @@ class _TokenClosingSession(object):
     def __init__(self, ip, username, password, scope, port="8181"):
         """Prepare session initialization data using hardcoded text."""
         self.auth_url = "http://" + ip + ":" + port + "/oauth2/token"
-        self.rest_prefix = "http://" + ip + ":" + port + "/restconf/"
+        self.rest_prefix = "http://" + ip + ":" + port + "/rests/"
         self.auth_data = "grant_type=password&username=" + username
         self.auth_data += "&password=" + password + "&scope=" + scope
         self.auth_header = {"Content-Type": "application/x-www-form-urlencoded"}
