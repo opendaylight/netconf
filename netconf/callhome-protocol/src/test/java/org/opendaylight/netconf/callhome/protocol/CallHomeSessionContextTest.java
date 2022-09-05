@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -32,7 +33,6 @@ import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.AttributeRepository.AttributeKey;
 import org.opendaylight.netconf.shaded.sshd.common.channel.StreamingChannel;
@@ -162,7 +162,8 @@ public class CallHomeSessionContextTest {
         OpenFuture mockFuture = mock(OpenFuture.class);
         doReturn(true).when(mockFuture).isOpened();
 
-        instance = new TestableContext(mockSession, mockAuth, mockFactory, mockMinaChannel);
+        instance = spy(new CallHomeSessionContext(mockSession, mockAuth, mockFactory));
+        doReturn(mockMinaChannel).when(instance).newMinaSshNettyChannel(any());
         SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel);
         // when
         listener.operationComplete(mockFuture);
@@ -194,20 +195,5 @@ public class CallHomeSessionContextTest {
         instance = new CallHomeSessionContext(mockSession, mockAuth, realFactory);
         verify(mockSession, times(0)).setAttribute(any(), any());
         assertNull(CallHomeSessionContext.getFrom(mockSession));
-    }
-
-    static class TestableContext extends CallHomeSessionContext {
-        MinaSshNettyChannel minaMock;
-
-        TestableContext(final ClientSession sshSession, final CallHomeAuthorization authorization,
-                        final CallHomeSessionContext.Factory factory, final MinaSshNettyChannel minaMock) {
-            super(sshSession, authorization, factory);
-            this.minaMock = minaMock;
-        }
-
-        @Override
-        protected MinaSshNettyChannel newMinaSshNettyChannel(final ClientChannel netconfChannel) {
-            return minaMock;
-        }
     }
 }
